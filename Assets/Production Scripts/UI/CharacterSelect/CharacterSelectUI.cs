@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -94,12 +95,12 @@ namespace Vi.UI
 
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
-            addCharacterButton.interactable = false;
+            addCharacterButton.gameObject.SetActive(false);
             
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            addCharacterButton.interactable = WebRequestManager.Singleton.Characters.Count < 5;
+            addCharacterButton.gameObject.SetActive(WebRequestManager.Singleton.Characters.Count < 5);
             webRequestStatusText.gameObject.SetActive(false);
 
             // Create character cards
@@ -597,7 +598,7 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             StartCoroutine(RefreshCharacterCards());
 

@@ -164,47 +164,20 @@ namespace Vi.Core
 
         private void Start()
         {
-            List<SkinnedMeshRenderer> skinnedMeshRenderersToEvaluate = new List<SkinnedMeshRenderer>();
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>())
+            SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
             {
-                if (skinnedMeshRenderer.GetComponentInParent<RuntimeWeapon>()) { continue; }
-                skinnedMeshRenderer.enabled = false;
-                skinnedMeshRenderersToEvaluate.Add(skinnedMeshRenderer);
+                skinnedMeshRenderer.forceRenderingOff = true;
             }
-            StartCoroutine(DisplayRenderersBasedOnEquipment(skinnedMeshRenderersToEvaluate.ToArray()));
+            StartCoroutine(TurnRenderersBackOn());
         }
 
-        private IEnumerator DisplayRenderersBasedOnEquipment(SkinnedMeshRenderer[] skinnedMeshRenderersToEvaluate)
+        private IEnumerator TurnRenderersBackOn()
         {
-            yield return new WaitUntil(() => weaponHandler.WeaponInitialized);
-            List<SkinnedMeshRenderer> renderersAlreadyEvaluated = new List<SkinnedMeshRenderer>();
-            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
+            yield return null;
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>(true))
             {
-                WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == equipmentType);
-                if (wearableEquipmentRendererDefinition != null)
-                {
-                    for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
-                    {
-                        if (wearableEquipmentInstances.ContainsKey(equipmentType))
-                        {
-                            SkinnedMeshRenderer[] skinnedMeshRenderers = wearableEquipmentInstances[equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                            if (skinnedMeshRenderers.Length > 1)
-                                skinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
-                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !wearableEquipmentInstances[equipmentType];
-                        }
-                        else
-                        {
-                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
-                        }
-                        renderersAlreadyEvaluated.Add(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i]);
-                    }
-                }
-            }
-
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderersToEvaluate)
-            {
-                if (renderersAlreadyEvaluated.Contains(skinnedMeshRenderer)) { continue; }
-                skinnedMeshRenderer.enabled = true;
+                skinnedMeshRenderer.forceRenderingOff = false;
             }
         }
 
@@ -250,14 +223,14 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (attributes.IsPulled())
-                {
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
-                }
-                else if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
+                if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
                 {
                     Transform grabAssailant = attributes.GetGrabAssailant().transform;
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude);
+                }
+                else if (attributes.IsPulled())
+                {
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
                 else
                 {

@@ -17,7 +17,7 @@ MonoBehaviour:
   blockingLocomotion: 0
   maxHP: 100
   maxStamina: 100
-  staminaRecoveryRate: 5
+  staminaRecoveryRate: 6
   staminaDelay: 1
   maxDefense: 100
   defenseRecoveryRate: 5
@@ -42,7 +42,7 @@ MonoBehaviour:
   blockVFXPrefab: {fileID: 1812881953744270, guid: ed0c022a338d3384d9ee622d354a94e2,
     type: 3}
   weaponModelData:
-  - skinPrefab: {fileID: 8191490173264096761, guid: ecb3e8a70c606f0428e77dc916468137,
+  - skinPrefab: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df,
       type: 3}
     data:
     - weaponPrefab: {fileID: 8233962304293885144, guid: bc30ff30053a8eb45906debad5bc4872,
@@ -66,7 +66,7 @@ MonoBehaviour:
       weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-  - skinPrefab: {fileID: 5628185823718001598, guid: d4c9b99b7fd5a2a4ca735f455c0e6c43,
+  - skinPrefab: {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785,
       type: 3}
     data:
     - weaponPrefab: {fileID: 8233962304293885144, guid: bc30ff30053a8eb45906debad5bc4872,
@@ -88,26 +88,6 @@ MonoBehaviour:
       weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-  - skinPrefab: {fileID: 2056428012761917673, guid: 1661f1dde06ac60488f11676dadcfe60,
-      type: 3}
-    data:
-    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
-        type: 3}
-      weaponBone: 18
-      weaponPositionOffset: {x: 0.09, y: -0.028, z: 0.01}
-      weaponRotationOffset: {x: 92.96701, y: -147.181, z: -167.978}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-  - skinPrefab: {fileID: 3053794231721553574, guid: 0bd975ac38fa2ef478d9b5cd810a7824,
-      type: 3}
-    data:
-    - weaponPrefab: {fileID: 899434540764439098, guid: d9fe2ae1537d2a74e81f23456b098583,
-        type: 3}
-      weaponBone: 18
-      weaponPositionOffset: {x: 0.0905, y: -0.0224, z: 0.009}
-      weaponRotationOffset: {x: 81.825, y: 25.117, z: 4.348}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:

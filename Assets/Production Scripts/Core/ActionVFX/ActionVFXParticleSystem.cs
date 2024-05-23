@@ -60,7 +60,7 @@ namespace Vi.Core
                 while (endBoundsPoint != Vector3.zero)
                 {
                     RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    if (Application.isEditor) { Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3); }
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                     bool bHit = false;

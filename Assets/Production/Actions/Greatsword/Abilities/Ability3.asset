@@ -163,7 +163,7 @@ MonoBehaviour:
   shouldFlinch: 0
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 1
+  shouldPlayHitReaction: 0
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -258,12 +258,11 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
+  animationSpeed: 2
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 15
-  agentDefenseCost: 0
+  agentStaminaCost: 30
   agentRageCost: 0
-  effectedWeaponBones: 0f000000
+  effectedWeaponBones: 
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -274,21 +273,20 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.4
   recoveryNormalizedTime: 0.7
-  damage: 10
+  isAffectedByRage: 1
+  damage: 0
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 3
-  timeBetweenHits: 0.1
-  isBlockable: 1
+  maxHitLimit: 0
+  timeBetweenHits: 0
+  isBlockable: 0
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
-  isFollowUpAttack: 1
+  isFollowUpAttack: 0
   ailment: 0
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
@@ -301,17 +299,20 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 3daf3a15cfd146543942e4b6524260ad, type: 3}
-  abilityCooldownTime: 15
-  statusesToApplyToSelfOnActivate: []
+  abilityCooldownTime: 30
+  statusesToApplyToSelfOnActivate:
+  - status: 1
+    value: 0.1
+    duration: 10
+    delay: 1
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
-  - {fileID: 4063615639490360170, guid: c1bded535e92346aa9c7a7936e89300e, type: 3}
-  - {fileID: 1307477173093867283, guid: 150c2ee685cd44eada9e9e2f97e60186, type: 3}
+  - {fileID: 8145130450554728973, guid: 29424c4facc574087bc2f95ce8e80ebe, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 0, y: 0, z: 0}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 60
   canLunge: 0
   minLungeDistance: 2.5

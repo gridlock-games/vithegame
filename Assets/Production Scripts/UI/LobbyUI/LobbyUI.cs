@@ -361,7 +361,7 @@ namespace Vi.UI
 
         public void ReturnToCharacterSelect()
         {
-            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(true); }
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
         }

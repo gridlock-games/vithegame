@@ -12,6 +12,8 @@ namespace Vi.ScriptableObjects
         public CharacterReference.EquipmentType equipmentType;
         public bool shouldDisableCharSkinRenderer;
 
+        private const bool shouldDebugWarnings = false;
+
         private void Start()
         {
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
@@ -28,9 +30,9 @@ namespace Vi.ScriptableObjects
             if (renderList.Length == 0)
                 return;
 
-            if (equipmentType == CharacterReference.EquipmentType.Cape)
+            foreach (SkinnedMeshRenderer srenderer in renderList)
             {
-                foreach (SkinnedMeshRenderer srenderer in renderList)
+                if (srenderer.GetComponent<MagicaCloth2.MagicaCloth>())
                 {
                     foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {
@@ -39,7 +41,7 @@ namespace Vi.ScriptableObjects
                         {
                             if (kvp.Key.name == potentialBone.name) { shouldSkip = true; break; }
                         }
-                        
+
                         if (shouldSkip) { break; }
 
                         Transform boneToMap = System.Array.Find(srenderer.bones, item => item.name == potentialBone.name);
@@ -50,10 +52,7 @@ namespace Vi.ScriptableObjects
                     }
                     srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
                 }
-            }
-            else
-            {
-                foreach (SkinnedMeshRenderer srenderer in renderList)
+                else // If this is not a cloth
                 {
                     Transform[] newBones = new Transform[srenderer.bones.Length];
 
@@ -63,7 +62,7 @@ namespace Vi.ScriptableObjects
 
                         if (!boneMap.TryGetValue(bone.name, out newBones[i]))
                         {
-                            if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
+                            if (Application.isEditor & shouldDebugWarnings) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
                         }
                     }
                     srenderer.bones = newBones;
@@ -103,7 +102,7 @@ namespace Vi.ScriptableObjects
         {
             if (!boneMap.TryGetValue(_name, out Transform _rootBone))
             {
-                if (Application.isEditor) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
+                if (Application.isEditor & shouldDebugWarnings) { Debug.LogWarning(name + " Unable to map bone \"" + _name + "\" to target skeleton."); }
             }
             return _rootBone;
         }
