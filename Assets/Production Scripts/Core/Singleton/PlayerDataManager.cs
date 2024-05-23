@@ -85,7 +85,7 @@ namespace Vi.Core
             SetMap(map);
         }
 
-        private NetworkVariable<NetworkString512Bytes> gameModeSettings = new NetworkVariable<NetworkString512Bytes>();
+        private NetworkVariable<FixedString512Bytes> gameModeSettings = new NetworkVariable<FixedString512Bytes>();
 
         public string GetGameModeSettings() { return gameModeSettings.Value.ToString(); }
 
@@ -996,6 +996,8 @@ namespace Vi.Core
             spawnPlayerRunning = false;
         }
 
+        [HideInInspector] public bool wasDisconnectedByClient;
+
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
@@ -1005,10 +1007,13 @@ namespace Vi.Core
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
             }
-            if (IsClient & !IsServer)
+            if (IsClient)
             {
-                // This object gets despawned, so make sure to not start this on a networkobject
-                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());
+                if (!wasDisconnectedByClient)
+                {
+                    // This object gets despawned, so make sure to not start this on a networkobject
+                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());
+                }
             }
         }
 

@@ -86,7 +86,7 @@ namespace Vi.Core
         {
             if (weaponTrail == null) { return; }
 
-            if (parentWeaponHandler.IsAttacking & !isStowed)
+            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
             {
                 weaponTrail.Activate();
             }

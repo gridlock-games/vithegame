@@ -65,7 +65,7 @@ namespace Vi.UI
             if (!attributes) { transform.GetChild(0).gameObject.SetActive(false); return; }
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
-            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
+            if (nameDisplay.isActiveAndEnabled) { nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString(); }
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
