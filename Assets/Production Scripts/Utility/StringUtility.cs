@@ -1,6 +1,5 @@
 using System;
 using System.Text.RegularExpressions;
-using Unity.Netcode;
 using Unity.Collections;
 
 namespace Vi.Utility
@@ -61,6 +60,18 @@ namespace Vi.Utility
             if (char.IsLower(returnValue[0])) { returnValue = char.ToUpper(returnValue[0]) + returnValue[1..]; }
 
             return returnValue;
+        }
+
+        public static string EvaluateFixedString(FixedString64Bytes input)
+        {
+            if (input == "")
+            {
+                return null;
+            }
+            else
+            {
+                return input.ToString();
+            }
         }
     }
 }

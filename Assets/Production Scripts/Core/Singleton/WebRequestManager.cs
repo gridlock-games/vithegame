@@ -11,7 +11,6 @@ using System.Linq;
 using Vi.Utility;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
-using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -1538,31 +1537,19 @@ namespace Vi.Core
                 this.charId = charId;
                 this.loadout = new NestedCharacterLoadoutPutPayload()
                 {
-                    loadoutSlot = EvaluateFixedString(loadout.loadoutSlot),
-                    helmGearItemId = EvaluateFixedString(loadout.helmGearItemId),
-                    chestArmorGearItemId = EvaluateFixedString(loadout.chestArmorGearItemId),
-                    shouldersGearItemId = EvaluateFixedString(loadout.shouldersGearItemId),
-                    bootsGearItemId = EvaluateFixedString(loadout.bootsGearItemId),
-                    pantsGearItemId = EvaluateFixedString(loadout.pantsGearItemId),
-                    beltGearItemId = EvaluateFixedString(loadout.beltGearItemId),
-                    glovesGearItemId = EvaluateFixedString(loadout.glovesGearItemId),
-                    capeGearItemId = EvaluateFixedString(loadout.capeGearItemId),
-                    robeGearItemId = EvaluateFixedString(loadout.robeGearItemId),
-                    weapon1ItemId = EvaluateFixedString(loadout.weapon1ItemId),
-                    weapon2ItemId = EvaluateFixedString(loadout.weapon2ItemId)
+                    loadoutSlot = StringUtility.EvaluateFixedString(loadout.loadoutSlot),
+                    helmGearItemId = StringUtility.EvaluateFixedString(loadout.helmGearItemId),
+                    chestArmorGearItemId = StringUtility.EvaluateFixedString(loadout.chestArmorGearItemId),
+                    shouldersGearItemId = StringUtility.EvaluateFixedString(loadout.shouldersGearItemId),
+                    bootsGearItemId = StringUtility.EvaluateFixedString(loadout.bootsGearItemId),
+                    pantsGearItemId = StringUtility.EvaluateFixedString(loadout.pantsGearItemId),
+                    beltGearItemId = StringUtility.EvaluateFixedString(loadout.beltGearItemId),
+                    glovesGearItemId = StringUtility.EvaluateFixedString(loadout.glovesGearItemId),
+                    capeGearItemId = StringUtility.EvaluateFixedString(loadout.capeGearItemId),
+                    robeGearItemId = StringUtility.EvaluateFixedString(loadout.robeGearItemId),
+                    weapon1ItemId = StringUtility.EvaluateFixedString(loadout.weapon1ItemId),
+                    weapon2ItemId = StringUtility.EvaluateFixedString(loadout.weapon2ItemId)
                 };
-            }
-
-            private static string EvaluateFixedString(FixedString64Bytes input)
-            {
-                if (input == "")
-                {
-                    return null;
-                }
-                else
-                {
-                    return input.ToString();
-                }
             }
 
             public struct NestedCharacterLoadoutPutPayload
