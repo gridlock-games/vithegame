@@ -10,6 +10,14 @@ namespace Vi.Core
     {
         private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
 
+        private void Awake()
+        {
+            foreach (Collider col in GetComponents<Collider>())
+            {
+                col.enabled = NetworkManager.Singleton.IsServer;
+            }
+        }
+
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 

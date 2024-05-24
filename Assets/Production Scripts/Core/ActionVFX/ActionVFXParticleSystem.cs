@@ -42,6 +42,7 @@ namespace Vi.Core
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
+                col.enabled = NetworkManager.Singleton.IsServer;
             }
         }
         
