@@ -20,17 +20,17 @@ PrefabInstance:
     - target: {fileID: 3278298057893725235, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
-      value: 0.58431375
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3278298057893725235, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.58431375
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3278298057893725235, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.62352943
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3278298057893725246, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
@@ -75,17 +75,17 @@ PrefabInstance:
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
-      value: 0.8784314
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.43137255
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.16862746
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
@@ -175,22 +175,22 @@ PrefabInstance:
     - target: {fileID: 8309988851213645458, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
-      value: 0.25490198
+      value: 0.23529412
       objectReference: {fileID: 0}
     - target: {fileID: 8309988851213645458, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
-      value: 0.58431375
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8309988851213645458, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.58431375
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8309988851213645458, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.62352943
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8309988851213645458, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
@@ -276,6 +276,8 @@ MonoBehaviour:
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 0}
   shouldUseAttackerPositionForHitAngles: 1
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
