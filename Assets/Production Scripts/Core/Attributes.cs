@@ -800,7 +800,7 @@ namespace Vi.Core
                 if (knockupHitCounter >= knockupHitLimit)
                 {
                     if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                    SetInviniciblity(recoveryTimeInvincibilityBuffer);
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
                     ailment.Value = ActionClip.Ailment.None;
                 }
             }
