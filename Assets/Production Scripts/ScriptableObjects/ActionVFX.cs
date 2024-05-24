@@ -48,7 +48,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] protected AudioClip audioClipToPlayOnAwake;
         [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
-        protected void Awake()
+        protected void OnEnable()
         {
             if (Application.isEditor)
             {
@@ -67,7 +67,7 @@ namespace Vi.ScriptableObjects
             if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }
         }
 
-        protected void OnDestroy()
+        protected void OnDisable()
         {
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnAwake, transform.position); }
         }

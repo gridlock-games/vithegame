@@ -26,9 +26,8 @@ namespace Vi.Core
         }
 
         private ParticleSystem[] particleSystems;
-        private new void Awake()
+        private void Awake()
         {
-            base.Awake();
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {
