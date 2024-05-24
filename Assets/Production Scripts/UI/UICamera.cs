@@ -33,6 +33,8 @@ namespace Vi.UI
         private bool lastCamState;
         private void Update()
         {
+            FindMainCamera();
+
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
             else if (mainCamera) { cam.enabled = false; }

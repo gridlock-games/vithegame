@@ -887,6 +887,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            FindMainCamera();
+
             if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
