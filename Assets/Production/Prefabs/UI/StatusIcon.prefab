@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3321638576694354118}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Rotation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 5145321343530905508}
   - component: {fileID: 4287584883681620424}
   - component: {fileID: 5289229924889923600}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 2767710509328944842}
   - component: {fileID: 7719303888140642190}
   - component: {fileID: 3815674246196931400}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TimerText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -235,10 +235,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3323336303386597698}
+  - component: {fileID: 6226740205248010279}
   - component: {fileID: 5709321902845020933}
   - component: {fileID: 1903599086852953272}
   - component: {fileID: 2114845971928191588}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: StatusIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -266,6 +267,28 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 90, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &6226740205248010279
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514816889173562316}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!222 &5709321902845020933
 CanvasRenderer:
   m_ObjectHideFlags: 0

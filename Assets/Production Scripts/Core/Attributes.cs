@@ -123,6 +123,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
             statuses.OnListChanged += OnStatusChange;
+            activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
@@ -153,6 +154,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
             statuses.OnListChanged -= OnStatusChange;
+            activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
@@ -186,7 +188,7 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
             }
             else
             {
@@ -207,7 +209,7 @@ namespace Vi.Core
             if (current)
             {
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.transform); }
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
             }
             else
             {
@@ -439,7 +441,6 @@ namespace Vi.Core
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-            if (attacker.ShouldPlayHitStop()) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
             if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
@@ -648,7 +649,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
 
                 if (HPDamage != 0)
                 {
@@ -709,10 +710,8 @@ namespace Vi.Core
 
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
-        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
+        private void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
-            yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
-
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
                 TryAddStatus(status.status, status.value, status.duration, status.delay);
@@ -767,14 +766,14 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
                             knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
@@ -800,17 +799,8 @@ namespace Vi.Core
                 if (knockupHitCounter >= knockupHitLimit)
                 {
                     if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                    SetInviniciblity(recoveryTimeInvincibilityBuffer);
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
                     ailment.Value = ActionClip.Ailment.None;
-                }
-            }
-
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
-            {
-                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                {
-                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
-                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
                 }
             }
         }
@@ -1014,6 +1004,15 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            {
+                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                {
+                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                }
+            }
+
             if (current == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = false;
@@ -1169,6 +1168,21 @@ namespace Vi.Core
         {
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
+        }
+
+        public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
+        private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
+        {
+            ActiveStatusesWasUpdatedThisFrame = true;
+            if (resetActiveStatusesBoolCoroutine != null) { StopCoroutine(resetActiveStatusesBoolCoroutine); }
+            resetActiveStatusesBoolCoroutine = StartCoroutine(ResetActiveStatusesWasUpdatedBool());
+        }
+
+        private Coroutine resetActiveStatusesBoolCoroutine;
+        private IEnumerator ResetActiveStatusesWasUpdatedBool()
+        {
+            yield return null;
+            ActiveStatusesWasUpdatedThisFrame = false;
         }
 
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)

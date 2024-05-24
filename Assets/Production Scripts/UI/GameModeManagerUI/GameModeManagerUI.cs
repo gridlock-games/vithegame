@@ -22,10 +22,7 @@ namespace Vi.UI
         protected void Start()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
             gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
@@ -48,12 +45,17 @@ namespace Vi.UI
             rightScoreText.text = gameModeManager.GetRightScoreString();
         }
 
-        protected void Update()
+        private void RefreshStatus()
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+        }
+
+        protected void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!gameModeManager.IsSpawned) { return; }
 

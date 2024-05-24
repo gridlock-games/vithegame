@@ -104,6 +104,9 @@ namespace Vi.UI
 
             aliveUIChildCanvases = aliveUIParent.GetComponentsInChildren<Canvas>(true);
             deathUIChildCanvases = deathUIParent.GetComponentsInChildren<Canvas>(true);
+
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            RefreshStatus();
         }
 
         private Vector3 equippedWeaponCardAnchoredPosition;
@@ -113,12 +116,6 @@ namespace Vi.UI
         private CanvasGroup[] canvasGroups;
         private void Start()
         {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
@@ -139,6 +136,14 @@ namespace Vi.UI
             UpdateTeammateAttributesList();
 
             UpdateWeapon(false);
+        }
+
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
         }
 
         private void UpdateTeammateAttributesList()
@@ -274,15 +279,17 @@ namespace Vi.UI
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
+        private void OnEnable()
+        {
+            RefreshStatus();
+        }
+
         List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
@@ -291,17 +298,20 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
+                if (attributes.ActiveStatusesWasUpdatedThisFrame)
                 {
-                    if (activeStatuses.Contains(statusIcon.Status))
+                    List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                    foreach (StatusIcon statusIcon in statusIcons)
                     {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
+                        if (activeStatuses.Contains(statusIcon.Status))
+                        {
+                            statusIcon.SetActive(true);
+                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        }
+                        else
+                        {
+                            statusIcon.SetActive(false);
+                        }
                     }
                 }
 

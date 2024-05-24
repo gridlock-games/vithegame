@@ -12,7 +12,8 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        private Dictionary<Weapon.WeaponBone, GameObject> weaponInstances = new Dictionary<Weapon.WeaponBone, GameObject>();
+        private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
+        private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
         public Weapon GetWeapon()
         {
@@ -33,6 +34,7 @@ namespace Vi.Core
             loadoutManager = GetComponent<LoadoutManager>();
             weaponInstance = ScriptableObject.CreateInstance<Weapon>();
             CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
+            RefreshStatus();
         }
 
         public bool WeaponInitialized { get; private set; }
@@ -102,16 +104,15 @@ namespace Vi.Core
 
         private void EquipWeapon()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                Destroy(kvp.Value);
+                Destroy(kvp.Value.gameObject);
             }
             weaponInstances.Clear();
+            shooterWeapons.Clear();
 
             CanAim = false;
-            Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
-            List<RuntimeWeapon> runtimeWeapons = new List<RuntimeWeapon>();
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
@@ -119,9 +120,16 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        GameObject instance = Instantiate(modelData.weaponPrefab);
-                        runtimeWeapons.Add(instance.GetComponent<RuntimeWeapon>());
-                        instances.Add(modelData.weaponBone, instance);
+                        RuntimeWeapon instance = Instantiate(modelData.weaponPrefab).GetComponent<RuntimeWeapon>();
+
+                        if (!instance)
+                        {
+                            Debug.LogError(instance + " does not have a runtime weapon component!");
+                            continue;
+                        }
+
+                        instance.SetWeaponBone(modelData.weaponBone);
+                        weaponInstances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
                         Transform bone = null;
@@ -139,15 +147,9 @@ namespace Vi.Core
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        if (instance.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                        {
-                            runtimeWeapon.SetWeaponBone(modelData.weaponBone);
-                        }
-                        else
-                        {
-                            Debug.LogWarning(instance + " does not have a runtime weapon component!");
-                        }
-                        CanAim = instance.GetComponent<ShooterWeapon>() | CanAim;
+                        ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
+                        if (shooterWeapon) { shooterWeapons.Add(shooterWeapon); }
+                        CanAim = shooterWeapon | CanAim;
                     }
                     broken = true;
                     break;
@@ -163,18 +165,10 @@ namespace Vi.Core
 
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
-            weaponInstances = instances;
-
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            List<RuntimeWeapon> runtimeWeaponList = weaponInstances.Values.ToList();
+            foreach (RuntimeWeapon runtimeWeapon in runtimeWeaponList)
             {
-                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                {
-                    runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeapons);
-                }
-                else
-                {
-                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
-                }
+                runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeaponList);
             }
         }
 
@@ -213,9 +207,9 @@ namespace Vi.Core
 
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
+                kvp.Value.ResetHitCounter();
             }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -299,21 +293,21 @@ namespace Vi.Core
             switch (actionVFXPrefab.transformType)
             {
                 case ActionVFX.TransformType.Stationary:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.Projectile:
                     if (isPreviewVFX)
                     {
-                        vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
                         vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         break;
                     }
@@ -322,12 +316,12 @@ namespace Vi.Core
                     {
                         if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                         {
-                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
+                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
                             vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                         else
                         {
-                            vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
+                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
                             vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
                     }
@@ -339,7 +333,7 @@ namespace Vi.Core
 
                     if (bHit)
                     {
-                        vfxInstance = Instantiate(actionVFXPrefab.gameObject,
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
                             Quaternion.LookRotation(Vector3.Cross(hit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
@@ -347,7 +341,7 @@ namespace Vi.Core
                     }
                     else if (isPreviewVFX)
                     {
-                        vfxInstance = Instantiate(actionVFXPrefab.gameObject,
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
                             attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
@@ -356,16 +350,16 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ParentToVictim:
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.StationaryOnVictim:
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.AimAtTarget:
-                    vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
+                    vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
 
                     // Look at point then apply rotation offset
@@ -382,7 +376,7 @@ namespace Vi.Core
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                    StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
@@ -394,7 +388,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    StartCoroutine(DestroyVFXWhenFinishedPlaying(vfxInstance));
+                    StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
@@ -407,44 +401,6 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
-        }
-
-        public static IEnumerator DestroyVFXWhenFinishedPlaying(GameObject vfxInstance)
-        {
-            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!particleSystem.isPlaying) { break; }
-                }
-            }
-
-            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!audioSource.isPlaying) { break; }
-                }
-            }
-
-            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!visualEffect.HasAnySystemAwake()) { break; }
-                }
-            }
-            
-            Destroy(vfxInstance);
         }
 
         public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
@@ -701,17 +657,17 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    if (FasterPlayerPrefs.Singleton.GetString("ZoomMode") == "TOGGLE")
+                    if (zoomMode == "TOGGLE")
                     {
                         if (isPressed) { aiming.Value = !aiming.Value; }
                     }
-                    else if (FasterPlayerPrefs.Singleton.GetString("ZoomMode") == "HOLD")
+                    else if (zoomMode == "HOLD")
                     {
                         aiming.Value = isPressed;
                     }
                     else
                     {
-                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + zoomMode);
                     }
                 }
                 else
@@ -892,12 +848,9 @@ namespace Vi.Core
 
         public bool IsNextProjectileDamageMultiplied()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    return shooterWeapon.GetNextDamageMultiplier() > 1;
-                }
+                return shooterWeapon.GetNextDamageMultiplier() > 1;
             }
             return false;
         }
@@ -909,21 +862,30 @@ namespace Vi.Core
         private void Aim(bool isAiming)
         {
             animationHandler.Animator.SetBool("Aiming", isAiming);
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
-                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
-                }
+                CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
+                animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+                ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
+                animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
             }
+        }
+
+        private string zoomMode = "TOGGLE";
+        private string blockingMode = "HOLD";
+        private bool disableBots;
+        private void RefreshStatus()
+        {
+            zoomMode = FasterPlayerPrefs.Singleton.GetString("ZoomMode");
+            blockingMode = FasterPlayerPrefs.Singleton.GetString("BlockingMode");
+            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
         }
 
         private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             animationHandler.Animator.SetBool("Blocking", IsBlocking);
 
             if (IsServer)
@@ -943,16 +905,9 @@ namespace Vi.Core
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
 
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                {
-                    runtimeWeapon.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
-                }
-                else
-                {
-                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
-                }
+                kvp.Value.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
             }
         }
 
@@ -981,13 +936,10 @@ namespace Vi.Core
             if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (!animationHandler.IsAtRest()) { return; }
 
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    StartCoroutine(Reload(shooterWeapon));
-                    break;
-                }
+                StartCoroutine(Reload(shooterWeapon));
+                break;
             }
         }
 
@@ -1007,17 +959,17 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             bool isPressed = value.isPressed;
-            if (FasterPlayerPrefs.Singleton.GetString("BlockingMode") == "TOGGLE")
+            if (blockingMode == "TOGGLE")
             {
                 if (isPressed) { isBlocking.Value = !isBlocking.Value; }
             }
-            else if (FasterPlayerPrefs.Singleton.GetString("BlockingMode") == "HOLD")
+            else if (blockingMode == "HOLD")
             {
                 isBlocking.Value = isPressed;
             }
             else
             {
-                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + blockingMode);
             }
         }
 
@@ -1038,15 +990,15 @@ namespace Vi.Core
         void OnDisableBots()
         {
             if (!Application.isEditor) { return; }
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"))).ToString());
+            FasterPlayerPrefs.Singleton.SetString("DisableBots", (!disableBots).ToString());
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
+            if (disableBots)
             {
-                Debug.Log("Disabled Bot AI");
+                Debug.Log("Enabled Bot AI");
             }
             else
             {
-                Debug.Log("Enabled Bot AI");
+                Debug.Log("Disabled Bot AI");
             }
         }
 

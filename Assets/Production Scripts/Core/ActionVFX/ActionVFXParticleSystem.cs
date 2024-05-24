@@ -26,9 +26,8 @@ namespace Vi.Core
         }
 
         private ParticleSystem[] particleSystems;
-        private new void Awake()
+        private void Awake()
         {
-            base.Awake();
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {
@@ -43,6 +42,7 @@ namespace Vi.Core
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
+                col.enabled = NetworkManager.Singleton.IsServer;
             }
         }
         

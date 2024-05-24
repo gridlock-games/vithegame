@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -29,9 +30,8 @@ namespace Vi.Core
             GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
         }
 
-        private new void Awake()
+        private void Awake()
         {
-            base.Awake();
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -62,14 +62,14 @@ namespace Vi.Core
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
         }
 
-        private new void OnDestroy()
+        private new void OnDisable()
         {
-            base.OnDestroy();
+            base.OnDisable();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                GameObject g = Instantiate(prefab, transform.position, transform.rotation);
+                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                 if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
             }
         }
 

@@ -21,15 +21,17 @@ namespace Vi.UI
             iconImage.sprite = statusImageReference.GetStatusIcon(Status);
         }
 
+        private Canvas canvas;
         private void Awake()
         {
+            canvas = GetComponent<Canvas>();
             image = GetComponent<Image>();
             SetActive(false);
         }
 
         public void SetActive(bool isActive)
         {
-            transform.GetChild(0).gameObject.SetActive(isActive);
+            canvas.enabled = isActive;
             image.enabled = isActive;
         }
     }

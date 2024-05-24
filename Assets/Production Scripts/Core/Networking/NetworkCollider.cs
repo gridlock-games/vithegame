@@ -7,11 +7,12 @@ namespace Vi.Core
     public class NetworkCollider : MonoBehaviour
     {
         public Attributes Attributes { get; private set; }
-        private MovementHandler movementHandler;
+        public MovementHandler MovementHandler { get; private set; }
+
         private Collider[] colliders;
         private void Awake()
         {
-            movementHandler = GetComponentInParent<MovementHandler>();
+            MovementHandler = GetComponentInParent<MovementHandler>();
             Attributes = GetComponentInParent<Attributes>();
             colliders = GetComponentsInChildren<Collider>();
         }
@@ -27,19 +28,19 @@ namespace Vi.Core
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.transform.root == transform.root) { return; }
-            movementHandler.ReceiveOnCollisionEnterMessage(collision);
+            MovementHandler.ReceiveOnCollisionEnterMessage(collision);
         }
 
         private void OnCollisionStay(Collision collision)
         {
             if (collision.transform.root == transform.root) { return; }
-            movementHandler.ReceiveOnCollisionStayMessage(collision);
+            MovementHandler.ReceiveOnCollisionStayMessage(collision);
         }
 
         private void OnCollisionExit(Collision collision)
         {
             if (collision.transform.root == transform.root) { return; }
-            movementHandler.ReceiveOnCollisionExitMessage(collision);
+            MovementHandler.ReceiveOnCollisionExitMessage(collision);
         }
 
         private void OnDrawGizmos()

@@ -36,7 +36,7 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private void Start()
         {
-            if (FasterPlayerPrefs.Singleton.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
+            RefreshStatus();
 
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
@@ -46,6 +46,16 @@ namespace Vi.UI
 
             movementHandler = transform.root.GetComponent<MovementHandler>();
             playerInput = movementHandler.GetComponent<PlayerInput>();
+        }
+
+        private void RefreshStatus()
+        {
+            if (FasterPlayerPrefs.Singleton.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
+        }
+
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
         }
 
         private void OnEnable()

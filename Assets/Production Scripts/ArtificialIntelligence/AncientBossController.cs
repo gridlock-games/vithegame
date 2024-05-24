@@ -148,8 +148,9 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.nextPosition = currentPosition.Value;
         }
 
-        private void Update()
+        private new void Update()
         {
+            base.Update();
             if (navMeshAgent.isOnNavMesh)
             {
                 if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance)

@@ -54,6 +54,17 @@ namespace Vi.Core
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
+            foreach (Collider col in colliders)
+            {
+                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
+                col.enabled = IsServer;
+            }
+        }
+
         private void Update()
         {
             if (!IsServer) { return; }
@@ -100,9 +111,9 @@ namespace Vi.Core
             base.OnDestroy();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                GameObject g = Instantiate(prefab, transform.position, transform.rotation);
+                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                 if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
             }
         }
 

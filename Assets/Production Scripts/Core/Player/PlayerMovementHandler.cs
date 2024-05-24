@@ -268,7 +268,6 @@ namespace Vi.Player
             {
                 cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.GetComponent<Camera>().enabled = true;
-                minimapCameraInstance.enabled = true;
 
                 playerInput.enabled = true;
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
@@ -280,7 +279,6 @@ namespace Vi.Player
             else
             {
                 Destroy(cameraController.gameObject);
-                Destroy(minimapCameraInstance.gameObject);
                 Destroy(playerInput);
             }
             movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
@@ -306,6 +304,7 @@ namespace Vi.Player
         {
             base.Awake();
             playerInput = GetComponent<PlayerInput>();
+            RefreshStatus();
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -327,9 +326,11 @@ namespace Vi.Player
         }
 
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
-        private readonly float minimapCameraOffset = 15;
-        private void Update()
+        private new void Update()
         {
+            base.Update();
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             FindMainCamera();
 
             if (!IsSpawned) { return; }
@@ -387,12 +388,6 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetBool("IsGrounded", isGrounded);
 
-            if (minimapCameraInstance)
-            {
-                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
-            }
-
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
@@ -423,6 +418,12 @@ namespace Vi.Player
 
         private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
+        private void RefreshStatus()
+        {
+            autoAim = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
+        }
+
+        private bool autoAim;
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
@@ -461,7 +462,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim")))
+            if (autoAim)
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {

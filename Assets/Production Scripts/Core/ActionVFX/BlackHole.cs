@@ -3,21 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(FollowUpVFX))]
     public class BlackHole : MonoBehaviour
     {
+        [SerializeField] private float duration = 3;
         [SerializeField] private float radius = 2;
         [SerializeField] private float forceMultiplier = 10;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
         [SerializeField] private ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
+        private float startTime;
+        private ParticleSystem ps;
         private FollowUpVFX vfx;
-        private void Start()
+        private void Awake()
         {
             vfx = GetComponent<FollowUpVFX>();
+            ps = GetComponent<ParticleSystem>();
+        }
+
+        private void OnEnable()
+        {
+            startTime = Time.time;
+        }
+
+        private void Update()
+        {
+            if (Time.time - startTime > duration)
+            {
+                ps.Pause(false);
+            }
         }
 
         Collider[] colliders = new Collider[20];
@@ -42,7 +60,7 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                        MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
                     }
                 }
@@ -53,7 +71,7 @@ namespace Vi.Core
             }
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
@@ -74,7 +92,7 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                        MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
 
                         ActionClip copy = Instantiate(vfx.ActionClip);
@@ -84,7 +102,7 @@ namespace Vi.Core
                         if (NetworkManager.Singleton.IsServer)
                         {
                             networkCollider.Attributes.ProcessProjectileHit(vfx.Attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
-                            copy, networkCollider.Attributes.transform.position, transform.position);
+                                copy, networkCollider.Attributes.transform.position, transform.position);
                         }
                     }
                 }
@@ -96,7 +114,7 @@ namespace Vi.Core
 
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(prefab, transform.position, transform.rotation)));
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
         }
 

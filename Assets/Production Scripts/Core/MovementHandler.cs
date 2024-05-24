@@ -33,17 +33,31 @@ namespace Vi.Core
         protected void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
+			RefreshStatus();
         }
 
-		public virtual void Flinch(Vector2 flinchAmount) { }
+		private Vector2 lookSensitivity;
+		private void RefreshStatus()
+		{
+			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);
+			zoomSensitivityMultiplier = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier");
+		}
 
+		protected void Update()
+        {
+			if (!IsLocalPlayer) { return; }
+			if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+		}
+
+        public virtual void Flinch(Vector2 flinchAmount) { }
+
+		private float zoomSensitivityMultiplier = 1;
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            Vector2 lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);
             if (weaponHandler)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
+                if (weaponHandler.IsAiming()) { lookSensitivity *= zoomSensitivityMultiplier; }
             }
             return lookInput * lookSensitivity;
         }

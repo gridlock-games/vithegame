@@ -42,10 +42,7 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
 
             attributes = GetComponentInParent<Attributes>();
 
@@ -62,6 +59,14 @@ namespace Vi.UI
             healthBarParent.localScale = Vector3.zero;
 
             UpdateNameTextAndColors();
+        }
+
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
         }
 
         private Camera mainCamera;
@@ -96,6 +101,11 @@ namespace Vi.UI
                     highestPoint = renderer.bounds.center;
                 }
             }
+        }
+
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
         }
 
         private void LateUpdate()
@@ -166,18 +176,21 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
-
-            List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-            foreach (StatusIcon statusIcon in statusIcons)
+            
+            if (attributes.ActiveStatusesWasUpdatedThisFrame)
             {
-                if (activeStatuses.Contains(statusIcon.Status))
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.SetActive(true);
-                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                }
-                else
-                {
-                    statusIcon.SetActive(false);
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
                 }
             }
         }

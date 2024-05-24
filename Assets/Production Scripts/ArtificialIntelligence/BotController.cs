@@ -85,6 +85,7 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
+            RefreshStatus();
         }
 
         private void Start()
@@ -268,8 +269,12 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private void Update()
+        private new void Update()
         {
+            base.Update();
+
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
             if (!CanMove()) { return; }
@@ -287,12 +292,19 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
             }
         }
+        
+        private void RefreshStatus()
+        {
+            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
+        }
+
+        private bool disableBots;
 
         private IEnumerator EvaluateBotLogic()
         {
             while (true)
             {
-                if (IsOwner & !bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
+                if (IsOwner & !disableBots)
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
 
@@ -329,7 +341,7 @@ namespace Vi.ArtificialIntelligence
 
                     EvaluteAction();
                 }
-                else if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
+                else if (disableBots)
                 {
                     if (navMeshAgent.isOnNavMesh)
                     {
