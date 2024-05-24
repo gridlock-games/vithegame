@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -96,7 +97,7 @@ namespace Vi.Core
 
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(prefab, transform.position, transform.rotation)));
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
         }
 

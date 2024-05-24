@@ -100,9 +100,9 @@ namespace Vi.Core
             base.OnDestroy();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                GameObject g = Instantiate(prefab, transform.position, transform.rotation);
+                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                 if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.DestroyVFXWhenFinishedPlaying(g));
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
             }
         }
 
