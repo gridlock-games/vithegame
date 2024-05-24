@@ -34,6 +34,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
                 pool.InactiveObjects.Remove(spawnableObj);
@@ -66,6 +67,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 pool.InactiveObjects.Remove(spawnableObj);
@@ -99,6 +101,8 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.transform.SetParent(parentTransform);
+                spawnableObj.transform.localPosition = Vector3.zero;
+                spawnableObj.transform.localRotation = Quaternion.identity;
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
