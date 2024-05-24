@@ -319,9 +319,15 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera) { return; }
+            mainCamera = Camera.main;
+        }
+
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private readonly float minimapCameraOffset = 15;
-        //private Vector2 lookInputToSubtract;
         private void Update()
         {
             if (!IsSpawned) { return; }
@@ -351,7 +357,7 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                                 foreach (RaycastHit hit in allHits)
                                 {
@@ -506,7 +512,7 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {
