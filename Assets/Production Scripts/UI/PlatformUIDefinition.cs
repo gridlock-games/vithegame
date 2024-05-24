@@ -21,7 +21,10 @@ namespace Vi.UI
 
         public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
 
-        public static bool UIElementIsAbleToBeModified(GameObject g) { return g.GetComponent<Button>() | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>()); }
+        public static bool UIElementIsAbleToBeModified(GameObject g)
+        {
+            return (g.GetComponent<Button>() & !g.name.Contains("Limits")) | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>());
+        }
 
         [System.Serializable]
         public struct UIDefinition
