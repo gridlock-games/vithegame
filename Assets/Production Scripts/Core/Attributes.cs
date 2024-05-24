@@ -767,14 +767,14 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
                             knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
