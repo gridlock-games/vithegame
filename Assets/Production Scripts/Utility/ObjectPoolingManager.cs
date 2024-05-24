@@ -9,7 +9,7 @@ namespace Vi.Utility
     {
         public static List<PooledObjectInfo> ObjectPools = new List<PooledObjectInfo>();
 
-        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
+        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.HideInHierarchy;
 
         public static GameObject SpawnObject(GameObject objectToSpawn)
         {
