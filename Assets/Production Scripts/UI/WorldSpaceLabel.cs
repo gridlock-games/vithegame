@@ -152,6 +152,7 @@ namespace Vi.UI
                 //Debug.LogWarning("Can't find a main camera for world space labels!");
             }
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
+            canvas.enabled = transform.localScale.magnitude > 0.01f;
 
             if (healthBarLocalScaleTarget == Vector3.zero)
             {
