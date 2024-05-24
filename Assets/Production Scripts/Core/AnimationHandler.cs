@@ -13,7 +13,6 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
-            Debug.Log(name + " " + actionClip.name + " action playing attempt");
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name, isFollowUpClip);
