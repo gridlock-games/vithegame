@@ -33,7 +33,13 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
-            transform.GetChild(0).gameObject.SetActive(attributes != null);
+            canvas.enabled = attributes != null;
+        }
+
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
         }
 
         private PlayerUI playerUI;
@@ -62,7 +68,7 @@ namespace Vi.UI
         public const float fillSpeed = 4;
         private void Update()
         {
-            if (!attributes) { transform.GetChild(0).gameObject.SetActive(false); return; }
+            if (!attributes) { canvas.enabled = false; return; }
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (nameDisplay.isActiveAndEnabled) { nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString(); }
