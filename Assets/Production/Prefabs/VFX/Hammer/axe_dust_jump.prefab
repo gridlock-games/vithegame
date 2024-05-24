@@ -7,6 +7,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1492178900878372935, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 1492178900878372935, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1492178900878372935, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1492178900878372935, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596108083174221, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596108083174221, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.7924528
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596108083174221, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.7924528
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596108083174221, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.7924528
+      objectReference: {fileID: 0}
     - target: {fileID: 5550403049875251280, guid: a1ec5084af0426e4b8c0e48774636073,
         type: 3}
       propertyPath: m_RootOrder
@@ -82,6 +122,11 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5550403049875251281, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
         type: 3}
       propertyPath: m_Name
@@ -117,3 +162,5 @@ MonoBehaviour:
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 0}

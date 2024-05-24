@@ -7,6 +7,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4629116891384550100, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891384550100, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891384550100, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891384550100, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
         type: 3}
       propertyPath: m_Name
@@ -87,6 +107,26 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4629116891520832364, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891520832364, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891520832364, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891520832364, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15a2a89b5459d534894b0f7b460682f4, type: 3}
 --- !u!1 &5556976136995777950 stripped
@@ -117,3 +157,5 @@ MonoBehaviour:
   crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 0}
