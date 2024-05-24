@@ -8,8 +8,8 @@ using Vi.Utility;
 
 public class DebugOverlay : MonoBehaviour
 {
-    [SerializeField] private GameObject debugCanvas;
-    [SerializeField] private GameObject consoleParent;
+    [SerializeField] private Canvas debugCanvas;
+    [SerializeField] private Canvas consoleParent;
     [SerializeField] private Text consoleLogText;
     [SerializeField] private Text fpsText;
     [SerializeField] private Text dividerText;
@@ -22,7 +22,7 @@ public class DebugOverlay : MonoBehaviour
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-        debugCanvas.SetActive(false);
+        debugCanvas.enabled = false;
         consoleLogText.text = myLog;
         DebugManager.instance.enableRuntimeUI = false;
 
@@ -81,9 +81,9 @@ public class DebugOverlay : MonoBehaviour
         bool fpsEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
         bool pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
 
-        debugCanvas.SetActive(consoleEnabled | fpsEnabled | pingEnabled);
+        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
 
-        consoleParent.SetActive(consoleEnabled);
+        consoleParent.enabled = consoleEnabled;
 
         if (fpsEnabled)
         {
