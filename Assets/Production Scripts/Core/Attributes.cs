@@ -806,15 +806,6 @@ namespace Vi.Core
                     ailment.Value = ActionClip.Ailment.None;
                 }
             }
-
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
-            {
-                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                {
-                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
-                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
-                }
-            }
         }
 
         private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
@@ -1015,6 +1006,15 @@ namespace Vi.Core
         {
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            {
+                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                {
+                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                }
+            }
 
             if (current == ActionClip.Ailment.Death)
             {
