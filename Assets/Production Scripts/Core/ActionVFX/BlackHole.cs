@@ -102,7 +102,7 @@ namespace Vi.Core
                         if (NetworkManager.Singleton.IsServer)
                         {
                             networkCollider.Attributes.ProcessProjectileHit(vfx.Attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
-                            copy, networkCollider.Attributes.transform.position, transform.position);
+                                copy, networkCollider.Attributes.transform.position, transform.position);
                         }
                     }
                 }
