@@ -294,10 +294,10 @@ MonoBehaviour:
   dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
-  canCancelAbilities: 0
-  canBeCancelledByLightAttacks: 0
-  canBeCancelledByHeavyAttacks: 0
-  canBeCancelledByAbilities: 0
+  canCancelAbilities: 1
+  canBeCancelledByLightAttacks: 1
+  canBeCancelledByHeavyAttacks: 1
+  canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 91bcf5c903bac484b8dbfaba8d4c8662, type: 3}
   abilityCooldownTime: 15
   statusesToApplyToSelfOnActivate: []
