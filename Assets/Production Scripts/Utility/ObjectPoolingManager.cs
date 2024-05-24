@@ -9,7 +9,7 @@ namespace Vi.Utility
     {
         public static List<PooledObjectInfo> ObjectPools = new List<PooledObjectInfo>();
 
-        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.HideInHierarchy;
+        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
 
         public static GameObject SpawnObject(GameObject objectToSpawn)
         {
@@ -101,8 +101,8 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.transform.SetParent(parentTransform);
-                spawnableObj.transform.localPosition = Vector3.zero;
-                spawnableObj.transform.localRotation = Quaternion.identity;
+                spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
+                spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }

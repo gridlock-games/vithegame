@@ -188,7 +188,7 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.transform); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
             }
             else
             {
@@ -209,7 +209,7 @@ namespace Vi.Core
             if (current)
             {
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.transform); }
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
             }
             else
             {
@@ -844,8 +844,8 @@ namespace Vi.Core
         private const float stunDuration = 3;
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
-        private const float attackerRageToBeAddedOnHit = 2;
-        private const float victimRageToBeAddedOnHit = 1;
+        private const float attackerRageToBeAddedOnHit = 100;
+        private const float victimRageToBeAddedOnHit = 100;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
@@ -1150,7 +1150,7 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier = 1;
+        private float damageMultiplier = 100;
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
