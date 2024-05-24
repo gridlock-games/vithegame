@@ -31,6 +31,8 @@ public class DebugOverlay : MonoBehaviour
         pingText.text = "";
 
         InvokeRepeating(nameof(RefreshFps), 0, 0.1f);
+
+        RefreshStatus();
     }
 
     void OnEnable()
@@ -70,16 +72,24 @@ public class DebugOverlay : MonoBehaviour
         localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
     }
 
+    private void RefreshStatus()
+    {
+        consoleEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
+        fpsEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
+        pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+    }
+
+    private bool consoleEnabled;
+    private bool fpsEnabled;
+    private bool pingEnabled;
+
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
-
-        bool consoleEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
+        
+        if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
-
-        bool fpsEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
-        bool pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
 
         debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
 

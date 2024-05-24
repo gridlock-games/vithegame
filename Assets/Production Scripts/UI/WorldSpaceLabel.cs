@@ -42,10 +42,7 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
 
             attributes = GetComponentInParent<Attributes>();
 
@@ -62,6 +59,14 @@ namespace Vi.UI
             healthBarParent.localScale = Vector3.zero;
 
             UpdateNameTextAndColors();
+        }
+
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
         }
 
         private Camera mainCamera;
@@ -96,6 +101,11 @@ namespace Vi.UI
                     highestPoint = renderer.bounds.center;
                 }
             }
+        }
+
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
         }
 
         private void LateUpdate()

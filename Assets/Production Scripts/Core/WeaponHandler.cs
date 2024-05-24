@@ -34,6 +34,7 @@ namespace Vi.Core
             loadoutManager = GetComponent<LoadoutManager>();
             weaponInstance = ScriptableObject.CreateInstance<Weapon>();
             CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
+            RefreshStatus();
         }
 
         public bool WeaponInitialized { get; private set; }
@@ -656,17 +657,17 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject)
                 {
-                    if (FasterPlayerPrefs.Singleton.GetString("ZoomMode") == "TOGGLE")
+                    if (zoomMode == "TOGGLE")
                     {
                         if (isPressed) { aiming.Value = !aiming.Value; }
                     }
-                    else if (FasterPlayerPrefs.Singleton.GetString("ZoomMode") == "HOLD")
+                    else if (zoomMode == "HOLD")
                     {
                         aiming.Value = isPressed;
                     }
                     else
                     {
-                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
+                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + zoomMode);
                     }
                 }
                 else
@@ -870,9 +871,21 @@ namespace Vi.Core
             }
         }
 
+        private string zoomMode = "TOGGLE";
+        private string blockingMode = "HOLD";
+        private bool disableBots;
+        private void RefreshStatus()
+        {
+            zoomMode = FasterPlayerPrefs.Singleton.GetString("ZoomMode");
+            blockingMode = FasterPlayerPrefs.Singleton.GetString("BlockingMode");
+            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
+        }
+
         private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             animationHandler.Animator.SetBool("Blocking", IsBlocking);
 
             if (IsServer)
@@ -946,17 +959,17 @@ namespace Vi.Core
         void OnBlock(InputValue value)
         {
             bool isPressed = value.isPressed;
-            if (FasterPlayerPrefs.Singleton.GetString("BlockingMode") == "TOGGLE")
+            if (blockingMode == "TOGGLE")
             {
                 if (isPressed) { isBlocking.Value = !isBlocking.Value; }
             }
-            else if (FasterPlayerPrefs.Singleton.GetString("BlockingMode") == "HOLD")
+            else if (blockingMode == "HOLD")
             {
                 isBlocking.Value = isPressed;
             }
             else
             {
-                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
+                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + blockingMode);
             }
         }
 
@@ -977,9 +990,9 @@ namespace Vi.Core
         void OnDisableBots()
         {
             if (!Application.isEditor) { return; }
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"))).ToString());
+            FasterPlayerPrefs.Singleton.SetString("DisableBots", (!disableBots).ToString());
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots")))
+            if (disableBots)
             {
                 Debug.Log("Disabled Bot AI");
             }

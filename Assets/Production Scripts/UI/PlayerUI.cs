@@ -114,10 +114,7 @@ namespace Vi.UI
         private void Start()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
 
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
@@ -139,6 +136,14 @@ namespace Vi.UI
             UpdateTeammateAttributesList();
 
             UpdateWeapon(false);
+        }
+
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
         }
 
         private void UpdateTeammateAttributesList()
@@ -279,10 +284,7 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }

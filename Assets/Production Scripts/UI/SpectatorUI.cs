@@ -19,10 +19,7 @@ namespace Vi.UI
         private void Start()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
 
             spectator = GetComponentInParent<Spectator>();
 
@@ -41,6 +38,14 @@ namespace Vi.UI
             rightPlayerCards = rightPlayerCardsTemp.ToArray();
         }
 
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
+        }
+
         public void OpenPauseMenu()
         {
             spectator.GetComponent<ActionMapHandler>().OnPause();
@@ -53,10 +58,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            }
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
             List<Attributes> initializedAttributesList = new List<Attributes>();

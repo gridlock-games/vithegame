@@ -109,6 +109,7 @@ namespace Vi.Utility
         private AudioSource musicSource;
         private void Start()
         {
+            RefreshStatus();
             foreach (AudioSource audioSouce in FindObjectsOfType<AudioSource>())
             {
                 RegisterAudioSource(audioSouce);
@@ -117,19 +118,27 @@ namespace Vi.Utility
             // This is for music
             if (TryGetComponent(out musicSource))
             {
-                musicSource.volume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
+                musicSource.volume = musicVolume;
                 musicSource.spatialBlend = 0;
             }
+        }
+
+        private float musicVolume = 1;
+        private void RefreshStatus()
+        {
+            musicVolume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
         }
 
         private const float musicFadeTime = 0.5f;
 
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (musicSource)
             {
                 if (!musicSource.isPlaying) { musicSource.Play(); }
-                musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : FasterPlayerPrefs.Singleton.GetFloat("MusicVolume"), Time.deltaTime * musicFadeTime);
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : musicVolume, Time.deltaTime * musicFadeTime);
             }
         }
     }

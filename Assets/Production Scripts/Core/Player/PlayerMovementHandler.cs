@@ -306,6 +306,7 @@ namespace Vi.Player
         {
             base.Awake();
             playerInput = GetComponent<PlayerInput>();
+            RefreshStatus();
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -328,8 +329,11 @@ namespace Vi.Player
 
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         private readonly float minimapCameraOffset = 15;
-        private void Update()
+        private new void Update()
         {
+            base.Update();
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             FindMainCamera();
 
             if (!IsSpawned) { return; }
@@ -423,6 +427,12 @@ namespace Vi.Player
 
         private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
+        private void RefreshStatus()
+        {
+            autoAim = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
+        }
+
+        private bool autoAim;
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
@@ -461,7 +471,7 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim")))
+            if (autoAim)
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {

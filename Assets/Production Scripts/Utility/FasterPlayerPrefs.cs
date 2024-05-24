@@ -33,6 +33,15 @@ namespace Vi.Utility
         private Dictionary<string, float> floatPrefs = new Dictionary<string, float>();
         private Dictionary<string, int> intPrefs = new Dictionary<string, int>();
 
+        public bool PlayerPrefsWasUpdatedThisFrame { get; private set; } = false;
+
+        private Coroutine resetPlayerPrefsBoolCoroutine;
+        private IEnumerator ResetPlayerPrefsWasUpdatedBool()
+        {
+            yield return null;
+            PlayerPrefsWasUpdatedThisFrame = false;
+        }
+
         public void DeleteAll()
         {
             stringPrefs.Clear();
@@ -42,6 +51,10 @@ namespace Vi.Utility
             PlayerPrefs.SetString(stringPrefKey, JsonConvert.SerializeObject(stringPrefs));
             PlayerPrefs.SetString(floatPrefKey, JsonConvert.SerializeObject(floatPrefs));
             PlayerPrefs.SetString(intPrefKey, JsonConvert.SerializeObject(intPrefs));
+
+            PlayerPrefsWasUpdatedThisFrame = true;
+            if (resetPlayerPrefsBoolCoroutine != null) { StopCoroutine(resetPlayerPrefsBoolCoroutine); }
+            resetPlayerPrefsBoolCoroutine = StartCoroutine(ResetPlayerPrefsWasUpdatedBool());
         }
 
         public void DeleteKey(string key)
@@ -53,6 +66,10 @@ namespace Vi.Utility
             PlayerPrefs.SetString(stringPrefKey, JsonConvert.SerializeObject(stringPrefs));
             PlayerPrefs.SetString(floatPrefKey, JsonConvert.SerializeObject(floatPrefs));
             PlayerPrefs.SetString(intPrefKey, JsonConvert.SerializeObject(intPrefs));
+
+            PlayerPrefsWasUpdatedThisFrame = true;
+            if (resetPlayerPrefsBoolCoroutine != null) { StopCoroutine(resetPlayerPrefsBoolCoroutine); }
+            resetPlayerPrefsBoolCoroutine = StartCoroutine(ResetPlayerPrefsWasUpdatedBool());
         }
 
         public float GetFloat(string key)
@@ -94,6 +111,10 @@ namespace Vi.Utility
             else
                 floatPrefs.Add(key, value);
             PlayerPrefs.SetString(floatPrefKey, JsonConvert.SerializeObject(floatPrefs));
+
+            PlayerPrefsWasUpdatedThisFrame = true;
+            if (resetPlayerPrefsBoolCoroutine != null) { StopCoroutine(resetPlayerPrefsBoolCoroutine); }
+            resetPlayerPrefsBoolCoroutine = StartCoroutine(ResetPlayerPrefsWasUpdatedBool());
         }
 
         public void SetInt(string key, int value)
@@ -103,6 +124,10 @@ namespace Vi.Utility
             else
                 intPrefs.Add(key, value);
             PlayerPrefs.SetString(intPrefKey, JsonConvert.SerializeObject(intPrefs));
+
+            PlayerPrefsWasUpdatedThisFrame = true;
+            if (resetPlayerPrefsBoolCoroutine != null) { StopCoroutine(resetPlayerPrefsBoolCoroutine); }
+            resetPlayerPrefsBoolCoroutine = StartCoroutine(ResetPlayerPrefsWasUpdatedBool());
         }
 
         public void SetString(string key, string value)
@@ -112,6 +137,10 @@ namespace Vi.Utility
             else
                 stringPrefs.Add(key, value);
             PlayerPrefs.SetString(stringPrefKey, JsonConvert.SerializeObject(stringPrefs));
+
+            PlayerPrefsWasUpdatedThisFrame = true;
+            if (resetPlayerPrefsBoolCoroutine != null) { StopCoroutine(resetPlayerPrefsBoolCoroutine); }
+            resetPlayerPrefsBoolCoroutine = StartCoroutine(ResetPlayerPrefsWasUpdatedBool());
         }
     }
 }

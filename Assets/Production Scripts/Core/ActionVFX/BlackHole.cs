@@ -43,7 +43,7 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                        MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
                     }
                 }
@@ -75,7 +75,7 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        MovementHandler movementHandler = networkCollider.Attributes.GetComponent<MovementHandler>();
+                        MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
 
                         ActionClip copy = Instantiate(vfx.ActionClip);
