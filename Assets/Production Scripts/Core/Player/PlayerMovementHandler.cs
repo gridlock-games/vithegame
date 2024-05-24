@@ -268,7 +268,6 @@ namespace Vi.Player
             {
                 cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.GetComponent<Camera>().enabled = true;
-                minimapCameraInstance.enabled = true;
 
                 playerInput.enabled = true;
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
@@ -280,7 +279,6 @@ namespace Vi.Player
             else
             {
                 Destroy(cameraController.gameObject);
-                Destroy(minimapCameraInstance.gameObject);
                 Destroy(playerInput);
             }
             movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
@@ -328,7 +326,6 @@ namespace Vi.Player
         }
 
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
-        private readonly float minimapCameraOffset = 15;
         private new void Update()
         {
             base.Update();
@@ -390,12 +387,6 @@ namespace Vi.Player
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetBool("IsGrounded", isGrounded);
-
-            if (minimapCameraInstance)
-            {
-                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
-            }
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
