@@ -104,6 +104,9 @@ namespace Vi.UI
 
             aliveUIChildCanvases = aliveUIParent.GetComponentsInChildren<Canvas>(true);
             deathUIChildCanvases = deathUIParent.GetComponentsInChildren<Canvas>(true);
+
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            RefreshStatus();
         }
 
         private Vector3 equippedWeaponCardAnchoredPosition;
@@ -113,9 +116,6 @@ namespace Vi.UI
         private CanvasGroup[] canvasGroups;
         private void Start()
         {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            RefreshStatus();
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
@@ -277,6 +277,11 @@ namespace Vi.UI
 
             primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+        }
+
+        private void OnEnable()
+        {
+            RefreshStatus();
         }
 
         List<Attributes> teammateAttributes = new List<Attributes>();
