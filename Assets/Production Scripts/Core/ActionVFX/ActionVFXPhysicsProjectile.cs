@@ -62,8 +62,9 @@ namespace Vi.Core
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
         }
 
-        private void OnDestroy()
+        private new void OnDisable()
         {
+            base.OnDisable();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
                 GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
