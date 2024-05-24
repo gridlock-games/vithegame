@@ -92,12 +92,18 @@ namespace Vi.UI
         private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
 
+        private Canvas[] aliveUIChildCanvases;
+        private Canvas[] deathUIChildCanvases;
+
         private void Awake()
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
+
+            aliveUIChildCanvases = aliveUIParent.GetComponentsInChildren<Canvas>(true);
+            deathUIChildCanvases = deathUIParent.GetComponentsInChildren<Canvas>(true);
         }
 
         private Vector3 equippedWeaponCardAnchoredPosition;
@@ -245,8 +251,16 @@ namespace Vi.UI
 
         private void UpdateActiveUIElements()
         {
-            aliveUIParent.SetActive(attributes.GetAilment() != ActionClip.Ailment.Death);
-            deathUIParent.SetActive(attributes.GetAilment() == ActionClip.Ailment.Death);
+            bool isDead = attributes.GetAilment() == ActionClip.Ailment.Death;
+            foreach (Canvas canvas in aliveUIChildCanvases)
+            {
+                canvas.enabled = !isDead;
+            }
+
+            foreach (Canvas canvas in deathUIChildCanvases)
+            {
+                canvas.enabled = isDead;
+            }
         }
 
         private const float weaponCardAnimationSpeed = 8;

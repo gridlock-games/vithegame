@@ -67,13 +67,22 @@ namespace Vi.UI
         // The minimum number of EMPTY lobby instances we want to run at one time
         private const int emptyLobbyServersRequired = 1;
 
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera) { return; }
+            mainCamera = Camera.main;
+        }
+
         private void Update()
         {
+            FindMainCamera();
+
             worldSpaceLabel.transform.localScale = Vector3.Lerp(worldSpaceLabel.transform.localScale, localPlayerInRange ? originalScale : Vector3.zero, Time.deltaTime * scalingSpeed);
 
-            if (Camera.main)
+            if (mainCamera)
             {
-                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
+                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
             }
 
             if (IsServer)

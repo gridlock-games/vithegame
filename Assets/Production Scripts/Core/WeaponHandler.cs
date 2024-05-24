@@ -130,9 +130,6 @@ namespace Vi.Core
                             case Weapon.WeaponBone.Root:
                                 bone = transform;
                                 break;
-                            case Weapon.WeaponBone.Camera:
-                                bone = Camera.main.transform;
-                                break;
                             default:
                                 bone = animationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
                                 break;

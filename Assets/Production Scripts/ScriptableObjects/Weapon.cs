@@ -112,8 +112,7 @@ namespace Vi.ScriptableObjects
             RightArm = HumanBodyBones.RightLowerArm,
             LeftArm = HumanBodyBones.LeftLowerArm,
             RightFoot = HumanBodyBones.RightFoot,
-            LeftFoot = HumanBodyBones.LeftFoot,
-            Camera = 100,
+            LeftFoot = HumanBodyBones.LeftFoot
         }
 
         [System.Serializable]
