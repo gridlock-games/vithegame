@@ -12,7 +12,8 @@ namespace Vi.Core
 {
     public class WeaponHandler : NetworkBehaviour
     {
-        private Dictionary<Weapon.WeaponBone, GameObject> weaponInstances = new Dictionary<Weapon.WeaponBone, GameObject>();
+        private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
+        private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
         public Weapon GetWeapon()
         {
@@ -102,16 +103,15 @@ namespace Vi.Core
 
         private void EquipWeapon()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                Destroy(kvp.Value);
+                Destroy(kvp.Value.gameObject);
             }
             weaponInstances.Clear();
+            shooterWeapons.Clear();
 
             CanAim = false;
-            Dictionary<Weapon.WeaponBone, GameObject> instances = new Dictionary<Weapon.WeaponBone, GameObject>();
 
-            List<RuntimeWeapon> runtimeWeapons = new List<RuntimeWeapon>();
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
@@ -119,9 +119,16 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        GameObject instance = Instantiate(modelData.weaponPrefab);
-                        runtimeWeapons.Add(instance.GetComponent<RuntimeWeapon>());
-                        instances.Add(modelData.weaponBone, instance);
+                        RuntimeWeapon instance = Instantiate(modelData.weaponPrefab).GetComponent<RuntimeWeapon>();
+
+                        if (!instance)
+                        {
+                            Debug.LogError(instance + " does not have a runtime weapon component!");
+                            continue;
+                        }
+
+                        instance.SetWeaponBone(modelData.weaponBone);
+                        weaponInstances.Add(modelData.weaponBone, instance);
                         instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
                         Transform bone = null;
@@ -139,15 +146,9 @@ namespace Vi.Core
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        if (instance.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                        {
-                            runtimeWeapon.SetWeaponBone(modelData.weaponBone);
-                        }
-                        else
-                        {
-                            Debug.LogWarning(instance + " does not have a runtime weapon component!");
-                        }
-                        CanAim = instance.GetComponent<ShooterWeapon>() | CanAim;
+                        ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
+                        if (shooterWeapon) { shooterWeapons.Add(shooterWeapon); }
+                        CanAim = shooterWeapon | CanAim;
                     }
                     broken = true;
                     break;
@@ -163,18 +164,10 @@ namespace Vi.Core
 
             animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
-            weaponInstances = instances;
-
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            List<RuntimeWeapon> runtimeWeaponList = weaponInstances.Values.ToList();
+            foreach (RuntimeWeapon runtimeWeapon in runtimeWeaponList)
             {
-                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                {
-                    runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeapons);
-                }
-                else
-                {
-                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
-                }
+                runtimeWeapon.SetAssociatedRuntimeWeapons(runtimeWeaponList);
             }
         }
 
@@ -213,9 +206,9 @@ namespace Vi.Core
 
             CurrentActionClip = actionClip;
             currentActionClipWeapon = weaponName;
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> weaponInstance in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                weaponInstance.Value.GetComponent<RuntimeWeapon>().ResetHitCounter();
+                kvp.Value.ResetHitCounter();
             }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -854,12 +847,9 @@ namespace Vi.Core
 
         public bool IsNextProjectileDamageMultiplied()
         {
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    return shooterWeapon.GetNextDamageMultiplier() > 1;
-                }
+                return shooterWeapon.GetNextDamageMultiplier() > 1;
             }
             return false;
         }
@@ -871,15 +861,12 @@ namespace Vi.Core
         private void Aim(bool isAiming)
         {
             animationHandler.Animator.SetBool("Aiming", isAiming);
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
-                    animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
-                    ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                    animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
-                }
+                CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
+                animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+                ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
+                animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
             }
         }
 
@@ -905,16 +892,9 @@ namespace Vi.Core
                 animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
 
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> kvp in weaponInstances)
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                if (kvp.Value.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                {
-                    runtimeWeapon.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
-                }
-                else
-                {
-                    Debug.LogError(kvp.Key + " has no runtime weapon component!");
-                }
+                kvp.Value.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
             }
         }
 
@@ -943,13 +923,10 @@ namespace Vi.Core
             if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (!animationHandler.IsAtRest()) { return; }
 
-            foreach (KeyValuePair<Weapon.WeaponBone, GameObject> instance in weaponInstances)
+            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                if (instance.Value.TryGetComponent(out ShooterWeapon shooterWeapon))
-                {
-                    StartCoroutine(Reload(shooterWeapon));
-                    break;
-                }
+                StartCoroutine(Reload(shooterWeapon));
+                break;
             }
         }
 
