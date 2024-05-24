@@ -9,6 +9,8 @@ namespace Vi.Utility
     {
         public static List<PooledObjectInfo> ObjectPools = new List<PooledObjectInfo>();
 
+        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
+
         public static GameObject SpawnObject(GameObject objectToSpawn)
         {
             PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == objectToSpawn.name);
@@ -27,7 +29,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn);
-                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
+                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
@@ -59,7 +61,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation);
-                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
+                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
@@ -91,7 +93,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, parentTransform);
-                spawnableObj.hideFlags = HideFlags.HideInHierarchy;
+                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
