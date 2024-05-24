@@ -123,6 +123,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged += OnIsInvincibleChange;
             isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
             statuses.OnListChanged += OnStatusChange;
+            activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
@@ -153,6 +154,7 @@ namespace Vi.Core
             isInvincible.OnValueChanged -= OnIsInvincibleChange;
             isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
             statuses.OnListChanged -= OnStatusChange;
+            activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
@@ -1169,6 +1171,21 @@ namespace Vi.Core
         {
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
+        }
+
+        public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
+        private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
+        {
+            ActiveStatusesWasUpdatedThisFrame = true;
+            if (resetActiveStatusesBoolCoroutine != null) { StopCoroutine(resetActiveStatusesBoolCoroutine); }
+            resetActiveStatusesBoolCoroutine = StartCoroutine(ResetActiveStatusesWasUpdatedBool());
+        }
+
+        private Coroutine resetActiveStatusesBoolCoroutine;
+        private IEnumerator ResetActiveStatusesWasUpdatedBool()
+        {
+            yield return null;
+            ActiveStatusesWasUpdatedThisFrame = false;
         }
 
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)

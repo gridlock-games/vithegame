@@ -85,17 +85,20 @@ namespace Vi.UI
 
             if (!playerUI)
             {
-                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
+                if (attributes.ActiveStatusesWasUpdatedThisFrame)
                 {
-                    if (activeStatuses.Contains(statusIcon.Status))
+                    List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                    foreach (StatusIcon statusIcon in statusIcons)
                     {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
+                        if (activeStatuses.Contains(statusIcon.Status))
+                        {
+                            statusIcon.SetActive(true);
+                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        }
+                        else
+                        {
+                            statusIcon.SetActive(false);
+                        }
                     }
                 }
             }
