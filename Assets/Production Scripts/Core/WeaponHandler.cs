@@ -994,11 +994,11 @@ namespace Vi.Core
 
             if (disableBots)
             {
-                Debug.Log("Disabled Bot AI");
+                Debug.Log("Enabled Bot AI");
             }
             else
             {
-                Debug.Log("Enabled Bot AI");
+                Debug.Log("Disabled Bot AI");
             }
         }
 

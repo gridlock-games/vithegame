@@ -845,7 +845,7 @@ namespace Vi.Core
         private const float knockdownDuration = 2;
         private const float knockupDuration = 4;
         private const float attackerRageToBeAddedOnHit = 100;
-        private const float victimRageToBeAddedOnHit = 100;
+        private const float victimRageToBeAddedOnHit = 1;
 
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
@@ -1150,7 +1150,7 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier = 100;
+        private float damageMultiplier = 1;
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;

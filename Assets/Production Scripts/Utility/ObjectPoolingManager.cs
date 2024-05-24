@@ -37,6 +37,7 @@ namespace Vi.Utility
                 spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
+                spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
@@ -70,6 +71,7 @@ namespace Vi.Utility
                 spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
+                spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
@@ -95,6 +97,12 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, parentTransform);
+                if (parentTransform)
+                {
+                    spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
+                        objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
+                        objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
+                }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
@@ -103,6 +111,12 @@ namespace Vi.Utility
                 spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
                 spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
+                if (parentTransform)
+                {
+                    spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
+                        objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
+                        objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
+                }
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
@@ -128,6 +142,12 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation, parentTransform);
+                if (parentTransform)
+                {
+                    spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
+                        objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
+                        objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
+                }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
@@ -136,6 +156,12 @@ namespace Vi.Utility
                 spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
+                if (parentTransform)
+                {
+                    spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
+                        objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
+                        objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
+                }
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
