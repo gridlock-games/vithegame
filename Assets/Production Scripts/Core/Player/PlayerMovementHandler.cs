@@ -330,6 +330,8 @@ namespace Vi.Player
         private readonly float minimapCameraOffset = 15;
         private void Update()
         {
+            FindMainCamera();
+
             if (!IsSpawned) { return; }
 
 #if UNITY_IOS || UNITY_ANDROID
