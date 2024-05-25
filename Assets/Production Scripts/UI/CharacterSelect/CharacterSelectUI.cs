@@ -254,10 +254,8 @@ namespace Vi.UI
                     buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
                 }
 
-                Color textureAverageColor = equipmentOption.averageTextureColor;
-
                 Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
-                image.color = textureAverageColor;
+                image.sprite = equipmentOption.equipmentIcon;
                 image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
                 customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name));
             }

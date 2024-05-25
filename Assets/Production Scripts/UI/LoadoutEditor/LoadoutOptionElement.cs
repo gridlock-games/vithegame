@@ -6,12 +6,12 @@ using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
-    public class WeaponOptionElement : MonoBehaviour
+    public class LoadoutOptionElement : MonoBehaviour
     {
         [SerializeField] private Image weaponIconImage;
         [SerializeField] private Text weaponNameText;
 
-        public void Initialize(CharacterReference.WeaponOption weaponOption)
+        public void InitializeWeapon(CharacterReference.WeaponOption weaponOption)
         {
             weaponIconImage.sprite = weaponOption.weaponIcon;
             weaponNameText.text = weaponOption.name;
@@ -27,8 +27,8 @@ namespace Vi.UI
             }
             else
             {
-                weaponIconImage.sprite = null;
-                weaponIconImage.color = Color.red;
+                weaponIconImage.sprite = wearableEquipmentOption.equipmentIcon;
+                weaponIconImage.color = Color.white;
                 weaponNameText.text = wearableEquipmentOption.name;
             }
         }

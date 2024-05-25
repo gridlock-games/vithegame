@@ -10,7 +10,7 @@ namespace Vi.UI
     public class ArmorSelectMenu : Menu
     {
         [SerializeField] private Transform weaponOptionScrollParent;
-        [SerializeField] private WeaponOptionElement weaponOptionPrefab;
+        [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
 
         private List<Button> buttonList = new List<Button>();
         private int playerDataId;
@@ -58,7 +58,7 @@ namespace Vi.UI
             Button invokeThis = null;
             if (WebRequestManager.NullableEquipmentTypes.Contains(equipmentType))
             {
-                WeaponOptionElement emptyEle = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
+                LoadoutOptionElement emptyEle = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 emptyEle.InitializeEquipment(null);
                 Button emptyButton = emptyEle.GetComponentInChildren<Button>();
                 emptyButton.onClick.AddListener(delegate { ChangeArmor(emptyButton, equipmentType, null, loadoutSlot); });
@@ -72,7 +72,7 @@ namespace Vi.UI
                 if (wearableEquipmentOption.equipmentType != equipmentType) { continue; }
                 if (wearableEquipmentOption.GetModel(playerData.character.raceAndGender, null) == null) { continue; }
 
-                WeaponOptionElement ele = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
+                LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 ele.InitializeEquipment(wearableEquipmentOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeArmor(button, equipmentType, wearableEquipmentOption, loadoutSlot); });
