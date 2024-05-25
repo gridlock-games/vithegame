@@ -29,13 +29,44 @@ namespace Vi.UI
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
         [SerializeField] private Text fpsWarningText;
+        [Header("Display Settings Resizing By Platform")]
+        [SerializeField] private GridLayoutGroup scrollGrid;
+        [SerializeField] private RectTransform displaySettingsGroup;
+        [SerializeField] private GameObject fullScreenModeElement;
+        [SerializeField] private GameObject resolutionElement;
 
         private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
+        private static readonly List<RuntimePlatform> platformsToAllowResolutionChangesOn = new List<RuntimePlatform>()
+        {
+            RuntimePlatform.WindowsPlayer,
+            RuntimePlatform.OSXPlayer,
+            RuntimePlatform.LinuxPlayer,
+            RuntimePlatform.WindowsEditor,
+            RuntimePlatform.OSXEditor,
+            RuntimePlatform.LinuxEditor
+        };
+
         private void Awake()
         {
+            if (!platformsToAllowResolutionChangesOn.Contains(Application.platform))
+            {
+                fullScreenModeElement.SetActive(false);
+                resolutionElement.SetActive(false);
+
+                scrollGrid.cellSize = new Vector2(scrollGrid.cellSize.x, scrollGrid.cellSize.y - 125 * 2);
+                displaySettingsGroup.sizeDelta = new Vector2(displaySettingsGroup.sizeDelta.x, displaySettingsGroup.sizeDelta.y - 125 * 2);
+
+                foreach (Transform child in displaySettingsGroup.parent)
+                {
+                    RectTransform rt = (RectTransform)child;
+                    if (rt == displaySettingsGroup) { continue; }
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, rt.anchoredPosition.y + 125 * 2);
+                }
+            }
+
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
 
