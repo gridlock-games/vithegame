@@ -4,12 +4,28 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 using Vi.ScriptableObjects;
+using UnityEngine.InputSystem;
 
 namespace Vi.Editor
 {
     public class GeneratePreviewIcons : MonoBehaviour
     {
-        [SerializeField] private Weapon[] weaponsToGenerate;
+        [SerializeField] private WeaponPositioningData[] weaponsToGenerate;
+        [SerializeField] private CharacterReference characterReference;
+
+        [System.Serializable]
+        private class WeaponPositioningData
+        {
+            public Weapon weapon;
+            public List<TransformData> transformDatas;
+        }
+
+        [System.Serializable]
+        private class TransformData
+        {
+            public Vector3 position;
+            public Vector3 rotation;
+        }
 
         private Camera cam;
 
@@ -21,23 +37,39 @@ namespace Vi.Editor
 
         private IEnumerator TakeScreenshot()
         {
-            foreach (Weapon weapon in weaponsToGenerate)
+            int weaponIndex = 0;
+            foreach (WeaponPositioningData weaponPositioningData in weaponsToGenerate)
             {
                 cam.clearFlags = CameraClearFlags.Skybox;
-                List<GameObject> instanceList = new List<GameObject>();
+                Dictionary<GameObject, int> transformCrosswalk = new Dictionary<GameObject, int>();
 
-                foreach (var data in weapon.GetWeaponModelData())
+                foreach (var data in weaponPositioningData.weapon.GetWeaponModelData())
                 {
-                    if (data.skinPrefab.name.Contains("Male"))
+                    if (data.skinPrefab.name == "Human_Male")
                     {
+                        int i = 0;
                         foreach (var d in data.data)
                         {
-                            instanceList.Add(Instantiate(d.weaponPrefab));
+                            if (!d.weaponPrefab.GetComponentInChildren<Renderer>()) { continue; }
+
+                            Vector3 pos = Vector3.zero;
+                            Quaternion rot = Quaternion.identity;
+
+                            if (i < weaponPositioningData.transformDatas.Count)
+                            {
+                                pos = weaponPositioningData.transformDatas[i].position;
+                                rot = Quaternion.Euler(weaponPositioningData.transformDatas[i].rotation);
+                            }
+
+                            transformCrosswalk.Add(Instantiate(d.weaponPrefab, pos, rot), i);
+                            i++;
                         }
                     }
                 }
 
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
+                yield return new WaitUntil(() => Keyboard.current.spaceKey.isPressed);
+                yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
 
                 cam.clearFlags = CameraClearFlags.Depth;
 
@@ -51,15 +83,28 @@ namespace Vi.Editor
                 screenshotTexture.Apply();
 
                 byte[] byteArray = screenshotTexture.EncodeToPNG();
-                string destinationPath = Path.Join("Assets/Production/Images/Weapon Icons", weapon.name + ".png");
+                string destinationPath = Path.Join("Assets/Production/Images/Weapon Icons", weaponPositioningData.weapon.name + ".png");
                 File.WriteAllBytes(destinationPath, byteArray);
 
-                foreach (GameObject instance in instanceList)
+                foreach (KeyValuePair<GameObject, int> kvp in transformCrosswalk)
                 {
-                    Destroy(instance);
+                    var posData = weaponsToGenerate[weaponIndex];
+
+                    var transformData = posData.transformDatas.Count > kvp.Value ? posData.transformDatas[kvp.Value] : new TransformData();
+                    transformData.position = kvp.Key.transform.position;
+                    transformData.rotation = kvp.Key.transform.eulerAngles;
+
+                    if (posData.transformDatas.Count > kvp.Value)
+                        posData.transformDatas[kvp.Value] = transformData;
+                    else
+                        posData.transformDatas.Add(transformData);
+
+                    weaponsToGenerate[weaponIndex] = posData;
+                    Destroy(kvp.Key);
                 }
 
                 yield return null;
+                weaponIndex++;
             }
         }
     }
