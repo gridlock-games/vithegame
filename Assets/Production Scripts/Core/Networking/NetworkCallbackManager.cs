@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -84,15 +85,15 @@ namespace Vi.Core
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             //Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, clientId));
         }
 
         private struct PlayerDataInput
         {
             public string characterId;
-            public int clientId;
+            public ulong clientId;
 
-            public PlayerDataInput(string characterId, int clientId)
+            public PlayerDataInput(string characterId, ulong clientId)
             {
                 this.characterId = characterId;
                 this.clientId = clientId;
@@ -137,14 +138,15 @@ namespace Vi.Core
         private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
-        private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
+        private IEnumerator AddPlayerData(string characterId, ulong clientId, PlayerDataManager.Team team)
         {
             addPlayerDataRunning = true;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(clientId, WebRequestManager.Singleton.CharacterById, team));
+            // If the game crashed, or the player disconnected for some reason, don't add their data
+            if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId)) { PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, WebRequestManager.Singleton.CharacterById, team)); }
             
             addPlayerDataRunning = false;
         }
