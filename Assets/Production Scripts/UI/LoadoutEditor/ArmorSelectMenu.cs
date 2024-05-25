@@ -59,7 +59,7 @@ namespace Vi.UI
             if (WebRequestManager.NullableEquipmentTypes.Contains(equipmentType))
             {
                 LoadoutOptionElement emptyEle = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
-                emptyEle.InitializeEquipment(null);
+                emptyEle.InitializeEquipment(null, playerData.character.raceAndGender);
                 Button emptyButton = emptyEle.GetComponentInChildren<Button>();
                 emptyButton.onClick.AddListener(delegate { ChangeArmor(emptyButton, equipmentType, null, loadoutSlot); });
                 buttonList.Add(emptyButton);
@@ -73,7 +73,7 @@ namespace Vi.UI
                 if (wearableEquipmentOption.GetModel(playerData.character.raceAndGender, null) == null) { continue; }
 
                 LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
-                ele.InitializeEquipment(wearableEquipmentOption);
+                ele.InitializeEquipment(wearableEquipmentOption, playerData.character.raceAndGender);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeArmor(button, equipmentType, wearableEquipmentOption, loadoutSlot); });
 

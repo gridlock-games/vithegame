@@ -174,8 +174,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 0.01
+  far clip plane: 1000000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -254,6 +254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldProcessWeapons: 0
   weaponsToGenerate:
   - weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
     transformDatas:
@@ -279,6 +280,7 @@ MonoBehaviour:
     transformDatas:
     - position: {x: -0.279, y: 0, z: -0.153}
       rotation: {x: -0, y: 0, z: 0}
+  shouldProcessEquipmentOptions: 1
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:

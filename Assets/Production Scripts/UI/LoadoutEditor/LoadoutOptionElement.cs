@@ -17,7 +17,7 @@ namespace Vi.UI
             weaponNameText.text = weaponOption.name;
         }
 
-        public void InitializeEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
+        public void InitializeEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             if (wearableEquipmentOption == null)
             {
@@ -27,7 +27,7 @@ namespace Vi.UI
             }
             else
             {
-                weaponIconImage.sprite = wearableEquipmentOption.equipmentIcon;
+                weaponIconImage.sprite = wearableEquipmentOption.GetIcon(raceAndGender);
                 weaponIconImage.color = Color.white;
                 weaponNameText.text = wearableEquipmentOption.name;
             }

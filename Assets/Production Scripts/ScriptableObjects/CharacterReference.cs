@@ -113,15 +113,22 @@ namespace Vi.ScriptableObjects
             public string name;
             public EquipmentType equipmentType;
             public string itemWebId;
-            public Sprite equipmentIcon;
             [SerializeField] private List<RaceAndGender> raceAndGenders = new List<RaceAndGender>();
             [SerializeField] private List<WearableEquipment> wearableEquipmentOptions = new List<WearableEquipment>();
+            [SerializeField] private List<Sprite> equipmentIcons = new List<Sprite>();
 
             public WearableEquipment GetModel(RaceAndGender raceAndGender, WearableEquipment emptyWearableEquipment)
             {
                 int index = raceAndGenders.IndexOf(raceAndGender);
                 if (index == -1) { return emptyWearableEquipment; }
                 return wearableEquipmentOptions[index];
+            }
+
+            public Sprite GetIcon(RaceAndGender raceAndGender)
+            {
+                int index = raceAndGenders.IndexOf(raceAndGender);
+                if (index == -1 | index >= equipmentIcons.Count) { return null; }
+                return equipmentIcons[index];
             }
 
             public WearableEquipmentOption(string name, EquipmentType equipmentType)
@@ -135,6 +142,23 @@ namespace Vi.ScriptableObjects
                 if (raceAndGenders.Contains(raceAndGender)) { return; }
                 raceAndGenders.Add(raceAndGender);
                 wearableEquipmentOptions.Add(wearableEquipment);
+            }
+
+            public void AddIcon(RaceAndGender raceAndGender, Sprite icon)
+            {
+                if (equipmentIcons.Count != raceAndGenders.Count)
+                {
+                    equipmentIcons = new List<Sprite>();
+                    for (int i = 0; i < raceAndGenders.Count; i++)
+                    {
+                        equipmentIcons.Add(null);
+                    }
+                }
+
+                int index = raceAndGenders.IndexOf(raceAndGender);
+                if (index == -1) { Debug.LogError("Index is -1"); return; }
+
+                equipmentIcons[index] = icon;
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)
@@ -376,6 +400,29 @@ namespace Vi.ScriptableObjects
                 }
             }
             AssetDatabase.SaveAssets();
+        }
+
+        private const string armorIconFolder = @"Assets\Production\Images\Equipment Icons";
+        
+        [ContextMenu("Assign Equipment Icons")]
+        private void AssignEquipmentIcons()
+        {
+            foreach (string armorIconPath in Directory.GetFiles(armorIconFolder, "*.png", SearchOption.TopDirectoryOnly))
+            {
+                string filename = Path.GetFileNameWithoutExtension(armorIconPath);
+
+                string[] splitString = filename.Split('-');
+
+                int equipmentOptionIndex = equipmentOptions.FindIndex(item => item.name == splitString[0]);
+                if (equipmentOptionIndex == -1) { Debug.LogError("Equipment Option Index is -1"); continue; }
+                RaceAndGender raceAndGender = System.Enum.Parse<RaceAndGender>(splitString[1]);
+
+                TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(armorIconPath);
+                importer.textureType = TextureImporterType.Sprite;
+                importer.SaveAndReimport();
+
+                equipmentOptions[equipmentOptionIndex].AddIcon(raceAndGender, AssetDatabase.LoadAssetAtPath<Sprite>(armorIconPath));
+            }
         }
         #endif
     }
