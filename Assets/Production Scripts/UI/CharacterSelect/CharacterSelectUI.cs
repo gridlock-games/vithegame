@@ -30,6 +30,11 @@ namespace Vi.UI
         [SerializeField] private Text primaryWeaponText;
         [SerializeField] private Image secondaryWeaponIcon;
         [SerializeField] private Text secondaryWeaponText;
+        [SerializeField] private Image helmImage;
+        [SerializeField] private Image chestImage;
+        [SerializeField] private Image bootsImage;
+        [SerializeField] private Image glovesImage;
+        [SerializeField] private Sprite defaultEquipmentSprite;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -366,6 +371,7 @@ namespace Vi.UI
 
         private WebRequestManager.Character selectedCharacter;
         private GameObject previewObject;
+        private LoadoutManager loadoutManager;
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
             goToTrainingRoomButton.interactable = true;
@@ -409,8 +415,12 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(true);
                 secondaryWeaponIcon.gameObject.SetActive(true);
+                helmImage.gameObject.SetActive(true);
+                chestImage.gameObject.SetActive(true);
+                bootsImage.gameObject.SetActive(true);
+                glovesImage.gameObject.SetActive(true);
 
-                LoadoutManager loadoutManager = previewObject.GetComponent<LoadoutManager>();
+                loadoutManager = previewObject.GetComponent<LoadoutManager>();
                 loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
                 primaryWeaponIcon.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
@@ -422,6 +432,10 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
+                helmImage.gameObject.SetActive(false);
+                chestImage.gameObject.SetActive(false);
+                bootsImage.gameObject.SetActive(false);
+                glovesImage.gameObject.SetActive(false);
 
                 if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
@@ -547,6 +561,22 @@ namespace Vi.UI
             {
                 serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime >= 0);
                 serverListElementList[i].transform.SetSiblingIndex(i);
+            }
+
+            if (loadoutManager)
+            {
+                CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+                helmImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Helm) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Helm).GetIcon(raceAndGender);
+                chestImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Chest) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Chest).GetIcon(raceAndGender);
+                bootsImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Boots) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Boots).GetIcon(raceAndGender);
+                glovesImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Gloves) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Gloves).GetIcon(raceAndGender);
+            }
+            else
+            {
+                helmImage.sprite = defaultEquipmentSprite;
+                chestImage.sprite = defaultEquipmentSprite;
+                bootsImage.sprite = defaultEquipmentSprite;
+                glovesImage.sprite = defaultEquipmentSprite;
             }
         }
 
