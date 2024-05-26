@@ -267,7 +267,7 @@ namespace Vi.UI
 
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
-            welcomeUserText.text = "Welcome " + FasterPlayerPrefs.Singleton.GetString("username");
+            welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
