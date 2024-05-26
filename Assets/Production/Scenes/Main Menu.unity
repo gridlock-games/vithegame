@@ -346,6 +346,7 @@ GameObject:
   - component: {fileID: 227929230}
   - component: {fileID: 227929229}
   - component: {fileID: 227929228}
+  - component: {fileID: 227929231}
   m_Layer: 5
   m_Name: Forgot_Password_Button
   m_TagString: Untagged
@@ -471,6 +472,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 227929226}
   m_CullTransparentMesh: 1
+--- !u!114 &227929231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227929226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &252662467
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,6 +497,7 @@ GameObject:
   - component: {fileID: 252662471}
   - component: {fileID: 252662470}
   - component: {fileID: 252662469}
+  - component: {fileID: 252662472}
   m_Layer: 5
   m_Name: AlreadyHaveAnAccount_Button
   m_TagString: Untagged
@@ -608,6 +623,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 252662467}
   m_CullTransparentMesh: 1
+--- !u!114 &252662472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252662467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1001 &335441039
 PrefabInstance:
   m_ObjectHideFlags: 0
