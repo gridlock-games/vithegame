@@ -20,21 +20,24 @@ namespace Vi.UI
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
-        [SerializeField] private CharacterCard characterCardPrefab;
+        [SerializeField] private CharacterCard[] characterCardInstances;
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
-        [SerializeField] private Button selectCharacterButton_autoConnectToHub;
         [SerializeField] private Button goToTrainingRoomButton;
-        [SerializeField] private Button addCharacterButton;
+        [SerializeField] private Sprite defaultEquipmentSprite;
+        [SerializeField] private RectTransform selectionBarSelectedImage;
+        [SerializeField] private RectTransform selectionBarUnselectedImage;
+        [SerializeField] private Button deleteCharacterButton;
+        [Header("Stats Section")]
+        [SerializeField] private GameObject statsParent;
+        [Header("Gear Section")]
+        [SerializeField] private GameObject gearParent;
         [SerializeField] private Image primaryWeaponIcon;
         [SerializeField] private Text primaryWeaponText;
         [SerializeField] private Image secondaryWeaponIcon;
         [SerializeField] private Text secondaryWeaponText;
-        [SerializeField] private Image helmImage;
-        [SerializeField] private Image chestImage;
-        [SerializeField] private Image bootsImage;
-        [SerializeField] private Image glovesImage;
-        [SerializeField] private Sprite defaultEquipmentSprite;
+        [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
+        [SerializeField] private Image[] equipmentImageValues;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -43,7 +46,6 @@ namespace Vi.UI
         [SerializeField] private GameObject removeEquipmentButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
         [SerializeField] private Button finishCharacterCustomizationButton;
-        [SerializeField] private Button deleteCharacterButton;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
         [SerializeField] private Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
@@ -78,46 +80,117 @@ namespace Vi.UI
             CharacterReference.EquipmentType.Brows,
         };
 
+        private Vector2 statsOpenAnchoredPosition;
+        private Vector2 statsOpenAnchorMin;
+        private Vector2 statsOpenAnchorMax;
+        private Vector2 statsOpenPivot;
+
+        private Vector2 gearOpenAnchoredPosition;
+        private Vector2 gearOpenAnchorMin;
+        private Vector2 gearOpenAnchorMax;
+        private Vector2 gearOpenPivot;
+
+        private bool statsSelected = true;
+        public void OpenStats()
+        {
+            statsSelected = true;
+        }
+
+        public void OpenGear()
+        {
+            statsSelected = false;
+        }
+
+        private const float selectionBarTransitionTime = 8;
+        private void UpdateSelectionBarPositions()
+        {
+            if (statsSelected)
+            {
+                selectionBarSelectedImage.anchorMin = Vector2.Lerp(selectionBarSelectedImage.anchorMin, statsOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarSelectedImage.anchorMax = Vector2.Lerp(selectionBarSelectedImage.anchorMax, statsOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarSelectedImage.pivot = Vector2.Lerp(selectionBarSelectedImage.pivot, statsOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+
+                selectionBarUnselectedImage.anchorMin = Vector2.Lerp(selectionBarUnselectedImage.anchorMin, gearOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarUnselectedImage.anchorMax = Vector2.Lerp(selectionBarUnselectedImage.anchorMax, gearOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarUnselectedImage.pivot = Vector2.Lerp(selectionBarUnselectedImage.pivot, gearOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+            }
+            else
+            {
+                selectionBarSelectedImage.anchorMin = Vector2.Lerp(selectionBarSelectedImage.anchorMin, gearOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarSelectedImage.anchorMax = Vector2.Lerp(selectionBarSelectedImage.anchorMax, gearOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarSelectedImage.pivot = Vector2.Lerp(selectionBarSelectedImage.pivot, gearOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+
+                selectionBarUnselectedImage.anchorMin = Vector2.Lerp(selectionBarUnselectedImage.anchorMin, statsOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarUnselectedImage.anchorMax = Vector2.Lerp(selectionBarUnselectedImage.anchorMax, statsOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
+                selectionBarUnselectedImage.pivot = Vector2.Lerp(selectionBarUnselectedImage.pivot, statsOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+            }
+
+            selectionBarSelectedImage.anchoredPosition = Vector2.Lerp(selectionBarSelectedImage.anchoredPosition, statsSelected ? statsOpenAnchoredPosition : gearOpenAnchoredPosition, Time.deltaTime * selectionBarTransitionTime);
+            selectionBarUnselectedImage.anchoredPosition = Vector2.Lerp(selectionBarUnselectedImage.anchoredPosition, statsSelected ? gearOpenAnchoredPosition : statsOpenAnchoredPosition, Time.deltaTime * selectionBarTransitionTime);
+        }
+
         private void Awake()
         {
+            OpenStats();
+
+            statsOpenAnchoredPosition = selectionBarSelectedImage.anchoredPosition;
+            statsOpenAnchorMin = selectionBarSelectedImage.anchorMin;
+            statsOpenAnchorMax = selectionBarSelectedImage.anchorMax;
+            statsOpenPivot = selectionBarSelectedImage.pivot;
+
+            gearOpenAnchoredPosition = selectionBarUnselectedImage.anchoredPosition;
+            gearOpenAnchorMin = selectionBarUnselectedImage.anchorMin;
+            gearOpenAnchorMax = selectionBarUnselectedImage.anchorMax;
+            gearOpenPivot = selectionBarUnselectedImage.pivot;
+
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
-            selectCharacterButton_autoConnectToHub.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
+            selectCharacterButton.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+
+            deleteCharacterButton.onClick.RemoveAllListeners();
+            deleteCharacterButton.onClick.AddListener(() => StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)));
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
 
         private IEnumerator RefreshCharacterCards()
         {
-            foreach (Transform child in characterCardParent)
-            {
-                if (child.GetComponent<CharacterCard>()) { Destroy(child.gameObject); }
-            }
             characterCardButtonReference.Clear();
+
+            for (int i = 0; i < characterCardInstances.Length; i++)
+            {
+                characterCardInstances[i].InitializeAsLockedCharacter();
+            }
 
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
-            addCharacterButton.gameObject.SetActive(false);
             
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            addCharacterButton.gameObject.SetActive(WebRequestManager.Singleton.Characters.Count < 5);
-            webRequestStatusText.gameObject.SetActive(false);
-
-            // Create character cards
-            foreach (WebRequestManager.Character character in WebRequestManager.Singleton.Characters)
+            bool addButtonCreated = false;
+            for (int i = 0; i < characterCardInstances.Length; i++)
             {
-                CharacterCard characterCard = Instantiate(characterCardPrefab.gameObject, characterCardParent).GetComponent<CharacterCard>();
-                characterCard.Initialize(character);
-                characterCard.GetComponent<Button>().onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
-                characterCard.editButton.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
-                characterCard.editButton.onClick.AddListener(delegate { OpenCharacterCustomization(character); });
-                characterCardButtonReference.Add(new ButtonInfo(characterCard.GetComponent<Button>(), "CharacterCard", character._id.ToString()));
+                if (i < WebRequestManager.Singleton.Characters.Count)
+                {
+                    WebRequestManager.Character character = WebRequestManager.Singleton.Characters[i];
+                    characterCardInstances[i].InitializeAsCharacter(character);
+                    characterCardInstances[i].Button.onClick.RemoveAllListeners();
+                    characterCardInstances[i].Button.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
+                    characterCardButtonReference.Add(new ButtonInfo(characterCardInstances[i].Button, "CharacterCard", character._id.ToString()));
+                }
+                else if (!addButtonCreated)
+                {
+                    addButtonCreated = true;
+                    characterCardInstances[i].InitializeAsAddButton();
+                    characterCardInstances[i].Button.onClick.RemoveAllListeners();
+                    characterCardInstances[i].Button.onClick.AddListener(delegate { OpenCharacterCustomization(); });
+                }
             }
+
+            webRequestStatusText.gameObject.SetActive(false);
         }
 
         private readonly int leftStartOffset = 400;
@@ -317,7 +390,6 @@ namespace Vi.UI
         private void RefreshButtonInteractability(bool disableAll = false)
         {
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
-            selectCharacterButton_autoConnectToHub.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
@@ -415,10 +487,10 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(true);
                 secondaryWeaponIcon.gameObject.SetActive(true);
-                helmImage.gameObject.SetActive(true);
-                chestImage.gameObject.SetActive(true);
-                bootsImage.gameObject.SetActive(true);
-                glovesImage.gameObject.SetActive(true);
+                for (int i = 0; i < equipmentTypeKeys.Length; i++)
+                {
+                    equipmentImageValues[i].gameObject.SetActive(true);
+                }
 
                 loadoutManager = previewObject.GetComponent<LoadoutManager>();
                 loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
@@ -432,10 +504,10 @@ namespace Vi.UI
             {
                 primaryWeaponIcon.gameObject.SetActive(false);
                 secondaryWeaponIcon.gameObject.SetActive(false);
-                helmImage.gameObject.SetActive(false);
-                chestImage.gameObject.SetActive(false);
-                bootsImage.gameObject.SetActive(false);
-                glovesImage.gameObject.SetActive(false);
+                for (int i = 0; i < equipmentTypeKeys.Length; i++)
+                {
+                    equipmentImageValues[i].gameObject.SetActive(false);
+                }
 
                 if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
@@ -447,8 +519,6 @@ namespace Vi.UI
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
-            deleteCharacterButton.onClick.RemoveAllListeners();
-            deleteCharacterButton.onClick.AddListener(delegate { StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)); });
 
             RefreshButtonInteractability();
         }
@@ -491,6 +561,10 @@ namespace Vi.UI
 
             primaryWeaponIcon.gameObject.SetActive(false);
             secondaryWeaponIcon.gameObject.SetActive(false);
+            for (int i = 0; i < equipmentTypeKeys.Length; i++)
+            {
+                equipmentImageValues[i].gameObject.SetActive(false);
+            }
 
             PlayerDataManager.Singleton.SetGameModeSettings("");
         }
@@ -500,6 +574,11 @@ namespace Vi.UI
         private bool lastClientState;
         private void Update()
         {
+            statsParent.SetActive(statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+            gearParent.SetActive(!statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+
+            UpdateSelectionBarPositions();
+
             gameVersionText.text = WebRequestManager.Singleton.GameIsUpToDate ? "" : "GAME IS OUT OF DATE";
 
             if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
@@ -566,17 +645,18 @@ namespace Vi.UI
             if (loadoutManager)
             {
                 CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
-                helmImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Helm) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Helm).GetIcon(raceAndGender);
-                chestImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Chest) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Chest).GetIcon(raceAndGender);
-                bootsImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Boots) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Boots).GetIcon(raceAndGender);
-                glovesImage.sprite = loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Gloves) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(CharacterReference.EquipmentType.Gloves).GetIcon(raceAndGender);
+
+                for (int i = 0; i < equipmentTypeKeys.Length; i++)
+                {
+                    equipmentImageValues[i].sprite = loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]).GetIcon(raceAndGender);
+                }
             }
             else
             {
-                helmImage.sprite = defaultEquipmentSprite;
-                chestImage.sprite = defaultEquipmentSprite;
-                bootsImage.sprite = defaultEquipmentSprite;
-                glovesImage.sprite = defaultEquipmentSprite;
+                for (int i = 0; i < equipmentTypeKeys.Length; i++)
+                {
+                    equipmentImageValues[i].sprite = defaultEquipmentSprite;
+                }
             }
         }
 
@@ -605,7 +685,6 @@ namespace Vi.UI
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
-            deleteCharacterButton.gameObject.SetActive(false);
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -621,7 +700,6 @@ namespace Vi.UI
             UpdateSelectedCharacter(character);
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
             isEditingExistingCharacter = true;
-            deleteCharacterButton.gameObject.SetActive(true);
         }
 
         public void OpenCharacterSelect()
@@ -645,7 +723,6 @@ namespace Vi.UI
         {
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
-            deleteCharacterButton.interactable = false;
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
@@ -658,7 +735,6 @@ namespace Vi.UI
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
-            deleteCharacterButton.interactable = true;
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
 
@@ -673,18 +749,28 @@ namespace Vi.UI
             returnButton.interactable = false;
             characterNameInputField.interactable = false;
 
+            foreach (CharacterCard card in characterCardInstances)
+            {
+                card.Button.interactable = false;
+            }
+
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "DELETING CHARACTER";
 
             yield return WebRequestManager.Singleton.CharacterDisableRequest(character._id.ToString());
 
-            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.gameObject.SetActive(false);
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
             deleteCharacterButton.interactable = true;
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
+
+            foreach (CharacterCard card in characterCardInstances)
+            {
+                card.Button.interactable = true;
+            }
 
             OpenCharacterSelect();
         }
@@ -705,7 +791,7 @@ namespace Vi.UI
 
         public IEnumerator AutoConnectToHubServer()
         {
-            selectCharacterButton_autoConnectToHub.interactable = false;
+            selectCharacterButton.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion();
@@ -725,7 +811,7 @@ namespace Vi.UI
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "No Hub Server Online.";
             }
             
-            selectCharacterButton_autoConnectToHub.interactable = true;
+            selectCharacterButton.interactable = true;
         }
 
         public void OpenServerBrowser()
