@@ -8,28 +8,30 @@ namespace Vi.UI
 {
     public class LoadoutOptionElement : MonoBehaviour
     {
-        [SerializeField] private Image weaponIconImage;
-        [SerializeField] private Text weaponNameText;
+        [SerializeField] private Image backgroundImage;
+        [SerializeField] private Image iconImage;
+        [SerializeField] private Text itemNameText;
 
         public void InitializeWeapon(CharacterReference.WeaponOption weaponOption)
         {
-            weaponIconImage.sprite = weaponOption.weaponIcon;
-            weaponNameText.text = weaponOption.name;
+            iconImage.sprite = weaponOption.weaponIcon;
+            iconImage.color = Color.white;
+            itemNameText.text = weaponOption.name;
         }
 
         public void InitializeEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             if (wearableEquipmentOption == null)
             {
-                weaponIconImage.sprite = null;
-                weaponIconImage.color = Color.red;
-                weaponNameText.text = "None";
+                iconImage.sprite = null;
+                iconImage.color = Color.red;
+                itemNameText.text = "None";
             }
             else
             {
-                weaponIconImage.sprite = wearableEquipmentOption.GetIcon(raceAndGender);
-                weaponIconImage.color = Color.white;
-                weaponNameText.text = wearableEquipmentOption.name;
+                iconImage.sprite = wearableEquipmentOption.GetIcon(raceAndGender);
+                iconImage.color = Color.white;
+                itemNameText.text = wearableEquipmentOption.name;
             }
         }
     }
