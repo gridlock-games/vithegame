@@ -168,7 +168,7 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (!movementHandler.CanMove()) { return; }
-            if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction) { return; }
+            if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
@@ -227,7 +227,7 @@ namespace Vi.Core
             AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
             AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
             // If we are transitioning to the same state as this actionclip
-            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
@@ -306,7 +306,7 @@ namespace Vi.Core
                 if (shouldEvaluatePreviousState)
                 {
                     // If we are in the middle of dodging, or playing a hit reaction, don't play this clip unless it's a hit reaction
-                    if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+                    if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return; }
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
@@ -347,7 +347,7 @@ namespace Vi.Core
             }
 
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
-            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction)
+            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
