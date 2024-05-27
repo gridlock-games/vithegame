@@ -26,10 +26,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float maxStamina = 100;
         [SerializeField] private float staminaRecoveryRate = 5;
         [SerializeField] private float staminaDelay = 1;
-        [Header("Defense")]
-        [SerializeField] private float maxDefense = 100;
-        [SerializeField] private float defenseRecoveryRate = 5;
-        [SerializeField] private float defenseDelay = 1;
+        [Header("Spirit")]
+        [SerializeField] private float maxSpirit = 100;
         [Header("Rage")]
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
@@ -61,12 +59,10 @@ namespace Vi.ScriptableObjects
 
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
-        public float GetMaxDefense() { return maxDefense; }
+        public float GetMaxSpirit() { return maxSpirit; }
         public float GetMaxRage() { return maxRage; }
         public float GetStaminaDelay() { return staminaDelay; }
-        public float GetDefenseDelay() { return defenseDelay; }
         public float GetStaminaRecoveryRate() { return staminaRecoveryRate; }
-        public float GetDefenseRecoveryRate() { return defenseRecoveryRate; }
         public float GetRageRecoveryRate() { return rageRecoveryRate; }
 
         [Header("Shooter Weapon Settings")]
@@ -420,8 +416,9 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
 
+        public float dodgeStaminaCost { get; private set; } = 0;
         [Header("Dodge Assignments")]
-        public float dodgeStaminaCost = 20;
+        public float dodgeCooldownDuration = 5;
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;
@@ -430,6 +427,12 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeBR;
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
+
+        private float lastDodgeActivateTime = Mathf.NegativeInfinity;
+
+        public void StartDodgeCooldown() { lastDodgeActivateTime = Time.time; }
+
+        public bool IsDodgeOnCooldown() { return Time.time - lastDodgeActivateTime < dodgeCooldownDuration; }
 
         public ActionClip GetDodgeClip(float angle)
         {

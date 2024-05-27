@@ -75,12 +75,12 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
-            defenseFillImage.fillAmount = attributes.GetDefense() / attributes.GetMaxDefense();
+            defenseFillImage.fillAmount = attributes.GetSpirit() / attributes.GetMaxSpirit();
             rageFillImage.fillAmount = attributes.GetRage() / attributes.GetMaxRage();
 
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * fillSpeed);
             interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
-            interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetDefense() / attributes.GetMaxDefense(), Time.deltaTime * fillSpeed);
+            interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetSpirit() / attributes.GetMaxSpirit(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
             if (!playerUI)

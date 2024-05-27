@@ -216,6 +216,10 @@ namespace Vi.Core
             {
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
             }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            {
+                weaponInstance.StartDodgeCooldown();
+            }
 
             actionVFXTracker.Clear();
             if (actionVFXPreviewInstance) { Destroy(actionVFXPreviewInstance.gameObject); }
@@ -458,7 +462,7 @@ namespace Vi.Core
 
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = attributes.GetDefense() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
+                IsBlocking = attributes.GetSpirit() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {
