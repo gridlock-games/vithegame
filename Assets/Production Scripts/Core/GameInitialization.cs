@@ -82,6 +82,8 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
 
+            if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0).ToString()); }
+
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
         }

@@ -31,6 +31,7 @@ public class DebugOverlay : MonoBehaviour
         pingText.text = "";
 
         InvokeRepeating(nameof(RefreshFps), 0, 0.1f);
+        InvokeRepeating(nameof(RefreshPing), 0, 0.1f);
 
         RefreshStatus();
     }
@@ -46,6 +47,12 @@ public class DebugOverlay : MonoBehaviour
     }
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
+
+    private void RefreshPing()
+    {
+        if (!localPlayer) { pingValue = 0; return; }
+        pingValue = localPlayer.GetRoundTripTime();
+    }
 
     public void Log(string logString, string stackTrace, LogType type)
     {
@@ -63,6 +70,7 @@ public class DebugOverlay : MonoBehaviour
     }
 
     private int fpsValue;
+    private ulong pingValue;
 
     private Attributes localPlayer;
     private void FindLocalPlayer()
@@ -142,15 +150,14 @@ public class DebugOverlay : MonoBehaviour
             bool pingTextEvaluated = false;
             if (localPlayer)
             {
-                ulong ping = localPlayer.GetRoundTripTime();
-                pingText.text = ping.ToString() + "ms";
+                pingText.text = pingValue.ToString() + "ms";
                 dividerText.text = fpsEnabled ? "|" : "";
                 Color pingTextColor;
-                if (ping >= 80)
+                if (pingValue >= 80)
                 {
                     pingTextColor = Color.red;
                 }
-                else if (ping >= 50)
+                else if (pingValue >= 50)
                 {
                     pingTextColor = Color.yellow;
                 }

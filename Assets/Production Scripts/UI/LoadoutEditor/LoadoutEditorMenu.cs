@@ -22,13 +22,22 @@ namespace Vi.UI
         [Header("Armor Select Menu")]
         [SerializeField] private ArmorSelectMenu armorSelectMenu;
         [SerializeField] private Button helmButton;
+        [SerializeField] private Image helmImage;
         [SerializeField] private Button chestButton;
+        [SerializeField] private Image chestImage;
         [SerializeField] private Button shouldersButton;
+        [SerializeField] private Image shouldersImage;
         [SerializeField] private Button glovesButton;
+        [SerializeField] private Image glovesImage;
         [SerializeField] private Button pantsButton;
+        [SerializeField] private Image pantsImage;
         [SerializeField] private Button bootsButton;
+        [SerializeField] private Image bootsImage;
         [SerializeField] private Button beltButton;
+        [SerializeField] private Image beltImage;
         [SerializeField] private Button capeButton;
+        [SerializeField] private Image capeImage;
+        [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
         private GameObject camInstance;
@@ -77,8 +86,6 @@ namespace Vi.UI
                 b.interactable = button != b;
             }
 
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
             WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
@@ -87,6 +94,7 @@ namespace Vi.UI
             playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
             PlayerDataManager.Singleton.SetPlayerData(playerData);
 
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             CharacterReference.WeaponOption weaponOption1 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId);
             CharacterReference.WeaponOption weaponOption2 = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId);
 
@@ -103,30 +111,55 @@ namespace Vi.UI
             secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
             secondaryWeaponButton.interactable = canEditLoadout;
 
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption helmOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.helmGearItemId).itemId);
             helmButton.onClick.RemoveAllListeners();
             helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
             helmButton.interactable = canEditLoadout;
+            helmImage.sprite = helmOption == null ? defaultSprite : helmOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption chestOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.chestArmorGearItemId).itemId);
             chestButton.onClick.RemoveAllListeners();
             chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
             chestButton.interactable = canEditLoadout;
+            chestImage.sprite = chestOption == null ? defaultSprite : chestOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption shouldersOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.shouldersGearItemId).itemId);
             shouldersButton.onClick.RemoveAllListeners();
             shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
             shouldersButton.interactable = canEditLoadout;
+            shouldersImage.sprite = shouldersOption == null ? defaultSprite : shouldersOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption glovesOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.glovesGearItemId).itemId);
             glovesButton.onClick.RemoveAllListeners();
             glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
             glovesButton.interactable = canEditLoadout;
+            glovesImage.sprite = glovesOption == null ? defaultSprite : glovesOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption pantsOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.pantsGearItemId).itemId);
             pantsButton.onClick.RemoveAllListeners();
             pantsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Pants, loadoutSlot); });
             pantsButton.interactable = canEditLoadout;
+            pantsImage.sprite = pantsOption == null ? defaultSprite : pantsOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption bootsOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.bootsGearItemId).itemId);
             bootsButton.onClick.RemoveAllListeners();
             bootsButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Boots, loadoutSlot); });
             bootsButton.interactable = canEditLoadout;
+            bootsImage.sprite = bootsOption == null ? defaultSprite : bootsOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption beltOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.beltGearItemId).itemId);
             beltButton.onClick.RemoveAllListeners();
             beltButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Belt, loadoutSlot); });
             beltButton.interactable = canEditLoadout;
+            beltImage.sprite = beltOption == null ? defaultSprite : beltOption.GetIcon(playerData.character.raceAndGender);
+
+            CharacterReference.WearableEquipmentOption capeOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.capeGearItemId).itemId);
             capeButton.onClick.RemoveAllListeners();
             capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });
             capeButton.interactable = canEditLoadout;
+            capeImage.sprite = capeOption == null ? defaultSprite : capeOption.GetIcon(playerData.character.raceAndGender);
         }
 
         private void OpenWeaponSelect(CharacterReference.WeaponOption weaponOption, CharacterReference.WeaponOption otherOption, LoadoutManager.WeaponSlotType weaponType, int loadoutSlot)

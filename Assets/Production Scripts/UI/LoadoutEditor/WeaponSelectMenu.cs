@@ -10,7 +10,7 @@ namespace Vi.UI
     public class WeaponSelectMenu : Menu
     {
         [SerializeField] private Transform weaponOptionScrollParent;
-        [SerializeField] private WeaponOptionElement weaponOptionPrefab;
+        [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
 
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
@@ -22,8 +22,8 @@ namespace Vi.UI
             Button invokeThis = null;
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
-                WeaponOptionElement ele = Instantiate(weaponOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<WeaponOptionElement>();
-                ele.Initialize(weaponOption);
+                LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
 
