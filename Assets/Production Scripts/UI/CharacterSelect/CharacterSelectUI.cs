@@ -41,9 +41,9 @@ namespace Vi.UI
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
-        [SerializeField] private GameObject characterCustomizationRowPrefab;
-        [SerializeField] private GameObject characterCustomizationButtonPrefab;
-        [SerializeField] private GameObject removeEquipmentButtonPrefab;
+        [SerializeField] private Transform customizationRowsParent;
+        [SerializeField] private CharacterCustomizationRow characterCustomizationRowPrefab;
+        [SerializeField] private CharacterCustomizationButton characterCustomizationButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
         [SerializeField] private Button finishCharacterCustomizationButton;
         [SerializeField] private Vector3 previewCharacterPosition = new Vector3(0.6f, 0, -7);
@@ -261,37 +261,36 @@ namespace Vi.UI
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
 
                     bool isOnLeftSide = true;
-                    isOnLeftSide = !isOnLeftSide;
+                    //isOnLeftSide = !isOnLeftSide;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).FindAll(item => item.materialApplicationLocation == characterMaterial.materialApplicationLocation).Count;
-                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
-                    buttonParent.GetComponentInChildren<GridLayoutGroup>().childAlignment = childAlignment;
-                    GridLayoutGroup.Corner startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperRight : GridLayoutGroup.Corner.UpperLeft;
-                    buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = startCorner;
+                    buttonParent.GetComponent<CharacterCustomizationRow>().GetLayoutGroup().childAlignment = childAlignment;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition -= new Vector3(300, 0, 0);
+                        headerText.transform.localPosition += new Vector3(300, 0, 0);
                         headerText.alignment = TextAnchor.MiddleLeft;
                     }
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
                 }
-                buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+                CharacterCustomizationRow rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                buttonParent = rowElement.GetLayoutGroup().transform;
 
                 Color textureAverageColor = characterMaterial.averageTextureColor;
 
-                Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
-                image.color = textureAverageColor;
+                CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
+                buttonElement.InitializeAsColor(textureAverageColor);
                 materialColorList.Add(new KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>(characterMaterial.materialApplicationLocation, textureAverageColor));
 
-                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
-                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
+                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
             }
 
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender))
@@ -299,93 +298,101 @@ namespace Vi.UI
                 if (!equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType)) { continue; }
 
                 Transform buttonParent = characterEquipmentParents.Find(item => item.equipmentType == equipmentOption.equipmentType).parent;
+                CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
 
                     bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
-                    isOnLeftSide = !isOnLeftSide;
+                    //isOnLeftSide = !isOnLeftSide;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).FindAll(item => item.equipmentType == equipmentOption.equipmentType).Count;
-                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * -50; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * -50; }
+                    if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
-                    buttonParent.GetComponentInChildren<GridLayoutGroup>().childAlignment = childAlignment;
-                    GridLayoutGroup.Corner startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperRight : GridLayoutGroup.Corner.UpperLeft;
-                    buttonParent.GetComponentInChildren<GridLayoutGroup>().startCorner = startCorner;
+                    rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    rowElement.GetLayoutGroup().childAlignment = childAlignment;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = equipmentOption.equipmentType.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition -= new Vector3(300, 0, 0);
+                        headerText.transform.localPosition += new Vector3(300, 0, 0);
                         headerText.alignment = TextAnchor.MiddleLeft;
                     }
                     characterEquipmentParents.Add(new EquipmentCustomizationParent() { equipmentType = equipmentOption.equipmentType, parent = buttonParent });
 
-                    buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
-                    Button removeButton = Instantiate(removeEquipmentButtonPrefab, buttonParent).GetComponent<Button>();
-                    removeButton.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
-                    customizationButtonReference.Add(new ButtonInfo(removeButton, equipmentOption.equipmentType.ToString(), "Remove"));
+                    buttonParent = rowElement.GetLayoutGroup().transform;
+                    CharacterCustomizationButton removeButton = rowElement.GetUninitializedButton();
+                    removeButton.InitializeAsRemoveEquipment();
+                    removeButton.Button.onClick.RemoveAllListeners();
+                    removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
+                    customizationButtonReference.Add(new ButtonInfo(removeButton.Button, equipmentOption.equipmentType.ToString(), "Remove"));
                 }
                 else
                 {
-                    buttonParent = buttonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+                    rowElement = buttonParent.GetComponentInParent<CharacterCustomizationRow>();
+                    buttonParent = rowElement.GetLayoutGroup().transform;
                 }
 
-                Image image = Instantiate(characterCustomizationButtonPrefab, buttonParent).GetComponent<Image>();
-                image.sprite = equipmentOption.GetIcon(raceAndGender);
-                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
-                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name));
+                CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
+                buttonElement.InitializeAsEquipment(equipmentOption, raceAndGender);
+                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name));
             }
 
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
             otherCustomizationRowParents.Add(raceButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
             int raceCount = 2;
-            leftQueuedSpacing = raceCount / 11 * -50;
-            raceButtonParent.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
-            raceButtonParent.GetComponentInChildren<Text>().text = "Race";
-            raceButtonParent = raceButtonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
+            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
+            raceRowElement.rowHeaderText.text = "Race";
+            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
 
-            foreach (string race in new List<string>() { "Human" }) // , "Orc"
+            foreach (string race in new List<string>() { "Human" })
             {
-                Image image = Instantiate(characterCustomizationButtonPrefab, raceButtonParent).GetComponent<Image>();
+                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
 
                 switch (race)
                 {
                     case "Human":
-                        image.color = new Color(210 / 255f, 180 / 255f, 140 / 255f, 1);
+                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
                         break;
                     case "Orc":
-                        image.color = Color.green;
+                        buttonElement.InitializeAsColor(Color.green);
                         break;
                     default:
                         Debug.Log("Not sure how to handle race string " + race);
                         break;
                 }
 
-                image.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                customizationButtonReference.Add(new ButtonInfo(image.GetComponent<Button>(), "Race", race));
+                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
             }
 
-            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab, characterCustomizationParent.transform).transform;
+            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
             otherCustomizationRowParents.Add(genderButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
             int genderCount = 2;
-            leftQueuedSpacing = genderCount / 11 * -50;
-            genderButtonParent.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
-            genderButtonParent.GetComponentInChildren<Text>().text = "Gender";
-            genderButtonParent = genderButtonParent.GetComponentInChildren<GridLayoutGroup>().transform;
+            leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
+            genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
+            genderRowElement.rowHeaderText.text = "Gender";
+            genderButtonParent = genderRowElement.GetLayoutGroup().transform;
 
-            Image boyButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
-            boyButtonImage.color = Color.blue;
-            boyButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            customizationButtonReference.Add(new ButtonInfo(boyButtonImage.GetComponent<Button>(), "Gender", "Male"));
-            Image girlButtonImage = Instantiate(characterCustomizationButtonPrefab, genderButtonParent).GetComponent<Image>();
-            girlButtonImage.color = Color.magenta;
-            girlButtonImage.GetComponent<Button>().onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            customizationButtonReference.Add(new ButtonInfo(girlButtonImage.GetComponent<Button>(), "Gender", "Female"));
+            CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
+            boyButtonElement.InitializeAsColor(Color.blue);
+            boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
+            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
+            
+            CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
+            girlButtonElement.InitializeAsColor(Color.magenta);
+            girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
+            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
         }
+
+        private const int customizationRowSpacing = -2000;
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
@@ -409,30 +416,35 @@ namespace Vi.UI
 
             foreach (ButtonInfo buttonInfo in customizationButtonReference)
             {
-                if (disableAll) { buttonInfo.button.interactable = false; continue; }
+                if (disableAll)
+                {
+                    buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(true);
+                    buttonInfo.button.interactable = false;
+                    continue;
+                }
 
                 switch (buttonInfo.key)
                 {
                     case "Eyes":
-                        buttonInfo.button.interactable = selectedCharacter.eyeColor != buttonInfo.value;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.eyeColor != buttonInfo.value);
                         break;
                     case "Body":
-                        buttonInfo.button.interactable = selectedCharacter.bodyColor != buttonInfo.value;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.bodyColor != buttonInfo.value);
                         break;
                     case "Brows":
-                        buttonInfo.button.interactable = selectedCharacter.brows == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.brows;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.brows == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.brows);
                         break;
                     case "Hair":
-                        buttonInfo.button.interactable = selectedCharacter.hair == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hair;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.hair == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hair);
                         break;
                     case "Beard":
-                        buttonInfo.button.interactable = selectedCharacter.beard == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beard;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.beard == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beard);
                         break;
                     case "Race":
-                        buttonInfo.button.interactable = selectedRace != buttonInfo.value;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedRace != buttonInfo.value);
                         break;
                     case "Gender":
-                        buttonInfo.button.interactable = selectedGender != buttonInfo.value;
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedGender != buttonInfo.value);
                         break;
                     default:
                         Debug.LogError("Not sure how to handle button key " + buttonInfo.key);
