@@ -406,7 +406,7 @@ namespace Vi.UI
                 switch (buttonInfo.key)
                 {
                     case "CharacterCard":
-                        buttonInfo.button.interactable = selectedCharacter._id != buttonInfo.value;
+                        buttonInfo.button.GetComponent<CharacterCard>().SetSelectedState(selectedCharacter._id != buttonInfo.value);
                         break;
                     default:
                         Debug.LogError("Not sure how to handle button key " + buttonInfo.key);

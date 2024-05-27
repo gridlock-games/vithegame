@@ -62,10 +62,11 @@ namespace Vi.UI
             levelText.text = "Lv." + character.experience.ToString();
         }
 
-        public void SetAsSelected()
+        public void SetSelectedState(bool isNotSelected)
         {
             if (!IsCharacter) { return; }
-            isSelected = true;
+            isSelected = !isNotSelected;
+            Button.interactable = isNotSelected;
         }
 
         private void OnEnable()
@@ -76,7 +77,7 @@ namespace Vi.UI
         }
 
         private const float selectedSizeMutliplier = 1.13f;
-        private const float selectedImageAnimationSpeed = 4;
+        private const float selectedImageAnimationSpeed = 8;
         private bool isSelected;
         private void Update()
         {
