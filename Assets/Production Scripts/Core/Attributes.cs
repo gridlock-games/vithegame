@@ -38,23 +38,23 @@ namespace Vi.Core
 
         public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
         public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
-        public float GetMaxDefense() { return weaponHandler.GetWeapon().GetMaxDefense(); }
+        public float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
         public float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
 
         private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<float> stamina = new NetworkVariable<float>();
-        private NetworkVariable<float> defense = new NetworkVariable<float>();
+        private NetworkVariable<float> spirit = new NetworkVariable<float>();
         private NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetHP() { return HP.Value; }
         public float GetStamina() { return stamina.Value; }
-        public float GetDefense() { return defense.Value; }
+        public float GetSpirit() { return spirit.Value; }
         public float GetRage() { return rage.Value; }
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
             HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
-            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
+            spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             stamina.Value = 0;
             if (resetRage)
                 rage.Value = 0;
@@ -86,20 +86,17 @@ namespace Vi.Core
                 stamina.Value += amount;
         }
 
-        public void AddDefense(float amount, bool activateCooldown = true)
+        public void AddSpirit(float amount)
         {
-            if (amount < 0) { amount *= defenseReductionMultiplier; }
-            if (amount > 0) { amount *= defenseIncreaseMultiplier; }
+            if (amount < 0) { amount *= spiritReductionMultiplier; }
+            if (amount > 0) { amount *= spiritIncreaseMultiplier; }
 
-            if (activateCooldown)
-                defenseDelayCooldown = weaponHandler.GetWeapon().GetDefenseDelay();
-
-            if (defense.Value + amount > weaponHandler.GetWeapon().GetMaxDefense())
-                defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
-            else if (defense.Value + amount < 0)
-                defense.Value = 0;
+            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit())
+                spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
+            else if (spirit.Value + amount < 0)
+                spirit.Value = 0;
             else
-                defense.Value += amount;
+                spirit.Value += amount;
         }
 
         public void AddRage(float amount)
@@ -136,7 +133,7 @@ namespace Vi.Core
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
-            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
+            spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
@@ -428,8 +425,8 @@ namespace Vi.Core
         }
 
         public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
-        private const float notBlockingDefenseHitReactionPercentage = 0.4f;
-        private const float blockingDefenseHitReactionPercentage = 0.5f;
+        private const float notBlockingSpiritHitReactionPercentage = 0.4f;
+        private const float blockingSpiritHitReactionPercentage = 0.5f;
 
         private const float rageDamageMultiplier = 1.15f;
 
@@ -528,7 +525,7 @@ namespace Vi.Core
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
-            //AddDefense(-attack.defenseDamage);
+            //AddSpirit(-attack.spiritDamage);
             if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
@@ -542,43 +539,43 @@ namespace Vi.Core
             HPDamage *= attacker.damageMultiplier;
             HPDamage *= damageMultiplier;
 
-            float defensePercentage = GetDefense() / GetMaxDefense();
+            float spiritPercentage = GetSpirit() / GetMaxSpirit();
 
             bool shouldPlayHitReaction = false;
             switch (hitReaction.GetHitReactionType())
             {
                 case ActionClip.HitReactionType.Normal:
-                    if (defensePercentage >= notBlockingDefenseHitReactionPercentage)
+                    if (spiritPercentage >= notBlockingSpiritHitReactionPercentage)
                     {
-                        AddDefense(HPDamage * 0.7f);
+                        AddSpirit(HPDamage * 0.7f);
                         HPDamage *= 0.7f;
                     }
-                    else if (defensePercentage > 0)
+                    else if (spiritPercentage > 0)
                     {
-                        AddDefense(HPDamage * 0.7f);
+                        AddSpirit(HPDamage * 0.7f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
                     }
-                    else // Defense is at 0
+                    else // Spirit is at 0
                     {
-                        AddDefense(attack.damage);
+                        AddSpirit(attack.damage);
                         shouldPlayHitReaction = true;
                     }
                     break;
                 case ActionClip.HitReactionType.Blocking:
-                    if (defensePercentage >= blockingDefenseHitReactionPercentage)
+                    if (spiritPercentage >= blockingSpiritHitReactionPercentage)
                     {
-                        AddDefense(HPDamage * 0.5f);
+                        AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
-                    else if (defensePercentage > 0)
+                    else if (spiritPercentage > 0)
                     {
-                        AddDefense(Mathf.NegativeInfinity);
+                        AddSpirit(Mathf.NegativeInfinity);
                         AddStamina(-GetMaxStamina() * 0.3f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
                     }
-                    else // Defense is at 0
+                    else // Spirit is at 0
                     {
                         AddStamina(-GetMaxStamina() * 0.3f);
                         if (GetStamina() < GetMaxStamina() * 0.3f)
@@ -926,7 +923,6 @@ namespace Vi.Core
             isUninterruptable.Value = Time.time <= uninterruptableEndTime;
 
             UpdateStamina();
-            //UpdateDefense();
             UpdateRage();
 
             roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
@@ -938,16 +934,6 @@ namespace Vi.Core
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
             if (staminaDelayCooldown > 0) { return; }
             AddStamina(weaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
-        }
-
-        private float defenseDelayCooldown;
-        private void UpdateDefense()
-        {
-            if (weaponHandler.IsBlocking) { return; }
-
-            defenseDelayCooldown = Mathf.Max(0, defenseDelayCooldown - Time.deltaTime);
-            if (defenseDelayCooldown > 0) return;
-            AddDefense(weaponHandler.GetWeapon().GetDefenseRecoveryRate() * Time.deltaTime, false);
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
@@ -1151,8 +1137,8 @@ namespace Vi.Core
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
-        private float defenseIncreaseMultiplier = 1;
-        private float defenseReductionMultiplier = 1;
+        private float spiritIncreaseMultiplier = 1;
+        private float spiritReductionMultiplier = 1;
         
         public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
         private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
@@ -1215,16 +1201,16 @@ namespace Vi.Core
                     healingMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
-                case ActionClip.Status.defenseIncreaseMultiplier:
-                    defenseIncreaseMultiplier *= statusPayload.value;
+                case ActionClip.Status.spiritIncreaseMultiplier:
+                    spiritIncreaseMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
-                    defenseIncreaseMultiplier /= statusPayload.value;
+                    spiritIncreaseMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
-                case ActionClip.Status.defenseReductionMultiplier:
-                    defenseReductionMultiplier *= statusPayload.value;
+                case ActionClip.Status.spiritReductionMultiplier:
+                    spiritReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
-                    defenseReductionMultiplier /= statusPayload.value;
+                    spiritReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:
