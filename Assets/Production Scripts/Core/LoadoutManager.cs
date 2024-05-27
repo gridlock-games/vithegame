@@ -74,6 +74,11 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+
+            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
+            {
+                equippedEquipment.Add(equipmentType, null);
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -151,17 +156,29 @@ namespace Vi.Core
                     CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
                     if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId); }
                     if (wearableEquipmentOption == null) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()); }
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
                     animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
                 else if (NetworkObject.IsPlayerObject)
                 {
-                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId), raceAndGender);
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId);
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
                 else
                 {
-                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()), raceAndGender);
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString());
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
             }
+        }
+
+        private Dictionary<CharacterReference.EquipmentType, CharacterReference.WearableEquipmentOption> equippedEquipment = new Dictionary<CharacterReference.EquipmentType, CharacterReference.WearableEquipmentOption>();
+
+        public CharacterReference.WearableEquipmentOption GetEquippedEquipmentOption(CharacterReference.EquipmentType equipmentType)
+        {
+            return equippedEquipment[equipmentType];
         }
 
         public override void OnNetworkDespawn()

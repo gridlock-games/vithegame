@@ -30,7 +30,9 @@ namespace Vi.UI
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
         [SerializeField] private Button returnButton;
-        [SerializeField] private Button switchLoginFormButton;
+        [SerializeField] private Button openLoginFormButton;
+        [SerializeField] private Button openRegisterAccountButton;
+        [SerializeField] private Button forgotPasswordButton;
         [SerializeField] private Text loginErrorText;
 
         [Header("OAuth")]
@@ -162,9 +164,9 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
+            forgotPasswordButton.gameObject.SetActive(true);
+            openRegisterAccountButton.gameObject.SetActive(true);
+            openLoginFormButton.gameObject.SetActive(false);
         }
 
         public void OpenCreateAccount()
@@ -181,9 +183,9 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "GO TO LOGIN";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenViLogin);
+            forgotPasswordButton.gameObject.SetActive(false);
+            openRegisterAccountButton.gameObject.SetActive(false);
+            openLoginFormButton.gameObject.SetActive(true);
         }
 
         public void OpenViLogin()
@@ -201,9 +203,9 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
+            forgotPasswordButton.gameObject.SetActive(true);
+            openRegisterAccountButton.gameObject.SetActive(true);
+            openLoginFormButton.gameObject.SetActive(false);
         }
 
         public void ReturnToInitialElements()
@@ -265,7 +267,7 @@ namespace Vi.UI
 
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
-            welcomeUserText.text = "Welcome " + FasterPlayerPrefs.Singleton.GetString("username");
+            welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
@@ -317,13 +319,14 @@ namespace Vi.UI
             }
 
             AuthResult authResult = task.Result;
+            oAuthMessageText.text = $"Waiting for Firebase Authentication";
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
-                welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
+                welcomeUserText.text = authResult.User.DisplayName;
                 FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Google");
                 FasterPlayerPrefs.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
@@ -348,6 +351,11 @@ namespace Vi.UI
         {
             WebRequestManager.Singleton.Logout();
             initialParent.SetActive(true);
+        }
+
+        public void ForgotPassword()
+        {
+            Debug.LogError("Not implemented yet!");
         }
 
         private FirebaseAuth auth;
@@ -448,7 +456,9 @@ namespace Vi.UI
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            switchLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            openLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            openRegisterAccountButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
                 button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
