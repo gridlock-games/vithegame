@@ -27,12 +27,12 @@ namespace Vi.Core
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
-            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(animationStateName);
+            return Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(actionsLayer).IsName(animationStateName);
         }
 
         public bool IsActionClipPlayingInCurrentState(ActionClip actionClip)
         {
-            return Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(GetActionClipAnimationStateName(actionClip));
+            return Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(GetActionClipAnimationStateName(actionClip));
         }
 
         private string GetActionClipAnimationStateName(ActionClip actionClip)
@@ -47,13 +47,13 @@ namespace Vi.Core
         {
             string stateName = GetActionClipAnimationStateName(actionClip);
             float normalizedTime = 0;
-            if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(stateName))
             {
-                normalizedTime = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+                normalizedTime = Animator.GetCurrentAnimatorStateInfo(actionsLayer).normalizedTime;
             }
-            else if (Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(stateName))
+            else if (Animator.GetNextAnimatorStateInfo(actionsLayer).IsName(stateName))
             {
-                normalizedTime = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime;
+                normalizedTime = Animator.GetNextAnimatorStateInfo(actionsLayer).normalizedTime;
             }
 
             float floor = Mathf.FloorToInt(normalizedTime);
@@ -115,10 +115,17 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
+        private bool IsPlayingHitReaction()
+        {
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.HitReaction) { return false; }
+            return !IsAtRest();
+        }
+
         public const float flinchingMovementSpeedMultiplier = 0.8f;
         public bool IsFlinching()
         {
-            return !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Flinch")).IsName("Empty");
+            return !Animator.GetCurrentAnimatorStateInfo(flinchLayer).IsName("Empty");
         }
 
         public bool IsGrabAttacking()
@@ -132,7 +139,7 @@ namespace Vi.Core
         {
             if (!lastClipPlayed) { return false; }
             if (lastClipPlayed.GetClipType() != ActionClip.ClipType.HeavyAttack) { return false; }
-            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
+            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(actionsLayer);
             return currentStateInfo.IsName(lastClipPlayed.name + "_Loop") | currentStateInfo.IsName(lastClipPlayed.name + "_Enhance") | currentStateInfo.IsName(lastClipPlayed.name + "_Start");
         }
 
@@ -141,7 +148,7 @@ namespace Vi.Core
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
-            Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
+            Animator.CrossFade("Empty", 0, actionsLayer);
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();
@@ -161,6 +168,7 @@ namespace Vi.Core
         };
 
         // This method plays the action on the server
+        private bool hitReactionIsStarting;
         private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
             WaitingForActionToPlay = false;
@@ -168,7 +176,7 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (!movementHandler.CanMove()) { return; }
-            if (attributes.IsRooted() & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
+            if ((attributes.IsRooted() | hitReactionIsStarting) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
@@ -224,15 +232,15 @@ namespace Vi.Core
                 if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
             }
 
-            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
-            AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Actions"));
+            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(actionsLayer);
+            AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(actionsLayer);
             // If we are transitioning to the same state as this actionclip
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
                 if (nextStateInfo.IsName(actionClipName)) { return; }
             }
 
-            bool isInTransition = Animator.IsInTransition(Animator.GetLayerIndex("Actions"));
+            bool isInTransition = Animator.IsInTransition(actionsLayer);
             bool shouldUseDodgeCancelTransitionTime = false;
             // If we are not at rest
             if (!currentStateInfo.IsName("Empty") | isInTransition)
@@ -366,11 +374,11 @@ namespace Vi.Core
                 if (rageCost != 0) { attributes.AddRage(rageCost); }
             }
 
+            // At this point we are going to play the action clip
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            // At this point we are going to play the action clip
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
                 StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
@@ -379,7 +387,7 @@ namespace Vi.Core
             if (heavyAttackCoroutine != null)
             {
                 StopCoroutine(heavyAttackCoroutine);
-                Animator.CrossFade("Empty", 0, Animator.GetLayerIndex("Actions"));
+                Animator.CrossFade("Empty", 0, actionsLayer);
             }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
@@ -399,6 +407,7 @@ namespace Vi.Core
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
+            Debug.Log(animationStateName + " " + currentStateInfo.IsName("Empty") + " " + nextStateInfo.IsName("Empty") + " " + name);
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 switch (actionClip.GetClipType())
@@ -408,17 +417,26 @@ namespace Vi.Core
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.GrabAttack:
                     case ActionClip.ClipType.Lunge:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
+                        Animator.CrossFade(animationStateName, transitionTime, actionsLayer);
                         break;
                     case ActionClip.ClipType.HeavyAttack:
                         heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                         break;
                     case ActionClip.ClipType.HitReaction:
+                        hitReactionIsStarting = true;
+
+                        if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+                        hitReactionIsStartingCoroutine = StartCoroutine(ResetHitReactionIsStarting(actionClip));
+
+                        if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+                        playStateAfterReachingEmptyCoroutine = StartCoroutine(PlayStateAfterReachingEmpty(animationStateName, transitionTime));
+                        
+                        break;
                     case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                        Animator.CrossFade(animationStateName, transitionTime, actionsLayer, 0);
                         break;
                     case ActionClip.ClipType.Flinch:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Flinch"), 0);
+                        Animator.CrossFade(animationStateName, transitionTime, flinchLayer, 0);
                         break;
                     default:
                         Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
@@ -435,6 +453,22 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
             lastClipPlayed = actionClip;
+        }
+
+        private Coroutine playStateAfterReachingEmptyCoroutine;
+        private IEnumerator PlayStateAfterReachingEmpty(string animationStateName, float transitionTime)
+        {
+            Animator.CrossFade("Empty", 0, actionsLayer);
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName("Empty"));
+            Animator.CrossFade(animationStateName, transitionTime, actionsLayer);
+        }
+
+        private Coroutine hitReactionIsStartingCoroutine;
+        private IEnumerator ResetHitReactionIsStarting(ActionClip actionClip)
+        {
+            string stateName = GetActionClipAnimationStateName(actionClip);
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(stateName));
+            hitReactionIsStarting = false;
         }
 
         public bool AreActionClipRequirementsMet(ActionClip actionClip)
@@ -542,13 +576,13 @@ namespace Vi.Core
                 if (i == 0)
                 {
                     yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip));
-                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
                 else
                 {
                     yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip.followUpActionClipsToPlay[i - 1].actionClip));
-                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
                 PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip, true);
@@ -571,14 +605,14 @@ namespace Vi.Core
             Animator.SetBool("CancelHeavyAttack", false);
             Animator.SetBool("PlayHeavyAttackEnd", actionClip.chargeAttackHasEndAnimation);
 
-            Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, Animator.GetLayerIndex("Actions"));
+            Animator.CrossFade(actionClip.name + "_Start", actionClip.transitionTime, actionsLayer);
 
             float chargeTime = 0;
             while (true)
             {
                 yield return null;
 
-                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Enhance"))
+                if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionClip.name + "_Loop") | Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionClip.name + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
                     //if (Application.isEditor) { Debug.Log(chargeTime); }
@@ -610,15 +644,15 @@ namespace Vi.Core
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
 
-                            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"));
+                            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionClip.name + "_Attack"));
 
                             while (true)
                             {
                                 yield return null;
 
-                                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionClip.name + "_Attack"))
+                                if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionClip.name + "_Attack"))
                                 {
-                                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                                    if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                                     {
                                         Animator.SetTrigger("ProgressHeavyAttackState");
                                         break;
@@ -666,15 +700,15 @@ namespace Vi.Core
 
         private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount)
         {
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"));
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionStateName + "_Attack"));
 
             while (true)
             {
                 yield return null;
 
-                if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName + "_Attack"))
+                if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionStateName + "_Attack"))
                 {
-                    if (Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                    if (Animator.GetCurrentAnimatorStateInfo(actionsLayer).normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         break;
@@ -688,11 +722,11 @@ namespace Vi.Core
             switch (avatarLayer)
             {
                 case ActionClip.AvatarLayer.FullBody:
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Actions"), 1);
+                    Animator.SetLayerWeight(actionsLayer, 1);
                     Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 0);
                     break;
                 case ActionClip.AvatarLayer.Aiming:
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Actions"), 0);
+                    Animator.SetLayerWeight(actionsLayer, 0);
                     Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 1);
                     break;
                 default:
@@ -751,17 +785,17 @@ namespace Vi.Core
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.GrabAttack:
                     case ActionClip.ClipType.Lunge:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"));
+                        Animator.CrossFade(animationStateName, transitionTime, actionsLayer);
                         break;
                     case ActionClip.ClipType.HeavyAttack:
                         heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                         break;
                     case ActionClip.ClipType.HitReaction:
                     case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Actions"), 0);
+                        Animator.CrossFade(animationStateName, transitionTime, actionsLayer, 0);
                         break;
                     case ActionClip.ClipType.Flinch:
-                        Animator.CrossFade(animationStateName, transitionTime, Animator.GetLayerIndex("Flinch"), 0);
+                        Animator.CrossFade(animationStateName, transitionTime, flinchLayer, 0);
                         break;
                     default:
                         Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
@@ -785,8 +819,8 @@ namespace Vi.Core
         private IEnumerator SetInvincibleStatusOnDodge(string actionStateName)
         {
             attributes.SetInviniciblity(5);
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Actions")).IsName(actionStateName));
-            AnimatorClipInfo[] dodgeClips = Animator.GetCurrentAnimatorClipInfo(Animator.GetLayerIndex("Actions"));
+            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionStateName));
+            AnimatorClipInfo[] dodgeClips = Animator.GetCurrentAnimatorClipInfo(actionsLayer);
             if (dodgeClips.Length > 0)
                 attributes.SetInviniciblity(dodgeClips[0].clip.length * 0.35f);
             else
@@ -840,6 +874,9 @@ namespace Vi.Core
                 GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 
                 Animator = modelInstance.GetComponent<Animator>();
+                actionsLayer = Animator.GetLayerIndex("Actions");
+                flinchLayer = Animator.GetLayerIndex("Flinch");
+
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
             }
@@ -877,6 +914,8 @@ namespace Vi.Core
         WeaponHandler weaponHandler;
         LoadoutManager loadoutManager;
         MovementHandler movementHandler;
+        private int actionsLayer;
+        private int flinchLayer;
         private void Awake()
         {
             attributes = GetComponent<Attributes>();
