@@ -432,13 +432,13 @@ namespace Vi.UI
                         buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.bodyColor != buttonInfo.value);
                         break;
                     case "Brows":
-                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.brows == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.brows);
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.brows == "" | selectedCharacter.brows == "EmptyWearableEquipment" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.brows);
                         break;
                     case "Hair":
-                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.hair == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hair);
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.hair == "" | selectedCharacter.hair == "EmptyWearableEquipment" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.hair);
                         break;
                     case "Beard":
-                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.beard == "" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beard);
+                        buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedCharacter.beard == "" | selectedCharacter.beard == "EmptyWearableEquipment" ? buttonInfo.value != "Remove" : buttonInfo.value != selectedCharacter.beard);
                         break;
                     case "Race":
                         buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedRace != buttonInfo.value);
