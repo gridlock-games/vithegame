@@ -216,6 +216,10 @@ namespace Vi.Core
             {
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
             }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            {
+                weaponInstance.StartDodgeCooldown();
+            }
 
             actionVFXTracker.Clear();
             if (actionVFXPreviewInstance) { Destroy(actionVFXPreviewInstance.gameObject); }

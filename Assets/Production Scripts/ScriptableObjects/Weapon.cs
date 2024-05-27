@@ -416,8 +416,9 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
 
+        public float dodgeStaminaCost { get; private set; } = 0;
         [Header("Dodge Assignments")]
-        public float dodgeStaminaCost = 20;
+        public float dodgeCooldownDuration = 5;
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;
@@ -426,6 +427,12 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeBR;
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
+
+        private float lastDodgeActivateTime = Mathf.NegativeInfinity;
+
+        public void StartDodgeCooldown() { lastDodgeActivateTime = Time.time; }
+
+        public bool IsDodgeOnCooldown() { return Time.time - lastDodgeActivateTime < dodgeCooldownDuration; }
 
         public ActionClip GetDodgeClip(float angle)
         {

@@ -172,6 +172,15 @@ namespace Vi.Core
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            {
+                if (weaponHandler.GetWeapon().IsDodgeOnCooldown()) { return; }
+            }
+            else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+            {
+                if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
+            }
+
             if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
             {
                 ActionClip lungeClip = weaponHandler.GetWeapon().GetLungeClip();
@@ -345,22 +354,27 @@ namespace Vi.Core
 
             if (!AreActionClipRequirementsMet(actionClip)) { return; }
 
-            if (ShouldApplyStaminaCost(actionClip)) { attributes.AddStamina(-GetStaminaCostOfClip(actionClip)); }
-            if (ShouldApplyRageCost(actionClip)) { attributes.AddRage(-GetRageCostOfClip(actionClip)); }
-
-            // Check stamina and rage requirements and apply statuses for specific actions
-            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            // Check stamina and rage requirements
+            if (ShouldApplyStaminaCost(actionClip))
             {
-                StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
+                float staminaCost = -GetStaminaCostOfClip(actionClip);
+                if (staminaCost != 0) { attributes.AddStamina(staminaCost); }
             }
-            else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
+            if (ShouldApplyRageCost(actionClip))
             {
-                if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
+                float rageCost = -GetRageCostOfClip(actionClip);
+                if (rageCost != 0) { attributes.AddRage(rageCost); }
             }
 
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
+
+            // At this point we are going to play the action clip
+            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+            {
+                StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
+            }
 
             if (heavyAttackCoroutine != null)
             {
