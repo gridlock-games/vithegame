@@ -77,7 +77,7 @@ namespace Vi.UI
         {
             CharacterReference.EquipmentType.Hair,
             CharacterReference.EquipmentType.Beard,
-            CharacterReference.EquipmentType.Brows,
+            CharacterReference.EquipmentType.Brows
         };
 
         private Vector2 statsOpenAnchoredPosition;

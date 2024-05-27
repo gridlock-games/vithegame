@@ -11,7 +11,8 @@ namespace Vi.UI
         [SerializeField] private GameObject characterParent;
         [SerializeField] private GameObject addParent;
         [SerializeField] private GameObject lockedParent;
-        [SerializeField] private Image selectedImage;
+        [SerializeField] private Image selectedOverlay;
+        [SerializeField] private Image selectedBorder;
         [SerializeField] private Text nameText;
         [SerializeField] private Text levelText;
 
@@ -69,7 +70,8 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            selectedImage.fillAmount = isSelected ? 1 : 0;
+            selectedOverlay.fillAmount = isSelected ? 1 : 0;
+            selectedBorder.fillAmount = isSelected ? 1 : 0;
             rt.sizeDelta = isSelected ? originalSizeDelta * selectedSizeMutliplier : originalSizeDelta;
         }
 
@@ -78,7 +80,8 @@ namespace Vi.UI
         private bool isSelected;
         private void Update()
         {
-            selectedImage.fillAmount = Mathf.Lerp(selectedImage.fillAmount, isSelected ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+            selectedOverlay.fillAmount = Mathf.Lerp(selectedOverlay.fillAmount, isSelected ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+            selectedBorder.fillAmount = Mathf.Lerp(selectedBorder.fillAmount, isSelected ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
             rt.sizeDelta = Vector2.Lerp(rt.sizeDelta, isSelected ? originalSizeDelta * selectedSizeMutliplier : originalSizeDelta, Time.deltaTime * selectedImageAnimationSpeed);
         }
     }
