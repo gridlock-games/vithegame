@@ -407,7 +407,6 @@ namespace Vi.Core
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
-            Debug.Log(animationStateName + " " + currentStateInfo.IsName("Empty") + " " + nextStateInfo.IsName("Empty") + " " + name);
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 switch (actionClip.GetClipType())
