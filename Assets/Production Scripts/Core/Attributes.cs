@@ -931,8 +931,6 @@ namespace Vi.Core
             UpdateRage();
 
             if (pingEnabled) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
-
-            Debug.Log(IsInvincible());
         }
 
         private float staminaDelayCooldown;

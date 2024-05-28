@@ -381,7 +381,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                StartCoroutine(SetInvincibleStatusOnDodge(actionClipName));
+                SetInvincibleStatusOnDodge(actionClipName);
             }
 
             if (heavyAttackCoroutine != null)
@@ -812,15 +812,10 @@ namespace Vi.Core
         [ClientRpc] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
 
         // Coroutine for setting invincibility status during a dodge
-        private IEnumerator SetInvincibleStatusOnDodge(string actionStateName)
+        private void SetInvincibleStatusOnDodge(string actionStateName)
         {
-            attributes.SetInviniciblity(5);
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(actionStateName));
-            AnimatorClipInfo[] dodgeClips = Animator.GetCurrentAnimatorClipInfo(actionsLayer);
-            if (dodgeClips.Length > 0)
-                attributes.SetInviniciblity(dodgeClips[0].clip.length * 0.35f);
-            else
-                attributes.SetInviniciblity(0);
+            AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
+            attributes.SetInviniciblity(animatorOverrideController[actionStateName].length * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }

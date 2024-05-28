@@ -1031,10 +1031,10 @@ namespace Vi.Core
             int capeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
             int robeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
-            int weapon1Index = Random.Range(0, weaponOptions.Length);
-            int weapon2Index = Random.Range(0, weaponOptions.Length);
-            //int weapon1Index = 3;
-            //int weapon2Index = 4;
+            //int weapon1Index = Random.Range(0, weaponOptions.Length);
+            //int weapon2Index = Random.Range(0, weaponOptions.Length);
+            int weapon1Index = 3;
+            int weapon2Index = 4;
 
             if (weapon1Index == weapon2Index)
             {
