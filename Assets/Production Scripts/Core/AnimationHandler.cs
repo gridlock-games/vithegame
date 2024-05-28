@@ -115,13 +115,6 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
-        private bool IsPlayingHitReaction()
-        {
-            if (!lastClipPlayed) { return false; }
-            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.HitReaction) { return false; }
-            return !IsAtRest();
-        }
-
         public const float flinchingMovementSpeedMultiplier = 0.8f;
         public bool IsFlinching()
         {

@@ -1048,7 +1048,7 @@ namespace Vi.Core
                 }
                 return actionClip;
             }
-            else if (animationHandler.IsAtRest() | animationHandler.IsDodging() | animationHandler.IsPlayingBlockingHitReaction())
+            else if ((animationHandler.IsAtRest() & !animationHandler.IsFlinching()) | animationHandler.IsDodging() | animationHandler.IsPlayingBlockingHitReaction())
             {
                 ResetComboSystem();
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
