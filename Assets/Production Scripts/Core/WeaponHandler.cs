@@ -456,8 +456,8 @@ namespace Vi.Core
 
             if (animationHandler.IsActionClipPlaying(CurrentActionClip))
             {
-                if (CurrentActionClip.isUninterruptable) { attributes.SetUninterruptable(Time.fixedDeltaTime * 2); }
-                if (CurrentActionClip.isInvincible) { attributes.SetInviniciblity(Time.fixedDeltaTime * 2); }
+                if (CurrentActionClip.isUninterruptable) { attributes.AddUninterruptableDuration(Time.fixedDeltaTime * 2); }
+                if (CurrentActionClip.isInvincible) { attributes.AddInvincibilityDuration(Time.fixedDeltaTime * 2); }
             }
 
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)

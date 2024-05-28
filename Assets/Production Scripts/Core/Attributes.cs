@@ -251,11 +251,13 @@ namespace Vi.Core
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
+        public void AddInvincibilityDuration(float duration) { invincibilityEndTime += duration; }
 
         public bool IsUninterruptable() { return isUninterruptable.Value; }
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
+        public void AddUninterruptableDuration(float duration) { uninterruptableEndTime += duration; }
 
         private bool wasStaggeredThisFrame;
         public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
