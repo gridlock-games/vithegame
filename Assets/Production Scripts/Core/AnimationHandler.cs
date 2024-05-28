@@ -202,7 +202,7 @@ namespace Vi.Core
                     {
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                                 angleList.Add((networkCollider,
@@ -805,9 +805,6 @@ namespace Vi.Core
             // Set the current action clip for the weapon handler
             weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
-
-            // If the action clip is a dodge, start the SetInvincibleStatusOnDodge coroutine
-            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge) { StartCoroutine(SetInvincibleStatusOnDodge(actionClipName)); }
 
             lastClipPlayed = actionClip;
         }

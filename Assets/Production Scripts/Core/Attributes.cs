@@ -117,8 +117,6 @@ namespace Vi.Core
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
-            isInvincible.OnValueChanged += OnIsInvincibleChange;
-            isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
@@ -148,8 +146,6 @@ namespace Vi.Core
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
-            isInvincible.OnValueChanged -= OnIsInvincibleChange;
-            isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
             statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
@@ -223,6 +219,7 @@ namespace Vi.Core
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
@@ -230,6 +227,8 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             movementHandler = GetComponent<MovementHandler>();
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            RefreshStatus();
         }
 
         private GameObject teamIndicatorInstance;
@@ -248,15 +247,13 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
         }
 
-        public bool IsInvincible { get; private set; }
+        public bool IsInvincible() { return isInvincible.Value; }
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
-        private void OnIsInvincibleChange(bool prev, bool current) { IsInvincible = current; }
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
-        public bool IsUninterruptable { get; private set; }
+        public bool IsUninterruptable() { return isUninterruptable.Value; }
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
-        private void OnIsUninterruptableChange(bool prev, bool current) { IsUninterruptable = current; }
         private float uninterruptableEndTime;
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
@@ -458,12 +455,12 @@ namespace Vi.Core
 
             if (attack.maxHitLimit == 0) { return false; }
 
-            if (IsInvincible) { return false; }
+            if (IsInvincible()) { return false; }
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
 
-                if (!IsUninterruptable)
+                if (!IsUninterruptable())
                 {
                     wasStaggeredThisFrame = true;
                     StartCoroutine(ResetStaggerBool());
@@ -522,7 +519,7 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
-            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
             //AddSpirit(-attack.spiritDamage);
@@ -607,7 +604,7 @@ namespace Vi.Core
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
-            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
+            if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
                 {
@@ -908,12 +905,20 @@ namespace Vi.Core
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
+        private bool pingEnabled;
+        private void RefreshStatus()
+        {
+            pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+        }
+
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!IsSpawned) { return; }
 
-            GlowRenderer.RenderInvincible(IsInvincible);
-            GlowRenderer.RenderUninterruptable(IsUninterruptable);
+            GlowRenderer.RenderInvincible(IsInvincible());
+            GlowRenderer.RenderUninterruptable(IsUninterruptable());
 
             if (!IsServer) { return; }
 
@@ -925,7 +930,9 @@ namespace Vi.Core
             UpdateStamina();
             UpdateRage();
 
-            roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
+            if (pingEnabled) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
+
+            Debug.Log(IsInvincible());
         }
 
         private float staminaDelayCooldown;
