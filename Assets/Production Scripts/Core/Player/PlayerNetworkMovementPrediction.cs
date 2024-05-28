@@ -55,16 +55,15 @@ namespace Vi.Player
         public void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             if (!IsServer) { Debug.LogError("PlayerNetworkMovementPrediction.SetOrientation() should only be called on the server!"); return; }
-            //SetRotationClientRpc(newRotation, new ClientRpcParams() { Send = { TargetClientIds = { l } } });
             overridePosition = newPosition;
             applyOverridePosition = true;
-            SetRotationClientRpc(newRotation, new ClientRpcParams() { Send = new ClientRpcSendParams() { TargetClientIds = new ulong[] { OwnerClientId } } });
+            SetRotationClientRpc(newRotation);
         }
 
         private bool applyOverrideRotation;
         private Quaternion overrideRotation;
-        [ClientRpc]
-        private void SetRotationClientRpc(Quaternion newRotation, ClientRpcParams clientRpcParams = default)
+        [Rpc(SendTo.Owner)]
+        private void SetRotationClientRpc(Quaternion newRotation)
         {
             movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
             overrideRotation = newRotation;
@@ -134,7 +133,7 @@ namespace Vi.Player
             currentTick++;
         }
 
-        [ClientRpc] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
+        [Rpc(SendTo.NotServer)] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
 
         private void HandleClientTick()
         {
@@ -230,7 +229,7 @@ namespace Vi.Player
             }
         }
 
-        [ServerRpc] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
+        [Rpc(SendTo.Server)] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {

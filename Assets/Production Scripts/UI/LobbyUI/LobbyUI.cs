@@ -725,15 +725,15 @@ namespace Vi.UI
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void StartGameServerRpc(ulong clientId)
         {
             StartGame();
-            EndStartGameClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } } });
+            EndStartGameClientRpc(RpcTarget.Single(clientId, RpcTargetUse.Temp));
         }
 
-        [ClientRpc]
-        private void EndStartGameClientRpc(ClientRpcParams clientRpcParams)
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void EndStartGameClientRpc(RpcParams rpcParams)
         {
             startGameServerRpcInProgress = false;
         }
@@ -768,7 +768,7 @@ namespace Vi.UI
 
         private NetworkList<ulong> lockedClients;
 
-        [ServerRpc(RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
 
         private void OnLockedClientListChange(NetworkListEvent<ulong> networkListEvent)
         {

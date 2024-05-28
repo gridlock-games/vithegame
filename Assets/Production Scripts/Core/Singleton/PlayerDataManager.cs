@@ -50,7 +50,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void SetGameModeServerRpc(GameMode newGameMode)
         {
             SetGameMode(newGameMode);
@@ -79,7 +79,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void SetMapServerRpc(string map)
         {
             SetMap(map);
@@ -104,7 +104,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void SetGameModeSettingsServerRpc(string gameModeSettings)
         {
             SetGameModeSettings(gameModeSettings);
@@ -425,7 +425,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)] private void AddBotDataServerRpc(Team team) { AddBotData(team); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team) { AddBotData(team); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -525,7 +525,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void KickPlayerServerRpc(int clientId) { KickPlayerOnServer(clientId); }
 
         private void KickPlayerOnServer(int clientId)
         {
@@ -551,7 +551,7 @@ namespace Vi.Core
             playerDataList.RemoveAt(index);
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void SetPlayerDataServerRpc(PlayerData playerData) { SetPlayerData(playerData); }
 
         public static bool DoesExist() { return _singleton; }

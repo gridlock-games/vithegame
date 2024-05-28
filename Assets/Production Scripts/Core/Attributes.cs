@@ -685,7 +685,7 @@ namespace Vi.Core
             StartHitStopClientRpc(attacker.NetworkObjectId);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
             Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
@@ -853,7 +853,7 @@ namespace Vi.Core
             RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
@@ -874,7 +874,7 @@ namespace Vi.Core
             RenderHitGlowOnlyClientRpc();
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitGlowOnlyClientRpc()
         {
             GlowRenderer.RenderHit();
@@ -894,7 +894,7 @@ namespace Vi.Core
             RenderBlockClientRpc(impactPosition);
         }
 
-        [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
+        [Rpc(SendTo.NotServer)] private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
             StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
@@ -989,7 +989,7 @@ namespace Vi.Core
 
         private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void ActivateRageServerRpc()
         {
             ActivateRage();

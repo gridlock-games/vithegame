@@ -913,7 +913,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void ReloadServerRpc()
         {
             ReloadOnServer();
