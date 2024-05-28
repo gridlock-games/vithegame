@@ -1051,7 +1051,7 @@ namespace Vi.Core
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            if (shouldMakeInvincible) { SetInviniciblity(duration); }
+            if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
             yield return new WaitForSeconds(duration);
             SetInviniciblity(recoveryTimeInvincibilityBuffer);
             ailment.Value = ActionClip.Ailment.None;
