@@ -86,26 +86,35 @@ namespace Vi.Core
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
-            foreach (ParticleSystem ps in particleSystems)
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                bool skip = false;
-                for (int i = 0; i < ps.trigger.colliderCount; i++)
+                foreach (ParticleSystem ps in particleSystems)
                 {
-                    if (ps.trigger.GetCollider(i) == other)
+                    bool skip = false;
+                    for (int i = 0; i < ps.trigger.colliderCount; i++)
                     {
-                        skip = true;
-                        break;
+                        if (ps.trigger.GetCollider(i) == other)
+                        {
+                            skip = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!skip)
-                {
-                    ps.trigger.AddCollider(other);
+                    if (!skip)
+                    {
+                        ps.trigger.AddCollider(other);
+                    }
                 }
             }
         }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
+
+        private new void OnDisable()
+        {
+            base.OnDisable();
+            hitCounter.Clear();
+        }
 
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
