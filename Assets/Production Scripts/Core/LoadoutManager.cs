@@ -104,7 +104,7 @@ namespace Vi.Core
             SwapWeaponOnRespawnClientRpc();
         }
 
-        [ClientRpc] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
+        [Rpc(SendTo.NotServer)] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
 
         private void AllowLoadoutSwap()
         {
@@ -326,7 +326,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void FlashAttackServerRpc(int weaponSlotToSwapTo)
         {
             StartCoroutine(WaitForWeaponSwapThenFlashAttack(weaponSlotToSwapTo));

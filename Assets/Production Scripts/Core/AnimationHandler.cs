@@ -115,13 +115,6 @@ namespace Vi.Core
             return !IsAtRest();
         }
 
-        private bool IsPlayingHitReaction()
-        {
-            if (!lastClipPlayed) { return false; }
-            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.HitReaction) { return false; }
-            return !IsAtRest();
-        }
-
         public const float flinchingMovementSpeedMultiplier = 0.8f;
         public bool IsFlinching()
         {
@@ -589,8 +582,8 @@ namespace Vi.Core
         }
 
         private bool heavyAttackReleased;
-        [ServerRpc] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
-        [ServerRpc] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
+        [Rpc(SendTo.Server)] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
+        [Rpc(SendTo.Server)] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
 
         public float HeavyAttackChargeTime { get; private set; }
         private Coroutine heavyAttackCoroutine;
@@ -674,11 +667,9 @@ namespace Vi.Core
             }
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
         {
-            if (IsServer) { return; }
-
             if (chargeTime > ActionClip.chargeAttackTime) // Attack
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
@@ -735,7 +726,7 @@ namespace Vi.Core
         }
 
         // Remote Procedure Call method for playing the action on the server
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void PlayActionServerRpc(string actionStateName, bool isFollowUpClip)
         {
             PlayActionOnServer(actionStateName, isFollowUpClip);
@@ -743,7 +734,7 @@ namespace Vi.Core
         }
 
         // Remote Procedure Call method for playing the action on the client
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
             if (IsServer) { return; }
@@ -809,7 +800,7 @@ namespace Vi.Core
             lastClipPlayed = actionClip;
         }
 
-        [ClientRpc] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
+        [Rpc(SendTo.Owner)] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
 
         // Coroutine for setting invincibility status during a dodge
         private void SetInvincibleStatusOnDodge(string actionStateName)

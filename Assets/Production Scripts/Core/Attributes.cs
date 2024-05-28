@@ -685,7 +685,7 @@ namespace Vi.Core
             StartHitStopClientRpc(attacker.NetworkObjectId);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
             Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
@@ -841,19 +841,16 @@ namespace Vi.Core
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
-            
-            if (!IsClient)
-            {
-                GlowRenderer.RenderHit();
-                StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-                Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-                AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
-            }
+
+            GlowRenderer.RenderHit();
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
 
             RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
@@ -866,15 +863,12 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
 
-            if (!IsClient)
-            {
-                GlowRenderer.RenderHit();
-            }
+            GlowRenderer.RenderHit();
 
             RenderHitGlowOnlyClientRpc();
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitGlowOnlyClientRpc()
         {
             GlowRenderer.RenderHit();
@@ -883,18 +877,16 @@ namespace Vi.Core
         private void RenderBlock(Vector3 impactPosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
-            
-            if (!IsClient)
-            {
-                GlowRenderer.RenderBlock();
-                StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-                AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
-            }
+
+            GlowRenderer.RenderBlock();
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
 
             RenderBlockClientRpc(impactPosition);
         }
 
-        [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
+        [Rpc(SendTo.NotServer)]
+        private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
             StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
@@ -989,7 +981,7 @@ namespace Vi.Core
 
         private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void ActivateRageServerRpc()
         {
             ActivateRage();

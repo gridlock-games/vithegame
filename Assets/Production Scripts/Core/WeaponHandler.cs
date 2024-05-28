@@ -222,7 +222,6 @@ namespace Vi.Core
             }
 
             actionVFXTracker.Clear();
-            if (actionVFXPreviewInstance) { Destroy(actionVFXPreviewInstance.gameObject); }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
@@ -270,7 +269,7 @@ namespace Vi.Core
             }
         }
 
-        public void SpawnPreviewVFX(ActionClip actionClip, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
+        public GameObject SpawnPreviewVFX(ActionClip actionClip, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
             actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset;
             actionPreviewVFXPrefab.vfxRotationOffset = actionClip.actionVFXList[0].vfxRotationOffset;
@@ -283,10 +282,9 @@ namespace Vi.Core
             actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
             actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
 
-            SpawnActionVFX(actionClip, actionPreviewVFXPrefab, attackerTransform, victimTransform);
+            return SpawnActionVFX(actionClip, actionPreviewVFXPrefab, attackerTransform, victimTransform);
         }
 
-        private ActionVFXPreview actionVFXPreviewInstance;
         private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
         public GameObject SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
@@ -385,10 +383,6 @@ namespace Vi.Core
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
                     actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
-                }
-                else if (vfxInstance.TryGetComponent(out ActionVFXPreview actionVFXPreview))
-                {
-                    actionVFXPreviewInstance = actionVFXPreview;
                 }
                 else
                 {
@@ -638,12 +632,6 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                if (actionVFXPreviewInstance)
-                {
-                    Destroy(actionVFXPreviewInstance.gameObject);
-                    return;
-                }
-
                 if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
             }
             else
@@ -721,6 +709,7 @@ namespace Vi.Core
             Ability1(value.isPressed);
         }
 
+        private GameObject ability1PreviewInstance;
         public void Ability1(bool isPressed)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
@@ -730,14 +719,14 @@ namespace Vi.Core
                 {
                     if (isPressed) // If we are holding down the key
                     {
-                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                        ability1PreviewInstance = SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance)
+                        if (ability1PreviewInstance)
                         {
                             animationHandler.PlayAction(actionClip);
-                            Destroy(actionVFXPreviewInstance.gameObject);
+                            ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance);
                         }
                     }
                 }
@@ -753,6 +742,7 @@ namespace Vi.Core
             Ability2(value.isPressed);
         }
 
+        private GameObject ability2PreviewInstance;
         public void Ability2(bool isPressed)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
@@ -762,14 +752,14 @@ namespace Vi.Core
                 {
                     if (isPressed) // If we are holding down the key
                     {
-                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                        ability2PreviewInstance = SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance)
+                        if (ability2PreviewInstance)
                         {
                             animationHandler.PlayAction(actionClip);
-                            Destroy(actionVFXPreviewInstance.gameObject);
+                            ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance);
                         }
                     }
                 }
@@ -785,6 +775,7 @@ namespace Vi.Core
             Ability3(value.isPressed);
         }
 
+        private GameObject ability3PreviewInstance;
         public void Ability3(bool isPressed)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
@@ -794,14 +785,14 @@ namespace Vi.Core
                 {
                     if (isPressed) // If we are holding down the key
                     {
-                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                        ability3PreviewInstance = SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance)
+                        if (ability3PreviewInstance)
                         {
                             animationHandler.PlayAction(actionClip);
-                            Destroy(actionVFXPreviewInstance.gameObject);
+                            ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance);
                         }
                     }
                 }
@@ -817,6 +808,7 @@ namespace Vi.Core
             Ability4(value.isPressed);
         }
 
+        private GameObject ability4PreviewInstance;
         public void Ability4(bool isPressed)
         {
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
@@ -826,14 +818,14 @@ namespace Vi.Core
                 {
                     if (isPressed) // If we are holding down the key
                     {
-                        SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
+                        ability4PreviewInstance = SpawnPreviewVFX(actionClip, actionClip.previewActionVFX.GetComponent<ActionVFXPreview>(), transform);
                     }
                     else // If we have released the key
                     {
-                        if (actionVFXPreviewInstance)
+                        if (ability4PreviewInstance)
                         {
                             animationHandler.PlayAction(actionClip);
-                            Destroy(actionVFXPreviewInstance.gameObject);
+                            ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance);
                         }
                     }
                 }
@@ -921,7 +913,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void ReloadServerRpc()
         {
             ReloadOnServer();
@@ -1056,7 +1048,7 @@ namespace Vi.Core
                 }
                 return actionClip;
             }
-            else if (animationHandler.IsAtRest() | animationHandler.IsDodging() | animationHandler.IsPlayingBlockingHitReaction())
+            else if ((animationHandler.IsAtRest() & !animationHandler.IsFlinching()) | animationHandler.IsDodging() | animationHandler.IsPlayingBlockingHitReaction())
             {
                 ResetComboSystem();
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
