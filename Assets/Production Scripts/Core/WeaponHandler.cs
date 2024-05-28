@@ -454,12 +454,6 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!animationHandler.Animator) { return; }
 
-            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
-            {
-                if (CurrentActionClip.isUninterruptable) { attributes.AddUninterruptableDuration(Time.fixedDeltaTime * 2); }
-                if (CurrentActionClip.isInvincible) { attributes.AddInvincibilityDuration(Time.fixedDeltaTime * 2); }
-            }
-
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 IsBlocking = attributes.GetSpirit() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;

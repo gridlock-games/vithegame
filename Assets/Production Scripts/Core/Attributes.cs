@@ -251,13 +251,11 @@ namespace Vi.Core
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
-        public void AddInvincibilityDuration(float duration) { invincibilityEndTime += duration; }
 
         public bool IsUninterruptable() { return isUninterruptable.Value; }
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
-        public void AddUninterruptableDuration(float duration) { uninterruptableEndTime += duration; }
 
         private bool wasStaggeredThisFrame;
         public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
@@ -926,8 +924,16 @@ namespace Vi.Core
 
             if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
 
-            isInvincible.Value = Time.time <= invincibilityEndTime;
-            isUninterruptable.Value = Time.time <= uninterruptableEndTime;
+            bool evaluateInvinicibility = true;
+            bool evaluateUninterruptability = true;
+            if (animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+            {
+                if (weaponHandler.CurrentActionClip.isUninterruptable) { isUninterruptable.Value = true; evaluateUninterruptability = false; }
+                if (weaponHandler.CurrentActionClip.isInvincible) { isInvincible.Value = true; evaluateInvinicibility = false; }
+            }
+
+            if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
+            if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
 
             UpdateStamina();
             UpdateRage();
