@@ -12,7 +12,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float walkSpeed = 2.5f;
         [SerializeField] private BlockingLocomotion blockingLocomotion = BlockingLocomotion.CanRun;
-        
+
         public enum BlockingLocomotion
         {
             NoMovement,
@@ -26,10 +26,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float maxStamina = 100;
         [SerializeField] private float staminaRecoveryRate = 5;
         [SerializeField] private float staminaDelay = 1;
-        [Header("Defense")]
-        [SerializeField] private float maxDefense = 100;
-        [SerializeField] private float defenseRecoveryRate = 5;
-        [SerializeField] private float defenseDelay = 1;
+        [Header("Spirit")]
+        [SerializeField] private float maxSpirit = 100;
         [Header("Rage")]
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
@@ -61,12 +59,10 @@ namespace Vi.ScriptableObjects
 
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
-        public float GetMaxDefense() { return maxDefense; }
+        public float GetMaxSpirit() { return maxSpirit; }
         public float GetMaxRage() { return maxRage; }
         public float GetStaminaDelay() { return staminaDelay; }
-        public float GetDefenseDelay() { return defenseDelay; }
         public float GetStaminaRecoveryRate() { return staminaRecoveryRate; }
-        public float GetDefenseRecoveryRate() { return defenseRecoveryRate; }
         public float GetRageRecoveryRate() { return rageRecoveryRate; }
 
         [Header("Shooter Weapon Settings")]
@@ -112,8 +108,7 @@ namespace Vi.ScriptableObjects
             RightArm = HumanBodyBones.RightLowerArm,
             LeftArm = HumanBodyBones.LeftLowerArm,
             RightFoot = HumanBodyBones.RightFoot,
-            LeftFoot = HumanBodyBones.LeftFoot,
-            Camera = 100,
+            LeftFoot = HumanBodyBones.LeftFoot
         }
 
         [System.Serializable]
@@ -187,7 +182,7 @@ namespace Vi.ScriptableObjects
                 // Block the attack
                 hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
-            
+
             if (hitReaction == null) // If attack wasn't blocked
             {
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
@@ -421,8 +416,9 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
 
+        public float dodgeStaminaCost { get; private set; } = 0;
         [Header("Dodge Assignments")]
-        public float dodgeStaminaCost = 20;
+        public float dodgeCooldownDuration = 5;
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;
@@ -431,6 +427,12 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeBR;
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
+
+        private float lastDodgeActivateTime = Mathf.NegativeInfinity;
+
+        public void StartDodgeCooldown() { lastDodgeActivateTime = Time.time; }
+
+        public bool IsDodgeOnCooldown() { return Time.time - lastDodgeActivateTime < dodgeCooldownDuration; }
 
         public ActionClip GetDodgeClip(float angle)
         {
@@ -476,7 +478,67 @@ namespace Vi.ScriptableObjects
 
         public ActionClip GetLungeClip() { return lunge; }
 
+        private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+
+        private void Awake()
+        {
+            if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
+            if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
+            if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
+            if (dodgeB) { actionClipLookup.TryAdd(dodgeB.name, dodgeB); }
+            if (dodgeBL) { actionClipLookup.TryAdd(dodgeBL.name, dodgeBL); }
+            if (dodgeBR) { actionClipLookup.TryAdd(dodgeBR.name, dodgeBR); }
+            if (dodgeL) { actionClipLookup.TryAdd(dodgeL.name, dodgeL); }
+            if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
+
+            if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
+
+            if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
+            if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }
+            if (ability3) { actionClipLookup.TryAdd(ability3.name, ability3); }
+            if (ability4) { actionClipLookup.TryAdd(ability4.name, ability4); }
+
+            if (flashAttack) { actionClipLookup.TryAdd(flashAttack.name, flashAttack); }
+
+            foreach (HitReaction hitReaction in hitReactions)
+            {
+                if (!hitReaction.reactionClip) { continue; }
+                actionClipLookup.TryAdd(hitReaction.reactionClip.name, hitReaction.reactionClip);
+            }
+
+            foreach (FlinchReaction flinchReaction in flinchReactions)
+            {
+                if (!flinchReaction.reactionClip) { continue; }
+                actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
+            }
+
+            foreach (Attack attack in attackList)
+            {
+                if (!attack.attackClip) { continue; }
+                actionClipLookup.TryAdd(attack.attackClip.name, attack.attackClip);
+            }
+
+            foreach (GrabAttackCrosswalk grabAttackCrosswalk in grabAttackClipList)
+            {
+                if (grabAttackCrosswalk.attack) { actionClipLookup.TryAdd(grabAttackCrosswalk.attack.name, grabAttackCrosswalk.attack); }
+                if (grabAttackCrosswalk.grabAttackClip) { actionClipLookup.TryAdd(grabAttackCrosswalk.grabAttackClip.name, grabAttackCrosswalk.grabAttackClip); }
+            }
+        }
+
         public ActionClip GetActionClipByName(string clipName)
+        {
+            if (actionClipLookup.ContainsKey(clipName))
+            {
+                return actionClipLookup[clipName];
+            }
+            else
+            {
+                if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
+                return null;
+            }
+        }
+
+        public ActionClip GetActionClipByNameUsingReflection(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
             foreach (FieldInfo propertyInfo in propertyList)

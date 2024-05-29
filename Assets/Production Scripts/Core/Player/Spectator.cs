@@ -308,8 +308,9 @@ namespace Vi.Player
 
         [SerializeField] private float collisionPositionOffset = -0.3f;
 
-        private void Update()
+        private new void Update()
         {
+            base.Update();
             if (!IsLocalPlayer) { return; }
 
             #if UNITY_IOS || UNITY_ANDROID

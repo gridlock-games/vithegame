@@ -682,6 +682,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 8083326875927295064, guid: 6681c57ed9380c94f87eea2e2be3838f,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cfcd382f4e1af2448be5914d2f63db93, type: 2}
     - target: {fileID: 8302991255347281649, guid: 6681c57ed9380c94f87eea2e2be3838f,
         type: 3}
       propertyPath: m_Layer
@@ -723,3 +728,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equipmentType: 11
+  shouldDisableCharSkinRenderer: 0

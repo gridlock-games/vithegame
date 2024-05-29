@@ -9,7 +9,6 @@ namespace Vi.UI
 {
     public class SceneLoadingUI : MonoBehaviour
     {
-        [SerializeField] private GameObject parentOfAll;
         [Header("Scene Loading")]
         [SerializeField] private GameObject progressBarParent;
         [SerializeField] private Image progressBarImage;
@@ -18,20 +17,39 @@ namespace Vi.UI
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
 
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
+
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
         private void Update()
         {
-            if (!NetSceneManager.Singleton) { parentOfAll.SetActive(false); return; }
+            if (!NetSceneManager.Singleton)
+            {
+                canvas.enabled = false;
+                return;
+            }
 
             NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
+            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject) | (NetworkManager.Singleton.ShutdownInProgress));
             progressBarParent.SetActive(PersistentLocalObjects.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer() & !playerObject));
 
             if (spawningPlayerObjectParent.activeSelf)
             {
-                string topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                string topText;
+                if (NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    topText = "Network Shutdown In Progress";
+                }
+                else
+                {
+                    topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                }
+                
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
 
                 if (Time.time - lastTextChangeTime > 0.5f)
@@ -55,7 +73,7 @@ namespace Vi.UI
                 }
             }
 
-            parentOfAll.SetActive(progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf);
+            canvas.enabled = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf;
 
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {

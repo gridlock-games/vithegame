@@ -42,6 +42,7 @@ namespace Vi.Core
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
+                col.enabled = NetworkManager.Singleton.IsServer;
             }
         }
         
@@ -58,8 +59,8 @@ namespace Vi.Core
                 Vector3 endBoundsPoint = boundsPoint;
                 while (endBoundsPoint != Vector3.zero)
                 {
-                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                    if (Application.isEditor) { Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3); }
                     System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
 
                     bool bHit = false;
@@ -78,30 +79,42 @@ namespace Vi.Core
             }
         }
 
+        private const string layersToHit = "NetworkPrediction";
+
         private void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+            if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
-            foreach (ParticleSystem ps in particleSystems)
+            if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                bool skip = false;
-                for (int i = 0; i < ps.trigger.colliderCount; i++)
+                foreach (ParticleSystem ps in particleSystems)
                 {
-                    if (ps.trigger.GetCollider(i) == other)
+                    bool skip = false;
+                    for (int i = 0; i < ps.trigger.colliderCount; i++)
                     {
-                        skip = true;
-                        break;
+                        if (ps.trigger.GetCollider(i) == other)
+                        {
+                            skip = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!skip)
-                {
-                    ps.trigger.AddCollider(other);
+                    if (!skip)
+                    {
+                        ps.trigger.AddCollider(other);
+                    }
                 }
             }
         }
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
+
+        private new void OnDisable()
+        {
+            base.OnDisable();
+            hitCounter.Clear();
+        }
 
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Vi.Core;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -82,7 +83,7 @@ namespace Vi.UI
 
         public void ConnectToLobbyServer()
         {
-            NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
+            PersistentLocalObjects.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
         }
 
         public void CreateNewLobbyRoom()
@@ -92,7 +93,7 @@ namespace Vi.UI
                 WebRequestManager.Server server = emptyLobbyServerList[0];
                 networkTransport.ConnectionData.Address = server.ip;
                 networkTransport.ConnectionData.Port = ushort.Parse(server.port);
-                NetSceneManager.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
+                PersistentLocalObjects.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
             }
             else
             {
@@ -103,7 +104,7 @@ namespace Vi.UI
 
         private IEnumerator ConnectToLobbyServerCoroutine()
         {
-            NetworkManager.Singleton.Shutdown(true);
+            NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             NetworkManager.Singleton.StartClient();
         }

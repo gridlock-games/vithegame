@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
-using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
     public class MovementHandler : NetworkBehaviour
     {
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+
+		public static readonly string[] layersToAccountForInMovement = new string[]
+		{
+			"Default",
+			"Projectile"
+		};
 
         public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
@@ -21,21 +27,37 @@ namespace Vi.Core
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
+		public virtual void AddForce(Vector3 force) { }
+
         protected WeaponHandler weaponHandler;
         protected void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
+			RefreshStatus();
         }
 
-		public virtual void Flinch(Vector2 flinchAmount) { }
+		private Vector2 lookSensitivity;
+		private void RefreshStatus()
+		{
+			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);
+			zoomSensitivityMultiplier = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier");
+		}
 
+		protected void Update()
+        {
+			if (!IsLocalPlayer) { return; }
+			if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+		}
+
+        public virtual void Flinch(Vector2 flinchAmount) { }
+
+		private float zoomSensitivityMultiplier = 1;
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            Vector2 lookSensitivity = new Vector2(PersistentLocalObjects.Singleton.GetFloat("MouseXSensitivity"), PersistentLocalObjects.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(PersistentLocalObjects.Singleton.GetString("InvertMouse")) ? -1 : 1);
             if (weaponHandler)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= PersistentLocalObjects.Singleton.GetFloat("ZoomSensitivityMultiplier"); }
+                if (weaponHandler.IsAiming()) { lookSensitivity *= zoomSensitivityMultiplier; }
             }
             return lookInput * lookSensitivity;
         }
@@ -87,15 +109,18 @@ namespace Vi.Core
 			Box bottomBox = new Box(origin, halfExtents, orientation);
 			Box topBox = new Box(origin + (direction * distance), halfExtents, orientation);
 
-			Debug.DrawLine(bottomBox.backBottomLeft, topBox.backBottomLeft, color, duration);
-			Debug.DrawLine(bottomBox.backBottomRight, topBox.backBottomRight, color, duration);
-			Debug.DrawLine(bottomBox.backTopLeft, topBox.backTopLeft, color, duration);
-			Debug.DrawLine(bottomBox.backTopRight, topBox.backTopRight, color, duration);
-			Debug.DrawLine(bottomBox.frontTopLeft, topBox.frontTopLeft, color, duration);
-			Debug.DrawLine(bottomBox.frontTopRight, topBox.frontTopRight, color, duration);
-			Debug.DrawLine(bottomBox.frontBottomLeft, topBox.frontBottomLeft, color, duration);
-			Debug.DrawLine(bottomBox.frontBottomRight, topBox.frontBottomRight, color, duration);
-
+			if (Application.isEditor)
+            {
+				Debug.DrawLine(bottomBox.backBottomLeft, topBox.backBottomLeft, color, duration);
+				Debug.DrawLine(bottomBox.backBottomRight, topBox.backBottomRight, color, duration);
+				Debug.DrawLine(bottomBox.backTopLeft, topBox.backTopLeft, color, duration);
+				Debug.DrawLine(bottomBox.backTopRight, topBox.backTopRight, color, duration);
+				Debug.DrawLine(bottomBox.frontTopLeft, topBox.frontTopLeft, color, duration);
+				Debug.DrawLine(bottomBox.frontTopRight, topBox.frontTopRight, color, duration);
+				Debug.DrawLine(bottomBox.frontBottomLeft, topBox.frontBottomLeft, color, duration);
+				Debug.DrawLine(bottomBox.frontBottomRight, topBox.frontBottomRight, color, duration);
+			}
+			
 			DrawBox(bottomBox, color, duration);
 			DrawBox(topBox, color, duration);
 		}
@@ -107,20 +132,23 @@ namespace Vi.Core
 
 		public static void DrawBox(Box box, Color color, float duration)
 		{
-			Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color, duration);
-			Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color, duration);
-			Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color, duration);
-			Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color, duration);
+			if (Application.isEditor)
+            {
+				Debug.DrawLine(box.frontTopLeft, box.frontTopRight, color, duration);
+				Debug.DrawLine(box.frontTopRight, box.frontBottomRight, color, duration);
+				Debug.DrawLine(box.frontBottomRight, box.frontBottomLeft, color, duration);
+				Debug.DrawLine(box.frontBottomLeft, box.frontTopLeft, color, duration);
 
-			Debug.DrawLine(box.backTopLeft, box.backTopRight, color, duration);
-			Debug.DrawLine(box.backTopRight, box.backBottomRight, color, duration);
-			Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color, duration);
-			Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color, duration);
+				Debug.DrawLine(box.backTopLeft, box.backTopRight, color, duration);
+				Debug.DrawLine(box.backTopRight, box.backBottomRight, color, duration);
+				Debug.DrawLine(box.backBottomRight, box.backBottomLeft, color, duration);
+				Debug.DrawLine(box.backBottomLeft, box.backTopLeft, color, duration);
 
-			Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color, duration);
-			Debug.DrawLine(box.frontTopRight, box.backTopRight, color, duration);
-			Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color, duration);
-			Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color, duration);
+				Debug.DrawLine(box.frontTopLeft, box.backTopLeft, color, duration);
+				Debug.DrawLine(box.frontTopRight, box.backTopRight, color, duration);
+				Debug.DrawLine(box.frontBottomRight, box.backBottomRight, color, duration);
+				Debug.DrawLine(box.frontBottomLeft, box.backBottomLeft, color, duration);
+			}
 		}
 
 		public struct Box

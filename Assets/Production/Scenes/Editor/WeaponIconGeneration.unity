@@ -174,8 +174,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 0.01
+  far clip plane: 1000000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -254,12 +254,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldProcessWeapons: 0
   weaponsToGenerate:
-  - {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
-  - {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
-  - {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
-  - {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
-  - {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
+  - weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
+    transformDatas:
+    - position: {x: -0.9, y: 0, z: -0.15}
+      rotation: {x: -0, y: 180, z: 0}
+    - position: {x: -0.9, y: 0, z: 0.15}
+      rotation: {x: -0, y: 180, z: 0}
+  - weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
+    transformDatas:
+    - position: {x: -0.5, y: -0.15, z: 0}
+      rotation: {x: -0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
+    transformDatas:
+    - position: {x: -0.504, y: 0.146, z: -0.453}
+      rotation: {x: -0, y: 0, z: 0}
+    - position: {x: -0.489, y: 0.036, z: 0}
+      rotation: {x: -0, y: 180, z: 0}
+  - weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
+    transformDatas:
+    - position: {x: -0.54, y: 0, z: -0.058}
+      rotation: {x: -0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
+    transformDatas:
+    - position: {x: -0.279, y: 0, z: -0.153}
+      rotation: {x: -0, y: 0, z: 0}
+  shouldProcessEquipmentOptions: 1
+  characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:
   m_ObjectHideFlags: 0

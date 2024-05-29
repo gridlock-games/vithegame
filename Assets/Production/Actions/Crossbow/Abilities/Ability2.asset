@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ability2
   m_EditorClassIdentifier: 
   clipType: 4
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
   rootMotionForwardMultiplier:
@@ -3417,6 +3418,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -4612,7 +4617,6 @@ MonoBehaviour:
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 8
-  agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 11000000
   weaponBonesToHide: 
@@ -4625,13 +4629,12 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.45
   recoveryNormalizedTime: 1
+  isAffectedByRage: 1
   damage: 2
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 3
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 2
   timeBetweenHits: 0.15
@@ -4652,7 +4655,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 1498fbdae44f5ff4bbd566721a388977, type: 3}
-  abilityCooldownTime: 2
+  abilityCooldownTime: 5
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -4661,10 +4664,10 @@ MonoBehaviour:
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
-  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
-  boxCastHalfExtents: {x: 2, y: 1, z: 1}
-  boxCastDistance: 5
   maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

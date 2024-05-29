@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -31,6 +33,7 @@ namespace Vi.Player
         private Attributes attributes;
         private GameObject cameraInterp;
         private Vector3 currentPositionOffset;
+        private UniversalAdditionalCameraData cameraData;
 
         public void SetRotation(float targetRotationX, float targetRotationY)
         {
@@ -59,6 +62,8 @@ namespace Vi.Player
             cameraInterp = new GameObject("Camera Interp");
             CameraPositionClone = new GameObject("Empty Camera Position Clone");
             currentPositionOffset = positionOffset;
+            cameraData = GetComponent<UniversalAdditionalCameraData>();
+            RefreshStatus();
         }
 
         private void OnDestroy()
@@ -70,8 +75,15 @@ namespace Vi.Player
         private const float killerRotationSpeed = 4;
         private const float killerRotationSlerpThreshold = 1;
 
+        private void RefreshStatus()
+        {
+            cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+        }
+
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             // Update camera interp transform
             Vector2 lookInput = movementHandler.GetLookInput();
             targetRotationX += lookInput.y;
@@ -140,8 +152,8 @@ namespace Vi.Player
                 CameraPositionClone.transform.LookAt(cameraInterp.transform);
 
                 // Move camera if there is a wall in the way
-                Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime);
-                if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }
+                if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
                 }

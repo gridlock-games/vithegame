@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using UnityEngine.UI;
+using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -15,9 +16,12 @@ namespace Vi.Core
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
 
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
         {
-            if (clientConnectTimeoutThreshold >= 60) { Debug.LogWarning("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+
+            if (clientConnectTimeoutThreshold >= 60) { Debug.LogError("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             CreatePlayerDataManager(false);
@@ -81,20 +85,22 @@ namespace Vi.Core
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             //Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            playerDataQueue.Enqueue(new PlayerDataInput(payload, (int)clientId));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, clientId));
         }
 
         private struct PlayerDataInput
         {
             public string characterId;
-            public int clientId;
+            public ulong clientId;
 
-            public PlayerDataInput(string characterId, int clientId)
+            public PlayerDataInput(string characterId, ulong clientId)
             {
                 this.characterId = characterId;
                 this.clientId = clientId;
             }
         }
+
+        public const int maxActivePlayersInLobby = 8;
 
         private Queue<PlayerDataInput> playerDataQueue = new Queue<PlayerDataInput>();
         private void Update()
@@ -111,7 +117,7 @@ namespace Vi.Core
                     }
                     else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                     {
-                        clientTeam = PlayerDataManager.Team.Competitor;
+                        clientTeam = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count >= 8 ? PlayerDataManager.Team.Spectator : PlayerDataManager.Team.Competitor;
                     }
                     else // Game in progress
                     {
@@ -132,14 +138,15 @@ namespace Vi.Core
         private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
-        private IEnumerator AddPlayerData(string characterId, int clientId, PlayerDataManager.Team team)
+        private IEnumerator AddPlayerData(string characterId, ulong clientId, PlayerDataManager.Team team)
         {
             addPlayerDataRunning = true;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData(clientId, WebRequestManager.Singleton.CharacterById, team));
+            // If the game crashed, or the player disconnected for some reason, don't add their data
+            if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId)) { PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, WebRequestManager.Singleton.CharacterById, team)); }
             
             addPlayerDataRunning = false;
         }
@@ -152,7 +159,6 @@ namespace Vi.Core
         private IEnumerator CreateServerInAPI()
         {
             if (NetworkManager.Singleton.IsClient) { yield break; }
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 
             yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") | NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"));
@@ -184,7 +190,6 @@ namespace Vi.Core
 
         private void OnClientStarted()
         {
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             StartCoroutine(ClientConnectTimeout());
         }
@@ -200,7 +205,7 @@ namespace Vi.Core
 
             if (!NetworkManager.Singleton.IsConnectedClient)
             {
-                NetworkManager.Singleton.Shutdown(true);
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
                 if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select")) { NetSceneManager.Singleton.LoadScene("Character Select"); }
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Could not connect to server.";

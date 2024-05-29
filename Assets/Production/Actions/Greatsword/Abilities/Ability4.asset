@@ -261,7 +261,6 @@ MonoBehaviour:
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 30
-  agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -273,14 +272,13 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.1
-  recoveryNormalizedTime: 0.5
-  damage: 15
+  recoveryNormalizedTime: 0.3
+  isAffectedByRage: 1
+  damage: 30
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 1
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 1
@@ -289,7 +287,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 3
+  ailment: 0
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
@@ -304,9 +302,13 @@ MonoBehaviour:
   abilityCooldownTime: 30
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
-  - status: 11
-    value: 1
-    duration: 5
+  - status: 6
+    value: 0.01
+    duration: 10
+    delay: 0
+  - status: 9
+    value: 0.1
+    duration: 10
     delay: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
@@ -316,9 +318,6 @@ MonoBehaviour:
   previewActionVFXScale: {x: 0.4, y: 0.4, z: 0.4}
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
-  boxCastOriginPositionOffset: {x: 0, y: 0, z: 0}
-  boxCastHalfExtents: {x: 0.15, y: 0.15, z: 0.15}
-  boxCastDistance: 5
   maximumTargetingRotationAngle: 60
   canLunge: 0
   minLungeDistance: 2.5

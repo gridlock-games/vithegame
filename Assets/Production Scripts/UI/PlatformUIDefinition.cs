@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Vi.Core;
 using UnityEngine.InputSystem.OnScreen;
 using Newtonsoft.Json;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -20,7 +21,10 @@ namespace Vi.UI
 
         public UIDefinition[] GetPlatformUIDefinitions() { return platformUIDefinitions; }
 
-        public static bool UIElementIsAbleToBeModified(GameObject g) { return g.GetComponent<Button>() | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>()); }
+        public static bool UIElementIsAbleToBeModified(GameObject g)
+        {
+            return (g.GetComponent<Button>() & !g.name.Contains("Limits")) | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>());
+        }
 
         [System.Serializable]
         public struct UIDefinition
@@ -236,9 +240,9 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (PersistentLocalObjects.Singleton.HasKey(customizablePlayerPrefName))
+            if (FasterPlayerPrefs.Singleton.HasKey(customizablePlayerPrefName))
             {
-                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString(customizablePlayerPrefName));
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString(customizablePlayerPrefName));
 
                 foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                 {

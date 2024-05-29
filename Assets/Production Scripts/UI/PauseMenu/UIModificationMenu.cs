@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using Vi.Core;
 using System.Linq;
-using UnityEngine.InputSystem.OnScreen;
+using Vi.Utility;
 using Newtonsoft.Json;
 
 namespace Vi.UI
@@ -56,6 +55,8 @@ namespace Vi.UI
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
                     {
                         if (c is Graphic) { continue; }
+                        if (c is Canvas) { continue; }
+                        if (c is GraphicRaycaster) { continue; }
                         if (c.GetType().ToString() == "DuloGames.UI.UIHighlightTransition") { continue; }
                         c.enabled = false;
                     }
@@ -110,9 +111,9 @@ namespace Vi.UI
 
                     if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
                     {
-                        if (PersistentLocalObjects.Singleton.HasKey("UIOverrides"))
+                        if (FasterPlayerPrefs.Singleton.HasKey("UIOverrides"))
                         {
-                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString("UIOverrides"));
+                            List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString("UIOverrides"));
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                             {
                                 GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
@@ -135,9 +136,9 @@ namespace Vi.UI
             GameObject prefabRef = prefabCrosswalk[draggableUIObject.gameObject];
 
             List<PlatformUIDefinition.PositionOverrideDefinition> overridesList;
-            if (PersistentLocalObjects.Singleton.HasKey("UIOverrides"))
+            if (FasterPlayerPrefs.Singleton.HasKey("UIOverrides"))
             {
-                overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(PersistentLocalObjects.Singleton.GetString("UIOverrides"));
+                overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString("UIOverrides"));
             }
             else
             {
@@ -151,12 +152,12 @@ namespace Vi.UI
                 newAnchoredY = modifiedRect.anchoredPosition.y
             });
             
-            PersistentLocalObjects.Singleton.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
+            FasterPlayerPrefs.Singleton.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
         }
 
         public void ResetUI()
         {
-            PersistentLocalObjects.Singleton.DeleteKey("UIOverrides");
+            FasterPlayerPrefs.Singleton.DeleteKey("UIOverrides");
             Start();
         }
     }

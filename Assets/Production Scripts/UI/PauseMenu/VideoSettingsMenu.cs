@@ -8,6 +8,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
 using System.Text.RegularExpressions;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -24,17 +25,49 @@ namespace Vi.UI
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private TMP_Dropdown msaaDropdown;
         [SerializeField] private Toggle hdrToggle;
+        [SerializeField] private Toggle postProcessingToggle;
         [Header("Action Buttons")]
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
         [SerializeField] private Text fpsWarningText;
+        [Header("Display Settings Resizing By Platform")]
+        [SerializeField] private GridLayoutGroup scrollGrid;
+        [SerializeField] private RectTransform displaySettingsGroup;
+        [SerializeField] private GameObject fullScreenModeElement;
+        [SerializeField] private GameObject resolutionElement;
 
         private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
 
+        private static readonly List<RuntimePlatform> platformsToAllowResolutionChangesOn = new List<RuntimePlatform>()
+        {
+            RuntimePlatform.WindowsPlayer,
+            RuntimePlatform.OSXPlayer,
+            RuntimePlatform.LinuxPlayer,
+            RuntimePlatform.WindowsEditor,
+            RuntimePlatform.OSXEditor,
+            RuntimePlatform.LinuxEditor
+        };
+
         private void Awake()
         {
+            if (!platformsToAllowResolutionChangesOn.Contains(Application.platform))
+            {
+                fullScreenModeElement.SetActive(false);
+                resolutionElement.SetActive(false);
+
+                scrollGrid.cellSize = new Vector2(scrollGrid.cellSize.x, scrollGrid.cellSize.y - 125 * 2);
+                displaySettingsGroup.sizeDelta = new Vector2(displaySettingsGroup.sizeDelta.x, displaySettingsGroup.sizeDelta.y - 125 * 2);
+
+                foreach (Transform child in displaySettingsGroup.parent)
+                {
+                    RectTransform rt = (RectTransform)child;
+                    if (rt == displaySettingsGroup) { continue; }
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, rt.anchoredPosition.y + 125 * 2);
+                }
+            }
+
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
 
@@ -122,6 +155,8 @@ namespace Vi.UI
 
             hdrToggle.isOn = pipeline.supportsHDR;
 
+            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+
             SetOriginalVariables();
         }
 
@@ -145,7 +180,8 @@ namespace Vi.UI
                 | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
                 | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
                 | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
-                | originalHDR != hdrToggle.isOn;
+                | originalHDR != hdrToggle.isOn
+                | originalPostProcessing != postProcessingToggle.isOn;
 
             applyChangesButton.interactable = changesPresent;
             discardChangesButton.interactable = changesPresent;
@@ -161,6 +197,7 @@ namespace Vi.UI
         private int originalVSyncState;
         private int originalMSAASampleCount;
         private bool originalHDR;
+        private bool originalPostProcessing;
         private void SetOriginalVariables()
         {
             originalFullScreenMode = fsModes[fullscreenModeDropdown.value];
@@ -172,6 +209,7 @@ namespace Vi.UI
             originalVSyncState = QualitySettings.vSyncCount;
             originalMSAASampleCount = pipeline.msaaSampleCount;
             originalHDR = pipeline.supportsHDR;
+            originalPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
         public void ApplyChanges()
@@ -195,6 +233,7 @@ namespace Vi.UI
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
             pipeline.supportsHDR = hdrToggle.isOn;
+            FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", postProcessingToggle.isOn.ToString());
 
             vsyncToggle.interactable = true;
 
@@ -245,6 +284,7 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
+            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
         public void OnQualitySettingsDropdownChange()
@@ -257,6 +297,7 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
+            postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
         }
 
         public void ValidateTargetFrameRate()
@@ -275,7 +316,7 @@ namespace Vi.UI
             }
 
             Application.targetFrameRate = targetFrameRate;
-            PersistentLocalObjects.Singleton.SetInt("TargetFrameRate", targetFrameRate);
+            FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
         }
     }
 }

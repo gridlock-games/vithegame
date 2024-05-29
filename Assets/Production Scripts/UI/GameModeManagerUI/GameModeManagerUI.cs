@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
-using Vi.Core;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -22,10 +22,7 @@ namespace Vi.UI
         protected void Start()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
             gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
@@ -48,12 +45,17 @@ namespace Vi.UI
             rightScoreText.text = gameModeManager.GetRightScoreString();
         }
 
-        protected void Update()
+        private void RefreshStatus()
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+        }
+
+        protected void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!gameModeManager.IsSpawned) { return; }
 

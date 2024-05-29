@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
     public class FootstepAudioHandler : MonoBehaviour
     {
         [SerializeField] private AudioClip[] footStepSounds;
-        [SerializeField] private float volume = 1;
+        private const float volume = 0.4f;
 
         Attributes attributes;
         private void Awake()
@@ -23,7 +24,7 @@ namespace Vi.Core
             if (!attributes.IsSpawned) { return; }
             if (attributes.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (footRaised)
                 {

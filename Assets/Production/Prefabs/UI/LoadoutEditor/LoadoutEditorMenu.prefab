@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8437061752975667004}
   - component: {fileID: 6314030588728949710}
   - component: {fileID: 7785607463062545884}
+  - component: {fileID: 4769285312389334921}
   m_Layer: 5
   m_Name: Preset Button 1
   m_TagString: Untagged
@@ -136,6 +137,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &4769285312389334921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162174530490046237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &210452467039142374
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,13 +526,22 @@ MonoBehaviour:
   armorSelectMenu: {fileID: 2162864202067643293, guid: 9f83927185909244e8bf851ed0c22939,
     type: 3}
   helmButton: {fileID: 6546556053875799246}
+  helmImage: {fileID: 5251486665199712639}
   chestButton: {fileID: 8161998427434068602}
+  chestImage: {fileID: 7902748422991583799}
   shouldersButton: {fileID: 6197509111361331961}
+  shouldersImage: {fileID: 5504748208424221130}
   glovesButton: {fileID: 450282441725083120}
+  glovesImage: {fileID: 3380865873052697431}
   pantsButton: {fileID: 2742114589475584802}
+  pantsImage: {fileID: 1943419988519536060}
   bootsButton: {fileID: 3035282467152482449}
+  bootsImage: {fileID: 4378615662662553905}
   beltButton: {fileID: 8236943264314816385}
+  beltImage: {fileID: 5042552337453465159}
   capeButton: {fileID: 254547551669311962}
+  capeImage: {fileID: 5680922573698806052}
+  defaultSprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
 --- !u!1 &617611897012372536
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,6 +725,7 @@ GameObject:
   - component: {fileID: 7428383216059692798}
   - component: {fileID: 8433520728096787365}
   - component: {fileID: 700795957282161525}
+  - component: {fileID: 4522370435726535709}
   m_Layer: 5
   m_Name: char_weaponA
   m_TagString: Untagged
@@ -758,7 +782,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 33fbf3f6a3c524da2a67d8c7060e6e75, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -812,6 +836,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4522370435726535709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771086447229189687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &820547937366905860
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,6 +862,7 @@ GameObject:
   - component: {fileID: 7859608456083855242}
   - component: {fileID: 8533054386661039843}
   - component: {fileID: 6119406819764615556}
+  - component: {fileID: 8795907170132717027}
   m_Layer: 5
   m_Name: Preset Button 4
   m_TagString: Untagged
@@ -948,6 +986,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &8795907170132717027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820547937366905860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &978634856514726496
 GameObject:
   m_ObjectHideFlags: 0
@@ -1266,6 +1317,7 @@ GameObject:
   - component: {fileID: 6735802839722639314}
   - component: {fileID: 7902748422991583799}
   - component: {fileID: 8161998427434068602}
+  - component: {fileID: 2295412232456337490}
   m_Layer: 5
   m_Name: char_chest
   m_TagString: Untagged
@@ -1322,7 +1374,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1376,6 +1428,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2295412232456337490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1279203171809791486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &1318878223939059516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1807,6 +1872,7 @@ GameObject:
   - component: {fileID: 4487756057147835000}
   - component: {fileID: 1943419988519536060}
   - component: {fileID: 2742114589475584802}
+  - component: {fileID: 7352994912672141893}
   m_Layer: 5
   m_Name: char_pants
   m_TagString: Untagged
@@ -1863,7 +1929,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1917,6 +1983,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7352994912672141893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2532735886738199950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &2552561707391663601
 GameObject:
   m_ObjectHideFlags: 0
@@ -2008,6 +2087,7 @@ GameObject:
   - component: {fileID: 991442918364269751}
   - component: {fileID: 2594161353200752169}
   - component: {fileID: 310317089757613045}
+  - component: {fileID: 1248719954258846421}
   m_Layer: 5
   m_Name: Button (Close)
   m_TagString: Untagged
@@ -2193,6 +2273,19 @@ MonoBehaviour:
   m_PressedTrigger: Pressed
   m_TargetGraphic: {fileID: 8779126080953415519}
   m_TargetGameObject: {fileID: 0}
+--- !u!114 &1248719954258846421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2849141897334082716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &3008142285277173523
 GameObject:
   m_ObjectHideFlags: 0
@@ -2709,6 +2802,7 @@ GameObject:
   - component: {fileID: 6555992391956596778}
   - component: {fileID: 5680922573698806052}
   - component: {fileID: 254547551669311962}
+  - component: {fileID: 6844137146995229352}
   m_Layer: 5
   m_Name: char_cape
   m_TagString: Untagged
@@ -2765,7 +2859,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2819,6 +2913,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6844137146995229352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241231232289685067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &3247031672410327909
 GameObject:
   m_ObjectHideFlags: 0
@@ -2911,6 +3018,7 @@ GameObject:
   - component: {fileID: 4522675128106312397}
   - component: {fileID: 4378615662662553905}
   - component: {fileID: 3035282467152482449}
+  - component: {fileID: 7764873740067048100}
   m_Layer: 5
   m_Name: char_boots
   m_TagString: Untagged
@@ -2967,7 +3075,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3021,6 +3129,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7764873740067048100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3248957673375075585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &3329438682565548269
 GameObject:
   m_ObjectHideFlags: 0
@@ -3629,6 +3750,7 @@ GameObject:
   - component: {fileID: 3609984358148719939}
   - component: {fileID: 7336604370294373636}
   - component: {fileID: 4609016592386842443}
+  - component: {fileID: 7621440158933680591}
   m_Layer: 5
   m_Name: Preset Button 3
   m_TagString: Untagged
@@ -3752,6 +3874,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &7621440158933680591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4178504277444157321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &4232376230007776122
 GameObject:
   m_ObjectHideFlags: 0
@@ -3815,14 +3950,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.12156863, g: 0.12156863, b: 0.12156863, a: 0.78039217}
+  m_Color: {r: 0.0627451, g: 0.0627451, b: 0.0627451, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4377,6 +4512,7 @@ GameObject:
   - component: {fileID: 4056935813796830097}
   - component: {fileID: 3380865873052697431}
   - component: {fileID: 450282441725083120}
+  - component: {fileID: 6480648059455498133}
   m_Layer: 5
   m_Name: char_gloves
   m_TagString: Untagged
@@ -4433,7 +4569,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4487,6 +4623,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6480648059455498133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5384494539375733314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &5933999755739721133
 GameObject:
   m_ObjectHideFlags: 0
@@ -4729,6 +4878,7 @@ GameObject:
   - component: {fileID: 1890008752824560560}
   - component: {fileID: 5042552337453465159}
   - component: {fileID: 8236943264314816385}
+  - component: {fileID: 8425797594201724775}
   m_Layer: 5
   m_Name: char_belt
   m_TagString: Untagged
@@ -4785,7 +4935,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4839,6 +4989,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8425797594201724775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546982727384795703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &6637540988642232612
 GameObject:
   m_ObjectHideFlags: 0
@@ -4931,6 +5094,7 @@ GameObject:
   - component: {fileID: 2131325702705207312}
   - component: {fileID: 2180454569610816864}
   - component: {fileID: 7981583418132947954}
+  - component: {fileID: 1505091241278972552}
   m_Layer: 5
   m_Name: char_weaponB
   m_TagString: Untagged
@@ -4987,7 +5151,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5041,6 +5205,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1505091241278972552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712870192113188272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &6844653684921992808
 GameObject:
   m_ObjectHideFlags: 0
@@ -5053,6 +5230,7 @@ GameObject:
   - component: {fileID: 3125271645891598917}
   - component: {fileID: 5251486665199712639}
   - component: {fileID: 6546556053875799246}
+  - component: {fileID: 6767404540677352631}
   m_Layer: 5
   m_Name: char_helm
   m_TagString: Untagged
@@ -5109,7 +5287,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5163,6 +5341,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6767404540677352631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6844653684921992808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &7224336341408827611
 GameObject:
   m_ObjectHideFlags: 0
@@ -5515,6 +5706,7 @@ GameObject:
   - component: {fileID: 1140871960317061042}
   - component: {fileID: 5504748208424221130}
   - component: {fileID: 6197509111361331961}
+  - component: {fileID: 68550064191522966}
   m_Layer: 5
   m_Name: char_shoulders
   m_TagString: Untagged
@@ -5571,7 +5763,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8e8df3102f7ae413c9fb2689284c738c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31eb89de04d74ae4480ebdd6f27a8b2f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5625,6 +5817,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &68550064191522966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7468704309039594475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &7474849421713976410
 GameObject:
   m_ObjectHideFlags: 0
@@ -6161,6 +6366,7 @@ GameObject:
   - component: {fileID: 6190609081269451422}
   - component: {fileID: 6925164705196636068}
   - component: {fileID: 2780698690286191487}
+  - component: {fileID: 380318036930591866}
   m_Layer: 5
   m_Name: Preset Button 2
   m_TagString: Untagged
@@ -6284,6 +6490,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alphaThreshold: 0.1
+--- !u!114 &380318036930591866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8545299772699101789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11be120b5ce36ba4ca40fddbbfcb6e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: afac6e611150b4dbdb7ffaa39f1c2e34, type: 3}
 --- !u!1 &8881918628511026170
 GameObject:
   m_ObjectHideFlags: 0

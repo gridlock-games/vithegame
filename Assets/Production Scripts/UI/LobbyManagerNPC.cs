@@ -12,11 +12,6 @@ namespace Vi.UI
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private HubServerBrowser UI;
 
-        // The minimum number of lobby instances we want to run at one time
-        private const int minimumLobbyServersRequired = 1;
-        // The minimum number of EMPTY lobby instances we want to run at one time
-        private const int emptyLobbyServersRequired = 1;
-
         private GameObject invoker;
         public override void Interact(GameObject invoker)
         {
@@ -66,18 +61,32 @@ namespace Vi.UI
 
         private const float scalingSpeed = 8;
         private const float rotationSpeed = 15;
+
+        // The minimum number of lobby instances we want to run at one time
+        private const int minimumLobbyServersRequired = 1;
+        // The minimum number of EMPTY lobby instances we want to run at one time
+        private const int emptyLobbyServersRequired = 1;
+
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera) { return; }
+            mainCamera = Camera.main;
+        }
+
         private void Update()
         {
+            FindMainCamera();
+
             worldSpaceLabel.transform.localScale = Vector3.Lerp(worldSpaceLabel.transform.localScale, localPlayerInRange ? originalScale : Vector3.zero, Time.deltaTime * scalingSpeed);
 
-            if (Camera.main)
+            if (mainCamera)
             {
-                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
+                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
             }
 
             if (IsServer)
             {
-                
                 List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
                 WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address);
                 foreach (WebRequestManager.Server server in lobbyServers)
@@ -99,6 +108,7 @@ namespace Vi.UI
                 {
                     if (emptyServerList.Count > 0 & !WebRequestManager.Singleton.IsDeletingServer)
                     {
+                        Debug.Log("Deleting server with id " + emptyServerList[0]._id.ToString());
                         WebRequestManager.Singleton.DeleteServer(emptyServerList[0]._id.ToString());
                     }
                 }
@@ -115,7 +125,7 @@ namespace Vi.UI
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Build\VitheGame.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\VitheGame.exe";
             }
             else
             {

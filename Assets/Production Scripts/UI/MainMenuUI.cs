@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.UI.SimpleGoogleSignIn;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -17,21 +18,21 @@ namespace Vi.UI
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
-
         [SerializeField] private Text loginMethodText;
         [SerializeField] private Text initialErrorText;
         [SerializeField] private Button[] authenticationButtons;
 
         [Header("Authentication")]
         [SerializeField] private Image viLogo;
-
         [SerializeField] private GameObject authenticationParent;
         [SerializeField] private InputField usernameInput;
         [SerializeField] private InputField emailInput;
         [SerializeField] private InputField passwordInput;
         [SerializeField] private Button loginButton;
         [SerializeField] private Button returnButton;
-        [SerializeField] private Button switchLoginFormButton;
+        [SerializeField] private Button openLoginFormButton;
+        [SerializeField] private Button openRegisterAccountButton;
+        [SerializeField] private Button forgotPasswordButton;
         [SerializeField] private Text loginErrorText;
 
         [Header("OAuth")]
@@ -41,13 +42,12 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
-
         [SerializeField] private Text welcomeUserText;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
-
         [SerializeField] private Button startLobbyServerButton;
+        [SerializeField] private Button startAutoClientButton;
 
         private bool startServerCalled;
         private const int hubPort = 7777;
@@ -67,6 +67,9 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = hubPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Player Hub");
             NetSceneManager.Singleton.LoadScene("Player Hub Environment");
@@ -100,14 +103,58 @@ namespace Vi.UI
             }
 
             networkTransport.ConnectionData.Port = (ushort)lobbyPort;
+
+            networkTransport.MaxPacketQueueSize = 512;
+            networkTransport.MaxSendQueueSize = 512;
+
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
+        private const string automatedClientUsername = "roxasodale91";
+        private const string automatedClientPassword = "123456";
+
+        private bool startAutomatedClientCalled;
+        public void StartAutomatedClient()
+        {
+            if (startAutomatedClientCalled) { return; }
+            startAutomatedClientCalled = true;
+            AudioListener.volume = 0;
+
+            StartCoroutine(LaunchAutoClient());
+        }
+
+        private IEnumerator LaunchAutoClient()
+        {
+            LoginWithVi();
+
+            usernameInput.text = automatedClientUsername;
+            passwordInput.text = automatedClientPassword;
+
+            yield return Login();
+
+            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); yield break; }
+
+            WebRequestManager.Singleton.RefreshCharacters();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+
+            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
+
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
+
+            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
+            networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+
+            NetworkManager.Singleton.StartClient();
+        }
+
         public void LoginWithVi()
         {
-            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             initialParent.SetActive(false);
 
@@ -117,9 +164,9 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
+            forgotPasswordButton.gameObject.SetActive(true);
+            openRegisterAccountButton.gameObject.SetActive(true);
+            openLoginFormButton.gameObject.SetActive(false);
         }
 
         public void OpenCreateAccount()
@@ -136,15 +183,15 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "GO TO LOGIN";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenViLogin);
+            forgotPasswordButton.gameObject.SetActive(false);
+            openRegisterAccountButton.gameObject.SetActive(false);
+            openLoginFormButton.gameObject.SetActive(true);
         }
 
         public void OpenViLogin()
         {
-            if (PersistentLocalObjects.Singleton.HasKey("username")) { usernameInput.text = PersistentLocalObjects.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (PersistentLocalObjects.Singleton.HasKey("password")) { passwordInput.text = PersistentLocalObjects.Singleton.GetString("password"); } else { passwordInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             viLogo.enabled = false;
             initialParent.SetActive(false);
@@ -156,9 +203,9 @@ namespace Vi.UI
             loginButton.onClick.RemoveAllListeners();
             loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
-            switchLoginFormButton.GetComponentInChildren<Text>().text = "CREATE ACCOUNT";
-            switchLoginFormButton.onClick.RemoveAllListeners();
-            switchLoginFormButton.onClick.AddListener(OpenCreateAccount);
+            forgotPasswordButton.gameObject.SetActive(true);
+            openRegisterAccountButton.gameObject.SetActive(true);
+            openLoginFormButton.gameObject.SetActive(false);
         }
 
         public void ReturnToInitialElements()
@@ -191,8 +238,8 @@ namespace Vi.UI
 
         public IEnumerator CreateAccount()
         {
-            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
-            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
+            FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
+            FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
 
             emailInput.interactable = false;
             usernameInput.interactable = false;
@@ -212,15 +259,15 @@ namespace Vi.UI
 
         public IEnumerator Login()
         {
-            PersistentLocalObjects.Singleton.SetString("LastSignInType", "Vi");
-            PersistentLocalObjects.Singleton.SetString("username", usernameInput.text);
-            PersistentLocalObjects.Singleton.SetString("password", passwordInput.text);
+            FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Vi");
+            FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
+            FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
             usernameInput.interactable = false;
             passwordInput.interactable = false;
 
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
-            welcomeUserText.text = "Welcome " + PersistentLocalObjects.Singleton.GetString("username");
+            welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
@@ -272,15 +319,16 @@ namespace Vi.UI
             }
 
             AuthResult authResult = task.Result;
+            oAuthMessageText.text = $"Waiting for Firebase Authentication";
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
-                welcomeUserText.text = "Welcome " + authResult.User.DisplayName;
-                PersistentLocalObjects.Singleton.SetString("LastSignInType", "Google");
-                PersistentLocalObjects.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
+                welcomeUserText.text = authResult.User.DisplayName;
+                FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Google");
+                FasterPlayerPrefs.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
             else
             {
@@ -305,6 +353,11 @@ namespace Vi.UI
             initialParent.SetActive(true);
         }
 
+        public void ForgotPassword()
+        {
+            Debug.LogError("Not implemented yet!");
+        }
+
         private FirebaseAuth auth;
 
         private void Start()
@@ -313,6 +366,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
+            startAutoClientButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
             if (!WebRequestManager.IsServerBuild())
@@ -324,13 +378,13 @@ namespace Vi.UI
 
         private IEnumerator AutomaticallyAttemptLogin()
         {
-            if (PersistentLocalObjects.Singleton.HasKey("LastSignInType"))
+            if (FasterPlayerPrefs.Singleton.HasKey("LastSignInType"))
             {
-                switch (PersistentLocalObjects.Singleton.GetString("LastSignInType"))
+                switch (FasterPlayerPrefs.Singleton.GetString("LastSignInType"))
                 {
                     case "Vi":
-                        usernameInput.text = PersistentLocalObjects.Singleton.GetString("username");
-                        passwordInput.text = PersistentLocalObjects.Singleton.GetString("password");
+                        usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username");
+                        passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password");
                         yield return Login();
 
                         if (WebRequestManager.Singleton.IsLoggedIn)
@@ -344,12 +398,12 @@ namespace Vi.UI
                         break;
 
                     case "Google":
-                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(PersistentLocalObjects.Singleton.GetString("GoogleIdTokenResponse")));
+                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("GoogleIdTokenResponse")));
 
                         break;
 
                     default:
-                        Debug.LogError("Not sure how to handle last sign in type " + PersistentLocalObjects.Singleton.GetString("LastSignInType"));
+                        Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
                         break;
                 }
             }
@@ -382,6 +436,7 @@ namespace Vi.UI
 
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
 
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {
@@ -393,11 +448,17 @@ namespace Vi.UI
                 {
                     StartLobbyServer();
                 }
+                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
+                {
+                    StartAutomatedClient();
+                }
             }
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            switchLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            openLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            openRegisterAccountButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
                 button.interactable = !WebRequestManager.Singleton.IsLoggingIn;

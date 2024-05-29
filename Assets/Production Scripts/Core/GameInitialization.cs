@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Analytics;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -30,7 +31,7 @@ namespace Vi.Core
             InitializePlayerPrefs();
 
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Application.targetFrameRate = PersistentLocalObjects.Singleton.GetInt("TargetFrameRate");
+            Application.targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
             StartCoroutine(LoadScenes());
 
             if (!WebRequestManager.IsServerBuild())
@@ -47,37 +48,41 @@ namespace Vi.Core
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
-            if (!PersistentLocalObjects.Singleton.HasKey("TargetFrameRate")) { PersistentLocalObjects.Singleton.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate")) { FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("InvertMouse")) { PersistentLocalObjects.Singleton.SetString("InvertMouse", false.ToString()); }
-            if (!PersistentLocalObjects.Singleton.HasKey("MouseXSensitivity")) { PersistentLocalObjects.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
-            if (!PersistentLocalObjects.Singleton.HasKey("MouseYSensitivity")) { PersistentLocalObjects.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
-            if (!PersistentLocalObjects.Singleton.HasKey("ZoomSensitivityMultiplier")) { PersistentLocalObjects.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
-            if (!PersistentLocalObjects.Singleton.HasKey("MobileLookJoystickSensitivity")) { PersistentLocalObjects.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
-            if (!PersistentLocalObjects.Singleton.HasKey("ZoomMode")) { PersistentLocalObjects.Singleton.SetString("ZoomMode", "TOGGLE"); }
-            if (!PersistentLocalObjects.Singleton.HasKey("BlockingMode")) { PersistentLocalObjects.Singleton.SetString("BlockingMode", "HOLD"); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetString("InvertMouse", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("MouseYSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("ZoomSensitivityMultiplier")) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("MobileLookJoystickSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
-            if (!PersistentLocalObjects.Singleton.HasKey("DisableBots")) { PersistentLocalObjects.Singleton.SetString("DisableBots", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("DisableBots")) { FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString()); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("AutoAim")) { PersistentLocalObjects.Singleton.SetString("AutoAim", true.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetString("AutoAim", true.ToString()); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("ConsoleEnabled")) { PersistentLocalObjects.Singleton.SetString("ConsoleEnabled", false.ToString()); }
-            if (!PersistentLocalObjects.Singleton.HasKey("FPSEnabled")) { PersistentLocalObjects.Singleton.SetString("FPSEnabled", false.ToString()); }
-            if (!PersistentLocalObjects.Singleton.HasKey("PingEnabled")) { PersistentLocalObjects.Singleton.SetString("PingEnabled", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetString("ConsoleEnabled", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetString("FPSEnabled", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("PingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PingEnabled", false.ToString()); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("Rebinds")) { PersistentLocalObjects.Singleton.SetString("Rebinds", ""); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("UIOpacity")) { PersistentLocalObjects.Singleton.SetFloat("UIOpacity", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("UIOpacity")) { FasterPlayerPrefs.Singleton.SetFloat("UIOpacity", 1); }
 
-            if (!PersistentLocalObjects.Singleton.HasKey("MasterVolume"))
+            if (!FasterPlayerPrefs.Singleton.HasKey("MasterVolume"))
             {
-                PersistentLocalObjects.Singleton.SetFloat("MasterVolume", 0.75f);
+                FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.75f);
                 AudioListener.volume = 0.75f;
             }
             else
             {
-                AudioListener.volume = PersistentLocalObjects.Singleton.GetFloat("MasterVolume");
+                AudioListener.volume = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
             }
+
+            if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
+
+            if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0).ToString()); }
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
@@ -85,12 +90,12 @@ namespace Vi.Core
 
         private void VerifyHoldPlayerPref(string key, int defaultIndex)
         {
-            if (!PersistentLocalObjects.Singleton.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
+            if (!FasterPlayerPrefs.Singleton.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
 
-            if (!holdToggleOptions.Contains(PersistentLocalObjects.Singleton.GetString(key)))
+            if (!holdToggleOptions.Contains(FasterPlayerPrefs.Singleton.GetString(key)))
             {
                 if (defaultIndex < 0 | defaultIndex >= holdToggleOptions.Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
-                PersistentLocalObjects.Singleton.SetString(key, holdToggleOptions[defaultIndex]);
+                FasterPlayerPrefs.Singleton.SetString(key, holdToggleOptions[defaultIndex]);
             }
         }
 

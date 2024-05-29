@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.ScriptableObjects;
-using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -43,11 +43,14 @@ namespace Vi.Player
         [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
@@ -56,11 +59,14 @@ namespace Vi.Player
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
@@ -110,7 +116,7 @@ namespace Vi.Player
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -127,7 +133,7 @@ namespace Vi.Player
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
                 }
@@ -155,14 +161,14 @@ namespace Vi.Player
                 else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | animationHandler.IsLunging())
                 {
                     movement = rootMotion;
-                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                    allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                    allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                     foreach (RaycastHit hit in allHits)
                     {
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
                                 angleList.Add((networkCollider,
@@ -203,14 +209,14 @@ namespace Vi.Player
             float yOffset = 0.2f;
             Vector3 startPos = movementPrediction.CurrentPosition;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {
                     break;
                 }
 
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
                 startPos.y += yOffset;
                 stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
 
@@ -237,6 +243,10 @@ namespace Vi.Player
                     moveSidesTarget.Value = animDir.x;
                 }
             }
+
+            movement += forceAccumulated;
+            forceAccumulated = Vector3.zero;
+
             lastMovement = movement;
 
             Vector3 newPosition;
@@ -256,12 +266,11 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
-                cameraController.GetComponent<AudioListener>().enabled = true;
+                cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.GetComponent<Camera>().enabled = true;
-                minimapCameraInstance.enabled = true;
 
                 playerInput.enabled = true;
-                string rebinds = PersistentLocalObjects.Singleton.GetString("Rebinds");
+                string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 GetComponent<ActionMapHandler>().enabled = true;
@@ -270,9 +279,9 @@ namespace Vi.Player
             else
             {
                 Destroy(cameraController.gameObject);
-                Destroy(minimapCameraInstance.gameObject);
-                playerInput.enabled = false;
+                Destroy(playerInput);
             }
+            movementPredictionRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()
@@ -295,6 +304,7 @@ namespace Vi.Player
         {
             base.Awake();
             playerInput = GetComponent<PlayerInput>();
+            RefreshStatus();
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -308,14 +318,24 @@ namespace Vi.Player
             animationHandler = GetComponent<AnimationHandler>();
         }
 
-        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
-        private readonly float minimapCameraOffset = 15;
-        //private Vector2 lookInputToSubtract;
-        private void Update()
+        private Camera mainCamera;
+        private void FindMainCamera()
         {
+            if (mainCamera) { return; }
+            mainCamera = Camera.main;
+        }
+
+        private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
+        private new void Update()
+        {
+            base.Update();
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            FindMainCamera();
+
             if (!IsSpawned) { return; }
 
-            #if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
@@ -340,7 +360,7 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                RaycastHit[] allHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                                 foreach (RaycastHit hit in allHits)
                                 {
@@ -361,20 +381,20 @@ namespace Vi.Player
                 }
             lookInput += lookInputToAdd;
             }
-            #endif
+#endif
 
             UpdateLocomotion();
             animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animationHandler.Animator.SetBool("IsGrounded", isGrounded);
 
-            if (minimapCameraInstance)
-            {
-                bool bHit = Physics.Raycast(transform.position, transform.up, out RaycastHit hit, minimapCameraOffset, LayerMask.GetMask(new string[] { "Default" }), QueryTriggerInteraction.Ignore);
-                minimapCameraInstance.transform.localPosition = bHit ? new Vector3(0, hit.distance, 0) : new Vector3(0, minimapCameraOffset, 0);
-            }
-
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
+        }
+
+        Vector3 forceAccumulated;
+        public override void AddForce(Vector3 force)
+        {
+            forceAccumulated += force * Time.fixedDeltaTime;
         }
 
         private float positionStrength = 1;
@@ -398,6 +418,12 @@ namespace Vi.Player
 
         private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
+        private void RefreshStatus()
+        {
+            autoAim = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
+        }
+
+        private bool autoAim;
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
@@ -436,20 +462,20 @@ namespace Vi.Player
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
-            if (bool.Parse(PersistentLocalObjects.Singleton.GetString("AutoAim")))
+            if (autoAim)
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
                     if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | animationHandler.IsLunging())
                     {
-                        ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
-                        RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + weaponHandler.CurrentActionClip.boxCastOriginPositionOffset, weaponHandler.CurrentActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, weaponHandler.CurrentActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
+                        RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                         List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
                         foreach (RaycastHit hit in allHits)
                         {
                             if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                             {
-                                if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible)
+                                if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                                 {
                                     Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
                                     angleList.Add((networkCollider,
@@ -489,7 +515,7 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(Camera.main.transform.position, Camera.main.transform.forward, 15, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {

@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
 using Vi.Utility;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -37,23 +38,23 @@ namespace Vi.Core
 
         public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
         public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
-        public float GetMaxDefense() { return weaponHandler.GetWeapon().GetMaxDefense(); }
+        public float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
         public float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
 
         private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<float> stamina = new NetworkVariable<float>();
-        private NetworkVariable<float> defense = new NetworkVariable<float>();
+        private NetworkVariable<float> spirit = new NetworkVariable<float>();
         private NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetHP() { return HP.Value; }
         public float GetStamina() { return stamina.Value; }
-        public float GetDefense() { return defense.Value; }
+        public float GetSpirit() { return spirit.Value; }
         public float GetRage() { return rage.Value; }
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
             HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
-            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
+            spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             stamina.Value = 0;
             if (resetRage)
                 rage.Value = 0;
@@ -85,20 +86,17 @@ namespace Vi.Core
                 stamina.Value += amount;
         }
 
-        public void AddDefense(float amount, bool activateCooldown = true)
+        public void AddSpirit(float amount)
         {
-            if (amount < 0) { amount *= defenseReductionMultiplier; }
-            if (amount > 0) { amount *= defenseIncreaseMultiplier; }
+            if (amount < 0) { amount *= spiritReductionMultiplier; }
+            if (amount > 0) { amount *= spiritIncreaseMultiplier; }
 
-            if (activateCooldown)
-                defenseDelayCooldown = weaponHandler.GetWeapon().GetDefenseDelay();
-
-            if (defense.Value + amount > weaponHandler.GetWeapon().GetMaxDefense())
-                defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
-            else if (defense.Value + amount < 0)
-                defense.Value = 0;
+            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit())
+                spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
+            else if (spirit.Value + amount < 0)
+                spirit.Value = 0;
             else
-                defense.Value += amount;
+                spirit.Value += amount;
         }
 
         public void AddRage(float amount)
@@ -114,25 +112,26 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitHP()); }
+            if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            rage.OnValueChanged += OnRageChanged;
+            isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
-            isInvincible.OnValueChanged += OnIsInvincibleChange;
-            isUninterruptable.OnValueChanged += OnIsUninterruptableChange;
             statuses.OnListChanged += OnStatusChange;
+            activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
-        private IEnumerator InitHP()
+        private IEnumerator InitStats()
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
             HP.Value = weaponHandler.GetWeapon().GetMaxHP();
-            defense.Value = weaponHandler.GetWeapon().GetMaxDefense();
+            spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
         }
 
         private IEnumerator AddPlayerObjectToGameLogicManager()
@@ -144,13 +143,14 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            rage.OnValueChanged -= OnRageChanged;
+            isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
-            isInvincible.OnValueChanged -= OnIsInvincibleChange;
-            isUninterruptable.OnValueChanged -= OnIsUninterruptableChange;
             statuses.OnListChanged -= OnStatusChange;
+            activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -170,6 +170,46 @@ namespace Vi.Core
             }
         }
 
+        private const float rageEndPercent = 0.01f;
+
+        [SerializeField] private GameObject rageAtMaxVFXPrefab;
+        [SerializeField] private GameObject ragingVFXPrefab;
+        private GameObject rageAtMaxVFXInstance;
+        private GameObject ragingVFXInstance;
+        private void OnRageChanged(float prev, float current)
+        {
+            float currentRagePercent = GetRage() / GetMaxRage();
+            if (currentRagePercent >= 1)
+            {
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
+            }
+            else
+            {
+                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
+            }
+
+            if (IsServer)
+            {
+                if (currentRagePercent < rageEndPercent)
+                {
+                    isRaging.Value = false;
+                }
+            }
+        }
+
+        private void OnIsRagingChanged(bool prev, bool current)
+        {
+            if (current)
+            {
+                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, animationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
+            }
+            else
+            {
+                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ragingVFXInstance); }
+            }
+        }
+
         public GlowRenderer GlowRenderer { get; private set; }
         private void OnTransformChildrenChanged()
         {
@@ -179,6 +219,7 @@ namespace Vi.Core
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
@@ -186,12 +227,14 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             movementHandler = GetComponent<MovementHandler>();
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            RefreshStatus();
         }
 
         private GameObject teamIndicatorInstance;
         private void Start()
         {
-            teamIndicatorInstance = Instantiate(teamIndicatorPrefab, transform);
+            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
         private void OnEnable()
@@ -204,15 +247,13 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
         }
 
-        public bool IsInvincible { get; private set; }
+        public bool IsInvincible() { return isInvincible.Value; }
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
-        private void OnIsInvincibleChange(bool prev, bool current) { IsInvincible = current; }
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
-        public bool IsUninterruptable { get; private set; }
+        public bool IsUninterruptable() { return isUninterruptable.Value; }
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
-        private void OnIsUninterruptableChange(bool prev, bool current) { IsUninterruptable = current; }
         private float uninterruptableEndTime;
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
@@ -338,7 +379,7 @@ namespace Vi.Core
         public int GetComboCounter() { return comboCounter.Value; }
 
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
-        private NetworkVariable<NetworkString64Bytes> grabAttackClipName = new NetworkVariable<NetworkString64Bytes>();
+        private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }
@@ -357,18 +398,13 @@ namespace Vi.Core
 
         public AnimationClip GetGrabReactionClip()
         {
-            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
-            {
-                Attributes grabAssailant = GetGrabAssailant();
-                if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+            Attributes grabAssailant = GetGrabAssailant();
+            if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
 
-                if (weaponOption.weapon.name == grabAssailant.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", ""))
-                {
-                    return weaponOption.weapon.GetActionClipByName(grabAttackClipName.Value.ToString()).grabVictimClip;
-                }
-            }
-            Debug.LogError("Couldn't find grab reaction clip!");
-            return null;
+            ActionClip grabAttackClip = grabAssailant.weaponHandler.GetWeapon().GetActionClipByName(grabAttackClipName.Value.ToString());
+
+            if (!grabAttackClip.grabVictimClip) { Debug.LogError("Couldn't find grab reaction clip!"); }
+            return grabAttackClip.grabVictimClip;
         }
 
         public void CancelGrab()
@@ -386,8 +422,10 @@ namespace Vi.Core
         }
 
         public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
-        private const float notBlockingDefenseHitReactionPercentage = 0.4f;
-        private const float blockingDefenseHitReactionPercentage = 0.5f;
+        private const float notBlockingSpiritHitReactionPercentage = 0.4f;
+        private const float blockingSpiritHitReactionPercentage = 0.5f;
+
+        private const float rageDamageMultiplier = 1.15f;
 
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
@@ -397,11 +435,13 @@ namespace Vi.Core
             }
 
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-            if (attacker.ShouldPlayHitStop()) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
             if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
             if (animationHandler.IsGrabAttacking()) { return false; }
+
+            // Don't let grab attack hit players that aren't grabbed
+            if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
@@ -415,12 +455,12 @@ namespace Vi.Core
 
             if (attack.maxHitLimit == 0) { return false; }
 
-            if (IsInvincible) { return false; }
+            if (IsInvincible()) { return false; }
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
 
-                if (!IsUninterruptable)
+                if (!IsUninterruptable())
                 {
                     wasStaggeredThisFrame = true;
                     StartCoroutine(ResetStaggerBool());
@@ -468,9 +508,9 @@ namespace Vi.Core
                 }
             }
 
+            if (ailment.Value == ActionClip.Ailment.Stun & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Stagger; }
             if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
             if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
-            if (ailment.Value == ActionClip.Ailment.Stun & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Stagger; }
 
             if (ailment.Value == ActionClip.Ailment.Stagger & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
 
@@ -479,12 +519,12 @@ namespace Vi.Core
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
             if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
 
-            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
-            //AddDefense(-attack.defenseDamage);
-            attacker.AddRage(attackerRageToBeAddedOnHit);
-            AddRage(victimRageToBeAddedOnHit);
+            //AddSpirit(-attack.spiritDamage);
+            if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
@@ -496,43 +536,43 @@ namespace Vi.Core
             HPDamage *= attacker.damageMultiplier;
             HPDamage *= damageMultiplier;
 
-            float defensePercentage = GetDefense() / GetMaxDefense();
+            float spiritPercentage = GetSpirit() / GetMaxSpirit();
 
             bool shouldPlayHitReaction = false;
             switch (hitReaction.GetHitReactionType())
             {
                 case ActionClip.HitReactionType.Normal:
-                    if (defensePercentage >= notBlockingDefenseHitReactionPercentage)
+                    if (spiritPercentage >= notBlockingSpiritHitReactionPercentage)
                     {
-                        AddDefense(HPDamage * 0.7f);
+                        AddSpirit(HPDamage * 0.7f);
                         HPDamage *= 0.7f;
                     }
-                    else if (defensePercentage > 0)
+                    else if (spiritPercentage > 0)
                     {
-                        AddDefense(HPDamage * 0.7f);
+                        AddSpirit(HPDamage * 0.7f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
                     }
-                    else // Defense is at 0
+                    else // Spirit is at 0
                     {
-                        AddDefense(attack.damage);
+                        AddSpirit(attack.damage);
                         shouldPlayHitReaction = true;
                     }
                     break;
                 case ActionClip.HitReactionType.Blocking:
-                    if (defensePercentage >= blockingDefenseHitReactionPercentage)
+                    if (spiritPercentage >= blockingSpiritHitReactionPercentage)
                     {
-                        AddDefense(HPDamage * 0.5f);
+                        AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
-                    else if (defensePercentage > 0)
+                    else if (spiritPercentage > 0)
                     {
-                        AddDefense(Mathf.NegativeInfinity);
+                        AddSpirit(Mathf.NegativeInfinity);
                         AddStamina(-GetMaxStamina() * 0.3f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
                     }
-                    else // Defense is at 0
+                    else // Spirit is at 0
                     {
                         AddStamina(-GetMaxStamina() * 0.3f);
                         if (GetStamina() < GetMaxStamina() * 0.3f)
@@ -556,13 +596,15 @@ namespace Vi.Core
                 }
             }
 
+            if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
+
             if (HP.Value + HPDamage <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
-            if (!IsUninterruptable | hitReaction.ailment == ActionClip.Ailment.Death)
+            if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
                 {
@@ -585,7 +627,7 @@ namespace Vi.Core
                         | animationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        animationHandler.PlayAction(hitReaction);
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
                     }
                 }
             }
@@ -601,8 +643,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (evaluateAfterHitStopCoroutine != null) { StopCoroutine(evaluateAfterHitStopCoroutine); }
-                evaluateAfterHitStopCoroutine = StartCoroutine(EvaluateAfterHitStop(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction));
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
 
                 if (HPDamage != 0)
                 {
@@ -621,7 +662,7 @@ namespace Vi.Core
                 }
             }
 
-            if (attack.shouldFlinch)
+            if (attack.shouldFlinch | IsRaging())
             {
                 movementHandler.Flinch(attack.GetFlinchAmount());
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle));
@@ -644,7 +685,7 @@ namespace Vi.Core
             StartHitStopClientRpc(attacker.NetworkObjectId);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
             Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
@@ -663,11 +704,8 @@ namespace Vi.Core
 
         public Attributes GetPullAssailant() { return PlayerDataManager.Singleton.GetPlayerObjectById(pullAssailantDataId.Value); }
 
-        private Coroutine evaluateAfterHitStopCoroutine;
-        private IEnumerator EvaluateAfterHitStop(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
+        private void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, Attributes attacker, ActionClip attack, ActionClip hitReaction)
         {
-            yield return new WaitForSeconds(ActionClip.HitStopEffectDuration);
-
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
                 TryAddStatus(status.status, status.value, status.duration, status.delay);
@@ -722,14 +760,14 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
                             break;
                         case ActionClip.Ailment.Knockup:
                             knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
                             break;
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
@@ -755,17 +793,8 @@ namespace Vi.Core
                 if (knockupHitCounter >= knockupHitLimit)
                 {
                     if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                    SetInviniciblity(recoveryTimeInvincibilityBuffer);
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
                     ailment.Value = ActionClip.Ailment.None;
-                }
-            }
-
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
-            {
-                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                {
-                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, attacker.transform, transform);
-                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
                 }
             }
         }
@@ -812,23 +841,20 @@ namespace Vi.Core
         private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
-            
-            if (!IsClient)
-            {
-                GlowRenderer.RenderHit();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
-                Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-                AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
-            }
+
+            GlowRenderer.RenderHit();
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
 
             RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -837,15 +863,12 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
 
-            if (!IsClient)
-            {
-                GlowRenderer.RenderHit();
-            }
+            GlowRenderer.RenderHit();
 
             RenderHitGlowOnlyClientRpc();
         }
 
-        [ClientRpc]
+        [Rpc(SendTo.NotServer)]
         private void RenderHitGlowOnlyClientRpc()
         {
             GlowRenderer.RenderHit();
@@ -855,20 +878,18 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
-            if (!IsClient)
-            {
-                GlowRenderer.RenderBlock();
-                StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-                AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
-            }
+            GlowRenderer.RenderBlock();
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
 
             RenderBlockClientRpc(impactPosition);
         }
 
-        [ClientRpc] private void RenderBlockClientRpc(Vector3 impactPosition)
+        [Rpc(SendTo.NotServer)]
+        private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            StartCoroutine(weaponHandler.DestroyVFXWhenFinishedPlaying(Instantiate(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -876,25 +897,40 @@ namespace Vi.Core
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
+        private bool pingEnabled;
+        private void RefreshStatus()
+        {
+            pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+        }
+
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!IsSpawned) { return; }
 
-            GlowRenderer.RenderInvincible(IsInvincible);
-            GlowRenderer.RenderUninterruptable(IsUninterruptable);
+            GlowRenderer.RenderInvincible(IsInvincible());
+            GlowRenderer.RenderUninterruptable(IsUninterruptable());
 
             if (!IsServer) { return; }
 
             if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
 
-            isInvincible.Value = Time.time <= invincibilityEndTime;
-            isUninterruptable.Value = Time.time <= uninterruptableEndTime;
+            bool evaluateInvinicibility = true;
+            bool evaluateUninterruptability = true;
+            if (animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+            {
+                if (weaponHandler.CurrentActionClip.isUninterruptable) { isUninterruptable.Value = true; evaluateUninterruptability = false; }
+                if (weaponHandler.CurrentActionClip.isInvincible) { isInvincible.Value = true; evaluateInvinicibility = false; }
+            }
+
+            if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
+            if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
 
             UpdateStamina();
-            //UpdateDefense();
             UpdateRage();
 
-            roundTripTime.Value = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().GetCurrentRtt(OwnerClientId);
+            if (pingEnabled) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
         private float staminaDelayCooldown;
@@ -905,22 +941,50 @@ namespace Vi.Core
             AddStamina(weaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
         }
 
-        private float defenseDelayCooldown;
-        private void UpdateDefense()
-        {
-            if (weaponHandler.IsBlocking) { return; }
-
-            defenseDelayCooldown = Mathf.Max(0, defenseDelayCooldown - Time.deltaTime);
-            if (defenseDelayCooldown > 0) return;
-            AddDefense(weaponHandler.GetWeapon().GetDefenseRecoveryRate() * Time.deltaTime, false);
-        }
-
+        public const float ragingStaminaCostMultiplier = 1.25f;
+        private const float rageDepletionRate = 1;
         private float rageDelayCooldown;
         private void UpdateRage()
         {
+            if (IsRaging())
+            {
+                AddRage(-rageDepletionRate * Time.deltaTime);
+            }
+
             rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
             if (rageDelayCooldown > 0) { return; }
             AddRage(weaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
+        }
+
+        public void OnActivateRage()
+        {
+            if (!CanActivateRage()) { return; }
+            ActivateRage();
+        }
+
+        public bool IsRaging() { return isRaging.Value; }
+        private NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
+        private void ActivateRage()
+        {
+            if (!IsSpawned) { Debug.LogError("Calling Attributes.ActivateRage() before this object is spawned!"); return; }
+
+            if (IsServer)
+            {
+                if (!CanActivateRage()) { return; }
+                isRaging.Value = true;
+            }
+            else
+            {
+                ActivateRageServerRpc();
+            }
+        }
+
+        private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
+
+        [Rpc(SendTo.Server)]
+        private void ActivateRageServerRpc()
+        {
+            ActivateRage();
         }
 
         private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
@@ -931,6 +995,15 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            {
+                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                {
+                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                }
+            }
+
             if (current == ActionClip.Ailment.Death)
             {
                 animationHandler.Animator.enabled = false;
@@ -939,6 +1012,7 @@ namespace Vi.Core
             }
             else if (prev == ActionClip.Ailment.Death)
             {
+                isRaging.Value = false;
                 animationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
@@ -977,7 +1051,7 @@ namespace Vi.Core
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            if (shouldMakeInvincible) { SetInviniciblity(duration); }
+            if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
             yield return new WaitForSeconds(duration);
             SetInviniciblity(recoveryTimeInvincibilityBuffer);
             ailment.Value = ActionClip.Ailment.None;
@@ -1068,8 +1142,8 @@ namespace Vi.Core
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
-        private float defenseIncreaseMultiplier = 1;
-        private float defenseReductionMultiplier = 1;
+        private float spiritIncreaseMultiplier = 1;
+        private float spiritReductionMultiplier = 1;
         
         public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
         private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
@@ -1085,6 +1159,21 @@ namespace Vi.Core
         {
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
+        }
+
+        public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
+        private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
+        {
+            ActiveStatusesWasUpdatedThisFrame = true;
+            if (resetActiveStatusesBoolCoroutine != null) { StopCoroutine(resetActiveStatusesBoolCoroutine); }
+            resetActiveStatusesBoolCoroutine = StartCoroutine(ResetActiveStatusesWasUpdatedBool());
+        }
+
+        private Coroutine resetActiveStatusesBoolCoroutine;
+        private IEnumerator ResetActiveStatusesWasUpdatedBool()
+        {
+            yield return null;
+            ActiveStatusesWasUpdatedThisFrame = false;
         }
 
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
@@ -1117,16 +1206,16 @@ namespace Vi.Core
                     healingMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
-                case ActionClip.Status.defenseIncreaseMultiplier:
-                    defenseIncreaseMultiplier *= statusPayload.value;
+                case ActionClip.Status.spiritIncreaseMultiplier:
+                    spiritIncreaseMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
-                    defenseIncreaseMultiplier /= statusPayload.value;
+                    spiritIncreaseMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
-                case ActionClip.Status.defenseReductionMultiplier:
-                    defenseReductionMultiplier *= statusPayload.value;
+                case ActionClip.Status.spiritReductionMultiplier:
+                    spiritReductionMultiplier *= statusPayload.value;
                     yield return new WaitForSeconds(statusPayload.duration);
-                    defenseReductionMultiplier /= statusPayload.value;
+                    spiritReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:

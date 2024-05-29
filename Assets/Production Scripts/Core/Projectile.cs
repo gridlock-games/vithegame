@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -11,6 +12,8 @@ namespace Vi.Core
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
+        [SerializeField] private AudioClip soundToPlayOnSpawn;
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -37,6 +40,8 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
+            AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position);
+
             startPosition = transform.position;
 
             Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -46,7 +51,18 @@ namespace Vi.Core
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
             }
 
-            if (gameObject.layer != LayerMask.NameToLayer("NetworkPrediction")) { Debug.LogError("Make sure projectiles are in the NetworkPrediction Layer!"); }
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
+            foreach (Collider col in colliders)
+            {
+                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
+                col.enabled = IsServer;
+            }
         }
 
         private void Update()
@@ -88,6 +104,17 @@ namespace Vi.Core
                 }
             }
             NetworkObject.Despawn(true);
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
+                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
+            }
         }
 
         private void OnDrawGizmos()

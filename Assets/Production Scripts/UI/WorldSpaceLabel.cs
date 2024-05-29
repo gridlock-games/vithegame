@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -31,6 +32,7 @@ namespace Vi.UI
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
+        private Canvas canvas;
         private Attributes attributes;
         private Renderer rendererToFollow;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
@@ -38,11 +40,9 @@ namespace Vi.UI
 
         private void Start()
         {
+            canvas = GetComponent<Canvas>();
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            foreach (CanvasGroup canvasGroup in canvasGroups)
-            {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
-            }
+            RefreshStatus();
 
             attributes = GetComponentInParent<Attributes>();
 
@@ -59,6 +59,22 @@ namespace Vi.UI
             healthBarParent.localScale = Vector3.zero;
 
             UpdateNameTextAndColors();
+        }
+
+        private void RefreshStatus()
+        {
+            foreach (CanvasGroup canvasGroup in canvasGroups)
+            {
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
+            }
+        }
+
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera) { return; }
+            mainCamera = Camera.main;
+            canvas.worldCamera = mainCamera;
         }
 
         private void UpdateNameTextAndColors()
@@ -87,11 +103,16 @@ namespace Vi.UI
             }
         }
 
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+        }
+
         private void LateUpdate()
         {
             foreach (CanvasGroup canvasGroup in canvasGroups)
             {
-                canvasGroup.alpha = PersistentLocalObjects.Singleton.GetFloat("UIOpacity");
+                canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
@@ -101,18 +122,20 @@ namespace Vi.UI
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
+            FindMainCamera();
+
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
-            if (Camera.main)
+            if (mainCamera)
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Camera.main.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
 
-                float camDistance = Vector3.Distance(Camera.main.transform.position, transform.position);
+                float camDistance = Vector3.Distance(mainCamera.transform.position, transform.position);
                 if (camDistance > viewDistance)
                 {
-                    Quaternion mouseOverRotation = Quaternion.LookRotation(Camera.main.transform.position - rendererToFollow.bounds.center);
-                    float upAngle = Vector3.SignedAngle(Camera.main.transform.up, mouseOverRotation * Vector3.up, Camera.main.transform.right);
-                    float horizontalAngle = Quaternion.Angle(Camera.main.transform.rotation, mouseOverRotation);
+                    Quaternion mouseOverRotation = Quaternion.LookRotation(mainCamera.transform.position - rendererToFollow.bounds.center);
+                    float upAngle = Vector3.SignedAngle(mainCamera.transform.up, mouseOverRotation * Vector3.up, mainCamera.transform.right);
+                    float horizontalAngle = Quaternion.Angle(mainCamera.transform.rotation, mouseOverRotation);
 
                     if (shouldUseFixedScale)
                         localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue) : Vector3.zero;
@@ -139,6 +162,7 @@ namespace Vi.UI
                 //Debug.LogWarning("Can't find a main camera for world space labels!");
             }
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
+            canvas.enabled = transform.localScale.magnitude > 0.01f;
 
             if (healthBarLocalScaleTarget == Vector3.zero)
             {
@@ -152,18 +176,21 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
-
-            List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-            foreach (StatusIcon statusIcon in statusIcons)
+            
+            if (attributes.ActiveStatusesWasUpdatedThisFrame)
             {
-                if (activeStatuses.Contains(statusIcon.Status))
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    statusIcon.SetActive(true);
-                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                }
-                else
-                {
-                    statusIcon.SetActive(false);
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
                 }
             }
         }

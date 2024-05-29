@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -73,6 +74,11 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
+
+            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
+            {
+                equippedEquipment.Add(equipmentType, null);
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -98,7 +104,7 @@ namespace Vi.Core
             SwapWeaponOnRespawnClientRpc();
         }
 
-        [ClientRpc] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
+        [Rpc(SendTo.NotServer)] private void SwapWeaponOnRespawnClientRpc() { AllowLoadoutSwap(); }
 
         private void AllowLoadoutSwap()
         {
@@ -143,24 +149,36 @@ namespace Vi.Core
 
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
 
-            foreach (KeyValuePair<CharacterReference.EquipmentType, NetworkString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
+            foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
                 if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
                 {
                     CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
                     if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId); }
                     if (wearableEquipmentOption == null) { wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()); }
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
                     animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
                 else if (NetworkObject.IsPlayerObject)
                 {
-                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId), raceAndGender);
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == kvp.Value.ToString()).itemId);
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
                 else
                 {
-                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString()), raceAndGender);
+                    CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == kvp.Value.ToString());
+                    equippedEquipment[kvp.Key] = wearableEquipmentOption;
+                    animationHandler.ApplyWearableEquipment(kvp.Key, wearableEquipmentOption, raceAndGender);
                 }
             }
+        }
+
+        private Dictionary<CharacterReference.EquipmentType, CharacterReference.WearableEquipmentOption> equippedEquipment = new Dictionary<CharacterReference.EquipmentType, CharacterReference.WearableEquipmentOption>();
+
+        public CharacterReference.WearableEquipmentOption GetEquippedEquipmentOption(CharacterReference.EquipmentType equipmentType)
+        {
+            return equippedEquipment[equipmentType];
         }
 
         public override void OnNetworkDespawn()
@@ -212,9 +230,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
-                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
-                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(1);
                         currentEquippedWeapon.Value = 1;
                         lastPrimaryFlashAttackTime = Time.time;
@@ -238,9 +254,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina()) { return; }
-                        if (flashAttack.agentDefenseCost > attributes.GetDefense()) { return; }
-                        if (flashAttack.agentRageCost > attributes.GetRage()) { return; }
+                        if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(2);
                         currentEquippedWeapon.Value = 2;
                         lastSecondaryFlashAttackTime = Time.time;
@@ -286,14 +300,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentRageCost > attributes.GetRage())
-                            canFlashAttack = false;
-                        else
-                            canFlashAttack = true;
+                        canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
@@ -307,14 +314,7 @@ namespace Vi.Core
                 {
                     if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
-                        if (flashAttack.agentStaminaCost > attributes.GetStamina())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentDefenseCost > attributes.GetDefense())
-                            canFlashAttack = false;
-                        else if (flashAttack.agentRageCost > attributes.GetRage())
-                            canFlashAttack = false;
-                        else
-                            canFlashAttack = true;
+                        canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
                 attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
@@ -326,7 +326,7 @@ namespace Vi.Core
             }
         }
 
-        [ServerRpc]
+        [Rpc(SendTo.Server)]
         private void FlashAttackServerRpc(int weaponSlotToSwapTo)
         {
             StartCoroutine(WaitForWeaponSwapThenFlashAttack(weaponSlotToSwapTo));

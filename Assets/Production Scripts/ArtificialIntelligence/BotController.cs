@@ -5,6 +5,7 @@ using Vi.Core;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using UnityEngine.AI;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -25,11 +26,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -38,11 +42,14 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
+            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
             {
-                if (collision.relativeVelocity.magnitude > 1)
+                if (collision.collider.GetComponent<NetworkCollider>())
                 {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    if (collision.relativeVelocity.magnitude > 1)
+                    {
+                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+                    }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -56,6 +63,7 @@ namespace Vi.ArtificialIntelligence
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
             }
+            networkColliderRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         public override void OnNetworkDespawn()
@@ -77,12 +85,14 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updatePosition = false;
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
+            RefreshStatus();
         }
 
         private void Start()
         {
             networkColliderRigidbody.transform.SetParent(null, true);
             UpdateActivePlayersList();
+            StartCoroutine(EvaluateBotLogic());
         }
 
         private new void OnDestroy()
@@ -113,7 +123,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Vector3 inputDir = transform.InverseTransformDirection(navMeshAgent.nextPosition - currentPosition.Value).normalized;
+            Vector3 inputDir = navMeshAgent.nextPosition - currentPosition.Value;
+            inputDir.y = 0;
+            inputDir = transform.InverseTransformDirection(inputDir).normalized;
             
             if (Vector3.Distance(navMeshAgent.destination, currentPosition.Value) < navMeshAgent.stoppingDistance)
             {
@@ -123,21 +135,23 @@ namespace Vi.ArtificialIntelligence
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (navMeshAgent.nextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
+            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
+
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
             else if (animationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value;
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -154,7 +168,7 @@ namespace Vi.ArtificialIntelligence
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded.Value = true;
                 }
@@ -200,14 +214,14 @@ namespace Vi.ArtificialIntelligence
             float yOffset = 0.2f;
             Vector3 startPos = currentPosition.Value;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {
                     break;
                 }
 
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
 
@@ -226,6 +240,9 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
+
+            movement += forceAccumulated;
+            forceAccumulated = Vector3.zero;
 
             Vector3 newPosition;
             if (Mathf.Approximately(movement.y, 0))
@@ -252,8 +269,12 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes targetAttributes;
 
-        private void Update()
+        private new void Update()
         {
+            base.Update();
+
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
             if (!CanMove()) { return; }
@@ -269,11 +290,24 @@ namespace Vi.ArtificialIntelligence
                 animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
                 animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
-                
-                if (IsOwner & !bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
+            }
+        }
+        
+        private void RefreshStatus()
+        {
+            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
+        }
+
+        private bool disableBots;
+
+        private IEnumerator EvaluateBotLogic()
+        {
+            while (true)
+            {
+                if (IsOwner & !disableBots)
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
-                    
+
                     targetAttributes = null;
                     foreach (Attributes player in activePlayers)
                     {
@@ -307,20 +341,22 @@ namespace Vi.ArtificialIntelligence
 
                     EvaluteAction();
                 }
-                else if (bool.Parse(PersistentLocalObjects.Singleton.GetString("DisableBots")))
+                else if (disableBots)
                 {
                     if (navMeshAgent.isOnNavMesh)
                     {
                         if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { navMeshAgent.destination = currentPosition.Value; }
                     }
                 }
+
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 0.75f;
+        private const float chargeAttackDuration = 0.5f;
         private const float chargeWaitDuration = 2;
         private float lastChargeAttackTime;
 
@@ -391,6 +427,13 @@ namespace Vi.ArtificialIntelligence
         {
             if (Time.time - lastAbilityTime > abilityWaitDuration)
             {
+                if (attributes.GetRage() / attributes.GetMaxRage() >= 1)
+                {
+                    attributes.OnActivateRage();
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
                 int abilityNum = Random.Range(1, 5);
                 if (abilityNum == 1)
                 {
@@ -414,6 +457,12 @@ namespace Vi.ArtificialIntelligence
                 }
                 lastAbilityTime = Time.time;
             }
+        }
+
+        Vector3 forceAccumulated;
+        public override void AddForce(Vector3 force)
+        {
+            forceAccumulated += force * Time.fixedDeltaTime;
         }
 
         private float positionStrength = 1;

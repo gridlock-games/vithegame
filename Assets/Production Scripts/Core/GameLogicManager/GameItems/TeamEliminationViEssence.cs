@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -20,7 +21,7 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, spawnSound, transform.position);
+            AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound);
         }
 
         private void OnTriggerEnter(Collider other)
