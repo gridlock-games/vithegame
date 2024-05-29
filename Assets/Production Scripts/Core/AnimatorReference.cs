@@ -147,6 +147,7 @@ namespace Vi.Core
         Animator animator;
         WeaponHandler weaponHandler;
         Attributes attributes;
+        MovementHandler movementHandler;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
         AnimationHandler animationHandler;
@@ -158,6 +159,7 @@ namespace Vi.Core
             weaponHandler = GetComponentInParent<WeaponHandler>();
             animationHandler = weaponHandler.GetComponent<AnimationHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
+            movementHandler = weaponHandler.GetComponent<MovementHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
         }
@@ -226,11 +228,13 @@ namespace Vi.Core
                 if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
                 {
                     Transform grabAssailant = attributes.GetGrabAssailant().transform;
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude);
+                    movementHandler.AddForce(Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude));
+                    curveAdjustedLocalRootMotion = Vector3.zero;
                 }
                 else if (attributes.IsPulled())
                 {
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                    movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
+                    curveAdjustedLocalRootMotion = Vector3.zero;
                 }
                 else
                 {
