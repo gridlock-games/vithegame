@@ -245,7 +245,7 @@ namespace Vi.Player
 
                 if (angle > 180) { angle -= 360; }
 
-                if (angle > -60 & angle < 30)
+                if (angle > -20 & angle < 20)
                 {
                     movement = Vector3.zero;
                 }
