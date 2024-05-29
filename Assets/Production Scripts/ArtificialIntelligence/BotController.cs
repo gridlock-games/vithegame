@@ -21,19 +21,15 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
-        [SerializeField] private float collisionPushDampeningFactor = 1;
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
+            if (collision.collider.GetComponent<NetworkCollider>())
             {
-                if (collision.collider.GetComponent<NetworkCollider>())
+                if (collision.relativeVelocity.magnitude > 1)
                 {
-                    if (collision.relativeVelocity.magnitude > 1)
-                    {
-                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                    }
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -42,14 +38,11 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
+            if (collision.collider.GetComponent<NetworkCollider>())
             {
-                if (collision.collider.GetComponent<NetworkCollider>())
+                if (collision.relativeVelocity.magnitude > 1)
                 {
-                    if (collision.relativeVelocity.magnitude > 1)
-                    {
-                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                    }
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
                 }
             }
             currentPosition.Value = networkColliderRigidbody.position;
@@ -239,6 +232,21 @@ namespace Vi.ArtificialIntelligence
             {
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
+            }
+
+            bool wasPlayerHit = Physics.CapsuleCast(currentPosition.Value, currentPosition.Value + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            //bool wasPlayerHit = Physics.Raycast(currentPosition.Value + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            if (wasPlayerHit)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
+                float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+
+                if (angle > 180) { angle -= 360; }
+
+                if (angle > -60 & angle < 30)
+                {
+                    movement = Vector3.zero;
+                }
             }
 
             movement += forceAccumulated;

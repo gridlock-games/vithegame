@@ -39,18 +39,13 @@ namespace Vi.Player
             cameraController.AddRotation(flinchAmount.x, flinchAmount.y);
         }
 
-        [Header("Collision Settings")]
-        [SerializeField] private float collisionPushDampeningFactor = 1;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
+            if (collision.collider.GetComponent<NetworkCollider>())
             {
-                if (collision.collider.GetComponent<NetworkCollider>())
+                if (collision.relativeVelocity.magnitude > 1)
                 {
-                    if (collision.relativeVelocity.magnitude > 1)
-                    {
-                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                    }
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
@@ -59,14 +54,11 @@ namespace Vi.Player
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (!animationHandler.IsGrabAttacking() & !attributes.IsGrabbed())
+            if (collision.collider.GetComponent<NetworkCollider>())
             {
-                if (collision.collider.GetComponent<NetworkCollider>())
+                if (collision.relativeVelocity.magnitude > 1)
                 {
-                    if (collision.relativeVelocity.magnitude > 1)
-                    {
-                        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                    }
+                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
                 }
             }
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
@@ -241,6 +233,21 @@ namespace Vi.Player
                 {
                     moveForwardTarget.Value = animDir.z;
                     moveSidesTarget.Value = animDir.x;
+                }
+            }
+
+            bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            if (wasPlayerHit)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
+                float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+
+                if (angle > 180) { angle -= 360; }
+
+                if (angle > -60 & angle < 30)
+                {
+                    movement = Vector3.zero;
                 }
             }
 
