@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -9,12 +10,28 @@ namespace Vi.Core
         public Attributes Attributes { get; private set; }
         public MovementHandler MovementHandler { get; private set; }
 
+        private static Dictionary<int, NetworkCollider> instanceIDTable = new Dictionary<int, NetworkCollider>();
+
         private Collider[] colliders;
         private void Awake()
         {
             MovementHandler = GetComponentInParent<MovementHandler>();
             Attributes = GetComponentInParent<Attributes>();
             colliders = GetComponentsInChildren<Collider>();
+
+            foreach (Collider c in colliders)
+            {
+                instanceIDTable.Add(c.GetInstanceID(), this);
+                c.hasModifiableContacts = true;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (Collider c in colliders)
+            {
+                instanceIDTable.Remove(c.GetInstanceID());
+            }
         }
 
         private void Update()
@@ -42,6 +59,39 @@ namespace Vi.Core
             if (collision.transform.root == transform.root) { return; }
             MovementHandler.ReceiveOnCollisionExitMessage(collision);
         }
+
+        //private void OnEnable()
+        //{
+        //    Physics.ContactModifyEvent += ModificationEvent;
+        //}
+
+        //public void OnDisable()
+        //{
+        //    Physics.ContactModifyEvent -= ModificationEvent;
+        //}
+
+        //public void ModificationEvent(PhysicsScene scene, NativeArray<ModifiableContactPair> pairs)
+        //{
+        //    // For each contact pair, ignore the contact points that are close to origin
+        //    foreach (var pair in pairs)
+        //    {
+        //        if (instanceIDTable.ContainsKey(pair.colliderInstanceID))
+        //        {
+        //            Debug.Log(instanceIDTable[pair.colliderInstanceID]);
+        //            //Debug.Log("First " + instanceIDTable[pair.colliderInstanceID].ToString());
+        //        }
+
+        //        //if (instanceIDTable.ContainsKey(pair.otherColliderInstanceID))
+        //        //{
+        //        //    Debug.Log("Second " + instanceIDTable[pair.otherColliderInstanceID].ToString());
+        //        //}
+
+        //        for (int i = 0; i < pair.contactCount; ++i)
+        //        {
+
+        //        }
+        //    }
+        //}
 
         private void OnDrawGizmos()
         {
