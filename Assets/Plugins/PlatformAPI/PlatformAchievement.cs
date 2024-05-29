@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
 using Steamworks;
 #endif
 
@@ -31,7 +31,7 @@ namespace jomarcentermjm.PlatformAPI
     {
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam Code
       if (SteamManager.Initialized)
       {
@@ -49,7 +49,7 @@ namespace jomarcentermjm.PlatformAPI
 
     public void UpdateStats(string ID, int value)
     {
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam
       if (SteamManager.Initialized)
       {
@@ -62,7 +62,7 @@ namespace jomarcentermjm.PlatformAPI
     {
       int output = 0;
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam
       if (SteamManager.Initialized && platform == GamePlatform.Steam)
       {

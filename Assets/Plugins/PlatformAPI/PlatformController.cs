@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
 using Steamworks;
 #endif
 namespace jomarcentermjm.PlatformAPI
@@ -55,7 +55,7 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttmptSteam()
     {
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
@@ -63,7 +63,7 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttemptDiscord()
     {
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       this.gameObject.AddComponent<DiscordManager>();
       return true;
 #endif
