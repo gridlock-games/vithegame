@@ -59,7 +59,6 @@ namespace jomarcentermjm.PlatformAPI
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
-            return false;
     }
 
     bool AttemptDiscord()
@@ -68,7 +67,6 @@ namespace jomarcentermjm.PlatformAPI
       this.gameObject.AddComponent<DiscordManager>();
       return true;
 #endif
-            return false;
     }
   }
 }
