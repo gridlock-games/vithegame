@@ -168,8 +168,12 @@ namespace Vi.UI
             openRegisterAccountButton.gameObject.SetActive(true);
             openLoginFormButton.gameObject.SetActive(false);
         }
+    public void LoginWithSteam()
+    {
+      initialErrorText.text = "Login with Steam has not been implemented yet";
+    }
 
-        public void OpenCreateAccount()
+      public void OpenCreateAccount()
         {
             usernameInput.text = "";
             passwordInput.text = "";
