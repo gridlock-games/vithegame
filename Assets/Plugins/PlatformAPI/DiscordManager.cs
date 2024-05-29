@@ -8,8 +8,9 @@ namespace jomarcentermjm.PlatformAPI
 {
     public class DiscordManager : MonoBehaviour
     {
-
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         public Discord.Discord discord;
+#endif
 
         // Use this for initialization
         void Start()
