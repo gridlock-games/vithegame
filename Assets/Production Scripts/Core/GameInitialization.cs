@@ -101,6 +101,7 @@ namespace Vi.Core
 
         private IEnumerator LoadScenes()
         {
+            yield return new WaitForSeconds(5);
             bool downloadsSuccessful = true;
 
             assetNumberText.text = "";
