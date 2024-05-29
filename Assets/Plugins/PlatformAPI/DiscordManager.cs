@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
 using Discord;
+#endif
 namespace jomarcentermjm.PlatformAPI
 {
   public class DiscordManager : MonoBehaviour
@@ -12,6 +14,7 @@ namespace jomarcentermjm.PlatformAPI
     // Use this for initialization
     void Start()
     {
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       discord = new Discord.Discord(1181075969558183996, (System.UInt64)Discord.CreateFlags.NoRequireDiscord);
       var activityManager = discord.GetActivityManager();
       var activity = new Discord.Activity
@@ -30,10 +33,12 @@ namespace jomarcentermjm.PlatformAPI
           Debug.Log("Successful activity change");
         }
       });
+#endif
     }
 
     public void ChangeActivityMessage(string state, string details, string largeimg, string largetext, string smallimage, string smalltext)
     {
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       var activityManager = discord.GetActivityManager();
       var activity = new Discord.Activity
       {
@@ -53,10 +58,12 @@ namespace jomarcentermjm.PlatformAPI
           Debug.Log("Successful activity change");
         }
       });
+#endif
     }
 
     public void clearActivity()
     {
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       var activityManager = discord.GetActivityManager();
       activityManager.ClearActivity((result) =>
       {
@@ -75,5 +82,6 @@ namespace jomarcentermjm.PlatformAPI
     {
       discord.RunCallbacks();
     }
+#endif
   }
 }

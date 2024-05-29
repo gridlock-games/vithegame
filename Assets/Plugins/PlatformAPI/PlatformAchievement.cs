@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
 using Steamworks;
+#endif
 
 
 
@@ -28,6 +31,7 @@ namespace jomarcentermjm.PlatformAPI
     {
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);
 
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam Code
       if (SteamManager.Initialized)
       {
@@ -38,29 +42,33 @@ namespace jomarcentermjm.PlatformAPI
           SteamUserStats.StoreStats();
         }
       }
+#endif
 
-      
+
     }
 
     public void UpdateStats(string ID, int value)
     {
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam
       if (SteamManager.Initialized)
       {
         SteamUserStats.SetStat(ID, value);
       }
+#endif
     }
 
     public int GetStats(GamePlatform platform , string ID)
     {
       int output = 0;
 
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       //Steam
       if (SteamManager.Initialized && platform == GamePlatform.Steam)
       {
         SteamUserStats.GetStat(ID, out output);
       }
-
+#endif
 
 
       return output;
