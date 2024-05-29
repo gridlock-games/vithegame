@@ -25,26 +25,26 @@ namespace Vi.ArtificialIntelligence
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
-            {
-                if (collision.relativeVelocity.magnitude > 1)
-                {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                }
-            }
+            //if (collision.collider.GetComponent<NetworkCollider>())
+            //{
+            //    if (collision.relativeVelocity.magnitude > 1)
+            //    {
+            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+            //    }
+            //}
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             if (!IsServer) { return; }
-            if (collision.collider.GetComponent<NetworkCollider>())
-            {
-                if (collision.relativeVelocity.magnitude > 1)
-                {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                }
-            }
+            //if (collision.collider.GetComponent<NetworkCollider>())
+            //{
+            //    if (collision.relativeVelocity.magnitude > 1)
+            //    {
+            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+            //    }
+            //}
             currentPosition.Value = networkColliderRigidbody.position;
         }
 

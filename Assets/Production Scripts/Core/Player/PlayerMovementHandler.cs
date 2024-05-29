@@ -41,26 +41,26 @@ namespace Vi.Player
 
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
-            {
-                if (collision.relativeVelocity.magnitude > 1)
-                {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                }
-            }
+            //if (collision.collider.GetComponent<NetworkCollider>())
+            //{
+            //    if (collision.relativeVelocity.magnitude > 1)
+            //    {
+            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+            //    }
+            //}
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (collision.collider.GetComponent<NetworkCollider>())
-            {
-                if (collision.relativeVelocity.magnitude > 1)
-                {
-                    if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-                }
-            }
+            //if (collision.collider.GetComponent<NetworkCollider>())
+            //{
+            //    if (collision.relativeVelocity.magnitude > 1)
+            //    {
+            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
+            //    }
+            //}
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
