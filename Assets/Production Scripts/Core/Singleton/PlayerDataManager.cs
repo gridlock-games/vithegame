@@ -17,6 +17,7 @@ namespace Vi.Core
     {
         [SerializeField] private GameObject spectatorPrefab;
         [SerializeField] private CharacterReference characterReference;
+        [SerializeField] private ControlsImageMapping controlsImageMapping;
 
         [SerializeField] private List<GameModeInfo> gameModeInfos;
 
@@ -30,6 +31,8 @@ namespace Vi.Core
         }
 
         public CharacterReference GetCharacterReference() { return characterReference; }
+
+        public ControlsImageMapping GetControlsImageMapping() { return controlsImageMapping; }
 
         public GameModeInfo GetGameModeInfo() { return gameModeInfos.Find(item => item.gameMode == gameMode.Value); }
 

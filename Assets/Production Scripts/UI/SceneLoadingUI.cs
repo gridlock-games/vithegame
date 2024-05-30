@@ -52,7 +52,7 @@ namespace Vi.UI
                 }
                 else if (NetSceneManager.Singleton.IsSpawned)
                 {
-                    if (PlayerDataManager.Singleton)
+                    if (PlayerDataManager.DoesExist())
                     {
                         topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
                     }

@@ -49,6 +49,7 @@ namespace Vi.Core
         private void InitializePlayerPrefs()
         {
             if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", false.ToString()); }
+            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
 
             if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate")) { FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
 
@@ -60,7 +61,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasKey("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
-            if (!FasterPlayerPrefs.Singleton.HasKey("DisableBots")) { FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString()); }
+            FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
 
             if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetString("AutoAim", true.ToString()); }
 
