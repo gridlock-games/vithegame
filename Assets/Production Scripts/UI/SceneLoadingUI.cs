@@ -45,9 +45,20 @@ namespace Vi.UI
                 {
                     topText = "Network Shutdown In Progress";
                 }
+                else if (NetSceneManager.Singleton.IsSpawned)
+                {
+                    if (PlayerDataManager.Singleton)
+                    {
+                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    }
+                    else
+                    {
+                        topText = "Spawning Player Object";
+                    }
+                }
                 else
                 {
-                    topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                    topText = "Connecting To Server";
                 }
                 
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }

@@ -920,6 +920,10 @@ namespace Vi.Core
             }
         }
 
+        public bool IsWaitingForSpawnPoint() { return isWaitingForSpawnPoint.Value; }
+
+        private NetworkVariable<bool> isWaitingForSpawnPoint = new NetworkVariable<bool>();
+
         private const float spawnPlayerTimeoutThreshold = 10;
         private const float maxSpawnPointWaitTime = 5;
 
@@ -955,12 +959,14 @@ namespace Vi.Core
                 float waitTime = 0;
                 while (!spawnPointFound)
                 {
+                    isWaitingForSpawnPoint.Value = true;
                     (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
                     yield return null;
                     waitTime += Time.deltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
-                
+                isWaitingForSpawnPoint.Value = false;
+
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
