@@ -417,7 +417,7 @@ namespace Vi.Core
 
             if (animationHandler.IsGrabAttacking())
             {
-                animationHandler.CancelAllActions();
+                animationHandler.CancelAllActions(0.15f);
             }
         }
 
@@ -1068,8 +1068,14 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
+            if (animationHandler.IsActionClipPlaying(hitReaction))
+            {
+                yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            }
+
             yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
             yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+
             isPulled.Value = false;
         }
 

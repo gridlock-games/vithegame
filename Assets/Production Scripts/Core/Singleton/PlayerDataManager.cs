@@ -865,7 +865,7 @@ namespace Vi.Core
             Quaternion spawnRotation = transformData.rotation;
 
             attributesToRespawn.ResetStats(1, false);
-            attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions();
+            attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions(0);
             attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
             attributesToRespawn.GetComponent<LoadoutManager>().SwapLoadoutOnRespawn();
         }
@@ -873,7 +873,7 @@ namespace Vi.Core
         public void RevivePlayer(Attributes attributesToRevive)
         {
             attributesToRevive.ResetStats(0.5f, false);
-            attributesToRevive.GetComponent<AnimationHandler>().CancelAllActions();
+            attributesToRevive.GetComponent<AnimationHandler>().CancelAllActions(0);
         }
 
         public void RespawnAllPlayers()
