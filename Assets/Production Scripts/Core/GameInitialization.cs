@@ -48,6 +48,8 @@ namespace Vi.Core
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
+            if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString()); }
+
             if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate")) { FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetString("InvertMouse", false.ToString()); }

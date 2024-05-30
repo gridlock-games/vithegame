@@ -14,6 +14,7 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
+        [SerializeField] private AlertBox tutorialAlertBox;
         [SerializeField] private Button returnButton;
         [SerializeField] private Text webRequestStatusText;
         [SerializeField] private Text gameVersionText;
@@ -131,6 +132,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
+
             OpenStats();
 
             statsOpenAnchoredPosition = selectionBarSelectedImage.anchoredPosition;
@@ -793,12 +796,36 @@ namespace Vi.UI
             if (NetworkManager.Singleton.StartHost())
             {
                 NetSceneManager.Singleton.LoadScene("Training Room");
+                NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+            }
+            else
+            {
+                Debug.LogError("Error trying to start host to go to training room");
+            }
+        }
+
+        public void GoToTutorial()
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
+            if (NetworkManager.Singleton.StartHost())
+            {
+                NetSceneManager.Singleton.LoadScene("Training Room");
                 NetSceneManager.Singleton.LoadScene("Tutorial Map");
             }
             else
             {
                 Debug.LogError("Error trying to start host to go to training room");
             }
+        }
+
+        public void StartTutorial()
+        {
+
+        }
+
+        public void SkipTutorial()
+        {
+            FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
         }
 
         public IEnumerator AutoConnectToHubServer()
