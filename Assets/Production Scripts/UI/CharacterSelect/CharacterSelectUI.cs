@@ -14,6 +14,7 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
+        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
         [SerializeField] private AlertBox tutorialAlertBox;
         [SerializeField] private Button returnButton;
         [SerializeField] private Text webRequestStatusText;
@@ -818,9 +819,13 @@ namespace Vi.UI
             }
         }
 
+        private GameObject UIElementHighlightInstance;
         public void StartTutorial()
         {
-
+            RectTransform rt = (RectTransform)characterCardInstances[0].transform;
+            Vector3 spawnPosition = rt.position;
+            spawnPosition.y += rt.sizeDelta.y / 4;
+            UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, spawnPosition, rt.rotation, transform);
         }
 
         public void SkipTutorial()
