@@ -1256,6 +1256,7 @@ GameObject:
   - component: {fileID: 2090035552}
   - component: {fileID: 2090035555}
   - component: {fileID: 2090035556}
+  - component: {fileID: 2090035557}
   m_Layer: 5
   m_Name: SceneLoadingProgressUI
   m_TagString: Untagged
@@ -1365,3 +1366,15 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5c2ee3048b9f53447a223ca5f58bee1b, type: 3}
   - {fileID: 21300000, guid: 6a338d31e1a84b143840701c04356b90, type: 3}
   backgroundImage: {fileID: 1683857013}
+--- !u!225 &2090035557
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090035550}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0

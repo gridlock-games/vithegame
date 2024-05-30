@@ -18,10 +18,14 @@ namespace Vi.UI
         [SerializeField] private Text spawningPlayerObjectText;
 
         private Canvas canvas;
+        private CanvasGroup canvasGroup;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            canvasGroup = GetComponent<CanvasGroup>();
         }
+
+        private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
@@ -30,7 +34,8 @@ namespace Vi.UI
         {
             if (!NetSceneManager.Singleton)
             {
-                canvas.enabled = false;
+                //canvas.enabled = false;
+                canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
                 return;
             }
 
@@ -84,7 +89,8 @@ namespace Vi.UI
                 }
             }
 
-            canvas.enabled = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf;
+            //canvas.enabled = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf;
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0, Time.deltaTime * alphaLerpSpeed);
 
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
