@@ -3535,8 +3535,14 @@ MonoBehaviour:
   - gameModes: 00000000
     teams: 02000000
     spawnPositions:
-    - {x: 0, y: 5, z: 0}
+    - {x: 9, y: 5, z: 0}
+    - {x: -9, y: 5, z: 0}
+    - {x: 0, y: 5, z: 10}
+    - {x: 0, y: 5, z: -10}
     spawnRotations:
+    - {x: 0, y: 270, z: 0}
+    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
