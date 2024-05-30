@@ -17,9 +17,11 @@ namespace Vi.UI
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
 
+        private Canvas canvas;
         private CanvasGroup canvasGroup;
         private void Awake()
         {
+            canvas = GetComponent<Canvas>();
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
@@ -30,6 +32,7 @@ namespace Vi.UI
         private float lastBytesAmount;
         private void Update()
         {
+            canvas.enabled = canvasGroup.alpha > 0.05f;
             if (!NetSceneManager.Singleton)
             {
                 canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
