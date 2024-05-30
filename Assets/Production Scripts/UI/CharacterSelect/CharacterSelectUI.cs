@@ -822,10 +822,8 @@ namespace Vi.UI
         private GameObject UIElementHighlightInstance;
         public void StartTutorial()
         {
-            RectTransform rt = (RectTransform)characterCardInstances[0].transform;
-            Vector3 spawnPosition = rt.position;
-            spawnPosition.y += rt.sizeDelta.y / 4;
-            UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, spawnPosition, rt.rotation, transform);
+            RectTransform parentRT = (RectTransform)characterCardInstances[0].transform;
+            UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
         }
 
         public void SkipTutorial()
