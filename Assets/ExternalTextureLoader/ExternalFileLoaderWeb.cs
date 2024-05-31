@@ -22,7 +22,12 @@ public class ExternalFileLoaderWeb : MonoBehaviour
 
   private void Awake()
   {
-    _singleton = this;
+    if (Singleton != null && Singleton != this) { Destroy(this); }
+        else
+        {
+      _singleton = this;
+    }
+    DontDestroyOnLoad(this);
   }
   public WebExternalAssets webExternalAssets { get; private set; }
 
