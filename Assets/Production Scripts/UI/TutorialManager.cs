@@ -166,28 +166,55 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Player Card
             {
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                        attributes.ResetComboCounter();
+                    }
+                }
+
                 currentOverlayMessage = "Player Card.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
             }
-            else if (currentActionIndex == 8) // Fight with NPC
+            else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-                currentOverlayMessage = "Defeat The Enemy.";
+                currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Enable();
                 }
 
                 playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                PlayerDataManager.Singleton.RespawnAllPlayers();
             }
-            else if (currentActionIndex == 9) // Display victory or defeat message
+            else if (currentActionIndex == 9) // Fight with NPC
             {
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                currentOverlayMessage = "Defeat The Enemy.";
+            }
+            else if (currentActionIndex == 10) // Display victory or defeat message
+            {
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
             }
             else
             {
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
+        }
+
+        private void OnDestroy()
+        {
+            FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
         }
 
         private string currentOverlayMessage;
@@ -326,13 +353,48 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Player Card
             {
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                        canProceed = attributes.GetComboCounter() > 0 | canProceed;
+                    }
+                }
 
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
-            else if (currentActionIndex == 8) // Fight with NPC
+            else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-
+                canProceed = true;
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
-            else if (currentActionIndex == 9) // Display victory or defeat message
+            else if (currentActionIndex == 9) // Fight with NPC
+            {
+                bool botIsDead = false;
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        botIsDead = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
+                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                    }
+                }
+
+                canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
+                if (canProceed) { DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 10) // Display victory or defeat message
             {
 
             }
