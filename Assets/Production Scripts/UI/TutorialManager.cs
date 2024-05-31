@@ -55,9 +55,44 @@ namespace Vi.UI
             actionChangeTime = Time.time;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
-            if (currentActionIndex == 1)
+
+            StartCoroutine(EvaluateAfterPlayerInputFound());
+        }
+
+        private IEnumerator EvaluateAfterPlayerInputFound()
+        {
+            yield return new WaitUntil(() => playerInput);
+            yield return null;
+
+            if (currentActionIndex == 0)
+            {
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name == "Inventory" | action.name == "Pause" | action.name == "Scoreboard") { continue; }
+                    if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+                }
+            }
+            else if (currentActionIndex == 1)
             {
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+            }
+            else if (currentActionIndex == 2)
+            {
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name.Contains("Attack")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
         }
 
@@ -148,6 +183,8 @@ namespace Vi.UI
             else if (currentActionIndex == 2)
             {
                 currentOverlayMessage = "Attack The Enemy.";
+
+
             }
             else
             {
