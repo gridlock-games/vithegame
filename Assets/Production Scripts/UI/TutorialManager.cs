@@ -18,6 +18,7 @@ namespace Vi.UI
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimationHandler animationHandler;
+        PlayerUI playerUI;
         private void FindPlayerInput()
         {
             if (playerInput) { return; }
@@ -30,6 +31,7 @@ namespace Vi.UI
                 attributes = localPlayer;
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
+                playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
             }
         }
 
@@ -62,16 +64,30 @@ namespace Vi.UI
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
 
+            foreach (GameObject instance in UIElementHighlightInstances)
+            {
+                Destroy(instance);
+            }
+
             StartCoroutine(EvaluateAfterPlayerInputFound());
         }
 
+        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
+        private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
+        [SerializeField] private GameObject locationPingPrefab;
+        private GameObject locationPingInstance;
+
         private IEnumerator EvaluateAfterPlayerInputFound()
         {
-            yield return new WaitUntil(() => playerInput);
-            yield return null;
+            if (!playerInput)
+            {
+                yield return new WaitUntil(() => playerInput);
+                yield return null;
+            }
 
             if (currentActionIndex == 0) // Look
             {
+                currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
@@ -81,6 +97,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
+                currentOverlayMessage = "Move To The Marked Location.";
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -90,6 +107,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
+                currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
@@ -98,40 +116,55 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 3) // Combo
             {
-
+                currentOverlayMessage = "Perform A Combo On The Enemy.";
+                attributes.ResetComboCounter();
             }
             else if (currentActionIndex == 4) // Ability
             {
+                currentOverlayMessage = "Use An Ability.";
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Ability")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                }
             }
             else if (currentActionIndex == 5) // Block
             {
+                currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
             }
             else if (currentActionIndex == 6) // Dodge
             {
+                currentOverlayMessage = "Dodge.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
             }
             else if (currentActionIndex == 7) // Player Card
             {
+                currentOverlayMessage = "Player Card.";
 
             }
             else if (currentActionIndex == 8) // Fight with NPC
             {
+                currentOverlayMessage = "Defeat The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Enable();
@@ -139,7 +172,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Display victory or defeat message
             {
-
+                currentOverlayMessage = "MATCH COMPLETE.";
             }
             else
             {
@@ -179,9 +212,6 @@ namespace Vi.UI
             }
         }
 
-        [SerializeField] private GameObject locationPingPrefab;
-        private GameObject locationPingInstance;
-
         private const float minDisplayTime = 5;
 
         private bool canProceed;
@@ -192,7 +222,6 @@ namespace Vi.UI
 
             if (currentActionIndex == 0) // Look
             {
-                currentOverlayMessage = "Look Around.";
                 //var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
                 //currentOverlaySprite = result.sprite;
 
@@ -212,8 +241,6 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
-                currentOverlayMessage = "Move To The Marked Location.";
-
                 if (locationPingInstance)
                 {
                     if (Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f) { DisplayNextAction(); }
@@ -233,23 +260,30 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
-                currentOverlayMessage = "Attack The Enemy.";
-                if (attributes.GetComboCounter() > 0) { DisplayNextAction(); }
+                canProceed = attributes.GetComboCounter() > 0 | canProceed;
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
             else if (currentActionIndex == 3) // Combo
             {
-                currentOverlayMessage = "Perform A Combo On The Enemy.";
-                if (attributes.GetComboCounter() > 1) { DisplayNextAction(); }
+                canProceed = attributes.GetComboCounter() > 1 | canProceed;
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
             else if (currentActionIndex == 4) // Ability
             {
-                currentOverlayMessage = "Use An Ability.";
-                if (weaponHandler.CurrentActionClip.name.Contains("Ability")) { DisplayNextAction(); }
+                canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
             else if (currentActionIndex == 5) // Block
             {
-                currentOverlayMessage = "Block An Attack.";
-
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -257,7 +291,7 @@ namespace Vi.UI
                     if (attributes)
                     {
                         WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | weaponHandler.IsInRecovery ? 0.5f : 1;
+                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                     }
                 }
                 
@@ -265,22 +299,18 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Dodge
             {
-                currentOverlayMessage = "Dodge.";
                 if (animationHandler.IsDodging()) { DisplayNextAction(); }
             }
             else if (currentActionIndex == 7) // Player Card
             {
-                currentOverlayMessage = "Player Card.";
 
             }
             else if (currentActionIndex == 8) // Fight with NPC
             {
-                currentOverlayMessage = "Defeat The Enemy.";
 
             }
             else if (currentActionIndex == 9) // Display victory or defeat message
             {
-                currentOverlayMessage = "MATCH COMPLETE.";
 
             }
             else

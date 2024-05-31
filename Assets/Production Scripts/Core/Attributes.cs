@@ -378,6 +378,12 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
+        public void ResetComboCounter()
+        {
+            if (!IsServer) { Debug.LogError("Reset combo counter should only be called on the server!"); return; }
+            comboCounter.Value = 0;
+        }
+
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
         private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();

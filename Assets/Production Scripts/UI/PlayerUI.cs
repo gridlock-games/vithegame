@@ -14,6 +14,12 @@ namespace Vi.UI
 {
     public class PlayerUI : MonoBehaviour
     {
+        public List<AbilityCard> GetAbilityCards() { return new List<AbilityCard>() { ability1, ability2, ability3, ability4 }; }
+
+        public RectTransform GetBlockingButton() { return blockingButton; }
+
+        public RectTransform GetDodgeButton() { return dodgeButton; }
+
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
@@ -44,6 +50,8 @@ namespace Vi.UI
         [SerializeField] private Image heavyAttackButton;
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
+        [SerializeField] private RectTransform blockingButton;
+        [SerializeField] private RectTransform dodgeButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
