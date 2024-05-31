@@ -22,6 +22,10 @@ namespace Vi.UI
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
+        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
+
+        public Image GetHeavyAttackButton() { return heavyAttackButton; }
+
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
@@ -54,6 +58,7 @@ namespace Vi.UI
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private RectTransform blockingButton;
         [SerializeField] private RectTransform dodgeButton;
+        [SerializeField] private RectTransform lookJoystickCenter;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 

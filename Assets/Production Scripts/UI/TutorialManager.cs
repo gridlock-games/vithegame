@@ -86,12 +86,15 @@ namespace Vi.UI
                 yield return null;
             }
 
+            InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
             if (currentActionIndex == 0) // Look
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name == "Inventory" | action.name == "Pause" | action.name == "Scoreboard") { continue; }
                     if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
@@ -102,30 +105,40 @@ namespace Vi.UI
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
             }
             else if (currentActionIndex == 2) // Attack
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["LightAttack"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Attack")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
             }
             else if (currentActionIndex == 3) // Combo
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["LightAttack"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetHeavyAttackButton().transform, true));
             }
             else if (currentActionIndex == 4) // Ability
             {
+                currentOverlaySprite = null;
+
                 currentOverlayMessage = "Use An Ability.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Ability")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
@@ -141,7 +154,6 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
@@ -158,7 +170,6 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
@@ -264,13 +275,8 @@ namespace Vi.UI
         private float actionChangeTime;
         private void CheckTutorialActionStatus()
         {
-            //InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
-
             if (currentActionIndex == 0) // Look
             {
-                //var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
-                //currentOverlaySprite = result.sprite;
-
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
                 {
                     if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
