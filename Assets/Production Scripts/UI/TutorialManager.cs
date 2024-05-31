@@ -131,6 +131,7 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
+                    abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
                     UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
             }
@@ -142,6 +143,11 @@ namespace Vi.UI
                 {
                     if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = Vector3.one;
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
@@ -161,7 +167,8 @@ namespace Vi.UI
             else if (currentActionIndex == 7) // Player Card
             {
                 currentOverlayMessage = "Player Card.";
-
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
             }
             else if (currentActionIndex == 8) // Fight with NPC
             {
@@ -170,6 +177,8 @@ namespace Vi.UI
                 {
                     playerInput.actions.FindAction(action.name).Enable();
                 }
+
+                playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
             }
             else if (currentActionIndex == 9) // Display victory or defeat message
             {
@@ -189,6 +198,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            overlayImage.enabled = overlayImage.sprite;
+
             FindPlayerInput();
             CheckTutorialActionStatus();
 

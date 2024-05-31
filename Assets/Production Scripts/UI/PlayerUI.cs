@@ -20,6 +20,8 @@ namespace Vi.UI
 
         public RectTransform GetDodgeButton() { return dodgeButton; }
 
+        public PlayerCard GetMainPlayerCard() { return playerCard; }
+
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
