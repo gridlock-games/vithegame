@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -12,6 +13,8 @@ public class NewsManager : MonoBehaviour
   [SerializeField] private VisualTreeAsset newsButtonUIDocument;
   [SerializeField] private VisualTreeAsset newsDataUIDocument;
   [SerializeField] private string newsImageServerLocation = "https://vi-assets.com/imagestorage/News/";
+
+  [SerializeField] private Texture2D defaultLoadingImage;
 
   private string NewsAPIURL = "154.90.35.191";
   private List<NewsData> newsData = new List<NewsData>();
@@ -81,6 +84,7 @@ public class NewsManager : MonoBehaviour
     VisualElement newsBody = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("NewsBody");
     IMGUIContainer newsContainer = newsBody.Q<IMGUIContainer>("NewsImage");
     Label newsdata = newsBody.Q<Label>("NewsData");
+    newsContainer.style.backgroundImage = defaultLoadingImage;
     //Update image
     if (ExternalFileLoaderWeb.Singleton)
     {
