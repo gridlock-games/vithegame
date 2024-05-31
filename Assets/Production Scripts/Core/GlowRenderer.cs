@@ -91,6 +91,13 @@ namespace Vi.Core
             }
         }
 
+        private readonly Color invincibleColor = new Color(1, 1, 0);
+        private readonly Color uninterruptableColor = new Color(1, 1, 1);
+        private readonly Color hitColor = new Color(1, 0, 0);
+        private readonly Color healColor = new Color(0, 1, 0);
+        private readonly Color blockColor = new Color(0, 0, 1);
+        private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
         private const float defaultFresnelPower = 5;
 
@@ -102,32 +109,32 @@ namespace Vi.Core
 
             if (isInvincible)
             {
-                colorTarget = new Color(1, 1, 0);
+                colorTarget = invincibleColor;
                 fresnelPowerTarget = fresnelPower;
             }
             else if (isUninterruptable)
             {
-                colorTarget = new Color(1, 1, 1);
+                colorTarget = uninterruptableColor;
                 fresnelPowerTarget = fresnelPower;
             }
             else if (Time.time - lastHitTime < 0.25f)
             {
-                colorTarget = new Color(1, 0, 0);
+                colorTarget = hitColor;
                 fresnelPowerTarget = fresnelPower;
             }
             else if (Time.time - lastHealTime < 0.25f)
             {
-                colorTarget = new Color(0, 1, 0);
+                colorTarget = healColor;
                 fresnelPowerTarget = fresnelPower;
             }
             else if (Time.time - lastBlockTime < 0.25f)
             {
-                colorTarget = new Color(0, 0, 1);
+                colorTarget = blockColor;
                 fresnelPowerTarget = fresnelPower;
             }
             else if (canFlashAttack)
             {
-                colorTarget = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+                colorTarget = flashAttackColor;
                 fresnelPowerTarget = fresnelPower;
             }
             
@@ -137,7 +144,12 @@ namespace Vi.Core
                 glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
                 glowMaterialInstance.SetColor(_Color, colorTarget);
             }
+            this.colorTarget = colorTarget;
         }
+
+        private Color colorTarget;
+
+        public bool IsRenderingBlock() { return colorTarget == blockColor; }
 
         private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");
         private readonly int _Color = Shader.PropertyToID("_Color");

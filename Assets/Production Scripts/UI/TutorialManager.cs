@@ -15,6 +15,9 @@ namespace Vi.UI
 
         PlayerInput playerInput;
         MovementHandler movementHandler;
+        Attributes attributes;
+        WeaponHandler weaponHandler;
+        AnimationHandler animationHandler;
         private void FindPlayerInput()
         {
             if (playerInput) { return; }
@@ -24,6 +27,9 @@ namespace Vi.UI
             {
                 playerInput = localPlayer.GetComponent<PlayerInput>();
                 movementHandler = localPlayer.GetComponent<MovementHandler>();
+                attributes = localPlayer;
+                weaponHandler = localPlayer.GetComponent<WeaponHandler>();
+                animationHandler = localPlayer.GetComponent<AnimationHandler>();
             }
         }
 
@@ -64,7 +70,7 @@ namespace Vi.UI
             yield return new WaitUntil(() => playerInput);
             yield return null;
 
-            if (currentActionIndex == 0)
+            if (currentActionIndex == 0) // Look
             {
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -73,7 +79,7 @@ namespace Vi.UI
                     if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
             }
-            else if (currentActionIndex == 1)
+            else if (currentActionIndex == 1) // Move
             {
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
                 foreach (InputAction action in playerInput.actions)
@@ -82,13 +88,58 @@ namespace Vi.UI
                     if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
             }
-            else if (currentActionIndex == 2)
+            else if (currentActionIndex == 2) // Attack
             {
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.actionMap.name != "Base") { continue; }
                     if (action.name.Contains("Attack")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
+            }
+            else if (currentActionIndex == 3) // Combo
+            {
+
+            }
+            else if (currentActionIndex == 4) // Ability
+            {
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name.Contains("Ability")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+            }
+            else if (currentActionIndex == 5) // Block
+            {
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+            }
+            else if (currentActionIndex == 6) // Dodge
+            {
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.actionMap.name != "Base") { continue; }
+                    if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+            }
+            else if (currentActionIndex == 7) // Player Card
+            {
+
+            }
+            else if (currentActionIndex == 8) // Fight with NPC
+            {
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Enable();
+                }
+            }
+            else if (currentActionIndex == 9) // Display victory or defeat message
+            {
+
             }
             else
             {
@@ -180,10 +231,56 @@ namespace Vi.UI
                     }
                 }
             }
-            else if (currentActionIndex == 2)
+            else if (currentActionIndex == 2) // Attack
             {
                 currentOverlayMessage = "Attack The Enemy.";
+                if (attributes.GetComboCounter() > 0) { DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 3) // Combo
+            {
+                currentOverlayMessage = "Perform A Combo On The Enemy.";
+                if (attributes.GetComboCounter() > 1) { DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 4) // Ability
+            {
+                currentOverlayMessage = "Use An Ability.";
+                if (weaponHandler.CurrentActionClip.name.Contains("Ability")) { DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 5) // Block
+            {
+                currentOverlayMessage = "Block An Attack.";
 
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | weaponHandler.IsInRecovery ? 0.5f : 1;
+                    }
+                }
+                
+                if (attributes.GlowRenderer.IsRenderingBlock()) { Time.timeScale = 1; DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 6) // Dodge
+            {
+                currentOverlayMessage = "Dodge.";
+                if (animationHandler.IsDodging()) { DisplayNextAction(); }
+            }
+            else if (currentActionIndex == 7) // Player Card
+            {
+                currentOverlayMessage = "Player Card.";
+
+            }
+            else if (currentActionIndex == 8) // Fight with NPC
+            {
+                currentOverlayMessage = "Defeat The Enemy.";
+
+            }
+            else if (currentActionIndex == 9) // Display victory or defeat message
+            {
+                currentOverlayMessage = "MATCH COMPLETE.";
 
             }
             else
