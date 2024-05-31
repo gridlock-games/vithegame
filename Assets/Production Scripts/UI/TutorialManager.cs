@@ -10,23 +10,21 @@ namespace Vi.UI
 {
     public class TutorialManager : MonoBehaviour
     {
+        [SerializeField] private Text overlayText;
         [SerializeField] private Image overlayImage;
-        [SerializeField] private TutorialAction[] tutorialActions;
-
-        [System.Serializable]
-        private struct TutorialAction
-        {
-            public string actionName;
-            public List<string> controlSchemesToAnimateOn;
-        }
 
         PlayerInput playerInput;
+        MovementHandler movementHandler;
         private void FindPlayerInput()
         {
             if (playerInput) { return; }
             if (!PlayerDataManager.DoesExist()) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
-            if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
+            if (localPlayer)
+            {
+                playerInput = localPlayer.GetComponent<PlayerInput>();
+                movementHandler = localPlayer.GetComponent<MovementHandler>();
+            }
         }
 
         RectTransform overlayImageRT;
@@ -36,11 +34,9 @@ namespace Vi.UI
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
             originalAnchoredPosition = ((RectTransform)overlayImage.transform).anchoredPosition;
-            DisplayNextAction();
             overlayImageRT = (RectTransform)overlayImage.transform;
+            DisplayNextAction();
         }
-
-        private const float minDisplayTime = 5;
 
         private const float animationSpeed = 100;
 
@@ -56,20 +52,24 @@ namespace Vi.UI
             overlayImageRT.anchoredPosition = originalAnchoredPosition;
         }
 
+        private string currentOverlayMessage;
+        private Sprite currentOverlaySprite;
+        private bool shouldAnimate;
+
         private void Update()
         {
             FindPlayerInput();
+            CheckTutorialActionStatus();
 
             if (!playerInput) { return; }
             if (string.IsNullOrWhiteSpace(playerInput.currentControlScheme)) { return; }
 
-            InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
-            var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions[tutorialActions[currentActionIndex].actionName]);
+            overlayText.text = currentOverlayMessage;
 
-            overlayImage.sprite = result.sprite;
+            overlayImage.sprite = currentOverlaySprite;
             overlayImage.preserveAspect = true;
 
-            if (tutorialActions[currentActionIndex].controlSchemesToAnimateOn.Contains(playerInput.currentControlScheme))
+            if (shouldAnimate)
             {
                 if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
 
@@ -82,6 +82,48 @@ namespace Vi.UI
             {
                 overlayImageRT.anchoredPosition = originalAnchoredPosition;
             }
+        }
+
+        private const float minDisplayTime = 5;
+
+        private bool canProceed;
+        private float actionChangeTime;
+        private int lastActionIndex = -1;
+        private void CheckTutorialActionStatus()
+        {
+            //InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
+
+            if (lastActionIndex != currentActionIndex)
+            {
+                canProceed = false;
+                actionChangeTime = Time.time;
+            }
+
+            if (currentActionIndex == 0) // Look
+            {
+                currentOverlayMessage = "Look Around.";
+                //var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
+                //currentOverlaySprite = result.sprite;
+
+                if (movementHandler)
+                {
+                    canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
+
+                    if (canProceed)
+                    {
+                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    }
+                }
+            }
+            else if (currentActionIndex == 1) // Move
+            {
+                currentOverlayMessage = "Move To The Enemy.";
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
+            }
+            lastActionIndex = currentActionIndex;
         }
     }
 }

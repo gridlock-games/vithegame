@@ -1425,7 +1425,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Look Around.
+  m_Text: Instructions Text
 --- !u!222 &840159707
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2012,12 +2012,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9883cb22ede79ac48a359707313f8ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  overlayText: {fileID: 840159706}
   overlayImage: {fileID: 900708831}
   tutorialActions:
   - actionName: Look
+    overlayMessage: Look Around.
     controlSchemesToAnimateOn:
     - Keyboard & Mouse
-    positionOffset: {x: 0, y: 0}
+    - Touchscreen
+  - actionName: LightAttack
+    overlayMessage: Attack.
+    controlSchemesToAnimateOn: []
+  - actionName: Move
+    overlayMessage: Walk.
+    controlSchemesToAnimateOn: []
+  - actionName: Move
+    overlayMessage: Walk.
+    controlSchemesToAnimateOn: []
 --- !u!4 &1017025817
 Transform:
   m_ObjectHideFlags: 0
