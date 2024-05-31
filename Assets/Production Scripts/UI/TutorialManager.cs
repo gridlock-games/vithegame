@@ -264,7 +264,7 @@ namespace Vi.UI
                 overlayImageRT.anchoredPosition = originalAnchoredPosition;
             }
 
-            if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
+            if (canProceed & !lastCanProceed) { Debug.Log("Settings action change time"); actionChangeTime = Time.time; }
             lastCanProceed = canProceed;
         }
 
