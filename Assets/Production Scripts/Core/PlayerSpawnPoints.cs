@@ -44,26 +44,26 @@ namespace Vi.Core
             }
         }
 
-        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
+        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, Attributes attributesToExcludeInLogic)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
             if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
 
             List<(float, TransformData)> verifiedSpawnPoints = new List<(float, TransformData)>();
-            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects(attributesToExcludeInLogic);
             foreach (TransformData transformData in possibleSpawnPoints)
             {
                 float minDistance = Mathf.Infinity;
                 foreach (Attributes attributes in activePlayerObjects)
                 {
-                    float distance = Vector3.Distance(attributes.transform.position, transformData.position);
+                    float distance = Vector3.Distance(attributes.GetComponent<MovementHandler>().GetPosition(), transformData.position);
                     if (distance < minDistance) { minDistance = distance; }
                 }
                 verifiedSpawnPoints.Add((minDistance, transformData));
             }
             // Get the spawn points where we have the largest minimum distance to another player object
-            float minDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
-            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == minDistanceInList).ToList();
+            float maxDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
+            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == maxDistanceInList).ToList();
 
             float distanceOfSelectedPoint = Mathf.Infinity;
             TransformData spawnPoint = new TransformData();

@@ -378,6 +378,12 @@ namespace Vi.Core
 
         public int GetComboCounter() { return comboCounter.Value; }
 
+        public void ResetComboCounter()
+        {
+            if (!IsServer) { Debug.LogError("Reset combo counter should only be called on the server!"); return; }
+            comboCounter.Value = 0;
+        }
+
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
         private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
@@ -417,7 +423,7 @@ namespace Vi.Core
 
             if (animationHandler.IsGrabAttacking())
             {
-                animationHandler.CancelAllActions();
+                animationHandler.CancelAllActions(0.15f);
             }
         }
 
@@ -843,7 +849,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
-            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
 
@@ -854,7 +860,7 @@ namespace Vi.Core
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -879,7 +885,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
             GlowRenderer.RenderBlock();
-            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
 
             RenderBlockClientRpc(impactPosition);
@@ -889,7 +895,7 @@ namespace Vi.Core
         private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -1068,8 +1074,14 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
+            if (animationHandler.IsActionClipPlaying(hitReaction))
+            {
+                yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            }
+
             yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
             yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+
             isPulled.Value = false;
         }
 

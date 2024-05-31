@@ -18,19 +18,24 @@ namespace Vi.UI
         [SerializeField] private Text spawningPlayerObjectText;
 
         private Canvas canvas;
+        private CanvasGroup canvasGroup;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            canvasGroup = GetComponent<CanvasGroup>();
         }
+
+        private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
         private void Update()
         {
+            canvas.enabled = canvasGroup.alpha > 0.05f;
             if (!NetSceneManager.Singleton)
             {
-                canvas.enabled = false;
+                canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
                 return;
             }
 
@@ -45,9 +50,20 @@ namespace Vi.UI
                 {
                     topText = "Network Shutdown In Progress";
                 }
+                else if (NetSceneManager.Singleton.IsSpawned)
+                {
+                    if (PlayerDataManager.DoesExist())
+                    {
+                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    }
+                    else
+                    {
+                        topText = "Spawning Player Object";
+                    }
+                }
                 else
                 {
-                    topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                    topText = "Connecting To Server";
                 }
                 
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
@@ -73,7 +89,7 @@ namespace Vi.UI
                 }
             }
 
-            canvas.enabled = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf;
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0, Time.deltaTime * alphaLerpSpeed);
 
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {

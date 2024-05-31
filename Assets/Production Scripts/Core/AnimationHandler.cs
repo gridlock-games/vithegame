@@ -136,12 +136,13 @@ namespace Vi.Core
             return currentStateInfo.IsName(lastClipPlayed.name + "_Loop") | currentStateInfo.IsName(lastClipPlayed.name + "_Enhance") | currentStateInfo.IsName(lastClipPlayed.name + "_Start");
         }
 
-        public void CancelAllActions()
+        public void CancelAllActions(float transitionTime)
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
-            Animator.CrossFade("Empty", 0, actionsLayer);
+            Animator.CrossFade("Empty", transitionTime, actionsLayer);
+            Animator.CrossFade("Empty", transitionTime, flinchLayer);
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();

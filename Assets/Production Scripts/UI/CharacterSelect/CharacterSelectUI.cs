@@ -14,6 +14,8 @@ namespace Vi.UI
 {
     public class CharacterSelectUI : MonoBehaviour
     {
+        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
+        [SerializeField] private AlertBox tutorialAlertBox;
         [SerializeField] private Button returnButton;
         [SerializeField] private Text webRequestStatusText;
         [SerializeField] private Text gameVersionText;
@@ -131,6 +133,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
+
             OpenStats();
 
             statsOpenAnchoredPosition = selectionBarSelectedImage.anchoredPosition;
@@ -396,8 +400,18 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
+            bool tutorialInProgress = bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress"));
+
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate & !tutorialInProgress;
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
+
+            if (tutorialInProgress)
+            {
+                if (goToTrainingRoomButton.interactable)
+                {
+                    CreateUIElementHighlight((RectTransform)goToTrainingRoomButton.transform);
+                }
+            }
 
             foreach (ButtonInfo buttonInfo in characterCardButtonReference)
             {
@@ -680,6 +694,7 @@ namespace Vi.UI
 
         public void ReturnToMainMenu()
         {
+            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
@@ -697,6 +712,11 @@ namespace Vi.UI
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
+
+            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+            {
+                CreateUIElementHighlight((RectTransform)characterNameInputField.transform);
+            }
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -729,6 +749,11 @@ namespace Vi.UI
             returnButton.onClick.AddListener(ReturnToMainMenu);
 
             UpdateSelectedCharacter(default);
+
+            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+            {
+                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            }
         }
 
         private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
@@ -793,12 +818,31 @@ namespace Vi.UI
             if (NetworkManager.Singleton.StartHost())
             {
                 NetSceneManager.Singleton.LoadScene("Training Room");
-                NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+                NetSceneManager.Singleton.LoadScene(bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")) ? "Eclipse Grove" : "Tutorial Map");
             }
             else
             {
                 Debug.LogError("Error trying to start host to go to training room");
             }
+        }
+
+        GameObject UIElementHighlightInstance;
+        private void CreateUIElementHighlight(RectTransform parentRT)
+        {
+            if (UIElementHighlightInstance) { Destroy(UIElementHighlightInstance); }
+            UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
+        }
+
+        public void StartTutorial()
+        {
+            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", true.ToString());
+
+            CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+        }
+
+        public void SkipTutorial()
+        {
+            FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
         }
 
         public IEnumerator AutoConnectToHubServer()

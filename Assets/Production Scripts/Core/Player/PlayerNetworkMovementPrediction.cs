@@ -55,6 +55,7 @@ namespace Vi.Player
         public void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             if (!IsServer) { Debug.LogError("PlayerNetworkMovementPrediction.SetOrientation() should only be called on the server!"); return; }
+            CurrentPosition = newPosition;
             overridePosition = newPosition;
             applyOverridePosition = true;
             SetRotationClientRpc(newRotation);
