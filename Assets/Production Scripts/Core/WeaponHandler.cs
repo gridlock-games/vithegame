@@ -378,7 +378,7 @@ namespace Vi.Core
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
@@ -386,7 +386,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
