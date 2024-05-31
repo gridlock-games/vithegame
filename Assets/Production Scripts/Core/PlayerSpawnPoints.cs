@@ -44,13 +44,13 @@ namespace Vi.Core
             }
         }
 
-        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
+        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, Attributes attributesToExcludeInLogic)
         {
             List<TransformData> possibleSpawnPoints = GetPossibleSpawnOrientations(gameMode, team);
             if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
 
             List<(float, TransformData)> verifiedSpawnPoints = new List<(float, TransformData)>();
-            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects(attributesToExcludeInLogic);
             foreach (TransformData transformData in possibleSpawnPoints)
             {
                 float minDistance = Mathf.Infinity;
