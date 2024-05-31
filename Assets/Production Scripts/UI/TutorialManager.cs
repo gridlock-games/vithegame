@@ -95,7 +95,6 @@ namespace Vi.UI
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name == "Inventory" | action.name == "Pause" | action.name == "Scoreboard") { continue; }
                     if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
             }
