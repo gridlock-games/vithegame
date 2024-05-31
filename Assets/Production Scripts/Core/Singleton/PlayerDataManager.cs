@@ -540,6 +540,11 @@ namespace Vi.Core
             {
                 RemovePlayerData(clientId);
             }
+
+            if (playerIdThatIsBeingSpawned == clientId)
+            {
+                EndSpawnPlayerCoroutine();
+            }
         }
 
         public void RemovePlayerData(int clientId)
@@ -981,6 +986,12 @@ namespace Vi.Core
             KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
+
+            if (!ContainsId(playerData.id))
+            {
+                spawnPlayerRunning = false;
+                yield break;
+            }
 
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {

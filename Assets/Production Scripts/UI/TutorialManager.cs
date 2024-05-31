@@ -50,6 +50,15 @@ namespace Vi.UI
         {
             currentActionIndex += 1;
             overlayImageRT.anchoredPosition = originalAnchoredPosition;
+
+            canProceed = false;
+            actionChangeTime = Time.time;
+
+            if (locationPingInstance) { Destroy(locationPingInstance); }
+            if (currentActionIndex == 1)
+            {
+                PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
+            }
         }
 
         private string currentOverlayMessage;
@@ -84,20 +93,16 @@ namespace Vi.UI
             }
         }
 
+        [SerializeField] private GameObject locationPingPrefab;
+        private GameObject locationPingInstance;
+
         private const float minDisplayTime = 5;
 
         private bool canProceed;
         private float actionChangeTime;
-        private int lastActionIndex = -1;
         private void CheckTutorialActionStatus()
         {
             //InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
-
-            if (lastActionIndex != currentActionIndex)
-            {
-                canProceed = false;
-                actionChangeTime = Time.time;
-            }
 
             if (currentActionIndex == 0) // Look
             {
@@ -105,10 +110,14 @@ namespace Vi.UI
                 //var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
                 //currentOverlaySprite = result.sprite;
 
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
+                {
+                    if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
+                }
+
                 if (movementHandler)
                 {
                     canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
-
                     if (canProceed)
                     {
                         if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
@@ -117,13 +126,33 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
-                currentOverlayMessage = "Move To The Enemy.";
+                currentOverlayMessage = "Move To The Marked Location.";
+
+                if (locationPingInstance)
+                {
+                    if (Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f) { DisplayNextAction(); }
+                }
+                else
+                {
+                    if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                    {
+                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                        Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                        if (attributes)
+                        {
+                            locationPingInstance = Instantiate(locationPingPrefab, attributes.transform.position + attributes.transform.forward, attributes.transform.rotation);
+                        }
+                    }
+                }
+            }
+            else if (currentActionIndex == 2)
+            {
+                currentOverlayMessage = "Attack The Enemy.";
             }
             else
             {
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
-            lastActionIndex = currentActionIndex;
         }
     }
 }

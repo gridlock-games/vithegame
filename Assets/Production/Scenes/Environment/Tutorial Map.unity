@@ -2014,21 +2014,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayText: {fileID: 840159706}
   overlayImage: {fileID: 900708831}
-  tutorialActions:
-  - actionName: Look
-    overlayMessage: Look Around.
-    controlSchemesToAnimateOn:
-    - Keyboard & Mouse
-    - Touchscreen
-  - actionName: LightAttack
-    overlayMessage: Attack.
-    controlSchemesToAnimateOn: []
-  - actionName: Move
-    overlayMessage: Walk.
-    controlSchemesToAnimateOn: []
-  - actionName: Move
-    overlayMessage: Walk.
-    controlSchemesToAnimateOn: []
+  locationPingPrefab: {fileID: 8637024446530902449, guid: 05068d4ff5d98b74ea95d95ee5eb08f5,
+    type: 3}
 --- !u!4 &1017025817
 Transform:
   m_ObjectHideFlags: 0
@@ -3838,13 +3825,9 @@ MonoBehaviour:
   - gameModes: 00000000
     teams: 02000000
     spawnPositions:
-    - {x: 9, y: 5, z: 0}
-    - {x: -9, y: 5, z: 0}
     - {x: 0, y: 5, z: 10}
-    - {x: 0, y: 5, z: -10}
+    - {x: 0, y: 5, z: -5}
     spawnRotations:
-    - {x: 0, y: 270, z: 0}
-    - {x: 0, y: 90, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
