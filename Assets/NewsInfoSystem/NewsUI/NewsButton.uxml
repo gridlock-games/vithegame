@@ -1,5 +1,5 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:Button display-tooltip-when-elided="true" name="NewsButton" style="flex-direction: row; justify-content: space-between; min-height: 30%; min-width: 100%; max-height: 100%; height: 98px;">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Button display-tooltip-when-elided="true" name="NewsButton" style="flex-direction: row; justify-content: space-between; min-height: 30%; min-width: 100%; max-height: 100%; height: 98px; background-color: rgb(125, 125, 125); margin-left: 0; margin-right: 0;">
         <ui:IMGUIContainer name="NewsImage" style="min-height: 100%; justify-content: center; align-items: center; flex-direction: row; background-image: url(&quot;project://database/Assets/PackagedPrefabs/RPG%20and%20MMO%20UI%205/Textures/Action%20Bar/Buttons/ActionBar_Button_Icon_Spells.png?fileID=2800000&amp;guid=f7d1ca34ceca595448a18c7307f203a9&amp;type=3#ActionBar_Button_Icon_Spells&quot;); width: 42px; -unity-background-scale-mode: scale-to-fit;" />
         <ui:Label text="Label" display-tooltip-when-elided="true" name="NewsTitle" style="-unity-font: url(&quot;project://database/Assets/PackagedPrefabs/Masshiro_UI/Vi_Log%20In_CharSelect/Jost-VariableFont_wght.ttf?fileID=12800000&amp;guid=fd8b48b178d55804e9351227508f9866&amp;type=3#Jost-VariableFont_wght&quot;); font-size: 30px; -unity-font-style: bold;" />
     </ui:Button>
