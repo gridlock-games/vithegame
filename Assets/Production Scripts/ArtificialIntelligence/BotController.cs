@@ -21,6 +21,8 @@ namespace Vi.ArtificialIntelligence
             if (!navMeshAgent.Warp(newPosition)) { Debug.LogError("Warp unsuccessful!"); }
         }
 
+        public override Vector3 GetPosition() { return currentPosition.Value; }
+
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {

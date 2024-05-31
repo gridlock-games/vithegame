@@ -24,6 +24,8 @@ namespace Vi.Player
             movementPrediction.SetOrientation(newPosition, newRotation);
         }
 
+        public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
+
         public void SetPredictionRigidbodyPosition(Vector3 newPosition)
         {
             movementPredictionRigidbody.position = newPosition;

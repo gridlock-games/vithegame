@@ -23,6 +23,8 @@ namespace Vi.Core
             transform.rotation = newRotation;
         }
 
+		public virtual Vector3 GetPosition() { return transform.position; }
+
         public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }

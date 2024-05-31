@@ -56,14 +56,14 @@ namespace Vi.Core
                 float minDistance = Mathf.Infinity;
                 foreach (Attributes attributes in activePlayerObjects)
                 {
-                    float distance = Vector3.Distance(attributes.transform.position, transformData.position);
+                    float distance = Vector3.Distance(attributes.GetComponent<MovementHandler>().GetPosition(), transformData.position);
                     if (distance < minDistance) { minDistance = distance; }
                 }
                 verifiedSpawnPoints.Add((minDistance, transformData));
             }
             // Get the spawn points where we have the largest minimum distance to another player object
-            float minDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
-            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == minDistanceInList).ToList();
+            float maxDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
+            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == maxDistanceInList).ToList();
 
             float distanceOfSelectedPoint = Mathf.Infinity;
             TransformData spawnPoint = new TransformData();
