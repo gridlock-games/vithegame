@@ -12,6 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private Text overlayText;
         [SerializeField] private Image overlayImage;
+        [SerializeField] private Image objectiveCompleteImage;
 
         PlayerInput playerInput;
         MovementHandler movementHandler;
@@ -184,10 +185,14 @@ namespace Vi.UI
         private Sprite currentOverlaySprite;
         private bool shouldAnimate;
 
+        private bool lastCanProceed;
+
         private void Update()
         {
             FindPlayerInput();
             CheckTutorialActionStatus();
+
+            objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, canProceed ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
 
             if (!playerInput) { return; }
             if (string.IsNullOrWhiteSpace(playerInput.currentControlScheme)) { return; }
@@ -210,9 +215,12 @@ namespace Vi.UI
             {
                 overlayImageRT.anchoredPosition = originalAnchoredPosition;
             }
+
+            if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
+            lastCanProceed = canProceed;
         }
 
-        private const float minDisplayTime = 5;
+        private const float minDisplayTime = 3;
 
         private bool canProceed;
         private float actionChangeTime;
@@ -299,7 +307,11 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Dodge
             {
-                if (animationHandler.IsDodging()) { DisplayNextAction(); }
+                canProceed = animationHandler.IsDodging() | canProceed;
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                }
             }
             else if (currentActionIndex == 7) // Player Card
             {
