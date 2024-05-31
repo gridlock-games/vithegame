@@ -69,7 +69,7 @@ namespace Vi.Core
             {
                 GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                 if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PlayerDataManager.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
+                PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
             }
         }
 
