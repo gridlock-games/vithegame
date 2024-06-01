@@ -11,42 +11,54 @@ namespace Vi.ScriptableObjects
     {
         [SerializeField] private List<ControlsImageElement> controlsImageElements;
 
-        public ActionSpriteResult GetActionSprite(InputControlScheme controlScheme, InputAction action)
+        public ActionSpriteResult GetActionSprite(InputControlScheme controlScheme, InputAction[] actions)
         {
             List<string> possiblePathList = new List<string>();
-            foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
-            {
-                string deviceName = device.name.ToLower();
-                deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
 
-                foreach (InputBinding binding in action.bindings)
+            List<Sprite> spriteList = new List<Sprite>();
+            List<string> pathList = new List<string>();
+
+            foreach (InputAction action in actions)
+            {
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
                 {
-                    var ele = controlsImageElements.Find(item => item.inputPath == binding.path);
-                    if (ele != null)
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+
+                    foreach (InputBinding binding in action.bindings)
                     {
-                        return new ActionSpriteResult(ele.inputPath, ele.sprite);
+                        var ele = controlsImageElements.Find(item => item.inputPath == binding.path);
+                        if (ele != null)
+                        {
+                            if (!pathList.Contains(ele.inputPath))
+                            {
+                                pathList.Add(ele.inputPath);
+                                spriteList.Add(ele.sprite);
+                            }
+                        }
+                        possiblePathList.Add(binding.path);
                     }
-                    possiblePathList.Add(binding.path);
                 }
             }
+            
+            if (pathList.Count == 0) { Debug.LogError("Could not find control image element"); }
+            foreach (string path in possiblePathList)
+            {
+                Debug.Log(path);
+            }
 
-            //Debug.LogError("Could not find control image element for " + action.name);
-            //foreach (string path in possiblePathList)
-            //{
-            //    Debug.Log(path);
-            //}
-            return new ActionSpriteResult();
+            return new ActionSpriteResult(pathList, spriteList);
         }
 
-        public struct ActionSpriteResult
+        public class ActionSpriteResult
         {
-            public string effectivePath;
-            public Sprite sprite;
+            public List<string> effectivePaths;
+            public List<Sprite> sprites;
 
-            public ActionSpriteResult(string effectivePath, Sprite sprite)
+            public ActionSpriteResult(List<string> effectivePaths, List<Sprite> sprites)
             {
-                this.effectivePath = effectivePath;
-                this.sprite = sprite;
+                this.effectivePaths = effectivePaths;
+                this.sprites = sprites;
             }
         }
 

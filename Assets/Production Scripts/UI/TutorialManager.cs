@@ -11,7 +11,7 @@ namespace Vi.UI
     public class TutorialManager : MonoBehaviour
     {
         [SerializeField] private Text overlayText;
-        [SerializeField] private Image overlayImage;
+        [SerializeField] private Image[] overlayImages;
         [SerializeField] private Image objectiveCompleteImage;
 
         PlayerInput playerInput;
@@ -42,9 +42,15 @@ namespace Vi.UI
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-            originalAnchoredPosition = ((RectTransform)overlayImage.transform).anchoredPosition;
-            overlayImageRT = (RectTransform)overlayImage.transform;
+            originalAnchoredPosition = ((RectTransform)overlayImages[0].transform).anchoredPosition;
+            overlayImageRT = (RectTransform)overlayImages[0].transform;
             DisplayNextAction();
+
+            foreach (Image image in overlayImages)
+            {
+                image.gameObject.SetActive(false);
+                image.preserveAspect = true;
+            }
         }
 
         private const float animationSpeed = 100;
@@ -89,8 +95,8 @@ namespace Vi.UI
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
             if (currentActionIndex == 0) // Look
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Look"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
@@ -100,8 +106,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Move"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Move"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Move To The Marked Location.";
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
@@ -112,8 +118,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["LightAttack"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
@@ -125,8 +131,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 3) // Combo
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["LightAttack"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
@@ -136,7 +142,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 4) // Ability
             {
-                currentOverlaySprite = null;
+                currentOverlaySprites.Clear();
 
                 currentOverlayMessage = "Use An Ability.";
                 foreach (InputAction action in playerInput.actions)
@@ -152,8 +158,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 5) // Block
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Block"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -171,8 +177,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Dodge
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Dodge"]);
-                currentOverlaySprite = result.sprite;
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
+                currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Dodge.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
@@ -185,7 +191,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Player Card
             {
-                currentOverlaySprite = null;
+                currentOverlaySprites.Clear();
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -203,7 +209,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-                currentOverlaySprite = null;
+                currentOverlaySprites.Clear();
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -217,13 +223,13 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Fight with NPC
             {
-                currentOverlaySprite = null;
+                currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 10) // Display victory or defeat message
             {
-                currentOverlaySprite = null;
+                currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
@@ -241,8 +247,8 @@ namespace Vi.UI
         }
 
         private string currentOverlayMessage;
-        private Sprite currentOverlaySprite;
-        private bool shouldAnimate;
+        private List<Sprite> currentOverlaySprites;
+        //private bool shouldAnimate;
 
         private bool lastCanProceed;
 
@@ -251,7 +257,10 @@ namespace Vi.UI
             if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
             lastCanProceed = canProceed;
 
-            overlayImage.enabled = overlayImage.sprite;
+            foreach (Image image in overlayImages)
+            {
+                image.gameObject.SetActive(image.sprite);
+            }
 
             FindPlayerInput();
             CheckTutorialActionStatus();
@@ -263,22 +272,24 @@ namespace Vi.UI
 
             overlayText.text = currentOverlayMessage;
 
-            overlayImage.sprite = currentOverlaySprite;
-            overlayImage.preserveAspect = true;
-
-            if (shouldAnimate)
+            for (int i = 0; i < overlayImages.Length; i++)
             {
-                if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
-
-                float amount = Time.deltaTime * animationSpeed * directionMultiplier;
-                positionOffset = Mathf.Clamp(positionOffset + amount, -maxOffset, maxOffset);
-
-                overlayImageRT.anchoredPosition += new Vector2(amount, 0);
+                overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
             }
-            else
-            {
-                overlayImageRT.anchoredPosition = originalAnchoredPosition;
-            }
+
+            //if (shouldAnimate)
+            //{
+            //    if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
+
+            //    float amount = Time.deltaTime * animationSpeed * directionMultiplier;
+            //    positionOffset = Mathf.Clamp(positionOffset + amount, -maxOffset, maxOffset);
+
+            //    overlayImageRT.anchoredPosition += new Vector2(amount, 0);
+            //}
+            //else
+            //{
+            //    overlayImageRT.anchoredPosition = originalAnchoredPosition;
+            //}
         }
 
         private const float minDisplayTime = 3;
