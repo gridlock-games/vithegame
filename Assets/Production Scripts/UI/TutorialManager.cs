@@ -37,6 +37,9 @@ namespace Vi.UI
             }
         }
 
+        private RectTransform layoutGroupRT;
+        private Vector2 originalAnchoredPosition;
+
         private void Awake()
         {
             FindPlayerInput();
@@ -48,6 +51,9 @@ namespace Vi.UI
                 image.gameObject.SetActive(false);
                 image.preserveAspect = true;
             }
+
+            layoutGroupRT = (RectTransform)imagesLayoutGroup.transform;
+            originalAnchoredPosition = layoutGroupRT.anchoredPosition;
         }
 
         private const float animationSpeed = 100;
@@ -62,6 +68,7 @@ namespace Vi.UI
         {
             currentActionIndex += 1;
 
+            shouldAnimatePosition = false;
             canProceed = false;
             actionChangeTime = Time.time;
 
@@ -91,6 +98,7 @@ namespace Vi.UI
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
             if (currentActionIndex == 0) // Look
             {
+                shouldAnimatePosition = true;
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
                 currentOverlaySprites = result.sprites;
 
@@ -244,7 +252,7 @@ namespace Vi.UI
 
         private string currentOverlayMessage;
         private List<Sprite> currentOverlaySprites;
-        //private bool shouldAnimate;
+        private bool shouldAnimatePosition;
 
         private bool lastCanProceed;
 
@@ -273,19 +281,19 @@ namespace Vi.UI
                 overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
             }
 
-            //if (shouldAnimate)
-            //{
-            //    if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
+            if (shouldAnimatePosition)
+            {
+                if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
 
-            //    float amount = Time.deltaTime * animationSpeed * directionMultiplier;
-            //    positionOffset = Mathf.Clamp(positionOffset + amount, -maxOffset, maxOffset);
+                float amount = Time.deltaTime * animationSpeed * directionMultiplier;
+                positionOffset = Mathf.Clamp(positionOffset + amount, -maxOffset, maxOffset);
 
-            //    overlayImageRT.anchoredPosition += new Vector2(amount, 0);
-            //}
-            //else
-            //{
-            //    overlayImageRT.anchoredPosition = originalAnchoredPosition;
-            //}
+                layoutGroupRT.anchoredPosition += new Vector2(amount, 0);
+            }
+            else
+            {
+                layoutGroupRT.anchoredPosition = originalAnchoredPosition;
+            }
         }
 
         private const float minDisplayTime = 3;
