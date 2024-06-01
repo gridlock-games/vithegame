@@ -19,7 +19,9 @@ namespace Vi.UI
 
             if (transform.parent is not RectTransform) { Debug.LogError("UI Element Highlight should be parented to a rect transform!"); }
 
-            rt.anchoredPosition = new Vector2(0, ((RectTransform)transform.parent).sizeDelta.y * transform.lossyScale.y);
+            RectTransform parentRT = (RectTransform)transform.parent;
+            Vector3 pos = parentRT.TransformPoint(parentRT.rect.center);
+            rt.position = pos;
         }
 
         private float directionMultiplier = 1;
