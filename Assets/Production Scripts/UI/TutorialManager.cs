@@ -281,7 +281,7 @@ namespace Vi.UI
             }
         }
 
-        private const float minDisplayTime = 2;
+        private const float minDisplayTime = 3;
 
         private bool canProceed;
         private float actionChangeTime;
