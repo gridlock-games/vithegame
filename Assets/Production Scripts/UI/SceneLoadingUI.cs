@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private GameObject progressBarParent;
         [SerializeField] private Image progressBarImage;
         [SerializeField] private Text progressBarText;
+        [SerializeField] private Text scenesLeftText;
         [Header("Player Object Spawning")]
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
@@ -91,6 +92,7 @@ namespace Vi.UI
 
             canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0, Time.deltaTime * alphaLerpSpeed);
 
+            scenesLeftText.text = "";
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
                 progressBarText.text = "Scene Loading Complete";
@@ -103,7 +105,8 @@ namespace Vi.UI
 
                 if (PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
                 {
-                    progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName + " | " + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                    progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName;
+                    scenesLeftText.text = (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
                 }
                 else // If this scene has not been downloaded
                 {
