@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private Text overlayText;
         [SerializeField] private Image[] overlayImages;
         [SerializeField] private Image objectiveCompleteImage;
+        [SerializeField] private HorizontalLayoutGroup imagesLayoutGroup;
 
         PlayerInput playerInput;
         MovementHandler movementHandler;
@@ -36,14 +37,10 @@ namespace Vi.UI
             }
         }
 
-        RectTransform overlayImageRT;
-        private Vector2 originalAnchoredPosition;
         private void Awake()
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-            originalAnchoredPosition = ((RectTransform)overlayImages[0].transform).anchoredPosition;
-            overlayImageRT = (RectTransform)overlayImages[0].transform;
             DisplayNextAction();
 
             foreach (Image image in overlayImages)
@@ -64,7 +61,6 @@ namespace Vi.UI
         private void DisplayNextAction()
         {
             currentActionIndex += 1;
-            overlayImageRT.anchoredPosition = originalAnchoredPosition;
 
             canProceed = false;
             actionChangeTime = Time.time;

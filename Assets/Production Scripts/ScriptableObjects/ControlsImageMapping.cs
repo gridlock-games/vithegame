@@ -27,7 +27,7 @@ namespace Vi.ScriptableObjects
 
                     foreach (InputBinding binding in action.bindings)
                     {
-                        var ele = controlsImageElements.Find(item => item.inputPath == binding.path);
+                        var ele = controlsImageElements.Find(item => item.inputPath == binding.effectivePath);
                         if (ele != null)
                         {
                             if (!pathList.Contains(ele.inputPath))
@@ -36,7 +36,7 @@ namespace Vi.ScriptableObjects
                                 spriteList.Add(ele.sprite);
                             }
                         }
-                        possiblePathList.Add(binding.path);
+                        possiblePathList.Add(binding.effectivePath);
                     }
                 }
             }
