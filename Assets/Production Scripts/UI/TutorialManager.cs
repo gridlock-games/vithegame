@@ -100,6 +100,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Move"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Move To The Marked Location.";
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
                 foreach (InputAction action in playerInput.actions)
@@ -149,6 +152,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 5) // Block
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Block"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
@@ -165,6 +171,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Dodge
             {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, playerInput.actions["Dodge"]);
+                currentOverlaySprite = result.sprite;
+
                 currentOverlayMessage = "Dodge.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 foreach (InputAction action in playerInput.actions)
@@ -176,6 +185,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Player Card
             {
+                currentOverlaySprite = null;
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -193,6 +203,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
+                currentOverlaySprite = null;
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -206,11 +217,13 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Fight with NPC
             {
+                currentOverlaySprite = null;
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 10) // Display victory or defeat message
             {
+                currentOverlaySprite = null;
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
@@ -235,6 +248,9 @@ namespace Vi.UI
 
         private void Update()
         {
+            if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
+            lastCanProceed = canProceed;
+
             overlayImage.enabled = overlayImage.sprite;
 
             FindPlayerInput();
@@ -263,12 +279,9 @@ namespace Vi.UI
             {
                 overlayImageRT.anchoredPosition = originalAnchoredPosition;
             }
-
-            if (canProceed & !lastCanProceed) { Debug.Log("Settings action change time"); actionChangeTime = Time.time; }
-            lastCanProceed = canProceed;
         }
 
-        private const float minDisplayTime = 3;
+        private const float minDisplayTime = 2;
 
         private bool canProceed;
         private float actionChangeTime;
@@ -283,18 +296,22 @@ namespace Vi.UI
 
                 if (movementHandler)
                 {
-                    canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
                     if (canProceed)
                     {
-                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                     }
+                    canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }
             else if (currentActionIndex == 1) // Move
             {
                 if (locationPingInstance)
                 {
-                    if (Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f) { DisplayNextAction(); }
+                    if (canProceed)
+                    {
+                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    }
+                    canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
                 }
                 else
                 {
@@ -311,27 +328,27 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
-                canProceed = attributes.GetComboCounter() > 0 | canProceed;
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                 }
+                canProceed = attributes.GetComboCounter() > 0 | canProceed;
             }
             else if (currentActionIndex == 3) // Combo
             {
-                canProceed = attributes.GetComboCounter() > 1 | canProceed;
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                 }
+                canProceed = attributes.GetComboCounter() > 1 | canProceed;
             }
             else if (currentActionIndex == 4) // Ability
             {
-                canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                 }
+                canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
             }
             else if (currentActionIndex == 5) // Block
             {
@@ -345,19 +362,28 @@ namespace Vi.UI
                         Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                     }
                 }
-                
-                if (attributes.GlowRenderer.IsRenderingBlock()) { Time.timeScale = 1; DisplayNextAction(); }
+
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                }
+                canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
             else if (currentActionIndex == 6) // Dodge
             {
-                canProceed = animationHandler.IsDodging() | canProceed;
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                 }
+                canProceed = animationHandler.IsDodging() | canProceed;
             }
             else if (currentActionIndex == 7) // Player Card
             {
+                if (canProceed)
+                {
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                }
+
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -368,19 +394,14 @@ namespace Vi.UI
                         canProceed = attributes.GetComboCounter() > 0 | canProceed;
                     }
                 }
-
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
-                }
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-                canProceed = true;
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); }
+                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
                 }
+                canProceed = true;
             }
             else if (currentActionIndex == 9) // Fight with NPC
             {
@@ -396,8 +417,8 @@ namespace Vi.UI
                     }
                 }
 
+                if (canProceed) { DisplayNextAction(); return; }
                 canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
-                if (canProceed) { DisplayNextAction(); }
             }
             else if (currentActionIndex == 10) // Display victory or defeat message
             {

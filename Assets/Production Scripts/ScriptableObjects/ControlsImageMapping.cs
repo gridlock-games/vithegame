@@ -30,11 +30,11 @@ namespace Vi.ScriptableObjects
                 }
             }
 
-            Debug.LogError("Could not find control image element for " + action.name);
-            foreach (string path in possiblePathList)
-            {
-                Debug.Log(path);
-            }
+            //Debug.LogError("Could not find control image element for " + action.name);
+            //foreach (string path in possiblePathList)
+            //{
+            //    Debug.Log(path);
+            //}
             return new ActionSpriteResult();
         }
 
