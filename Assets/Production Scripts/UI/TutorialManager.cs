@@ -366,7 +366,16 @@ namespace Vi.UI
                 {
                     if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
-                canProceed = attributes.GetComboCounter() > 1 | canProceed;
+
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | canProceed;
+                    }
+                }
             }
             else if (currentActionIndex == 4) // Ability
             {
