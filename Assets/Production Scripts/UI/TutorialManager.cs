@@ -138,7 +138,8 @@ namespace Vi.UI
             else if (currentActionIndex == 3) // Combo
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites.AddRange(result.sprites);
+                currentOverlaySprites.AddRange(result.sprites);
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
