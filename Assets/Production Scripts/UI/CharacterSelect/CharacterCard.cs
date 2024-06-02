@@ -22,13 +22,11 @@ namespace Vi.UI
 
         public bool IsCharacter { get; private set; }
 
-        private RectTransform rt;
-        private Vector2 originalSizeDelta;
+        private Vector3 originalScale;
 
         private void Awake()
         {
-            rt = (RectTransform)transform;
-            originalSizeDelta = rt.sizeDelta;
+            originalScale = transform.localScale;
         }
 
         public void InitializeAsAddButton()
@@ -73,24 +71,24 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            selectedOverlay.fillAmount = isSelected ? 1 : 0;
-            selectedBorder.fillAmount = isSelected ? 1 : 0;
+            selectedOverlay.color = isSelected ? glowOnColor : glowOffColor;
+            selectedBorder.color = isSelected ? glowOnColor : glowOffColor;
             selectedGlow.color = isSelected ? glowOnColor : glowOffColor;
-            rt.sizeDelta = isSelected ? originalSizeDelta * selectedSizeMutliplier : originalSizeDelta;
+            transform.localScale = isSelected ? originalScale * selectedSizeMutliplier : originalScale;
         }
 
         private readonly static Color glowOnColor = new Color(1, 1, 1, 1);
         private readonly static Color glowOffColor = new Color(1, 1, 1, 0);
 
-        private const float selectedSizeMutliplier = 1.13f;
+        private const float selectedSizeMutliplier = 1.1f;
         private const float selectedImageAnimationSpeed = 8;
         private bool isSelected;
         private void Update()
         {
-            selectedOverlay.fillAmount = Mathf.Lerp(selectedOverlay.fillAmount, isSelected | pointerIsHoveringOnThisObject ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
-            selectedBorder.fillAmount = Mathf.Lerp(selectedBorder.fillAmount, isSelected | pointerIsHoveringOnThisObject ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+            selectedOverlay.color = Color.Lerp(selectedOverlay.color, isSelected | pointerIsHoveringOnThisObject ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
+            selectedBorder.color = Color.Lerp(selectedBorder.color, isSelected | pointerIsHoveringOnThisObject ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
             selectedGlow.color = Color.Lerp(selectedGlow.color, isSelected | pointerIsHoveringOnThisObject ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
-            rt.sizeDelta = Vector2.Lerp(rt.sizeDelta, isSelected | pointerIsHoveringOnThisObject ? originalSizeDelta * selectedSizeMutliplier : originalSizeDelta, Time.deltaTime * selectedImageAnimationSpeed);
+            transform.localScale = Vector3.Lerp(transform.localScale, isSelected | pointerIsHoveringOnThisObject ? originalScale * selectedSizeMutliplier : originalScale, Time.deltaTime * selectedImageAnimationSpeed);
         }
 
         private bool pointerIsHoveringOnThisObject;

@@ -13,24 +13,30 @@ namespace Vi.UI
         [SerializeField] private GameObject progressBarParent;
         [SerializeField] private Image progressBarImage;
         [SerializeField] private Text progressBarText;
+        [SerializeField] private Text scenesLeftText;
         [Header("Player Object Spawning")]
         [SerializeField] private GameObject spawningPlayerObjectParent;
         [SerializeField] private Text spawningPlayerObjectText;
 
         private Canvas canvas;
+        private CanvasGroup canvasGroup;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            canvasGroup = GetComponent<CanvasGroup>();
         }
+
+        private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
         private void Update()
         {
+            canvas.enabled = canvasGroup.alpha > 0.05f;
             if (!NetSceneManager.Singleton)
             {
-                canvas.enabled = false;
+                canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
                 return;
             }
 
@@ -45,9 +51,20 @@ namespace Vi.UI
                 {
                     topText = "Network Shutdown In Progress";
                 }
+                else if (NetSceneManager.Singleton.IsSpawned)
+                {
+                    if (PlayerDataManager.DoesExist())
+                    {
+                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    }
+                    else
+                    {
+                        topText = "Spawning Player Object";
+                    }
+                }
                 else
                 {
-                    topText = NetSceneManager.Singleton.IsSpawned ? "Spawning Player Object" : "Connecting To Server";
+                    topText = "Connecting To Server";
                 }
                 
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
@@ -73,8 +90,9 @@ namespace Vi.UI
                 }
             }
 
-            canvas.enabled = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf;
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0, Time.deltaTime * alphaLerpSpeed);
 
+            scenesLeftText.text = "";
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
                 progressBarText.text = "Scene Loading Complete";
@@ -87,7 +105,8 @@ namespace Vi.UI
 
                 if (PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
                 {
-                    progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName + " | " + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                    progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName;
+                    scenesLeftText.text = (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
                 }
                 else // If this scene has not been downloaded
                 {

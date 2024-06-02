@@ -1033,8 +1033,6 @@ namespace Vi.Core
 
             int weapon1Index = Random.Range(0, weaponOptions.Length);
             int weapon2Index = Random.Range(0, weaponOptions.Length);
-            weapon1Index = 0;
-            weapon2Index = 1;
 
             if (weapon1Index == weapon2Index)
             {

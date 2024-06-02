@@ -17,6 +17,7 @@ namespace Vi.Core
     {
         [SerializeField] private GameObject spectatorPrefab;
         [SerializeField] private CharacterReference characterReference;
+        [SerializeField] private ControlsImageMapping controlsImageMapping;
 
         [SerializeField] private List<GameModeInfo> gameModeInfos;
 
@@ -30,6 +31,8 @@ namespace Vi.Core
         }
 
         public CharacterReference GetCharacterReference() { return characterReference; }
+
+        public ControlsImageMapping GetControlsImageMapping() { return controlsImageMapping; }
 
         public GameModeInfo GetGameModeInfo() { return gameModeInfos.Find(item => item.gameMode == gameMode.Value); }
 
@@ -537,6 +540,11 @@ namespace Vi.Core
             {
                 RemovePlayerData(clientId);
             }
+
+            if (playerIdThatIsBeingSpawned == clientId)
+            {
+                EndSpawnPlayerCoroutine();
+            }
         }
 
         public void RemovePlayerData(int clientId)
@@ -848,12 +856,12 @@ namespace Vi.Core
 
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
             float waitTime = 0;
             while (!spawnPointFound)
             {
                 attributesToRespawn.isWaitingForSpawnPoint = true;
-                (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam());
+                (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
                 yield return null;
                 waitTime += Time.deltaTime;
                 if (waitTime > maxSpawnPointWaitTime) { break; }
@@ -920,6 +928,10 @@ namespace Vi.Core
             }
         }
 
+        public bool IsWaitingForSpawnPoint() { return isWaitingForSpawnPoint.Value; }
+
+        private NetworkVariable<bool> isWaitingForSpawnPoint = new NetworkVariable<bool>();
+
         private const float spawnPlayerTimeoutThreshold = 10;
         private const float maxSpawnPointWaitTime = 5;
 
@@ -951,16 +963,18 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
                 float waitTime = 0;
                 while (!spawnPointFound)
                 {
-                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team);
+                    isWaitingForSpawnPoint.Value = true;
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
                     yield return null;
                     waitTime += Time.deltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
-                
+                isWaitingForSpawnPoint.Value = false;
+
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
@@ -972,6 +986,12 @@ namespace Vi.Core
             KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
+
+            if (!ContainsId(playerData.id))
+            {
+                spawnPlayerRunning = false;
+                yield break;
+            }
 
             if (GetPlayerData(playerData.id).team == Team.Spectator)
             {
