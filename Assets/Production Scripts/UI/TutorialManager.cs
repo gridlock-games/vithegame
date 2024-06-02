@@ -11,6 +11,7 @@ namespace Vi.UI
     public class TutorialManager : MonoBehaviour
     {
         [SerializeField] private Text overlayText;
+        [SerializeField] private Text timerText;
         [SerializeField] private Image[] overlayImages;
         [SerializeField] private Image objectiveCompleteImage;
         [SerializeField] private HorizontalLayoutGroup imagesLayoutGroup;
@@ -70,6 +71,7 @@ namespace Vi.UI
 
             shouldAnimatePosition = false;
             canProceed = false;
+            timerEnabled = false;
             actionChangeTime = Time.time;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
@@ -213,6 +215,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
+                transitionTime = 5;
+
+                timerEnabled = true;
                 currentOverlaySprites.Clear();
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
@@ -227,6 +232,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Fight with NPC
             {
+                transitionTime = 3;
+
                 currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
@@ -255,9 +262,12 @@ namespace Vi.UI
         private bool shouldAnimatePosition;
 
         private bool lastCanProceed;
+        private bool timerEnabled;
 
         private void Update()
         {
+            timerText.text = timerEnabled ? (transitionTime - (Time.time - actionChangeTime)).ToString("F2") : "";
+
             if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
             lastCanProceed = canProceed;
 
@@ -296,7 +306,7 @@ namespace Vi.UI
             }
         }
 
-        private const float minDisplayTime = 3;
+        private float transitionTime = 3;
 
         private bool canProceed;
         private float actionChangeTime;
@@ -313,7 +323,7 @@ namespace Vi.UI
                 {
                     if (canProceed)
                     {
-                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                     }
                     canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
@@ -324,7 +334,7 @@ namespace Vi.UI
                 {
                     if (canProceed)
                     {
-                        if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                     }
                     canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
                 }
@@ -345,7 +355,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
                 canProceed = attributes.GetComboCounter() > 0 | canProceed;
             }
@@ -353,7 +363,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
                 canProceed = attributes.GetComboCounter() > 1 | canProceed;
             }
@@ -361,7 +371,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
                 canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
             }
@@ -380,15 +390,26 @@ namespace Vi.UI
 
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
             else if (currentActionIndex == 6) // Dodge
             {
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+                    if (attributes)
+                    {
+                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
+                    }
+                }
+
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
@@ -396,7 +417,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
 
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
@@ -414,7 +435,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > minDisplayTime) { DisplayNextAction(); return; }
+                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
                 }
                 canProceed = true;
             }

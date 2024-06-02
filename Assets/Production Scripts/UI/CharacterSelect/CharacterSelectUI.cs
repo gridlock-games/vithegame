@@ -28,6 +28,7 @@ namespace Vi.UI
         [SerializeField] private Button goToTrainingRoomButton;
         [SerializeField] private Sprite defaultEquipmentSprite;
         [SerializeField] private RectTransform selectionBarSelectedImage;
+        [SerializeField] private Image selectionBarGlowImage;
         [SerializeField] private RectTransform selectionBarUnselectedImage;
         [SerializeField] private Button deleteCharacterButton;
         [Header("Stats Section")]
@@ -106,6 +107,7 @@ namespace Vi.UI
         private const float selectionBarTransitionTime = 8;
         private void UpdateSelectionBarPositions()
         {
+            Color selectionBarGlowTarget = originalSelectionBarGlowColor;
             if (statsSelected)
             {
                 selectionBarSelectedImage.anchorMin = Vector2.Lerp(selectionBarSelectedImage.anchorMin, statsOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
@@ -115,6 +117,11 @@ namespace Vi.UI
                 selectionBarUnselectedImage.anchorMin = Vector2.Lerp(selectionBarUnselectedImage.anchorMin, gearOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
                 selectionBarUnselectedImage.anchorMax = Vector2.Lerp(selectionBarUnselectedImage.anchorMax, gearOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
                 selectionBarUnselectedImage.pivot = Vector2.Lerp(selectionBarUnselectedImage.pivot, gearOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+
+                if (Vector2.Distance(selectionBarSelectedImage.pivot, statsOpenPivot) > 0.1f)
+                {
+                    selectionBarGlowTarget = new Color(1, 1, 1, 0);
+                }
             }
             else
             {
@@ -125,17 +132,28 @@ namespace Vi.UI
                 selectionBarUnselectedImage.anchorMin = Vector2.Lerp(selectionBarUnselectedImage.anchorMin, statsOpenAnchorMin, Time.deltaTime * selectionBarTransitionTime);
                 selectionBarUnselectedImage.anchorMax = Vector2.Lerp(selectionBarUnselectedImage.anchorMax, statsOpenAnchorMax, Time.deltaTime * selectionBarTransitionTime);
                 selectionBarUnselectedImage.pivot = Vector2.Lerp(selectionBarUnselectedImage.pivot, statsOpenPivot, Time.deltaTime * selectionBarTransitionTime);
+
+                if (Vector2.Distance(selectionBarSelectedImage.pivot, gearOpenPivot) > 0.1f)
+                {
+                    selectionBarGlowTarget = new Color(1, 1, 1, 0);
+                }
             }
+
+            selectionBarGlowImage.color = Color.Lerp(selectionBarGlowImage.color, selectionBarGlowTarget, Time.deltaTime * selectionBarTransitionTime);
 
             selectionBarSelectedImage.anchoredPosition = Vector2.Lerp(selectionBarSelectedImage.anchoredPosition, statsSelected ? statsOpenAnchoredPosition : gearOpenAnchoredPosition, Time.deltaTime * selectionBarTransitionTime);
             selectionBarUnselectedImage.anchoredPosition = Vector2.Lerp(selectionBarUnselectedImage.anchoredPosition, statsSelected ? gearOpenAnchoredPosition : statsOpenAnchoredPosition, Time.deltaTime * selectionBarTransitionTime);
         }
+
+        private Color originalSelectionBarGlowColor;
 
         private void Awake()
         {
             if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
 
             OpenStats();
+
+            originalSelectionBarGlowColor = selectionBarGlowImage.color;
 
             statsOpenAnchoredPosition = selectionBarSelectedImage.anchoredPosition;
             statsOpenAnchorMin = selectionBarSelectedImage.anchorMin;
