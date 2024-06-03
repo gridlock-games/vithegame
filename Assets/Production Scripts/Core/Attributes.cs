@@ -1115,10 +1115,22 @@ namespace Vi.Core
             return true;
         }
 
+        private bool stopAllStatuses;
         public void RemoveAllStatuses()
         {
             if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatuses() should only be called on the server"); return; }
-            statuses.Clear();
+
+            if (stopAllStatusesCoroutine != null) { StopCoroutine(stopAllStatusesCoroutine); }
+            stopAllStatuses = true;
+            stopAllStatusesCoroutine = StartCoroutine(ResetStopAllStatusesBool());
+        }
+
+        private Coroutine stopAllStatusesCoroutine;
+        private IEnumerator ResetStopAllStatusesBool()
+        {
+            yield return null;
+            yield return null;
+            stopAllStatuses = false;
         }
 
         private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
@@ -1162,7 +1174,7 @@ namespace Vi.Core
         private float healingMultiplier = 1;
         private float spiritIncreaseMultiplier = 1;
         private float spiritReductionMultiplier = 1;
-        
+
         public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
         private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
 
@@ -1177,7 +1189,6 @@ namespace Vi.Core
         {
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
-            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Clear) { activeStatuses.Clear(); }
         }
 
         public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
@@ -1203,43 +1214,85 @@ namespace Vi.Core
             {
                 case ActionClip.Status.damageMultiplier:
                     damageMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    float elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     damageMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReductionMultiplier:
                     damageReductionMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     damageReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReceivedMultiplier:
                     damageReceivedMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     damageReceivedMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healingMultiplier:
                     healingMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     healingMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.spiritIncreaseMultiplier:
                     spiritIncreaseMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     spiritIncreaseMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.spiritReductionMultiplier:
                     spiritReductionMultiplier *= statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     spiritReductionMultiplier /= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:
-                    float elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration)
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1249,7 +1302,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.poisoned:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration)
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1259,7 +1312,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.drain:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration)
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1269,31 +1322,63 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
                     movementSpeedDecrease.Value += statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     movementSpeedDecrease.Value -= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
                     movementSpeedIncrease.Value += statusPayload.value;
-                    yield return new WaitForSeconds(statusPayload.duration);
+
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     movementSpeedIncrease.Value -= statusPayload.value;
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.rooted:
-                    yield return new WaitForSeconds(statusPayload.duration);
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.silenced:
-                    yield return new WaitForSeconds(statusPayload.duration);
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.fear:
-                    yield return new WaitForSeconds(statusPayload.duration);
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        yield return null;
+                    }
+
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healing:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration)
+                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
                     {
                         AddHP(weaponHandler.GetWeapon().GetMaxHP() / GetHP() * 10 * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
