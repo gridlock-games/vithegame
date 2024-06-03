@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Player;
 using Vi.Utility;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ namespace Vi.UI
         [SerializeField] private HorizontalLayoutGroup imagesLayoutGroup;
 
         PlayerInput playerInput;
-        MovementHandler movementHandler;
+        PlayerMovementHandler playerMovementHandler;
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimationHandler animationHandler;
@@ -31,7 +32,7 @@ namespace Vi.UI
             if (localPlayer)
             {
                 playerInput = localPlayer.GetComponent<PlayerInput>();
-                movementHandler = localPlayer.GetComponent<MovementHandler>();
+                playerMovementHandler = localPlayer.GetComponent<PlayerMovementHandler>();
                 attributes = localPlayer;
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
@@ -56,6 +57,8 @@ namespace Vi.UI
             layoutGroupRT = (RectTransform)imagesLayoutGroup.transform;
             originalAnchoredPosition = layoutGroupRT.anchoredPosition;
 
+            objectiveCompleteImage.color = new Color(1, 1, 1, 0);
+
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
         }
 
@@ -79,6 +82,7 @@ namespace Vi.UI
         {
             currentActionIndex += 1;
 
+            shouldLockCameraOnBot = false;
             shouldAnimatePosition = false;
             canProceed = false;
             timerEnabled = false;
@@ -150,6 +154,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 4) // Ability
             {
+                shouldLockCameraOnBot = true;
+
                 currentOverlaySprites.Clear();
 
                 currentOverlayMessage = "Use An Ability.";
@@ -370,11 +376,14 @@ namespace Vi.UI
 
             if (shouldLockCameraOnBot)
             {
-
+                if (botAttributes & playerMovementHandler)
+                {
+                    playerMovementHandler.LockOnTarget(botAttributes.transform);
+                }
             }
-            else
+            else if (playerMovementHandler)
             {
-
+                playerMovementHandler.LockOnTarget(null);
             }
         }
 
@@ -408,9 +417,9 @@ namespace Vi.UI
                     if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
                 }
 
-                if (movementHandler)
+                if (playerMovementHandler)
                 {
-                    canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
+                    canProceed = playerMovementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }
             else if (currentActionIndex == 1) // Move
@@ -423,7 +432,7 @@ namespace Vi.UI
                 {
                     if (botAttributes)
                     {
-                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward, botAttributes.transform.rotation);
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward, botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }

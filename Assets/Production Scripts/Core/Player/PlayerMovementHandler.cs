@@ -26,6 +26,12 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
+        public Transform TargetToLockOn { get; private set; }
+        public void LockOnTarget(Transform target)
+        {
+            TargetToLockOn = target;
+        }
+
         public void SetPredictionRigidbodyPosition(Vector3 newPosition)
         {
             movementPredictionRigidbody.position = newPosition;
