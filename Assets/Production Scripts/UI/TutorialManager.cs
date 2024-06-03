@@ -319,14 +319,15 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
 
+                bufferDurationBetweenActions = 3;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
-                bufferDurationBetweenActions = 3;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
-                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 // Set messages active here
                 while (mainGroup.alpha > colorDistance)
                 {
@@ -347,6 +348,14 @@ namespace Vi.UI
                         elapsedTime += Time.deltaTime;
                         endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageLerpSpeed);
                     }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < endingMessageDisplayDuration)
+                    {
+                        yield return null;
+                        elapsedTime += Time.deltaTime;
+                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageLerpSpeed);
+                    }
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
@@ -354,18 +363,23 @@ namespace Vi.UI
                 yield return new WaitForSeconds(2);
 
                 // Return to char select
-                if (NetworkManager.Singleton.IsListening)
-                {
-                    PlayerDataManager.Singleton.wasDisconnectedByClient = true;
-                    NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
-                    yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
-                }
-                NetSceneManager.Singleton.LoadScene("Character Select");
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharSelect());
             }
             else
             {
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
+        }
+
+        private IEnumerator ReturnToCharSelect()
+        {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.wasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+            NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
         private const float endingMessageLerpSpeed = 2;
