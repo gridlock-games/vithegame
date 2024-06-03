@@ -141,7 +141,7 @@ namespace Vi.UI
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Attack")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("LightAttack")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
@@ -272,14 +272,20 @@ namespace Vi.UI
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
-                bufferDurationBetweenActions = 6;
+                playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
+                bufferDurationBetweenActions = 3;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.SetAllPlayersMobility(false);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
+                onTaskCompleteBufferDuration = 5;
+                checkmarkDuration = 0;
+                bufferDurationBetweenActions = 0;
+
                 timerEnabled = true;
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
@@ -287,20 +293,18 @@ namespace Vi.UI
                     playerInput.actions.FindAction(action.name).Enable();
                 }
 
-                playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
-
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-                PlayerDataManager.Singleton.RespawnAllPlayers();
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {
+                PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-                FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
+                //FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
             }
             else
@@ -381,7 +385,7 @@ namespace Vi.UI
                     overlayImages[i].sprite = null;
                 }
             }
-            else if (lastIsInBufferTime)
+            else if (lastIsInBufferTime & canProceed)
             {
                 StartCoroutine(DisplayNextAction());
             }
@@ -401,7 +405,7 @@ namespace Vi.UI
                 image.gameObject.SetActive(image.sprite);
             }
 
-            timerText.text = timerEnabled ? (bufferDurationBetweenActions - (Time.time - bufferStartTime)).ToString("F0") : "";
+            timerText.text = timerEnabled ? (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime)).ToString("F0") : "";
 
             if (canProceed & !lastCanProceed)
             {
