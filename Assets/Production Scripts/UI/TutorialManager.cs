@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.Player;
 using Vi.Utility;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -17,6 +18,8 @@ namespace Vi.UI
         [SerializeField] private Image[] overlayImages;
         [SerializeField] private Image objectiveCompleteImage;
         [SerializeField] private HorizontalLayoutGroup imagesLayoutGroup;
+        [SerializeField] private CanvasGroup mainGroup;
+        [SerializeField] private Text[] endingMessages;
 
         PlayerInput playerInput;
         PlayerMovementHandler playerMovementHandler;
@@ -314,19 +317,59 @@ namespace Vi.UI
                 Time.timeScale = 0.5f;
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-                //FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
-                currentOverlayMessage = "MATCH COMPLETE.";
+                currentOverlayMessage = "ENEMY KNOCKED OUT.";
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
 
                 bufferDurationBetweenActions = 3;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 // Set messages active here
+                while (mainGroup.alpha > colorDistance)
+                {
+                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageLerpSpeed);
+                    yield return null;
+                }
+                mainGroup.alpha = 0;
+
+                foreach (Text endingMessage in endingMessages)
+                {
+                    endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
+                    endingMessage.gameObject.SetActive(true);
+
+                    float elapsedTime = 0;
+                    while (elapsedTime < endingMessageDisplayDuration)
+                    {
+                        yield return null;
+                        elapsedTime += Time.deltaTime;
+                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageLerpSpeed);
+                    }
+                }
+
+                FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
+
+                yield return new WaitForSeconds(2);
+
+                // Return to char select
+                if (NetworkManager.Singleton.IsListening)
+                {
+                    PlayerDataManager.Singleton.wasDisconnectedByClient = true;
+                    NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                    yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+                }
+                NetSceneManager.Singleton.LoadScene("Character Select");
             }
             else
             {
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
         }
+
+        private const float endingMessageLerpSpeed = 2;
+        private const float endingMessageDisplayDuration = 2;
 
         [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
         private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
