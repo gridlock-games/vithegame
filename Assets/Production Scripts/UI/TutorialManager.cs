@@ -356,6 +356,7 @@ namespace Vi.UI
                         elapsedTime += Time.deltaTime;
                         endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageLerpSpeed);
                     }
+                    endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
