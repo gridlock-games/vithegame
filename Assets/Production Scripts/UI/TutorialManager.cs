@@ -83,6 +83,10 @@ namespace Vi.UI
             canProceed = false;
             timerEnabled = false;
 
+            onTaskCompleteBufferDuration = 3;
+            checkmarkDuration = 1;
+            bufferDurationBetweenActions = 3;
+
             Time.timeScale = 1;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
@@ -132,6 +136,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 3) // Combo
             {
+                onTaskCompleteBufferDuration = 2;
+
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
                 currentOverlaySprites.AddRange(result.sprites);
                 currentOverlaySprites.AddRange(result.sprites);
@@ -260,17 +266,31 @@ namespace Vi.UI
         private string currentOverlayMessage;
         private List<Sprite> currentOverlaySprites = new List<Sprite>();
 
+        private bool shouldLockCameraOnBot;
         private bool shouldAnimatePosition;
         private bool timerEnabled;
 
         private bool lastCanProceed;
         private bool lastIsInBufferTime;
 
+        private Attributes botAttributes;
+
+        private void FindBotAttributes()
+        {
+            if (botAttributes) { return; }
+            if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                botAttributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+            }
+        }
+
         private void Update()
         {
             tutorialCanvas.enabled = currentActionIndex > -1;
 
             FindPlayerInput();
+            FindBotAttributes();
 
             if (IsTaskComplete())
             {
@@ -347,15 +367,24 @@ namespace Vi.UI
             {
                 layoutGroupRT.anchoredPosition = originalAnchoredPosition;
             }
+
+            if (shouldLockCameraOnBot)
+            {
+
+            }
+            else
+            {
+
+            }
         }
 
         private bool IsTaskComplete() { return Time.time - onTaskCompleteStartTime <= onTaskCompleteBufferDuration; }
         private bool ShouldCheckmarkBeDisplayed() { return Time.time - checkmarkStartTime <= checkmarkDuration; }
         private bool IsInBufferTime() { return Time.time - bufferStartTime <= bufferDurationBetweenActions; }
 
-        private const float onTaskCompleteBufferDuration = 3;
-        private const float checkmarkDuration = 2;
-        private const float bufferDurationBetweenActions = 3;
+        private float onTaskCompleteBufferDuration = 3;
+        private float checkmarkDuration = 1;
+        private float bufferDurationBetweenActions = 3;
 
         private float onTaskCompleteStartTime = Mathf.NegativeInfinity;
         private float checkmarkStartTime = Mathf.NegativeInfinity;
@@ -392,14 +421,9 @@ namespace Vi.UI
                 }
                 else
                 {
-                    if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                    if (botAttributes)
                     {
-                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                        Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                        if (attributes)
-                        {
-                            locationPingInstance = Instantiate(locationPingPrefab, attributes.transform.position + attributes.transform.forward, attributes.transform.rotation);
-                        }
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward, botAttributes.transform.rotation);
                     }
                 }
             }
@@ -409,14 +433,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 3) // Combo
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | canProceed;
-                    }
+                    canProceed = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | canProceed;
                 }
             }
             else if (currentActionIndex == 4) // Ability
@@ -425,45 +444,27 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 5) // Block
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
-                    }
+                    WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
-
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
             else if (currentActionIndex == 6) // Dodge
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
-                    }
+                    WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
-
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
             else if (currentActionIndex == 7) // Player Card
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        canProceed = attributes.GetComboCounter() > 0 | canProceed;
-                    }
+                    canProceed = attributes.GetComboCounter() > 0 | canProceed;
                 }
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
@@ -473,17 +474,10 @@ namespace Vi.UI
             else if (currentActionIndex == 9) // Fight with NPC
             {
                 bool botIsDead = false;
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        botIsDead = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                    }
+                    botIsDead = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
                 }
-
                 canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
             }
             else if (currentActionIndex == 10) // Display victory or defeat message
