@@ -83,6 +83,8 @@ namespace Vi.UI
             canProceed = false;
             timerEnabled = false;
 
+            Time.timeScale = 1;
+
             if (locationPingInstance) { Destroy(locationPingInstance); }
 
             foreach (GameObject instance in UIElementHighlightInstances)
@@ -181,7 +183,6 @@ namespace Vi.UI
                 currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Dodge.";
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }

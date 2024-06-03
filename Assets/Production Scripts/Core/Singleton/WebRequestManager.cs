@@ -876,7 +876,7 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender);
+            Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender, true);
             Loadout loadout2 = GetRandomizedLoadout(character.raceAndGender);
             Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
             Loadout loadout4 = GetRandomizedLoadout(character.raceAndGender);
@@ -1006,7 +1006,7 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Shoulders,
         };
 
-        public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender)
+        public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender, bool useDefaultPrimaryWeapon = false)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
@@ -1031,7 +1031,7 @@ namespace Vi.Core
             int capeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
             int robeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
-            int weapon1Index = Random.Range(0, weaponOptions.Length);
+            int weapon1Index = useDefaultPrimaryWeapon ? 1 : Random.Range(0, weaponOptions.Length);
             int weapon2Index = Random.Range(0, weaponOptions.Length);
 
             if (weapon1Index == weapon2Index)
