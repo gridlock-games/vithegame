@@ -30,6 +30,8 @@ namespace Vi.UI
         private float fadeToBlackSpeed = 8;
         public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
 
+        public Color GetFadeToBlackColor() { return fadeToBlackImage.color; }
+
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;

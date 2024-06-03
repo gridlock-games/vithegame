@@ -78,6 +78,9 @@ namespace Vi.UI
 
         private int currentActionIndex = -1;
 
+        private const float fadeToBlackSpeed = 2;
+        private const float colorDistance = 0.001f;
+
         private IEnumerator DisplayNextAction()
         {
             currentActionIndex += 1;
@@ -179,9 +182,8 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    if (!abilityNames.Contains(abilityCard.Ability.name)) { continue; }
-                    abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                    UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                    abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
+                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
             }
             else if (currentActionIndex == 5) // Ability 4
@@ -198,10 +200,16 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    if (!abilityNames.Contains(abilityCard.Ability.name)) { continue; }
-                    abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                    UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                    abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
+                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 6) // Block
             {
@@ -212,7 +220,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Block") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
@@ -221,6 +229,13 @@ namespace Vi.UI
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 7) // Dodge
             {
@@ -234,14 +249,33 @@ namespace Vi.UI
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 8) // Player Card
             {
                 botAttributes.ResetComboCounter();
 
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
                 currentOverlayMessage = "Player Card.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
