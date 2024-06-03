@@ -431,7 +431,7 @@ namespace Vi.Player
             }
         }
 
-        private static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
+        public static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
 
         private void RefreshStatus()
         {

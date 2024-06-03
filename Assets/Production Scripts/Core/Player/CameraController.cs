@@ -87,8 +87,8 @@ namespace Vi.Player
             // Update camera interp transform
             if (movementHandler.TargetToLockOn)
             {
-                Quaternion targetRot = Quaternion.LookRotation(movementHandler.TargetToLockOn.position - transform.position, Vector3.up);
-                targetRotationX = targetRot.eulerAngles.x;
+                Quaternion targetRot = Quaternion.LookRotation(movementHandler.TargetToLockOn.position + PlayerMovementHandler.targetSystemOffset - transform.position, Vector3.up);
+                targetRotationX = -targetRot.eulerAngles.x;
                 targetRotationY = targetRot.eulerAngles.y - 180;
             }
             else
