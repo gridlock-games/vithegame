@@ -380,10 +380,6 @@ namespace Vi.UI
 
                 if (movementHandler)
                 {
-                    if (canProceed)
-                    {
-                        if (IsTaskComplete()) { DisplayNextAction(); return; }
-                    }
                     canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }
@@ -391,10 +387,6 @@ namespace Vi.UI
             {
                 if (locationPingInstance)
                 {
-                    if (canProceed)
-                    {
-                        if (IsTaskComplete()) { DisplayNextAction(); return; }
-                    }
                     canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
                 }
                 else
@@ -412,19 +404,10 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { DisplayNextAction(); return; }
-                }
                 canProceed = attributes.GetComboCounter() > 0 | canProceed;
             }
             else if (currentActionIndex == 3) // Combo
             {
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { DisplayNextAction(); return; }
-                }
-
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -437,10 +420,6 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 4) // Ability
             {
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { DisplayNextAction(); return; }
-                }
                 canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
             }
             else if (currentActionIndex == 5) // Block
@@ -456,10 +435,6 @@ namespace Vi.UI
                     }
                 }
 
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { Time.timeScale = 1; DisplayNextAction(); return; }
-                }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
             else if (currentActionIndex == 6) // Dodge
@@ -475,19 +450,10 @@ namespace Vi.UI
                     }
                 }
 
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { Time.timeScale = 1; DisplayNextAction(); return; }
-                }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
             else if (currentActionIndex == 7) // Player Card
             {
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { DisplayNextAction(); return; }
-                }
-
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
@@ -501,10 +467,6 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-                if (canProceed)
-                {
-                    if (IsTaskComplete()) { DisplayNextAction(); return; }
-                }
                 canProceed = true;
             }
             else if (currentActionIndex == 9) // Fight with NPC
@@ -521,7 +483,6 @@ namespace Vi.UI
                     }
                 }
 
-                if (canProceed) { DisplayNextAction(); return; }
                 canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
             }
             else if (currentActionIndex == 10) // Display victory or defeat message
