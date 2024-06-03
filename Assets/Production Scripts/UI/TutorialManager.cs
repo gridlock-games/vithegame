@@ -78,7 +78,7 @@ namespace Vi.UI
 
         private int currentActionIndex = -1;
 
-        private const float fadeToBlackSpeed = 2;
+        private const float fadeToBlackSpeed = 3;
         private const float colorDistance = 0.001f;
 
         private IEnumerator DisplayNextAction()
@@ -243,6 +243,7 @@ namespace Vi.UI
                 currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Dodge.";
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
@@ -367,6 +368,8 @@ namespace Vi.UI
                 {
                     overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
                 }
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
             }
             else if (IsInBufferTime())
             {
@@ -512,7 +515,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
@@ -521,7 +524,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
+                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
@@ -530,7 +533,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    canProceed = attributes.GetComboCounter() > 0 | canProceed;
+                    canProceed = botAttributes.GetComboCounter() > 0 | canProceed;
                 }
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
@@ -542,9 +545,9 @@ namespace Vi.UI
                 bool botIsDead = false;
                 if (botAttributes)
                 {
-                    botIsDead = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
+                    botIsDead = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
                 }
-                canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
+                canProceed = botIsDead | canProceed;
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
