@@ -146,6 +146,7 @@ namespace Vi.Core
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();
+            attributes.RemoveAllStatuses();
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 

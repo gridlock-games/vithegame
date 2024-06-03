@@ -85,9 +85,18 @@ namespace Vi.Player
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             // Update camera interp transform
-            Vector2 lookInput = movementHandler.GetLookInput();
-            targetRotationX += lookInput.y;
-            targetRotationY += lookInput.x;
+            if (movementHandler.TargetToLockOn)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(movementHandler.TargetToLockOn.position + PlayerMovementHandler.targetSystemOffset - transform.position, Vector3.up);
+                targetRotationX = -targetRot.eulerAngles.x;
+                targetRotationY = targetRot.eulerAngles.y - 180;
+            }
+            else
+            {
+                Vector2 lookInput = movementHandler.GetLookInput();
+                targetRotationX += lookInput.y;
+                targetRotationY += lookInput.x;
+            }
             movementHandler.ResetLookInput();
 
             targetRotationX %= 360f;
