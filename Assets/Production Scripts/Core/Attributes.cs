@@ -1218,7 +1218,7 @@ namespace Vi.Core
                     damageMultiplier *= statusPayload.value;
 
                     float elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1231,7 +1231,7 @@ namespace Vi.Core
                     damageReductionMultiplier *= statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1244,7 +1244,7 @@ namespace Vi.Core
                     damageReceivedMultiplier *= statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1257,7 +1257,7 @@ namespace Vi.Core
                     healingMultiplier *= statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1270,7 +1270,7 @@ namespace Vi.Core
                     spiritIncreaseMultiplier *= statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1283,7 +1283,7 @@ namespace Vi.Core
                     spiritReductionMultiplier *= statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1294,7 +1294,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.burning:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1304,7 +1304,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.poisoned:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1314,7 +1314,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.drain:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
@@ -1326,7 +1326,7 @@ namespace Vi.Core
                     movementSpeedDecrease.Value += statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1339,7 +1339,7 @@ namespace Vi.Core
                     movementSpeedIncrease.Value += statusPayload.value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1350,7 +1350,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1360,7 +1360,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.silenced:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1370,7 +1370,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.fear:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
                         yield return null;
@@ -1380,7 +1380,7 @@ namespace Vi.Core
                     break;
                 case ActionClip.Status.healing:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration | stopAllStatuses)
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         AddHP(weaponHandler.GetWeapon().GetMaxHP() / GetHP() * 10 * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
