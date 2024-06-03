@@ -66,7 +66,7 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => playerInput);
             yield return null;
-            DisplayNextAction();
+            StartCoroutine(DisplayNextAction());
         }
 
         private const float animationSpeed = 100;
@@ -78,14 +78,19 @@ namespace Vi.UI
 
         private int currentActionIndex = -1;
 
-        private void DisplayNextAction()
+        private IEnumerator DisplayNextAction()
         {
             currentActionIndex += 1;
 
+            currentOverlaySprites.Clear();
+            currentOverlayMessage = "";
+
             shouldLockCameraOnBot = false;
             shouldAnimatePosition = false;
-            canProceed = false;
             timerEnabled = false;
+
+            canProceed = false;
+            canProceedCondition1 = false;
 
             onTaskCompleteBufferDuration = 3;
             checkmarkDuration = 1;
@@ -145,6 +150,7 @@ namespace Vi.UI
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
                 currentOverlaySprites.AddRange(result.sprites);
                 currentOverlaySprites.AddRange(result.sprites);
+                currentOverlaySprites.AddRange(result.sprites);
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
@@ -156,7 +162,12 @@ namespace Vi.UI
             {
                 shouldLockCameraOnBot = true;
 
-                currentOverlaySprites.Clear();
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
+                yield return new WaitForSeconds(2);
 
                 currentOverlayMessage = "Use An Ability.";
                 List<string> abilityNames = new List<string>() { "Ability1", "Ability2", "Ability3" };
@@ -177,8 +188,6 @@ namespace Vi.UI
             {
                 shouldLockCameraOnBot = true;
 
-                currentOverlaySprites.Clear();
-
                 currentOverlayMessage = "Use Your Ultimate Ability.";
                 List<string> abilityNames = new List<string>() { "Ability4" };
                 foreach (InputAction action in playerInput.actions)
@@ -196,11 +205,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Block
             {
-                shouldLockCameraOnBot = true;
-
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
                 currentOverlaySprites = result.sprites;
-
+                
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
@@ -230,17 +237,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Player Card
             {
-                currentOverlaySprites.Clear();
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
-                {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        attributes.ResetComboCounter();
-                    }
-                }
+                botAttributes.ResetComboCounter();
 
                 currentOverlayMessage = "Player Card.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -248,10 +245,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
-                //transitionTime = 5;
-
                 timerEnabled = true;
-                currentOverlaySprites.Clear();
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -265,15 +259,11 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {
-                //transitionTime = 3;
-
-                currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
-                currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
@@ -356,7 +346,7 @@ namespace Vi.UI
             }
             else if (lastIsInBufferTime)
             {
-                DisplayNextAction();
+                StartCoroutine(DisplayNextAction());
             }
             else
             {
@@ -426,6 +416,7 @@ namespace Vi.UI
         private float bufferStartTime = Mathf.NegativeInfinity;
 
         private bool canProceed;
+        private bool canProceedCondition1;
         private void CheckTutorialActionStatus()
         {
             if (currentActionIndex == -1)
@@ -475,11 +466,13 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 4) // Ability
             {
-                canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
+                canProceedCondition1 = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceedCondition1;
+                canProceed = (canProceedCondition1 & !animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip)) | canProceed;
             }
             else if (currentActionIndex == 5) // Ultimate Ability
             {
-                canProceed = weaponHandler.CurrentActionClip.name == "Ability4" | canProceed;
+                canProceedCondition1 = weaponHandler.CurrentActionClip.name == "Ability4" | canProceedCondition1;
+                canProceed = (canProceedCondition1 & !animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip)) | canProceed;
             }
             else if (currentActionIndex == 6) // Block
             {
