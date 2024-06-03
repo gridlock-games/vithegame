@@ -301,15 +301,26 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {
+                onTaskCompleteBufferDuration = 1;
+                checkmarkDuration = 1;
+                bufferDurationBetweenActions = 0;
+
                 PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
+                Time.timeScale = 0.5f;
+
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 //FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
                 currentOverlayMessage = "MATCH COMPLETE.";
+
+                bufferDurationBetweenActions = 3;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                // Set messages active here
             }
             else
             {
@@ -326,6 +337,7 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            Time.timeScale = 1;
         }
 
         private string currentOverlayMessage;
@@ -356,8 +368,6 @@ namespace Vi.UI
 
             FindPlayerInput();
             FindBotAttributes();
-
-            Debug.Log(currentActionIndex + " " + onTaskCompleteBufferDuration + " " + checkmarkDuration + " " + bufferDurationBetweenActions);
 
             if (IsTaskComplete())
             {
