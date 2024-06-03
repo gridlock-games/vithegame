@@ -99,6 +99,10 @@ namespace Vi.UI
             checkmarkDuration = 1;
             bufferDurationBetweenActions = 3;
 
+            onTaskCompleteStartTime = Mathf.NegativeInfinity;
+            checkmarkStartTime = Mathf.NegativeInfinity;
+            bufferStartTime = Mathf.NegativeInfinity;
+
             Time.timeScale = 1;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
@@ -352,6 +356,8 @@ namespace Vi.UI
 
             FindPlayerInput();
             FindBotAttributes();
+
+            Debug.Log(currentActionIndex + " " + onTaskCompleteBufferDuration + " " + checkmarkDuration + " " + bufferDurationBetweenActions);
 
             if (IsTaskComplete())
             {
