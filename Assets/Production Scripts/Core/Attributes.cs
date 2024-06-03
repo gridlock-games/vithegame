@@ -1130,8 +1130,6 @@ namespace Vi.Core
         {
             yield return null;
             yield return null;
-            yield return null;
-            yield return null;
             stopAllStatuses = false;
         }
 
