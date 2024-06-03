@@ -10,6 +10,7 @@ namespace Vi.UI
 {
     public class TutorialManager : MonoBehaviour
     {
+        [SerializeField] private Canvas tutorialCanvas;
         [SerializeField] private Text overlayText;
         [SerializeField] private Text timerText;
         [SerializeField] private Image[] overlayImages;
@@ -45,7 +46,6 @@ namespace Vi.UI
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-            DisplayNextAction();
 
             foreach (Image image in overlayImages)
             {
@@ -55,6 +55,15 @@ namespace Vi.UI
 
             layoutGroupRT = (RectTransform)imagesLayoutGroup.transform;
             originalAnchoredPosition = layoutGroupRT.anchoredPosition;
+
+            StartCoroutine(DisplayNextActionAfterPlayerInputFound());
+        }
+
+        private IEnumerator DisplayNextActionAfterPlayerInputFound()
+        {
+            yield return new WaitUntil(() => playerInput);
+            yield return null;
+            DisplayNextAction();
         }
 
         private const float animationSpeed = 100;
@@ -65,6 +74,7 @@ namespace Vi.UI
         private float directionMultiplier = -1;
 
         private int currentActionIndex = -1;
+
         private void DisplayNextAction()
         {
             currentActionIndex += 1;
@@ -72,29 +82,12 @@ namespace Vi.UI
             shouldAnimatePosition = false;
             canProceed = false;
             timerEnabled = false;
-            actionChangeTime = Time.time;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
 
             foreach (GameObject instance in UIElementHighlightInstances)
             {
                 Destroy(instance);
-            }
-
-            StartCoroutine(EvaluateAfterPlayerInputFound());
-        }
-
-        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
-        private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
-        [SerializeField] private GameObject locationPingPrefab;
-        private GameObject locationPingInstance;
-
-        private IEnumerator EvaluateAfterPlayerInputFound()
-        {
-            if (!playerInput)
-            {
-                yield return new WaitUntil(() => playerInput);
-                yield return null;
             }
 
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
@@ -216,7 +209,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 8) // Prepare to fight with NPC
             {
-                transitionTime = 5;
+                //transitionTime = 5;
 
                 timerEnabled = true;
                 currentOverlaySprites.Clear();
@@ -233,7 +226,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 9) // Fight with NPC
             {
-                transitionTime = 3;
+                //transitionTime = 3;
 
                 currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -252,6 +245,11 @@ namespace Vi.UI
             }
         }
 
+        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
+        private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
+        [SerializeField] private GameObject locationPingPrefab;
+        private GameObject locationPingInstance;
+
         private void OnDestroy()
         {
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -259,38 +257,81 @@ namespace Vi.UI
         }
 
         private string currentOverlayMessage;
-        private List<Sprite> currentOverlaySprites;
+        private List<Sprite> currentOverlaySprites = new List<Sprite>();
+
         private bool shouldAnimatePosition;
+        private bool timerEnabled;
 
         private bool lastCanProceed;
-        private bool timerEnabled;
+        private bool lastIsInBufferTime;
 
         private void Update()
         {
-            timerText.text = timerEnabled ? (transitionTime - (Time.time - actionChangeTime)).ToString("F2") : "";
+            tutorialCanvas.enabled = currentActionIndex > -1;
 
-            if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
-            lastCanProceed = canProceed;
+            FindPlayerInput();
+
+            if (IsTaskComplete())
+            {
+                overlayText.text = currentOverlayMessage;
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
+            else if (ShouldCheckmarkBeDisplayed())
+            {
+                overlayText.text = currentOverlayMessage;
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
+            else if (IsInBufferTime())
+            {
+                overlayText.text = "";
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = null;
+                }
+            }
+            else if (lastIsInBufferTime)
+            {
+                DisplayNextAction();
+            }
+            else
+            {
+                CheckTutorialActionStatus();
+                overlayText.text = currentOverlayMessage;
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
 
             foreach (Image image in overlayImages)
             {
                 image.gameObject.SetActive(image.sprite);
             }
 
-            FindPlayerInput();
-            CheckTutorialActionStatus();
+            timerText.text = timerEnabled ? (bufferDurationBetweenActions - (Time.time - bufferStartTime)).ToString("F0") : "";
 
-            objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, canProceed ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
-
-            if (!playerInput) { return; }
-            if (string.IsNullOrWhiteSpace(playerInput.currentControlScheme)) { return; }
-
-            overlayText.text = currentOverlayMessage;
-
-            for (int i = 0; i < overlayImages.Length; i++)
+            if (canProceed & !lastCanProceed)
             {
-                overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                onTaskCompleteStartTime = Time.time;
+                checkmarkStartTime = Time.time + onTaskCompleteBufferDuration;
+                bufferStartTime = Time.time + onTaskCompleteBufferDuration + checkmarkDuration;
             }
+
+            lastIsInBufferTime = IsInBufferTime();
+            lastCanProceed = canProceed;
 
             if (shouldAnimatePosition)
             {
@@ -307,13 +348,30 @@ namespace Vi.UI
             }
         }
 
-        private float transitionTime = 3;
+        private bool IsTaskComplete() { return Time.time - onTaskCompleteStartTime <= onTaskCompleteBufferDuration; }
+        private bool ShouldCheckmarkBeDisplayed() { return Time.time - checkmarkStartTime <= checkmarkDuration; }
+        private bool IsInBufferTime() { return Time.time - bufferStartTime <= bufferDurationBetweenActions; }
+
+        private const float onTaskCompleteBufferDuration = 3;
+        private const float checkmarkDuration = 2;
+        private const float bufferDurationBetweenActions = 3;
+
+        private float onTaskCompleteStartTime = Mathf.NegativeInfinity;
+        private float checkmarkStartTime = Mathf.NegativeInfinity;
+        private float bufferStartTime = Mathf.NegativeInfinity;
 
         private bool canProceed;
-        private float actionChangeTime;
         private void CheckTutorialActionStatus()
         {
-            if (currentActionIndex == 0) // Look
+            if (currentActionIndex == -1)
+            {
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
+                {
+                    if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
+                }
+                return;
+            }
+            else if (currentActionIndex == 0) // Look
             {
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
                 {
@@ -324,7 +382,7 @@ namespace Vi.UI
                 {
                     if (canProceed)
                     {
-                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                        if (IsTaskComplete()) { DisplayNextAction(); return; }
                     }
                     canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
@@ -335,7 +393,7 @@ namespace Vi.UI
                 {
                     if (canProceed)
                     {
-                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                        if (IsTaskComplete()) { DisplayNextAction(); return; }
                     }
                     canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
                 }
@@ -356,7 +414,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { DisplayNextAction(); return; }
                 }
                 canProceed = attributes.GetComboCounter() > 0 | canProceed;
             }
@@ -364,7 +422,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { DisplayNextAction(); return; }
                 }
 
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
@@ -381,7 +439,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { DisplayNextAction(); return; }
                 }
                 canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
             }
@@ -400,7 +458,7 @@ namespace Vi.UI
 
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { Time.timeScale = 1; DisplayNextAction(); return; }
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
@@ -419,7 +477,7 @@ namespace Vi.UI
 
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { Time.timeScale = 1; DisplayNextAction(); return; }
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
@@ -427,7 +485,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { DisplayNextAction(); return; }
                 }
 
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
@@ -445,7 +503,7 @@ namespace Vi.UI
             {
                 if (canProceed)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    if (IsTaskComplete()) { DisplayNextAction(); return; }
                 }
                 canProceed = true;
             }
