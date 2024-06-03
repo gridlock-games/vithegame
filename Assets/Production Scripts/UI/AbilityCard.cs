@@ -13,21 +13,21 @@ namespace Vi.UI
         [SerializeField] private Text keybindText;
         [SerializeField] private ActionClip previewAbility;
 
-        private ActionClip ability;
+        public ActionClip Ability { get; private set; }
 
         public void SetPreviewOn()
         {
             if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
-            ability = previewAbility;
-            abilityIcon.sprite = ability.abilityImageIcon;
-            inactiveAbilityIcon.sprite = ability.abilityImageIcon;
+            Ability = previewAbility;
+            abilityIcon.sprite = Ability.abilityImageIcon;
+            inactiveAbilityIcon.sprite = Ability.abilityImageIcon;
             keybindText.text = previewAbility.name.Replace("Ability", "");
             cooldownIcon.fillAmount = 0;
         }
 
         public void UpdateCard(ActionClip ability, string keybindText)
         {
-            this.ability = ability;
+            this.Ability = ability;
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
@@ -50,11 +50,11 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (ability == null) { return; }
-            cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
-            abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(ability);
+            if (Ability == null) { return; }
+            cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+            abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
 
-            if (animationHandler.AreActionClipRequirementsMet(ability))
+            if (animationHandler.AreActionClipRequirementsMet(Ability))
             {
                 borderImage.color = originalBorderImageColor;
             }

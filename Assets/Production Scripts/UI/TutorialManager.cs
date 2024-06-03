@@ -152,26 +152,52 @@ namespace Vi.UI
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetHeavyAttackButton().transform, true));
             }
-            else if (currentActionIndex == 4) // Ability
+            else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
                 shouldLockCameraOnBot = true;
 
                 currentOverlaySprites.Clear();
 
                 currentOverlayMessage = "Use An Ability.";
+                List<string> abilityNames = new List<string>() { "Ability1", "Ability2", "Ability3" };
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Ability")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
+                    if (!abilityNames.Contains(abilityCard.Ability.name)) { continue; }
                     abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
                     UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
             }
-            else if (currentActionIndex == 5) // Block
+            else if (currentActionIndex == 5) // Ability 4
             {
+                shouldLockCameraOnBot = true;
+
+                currentOverlaySprites.Clear();
+
+                currentOverlayMessage = "Use Your Ultimate Ability.";
+                List<string> abilityNames = new List<string>() { "Ability4" };
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    else { playerInput.actions.FindAction(action.name).Disable(); }
+                }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    if (!abilityNames.Contains(abilityCard.Ability.name)) { continue; }
+                    abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                    UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                }
+            }
+            else if (currentActionIndex == 6) // Block
+            {
+                shouldLockCameraOnBot = true;
+
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
                 currentOverlaySprites = result.sprites;
 
@@ -189,7 +215,7 @@ namespace Vi.UI
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
             }
-            else if (currentActionIndex == 6) // Dodge
+            else if (currentActionIndex == 7) // Dodge
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
                 currentOverlaySprites = result.sprites;
@@ -202,7 +228,7 @@ namespace Vi.UI
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
             }
-            else if (currentActionIndex == 7) // Player Card
+            else if (currentActionIndex == 8) // Player Card
             {
                 currentOverlaySprites.Clear();
                 if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
@@ -220,7 +246,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
             }
-            else if (currentActionIndex == 8) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
                 //transitionTime = 5;
 
@@ -237,7 +263,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 PlayerDataManager.Singleton.RespawnAllPlayers();
             }
-            else if (currentActionIndex == 9) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
                 //transitionTime = 3;
 
@@ -245,7 +271,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
-            else if (currentActionIndex == 10) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
                 currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
@@ -451,7 +477,11 @@ namespace Vi.UI
             {
                 canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
             }
-            else if (currentActionIndex == 5) // Block
+            else if (currentActionIndex == 5) // Ultimate Ability
+            {
+                canProceed = weaponHandler.CurrentActionClip.name == "Ability4" | canProceed;
+            }
+            else if (currentActionIndex == 6) // Block
             {
                 if (botAttributes)
                 {
@@ -460,7 +490,7 @@ namespace Vi.UI
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
-            else if (currentActionIndex == 6) // Dodge
+            else if (currentActionIndex == 7) // Dodge
             {
                 if (botAttributes)
                 {
@@ -469,18 +499,18 @@ namespace Vi.UI
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
-            else if (currentActionIndex == 7) // Player Card
+            else if (currentActionIndex == 8) // Player Card
             {
                 if (botAttributes)
                 {
                     canProceed = attributes.GetComboCounter() > 0 | canProceed;
                 }
             }
-            else if (currentActionIndex == 8) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
                 canProceed = true;
             }
-            else if (currentActionIndex == 9) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
                 bool botIsDead = false;
                 if (botAttributes)
@@ -489,7 +519,7 @@ namespace Vi.UI
                 }
                 canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
             }
-            else if (currentActionIndex == 10) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
 
             }
