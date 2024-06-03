@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028326, g: 0.22571333, b: 0.30692202, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1545,7 +1545,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -324}
-  m_SizeDelta: {x: 295.55, y: 72.88251}
+  m_SizeDelta: {x: 1920, y: 72.88251}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &840159706
 MonoBehaviour:
@@ -2167,6 +2167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9883cb22ede79ac48a359707313f8ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tutorialCanvas: {fileID: 1394462165}
   overlayText: {fileID: 840159706}
   timerText: {fileID: 1774242900}
   overlayImages:
