@@ -1110,14 +1110,20 @@ namespace Vi.Core
 
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
         {
-            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryAddStatus() should only be called on the server"); return false; }
+            if (!IsServer) { Debug.LogError("Attributes.TryAddStatus() should only be called on the server"); return false; }
             statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay));
             return true;
         }
 
+        public void RemoveAllStatuses()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatuses() should only be called on the server"); return; }
+            statuses.Clear();
+        }
+
         private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
         {
-            if (!IsServer) { Debug.LogError("CharacterStatusManager.TryRemoveStatus() should only be called on the server"); return false; }
+            if (!IsServer) { Debug.LogError("Attributes.TryRemoveStatus() should only be called on the server"); return false; }
 
             if (!statuses.Contains(statusPayload) & !activeStatuses.Contains((int)statusPayload.status))
             {
@@ -1171,6 +1177,7 @@ namespace Vi.Core
         {
             if (!IsServer) { return; }
             if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
+            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Clear) { activeStatuses.Clear(); }
         }
 
         public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }

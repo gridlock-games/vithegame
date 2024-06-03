@@ -405,6 +405,7 @@ namespace Vi.UI
 
             if (canProceed & !lastCanProceed)
             {
+                Time.timeScale = 1;
                 onTaskCompleteStartTime = Time.time;
                 checkmarkStartTime = Time.time + onTaskCompleteBufferDuration;
                 bufferStartTime = Time.time + onTaskCompleteBufferDuration + checkmarkDuration;
