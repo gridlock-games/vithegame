@@ -405,7 +405,8 @@ namespace Vi.UI
                 image.gameObject.SetActive(image.sprite);
             }
 
-            timerText.text = timerEnabled ? (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime)).ToString("F0") : "";
+            float timerTextNum = (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime));
+            timerText.text = timerEnabled & timerTextNum >= 0 ? timerTextNum.ToString("F0") : "";
 
             if (canProceed & !lastCanProceed)
             {
