@@ -160,5 +160,10 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.DeleteKey("UIOverrides");
             Start();
         }
+
+    public void closeUI()
+    {
+      Destroy(gameObject);
+    }
     }
 }
