@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SettingMenuController : MonoBehaviour
+{
+
+  [SerializeField] private List<GameObject> uiList = new List<GameObject>();
+  [SerializeField] private int defaultUI;
+  
+  private int currentSelection;
+
+  public void Awake()
+  {
+    //Clean up current set
+    foreach (var item in uiList)
+    {
+      item.SetActive(false);
+    }
+
+    currentSelection = defaultUI;
+    uiList[defaultUI].SetActive(true);
+  }
+
+  public void changeObject(int selectionObject)
+  {
+    if (selectionObject != currentSelection)
+    {
+      //Turn off current selection
+      uiList[currentSelection].SetActive(false);
+
+      //Turn on Selected Selection
+      uiList[selectionObject].SetActive(true);
+
+      //Set new ID
+      currentSelection = selectionObject;
+    }
+
+  }
+
+  public void CloseUI()
+  {
+    Destroy(this.gameObject);
+  }
+
+}
