@@ -370,6 +370,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7445631659029336568}
+  - component: {fileID: 70863724932165166}
   m_Layer: 5
   m_Name: AudioSetting_Menu
   m_TagString: Untagged
@@ -398,6 +399,26 @@ RectTransform:
   m_AnchoredPosition: {x: -12.911987, y: 0}
   m_SizeDelta: {x: 25.824, y: 0.00012207}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &70863724932165166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5505017695434282037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 086a3d3452662b94aa45655e1036f51c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  errorText: {fileID: 0}
+  volumeSlider: {fileID: 0}
+  musicVolumeSlider: {fileID: 0}
+  speakerModeDropdown: {fileID: 0}
+  dspBufferSizeDropdown: {fileID: 0}
+  sampleRateDropdown: {fileID: 0}
+  numRealVoicesDropdown: {fileID: 0}
+  numVirtualVoicesDropdown: {fileID: 0}
 --- !u!1 &8184983842696513602
 GameObject:
   m_ObjectHideFlags: 0

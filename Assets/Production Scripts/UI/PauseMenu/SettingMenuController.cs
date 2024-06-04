@@ -1,46 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vi.Core;
 
-public class SettingMenuController : MonoBehaviour
+namespace Vi.UI
 {
-
-  [SerializeField] private List<GameObject> uiList = new List<GameObject>();
-  [SerializeField] private int defaultUI;
-  
-  private int currentSelection;
-
-  public void Awake()
+  public class SettingMenuController : Menu
   {
-    //Clean up current set
-    foreach (var item in uiList)
+
+    [SerializeField] private List<GameObject> uiList = new List<GameObject>();
+    [SerializeField] private int defaultUI;
+    [SerializeField] private GameObject oldControlsUI;
+    private int currentSelection;
+
+    public void Awake()
     {
-      item.SetActive(false);
+      //Clean up current set
+      foreach (var item in uiList)
+      {
+        item.SetActive(false);
+      }
+
+      currentSelection = defaultUI;
+      uiList[defaultUI].SetActive(true);
     }
 
-    currentSelection = defaultUI;
-    uiList[defaultUI].SetActive(true);
-  }
-
-  public void changeObject(int selectionObject)
-  {
-    if (selectionObject != currentSelection)
+    public void changeObject(int selectionObject)
     {
-      //Turn off current selection
-      uiList[currentSelection].SetActive(false);
+      if (selectionObject != currentSelection)
+      {
+        //Turn off current selection
+        uiList[currentSelection].SetActive(false);
 
-      //Turn on Selected Selection
-      uiList[selectionObject].SetActive(true);
+        //Turn on Selected Selection
+        uiList[selectionObject].SetActive(true);
 
-      //Set new ID
-      currentSelection = selectionObject;
+        //Set new ID
+        currentSelection = selectionObject;
+      }
+
     }
 
-  }
+    public void CloseUI()
+    {
+      Destroy(this.gameObject);
+    }
 
-  public void CloseUI()
-  {
-    Destroy(this.gameObject);
+    public void OpenOldControlUI()
+    {
+      Instantiate(oldControlsUI);
+    }
   }
-
 }
