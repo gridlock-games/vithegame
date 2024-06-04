@@ -136,6 +136,8 @@ namespace Vi.UI
                 {
                     if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
             }
             else if (currentActionIndex == 1) // Move
             {
@@ -201,7 +203,6 @@ namespace Vi.UI
                 attributes.ResetComboCounter();
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
-                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetHeavyAttackButton().transform, true));
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -606,6 +607,7 @@ namespace Vi.UI
 
                 if (playerMovementHandler)
                 {
+                    Debug.Log(playerMovementHandler.GetLookInput());
                     canProceed = playerMovementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }

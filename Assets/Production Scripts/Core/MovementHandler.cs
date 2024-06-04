@@ -61,11 +61,9 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            if (weaponHandler)
-            {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= zoomSensitivityMultiplier; }
-            }
-            return lookInput * lookSensitivity;
+			bool shouldUseZoomSensMultiplier = false;
+            if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }
+            return shouldUseZoomSensMultiplier ? lookInput * lookSensitivity * zoomSensitivityMultiplier: lookInput * lookSensitivity;
         }
 
 		public void ResetLookInput()

@@ -24,8 +24,6 @@ namespace Vi.UI
 
         public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
 
-        public Image GetHeavyAttackButton() { return heavyAttackButton; }
-
         private bool shouldFadeToBlack;
         private float fadeToBlackSpeed = 8;
         public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
