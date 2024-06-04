@@ -68,26 +68,31 @@ namespace Vi.UI
 
         public void OpenPauseMenu()
         {
+            if (!playerInput.actions.FindAction("Pause").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnPause();
         }
 
         public void OpenInventoryMenu()
         {
+            if (!playerInput.actions.FindAction("Inventory").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnInventory();
         }
 
         public void OpenScoreboard()
         {
+            if (!playerInput.actions.FindAction("Scoreboard").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
         }
 
         public void SwitchWeapon()
         {
+            if (!playerInput.actions.FindAction("SwitchWeapon").enabled) { return; }
             loadoutManager.SwitchWeapon();
         }
 
         public void StartLightAttack()
         {
+            if (!playerInput.actions.FindAction("LightAttack").enabled) { return; }
             weaponHandler.LightAttackHold(true);
         }
 
@@ -98,6 +103,7 @@ namespace Vi.UI
 
         public void StartHeavyAttack()
         {
+            if (!playerInput.actions.FindAction("HeavyAttack").enabled) { return; }
             weaponHandler.HeavyAttackHold(true);
         }
 

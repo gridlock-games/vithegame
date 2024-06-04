@@ -26,12 +26,8 @@ namespace Vi.Core
         private MovementHandler movementHandler;
         private LoadoutManager loadoutManager;
 
-        private PlayerInput playerInput;
-
         private void Awake()
         {
-            playerInput = GetComponent<PlayerInput>();
-
             animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             movementHandler = GetComponent<MovementHandler>();
@@ -588,11 +584,6 @@ namespace Vi.Core
 
         public void LightAttack(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("LightAttack").enabled) { isPressed = false; }
-            }
-
             if (isPressed)
             {
                 if (!IsBlocking)
@@ -639,11 +630,6 @@ namespace Vi.Core
 
         public void HeavyAttack(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("HeavyAttack").enabled) { isPressed = false; }
-            }
-
             if (isPressed)
             {
                 if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
@@ -726,11 +712,6 @@ namespace Vi.Core
         private GameObject ability1PreviewInstance;
         public void Ability1(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("Ability1").enabled) { isPressed = false; }
-            }
-
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
             if (actionClip != null)
             {
@@ -764,11 +745,6 @@ namespace Vi.Core
         private GameObject ability2PreviewInstance;
         public void Ability2(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("Ability2").enabled) { isPressed = false; }
-            }
-
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
             if (actionClip != null)
             {
@@ -802,11 +778,6 @@ namespace Vi.Core
         private GameObject ability3PreviewInstance;
         public void Ability3(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("Ability3").enabled) { isPressed = false; }
-            }
-
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
             if (actionClip != null)
             {
@@ -840,11 +811,6 @@ namespace Vi.Core
         private GameObject ability4PreviewInstance;
         public void Ability4(bool isPressed)
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("Ability4").enabled) { isPressed = false; }
-            }
-
             ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
             if (actionClip != null)
             {
@@ -937,11 +903,6 @@ namespace Vi.Core
 
         void OnReload()
         {
-            if (playerInput)
-            {
-                if (!playerInput.actions.FindAction("Reload").enabled) { return; }
-            }
-
             if (IsServer)
             {
                 ReloadOnServer();
