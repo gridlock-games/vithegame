@@ -314,7 +314,7 @@ namespace Vi.ArtificialIntelligence
         {
             while (true)
             {
-                if (IsOwner & !disableBots)
+                if (IsOwner)
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
 
@@ -327,29 +327,32 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    if (targetAttributes)
+                    if (!disableBots)
                     {
-                        if (navMeshAgent.isOnNavMesh)
+                        if (targetAttributes)
                         {
-                            if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
-                        }
-                    }
-                    else
-                    {
-                        if (navMeshAgent.isOnNavMesh)
-                        {
-                            if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance)
+                            if (navMeshAgent.isOnNavMesh)
                             {
-                                float walkRadius = 500;
-                                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                                randomDirection += transform.position;
-                                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                                navMeshAgent.destination = hit.position;
+                                if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetAttributes.transform.position.x, targetAttributes.transform.position.z)) { navMeshAgent.destination = targetAttributes.transform.position; }
                             }
                         }
-                    }
+                        else
+                        {
+                            if (navMeshAgent.isOnNavMesh)
+                            {
+                                if (Vector3.Distance(navMeshAgent.destination, transform.position) <= navMeshAgent.stoppingDistance)
+                                {
+                                    float walkRadius = 500;
+                                    Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                                    randomDirection += transform.position;
+                                    NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                                    navMeshAgent.destination = hit.position;
+                                }
+                            }
+                        }
 
-                    EvaluteAction();
+                        EvaluteAction();
+                    }
                 }
                 else if (disableBots)
                 {
