@@ -13,6 +13,8 @@ namespace Vi.UI
     [SerializeField] private GameObject oldControlsUI;
     private int currentSelection;
 
+    [SerializeField] private UIModificationMenu UIModificationMenu;
+
     public void Awake()
     {
       //Clean up current set
@@ -46,6 +48,13 @@ namespace Vi.UI
       Destroy(this.gameObject);
     }
 
+    public void OpenUIModificationMenu()
+    {
+      GameObject _settings = Instantiate(UIModificationMenu.gameObject);
+      _settings.GetComponent<Menu>().SetLastMenu(gameObject);
+      childMenu = _settings;
+      gameObject.SetActive(false);
+    }
     public void OpenOldControlUI()
     {
       Instantiate(oldControlsUI);
