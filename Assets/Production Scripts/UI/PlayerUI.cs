@@ -26,6 +26,12 @@ namespace Vi.UI
 
         public Image GetHeavyAttackButton() { return heavyAttackButton; }
 
+        private bool shouldFadeToBlack;
+        private float fadeToBlackSpeed = 8;
+        public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
+
+        public Color GetFadeToBlackColor() { return fadeToBlackImage.color; }
+
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
@@ -349,8 +355,16 @@ namespace Vi.UI
                     }
                 }
 
-                fadeToBlackImage.color = Color.clear;
-                fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                if (shouldFadeToBlack)
+                {
+                    fadeToBlackImage.color = Color.Lerp(fadeToBlackImage.color, Color.black, Time.deltaTime * fadeToBlackSpeed);
+                    fadeToWhiteImage.color = fadeToBlackImage.color;
+                }
+                else
+                {
+                    fadeToBlackImage.color = Color.clear;
+                    fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                }
             }
             else
             {
