@@ -3,21 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Player;
 using Vi.Utility;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
     public class TutorialManager : MonoBehaviour
     {
+        [SerializeField] private Canvas tutorialCanvas;
         [SerializeField] private Text overlayText;
         [SerializeField] private Text timerText;
         [SerializeField] private Image[] overlayImages;
         [SerializeField] private Image objectiveCompleteImage;
         [SerializeField] private HorizontalLayoutGroup imagesLayoutGroup;
+        [SerializeField] private CanvasGroup mainGroup;
+        [SerializeField] private Text[] endingMessages;
 
         PlayerInput playerInput;
-        MovementHandler movementHandler;
+        PlayerMovementHandler playerMovementHandler;
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimationHandler animationHandler;
@@ -30,7 +35,7 @@ namespace Vi.UI
             if (localPlayer)
             {
                 playerInput = localPlayer.GetComponent<PlayerInput>();
-                movementHandler = localPlayer.GetComponent<MovementHandler>();
+                playerMovementHandler = localPlayer.GetComponent<PlayerMovementHandler>();
                 attributes = localPlayer;
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
@@ -45,7 +50,6 @@ namespace Vi.UI
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-            DisplayNextAction();
 
             foreach (Image image in overlayImages)
             {
@@ -55,6 +59,17 @@ namespace Vi.UI
 
             layoutGroupRT = (RectTransform)imagesLayoutGroup.transform;
             originalAnchoredPosition = layoutGroupRT.anchoredPosition;
+
+            objectiveCompleteImage.color = new Color(1, 1, 1, 0);
+
+            StartCoroutine(DisplayNextActionAfterPlayerInputFound());
+        }
+
+        private IEnumerator DisplayNextActionAfterPlayerInputFound()
+        {
+            yield return new WaitUntil(() => playerInput);
+            yield return null;
+            StartCoroutine(DisplayNextAction());
         }
 
         private const float animationSpeed = 100;
@@ -65,36 +80,39 @@ namespace Vi.UI
         private float directionMultiplier = -1;
 
         private int currentActionIndex = -1;
-        private void DisplayNextAction()
+
+        private const float fadeToBlackSpeed = 3;
+        private const float colorDistance = 0.001f;
+
+        private IEnumerator DisplayNextAction()
         {
             currentActionIndex += 1;
 
+            currentOverlaySprites.Clear();
+            currentOverlayMessage = "";
+
+            shouldLockCameraOnBot = false;
             shouldAnimatePosition = false;
-            canProceed = false;
             timerEnabled = false;
-            actionChangeTime = Time.time;
+
+            canProceed = false;
+            canProceedCondition1 = false;
+
+            onTaskCompleteBufferDuration = 3;
+            checkmarkDuration = 1;
+            bufferDurationBetweenActions = 3;
+
+            onTaskCompleteStartTime = Mathf.NegativeInfinity;
+            checkmarkStartTime = Mathf.NegativeInfinity;
+            bufferStartTime = Mathf.NegativeInfinity;
+
+            Time.timeScale = 1;
 
             if (locationPingInstance) { Destroy(locationPingInstance); }
 
             foreach (GameObject instance in UIElementHighlightInstances)
             {
                 Destroy(instance);
-            }
-
-            StartCoroutine(EvaluateAfterPlayerInputFound());
-        }
-
-        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
-        private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
-        [SerializeField] private GameObject locationPingPrefab;
-        private GameObject locationPingInstance;
-
-        private IEnumerator EvaluateAfterPlayerInputFound()
-        {
-            if (!playerInput)
-            {
-                yield return new WaitUntil(() => playerInput);
-                yield return null;
             }
 
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
@@ -130,15 +148,19 @@ namespace Vi.UI
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Attack")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("LightAttack")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
             }
             else if (currentActionIndex == 3) // Combo
             {
+                onTaskCompleteBufferDuration = 2;
+
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites.AddRange(result.sprites);
+                currentOverlaySprites.AddRange(result.sprites);
+                currentOverlaySprites.AddRange(result.sprites);
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
@@ -146,32 +168,66 @@ namespace Vi.UI
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetHeavyAttackButton().transform, true));
             }
-            else if (currentActionIndex == 4) // Ability
+            else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
-                currentOverlaySprites.Clear();
+                shouldLockCameraOnBot = true;
 
-                currentOverlayMessage = "Use An Ability.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Ability")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
+                yield return new WaitForSeconds(2);
+
+                currentOverlayMessage = "Use An Ability.";
+                List<string> abilityNames = new List<string>() { "Ability1", "Ability2", "Ability3" };
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    abilityCard.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                    UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                    abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
+                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
             }
-            else if (currentActionIndex == 5) // Block
+            else if (currentActionIndex == 5) // Ability 4
+            {
+                shouldLockCameraOnBot = true;
+
+                currentOverlayMessage = "Use Your Ultimate Ability.";
+                List<string> abilityNames = new List<string>() { "Ability4" };
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    else { playerInput.actions.FindAction(action.name).Disable(); }
+                }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
+                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                }
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+            }
+            else if (currentActionIndex == 6) // Block
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
                 currentOverlaySprites = result.sprites;
-
+                
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Block")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Block") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
@@ -180,70 +236,133 @@ namespace Vi.UI
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
-            else if (currentActionIndex == 6) // Dodge
+            else if (currentActionIndex == 7) // Dodge
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
                 currentOverlaySprites = result.sprites;
 
                 currentOverlayMessage = "Dodge.";
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
-            else if (currentActionIndex == 7) // Player Card
+            else if (currentActionIndex == 8) // Player Card
             {
-                currentOverlaySprites.Clear();
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                botAttributes.ResetComboCounter();
+
+                foreach (InputAction action in playerInput.actions)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        attributes.ResetComboCounter();
-                    }
+                    playerInput.actions.FindAction(action.name).Disable();
                 }
 
                 currentOverlayMessage = "Player Card.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
+                bufferDurationBetweenActions = 3;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.SetAllPlayersMobility(false);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
-            else if (currentActionIndex == 8) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
-                transitionTime = 5;
+                onTaskCompleteBufferDuration = 5;
+                checkmarkDuration = 0;
+                bufferDurationBetweenActions = 0;
 
                 timerEnabled = true;
-                currentOverlaySprites.Clear();
                 currentOverlayMessage = "Prepare To Fight!";
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Enable();
                 }
 
-                playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
-
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-                PlayerDataManager.Singleton.RespawnAllPlayers();
             }
-            else if (currentActionIndex == 9) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
-                transitionTime = 3;
+                onTaskCompleteBufferDuration = 1;
+                checkmarkDuration = 1;
+                bufferDurationBetweenActions = 0;
 
-                currentOverlaySprites.Clear();
+                PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
-            else if (currentActionIndex == 10) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
-                currentOverlaySprites.Clear();
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                currentOverlayMessage = "ENEMY KNOCKED OUT.";
+
+                bufferDurationBetweenActions = 3;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
+                // Set messages active here
+                while (mainGroup.alpha > colorDistance)
+                {
+                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageLerpSpeed);
+                    yield return null;
+                }
+                mainGroup.alpha = 0;
+
+                foreach (Text endingMessage in endingMessages)
+                {
+                    endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
+                    endingMessage.gameObject.SetActive(true);
+
+                    float elapsedTime = 0;
+                    while (elapsedTime < endingMessageDisplayDuration)
+                    {
+                        yield return null;
+                        elapsedTime += Time.deltaTime;
+                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageLerpSpeed);
+                    }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < endingMessageDisplayDuration)
+                    {
+                        yield return null;
+                        elapsedTime += Time.deltaTime;
+                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageLerpSpeed);
+                    }
+                    endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
+                }
+
                 FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
-                currentOverlayMessage = "MATCH COMPLETE.";
+
+                yield return new WaitForSeconds(2);
+
+                // Return to char select
+                PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharSelect());
             }
             else
             {
@@ -251,45 +370,130 @@ namespace Vi.UI
             }
         }
 
+        private IEnumerator ReturnToCharSelect()
+        {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.wasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+            NetSceneManager.Singleton.LoadScene("Character Select");
+        }
+
+        private const float endingMessageLerpSpeed = 2;
+        private const float endingMessageDisplayDuration = 2;
+
+        [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
+        private List<GameObject> UIElementHighlightInstances = new List<GameObject>();
+        [SerializeField] private GameObject locationPingPrefab;
+        private GameObject locationPingInstance;
+
         private void OnDestroy()
         {
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            Time.timeScale = 1;
         }
 
         private string currentOverlayMessage;
-        private List<Sprite> currentOverlaySprites;
+        private List<Sprite> currentOverlaySprites = new List<Sprite>();
+
+        private bool shouldLockCameraOnBot;
         private bool shouldAnimatePosition;
+        private bool timerEnabled;
 
         private bool lastCanProceed;
-        private bool timerEnabled;
+        private bool lastIsInBufferTime;
+
+        private Attributes botAttributes;
+
+        private void FindBotAttributes()
+        {
+            if (botAttributes) { return; }
+            if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
+                botAttributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
+            }
+        }
 
         private void Update()
         {
-            timerText.text = timerEnabled ? (transitionTime - (Time.time - actionChangeTime)).ToString("F2") : "";
+            tutorialCanvas.enabled = currentActionIndex > -1;
 
-            if (canProceed & !lastCanProceed) { actionChangeTime = Time.time; }
-            lastCanProceed = canProceed;
+            FindPlayerInput();
+            FindBotAttributes();
+
+            if (IsTaskComplete())
+            {
+                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+
+                overlayText.text = currentOverlayMessage;
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
+            else if (ShouldCheckmarkBeDisplayed())
+            {
+                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+
+                overlayText.text = currentOverlayMessage;
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+            }
+            else if (IsInBufferTime())
+            {
+                overlayText.text = "";
+                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = null;
+                }
+            }
+            else if (lastIsInBufferTime & canProceed)
+            {
+                StartCoroutine(DisplayNextAction());
+            }
+            else
+            {
+                CheckTutorialActionStatus();
+                overlayText.text = currentOverlayMessage;
+
+                for (int i = 0; i < overlayImages.Length; i++)
+                {
+                    overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
 
             foreach (Image image in overlayImages)
             {
                 image.gameObject.SetActive(image.sprite);
             }
 
-            FindPlayerInput();
-            CheckTutorialActionStatus();
+            float timerTextNum = (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime));
+            timerText.text = timerEnabled & timerTextNum >= 0 ? timerTextNum.ToString("F0") : "";
 
-            objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, canProceed ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
-
-            if (!playerInput) { return; }
-            if (string.IsNullOrWhiteSpace(playerInput.currentControlScheme)) { return; }
-
-            overlayText.text = currentOverlayMessage;
-
-            for (int i = 0; i < overlayImages.Length; i++)
+            if (canProceed & !lastCanProceed)
             {
-                overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                Time.timeScale = 1;
+                onTaskCompleteStartTime = Time.time;
+                checkmarkStartTime = Time.time + onTaskCompleteBufferDuration;
+                bufferStartTime = Time.time + onTaskCompleteBufferDuration + checkmarkDuration;
             }
+
+            lastIsInBufferTime = IsInBufferTime();
+            lastCanProceed = canProceed;
 
             if (shouldAnimatePosition)
             {
@@ -304,159 +508,130 @@ namespace Vi.UI
             {
                 layoutGroupRT.anchoredPosition = originalAnchoredPosition;
             }
+
+            if (shouldLockCameraOnBot)
+            {
+                if (botAttributes & playerMovementHandler)
+                {
+                    playerMovementHandler.LockOnTarget(botAttributes.transform);
+                }
+            }
+            else if (playerMovementHandler)
+            {
+                playerMovementHandler.LockOnTarget(null);
+            }
         }
 
-        private float transitionTime = 3;
+        private bool IsTaskComplete() { return Time.time - onTaskCompleteStartTime <= onTaskCompleteBufferDuration; }
+        private bool ShouldCheckmarkBeDisplayed() { return Time.time - checkmarkStartTime <= checkmarkDuration; }
+        private bool IsInBufferTime() { return Time.time - bufferStartTime <= bufferDurationBetweenActions; }
+
+        private float onTaskCompleteBufferDuration = 3;
+        private float checkmarkDuration = 1;
+        private float bufferDurationBetweenActions = 3;
+
+        private float onTaskCompleteStartTime = Mathf.NegativeInfinity;
+        private float checkmarkStartTime = Mathf.NegativeInfinity;
+        private float bufferStartTime = Mathf.NegativeInfinity;
 
         private bool canProceed;
-        private float actionChangeTime;
+        private bool canProceedCondition1;
         private void CheckTutorialActionStatus()
         {
-            if (currentActionIndex == 0) // Look
+            if (currentActionIndex == -1)
+            {
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
+                {
+                    if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
+                }
+                return;
+            }
+            else if (currentActionIndex == 0) // Look
             {
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
                 {
                     if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
                 }
 
-                if (movementHandler)
+                if (playerMovementHandler)
                 {
-                    if (canProceed)
-                    {
-                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                    }
-                    canProceed = movementHandler.GetLookInput() != Vector2.zero | canProceed;
+                    canProceed = playerMovementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }
             else if (currentActionIndex == 1) // Move
             {
                 if (locationPingInstance)
                 {
-                    if (canProceed)
-                    {
-                        if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                    }
                     canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
                 }
                 else
                 {
-                    if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                    if (botAttributes)
                     {
-                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                        Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                        if (attributes)
-                        {
-                            locationPingInstance = Instantiate(locationPingPrefab, attributes.transform.position + attributes.transform.forward, attributes.transform.rotation);
-                        }
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward, botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }
             else if (currentActionIndex == 2) // Attack
             {
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                }
                 canProceed = attributes.GetComboCounter() > 0 | canProceed;
             }
             else if (currentActionIndex == 3) // Combo
             {
-                if (canProceed)
+                if (botAttributes)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
+                    canProceed = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | canProceed;
                 }
-                canProceed = attributes.GetComboCounter() > 1 | canProceed;
             }
             else if (currentActionIndex == 4) // Ability
             {
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                }
-                canProceed = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceed;
+                canProceedCondition1 = weaponHandler.CurrentActionClip.name.Contains("Ability") | canProceedCondition1;
+                canProceed = (canProceedCondition1 & !animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip)) | canProceed;
             }
-            else if (currentActionIndex == 5) // Block
+            else if (currentActionIndex == 5) // Ultimate Ability
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                canProceedCondition1 = weaponHandler.CurrentActionClip.name == "Ability4" | canProceedCondition1;
+                canProceed = (canProceedCondition1 & !animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip)) | canProceed;
+            }
+            else if (currentActionIndex == 6) // Block
+            {
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
-                    }
-                }
-
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
-            else if (currentActionIndex == 6) // Dodge
+            else if (currentActionIndex == 7) // Dodge
             {
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
-                    }
-                }
-
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > transitionTime) { Time.timeScale = 1; DisplayNextAction(); return; }
+                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
-            else if (currentActionIndex == 7) // Player Card
+            else if (currentActionIndex == 8) // Player Card
             {
-                if (canProceed)
+                if (botAttributes)
                 {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                }
-
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
-                {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                        canProceed = attributes.GetComboCounter() > 0 | canProceed;
-                    }
+                    canProceed = botAttributes.GetComboCounter() > 0 | canProceed;
                 }
             }
-            else if (currentActionIndex == 8) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
-                if (canProceed)
-                {
-                    if (Time.time - actionChangeTime > transitionTime) { DisplayNextAction(); return; }
-                }
                 canProceed = true;
             }
-            else if (currentActionIndex == 9) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
                 bool botIsDead = false;
-                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => item.id < 0))
+                if (botAttributes)
                 {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Find(item => item.id < 0);
-                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerData.id);
-                    if (attributes)
-                    {
-                        botIsDead = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
-                        WeaponHandler weaponHandler = attributes.GetComponent<WeaponHandler>();
-                    }
+                    botIsDead = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death;
                 }
-
-                if (canProceed) { DisplayNextAction(); return; }
-                canProceed = attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death | botIsDead | canProceed;
+                canProceed = botIsDead | canProceed;
             }
-            else if (currentActionIndex == 10) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
 
             }

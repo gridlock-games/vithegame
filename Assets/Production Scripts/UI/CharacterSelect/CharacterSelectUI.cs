@@ -420,14 +420,14 @@ namespace Vi.UI
         {
             bool tutorialInProgress = bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress"));
 
-            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate & !tutorialInProgress;
+            selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & (WebRequestManager.Singleton.GameIsUpToDate | tutorialInProgress);
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             if (tutorialInProgress)
             {
-                if (goToTrainingRoomButton.interactable)
+                if (selectCharacterButton.interactable)
                 {
-                    CreateUIElementHighlight((RectTransform)goToTrainingRoomButton.transform);
+                    CreateUIElementHighlight((RectTransform)selectCharacterButton.transform);
                 }
             }
 
@@ -856,6 +856,11 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", true.ToString());
 
             CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+
+            selectCharacterButton.onClick.RemoveAllListeners();
+            selectCharacterButton.onClick.AddListener(() => GoToTrainingRoom());
+
+            goToTrainingRoomButton.gameObject.SetActive(false);
         }
 
         public void SkipTutorial()
