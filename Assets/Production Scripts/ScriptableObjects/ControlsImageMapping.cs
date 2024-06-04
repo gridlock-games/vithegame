@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Linq;
+using UnityEditor;
+using System.Text;
 
 namespace Vi.ScriptableObjects
 {
@@ -13,10 +15,11 @@ namespace Vi.ScriptableObjects
 
         public ActionSpriteResult GetActionSprite(InputControlScheme controlScheme, InputAction[] actions)
         {
-            List<string> possiblePathList = new List<string>();
-
-            List<Sprite> spriteList = new List<Sprite>();
-            List<string> pathList = new List<string>();
+            List<string> inputPathList = new List<string>();
+            List<string> displayPathList = new List<string>();
+            List<string> shortDisplayPathList = new List<string>();
+            List<Sprite> pressedSpriteList = new List<Sprite>();
+            List<Sprite> releasedSpriteList = new List<Sprite>();
 
             foreach (InputAction action in actions)
             {
@@ -30,43 +33,102 @@ namespace Vi.ScriptableObjects
                         var ele = controlsImageElements.Find(item => item.inputPath == binding.effectivePath);
                         if (ele != null)
                         {
-                            if (!pathList.Contains(ele.inputPath))
+                            if (!inputPathList.Contains(ele.inputPath))
                             {
-                                pathList.Add(ele.inputPath);
-                                spriteList.Add(ele.sprite);
+                                inputPathList.Add(ele.inputPath);
+                                displayPathList.Add(ele.displayName);
+                                shortDisplayPathList.Add(ele.shortDisplayName);
+                                pressedSpriteList.Add(ele.pressedSprite);
+                                releasedSpriteList.Add(ele.releasedSprite);
                             }
                         }
-                        possiblePathList.Add(binding.effectivePath);
                     }
                 }
             }
             
-            if (pathList.Count == 0) { Debug.LogError("Could not find control image element"); }
-            foreach (string path in possiblePathList)
-            {
-                Debug.Log(path);
-            }
+            if (inputPathList.Count == 0) { Debug.LogError("Could not find control image element"); }
 
-            return new ActionSpriteResult(pathList, spriteList);
+            return new ActionSpriteResult(inputPathList, displayPathList, shortDisplayPathList, pressedSpriteList, releasedSpriteList);
         }
 
         public class ActionSpriteResult
         {
-            public List<string> effectivePaths;
-            public List<Sprite> sprites;
+            public List<string> inputPaths;
+            public List<string> displayPaths;
+            public List<string> shortDisplayPaths;
+            public List<Sprite> pressedSprites;
+            public List<Sprite> releasedSprites;
 
-            public ActionSpriteResult(List<string> effectivePaths, List<Sprite> sprites)
+            public ActionSpriteResult(List<string> inputPaths, List<string> displayPaths, List<string> shortDisplayPaths, List<Sprite> pressedSprites, List<Sprite> releasedSprites)
             {
-                this.effectivePaths = effectivePaths;
-                this.sprites = sprites;
+                this.inputPaths = inputPaths;
+                this.displayPaths = displayPaths;
+                this.shortDisplayPaths = shortDisplayPaths;
+                this.pressedSprites = pressedSprites;
+                this.releasedSprites = releasedSprites;
             }
         }
 
         [System.Serializable]
-        private class ControlsImageElement
+        private class ControlsImageElement : System.IEquatable<ControlsImageElement>
         {
             public string inputPath;
-            public Sprite sprite;
+            public string displayName;
+            public string shortDisplayName;
+            public Sprite pressedSprite;
+            public Sprite releasedSprite;
+
+            public ControlsImageElement(string inputPath, string displayName, string shortDisplayName)
+            {
+                this.inputPath = inputPath;
+                this.displayName = displayName;
+                this.shortDisplayName = shortDisplayName;
+            }
+
+            public bool Equals(ControlsImageElement other)
+            {
+                return inputPath == other.inputPath;
+            }
         }
+
+        #if UNITY_EDITOR
+        [ContextMenu("Set Dirty")]
+        private void SetDirtyAtWill()
+        {
+            EditorUtility.SetDirty(this);
+        }
+
+        [ContextMenu("Add Missing Paths")]
+        private void AddMissingPaths()
+        {
+            foreach (InputDevice device in InputSystem.devices.ToArray())
+            {
+                foreach (InputControl control in device.allControls)
+                {
+                    try
+                    {
+                        string finalPath = control.path;
+
+                        StringBuilder sb = new StringBuilder(finalPath);
+                        sb[finalPath.IndexOf('/')] = '<';
+                        finalPath = sb.ToString();
+
+                        sb = new StringBuilder(finalPath);
+                        int index = finalPath.IndexOf('/');
+                        sb[index] = '>';
+                        finalPath = sb.ToString();
+                        finalPath = finalPath.Insert(index+1, "/");
+
+                        ControlsImageElement ele = new ControlsImageElement(finalPath, control.displayName, control.shortDisplayName);
+                        if (!controlsImageElements.Exists(item => item.Equals(ele))) { controlsImageElements.Add(ele); }
+                    }
+                    catch
+                    {
+                        Debug.Log("Error during " + device.name + " - " + control.path);
+                    }
+                }
+            }
+        }
+        #endif
     }
 }

@@ -13,21 +13,893 @@ MonoBehaviour:
   m_Name: ControlsImageMapping
   m_EditorClassIdentifier: 
   controlsImageElements:
-  - inputPath: <Mouse>/delta
-    sprite: {fileID: 21300000, guid: 0e53bba5e2c4de3468eeef74d58dbfe9, type: 3}
-  - inputPath: <Mouse>/leftButton
-    sprite: {fileID: 21300000, guid: 3796b6bb0912c904f9e835d0a221317f, type: 3}
-  - inputPath: <Mouse>/rightButton
-    sprite: {fileID: 21300000, guid: b405491bd79fd8f44a5ff1b99a0c4949, type: 3}
-  - inputPath: <Keyboard>/w
-    sprite: {fileID: 21300000, guid: ee445bce443673344af865dd06e03066, type: 3}
-  - inputPath: <Keyboard>/s
-    sprite: {fileID: 21300000, guid: a76982c6e37a167448e7398d81cd2e28, type: 3}
-  - inputPath: <Keyboard>/a
-    sprite: {fileID: 21300000, guid: 46ea2fefca64ab94ca3cc51677ca884f, type: 3}
-  - inputPath: <Keyboard>/d
-    sprite: {fileID: 21300000, guid: ff85c73ea6c47a6498ad65d7bf91af02, type: 3}
-  - inputPath: <Keyboard>/leftShift
-    sprite: {fileID: 21300000, guid: 8235c5d3a65dd9c42ab87f399ab0da97, type: 3}
+  - inputPath: <Keyboard>/anyKey
+    displayName: Any Key
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 95bf1c49d938af84da32bce172ea5c2f, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 33cdb555faadadf49b2e59a8ce6fbc78, type: 3}
+  - inputPath: <Keyboard>/escape
+    displayName: Esc
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
   - inputPath: <Keyboard>/space
-    sprite: {fileID: 21300000, guid: 33cdb555faadadf49b2e59a8ce6fbc78, type: 3}
+    displayName: Space
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 95bf1c49d938af84da32bce172ea5c2f, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 33cdb555faadadf49b2e59a8ce6fbc78, type: 3}
+  - inputPath: <Keyboard>/enter
+    displayName: Enter
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/tab
+    displayName: Tab
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/backquote
+    displayName: '`'
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/quote
+    displayName: ''''
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/semicolon
+    displayName: ;
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/comma
+    displayName: ','
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/period
+    displayName: .
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/slash
+    displayName: /
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/backslash
+    displayName: \
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftBracket
+    displayName: '['
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/rightBracket
+    displayName: ']'
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/minus
+    displayName: '-'
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/equals
+    displayName: =
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/upArrow
+    displayName: Up
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/downArrow
+    displayName: Down
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftArrow
+    displayName: Left
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/rightArrow
+    displayName: Right
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/a
+    displayName: A
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 0d5c7c201171a1f4cb15a6979a9ec9a5, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 46ea2fefca64ab94ca3cc51677ca884f, type: 3}
+  - inputPath: <Keyboard>/b
+    displayName: B
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/c
+    displayName: C
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/d
+    displayName: D
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 53febf1fae935e44bbd8115508aa85bd, type: 3}
+    releasedSprite: {fileID: 21300000, guid: ff85c73ea6c47a6498ad65d7bf91af02, type: 3}
+  - inputPath: <Keyboard>/e
+    displayName: E
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 8aacf816f7e1cea488c319af5a582a47, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 47881e9985ad3904babacbaff44cb3bb, type: 3}
+  - inputPath: <Keyboard>/f
+    displayName: F
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 825bf68d3ee125044907abebeb83cb20, type: 3}
+    releasedSprite: {fileID: 21300000, guid: a69182fc5d4fe7744bf8249eae6cc74c, type: 3}
+  - inputPath: <Keyboard>/g
+    displayName: G
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/h
+    displayName: H
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/i
+    displayName: I
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/j
+    displayName: J
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/k
+    displayName: K
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/l
+    displayName: L
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/m
+    displayName: M
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/n
+    displayName: N
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/o
+    displayName: O
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/p
+    displayName: P
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/q
+    displayName: Q
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 49f6ca275f2f9da4e9c8f97f45433968, type: 3}
+    releasedSprite: {fileID: 21300000, guid: bd14cf5f54e1b874da14f5148c36c38d, type: 3}
+  - inputPath: <Keyboard>/r
+    displayName: R
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/s
+    displayName: S
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 2bb2d7f102243c943840248f6ba5829c, type: 3}
+    releasedSprite: {fileID: 21300000, guid: a76982c6e37a167448e7398d81cd2e28, type: 3}
+  - inputPath: <Keyboard>/t
+    displayName: T
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/u
+    displayName: U
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/v
+    displayName: V
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 2ccfd78d823d74848a73361025b01d47, type: 3}
+    releasedSprite: {fileID: 21300000, guid: cc8ada2db3c2dfe4fa1c049219063f38, type: 3}
+  - inputPath: <Keyboard>/w
+    displayName: W
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 44f0cefcbdb99084e85896e078a28230, type: 3}
+    releasedSprite: {fileID: 21300000, guid: ee445bce443673344af865dd06e03066, type: 3}
+  - inputPath: <Keyboard>/x
+    displayName: X
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/y
+    displayName: Y
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/z
+    displayName: Z
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/1
+    displayName: 1
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/2
+    displayName: 2
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/3
+    displayName: 3
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/4
+    displayName: 4
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/5
+    displayName: 5
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/6
+    displayName: 6
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/7
+    displayName: 7
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/8
+    displayName: 8
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/9
+    displayName: 9
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/0
+    displayName: 0
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftShift
+    displayName: Shift
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: a819a9532ff63494e8b025a5936f218a, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 8235c5d3a65dd9c42ab87f399ab0da97, type: 3}
+  - inputPath: <Keyboard>/rightShift
+    displayName: Right Shift
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/shift
+    displayName: Shift
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftAlt
+    displayName: Alt
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/rightAlt
+    displayName: Right Alt
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/alt
+    displayName: Alt
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftCtrl
+    displayName: Ctrl
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/rightCtrl
+    displayName: Right Ctrl
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/ctrl
+    displayName: Control
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/leftMeta
+    displayName: Left Windows
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/rightMeta
+    displayName: Right Windows
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/contextMenu
+    displayName: Application
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/backspace
+    displayName: Backspace
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/pageDown
+    displayName: Page Down
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/pageUp
+    displayName: Page Up
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/home
+    displayName: Home
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/end
+    displayName: End
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/insert
+    displayName: Insert
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/delete
+    displayName: Delete
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/capsLock
+    displayName: Caps Lock
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numLock
+    displayName: Num Lock
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/printScreen
+    displayName: Prnt Scrn
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/scrollLock
+    displayName: Scroll Lock
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/pause
+    displayName: Break
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadEnter
+    displayName: Num Enter
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadDivide
+    displayName: Num /
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadMultiply
+    displayName: '*'
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadPlus
+    displayName: +
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadMinus
+    displayName: '-'
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadPeriod
+    displayName: Num Del
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpadEquals
+    displayName: Num 5
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad1
+    displayName: Num 1
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad2
+    displayName: Num 2
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad3
+    displayName: Num 3
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad4
+    displayName: Num 4
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad5
+    displayName: Num 5
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad6
+    displayName: Num 6
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad7
+    displayName: Num 7
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad8
+    displayName: Num 8
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad9
+    displayName: Num 9
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/numpad0
+    displayName: Num 0
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f1
+    displayName: F1
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f2
+    displayName: F2
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f3
+    displayName: F3
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f4
+    displayName: F4
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f5
+    displayName: F5
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f6
+    displayName: F6
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f7
+    displayName: F7
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f8
+    displayName: F8
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f9
+    displayName: F9
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f10
+    displayName: F10
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f11
+    displayName: F11
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/f12
+    displayName: F12
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/OEM1
+    displayName: \
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/OEM2
+    displayName: OEM2
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/OEM3
+    displayName: OEM3
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/OEM4
+    displayName: OEM4
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/OEM5
+    displayName: OEM5
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Keyboard>/IMESelected
+    displayName: IMESelected
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/position
+    displayName: Position
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta
+    displayName: Delta
+    shortDisplayName: 
+    pressedSprite: {fileID: 21300000, guid: 0e53bba5e2c4de3468eeef74d58dbfe9, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 0e53bba5e2c4de3468eeef74d58dbfe9, type: 3}
+  - inputPath: <Mouse>/scroll
+    displayName: Scroll
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/press
+    displayName: Press
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/leftButton
+    displayName: Left Button
+    shortDisplayName: LMB
+    pressedSprite: {fileID: 21300000, guid: 3796b6bb0912c904f9e835d0a221317f, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 0e53bba5e2c4de3468eeef74d58dbfe9, type: 3}
+  - inputPath: <Mouse>/rightButton
+    displayName: Right Button
+    shortDisplayName: RMB
+    pressedSprite: {fileID: 21300000, guid: b405491bd79fd8f44a5ff1b99a0c4949, type: 3}
+    releasedSprite: {fileID: 21300000, guid: 0e53bba5e2c4de3468eeef74d58dbfe9, type: 3}
+  - inputPath: <Mouse>/middleButton
+    displayName: Middle Button
+    shortDisplayName: MMB
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/forwardButton
+    displayName: Forward
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/backButton
+    displayName: Back
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/pressure
+    displayName: Pressure
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/radius
+    displayName: Radius
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/pointerId
+    displayName: pointerId
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/displayIndex
+    displayName: Display Index
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/clickCount
+    displayName: Click Count
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/position/x
+    displayName: Position X
+    shortDisplayName: Position X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/position/y
+    displayName: Position Y
+    shortDisplayName: Position Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/up
+    displayName: Delta Up
+    shortDisplayName: Delta Up
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/down
+    displayName: Delta Down
+    shortDisplayName: Delta Down
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/left
+    displayName: Delta Left
+    shortDisplayName: Delta Left
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/right
+    displayName: Delta Right
+    shortDisplayName: Delta Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/x
+    displayName: Delta X
+    shortDisplayName: Delta X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/delta/y
+    displayName: Delta Y
+    shortDisplayName: Delta Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/up
+    displayName: Scroll Up
+    shortDisplayName: Scroll Up
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/down
+    displayName: Scroll Down
+    shortDisplayName: Scroll Down
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/left
+    displayName: Scroll Left
+    shortDisplayName: Scroll Left
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/right
+    displayName: Scroll Right
+    shortDisplayName: Scroll Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/x
+    displayName: Scroll Left/Right
+    shortDisplayName: Scroll Left/Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/scroll/y
+    displayName: Scroll Up/Down
+    shortDisplayName: Scroll Wheel
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/radius/x
+    displayName: Radius X
+    shortDisplayName: Radius X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <Mouse>/radius/y
+    displayName: Radius Y
+    shortDisplayName: Radius Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad
+    displayName: D-Pad
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/start
+    displayName: Start
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/select
+    displayName: Select
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStickPress
+    displayName: Left Stick Press
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStickPress
+    displayName: Right Stick Press
+    shortDisplayName: 
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftShoulder
+    displayName: Left Bumper
+    shortDisplayName: LB
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightShoulder
+    displayName: Right Bumper
+    shortDisplayName: RB
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/buttonSouth
+    displayName: A
+    shortDisplayName: A
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/buttonEast
+    displayName: B
+    shortDisplayName: B
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/buttonWest
+    displayName: X
+    shortDisplayName: X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/buttonNorth
+    displayName: Y
+    shortDisplayName: Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftTrigger
+    displayName: Left Trigger
+    shortDisplayName: LT
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightTrigger
+    displayName: Right Trigger
+    shortDisplayName: RT
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick
+    displayName: Left Stick
+    shortDisplayName: LS
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick
+    displayName: Right Stick
+    shortDisplayName: RS
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/x
+    displayName: D-Pad X
+    shortDisplayName: D-Pad X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/y
+    displayName: D-Pad Y
+    shortDisplayName: D-Pad Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/up
+    displayName: D-Pad Up
+    shortDisplayName: D-Pad Up
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/down
+    displayName: D-Pad Down
+    shortDisplayName: D-Pad Down
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/left
+    displayName: D-Pad Left
+    shortDisplayName: D-Pad Left
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/dpad/right
+    displayName: D-Pad Right
+    shortDisplayName: D-Pad Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/up
+    displayName: Left Stick Up
+    shortDisplayName: LS Up
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/x
+    displayName: Left Stick X
+    shortDisplayName: LS X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/y
+    displayName: Left Stick Y
+    shortDisplayName: LS Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/down
+    displayName: Left Stick Down
+    shortDisplayName: LS Down
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/left
+    displayName: Left Stick Left
+    shortDisplayName: LS Left
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/leftStick/right
+    displayName: Left Stick Right
+    shortDisplayName: LS Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/up
+    displayName: Right Stick Up
+    shortDisplayName: RS Up
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/x
+    displayName: Right Stick X
+    shortDisplayName: RS X
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/y
+    displayName: Right Stick Y
+    shortDisplayName: RS Y
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/down
+    displayName: Right Stick Down
+    shortDisplayName: RS Down
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/left
+    displayName: Right Stick Left
+    shortDisplayName: RS Left
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}
+  - inputPath: <XInputControllerWindows>/rightStick/right
+    displayName: Right Stick Right
+    shortDisplayName: RS Right
+    pressedSprite: {fileID: 0}
+    releasedSprite: {fileID: 0}

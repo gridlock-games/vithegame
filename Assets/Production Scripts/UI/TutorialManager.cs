@@ -120,7 +120,7 @@ namespace Vi.UI
             {
                 shouldAnimatePosition = true;
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites = result.releasedSprites;
 
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
@@ -131,7 +131,7 @@ namespace Vi.UI
             else if (currentActionIndex == 1) // Move
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Move"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites = result.releasedSprites;
 
                 currentOverlayMessage = "Move To The Marked Location.";
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
@@ -143,7 +143,7 @@ namespace Vi.UI
             else if (currentActionIndex == 2) // Attack
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites = result.releasedSprites;
 
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
@@ -158,9 +158,9 @@ namespace Vi.UI
                 onTaskCompleteBufferDuration = 2;
 
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites.AddRange(result.sprites);
-                currentOverlaySprites.AddRange(result.sprites);
-                currentOverlaySprites.AddRange(result.sprites);
+                currentOverlaySprites.AddRange(result.releasedSprites);
+                currentOverlaySprites.AddRange(result.releasedSprites);
+                currentOverlaySprites.AddRange(result.releasedSprites);
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
@@ -221,7 +221,7 @@ namespace Vi.UI
             else if (currentActionIndex == 6) // Block
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites = result.releasedSprites;
                 
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -247,7 +247,7 @@ namespace Vi.UI
             else if (currentActionIndex == 7) // Dodge
             {
                 var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
-                currentOverlaySprites = result.sprites;
+                currentOverlaySprites = result.releasedSprites;
 
                 currentOverlayMessage = "Dodge.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
