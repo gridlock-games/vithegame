@@ -125,7 +125,7 @@ namespace Vi.UI
                 {
                     currentOverlaySprites = controlSchemeSpriteList;
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
                     currentOverlaySprites = result.pressedSprites;
@@ -146,7 +146,7 @@ namespace Vi.UI
                 {
                     currentOverlaySprites = controlSchemeSpriteList;
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Move"] });
                     currentOverlaySprites = result.releasedSprites;
@@ -166,7 +166,7 @@ namespace Vi.UI
                 {
                     currentOverlaySprites = controlSchemeSpriteList;
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
                     currentOverlaySprites = result.pressedSprites;
@@ -191,7 +191,7 @@ namespace Vi.UI
                     currentOverlaySprites.AddRange(controlSchemeSpriteList);
                     currentOverlaySprites.AddRange(controlSchemeSpriteList);
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
                     currentOverlaySprites.AddRange(result.pressedSprites);
@@ -261,7 +261,7 @@ namespace Vi.UI
                 {
                     currentOverlaySprites = controlSchemeSpriteList;
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
                     currentOverlaySprites = result.releasedSprites;
@@ -295,7 +295,7 @@ namespace Vi.UI
                 {
                     currentOverlaySprites = controlSchemeSpriteList;
                 }
-                else
+                else if (controlScheme.name != "Touchscreen")
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
                     currentOverlaySprites = result.releasedSprites;
