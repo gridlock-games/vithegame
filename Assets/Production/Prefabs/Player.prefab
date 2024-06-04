@@ -110,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1977550921
+  GlobalObjectIdHash: 891803348
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -135,7 +135,6 @@ MonoBehaviour:
   minimapCameraInstance: {fileID: 0}
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
-  collisionPushDampeningFactor: 1
   movementPredictionRigidbody: {fileID: 3111202478790198839}
   gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
   gravitySphereCastRadius: 0.6
@@ -283,7 +282,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1271
+    m_Bits: 3319
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

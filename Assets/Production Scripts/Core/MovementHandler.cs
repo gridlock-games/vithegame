@@ -14,7 +14,8 @@ namespace Vi.Core
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
 			"Default",
-			"Projectile"
+			"Projectile",
+			"ProjectileCollider"
 		};
 
         public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
