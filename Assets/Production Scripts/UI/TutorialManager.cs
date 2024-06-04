@@ -264,7 +264,7 @@ namespace Vi.UI
                 else
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
-                    currentOverlaySprites = result.pressedSprites;
+                    currentOverlaySprites = result.releasedSprites;
                 }
                 
                 currentOverlayMessage = "Block An Attack.";
@@ -298,7 +298,7 @@ namespace Vi.UI
                 else
                 {
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
-                    currentOverlaySprites = result.pressedSprites;
+                    currentOverlaySprites = result.releasedSprites;
                 }
 
                 currentOverlayMessage = "Dodge.";
