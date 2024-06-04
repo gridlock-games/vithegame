@@ -11,6 +11,18 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "ControlsImageMapping", menuName = "Production/Controls Image Mapping")]
     public class ControlsImageMapping : ScriptableObject
     {
+        [SerializeField] private List<ControlSchemeActionImage> controlSchemeActionImages;
+
+        public List<Sprite> GetControlSchemeActionImages(InputControlScheme controlScheme, InputAction action)
+        {
+            List<Sprite> spriteList = new List<Sprite>();
+            foreach (ControlSchemeActionImage controlSchemeActionImage in controlSchemeActionImages.FindAll(item => item.controlSchemeName == controlScheme.name & item.actionName == action.name))
+            {
+                spriteList.Add(controlSchemeActionImage.sprite);
+            }
+            return spriteList;
+        }
+
         [SerializeField] private List<ControlsImageElement> controlsImageElements;
 
         public ActionSpriteResult GetActionSprite(InputControlScheme controlScheme, InputAction[] actions)
@@ -91,7 +103,20 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        #if UNITY_EDITOR
+        [System.Serializable]
+        private class ControlSchemeActionImage : System.IEquatable<ControlSchemeActionImage>
+        {
+            public string controlSchemeName;
+            public string actionName;
+            public Sprite sprite;
+
+            public bool Equals(ControlSchemeActionImage other)
+            {
+                return false;
+            }
+        }
+
+#if UNITY_EDITOR
         [ContextMenu("Set Dirty")]
         private void SetDirtyAtWill()
         {

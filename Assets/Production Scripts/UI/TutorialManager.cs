@@ -119,9 +119,18 @@ namespace Vi.UI
             if (currentActionIndex == 0) // Look
             {
                 shouldAnimatePosition = true;
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
-                currentOverlaySprites = result.releasedSprites;
 
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Look"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
+                    currentOverlaySprites = result.pressedSprites;
+                }
+                
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -130,8 +139,16 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Move"] });
-                currentOverlaySprites = result.releasedSprites;
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Move"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Move"] });
+                    currentOverlaySprites = result.releasedSprites;
+                }
 
                 currentOverlayMessage = "Move To The Marked Location.";
                 PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
@@ -142,8 +159,16 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 2) // Attack
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites = result.releasedSprites;
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["LightAttack"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
+                    currentOverlaySprites = result.pressedSprites;
+                }
 
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
@@ -157,10 +182,20 @@ namespace Vi.UI
             {
                 onTaskCompleteBufferDuration = 2;
 
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
-                currentOverlaySprites.AddRange(result.releasedSprites);
-                currentOverlaySprites.AddRange(result.releasedSprites);
-                currentOverlaySprites.AddRange(result.releasedSprites);
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["LightAttack"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                    currentOverlaySprites.AddRange(controlSchemeSpriteList);
+                    currentOverlaySprites.AddRange(controlSchemeSpriteList);
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["LightAttack"] });
+                    currentOverlaySprites.AddRange(result.pressedSprites);
+                    currentOverlaySprites.AddRange(result.pressedSprites);
+                    currentOverlaySprites.AddRange(result.pressedSprites);
+                }
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 attributes.ResetComboCounter();
@@ -220,8 +255,16 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Block
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
-                currentOverlaySprites = result.releasedSprites;
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Block"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
+                    currentOverlaySprites = result.pressedSprites;
+                }
                 
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
@@ -246,8 +289,16 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Dodge
             {
-                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
-                currentOverlaySprites = result.releasedSprites;
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Dodge"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Dodge"] });
+                    currentOverlaySprites = result.pressedSprites;
+                }
 
                 currentOverlayMessage = "Dodge.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());

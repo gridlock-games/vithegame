@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2a8016dc9fd58148a8487b5d9597425, type: 3}
   m_Name: ControlsImageMapping
   m_EditorClassIdentifier: 
+  controlSchemeActionImages:
+  - controlSchemeName: Touchscreen
+    actionName: Look
+    sprite: {fileID: 21300000, guid: 627e1ca0e3717a24ba0ac17e91e7c814, type: 3}
   controlsImageElements:
   - inputPath: <Keyboard>/anyKey
     displayName: Any Key
