@@ -314,8 +314,6 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
-                Time.timeScale = 0.5f;
-
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
 
@@ -429,6 +427,8 @@ namespace Vi.UI
 
             if (IsTaskComplete())
             {
+                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
 
@@ -439,6 +439,8 @@ namespace Vi.UI
             }
             else if (ShouldCheckmarkBeDisplayed())
             {
+                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * animationSpeed);
 
