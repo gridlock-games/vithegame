@@ -607,8 +607,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 503530036592556090}
-        m_TargetAssemblyTypeName: SettingMenuController, Vi.UI
-        m_MethodName: CloseUI
+        m_TargetAssemblyTypeName: Vi.Core.Menu, Vi.Core
+        m_MethodName: GoBackToLastMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2749,6 +2749,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421411923506405751, guid: 6962f6c076dfc4a408453dd45e72d1d8,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6544733086748558199}
+    - target: {fileID: 8421411923506405751, guid: 6962f6c076dfc4a408453dd45e72d1d8,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8728884847211660846, guid: 6962f6c076dfc4a408453dd45e72d1d8,
         type: 3}
