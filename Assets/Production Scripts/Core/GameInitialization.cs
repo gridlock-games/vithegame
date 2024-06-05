@@ -62,6 +62,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
 
             if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetString("AutoAim", true.ToString()); }
 

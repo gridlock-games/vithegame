@@ -15,6 +15,18 @@ namespace Vi.UI
 
         public ActionClip Ability { get; private set; }
 
+        public void SetActive(bool isActive)
+        {
+            if (!canvas) { canvas = GetComponent<Canvas>(); }
+            canvas.enabled = isActive;
+        }
+
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
+
         public void SetPreviewOn()
         {
             if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
@@ -27,7 +39,7 @@ namespace Vi.UI
 
         public void UpdateCard(ActionClip ability, string keybindText)
         {
-            this.Ability = ability;
+            Ability = ability;
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;

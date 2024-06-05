@@ -16,6 +16,8 @@ namespace Vi.UI
     {
         public List<AbilityCard> GetAbilityCards() { return new List<AbilityCard>() { ability1, ability2, ability3, ability4 }; }
 
+        public Image GetHeavyAttackButton() { return heavyAttackButton; }
+
         public RectTransform GetBlockingButton() { return blockingButton; }
 
         public RectTransform GetDodgeButton() { return dodgeButton; }
@@ -23,6 +25,18 @@ namespace Vi.UI
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
         public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
+
+        public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
+
+        public RectTransform GetSwitchWeaponButton() { return switchWeaponButton; }
+
+        public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
+
+        public Button GetPauseMenuButton() { return pauseMenuButton; }
+
+        public Button GetLoadoutMenuButton() { return loadoutMenuButton; }
+
+        public Button GetScoreboardButton() { return scoreboardButton; }
 
         private bool shouldFadeToBlack;
         private float fadeToBlackSpeed = 8;
@@ -56,6 +70,8 @@ namespace Vi.UI
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
         [SerializeField] private CustomOnScreenStick moveJoystick;
+        [SerializeField] private Button pauseMenuButton;
+        [SerializeField] private Button loadoutMenuButton;
         [SerializeField] private Button scoreboardButton;
         [SerializeField] private Image heavyAttackButton;
         [SerializeField] private Sprite aimIcon;
@@ -63,6 +79,8 @@ namespace Vi.UI
         [SerializeField] private RectTransform blockingButton;
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private RectTransform lookJoystickCenter;
+        [SerializeField] private RectTransform switchWeaponButton;
+        [SerializeField] private RectTransform onScreenReloadButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -96,10 +114,7 @@ namespace Vi.UI
             weaponHandler.LightAttackHold(true);
         }
 
-        public void StopLightAttack()
-        {
-            weaponHandler.LightAttackHold(false);
-        }
+        public void StopLightAttack() { weaponHandler.LightAttackHold(false); }
 
         public void StartHeavyAttack()
         {
@@ -112,13 +127,58 @@ namespace Vi.UI
             weaponHandler.HeavyAttackHold(false);
         }
 
+        public void Ability1(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability1").enabled) { isPressed = false; }
+            weaponHandler.Ability1(isPressed);
+        }
+
+        public void Ability2(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability2").enabled) { isPressed = false; }
+            weaponHandler.Ability2(isPressed);
+        }
+
+        public void Ability3(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability3").enabled) { isPressed = false; }
+            weaponHandler.Ability3(isPressed);
+        }
+
+        public void Ability4(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability4").enabled) { isPressed = false; }
+            weaponHandler.Ability4(isPressed);
+        }
+
+        public void Reload()
+        {
+            if (!playerInput.actions.FindAction("Reload").enabled) { return; }
+            weaponHandler.Reload();
+        }
+
+        public void Dodge()
+        {
+            if (!playerInput.actions.FindAction("Dodge").enabled) { return; }
+            playerMovementHandler.OnDodge();
+        }
+
+        public void Block(bool isPressed) { weaponHandler.Block(isPressed); }
+
+        public void Rage() { attributes.OnActivateRage(); }
+
+        public void IncrementFollowPlayer() { playerMovementHandler.OnIncrementFollowPlayer(); }
+
+        public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
+        private PlayerMovementHandler playerMovementHandler;
 
-        private Canvas[] aliveUIChildCanvases;
-        private Canvas[] deathUIChildCanvases;
+        [SerializeField] private Canvas[] aliveUIChildCanvases;
+        [SerializeField] private Canvas[] deathUIChildCanvases;
 
         private void Awake()
         {
@@ -126,9 +186,7 @@ namespace Vi.UI
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
-
-            aliveUIChildCanvases = aliveUIParent.GetComponentsInChildren<Canvas>(true);
-            deathUIChildCanvases = deathUIParent.GetComponentsInChildren<Canvas>(true);
+            playerMovementHandler = weaponHandler.GetComponent<PlayerMovementHandler>();
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();

@@ -40,6 +40,27 @@ namespace Vi.UI
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
                 playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
+
+                foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
+                {
+                    weaponCard.SetActive(false);
+                }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.SetActive(false);
+                }
+
+                playerUI.GetSwitchWeaponButton().gameObject.SetActive(false);
+                playerUI.GetBlockingButton().gameObject.SetActive(false);
+                playerUI.GetDodgeButton().gameObject.SetActive(false);
+                playerUI.GetMainPlayerCard().gameObject.SetActive(false);
+                playerUI.GetOnScreenReloadButton().gameObject.SetActive(false);
+                playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+
+                playerUI.GetPauseMenuButton().gameObject.SetActive(false);
+                playerUI.GetScoreboardButton().gameObject.SetActive(false);
+                playerUI.GetLoadoutMenuButton().gameObject.SetActive(false);
             }
         }
 
@@ -50,6 +71,7 @@ namespace Vi.UI
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", true.ToString());
 
             foreach (Image image in overlayImages)
             {
@@ -141,6 +163,9 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 1) // Move
             {
+                onTaskCompleteBufferDuration = 0;
+                checkmarkDuration = 2;
+
                 List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Move"]);
                 if (controlSchemeSpriteList.Count > 0)
                 {
@@ -153,10 +178,17 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Move To The Marked Location.";
-                PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
+                PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor, true);
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
             }
             else if (currentActionIndex == 2) // Attack
@@ -175,10 +207,17 @@ namespace Vi.UI
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("LightAttack")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("LightAttack") | action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
+
+                yield return new WaitUntil(() => IsTaskComplete());
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
             }
             else if (currentActionIndex == 3) // Combo
             {
@@ -200,9 +239,20 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.name.Contains("LightAttack") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
                 attributes.ResetComboCounter();
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
+
+                yield return new WaitUntil(() => IsTaskComplete());
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -225,8 +275,9 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
+                    abilityCard.SetActive(true);
                     abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
-                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                    if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
             }
             else if (currentActionIndex == 5) // Ability 4
@@ -252,10 +303,14 @@ namespace Vi.UI
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 6) // Block
             {
+                playerUI.GetBlockingButton().gameObject.SetActive(true);
+
                 List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Block"]);
                 if (controlSchemeSpriteList.Count > 0)
                 {
@@ -271,7 +326,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Block") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Block") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
@@ -281,15 +336,27 @@ namespace Vi.UI
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
 
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 7) // Dodge
             {
+                playerUI.GetDodgeButton().gameObject.SetActive(true);
+
                 List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Dodge"]);
                 if (controlSchemeSpriteList.Count > 0)
                 {
@@ -305,16 +372,26 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Dodge") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
+
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 8) // Player Card
@@ -327,6 +404,8 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Player Card.";
+                playerUI.GetMainPlayerCard().gameObject.SetActive(true);
+                yield return new WaitForSeconds(2);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
 
@@ -353,6 +432,24 @@ namespace Vi.UI
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+
+                foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
+                {
+                    weaponCard.SetActive(true);
+                }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.SetActive(true);
+                }
+
+                playerUI.GetHeavyAttackButton().gameObject.SetActive(true);
+                playerUI.GetOnScreenReloadButton().gameObject.SetActive(true);
+                playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
+
+                playerUI.GetPauseMenuButton().gameObject.SetActive(true);
+                playerUI.GetScoreboardButton().gameObject.SetActive(true);
+                playerUI.GetLoadoutMenuButton().gameObject.SetActive(true);
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {
@@ -362,6 +459,7 @@ namespace Vi.UI
 
                 PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
@@ -445,6 +543,7 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
             Time.timeScale = 1;
         }
 
@@ -502,6 +601,11 @@ namespace Vi.UI
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+
+                foreach (GameObject instance in UIElementHighlightInstances)
+                {
+                    Destroy(instance);
+                }
             }
             else if (IsInBufferTime())
             {
@@ -525,6 +629,14 @@ namespace Vi.UI
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
                     overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
+                }
+            }
+
+            if (playerUI)
+            {
+                if (currentActionIndex < 9) // Prepare to fight with NPC
+                {
+                    playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 }
             }
 
@@ -614,13 +726,13 @@ namespace Vi.UI
             {
                 if (locationPingInstance)
                 {
-                    canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1.7f | canProceed;
+                    canProceed = Vector3.Distance(locationPingInstance.transform.position, playerInput.transform.position) < 1 | canProceed;
                 }
                 else
                 {
                     if (botAttributes)
                     {
-                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward, botAttributes.transform.rotation, botAttributes.transform);
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * 3, botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }
@@ -650,7 +762,7 @@ namespace Vi.UI
                 if (botAttributes)
                 {
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
-                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
@@ -659,7 +771,7 @@ namespace Vi.UI
                 if (botAttributes)
                 {
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
-                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }

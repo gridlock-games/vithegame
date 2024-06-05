@@ -901,6 +901,11 @@ namespace Vi.Core
             }
         }
 
+        public void Reload()
+        {
+            OnReload();
+        }
+
         void OnReload()
         {
             if (IsServer)
@@ -948,7 +953,11 @@ namespace Vi.Core
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         void OnBlock(InputValue value)
         {
-            bool isPressed = value.isPressed;
+            Block(value.isPressed);
+        }
+
+        public void Block(bool isPressed)
+        {
             if (blockingMode == "TOGGLE")
             {
                 if (isPressed) { isBlocking.Value = !isBlocking.Value; }

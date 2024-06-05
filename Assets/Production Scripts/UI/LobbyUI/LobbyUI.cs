@@ -657,7 +657,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            PlayerDataManager.Singleton.AddBotData(team);
+            PlayerDataManager.Singleton.AddBotData(team, false);
         }
 
         private void ChooseLoadoutPreset(Button button, int loadoutSlot)

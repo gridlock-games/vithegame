@@ -953,7 +953,7 @@ namespace Vi.Core
                 CharacterReference.RaceAndGender.HumanMale);
         }
 
-        public Character GetRandomizedCharacter()
+        public Character GetRandomizedCharacter(bool useDefaultPrimaryWeapon)
         {
             List<CharacterReference.RaceAndGender> raceAndGenderList = new List<CharacterReference.RaceAndGender>()
             {
@@ -968,7 +968,7 @@ namespace Vi.Core
             string gender = raceAndGenderStrings[1];
 
             return new Character("", race + "_" + gender, "", 0, 1,
-                GetRandomizedLoadout(raceAndGender),
+                GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),

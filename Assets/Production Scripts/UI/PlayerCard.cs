@@ -33,6 +33,7 @@ namespace Vi.UI
         public void Initialize(Attributes attributes)
         {
             this.attributes = attributes;
+            if (!canvas) { canvas = GetComponent<Canvas>(); }
             canvas.enabled = attributes != null;
         }
 
