@@ -48,7 +48,7 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    abilityCard.gameObject.SetActive(false);
+                    abilityCard.SetActive(false);
                 }
 
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(false);
@@ -275,7 +275,7 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    abilityCard.gameObject.SetActive(true);
+                    abilityCard.SetActive(true);
                     abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
                     if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
@@ -440,7 +440,7 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
-                    abilityCard.gameObject.SetActive(true);
+                    abilityCard.SetActive(true);
                 }
 
                 playerUI.GetHeavyAttackButton().gameObject.SetActive(true);
