@@ -141,7 +141,7 @@ namespace Vi.Utility
 
             if (Time.timeScale != lastTimeScale)
             {
-                registeredAudioSources.RemoveAll(null);
+                registeredAudioSources.RemoveAll(item => item == null);
                 foreach (AudioSource audioSource in registeredAudioSources)
                 {
                     audioSource.pitch = Time.timeScale;
