@@ -11,482 +11,492 @@ using Vi.Utility;
 
 namespace Vi.UI
 {
-    public class MainMenuUI : MonoBehaviour
+  public class MainMenuUI : MonoBehaviour
+  {
+    [SerializeField] private PauseMenu pauseMenu;
+    [SerializeField] private ContentManager contentManager;
+
+    [SerializeField] private NewsManager newsManager;
+
+    [Header("Initial Group")]
+    [SerializeField] private GameObject initialParent;
+
+    [SerializeField] private Text loginMethodText;
+    [SerializeField] private Text initialErrorText;
+    [SerializeField] private Button[] authenticationButtons;
+
+    [Header("Authentication")]
+    [SerializeField] private Image viLogo;
+
+    [SerializeField] private GameObject authenticationParent;
+    [SerializeField] private InputField usernameInput;
+    [SerializeField] private InputField emailInput;
+    [SerializeField] private InputField passwordInput;
+    [SerializeField] private Button loginButton;
+    [SerializeField] private Button returnButton;
+    [SerializeField] private Button openLoginFormButton;
+    [SerializeField] private Button openRegisterAccountButton;
+    [SerializeField] private Button forgotPasswordButton;
+    [SerializeField] private Text loginErrorText;
+
+    [Header("OAuth")]
+    [SerializeField] private GameObject oAuthParent;
+
+    [SerializeField] private Button oAuthReturnBtn;
+    [SerializeField] private Text oAuthMessageText;
+
+    [Header("Play Menu")]
+    [SerializeField] private GameObject playParent;
+
+    [SerializeField] private Text welcomeUserText;
+
+    [Header("Editor Only")]
+    [SerializeField] private Button startHubServerButton;
+
+    [SerializeField] private Button startLobbyServerButton;
+    [SerializeField] private Button startAutoClientButton;
+
+    private bool startServerCalled;
+    private const int hubPort = 7777;
+
+    public void StartHubServer()
     {
-        [SerializeField] private PauseMenu pauseMenu;
-        [SerializeField] private ContentManager contentManager;
-        [SerializeField] private NewsManager newsManager;
+      if (startServerCalled) { return; }
+      startServerCalled = true;
+      AudioListener.volume = 0;
 
-        [Header("Initial Group")]
-        [SerializeField] private GameObject initialParent;
-        [SerializeField] private Text loginMethodText;
-        [SerializeField] private Text initialErrorText;
-        [SerializeField] private Button[] authenticationButtons;
+      var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+      networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
 
-        [Header("Authentication")]
-        [SerializeField] private Image viLogo;
-        [SerializeField] private GameObject authenticationParent;
-        [SerializeField] private InputField usernameInput;
-        [SerializeField] private InputField emailInput;
-        [SerializeField] private InputField passwordInput;
-        [SerializeField] private Button loginButton;
-        [SerializeField] private Button returnButton;
-        [SerializeField] private Button openLoginFormButton;
-        [SerializeField] private Button openRegisterAccountButton;
-        [SerializeField] private Button forgotPasswordButton;
-        [SerializeField] private Text loginErrorText;
+      if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+      {
+        networkTransport.ConnectionData.Address = "127.0.0.1";
+      }
 
-        [Header("OAuth")]
-        [SerializeField] private GameObject oAuthParent;
-        [SerializeField] private Button oAuthReturnBtn;
-        [SerializeField] private Text oAuthMessageText;
+      networkTransport.ConnectionData.Port = hubPort;
 
-        [Header("Play Menu")]
-        [SerializeField] private GameObject playParent;
-        [SerializeField] private Text welcomeUserText;
+      networkTransport.MaxPacketQueueSize = 512;
 
-        [Header("Editor Only")]
-        [SerializeField] private Button startHubServerButton;
-        [SerializeField] private Button startLobbyServerButton;
-        [SerializeField] private Button startAutoClientButton;
+      NetworkManager.Singleton.StartServer();
+      NetSceneManager.Singleton.LoadScene("Player Hub");
+      NetSceneManager.Singleton.LoadScene("Player Hub Environment");
+    }
 
-        private bool startServerCalled;
-        private const int hubPort = 7777;
+    public void StartLobbyServer()
+    {
+      if (startServerCalled) { return; }
+      startServerCalled = true;
+      AudioListener.volume = 0;
 
-        public void StartHubServer()
-        {
-            if (startServerCalled) { return; }
-            startServerCalled = true;
-            AudioListener.volume = 0;
+      var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+      networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+      if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+      {
+        networkTransport.ConnectionData.Address = "127.0.0.1";
+      }
 
-            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
-            {
-                networkTransport.ConnectionData.Address = "127.0.0.1";
-            }
+      List<int> portList = new List<int>();
+      foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
+      {
+        portList.Add(int.Parse(server.port));
+      }
 
-            networkTransport.ConnectionData.Port = hubPort;
+      int lobbyPort = hubPort - 1;
+      while (lobbyPort > 0)
+      {
+        if (!portList.Contains(lobbyPort)) { break; }
+        lobbyPort--;
+      }
 
-            networkTransport.MaxPacketQueueSize = 512;
+      networkTransport.ConnectionData.Port = (ushort)lobbyPort;
 
-            NetworkManager.Singleton.StartServer();
-            NetSceneManager.Singleton.LoadScene("Player Hub");
-            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
-        }
+      networkTransport.MaxPacketQueueSize = 512;
+      networkTransport.MaxSendQueueSize = 512;
 
-        public void StartLobbyServer()
-        {
-            if (startServerCalled) { return; }
-            startServerCalled = true;
-            AudioListener.volume = 0;
+      NetworkManager.Singleton.StartServer();
+      NetSceneManager.Singleton.LoadScene("Lobby");
+    }
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+    private const string automatedClientUsername = "roxasodale91";
+    private const string automatedClientPassword = "123456";
 
-            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
-            {
-                networkTransport.ConnectionData.Address = "127.0.0.1";
-            }
+    private bool startAutomatedClientCalled;
 
-            List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
-            {
-                portList.Add(int.Parse(server.port));
-            }
+    public void StartAutomatedClient()
+    {
+      if (startAutomatedClientCalled) { return; }
+      startAutomatedClientCalled = true;
+      AudioListener.volume = 0;
 
-            int lobbyPort = hubPort - 1;
-            while (lobbyPort > 0)
-            {
-                if (!portList.Contains(lobbyPort)) { break; }
-                lobbyPort--;
-            }
+      StartCoroutine(LaunchAutoClient());
+    }
 
-            networkTransport.ConnectionData.Port = (ushort)lobbyPort;
+    private IEnumerator LaunchAutoClient()
+    {
+      LoginWithVi();
 
-            networkTransport.MaxPacketQueueSize = 512;
-            networkTransport.MaxSendQueueSize = 512;
+      usernameInput.text = automatedClientUsername;
+      passwordInput.text = automatedClientPassword;
 
-            NetworkManager.Singleton.StartServer();
-            NetSceneManager.Singleton.LoadScene("Lobby");
-        }
+      yield return Login();
 
-        private const string automatedClientUsername = "roxasodale91";
-        private const string automatedClientPassword = "123456";
+      if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); yield break; }
 
-        private bool startAutomatedClientCalled;
-        public void StartAutomatedClient()
-        {
-            if (startAutomatedClientCalled) { return; }
-            startAutomatedClientCalled = true;
-            AudioListener.volume = 0;
+      WebRequestManager.Singleton.RefreshCharacters();
+      yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            StartCoroutine(LaunchAutoClient());
-        }
+      if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
 
-        private IEnumerator LaunchAutoClient()
-        {
-            LoginWithVi();
+      NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
 
-            usernameInput.text = automatedClientUsername;
-            passwordInput.text = automatedClientPassword;
+      if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
 
-            yield return Login();
+      var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+      networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
+      networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
 
-            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); yield break; }
+      NetworkManager.Singleton.StartClient();
+    }
 
-            WebRequestManager.Singleton.RefreshCharacters();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+    public void LoginWithVi()
+    {
+      if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+      if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
-            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
+      initialParent.SetActive(false);
 
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
+      emailInput.gameObject.SetActive(false);
+      loginButton.GetComponentInChildren<Text>().text = "LOGIN";
 
-            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
+      loginButton.onClick.RemoveAllListeners();
+      loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
-            networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+      forgotPasswordButton.gameObject.SetActive(true);
+      openRegisterAccountButton.gameObject.SetActive(true);
+      openLoginFormButton.gameObject.SetActive(false);
+    }
 
-            NetworkManager.Singleton.StartClient();
-        }
-
-        public void LoginWithVi()
-        {
-            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
-
-            initialParent.SetActive(false);
-
-            emailInput.gameObject.SetActive(false);
-            loginButton.GetComponentInChildren<Text>().text = "LOGIN";
-
-            loginButton.onClick.RemoveAllListeners();
-            loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
-
-            forgotPasswordButton.gameObject.SetActive(true);
-            openRegisterAccountButton.gameObject.SetActive(true);
-            openLoginFormButton.gameObject.SetActive(false);
-        }
     public void LoginWithSteam()
     {
       initialErrorText.text = "Login with Steam has not been implemented yet";
     }
 
-      public void OpenCreateAccount()
-        {
-            usernameInput.text = "";
-            passwordInput.text = "";
-            emailInput.text = "";
-
-            initialParent.SetActive(false);
-
-            emailInput.gameObject.SetActive(true);
-            loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
-
-            loginButton.onClick.RemoveAllListeners();
-            loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
-
-            forgotPasswordButton.gameObject.SetActive(false);
-            openRegisterAccountButton.gameObject.SetActive(false);
-            openLoginFormButton.gameObject.SetActive(true);
-        }
-
-        public void OpenViLogin()
-        {
-            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
-
-            viLogo.enabled = false;
-            initialParent.SetActive(false);
-            authenticationParent.SetActive(true);
-
-            emailInput.gameObject.SetActive(false);
-            loginButton.GetComponentInChildren<Text>().text = "LOGIN";
-
-            loginButton.onClick.RemoveAllListeners();
-            loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
-
-            forgotPasswordButton.gameObject.SetActive(true);
-            openRegisterAccountButton.gameObject.SetActive(true);
-            openLoginFormButton.gameObject.SetActive(false);
-        }
-
-        public void ReturnToInitialElements()
-        {
-            WebRequestManager.Singleton.ResetLogInErrorText();
-            initialParent.SetActive(true);
-            viLogo.enabled = true;
-            initialErrorText.text = "";
-        }
-
-        public void GoToCharacterSelect()
-        {
-            NetSceneManager.Singleton.LoadScene("Character Select");
-        }
-
-        public void OpenSettingsMenu()
-        {
-            Instantiate(pauseMenu.gameObject);
-        }
-
-        public void OpenContentManager()
-        {
-            Instantiate(contentManager.gameObject);
-        }
-
-        public void OpenNewsScreen()
+    public void OpenCreateAccount()
     {
-      Instantiate(newsManager.gameObject);
+      usernameInput.text = "";
+      passwordInput.text = "";
+      emailInput.text = "";
+
+      initialParent.SetActive(false);
+
+      emailInput.gameObject.SetActive(true);
+      loginButton.GetComponentInChildren<Text>().text = "SUBMIT";
+
+      loginButton.onClick.RemoveAllListeners();
+      loginButton.onClick.AddListener(delegate { StartCoroutine(CreateAccount()); });
+
+      forgotPasswordButton.gameObject.SetActive(false);
+      openRegisterAccountButton.gameObject.SetActive(false);
+      openLoginFormButton.gameObject.SetActive(true);
     }
 
-        public void QuitGame()
+    public void OpenViLogin()
+    {
+      if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+      if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
+
+      viLogo.enabled = false;
+      initialParent.SetActive(false);
+      authenticationParent.SetActive(true);
+
+      emailInput.gameObject.SetActive(false);
+      loginButton.GetComponentInChildren<Text>().text = "LOGIN";
+
+      loginButton.onClick.RemoveAllListeners();
+      loginButton.onClick.AddListener(delegate { StartCoroutine(Login()); });
+
+      forgotPasswordButton.gameObject.SetActive(true);
+      openRegisterAccountButton.gameObject.SetActive(true);
+      openLoginFormButton.gameObject.SetActive(false);
+    }
+
+    public void ReturnToInitialElements()
+    {
+      WebRequestManager.Singleton.ResetLogInErrorText();
+      initialParent.SetActive(true);
+      viLogo.enabled = true;
+      initialErrorText.text = "";
+    }
+
+    public void GoToCharacterSelect()
+    {
+      NetSceneManager.Singleton.LoadScene("Character Select");
+    }
+
+    public void OpenSettingsMenu()
+    {
+      Instantiate(pauseMenu.gameObject);
+    }
+
+    public void OpenContentManager()
+    {
+      Instantiate(contentManager.gameObject);
+    }
+
+    public void OpenNewsScreen()
+    {
+      newsManager.gameObject.SetActive(true);
+      gameObject.SetActive(false);
+    }
+
+    public void QuitGame()
+    {
+      Application.Quit();
+    }
+
+    public IEnumerator CreateAccount()
+    {
+      FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
+      FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
+
+      emailInput.interactable = false;
+      usernameInput.interactable = false;
+      passwordInput.interactable = false;
+
+      yield return WebRequestManager.Singleton.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
+
+      emailInput.interactable = true;
+      usernameInput.interactable = true;
+      passwordInput.interactable = true;
+
+      if (string.IsNullOrEmpty(WebRequestManager.Singleton.LogInErrorText))
+      {
+        ReturnToInitialElements();
+      }
+    }
+
+    public IEnumerator Login()
+    {
+      FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Vi");
+      FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
+      FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
+      usernameInput.interactable = false;
+      passwordInput.interactable = false;
+
+      yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
+
+      welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
+      usernameInput.interactable = true;
+      passwordInput.interactable = true;
+    }
+
+    //private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
+    //private const string googleSignInSecretId = "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";
+
+    private const string googleSignInClientId = "583444002427-p8hrsdv9p38migp7db30mch3qeluodda.apps.googleusercontent.com";
+    private const string googleSignInSecretId = "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";
+
+    public void LoginWithGoogle()
+    {
+      Debug.Log("Logging in with Google");
+      dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
+      openDialogue("Google");
+      GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
+      {
+        if (success)
         {
-            Application.Quit();
+          StartCoroutine(WaitForGoogleAuth(tokenData));
         }
-
-        public IEnumerator CreateAccount()
+        else
         {
-            FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
-            FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
-
-            emailInput.interactable = false;
-            usernameInput.interactable = false;
-            passwordInput.interactable = false;
-
-            yield return WebRequestManager.Singleton.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
-
-            emailInput.interactable = true;
-            usernameInput.interactable = true;
-            passwordInput.interactable = true;
-
-            if (string.IsNullOrEmpty(WebRequestManager.Singleton.LogInErrorText))
-            {
-                ReturnToInitialElements();
-            }
+          Debug.LogError("Google sign in error - " + error);
+          oAuthParent.SetActive(false);
         }
+      });
+    }
 
-        public IEnumerator Login()
+    private IEnumerator WaitForGoogleAuth(GoogleAuth.GoogleIdTokenResponse tokenData)
+    {
+      Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+      System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
+
+      yield return new WaitUntil(() => task.IsCompleted);
+
+      if (task.IsCanceled)
+      {
+        loginErrorText.text = "Login with google was cancelled.";
+        oAuthParent.SetActive(false);
+        yield break;
+      }
+
+      if (task.IsFaulted)
+      {
+        loginErrorText.text = "Login with google encountered an error.";
+        oAuthParent.SetActive(false);
+        yield break;
+      }
+
+      AuthResult authResult = task.Result;
+      oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+
+      if (WebRequestManager.Singleton.IsLoggedIn)
+      {
+        initialParent.SetActive(false);
+        oAuthParent.SetActive(false);
+        welcomeUserText.text = authResult.User.DisplayName;
+        FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Google");
+        FasterPlayerPrefs.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
+      }
+      else
+      {
+        oAuthParent.SetActive(false);
+        initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+      }
+    }
+
+    public void LoginWithFacebook()
+    {
+      initialErrorText.text = "Facebook sign in not implemented yet";
+    }
+
+    public void LoginWithApple()
+    {
+      initialErrorText.text = "Apple sign in not implemented yet";
+    }
+
+    public void Logout()
+    {
+      WebRequestManager.Singleton.Logout();
+      initialParent.SetActive(true);
+    }
+
+    public void ForgotPassword()
+    {
+      Debug.LogError("Not implemented yet!");
+    }
+
+    private FirebaseAuth auth;
+
+    private void Start()
+    {
+      initialParent.SetActive(true);
+      WebRequestManager.Singleton.RefreshServers();
+      startHubServerButton.gameObject.SetActive(Application.isEditor);
+      startLobbyServerButton.gameObject.SetActive(Application.isEditor);
+      startAutoClientButton.gameObject.SetActive(Application.isEditor);
+      initialErrorText.text = "";
+
+      if (!WebRequestManager.IsServerBuild())
+      {
+        auth = FirebaseAuth.DefaultInstance;
+        StartCoroutine(AutomaticallyAttemptLogin());
+      }
+    }
+
+    private IEnumerator AutomaticallyAttemptLogin()
+    {
+      if (FasterPlayerPrefs.Singleton.HasKey("LastSignInType"))
+      {
+        switch (FasterPlayerPrefs.Singleton.GetString("LastSignInType"))
         {
-            FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Vi");
-            FasterPlayerPrefs.Singleton.SetString("username", usernameInput.text);
-            FasterPlayerPrefs.Singleton.SetString("password", passwordInput.text);
-            usernameInput.interactable = false;
-            passwordInput.interactable = false;
-
-            yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
-
-            welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
-            usernameInput.interactable = true;
-            passwordInput.interactable = true;
-        }
-
-        //private const string googleSignInClientId = "775793118365-5tfdruavpvn7u572dv460i8omc2hmgjt.apps.googleusercontent.com";
-        //private const string googleSignInSecretId = "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";
-
-        private const string googleSignInClientId = "583444002427-p8hrsdv9p38migp7db30mch3qeluodda.apps.googleusercontent.com";
-        private const string googleSignInSecretId = "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";
-
-        public void LoginWithGoogle()
-        {
-            Debug.Log("Logging in with Google");
-            dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
-            openDialogue("Google");
-            GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
-            {
-                if (success)
-                {
-                    StartCoroutine(WaitForGoogleAuth(tokenData));
-                }
-                else
-                {
-                    Debug.LogError("Google sign in error - " + error);
-                    oAuthParent.SetActive(false);
-                }
-            });
-        }
-
-        private IEnumerator WaitForGoogleAuth(GoogleAuth.GoogleIdTokenResponse tokenData)
-        {
-            Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
-            System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
-
-            yield return new WaitUntil(() => task.IsCompleted);
-
-            if (task.IsCanceled)
-            {
-                loginErrorText.text = "Login with google was cancelled.";
-                oAuthParent.SetActive(false);
-                yield break;
-            }
-
-            if (task.IsFaulted)
-            {
-                loginErrorText.text = "Login with google encountered an error.";
-                oAuthParent.SetActive(false);
-                yield break;
-            }
-
-            AuthResult authResult = task.Result;
-            oAuthMessageText.text = $"Waiting for Firebase Authentication";
-            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+          case "Vi":
+            usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username");
+            passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password");
+            yield return Login();
 
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
-                initialParent.SetActive(false);
-                oAuthParent.SetActive(false);
-                welcomeUserText.text = authResult.User.DisplayName;
-                FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Google");
-                FasterPlayerPrefs.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
+              initialParent.SetActive(false);
             }
             else
             {
-                oAuthParent.SetActive(false);
-                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+              initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
             }
+            break;
+
+          case "Google":
+            yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("GoogleIdTokenResponse")));
+
+            break;
+
+          default:
+            Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
+            break;
         }
-
-        public void LoginWithFacebook()
-        {
-            initialErrorText.text = "Facebook sign in not implemented yet";
-        }
-
-        public void LoginWithApple()
-        {
-            initialErrorText.text = "Apple sign in not implemented yet";
-        }
-
-        public void Logout()
-        {
-            WebRequestManager.Singleton.Logout();
-            initialParent.SetActive(true);
-        }
-
-        public void ForgotPassword()
-        {
-            Debug.LogError("Not implemented yet!");
-        }
-
-        private FirebaseAuth auth;
-
-        private void Start()
-        {
-            initialParent.SetActive(true);
-            WebRequestManager.Singleton.RefreshServers();
-            startHubServerButton.gameObject.SetActive(Application.isEditor);
-            startLobbyServerButton.gameObject.SetActive(Application.isEditor);
-            startAutoClientButton.gameObject.SetActive(Application.isEditor);
-            initialErrorText.text = "";
-
-            if (!WebRequestManager.IsServerBuild())
-            {
-                auth = FirebaseAuth.DefaultInstance;
-                StartCoroutine(AutomaticallyAttemptLogin());
-            }
-        }
-
-        private IEnumerator AutomaticallyAttemptLogin()
-        {
-            if (FasterPlayerPrefs.Singleton.HasKey("LastSignInType"))
-            {
-                switch (FasterPlayerPrefs.Singleton.GetString("LastSignInType"))
-                {
-                    case "Vi":
-                        usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username");
-                        passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password");
-                        yield return Login();
-
-                        if (WebRequestManager.Singleton.IsLoggedIn)
-                        {
-                            initialParent.SetActive(false);
-                        }
-                        else
-                        {
-                            initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
-                        }
-                        break;
-
-                    case "Google":
-                        yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("GoogleIdTokenResponse")));
-
-                        break;
-
-                    default:
-                        Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
-                        break;
-                }
-            }
-        }
-
-        private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
-        {
-            Debug.Log($"Prepare deeplink login to look for {loginSource} Oauth");
-            DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
-            dlp.SetLoginSource(loginSource);
-        }
-        public void CloseOAuthDialogue()
-        {
-            oAuthParent.SetActive(false);
-
-            //Shutdown any possible Listner - Google
-            if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
-            { GoogleAuth.ShutdownListner(); }
-        }
-
-        private void openDialogue(string platformname)
-        {
-            oAuthParent.SetActive(true);
-            oAuthMessageText.text = $"Waiting for {platformname} Login";
-        }
-
-        private void Update()
-        {
-            loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
-
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-
-            if (!WebRequestManager.Singleton.IsRefreshingServers)
-            {
-                if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
-                {
-                    StartHubServer();
-                }
-                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
-                {
-                    StartLobbyServer();
-                }
-                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
-                {
-                    StartAutomatedClient();
-                }
-            }
-
-            loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            openLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            openRegisterAccountButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            foreach (Button button in authenticationButtons)
-            {
-                button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            }
-
-            if (!initialParent.activeSelf)
-            {
-                authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
-                playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
-            }
-            else
-            {
-                authenticationParent.SetActive(false);
-                playParent.SetActive(false);
-            }
-
-            viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
-            loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
-        }
+      }
     }
+
+    private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
+    {
+      Debug.Log($"Prepare deeplink login to look for {loginSource} Oauth");
+      DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
+      dlp.SetLoginSource(loginSource);
+    }
+
+    public void CloseOAuthDialogue()
+    {
+      oAuthParent.SetActive(false);
+
+      //Shutdown any possible Listner - Google
+      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
+      { GoogleAuth.ShutdownListner(); }
+    }
+
+    private void openDialogue(string platformname)
+    {
+      oAuthParent.SetActive(true);
+      oAuthMessageText.text = $"Waiting for {platformname} Login";
+    }
+
+    private void Update()
+    {
+      loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
+
+      startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+      startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+      startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+
+      if (!WebRequestManager.Singleton.IsRefreshingServers)
+      {
+        if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
+        {
+          StartHubServer();
+        }
+        else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
+        {
+          StartLobbyServer();
+        }
+        else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
+        {
+          StartAutomatedClient();
+        }
+      }
+
+      loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      openLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      openRegisterAccountButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      foreach (Button button in authenticationButtons)
+      {
+        button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+      }
+
+      if (!initialParent.activeSelf)
+      {
+        authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
+        playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
+      }
+      else
+      {
+        authenticationParent.SetActive(false);
+        playParent.SetActive(false);
+      }
+
+      viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
+      loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+    }
+  }
 }

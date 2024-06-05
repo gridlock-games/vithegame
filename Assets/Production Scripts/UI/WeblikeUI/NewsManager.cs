@@ -16,7 +16,7 @@ namespace Vi.UI
     [SerializeField] private VisualTreeAsset newsButtonUIDocument;
     [SerializeField] private VisualTreeAsset newsDataUIDocument;
     [SerializeField] private string newsImageServerLocation = "https://vi-assets.com/imagestorage/News/";
-
+    [SerializeField] private GameObject mainMenuGameObject;
     [SerializeField] private Texture2D defaultLoadingImage;
 
     private string NewsAPIURL = "154.90.35.191";
@@ -24,7 +24,7 @@ namespace Vi.UI
     private List<Button> newsButtonList = new List<Button>();
 
     // Start is called before the first frame update
-    private void Awake()
+    void OnEnable()
     {
       StartCoroutine("GetNewsData");
       addQuitButton();
@@ -62,7 +62,10 @@ namespace Vi.UI
     private void addQuitButton()
     {
       Button exitButton = GetComponent<UIDocument>().rootVisualElement.Q<Button>("ExitButton");
-      exitButton.clicked += () => { Destroy(this.gameObject); };
+      exitButton.clicked += () => { 
+        mainMenuGameObject.SetActive(true);
+        gameObject.SetActive(false);
+      };
     }
     private void UpdateListUI()
     {
