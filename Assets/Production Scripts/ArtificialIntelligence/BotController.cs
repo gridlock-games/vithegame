@@ -329,7 +329,14 @@ namespace Vi.ArtificialIntelligence
                         break;
                     }
 
-                    if (!disableBots)
+                    if (disableBots)
+                    {
+                        if (navMeshAgent.isOnNavMesh)
+                        {
+                            if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { navMeshAgent.destination = currentPosition.Value; }
+                        }
+                    }
+                    else
                     {
                         if (targetAttributes)
                         {
