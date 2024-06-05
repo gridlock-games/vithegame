@@ -6,8 +6,10 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
+using jomarcentermjm.ExternalFileHandler;
 
-
+namespace Vi.UI
+{
   public class NewsManager : MonoBehaviour
   {
     [SerializeField] private UIDocument newsUIDocument;
@@ -124,3 +126,4 @@ using UnityEngine.UIElements;
     public bool isActive { get; set; }
     public string id { get; set; }
   }
+}
