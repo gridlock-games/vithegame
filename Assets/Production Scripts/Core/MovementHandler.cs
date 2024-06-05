@@ -36,9 +36,11 @@ namespace Vi.Core
 		public virtual void AddForce(Vector3 force) { }
 
         protected WeaponHandler weaponHandler;
+		protected PlayerInput playerInput;
         protected void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
+			playerInput = GetComponent<PlayerInput>();
 			RefreshStatus();
         }
 
@@ -61,11 +63,14 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-            if (weaponHandler)
+			if (playerInput)
             {
-                if (weaponHandler.IsAiming()) { lookSensitivity *= zoomSensitivityMultiplier; }
+				if (!playerInput.actions.FindAction("Look").enabled) { return Vector2.zero; }
             }
-            return lookInput * lookSensitivity;
+
+			bool shouldUseZoomSensMultiplier = false;
+            if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }
+            return shouldUseZoomSensMultiplier ? lookInput * lookSensitivity * zoomSensitivityMultiplier: lookInput * lookSensitivity;
         }
 
 		public void ResetLookInput()
@@ -78,7 +83,14 @@ namespace Vi.Core
 
 		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput; }
 
-        public Vector2 GetMoveInput() { return moveInput; }
+        public Vector2 GetMoveInput()
+		{
+			if (playerInput)
+			{
+				if (!playerInput.actions.FindAction("Move").enabled) { return Vector2.zero; }
+			}
+			return moveInput;
+		}
 
 		public void SetMoveInput(Vector2 moveInput) { this.moveInput = moveInput; }
 

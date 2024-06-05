@@ -24,8 +24,6 @@ namespace Vi.UI
 
         public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
 
-        public Image GetHeavyAttackButton() { return heavyAttackButton; }
-
         private bool shouldFadeToBlack;
         private float fadeToBlackSpeed = 8;
         public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
@@ -70,26 +68,31 @@ namespace Vi.UI
 
         public void OpenPauseMenu()
         {
+            if (!playerInput.actions.FindAction("Pause").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnPause();
         }
 
         public void OpenInventoryMenu()
         {
+            if (!playerInput.actions.FindAction("Inventory").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnInventory();
         }
 
         public void OpenScoreboard()
         {
+            if (!playerInput.actions.FindAction("Scoreboard").enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
         }
 
         public void SwitchWeapon()
         {
+            if (!playerInput.actions.FindAction("SwitchWeapon").enabled) { return; }
             loadoutManager.SwitchWeapon();
         }
 
         public void StartLightAttack()
         {
+            if (!playerInput.actions.FindAction("LightAttack").enabled) { return; }
             weaponHandler.LightAttackHold(true);
         }
 
@@ -100,6 +103,7 @@ namespace Vi.UI
 
         public void StartHeavyAttack()
         {
+            if (!playerInput.actions.FindAction("HeavyAttack").enabled) { return; }
             weaponHandler.HeavyAttackHold(true);
         }
 
