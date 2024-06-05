@@ -46,6 +46,15 @@ namespace Vi.UI
                     weaponCard.SetActive(false);
                 }
 
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.gameObject.SetActive(false);
+                }
+
+                playerUI.GetScoreboardButton().gameObject.SetActive(false);
+                playerUI.GetSwitchWeaponButton().gameObject.SetActive(false);
+                playerUI.GetBlockingButton().gameObject.SetActive(false);
+                playerUI.GetDodgeButton().gameObject.SetActive(false);
                 playerUI.GetMainPlayerCard().gameObject.SetActive(false);
             }
         }
@@ -294,6 +303,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 6) // Block
             {
+                playerUI.GetBlockingButton().gameObject.SetActive(true);
+
                 List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Block"]);
                 if (controlSchemeSpriteList.Count > 0)
                 {
@@ -338,6 +349,8 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 7) // Dodge
             {
+                playerUI.GetDodgeButton().gameObject.SetActive(true);
+
                 List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Dodge"]);
                 if (controlSchemeSpriteList.Count > 0)
                 {
@@ -418,6 +431,14 @@ namespace Vi.UI
                 {
                     weaponCard.SetActive(true);
                 }
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.gameObject.SetActive(true);
+                }
+
+                playerUI.GetScoreboardButton().gameObject.SetActive(true);
+                playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {

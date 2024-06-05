@@ -26,6 +26,14 @@ namespace Vi.UI
 
         public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
 
+        public RectTransform GetSwitchWeaponButton() { return switchWeaponButton; }
+
+        public Button GetPauseMenuButton() { return pauseMenuButton; }
+
+        public Button GetLoadoutMenuButton() { return loadoutMenuButton; }
+
+        public Button GetScoreboardButton() { return scoreboardButton; }
+
         private bool shouldFadeToBlack;
         private float fadeToBlackSpeed = 8;
         public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
@@ -58,6 +66,8 @@ namespace Vi.UI
         [SerializeField] private GameObject aliveUIParent;
         [Header("Mobile UI")]
         [SerializeField] private CustomOnScreenStick moveJoystick;
+        [SerializeField] private Button pauseMenuButton;
+        [SerializeField] private Button loadoutMenuButton;
         [SerializeField] private Button scoreboardButton;
         [SerializeField] private Image heavyAttackButton;
         [SerializeField] private Sprite aimIcon;
@@ -65,6 +75,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform blockingButton;
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private RectTransform lookJoystickCenter;
+        [SerializeField] private RectTransform switchWeaponButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 

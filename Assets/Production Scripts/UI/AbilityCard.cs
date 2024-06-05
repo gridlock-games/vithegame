@@ -27,7 +27,7 @@ namespace Vi.UI
 
         public void UpdateCard(ActionClip ability, string keybindText)
         {
-            this.Ability = ability;
+            Ability = ability;
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
