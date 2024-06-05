@@ -38,6 +38,18 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private InputActionAsset inputActions;
 
+        public void SetActive(bool isActive)
+        {
+            if (!canvas) { canvas = GetComponent<Canvas>(); }
+            canvas.enabled = isActive;
+        }
+
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
+
         public void SetPreviewOn(LoadoutManager.WeaponSlotType weaponSlotType)
         {
             withBindingParent.gameObject.SetActive(false);

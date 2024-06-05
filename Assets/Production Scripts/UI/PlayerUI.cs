@@ -24,6 +24,8 @@ namespace Vi.UI
 
         public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
 
+        public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
+
         private bool shouldFadeToBlack;
         private float fadeToBlackSpeed = 8;
         public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
@@ -117,8 +119,8 @@ namespace Vi.UI
         private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
 
-        private Canvas[] aliveUIChildCanvases;
-        private Canvas[] deathUIChildCanvases;
+        [SerializeField] private Canvas[] aliveUIChildCanvases;
+        [SerializeField] private Canvas[] deathUIChildCanvases;
 
         private void Awake()
         {
@@ -126,9 +128,6 @@ namespace Vi.UI
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
-
-            aliveUIChildCanvases = aliveUIParent.GetComponentsInChildren<Canvas>(true);
-            deathUIChildCanvases = deathUIParent.GetComponentsInChildren<Canvas>(true);
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();

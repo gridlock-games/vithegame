@@ -40,6 +40,13 @@ namespace Vi.UI
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
                 playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
+
+                foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
+                {
+                    weaponCard.SetActive(false);
+                }
+
+                playerUI.GetMainPlayerCard().gameObject.SetActive(false);
             }
         }
 
@@ -378,6 +385,8 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Player Card.";
+                playerUI.GetMainPlayerCard().gameObject.SetActive(true);
+                yield return new WaitForSeconds(2);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
 
@@ -404,6 +413,11 @@ namespace Vi.UI
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+
+                foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
+                {
+                    weaponCard.SetActive(true);
+                }
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {

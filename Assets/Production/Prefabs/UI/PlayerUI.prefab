@@ -1336,6 +1336,13 @@ MonoBehaviour:
   blockingButton: {fileID: 5724712073000026927}
   dodgeButton: {fileID: 2739320560445226099}
   lookJoystickCenter: {fileID: 3449101954136775650}
+  aliveUIChildCanvases:
+  - {fileID: 1563455796112825708}
+  - {fileID: 5714880452247409252}
+  - {fileID: 931287237100784427}
+  deathUIChildCanvases:
+  - {fileID: 2224668510273317115}
+  - {fileID: 5694451687495376449}
 --- !u!114 &5666987421114583128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5657,7 +5664,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 15.342465
+      value: 16.37028
       objectReference: {fileID: 0}
     - target: {fileID: 6117385750501809473, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
