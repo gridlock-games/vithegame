@@ -632,6 +632,11 @@ namespace Vi.UI
                 }
             }
 
+            if (currentActionIndex < 9) // Prepare to fight with NPC
+            {
+                playerUI.GetScoreboardButton().gameObject.SetActive(false);
+            }
+
             foreach (Image image in overlayImages)
             {
                 image.gameObject.SetActive(image.sprite);
