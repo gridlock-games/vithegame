@@ -519,7 +519,7 @@ namespace Vi.Player
             lookInput = value.Get<Vector2>() * (attributes.IsFeared() ? -1 : 1);
         }
 
-        void OnDodge()
+        public void OnDodge()
         {
             if (animationHandler.IsReloading()) { return; }
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (attributes.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
@@ -541,7 +541,7 @@ namespace Vi.Player
         }
 
         public Attributes CameraFollowTarget { get; private set; }
-        void OnIncrementFollowPlayer()
+        public void OnIncrementFollowPlayer()
         {
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -566,7 +566,7 @@ namespace Vi.Player
             }
         }
 
-        void OnDecrementFollowPlayer()
+        public void OnDecrementFollowPlayer()
         {
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {

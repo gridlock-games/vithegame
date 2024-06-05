@@ -114,10 +114,7 @@ namespace Vi.UI
             weaponHandler.LightAttackHold(true);
         }
 
-        public void StopLightAttack()
-        {
-            weaponHandler.LightAttackHold(false);
-        }
+        public void StopLightAttack() { weaponHandler.LightAttackHold(false); }
 
         public void StartHeavyAttack()
         {
@@ -130,10 +127,55 @@ namespace Vi.UI
             weaponHandler.HeavyAttackHold(false);
         }
 
+        public void Ability1(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability1").enabled) { isPressed = false; }
+            weaponHandler.Ability1(isPressed);
+        }
+
+        public void Ability2(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability2").enabled) { isPressed = false; }
+            weaponHandler.Ability2(isPressed);
+        }
+
+        public void Ability3(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability3").enabled) { isPressed = false; }
+            weaponHandler.Ability3(isPressed);
+        }
+
+        public void Ability4(bool isPressed)
+        {
+            if (!playerInput.actions.FindAction("Ability4").enabled) { isPressed = false; }
+            weaponHandler.Ability4(isPressed);
+        }
+
+        public void Reload()
+        {
+            if (!playerInput.actions.FindAction("Reload").enabled) { return; }
+            weaponHandler.Reload();
+        }
+
+        public void Dodge()
+        {
+            if (!playerInput.actions.FindAction("Dodge").enabled) { return; }
+            playerMovementHandler.OnDodge();
+        }
+
+        public void Block(bool isPressed) { weaponHandler.Block(isPressed); }
+
+        public void Rage() { attributes.OnActivateRage(); }
+
+        public void IncrementFollowPlayer() { playerMovementHandler.OnIncrementFollowPlayer(); }
+
+        public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
+
         private WeaponHandler weaponHandler;
         private Attributes attributes;
         private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
+        private PlayerMovementHandler playerMovementHandler;
 
         [SerializeField] private Canvas[] aliveUIChildCanvases;
         [SerializeField] private Canvas[] deathUIChildCanvases;
@@ -144,6 +186,7 @@ namespace Vi.UI
             attributes = weaponHandler.GetComponent<Attributes>();
             playerInput = weaponHandler.GetComponent<PlayerInput>();
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
+            playerMovementHandler = weaponHandler.GetComponent<PlayerMovementHandler>();
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
