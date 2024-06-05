@@ -133,7 +133,7 @@ namespace Vi.Utility
 
         private const float musicFadeTime = 0.5f;
 
-        private float lastTimeScale = Time.timeScale;
+        private float lastTimeScale = 1;
 
         private void Update()
         {
