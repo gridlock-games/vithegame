@@ -36,7 +36,7 @@ namespace Vi.Core
 		public virtual void AddForce(Vector3 force) { }
 
         protected WeaponHandler weaponHandler;
-		private PlayerInput playerInput;
+		protected PlayerInput playerInput;
         protected void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();

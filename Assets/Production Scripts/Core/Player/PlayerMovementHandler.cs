@@ -314,11 +314,9 @@ namespace Vi.Player
             if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
         }
 
-        private PlayerInput playerInput;
         private new void Awake()
         {
             base.Awake();
-            playerInput = GetComponent<PlayerInput>();
             RefreshStatus();
         }
 
