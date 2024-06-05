@@ -470,7 +470,7 @@ namespace Vi.UI
             }
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             tutorialCanvas.enabled = currentActionIndex > -1;
 
@@ -607,7 +607,6 @@ namespace Vi.UI
 
                 if (playerMovementHandler)
                 {
-                    Debug.Log(playerMovementHandler.GetLookInput());
                     canProceed = playerMovementHandler.GetLookInput() != Vector2.zero | canProceed;
                 }
             }
