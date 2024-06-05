@@ -270,8 +270,9 @@ namespace Vi.UI
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
+                    abilityCard.gameObject.SetActive(true);
                     abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
-                    if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
+                    if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
             }
             else if (currentActionIndex == 5) // Ability 4
