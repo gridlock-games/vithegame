@@ -306,9 +306,11 @@ namespace Vi.ArtificialIntelligence
         private void RefreshStatus()
         {
             disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
+            canOnlyLightAttack = bool.Parse(FasterPlayerPrefs.Singleton.GetString("BotsCanOnlyLightAttack"));
         }
 
         private bool disableBots;
+        private bool canOnlyLightAttack;
 
         private IEnumerator EvaluateBotLogic()
         {
@@ -384,6 +386,18 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
+            if (canOnlyLightAttack)
+            {
+                if (Vector3.Distance(navMeshAgent.destination, transform.position) < lightAttackDistance)
+                {
+                    if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+                    else { weaponHandler.HeavyAttack(false); }
+
+                    weaponHandler.LightAttack(true);
+                }
+                return;
+            }
+
             if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
             {
                 loadoutManager.SwitchWeapon();

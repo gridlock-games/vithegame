@@ -23,7 +23,7 @@ namespace Vi.ArtificialIntelligence
             yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer());
             foreach (BotDefinition botDefinition in botDefinitions)
             {
-                PlayerDataManager.Singleton.AddBotData(botDefinition.team);
+                PlayerDataManager.Singleton.AddBotData(botDefinition.team, false);
             }
         }
 

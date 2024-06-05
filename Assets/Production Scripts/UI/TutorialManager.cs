@@ -50,6 +50,7 @@ namespace Vi.UI
         {
             FindPlayerInput();
             FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", true.ToString());
 
             foreach (Image image in overlayImages)
             {
@@ -156,7 +157,7 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Move To The Marked Location.";
-                PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor);
+                PlayerDataManager.Singleton.AddBotData(PlayerDataManager.Team.Competitor, true);
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
@@ -189,6 +190,13 @@ namespace Vi.UI
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
+
+                yield return new WaitUntil(() => IsTaskComplete());
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
             }
             else if (currentActionIndex == 3) // Combo
             {
@@ -210,9 +218,20 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.name.Contains("LightAttack") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
                 attributes.ResetComboCounter();
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
+
+                yield return new WaitUntil(() => IsTaskComplete());
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -262,6 +281,8 @@ namespace Vi.UI
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 6) // Block
@@ -291,11 +312,21 @@ namespace Vi.UI
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
 
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
+
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 7) // Dodge
@@ -315,16 +346,26 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Dodge")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Dodge") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetDodgeButton().transform, true));
+
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Disable();
+                }
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 8) // Player Card
@@ -372,6 +413,7 @@ namespace Vi.UI
 
                 PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
@@ -455,6 +497,7 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
             Time.timeScale = 1;
         }
 
@@ -665,7 +708,7 @@ namespace Vi.UI
                 if (botAttributes)
                 {
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
-                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
             }
@@ -674,7 +717,7 @@ namespace Vi.UI
                 if (botAttributes)
                 {
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
-                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.5f : 1;
+                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
