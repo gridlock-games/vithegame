@@ -51,11 +51,16 @@ namespace Vi.UI
                     abilityCard.gameObject.SetActive(false);
                 }
 
-                playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(false);
                 playerUI.GetBlockingButton().gameObject.SetActive(false);
                 playerUI.GetDodgeButton().gameObject.SetActive(false);
                 playerUI.GetMainPlayerCard().gameObject.SetActive(false);
+                playerUI.GetOnScreenReloadButton().gameObject.SetActive(false);
+                playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+
+                playerUI.GetPauseMenuButton().gameObject.SetActive(false);
+                playerUI.GetScoreboardButton().gameObject.SetActive(false);
+                playerUI.GetLoadoutMenuButton().gameObject.SetActive(false);
             }
         }
 
@@ -438,8 +443,13 @@ namespace Vi.UI
                     abilityCard.gameObject.SetActive(true);
                 }
 
-                playerUI.GetScoreboardButton().gameObject.SetActive(true);
+                playerUI.GetHeavyAttackButton().gameObject.SetActive(true);
+                playerUI.GetOnScreenReloadButton().gameObject.SetActive(true);
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
+
+                playerUI.GetPauseMenuButton().gameObject.SetActive(true);
+                playerUI.GetScoreboardButton().gameObject.SetActive(true);
+                playerUI.GetLoadoutMenuButton().gameObject.SetActive(true);
             }
             else if (currentActionIndex == 10) // Fight with NPC
             {

@@ -16,6 +16,8 @@ namespace Vi.UI
     {
         public List<AbilityCard> GetAbilityCards() { return new List<AbilityCard>() { ability1, ability2, ability3, ability4 }; }
 
+        public Image GetHeavyAttackButton() { return heavyAttackButton; }
+
         public RectTransform GetBlockingButton() { return blockingButton; }
 
         public RectTransform GetDodgeButton() { return dodgeButton; }
@@ -27,6 +29,8 @@ namespace Vi.UI
         public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
 
         public RectTransform GetSwitchWeaponButton() { return switchWeaponButton; }
+
+        public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
@@ -76,6 +80,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private RectTransform lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
+        [SerializeField] private RectTransform onScreenReloadButton;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
