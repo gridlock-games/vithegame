@@ -80,7 +80,7 @@ namespace Vi.Player
             cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
