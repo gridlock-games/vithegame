@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Vi.Core;
 using static ExternalFileLoaderWeb;
-using static GameCreator.Behavior.Behavior;
 
 public class ExternalFileLoaderWeb : MonoBehaviour
 {

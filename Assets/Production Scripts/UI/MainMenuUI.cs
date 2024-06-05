@@ -15,6 +15,7 @@ namespace Vi.UI
     {
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private ContentManager contentManager;
+        [SerializeField] private NewsManager newsManager;
 
         [Header("Initial Group")]
         [SerializeField] private GameObject initialParent;
@@ -234,6 +235,11 @@ namespace Vi.UI
         {
             Instantiate(contentManager.gameObject);
         }
+
+        public void OpenNewsScreen()
+    {
+      Instantiate(newsManager.gameObject);
+    }
 
         public void QuitGame()
         {
