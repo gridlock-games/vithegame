@@ -32,10 +32,12 @@ namespace Vi.Utility
             }
         }
 
+        List<AudioSource> registeredAudioSources = new List<AudioSource>();
         public void RegisterAudioSource(AudioSource audioSource)
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
+            registeredAudioSources.Add(audioSource);
         }
 
         /// <summary>
@@ -131,15 +133,29 @@ namespace Vi.Utility
 
         private const float musicFadeTime = 0.5f;
 
+        private float lastTimeScale = Time.timeScale;
+
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            if (Time.timeScale != lastTimeScale)
+            {
+                registeredAudioSources.RemoveAll(null);
+                foreach (AudioSource audioSource in registeredAudioSources)
+                {
+                    audioSource.pitch = Time.timeScale;
+                }
+            }
 
             if (musicSource)
             {
                 if (!musicSource.isPlaying) { musicSource.Play(); }
                 musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : musicVolume, Time.deltaTime * musicFadeTime);
+                musicSource.pitch = Time.timeScale;
             }
+
+            lastTimeScale = Time.timeScale;
         }
     }
 }
