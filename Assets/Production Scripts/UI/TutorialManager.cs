@@ -106,6 +106,8 @@ namespace Vi.UI
         private const float fadeToBlackSpeed = 3;
         private const float colorDistance = 0.001f;
 
+        private const float forwardSpawnPosMultiplier = 2.5f;
+
         private IEnumerator DisplayNextAction()
         {
             currentActionIndex += 1;
@@ -279,6 +281,13 @@ namespace Vi.UI
                     abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
                     if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
+
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = Vector3.one;
+                }
             }
             else if (currentActionIndex == 5) // Ability 4
             {
@@ -298,13 +307,20 @@ namespace Vi.UI
                     if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
 
+                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = Vector3.one;
+                }
+
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
                 playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 6) // Block
@@ -350,7 +366,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 7) // Dodge
@@ -391,7 +407,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 8) // Player Card
@@ -732,7 +748,7 @@ namespace Vi.UI
                 {
                     if (botAttributes)
                     {
-                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * 3, botAttributes.transform.rotation, botAttributes.transform);
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }
