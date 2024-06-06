@@ -257,8 +257,6 @@ namespace Vi.UI
                 }
             }
 
-            Debug.Log("Update Weapon Called " + forceRefresh);
-
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
