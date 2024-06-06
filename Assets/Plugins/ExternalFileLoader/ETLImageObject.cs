@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Vi.Core;
 
+namespace jomarcentermjm.ExternalFileHandler
+{
 public class ETLImageObject : MonoBehaviour
 {
   public string itemID;
@@ -39,4 +41,5 @@ public class ETLImageObject : MonoBehaviour
   }
 
 
+}
 }

@@ -405,13 +405,13 @@ namespace Vi.Core
         };
 
         private int botClientId = 0;
-        public void AddBotData(Team team)
+        public void AddBotData(Team team, bool useDefaultPrimaryWeapon)
         {
             if (IsServer)
             {
                 botClientId--;
 
-                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter();
+                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
 
                 List<string> potentialNames = botNames[botCharacter.raceAndGender];
                 potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
@@ -424,11 +424,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(team);
+                AddBotDataServerRpc(team, useDefaultPrimaryWeapon);
             }
         }
 
-        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team) { AddBotData(team); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon) { AddBotData(team, useDefaultPrimaryWeapon); }
 
         public void AddPlayerData(PlayerData playerData)
         {

@@ -22,6 +22,11 @@ namespace Vi.UI
             RectTransform parentRT = (RectTransform)transform.parent;
             Vector3 pos = parentRT.TransformPoint(parentRT.rect.center);
             rt.position = pos;
+
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                transform.localScale *= 2;
+            }
         }
 
         private float directionMultiplier = 1;
