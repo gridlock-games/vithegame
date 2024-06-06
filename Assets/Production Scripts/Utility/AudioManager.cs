@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace Vi.Utility
 {
@@ -11,9 +13,9 @@ namespace Vi.Utility
         [SerializeField] private MusicClip[] musicClips;
 
         [System.Serializable]
-        private struct MusicClip
+        private class MusicClip
         {
-            public string sceneNameToPlay;
+            public string[] sceneNamesToPlay;
             public AudioClip song;
         }
 
@@ -106,16 +108,20 @@ namespace Vi.Utility
         private void Awake()
         {
             _singleton = this;
+            SceneManager.sceneLoaded += OnSceneLoad;
+            SceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoad;
+            SceneManager.sceneUnloaded -= OnSceneUnload;
         }
 
         private AudioSource musicSource;
         private void Start()
         {
             RefreshStatus();
-            foreach (AudioSource audioSouce in FindObjectsOfType<AudioSource>())
-            {
-                RegisterAudioSource(audioSouce);
-            }
 
             // This is for music
             if (TryGetComponent(out musicSource))
@@ -123,6 +129,14 @@ namespace Vi.Utility
                 musicSource.volume = musicVolume;
                 musicSource.spatialBlend = 0;
             }
+
+            foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>())
+            {
+                if (audioSource == musicSource) { continue; }
+                RegisterAudioSource(audioSource);
+            }
+
+            RefreshMusicClip();
         }
 
         private float musicVolume = 1;
@@ -131,7 +145,7 @@ namespace Vi.Utility
             musicVolume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
         }
 
-        private const float musicFadeTime = 0.5f;
+        private const float musicFadeSpeed = 0.5f;
 
         private float lastTimeScale = 1;
 
@@ -148,14 +162,89 @@ namespace Vi.Utility
                 }
             }
 
-            if (musicSource)
+            if (!musicSource.isPlaying & musicSource.clip) { musicSource.Play(); }
+
+            if (currentMusicClip == null)
             {
-                if (!musicSource.isPlaying) { musicSource.Play(); }
-                musicSource.volume = Mathf.MoveTowards(musicSource.volume, NetworkManager.Singleton.IsConnectedClient ? 0 : musicVolume, Time.deltaTime * musicFadeTime);
-                musicSource.pitch = Time.timeScale;
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0, Time.deltaTime * musicFadeSpeed);
             }
+            else if (!isCrossfading)
+            {
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
+            }
+            musicSource.pitch = Time.timeScale;
 
             lastTimeScale = Time.timeScale;
+        }
+
+        private bool isCrossfading;
+        private Coroutine crossFadeCoroutine;
+        private IEnumerator CrossFadeBetweenSongs()
+        {
+            isCrossfading = true;
+
+            while (true)
+            {
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0, Time.deltaTime * musicFadeSpeed);
+                if (musicSource.volume == 0) { break; }
+                yield return null;
+            }
+
+            if (currentMusicClip == null) { isCrossfading = false; yield break; }
+            musicSource.clip = currentMusicClip.song;
+
+            while (true)
+            {
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
+                if (Mathf.Approximately(musicSource.volume, musicVolume)) { break; }
+                yield return null;
+            }
+
+            isCrossfading = false;
+        }
+
+        private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        {
+            RefreshMusicClip();
+        }
+
+        private void OnSceneUnload(Scene scene)
+        {
+            RefreshMusicClip();
+        }
+
+        private MusicClip currentMusicClip;
+        private void RefreshMusicClip()
+        {
+            bool musicClipFound = false;
+            foreach (MusicClip musicClip in musicClips)
+            {
+                foreach (string sceneName in musicClip.sceneNamesToPlay)
+                {
+                    Scene scene = SceneManager.GetSceneByName(sceneName);
+                    if (!scene.IsValid()) { continue; }
+
+                    if (scene.isLoaded)
+                    {
+                        musicClipFound = true;
+                        currentMusicClip = musicClip;
+
+                        // If the clip we are changing to is not the same as the previous clip, and there is already a clip assigned to the music source
+                        if (musicSource.clip != musicClip.song & musicSource.clip)
+                        {
+                            if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
+                            crossFadeCoroutine = StartCoroutine(CrossFadeBetweenSongs());
+                        }
+                        else
+                        {
+                            musicSource.clip = musicClip.song;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (!musicClipFound) { currentMusicClip = null; }
         }
     }
 }
