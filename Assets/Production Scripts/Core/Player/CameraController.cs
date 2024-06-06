@@ -50,6 +50,7 @@ namespace Vi.Player
             targetRotationY += rotationY;
         }
 
+        private Animator animator;
         private void Start()
         {
             targetRotationX = 0;
@@ -64,6 +65,8 @@ namespace Vi.Player
             currentPositionOffset = positionOffset;
             cameraData = GetComponent<UniversalAdditionalCameraData>();
             RefreshStatus();
+
+            animator = GetComponent<Animator>();
         }
 
         private void OnDestroy()
@@ -152,20 +155,42 @@ namespace Vi.Player
                 }
 
                 currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
-                transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
 
-                transform.LookAt(cameraInterp.transform);
+                IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
 
-                // Do the same thing for the clone transform
-                CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-                CameraPositionClone.transform.LookAt(cameraInterp.transform);
-
-                // Move camera if there is a wall in the way
-                if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }
-                if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                if (!IsAnimating)
                 {
-                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+
+                    transform.LookAt(cameraInterp.transform);
+
+                    // Do the same thing for the clone transform
+                    CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                    CameraPositionClone.transform.LookAt(cameraInterp.transform);
+
+                    // Move camera if there is a wall in the way
+                    if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }
+                    if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                    {
+                        transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                    }
                 }
+            }
+        }
+
+        public bool IsAnimating { get; private set; }
+
+        public void PlayAnimation(string stateName)
+        {
+            animator.Play(stateName);
+        }
+
+        private void OnAnimatorMove()
+        {
+            if (IsAnimating)
+            {
+                transform.position += animator.deltaPosition;
+                transform.rotation *= animator.deltaRotation;
             }
         }
     }

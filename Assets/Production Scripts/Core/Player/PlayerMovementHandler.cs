@@ -93,7 +93,7 @@ namespace Vi.Player
             }
 
             Quaternion newRotation = movementPrediction.CurrentRotation;
-            if (IsOwner)
+            if (IsOwner & !cameraController.IsAnimating)
             {
                 Vector3 camDirection = cameraController.transform.TransformDirection(Vector3.forward);
                 camDirection.Scale(HORIZONTAL_PLANE);
@@ -329,6 +329,14 @@ namespace Vi.Player
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
+
+            StartCoroutine(PlayCameraAnimation());
+        }
+
+        private IEnumerator PlayCameraAnimation()
+        {
+            yield return new WaitForSeconds(2);
+            cameraController.PlayAnimation("TutorialIntro");
         }
 
         private Camera mainCamera;
