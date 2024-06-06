@@ -66,6 +66,10 @@ namespace Vi.Player
             cameraData = GetComponent<UniversalAdditionalCameraData>();
             RefreshStatus();
 
+            cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+            transform.LookAt(cameraInterp.transform);
+
             animator = GetComponent<Animator>();
         }
 
@@ -82,6 +86,8 @@ namespace Vi.Player
         {
             cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
+
+        bool test;
 
         private void LateUpdate()
         {

@@ -330,12 +330,6 @@ namespace Vi.Player
             attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
 
-            StartCoroutine(PlayCameraAnimation());
-        }
-
-        private IEnumerator PlayCameraAnimation()
-        {
-            yield return new WaitForSeconds(2);
             cameraController.PlayAnimation("TutorialIntro");
         }
 
