@@ -172,7 +172,6 @@ namespace Vi.Utility
             {
                 musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
             }
-            musicSource.pitch = Time.timeScale;
 
             lastTimeScale = Time.timeScale;
         }
