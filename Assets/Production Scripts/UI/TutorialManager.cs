@@ -106,7 +106,7 @@ namespace Vi.UI
         private const float fadeToBlackSpeed = 3;
         private const float colorDistance = 0.001f;
 
-        private const float forwardSpawnPosMultiplier = 2.5f;
+        private const float forwardSpawnPosMultiplier = 2;
 
         private IEnumerator DisplayNextAction()
         {
@@ -255,6 +255,15 @@ namespace Vi.UI
                 {
                     playerInput.actions.FindAction(action.name).Disable();
                 }
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -282,7 +291,7 @@ namespace Vi.UI
                     if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
 
-                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+                yield return new WaitUntil(() => !IsTaskComplete() & ShouldCheckmarkBeDisplayed());
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
@@ -307,7 +316,7 @@ namespace Vi.UI
                     if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
 
-                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
+                yield return new WaitUntil(() => !IsTaskComplete() & ShouldCheckmarkBeDisplayed());
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
