@@ -101,7 +101,7 @@ namespace Vi.Player
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
-            isAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
+            IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
 
             // Update camera interp transform
             if (movementHandler.TargetToLockOn)
@@ -112,7 +112,7 @@ namespace Vi.Player
             }
             else
             {
-                Vector2 lookInput = isAnimating ? Vector2.zero : movementHandler.GetLookInput();
+                Vector2 lookInput = IsAnimating ? Vector2.zero : movementHandler.GetLookInput();
                 targetRotationX += lookInput.y;
                 targetRotationY += lookInput.x;
             }
@@ -178,7 +178,7 @@ namespace Vi.Player
                 targetPosition = CameraPositionClone.transform.position;
                 targetRotation = CameraPositionClone.transform.rotation;
 
-                if (isAnimating)
+                if (IsAnimating)
                 {
                     transform.position = targetPosition + animationPositionOffset;
                     transform.rotation = targetRotation * animationRotationOffset;
@@ -198,7 +198,7 @@ namespace Vi.Player
             }
         }
 
-        private bool isAnimating;
+        public bool IsAnimating { get; private set; }
 
         public void PlayAnimation(string stateName)
         {
@@ -207,14 +207,14 @@ namespace Vi.Player
 
         public Vector3 GetCamDirection()
         {
-            return isAnimating ? CameraPositionClone.transform.forward : transform.forward;
+            return IsAnimating ? CameraPositionClone.transform.forward : transform.forward;
         }
 
         Vector3 animationPositionOffset;
         Quaternion animationRotationOffset;
         private void OnAnimatorMove()
         {
-            if (isAnimating)
+            if (IsAnimating)
             {
                 animationPositionOffset += animator.deltaPosition;
                 animationRotationOffset *= animator.deltaRotation;

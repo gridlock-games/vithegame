@@ -26,6 +26,8 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
+        public bool IsCameraAnimating() { return cameraController.IsAnimating; }
+
         public Transform TargetToLockOn { get; private set; }
         public void LockOnTarget(Transform target)
         {

@@ -169,9 +169,9 @@ namespace Vi.Core
         {
             public PlayerDataManager.GameMode[] gameModes;
             public PlayerDataManager.Team[] teams;
-            public Vector3[] spawnPositions;
-            public Vector3[] spawnRotations;
-            public int[] spawnPriorities;
+            public Vector3[] spawnPositions = new Vector3[0];
+            public Vector3[] spawnRotations = new Vector3[0];
+            public int[] spawnPriorities = new int[0];
         }
     }
 }

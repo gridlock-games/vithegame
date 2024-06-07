@@ -94,6 +94,7 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => playerInput);
             yield return null;
+            yield return new WaitUntil(() => !attributes.GetComponent<PlayerMovementHandler>().IsCameraAnimating());
             StartCoroutine(DisplayNextAction());
         }
 
@@ -156,7 +157,7 @@ namespace Vi.UI
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
                     currentOverlaySprites = result.pressedSprites;
                 }
-                
+
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -596,8 +597,6 @@ namespace Vi.UI
             }
         }
 
-        private const float objectCompleteImageSpeed = 2;
-
         private void LateUpdate()
         {
             tutorialCanvas.enabled = currentActionIndex > -1;
@@ -610,7 +609,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * objectCompleteImageSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -622,7 +621,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * objectCompleteImageSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 1);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -639,7 +638,7 @@ namespace Vi.UI
             else if (IsInBufferTime())
             {
                 overlayText.text = "";
-                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * objectCompleteImageSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
