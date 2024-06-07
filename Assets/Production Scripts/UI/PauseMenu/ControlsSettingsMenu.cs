@@ -18,12 +18,10 @@ namespace Vi.UI
         [SerializeField] private InputField zoomMultiplierInput;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
-        [SerializeField] private RectTransform lookSettingsGroupParent;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
         [Header("Key Rebinding")]
         [SerializeField] private InputActionAsset controlsAsset;
-        [SerializeField] private GridLayoutGroup scrollViewContentGrid;
         [SerializeField] private RectTransform rebindingElementParent;
         [SerializeField] private RebindingElement rebindingElementPrefab;
         [SerializeField] private GameObject rebindingSectionHeaderPrefab;
@@ -58,12 +56,9 @@ namespace Vi.UI
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
             mobileLookJoystickSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
 
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer | Application.platform == RuntimePlatform.WindowsEditor)
             {
                 mobileLookJoystickInputParent.gameObject.SetActive(true);
-                lookSettingsGroupParent.sizeDelta = new Vector2(lookSettingsGroupParent.sizeDelta.x, lookSettingsGroupParent.sizeDelta.y + 125);
-                scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
-                rebindingElementParent.anchoredPosition = new Vector2(rebindingElementParent.anchoredPosition.x, rebindingElementParent.anchoredPosition.y - 125);
             }
 
             zoomModeDropdown.AddOptions(holdToggleOptions);
@@ -75,23 +70,16 @@ namespace Vi.UI
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
             if (!playerInput) { playerInput = FindObjectOfType<PlayerInput>(); }
-
-            originalRebindingParentSizeDelta = rebindingElementParent.sizeDelta;
-
-            originalScrollViewGridLayoutSize = scrollViewContentGrid.cellSize;
         }
 
-        private Vector2 originalScrollViewGridLayoutSize;
-        private Vector2 originalRebindingParentSizeDelta;
+        private const float elementSpacing = 100;
+        private List<GameObject> rebindingElementObjects = new List<GameObject>();
         private void RegenerateInputBindingMenu()
         {
-            foreach (Transform child in rebindingElementParent)
+            foreach (GameObject g in rebindingElementObjects)
             {
-                Destroy(child.gameObject);
+                Destroy(g);
             }
-
-            rebindingElementParent.sizeDelta = new Vector2(originalRebindingParentSizeDelta.x, 0);
-            scrollViewContentGrid.cellSize = originalScrollViewGridLayoutSize;
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
@@ -100,10 +88,10 @@ namespace Vi.UI
                 RebindableAction[] rebindableActionGroup = System.Array.FindAll(rebindableActions, item => item.actionGroup == actionGroup & !item.excludedControlSchemes.Contains(playerInput.currentControlScheme));
                 if (rebindableActionGroup.Length > 0)
                 {
-                    Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent).GetComponentInChildren<Text>().text = actionGroup.ToString();
+                    rebindingElementObjects.Add(Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent));
+                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString();
 
-                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 150);
-                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 150);
+                    rebindingElementParent.sizeDelta += new Vector2(0, elementSpacing);
 
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {
@@ -118,12 +106,12 @@ namespace Vi.UI
                                 deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                                 if (binding.path.ToLower().Contains(deviceName.ToLower()))
                                 {
-                                    RebindingElement rebindingElement = Instantiate(rebindingElementPrefab, rebindingElementParent).GetComponent<RebindingElement>();
+                                    rebindingElementObjects.Add(Instantiate(rebindingElementPrefab.gameObject, rebindingElementParent));
+                                    RebindingElement rebindingElement = rebindingElementObjects[^1].GetComponent<RebindingElement>();
+                                    rebindingElementParent.sizeDelta += new Vector2(0, elementSpacing);
                                     rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
                                     bindingFound = true;
                                     shouldBreak = !binding.isPartOfComposite;
-                                    rebindingElementParent.sizeDelta = new Vector2(rebindingElementParent.sizeDelta.x, rebindingElementParent.sizeDelta.y + 125);
-                                    scrollViewContentGrid.cellSize = new Vector2(scrollViewContentGrid.cellSize.x, scrollViewContentGrid.cellSize.y + 125);
                                     break;
                                 }
                             }

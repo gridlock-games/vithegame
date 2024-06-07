@@ -24,14 +24,14 @@ namespace Vi.UI
         {
             if (string.IsNullOrWhiteSpace(rebindableAction.overrideActionName))
             {
-                inputActionDisplayText.text = rebindableAction.inputActionReferences[0].action.name;
+                inputActionDisplayText.text = rebindableAction.inputActionReferences[0].action.name.ToUpper();
             }
             else
             {
-                inputActionDisplayText.text = rebindableAction.overrideActionName;
+                inputActionDisplayText.text = rebindableAction.overrideActionName.ToUpper();
             }
 
-            bindingDisplayText.text = "[Not Bound]";
+            bindingDisplayText.text = "[NOT BOUND]";
             
             InputBinding binding = rebindableAction.inputActionReferences[0].action.bindings[bindingIndex];
             if (!string.IsNullOrWhiteSpace(binding.name))
@@ -39,16 +39,16 @@ namespace Vi.UI
                 switch (binding.name)
                 {
                     case "up":
-                        inputActionDisplayText.text += " Forward";
+                        inputActionDisplayText.text += " Forward".ToUpper();
                         break;
                     case "down":
-                        inputActionDisplayText.text += " Backward";
+                        inputActionDisplayText.text += " Backward".ToUpper();
                         break;
                     case "left":
-                        inputActionDisplayText.text += " Left";
+                        inputActionDisplayText.text += " Left".ToUpper();
                         break;
                     case "right":
-                        inputActionDisplayText.text += " Right";
+                        inputActionDisplayText.text += " Right".ToUpper();
                         break;
                     default:
                         Debug.Log("Unsure what to display for binding name " + binding.name);
@@ -62,7 +62,7 @@ namespace Vi.UI
                 deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                 if (binding.path.ToLower().Contains(deviceName.ToLower()))
                 {
-                    if (bindingDisplayText.text == "[Not Bound]")
+                    if (bindingDisplayText.text == "[NOT BOUND]")
                     {
                         bindingDisplayText.text = binding.ToDisplayString();
                     }
