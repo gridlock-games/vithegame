@@ -24,7 +24,8 @@ public class ConvertSelectFieldToDropdown : MonoBehaviour
         {
             selectField.AddOption(option.text);
         }
-        selectField.value = dropdown.options[dropdown.value].text;
+
+        if (dropdown.options.Count > 0) { selectField.value = dropdown.options[dropdown.value].text; }
 
         startCalled = true;
     }

@@ -31,7 +31,7 @@ namespace Vi.UI
         [SerializeField] private Button discardChangesButton;
         [SerializeField] private Text fpsWarningText;
         [Header("Display Settings Resizing By Platform")]
-        [SerializeField] private GridLayoutGroup scrollGrid;
+        //[SerializeField] private GridLayoutGroup scrollGrid;
         [SerializeField] private RectTransform displaySettingsGroup;
         [SerializeField] private GameObject fullScreenModeElement;
         [SerializeField] private GameObject resolutionElement;
@@ -57,7 +57,7 @@ namespace Vi.UI
                 fullScreenModeElement.SetActive(false);
                 resolutionElement.SetActive(false);
 
-                scrollGrid.cellSize = new Vector2(scrollGrid.cellSize.x, scrollGrid.cellSize.y - 125 * 2);
+                //scrollGrid.cellSize = new Vector2(scrollGrid.cellSize.x, scrollGrid.cellSize.y - 125 * 2);
                 displaySettingsGroup.sizeDelta = new Vector2(displaySettingsGroup.sizeDelta.x, displaySettingsGroup.sizeDelta.y - 125 * 2);
 
                 foreach (Transform child in displaySettingsGroup.parent)
