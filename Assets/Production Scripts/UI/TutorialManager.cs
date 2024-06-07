@@ -506,7 +506,7 @@ namespace Vi.UI
                 // Set messages active here
                 while (mainGroup.alpha > colorDistance)
                 {
-                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageLerpSpeed);
+                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageSpeed);
                     yield return null;
                 }
                 mainGroup.alpha = 0;
@@ -521,7 +521,7 @@ namespace Vi.UI
                     {
                         yield return null;
                         elapsedTime += Time.deltaTime;
-                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageLerpSpeed);
+                        endingMessage.color = Vector4.MoveTowards(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageSpeed);
                     }
 
                     elapsedTime = 0;
@@ -529,7 +529,7 @@ namespace Vi.UI
                     {
                         yield return null;
                         elapsedTime += Time.deltaTime;
-                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageLerpSpeed);
+                        endingMessage.color = Vector4.MoveTowards(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageSpeed);
                     }
                     endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
                 }
@@ -558,7 +558,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
-        private const float endingMessageLerpSpeed = 2;
+        private const float endingMessageSpeed = 1;
         private const float endingMessageDisplayDuration = 2;
 
         [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
@@ -596,6 +596,8 @@ namespace Vi.UI
             }
         }
 
+        private const float objectCompleteImageSpeed = 2;
+
         private void LateUpdate()
         {
             tutorialCanvas.enabled = currentActionIndex > -1;
@@ -608,7 +610,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * objectCompleteImageSpeed);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -620,7 +622,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * objectCompleteImageSpeed);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -637,7 +639,7 @@ namespace Vi.UI
             else if (IsInBufferTime())
             {
                 overlayText.text = "";
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = Vector4.MoveTowards(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * objectCompleteImageSpeed);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
