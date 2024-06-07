@@ -12,7 +12,6 @@ namespace Vi.Player
     public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private Camera minimapCameraInstance;
 
         [Header("Locomotion Settings")]
         [SerializeField] private float angularSpeed = 540;

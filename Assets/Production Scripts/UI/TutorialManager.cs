@@ -507,7 +507,7 @@ namespace Vi.UI
                 // Set messages active here
                 while (mainGroup.alpha > colorDistance)
                 {
-                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageSpeed);
+                    mainGroup.alpha = Mathf.MoveTowards(mainGroup.alpha, 0, Time.deltaTime * endingMessageSpeed);
                     yield return null;
                 }
                 mainGroup.alpha = 0;
@@ -675,7 +675,7 @@ namespace Vi.UI
                 image.gameObject.SetActive(image.sprite);
             }
 
-            float timerTextNum = (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime));
+            float timerTextNum = onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime);
             timerText.text = timerEnabled & timerTextNum >= 0 ? timerTextNum.ToString("F0") : "";
 
             if (canProceed & !lastCanProceed)
