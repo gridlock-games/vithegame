@@ -93,9 +93,9 @@ namespace Vi.Player
             }
 
             Quaternion newRotation = movementPrediction.CurrentRotation;
-            if (IsOwner & !cameraController.IsAnimating)
+            if (IsOwner)
             {
-                Vector3 camDirection = cameraController.transform.TransformDirection(Vector3.forward);
+                Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
