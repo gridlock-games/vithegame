@@ -212,7 +212,7 @@ namespace Vi.UI
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
 
-            //fadeToWhiteImage.color = Color.black;
+            fadeToWhiteImage.color = Color.black;
 
             playerCard.Initialize(GetComponentInParent<Attributes>());
 

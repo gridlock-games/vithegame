@@ -56,6 +56,7 @@ namespace Vi.Player
             targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
+            animator = GetComponent<Animator>();
             movementHandler = GetComponentInParent<PlayerMovementHandler>();
             weaponHandler = movementHandler.GetComponent<WeaponHandler>();
             attributes = movementHandler.GetComponent<Attributes>();
@@ -70,7 +71,7 @@ namespace Vi.Player
             transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             transform.LookAt(cameraInterp.transform);
 
-            animator = GetComponent<Animator>();
+            LateUpdate();
         }
 
         private void OnDestroy()
@@ -87,11 +88,11 @@ namespace Vi.Player
             cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
-        bool test;
-
         private void LateUpdate()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
 
             // Update camera interp transform
             if (movementHandler.TargetToLockOn)
@@ -102,7 +103,7 @@ namespace Vi.Player
             }
             else
             {
-                Vector2 lookInput = movementHandler.GetLookInput();
+                Vector2 lookInput = IsAnimating ? Vector2.zero : movementHandler.GetLookInput();
                 targetRotationX += lookInput.y;
                 targetRotationY += lookInput.x;
             }
@@ -161,8 +162,6 @@ namespace Vi.Player
                 }
 
                 currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
-
-                IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
 
                 if (!IsAnimating)
                 {

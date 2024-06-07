@@ -330,7 +330,10 @@ namespace Vi.Player
             attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
 
-            cameraController.PlayAnimation("TutorialIntro");
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Map"))
+            {
+                cameraController.PlayAnimation("TutorialIntro");
+            }
         }
 
         private Camera mainCamera;
