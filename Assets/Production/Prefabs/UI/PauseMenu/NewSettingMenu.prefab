@@ -1738,7 +1738,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -35, y: -35}
-  m_SizeDelta: {x: 578.1746, y: 82.61492}
+  m_SizeDelta: {x: 576.5248, y: 82.46766}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &9058069777172967608
 CanvasRenderer:
@@ -2726,6 +2726,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: -59.916492
       objectReference: {fileID: 0}
+    - target: {fileID: 8426563191932979262, guid: 6f1ce633a8d8b5b4d85ecb6b87e7a09f,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8759998843380987215, guid: 6f1ce633a8d8b5b4d85ecb6b87e7a09f,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2881,6 +2886,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UISettings_Menu
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238300188064045909, guid: 6962f6c076dfc4a408453dd45e72d1d8,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6962f6c076dfc4a408453dd45e72d1d8, type: 3}
@@ -3770,6 +3780,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4477539852483135700, guid: f4765ff7f7167214f86b02cb1995750e,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4625491340545900349, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -3828,7 +3843,7 @@ PrefabInstance:
     - target: {fileID: 6693378349620609744, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7164430992344248774, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
@@ -4379,6 +4394,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.x
       value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 1958529826601565656, guid: c91888a193d7ab2429318a166ae1dbbb,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2240888224178263326, guid: c91888a193d7ab2429318a166ae1dbbb,
         type: 3}
@@ -5057,6 +5077,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -56.169678
+      objectReference: {fileID: 0}
+    - target: {fileID: 5056558872553187695, guid: 6ceb2d1fe53d4214eb12c0d84bbf1398,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5313625914780466385, guid: 6ceb2d1fe53d4214eb12c0d84bbf1398,
         type: 3}

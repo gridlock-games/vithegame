@@ -45,7 +45,7 @@ namespace Vi.UI
             RuntimePlatform.WindowsPlayer,
             RuntimePlatform.OSXPlayer,
             RuntimePlatform.LinuxPlayer,
-            RuntimePlatform.WindowsEditor,
+            //RuntimePlatform.WindowsEditor,
             RuntimePlatform.OSXEditor,
             RuntimePlatform.LinuxEditor
         };

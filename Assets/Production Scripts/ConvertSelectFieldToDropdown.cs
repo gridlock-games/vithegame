@@ -32,7 +32,7 @@ public class ConvertSelectFieldToDropdown : MonoBehaviour
 
     public void UpdateDropdownValue()
     {
-        StartCoroutine(UpdateDropdownAfterStart());
+        if (isActiveAndEnabled) { StartCoroutine(UpdateDropdownAfterStart()); }
     }
 
     private IEnumerator UpdateDropdownAfterStart()
@@ -45,7 +45,7 @@ public class ConvertSelectFieldToDropdown : MonoBehaviour
 
     public void UpdateSelectFieldValue()
     {
-        StartCoroutine(UpdateSelectFieldAfterStart());
+        if (isActiveAndEnabled) { StartCoroutine(UpdateSelectFieldAfterStart()); }
     }
 
     private IEnumerator UpdateSelectFieldAfterStart()
