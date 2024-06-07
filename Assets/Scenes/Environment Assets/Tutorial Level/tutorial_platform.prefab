@@ -673,6 +673,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5693185650851078865}
+  - component: {fileID: 4054656799862715880}
   m_Layer: 0
   m_Name: pillar
   m_TagString: Untagged
@@ -697,6 +698,19 @@ Transform:
   m_Father: {fileID: 5693185651758938278}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4054656799862715880
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693185650851078864}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 3.4785385, z: 1}
+  m_Center: {x: 0, y: -0.3445034, z: 0}
 --- !u!1 &5693185651248391695
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,6 +858,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5693185651330116049}
+  - component: {fileID: 2835185985061216433}
   m_Layer: 0
   m_Name: pillar
   m_TagString: Untagged
@@ -868,6 +883,19 @@ Transform:
   m_Father: {fileID: 5693185651758938278}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2835185985061216433
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693185651330116048}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 3.9423504, z: 1}
+  m_Center: {x: -0, y: 1.4711746, z: -0}
 --- !u!1 &5693185651433870965
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,6 +905,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5693185651433870966}
+  - component: {fileID: 916981007}
   m_Layer: 0
   m_Name: pillar
   m_TagString: Untagged
@@ -901,6 +930,19 @@ Transform:
   m_Father: {fileID: 5693185651758938278}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!65 &916981007
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693185651433870965}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 3.3259292, z: 1}
+  m_Center: {x: 0, y: -0.25013798, z: 0}
 --- !u!1 &5693185651596212856
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,6 +1024,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5693185651815573374}
+  - component: {fileID: 916981008}
   m_Layer: 0
   m_Name: pillar
   m_TagString: Untagged
@@ -1006,6 +1049,19 @@ Transform:
   m_Father: {fileID: 5693185651758938278}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!65 &916981008
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5693185651815573373}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 4.0111856, z: 1}
+  m_Center: {x: 0, y: 1.5055921, z: 0}
 --- !u!1 &5693185652091591869
 GameObject:
   m_ObjectHideFlags: 0
