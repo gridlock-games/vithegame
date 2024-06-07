@@ -33,6 +33,12 @@ public class DebugOverlay : MonoBehaviour
         InvokeRepeating(nameof(RefreshFps), 0, 0.1f);
         InvokeRepeating(nameof(RefreshPing), 0, 0.1f);
 
+        StartCoroutine(RefreshStatusAfter1Frame());
+    }
+
+    private IEnumerator RefreshStatusAfter1Frame()
+    {
+        yield return null;
         RefreshStatus();
     }
 

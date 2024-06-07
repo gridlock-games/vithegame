@@ -56,15 +56,261 @@ MonoBehaviour:
   zoomMultiplierInput: {fileID: 5689404818506977806}
   zoomModeDropdown: {fileID: 7557419896726574827}
   blockingModeDropdown: {fileID: 3966120009192794878}
-  lookSettingsGroupParent: {fileID: 0}
   mobileLookJoystickInputParent: {fileID: 0}
   mobileLookJoystickSensitivityInput: {fileID: 7643432105948241674}
-  controlsAsset: {fileID: 0}
-  scrollViewContentGrid: {fileID: 0}
+  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
+    type: 3}
   rebindingElementParent: {fileID: 0}
-  rebindingElementPrefab: {fileID: 0}
-  rebindingSectionHeaderPrefab: {fileID: 0}
-  rebindableActions: []
+  rebindingElementPrefab: {fileID: 3640826388737094634, guid: aad87bb93b915bb4eb0082c6e08019fb,
+    type: 3}
+  rebindingSectionHeaderPrefab: {fileID: 6143946943025144434, guid: d4699cc84171e854bbbdcf2e2a65336b,
+    type: 3}
+  rebindableActions:
+  - overrideActionName: Ability 1
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 6916536625684554248, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 2
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -5038717820958107051, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 3
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 4515516360362214105, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ability 4
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2013674324404209891, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Activate Rage
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -5435891241600975454, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -3073957792324674350, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Heavy Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -4895871817904562169, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Heavy Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 3855856810217455150, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Keyboard & Mouse
+  - overrideActionName: 
+    actionGroup: 0
+    inputActionReferences:
+    - {fileID: 7500517785045450566, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Light Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -8365810465465610074, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Light Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 1466368605225409598, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Keyboard & Mouse
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -6165872021668447691, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 0
+    inputActionReferences:
+    - {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -4942588444766842868, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Use Primary Weapon
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 6323030998958668391, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Gamepad
+    - Touchscreen
+  - overrideActionName: Use Secondary Weapon
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2829945742728114018, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Gamepad
+    - Touchscreen
+  - overrideActionName: Switch Weapon
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -8441861740736939578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Keyboard & Mouse
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 5304234536181186105, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Follow Previous Player
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7939484115188895425, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: 
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2555118930296445826, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Environment View Toggle
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 4010522318726611473, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Follow Player 1
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7103627180512043578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 2
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 5147967608157037885, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 3
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -1189835552163759953, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 4
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 6665943985039168211, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 5
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -1369703491976155950, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 6
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -7006894354886886491, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 7
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 4652540119691910013, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 8
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 8979544820950716431, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 9
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 3360090477999853096, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Player 10
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 6399690150165955535, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Follow Next Player
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -9119437012531945337, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Increase Move Speed
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
 --- !u!1 &1061705503343636783
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,8 +781,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7928249272550076956}
-  - {fileID: 6801942206586529339}
   - {fileID: 4928681457545180173}
   - {fileID: 1228473551430865205}
   - {fileID: 4688046511020311111}
@@ -738,7 +982,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7583614748884552518}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.7202824
+  m_Size: 0.72028244
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -839,7 +1083,7 @@ PrefabInstance:
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -986,7 +1230,7 @@ PrefabInstance:
     - target: {fileID: 5700680649975087458, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5700680649975087458, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
@@ -1128,7 +1372,7 @@ PrefabInstance:
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -1285,7 +1529,7 @@ PrefabInstance:
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
@@ -1447,7 +1691,7 @@ PrefabInstance:
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -1574,141 +1818,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &3922671300236281431
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 4095412132247364457}
-    m_Modifications:
-    - target: {fileID: 7289931223660524560, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_Text
-      value: CAMERA SENSITIVITY
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 1283.5146
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 119.1647
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 641.7573
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -59.58235
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044706881749838809, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_Name
-      value: LookSentitivity_Blank
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044706881749838809, guid: 107af880d99052d48aeff954f738ac42,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 107af880d99052d48aeff954f738ac42, type: 3}
---- !u!224 &6801942206586529339 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7500035606285099116, guid: 107af880d99052d48aeff954f738ac42,
-    type: 3}
-  m_PrefabInstance: {fileID: 3922671300236281431}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4835145306573884519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1729,7 +1838,7 @@ PrefabInstance:
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 150495101080817184, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -1856,141 +1965,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 4835145306573884519}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &5900990249363039939
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 4095412132247364457}
-    m_Modifications:
-    - target: {fileID: 3058632104277843818, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_Name
-      value: Reset_Button
-      objectReference: {fileID: 0}
-    - target: {fileID: 3058632104277843818, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_Text
-      value: Reset Setup
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 1283.5146
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 119.1647
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 641.7573
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -59.58235
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: de1f78cd1029a2645ab2c9168a1a73e3, type: 3}
---- !u!224 &7928249272550076956 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
-    type: 3}
-  m_PrefabInstance: {fileID: 5900990249363039939}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8271765654470102656
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2001,7 +1975,7 @@ PrefabInstance:
     - target: {fileID: 3058632104277843818, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
       propertyPath: m_Name
-      value: ButtonAssign_Button
+      value: Reset_Button
       objectReference: {fileID: 0}
     - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
@@ -2021,7 +1995,7 @@ PrefabInstance:
     - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
@@ -2151,7 +2125,7 @@ PrefabInstance:
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
