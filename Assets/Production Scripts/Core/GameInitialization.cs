@@ -26,7 +26,7 @@ namespace Vi.Core
             Application.Quit();
         }
 
-        private void Start()
+        private void Awake()
         {
             InitializePlayerPrefs();
 
