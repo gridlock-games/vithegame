@@ -13,6 +13,7 @@ namespace Vi.UI
     public class TutorialManager : MonoBehaviour
     {
         [SerializeField] private Canvas tutorialCanvas;
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private Text overlayText;
         [SerializeField] private Text timerText;
         [SerializeField] private Image[] overlayImages;
@@ -83,6 +84,8 @@ namespace Vi.UI
             originalAnchoredPosition = layoutGroupRT.anchoredPosition;
 
             objectiveCompleteImage.color = new Color(1, 1, 1, 0);
+
+            backgroundImage.enabled = false;
 
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
         }
@@ -656,6 +659,8 @@ namespace Vi.UI
                     overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
                 }
             }
+
+            backgroundImage.enabled = !string.IsNullOrWhiteSpace(overlayText.text);
 
             if (playerUI)
             {
