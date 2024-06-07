@@ -48,7 +48,7 @@ namespace Vi.UI
 
         private PlayerInput playerInput;
 
-        private void Start()
+        private void Awake()
         {
             invertLookToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse"));
             mouseXSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity").ToString();
