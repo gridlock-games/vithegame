@@ -106,7 +106,6 @@ namespace Vi.UI
 
         private int currentActionIndex = -1;
 
-        private const float fadeToBlackSpeed = 3;
         private const float colorDistance = 0.001f;
 
         private const float forwardSpawnPosMultiplier = 2;
@@ -261,12 +260,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -328,12 +327,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 6) // Block
             {
@@ -374,12 +373,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 7) // Dodge
             {
@@ -415,12 +414,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 8) // Player Card
             {
@@ -440,11 +439,11 @@ namespace Vi.UI
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
                 bufferDurationBetweenActions = 3;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.SetAllPlayersMobility(false);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
@@ -496,7 +495,7 @@ namespace Vi.UI
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
 
                 bufferDurationBetweenActions = 3;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
 
                 foreach (InputAction action in playerInput.actions)
