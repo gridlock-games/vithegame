@@ -922,6 +922,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468173d0a688b3e42bd7e8b552ba112b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  armorNameText: {fileID: 2303669367625209005}
   gearIcon: {fileID: 3640567270577730066}
   selectedBorder: {fileID: 3640567270404140455}
   overlayCanvasGroup: {fileID: 1367370539592180017}
@@ -2402,7 +2403,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7347916037901890812}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -2418,7 +2419,7 @@ GameObject:
   - component: {fileID: 4185065705038853156}
   - component: {fileID: 2303669367625209005}
   m_Layer: 5
-  m_Name: Label
+  m_Name: Armor_Name_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

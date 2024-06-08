@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class WeaponDisplayElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private Text weaponNameText;
         [SerializeField] private Image gearIcon;
         [SerializeField] private Image selectedBorder;
         [SerializeField] private CanvasGroup overlayCanvasGroup;
@@ -19,11 +20,13 @@ namespace Vi.UI
         public void Initialize(CharacterReference.WeaponOption weaponOption)
         {
             gearIcon.sprite = weaponOption?.weaponIcon;
+            weaponNameText.text = weaponOption == null ? "" : weaponOption.name.ToUpper();
             this.weaponOption = weaponOption;
 
             for (int i = 0; i < weaponOption.weapon.GetAbilities().Count; i++)
             {
                 abilityImages[i].sprite = weaponOption.weapon.GetAbilities()[i].abilityImageIcon;
+                abilityImages[i].color = Color.white;
             }
         }
 

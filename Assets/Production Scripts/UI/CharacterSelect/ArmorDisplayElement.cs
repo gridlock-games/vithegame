@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class ArmorDisplayElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private Text armorNameText;
         [SerializeField] private Image gearIcon;
         [SerializeField] private Image selectedBorder;
         [SerializeField] private CanvasGroup overlayCanvasGroup;
@@ -18,6 +19,7 @@ namespace Vi.UI
         public void Initialize(CharacterReference.WearableEquipmentOption armorOption, CharacterReference.RaceAndGender raceAndGender)
         {
             gearIcon.sprite = armorOption?.GetIcon(raceAndGender);
+            armorNameText.text = armorOption == null ? "" : armorOption.name.ToUpper();
             this.armorOption = armorOption;
         }
 
