@@ -29,7 +29,7 @@ namespace Vi.UI
             overlayCanvasGroup.alpha = pointerIsHoveringOnThisObject & armorOption != null ? 1 : 0;
         }
 
-        private const float selectedImageAnimationSpeed = 2;
+        private const float selectedImageAnimationSpeed = 4;
         private void Update()
         {
             gearIcon.enabled = gearIcon.sprite;
