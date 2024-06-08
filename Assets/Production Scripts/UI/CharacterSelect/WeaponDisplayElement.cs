@@ -12,6 +12,7 @@ namespace Vi.UI
         [SerializeField] private Image gearIcon;
         [SerializeField] private Image selectedBorder;
         [SerializeField] private CanvasGroup overlayCanvasGroup;
+        [SerializeField] private RectTransform itemDescriptionParent;
         [SerializeField] private Image[] abilityImages;
 
         private CharacterReference.WeaponOption weaponOption = null;
@@ -41,6 +42,8 @@ namespace Vi.UI
             gearIcon.enabled = gearIcon.sprite;
             selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, pointerIsHoveringOnThisObject & weaponOption != null ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
             overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, pointerIsHoveringOnThisObject & weaponOption != null ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+        
+            
         }
 
         private bool pointerIsHoveringOnThisObject;
