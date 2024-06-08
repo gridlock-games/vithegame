@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028326, g: 0.22571333, b: 0.30692202, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1480,6 +1480,7 @@ MonoBehaviour:
   selectionBarGlowImage: {fileID: 1921887605}
   selectionBarUnselectedImage: {fileID: 597176707}
   deleteCharacterButton: {fileID: 1225081412}
+  statsAndGearParent: {fileID: 1292376091}
   statsParent: {fileID: 525894811}
   gearParent: {fileID: 33587557}
   primaryWeaponIcon: {fileID: 191114569}
@@ -4992,7 +4993,7 @@ PrefabInstance:
     - target: {fileID: 5205780964996573365, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5205780964996573365, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}

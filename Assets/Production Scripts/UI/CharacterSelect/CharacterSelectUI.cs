@@ -31,6 +31,7 @@ namespace Vi.UI
         [SerializeField] private Image selectionBarGlowImage;
         [SerializeField] private RectTransform selectionBarUnselectedImage;
         [SerializeField] private Button deleteCharacterButton;
+        [SerializeField] private GameObject statsAndGearParent;
         [Header("Stats Section")]
         [SerializeField] private GameObject statsParent;
         [Header("Gear Section")]
@@ -618,8 +619,9 @@ namespace Vi.UI
         private bool lastClientState;
         private void Update()
         {
-            statsParent.SetActive(statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
-            gearParent.SetActive(!statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+            statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+            statsParent.SetActive(statsSelected);
+            gearParent.SetActive(!statsSelected);
 
             UpdateSelectionBarPositions();
 
