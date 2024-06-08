@@ -37,13 +37,19 @@ namespace Vi.UI
         }
 
         private const float selectedImageAnimationSpeed = 4;
+        Vector3[] worldCorners = new Vector3[4];
         private void Update()
         {
             gearIcon.enabled = gearIcon.sprite;
             selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, pointerIsHoveringOnThisObject & weaponOption != null ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
             overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, pointerIsHoveringOnThisObject & weaponOption != null ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
-        
-            
+
+            itemDescriptionParent.GetWorldCorners(worldCorners);
+
+            if (worldCorners[0].y < 0)
+            {
+                itemDescriptionParent.anchoredPosition = new Vector2(itemDescriptionParent.anchoredPosition.x, itemDescriptionParent.anchoredPosition.y - worldCorners[0].y * 2);
+            }
         }
 
         private bool pointerIsHoveringOnThisObject;
