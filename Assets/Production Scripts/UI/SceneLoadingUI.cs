@@ -34,7 +34,7 @@ namespace Vi.UI
         private void Update()
         {
             canvas.enabled = canvasGroup.alpha > 0.05f;
-            if (!NetSceneManager.Singleton)
+            if (!NetSceneManager.DoesExist())
             {
                 canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
                 return;

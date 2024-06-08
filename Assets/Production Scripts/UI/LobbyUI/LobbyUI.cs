@@ -15,6 +15,7 @@ namespace Vi.UI
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
+        [SerializeField] private Button returnToHubButton;
         [SerializeField] private Vector3 previewCharacterPosition;
         [SerializeField] private Vector3 previewCharacterRotation;
         [SerializeField] private Button lockCharacterButton;
@@ -85,8 +86,13 @@ namespace Vi.UI
             PlayerDataManager.GameMode.TeamElimination
         };
 
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Awake()
         {
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+
+            returnToHubButton.onClick.AddListener(() => ReturnToHub());
+
             lockedClients = new NetworkList<ulong>();
 
             CloseRoomSettings();
@@ -359,11 +365,32 @@ namespace Vi.UI
             }
         }
 
-        public void ReturnToCharacterSelect()
+        private void ReturnToHub()
         {
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             NetSceneManager.Singleton.LoadScene("Character Select");
+            PersistentLocalObjects.Singleton.StartCoroutine(ReturnToHubCoroutine());
+        }
+
+        private IEnumerator ReturnToHubCoroutine()
+        {
+            returnToHubButton.interactable = false;
+
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.wasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
+                networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
+                networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+                NetworkManager.Singleton.StartClient();
+            }
         }
 
         public void ValidateInputAsInt(InputField inputField)
