@@ -144,12 +144,7 @@ namespace Vi.Core
                 glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
                 glowMaterialInstance.SetColor(_Color, colorTarget);
             }
-            this.colorTarget = colorTarget;
         }
-
-        private Color colorTarget;
-
-        public bool IsRenderingBlock() { return colorTarget == blockColor; }
 
         private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");
         private readonly int _Color = Shader.PropertyToID("_Color");

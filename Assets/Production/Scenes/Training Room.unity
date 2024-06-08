@@ -169,8 +169,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botDefinitions:
   - team: 2
-  - team: 2
-  - team: 2
 --- !u!1 &1467391048
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +223,7 @@ MonoBehaviour:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 90, z: 0}
+    spawnPriorities: 
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20

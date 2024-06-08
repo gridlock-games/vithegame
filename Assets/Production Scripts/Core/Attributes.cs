@@ -384,6 +384,13 @@ namespace Vi.Core
             comboCounter.Value = 0;
         }
 
+        private float lastBlockTime = Mathf.NegativeInfinity;
+        public bool BlockedRecently()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.BlockedRecently will not be evaluated properly if we aren't the server!"); return false; }
+            return Time.time - lastBlockTime <= 0.25f;
+        }
+
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
         private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
@@ -566,6 +573,7 @@ namespace Vi.Core
                     }
                     break;
                 case ActionClip.HitReactionType.Blocking:
+                    lastBlockTime = Time.time;
                     if (spiritPercentage >= blockingSpiritHitReactionPercentage)
                     {
                         AddSpirit(HPDamage * 0.5f);

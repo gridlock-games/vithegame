@@ -94,6 +94,12 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => playerInput);
             yield return null;
+
+            foreach (InputAction action in playerInput.actions)
+            {
+                if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+            }
+
             yield return new WaitUntil(() => !attributes.GetComponent<PlayerMovementHandler>().IsCameraAnimating());
             StartCoroutine(DisplayNextAction());
         }
@@ -495,6 +501,10 @@ namespace Vi.UI
                 yield return new WaitForSeconds(2);
 
                 currentOverlayMessage = "";
+
+                yield return new WaitUntil(() => canProceed);
+
+                currentOverlayMessage = "ENEMY KNOCKED OUT.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
@@ -800,7 +810,7 @@ namespace Vi.UI
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
-                canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
+                canProceed = attributes.BlockedRecently() | canProceed;
             }
             else if (currentActionIndex == 7) // Dodge
             {
