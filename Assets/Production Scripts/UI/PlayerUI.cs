@@ -39,8 +39,7 @@ namespace Vi.UI
         public Button GetScoreboardButton() { return scoreboardButton; }
 
         private bool shouldFadeToBlack;
-        private float fadeToBlackSpeed = 8;
-        public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
+        public void SetFadeToBlack(bool shouldFade) { shouldFadeToBlack = shouldFade; }
 
         public Color GetFadeToBlackColor() { return fadeToBlackImage.color; }
 
@@ -435,13 +434,13 @@ namespace Vi.UI
 
                 if (shouldFadeToBlack)
                 {
-                    fadeToBlackImage.color = Color.Lerp(fadeToBlackImage.color, Color.black, Time.deltaTime * fadeToBlackSpeed);
-                    fadeToWhiteImage.color = fadeToBlackImage.color;
+                    fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
+                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);
                 }
                 else
                 {
                     fadeToBlackImage.color = Color.clear;
-                    fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
                 }
             }
             else

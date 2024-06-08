@@ -25,7 +25,7 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.SetFloat(playerPrefName, slider.value);
         }
 
-        private void Start()
+        private void Awake()
         {
             autoAimToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
             consoleToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
