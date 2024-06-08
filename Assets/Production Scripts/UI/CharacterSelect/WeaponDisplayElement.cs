@@ -54,9 +54,13 @@ namespace Vi.UI
 
             itemDescriptionParent.GetWorldCorners(worldCorners);
 
-            if (worldCorners[0].y < 0)
+            if (worldCorners[1].y > Screen.height)
             {
-                itemDescriptionParent.anchoredPosition = new Vector2(itemDescriptionParent.anchoredPosition.x, itemDescriptionParent.anchoredPosition.y - worldCorners[0].y * 2);
+                itemDescriptionParent.anchoredPosition = new Vector2(itemDescriptionParent.anchoredPosition.x, itemDescriptionParent.anchoredPosition.y - (worldCorners[1].y - Screen.height));
+            }
+            else if (worldCorners[0].y < 0)
+            {
+                itemDescriptionParent.anchoredPosition = new Vector2(itemDescriptionParent.anchoredPosition.x, itemDescriptionParent.anchoredPosition.y - worldCorners[0].y);
             }
 
             canvas.overrideSorting = isSelected;
