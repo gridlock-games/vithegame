@@ -35,8 +35,8 @@ namespace Vi.UI
         [SerializeField] private GameObject statsParent;
         [Header("Gear Section")]
         [SerializeField] private GameObject gearParent;
-        [SerializeField] private Image primaryWeaponIcon;
-        [SerializeField] private Image secondaryWeaponIcon;
+        [SerializeField] private WeaponDisplayElement primaryWeaponDisplayElement;
+        [SerializeField] private WeaponDisplayElement secondaryWeaponDisplayElement;
         [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
         [SerializeField] private ArmorDisplayElement[] equipmentImageValues;
 
@@ -527,8 +527,8 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
             {
-                primaryWeaponIcon.gameObject.SetActive(true);
-                secondaryWeaponIcon.gameObject.SetActive(true);
+                primaryWeaponDisplayElement.gameObject.SetActive(true);
+                secondaryWeaponDisplayElement.gameObject.SetActive(true);
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
                     equipmentImageValues[i].gameObject.SetActive(true);
@@ -537,13 +537,13 @@ namespace Vi.UI
                 loadoutManager = previewObject.GetComponent<LoadoutManager>();
                 loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
-                primaryWeaponIcon.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
-                secondaryWeaponIcon.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
+                primaryWeaponDisplayElement.Initialize(loadoutManager.PrimaryWeaponOption);
+                secondaryWeaponDisplayElement.Initialize(loadoutManager.SecondaryWeaponOption);
             }
             else
             {
-                primaryWeaponIcon.gameObject.SetActive(false);
-                secondaryWeaponIcon.gameObject.SetActive(false);
+                primaryWeaponDisplayElement.gameObject.SetActive(false);
+                secondaryWeaponDisplayElement.gameObject.SetActive(false);
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
                     equipmentImageValues[i].gameObject.SetActive(false);
@@ -599,8 +599,8 @@ namespace Vi.UI
 
             WebRequestManager.Singleton.RefreshServers();
 
-            primaryWeaponIcon.gameObject.SetActive(false);
-            secondaryWeaponIcon.gameObject.SetActive(false);
+            primaryWeaponDisplayElement.gameObject.SetActive(false);
+            secondaryWeaponDisplayElement.gameObject.SetActive(false);
             for (int i = 0; i < equipmentTypeKeys.Length; i++)
             {
                 equipmentImageValues[i].gameObject.SetActive(false);
