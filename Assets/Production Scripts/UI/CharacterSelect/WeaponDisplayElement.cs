@@ -30,6 +30,12 @@ namespace Vi.UI
         private readonly static Color glowOnColor = new Color(1, 1, 1, 1);
         private readonly static Color glowOffColor = new Color(1, 1, 1, 0);
 
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
+
         private void OnEnable()
         {
             selectedBorder.color = pointerIsHoveringOnThisObject & weaponOption != null ? glowOnColor : glowOffColor;
@@ -40,9 +46,11 @@ namespace Vi.UI
         Vector3[] worldCorners = new Vector3[4];
         private void Update()
         {
+            bool isSelected = pointerIsHoveringOnThisObject & weaponOption != null;
+
             gearIcon.enabled = gearIcon.sprite;
-            selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, pointerIsHoveringOnThisObject & weaponOption != null ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
-            overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, pointerIsHoveringOnThisObject & weaponOption != null ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+            selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, isSelected ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
+            overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, isSelected ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
 
             itemDescriptionParent.GetWorldCorners(worldCorners);
 
@@ -50,6 +58,9 @@ namespace Vi.UI
             {
                 itemDescriptionParent.anchoredPosition = new Vector2(itemDescriptionParent.anchoredPosition.x, itemDescriptionParent.anchoredPosition.y - worldCorners[0].y * 2);
             }
+
+            canvas.overrideSorting = isSelected;
+            canvas.sortingOrder = 25;
         }
 
         private bool pointerIsHoveringOnThisObject;
