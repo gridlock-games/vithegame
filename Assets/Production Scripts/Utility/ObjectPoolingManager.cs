@@ -7,6 +7,8 @@ namespace Vi.Utility
 {
     public class ObjectPoolingManager : MonoBehaviour
     {
+        public const string cullingOverrideTag = "DoNotCull";
+
         public static List<PooledObjectInfo> ObjectPools = new List<PooledObjectInfo>();
 
         private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
