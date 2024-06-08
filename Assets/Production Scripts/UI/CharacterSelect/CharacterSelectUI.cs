@@ -26,7 +26,6 @@ namespace Vi.UI
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
         [SerializeField] private Button goToTrainingRoomButton;
-        [SerializeField] private Sprite defaultEquipmentSprite;
         [SerializeField] private RectTransform selectionBarSelectedImage;
         [SerializeField] private Image selectionBarGlowImage;
         [SerializeField] private RectTransform selectionBarUnselectedImage;
@@ -39,7 +38,7 @@ namespace Vi.UI
         [SerializeField] private Image primaryWeaponIcon;
         [SerializeField] private Image secondaryWeaponIcon;
         [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
-        [SerializeField] private Image[] equipmentImageValues;
+        [SerializeField] private ArmorDisplayElement[] equipmentImageValues;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -690,14 +689,14 @@ namespace Vi.UI
 
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
-                    equipmentImageValues[i].sprite = loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]).GetIcon(raceAndGender);
+                    equipmentImageValues[i].Initialize(loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]), raceAndGender);
                 }
             }
             else
             {
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
-                    equipmentImageValues[i].sprite = defaultEquipmentSprite;
+                    equipmentImageValues[i].Initialize(null, default);
                 }
             }
         }

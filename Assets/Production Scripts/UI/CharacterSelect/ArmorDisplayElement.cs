@@ -3,28 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
     public class ArmorDisplayElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private Image gearIcon;
         [SerializeField] private Image selectedBorder;
         [SerializeField] private CanvasGroup overlayCanvasGroup;
+
+        private CharacterReference.WearableEquipmentOption armorOption = null;
+        public void Initialize(CharacterReference.WearableEquipmentOption armorOption, CharacterReference.RaceAndGender raceAndGender)
+        {
+            gearIcon.sprite = armorOption?.GetIcon(raceAndGender);
+            this.armorOption = armorOption;
+        }
 
         private readonly static Color glowOnColor = new Color(1, 1, 1, 1);
         private readonly static Color glowOffColor = new Color(1, 1, 1, 0);
 
         private void OnEnable()
         {
-            selectedBorder.color = pointerIsHoveringOnThisObject ? glowOnColor : glowOffColor;
-            overlayCanvasGroup.alpha = pointerIsHoveringOnThisObject ? 1 : 0;
+            selectedBorder.color = pointerIsHoveringOnThisObject & armorOption != null ? glowOnColor : glowOffColor;
+            overlayCanvasGroup.alpha = pointerIsHoveringOnThisObject & armorOption != null ? 1 : 0;
         }
 
         private const float selectedImageAnimationSpeed = 2;
         private void Update()
         {
-            selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, pointerIsHoveringOnThisObject ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
-            overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, pointerIsHoveringOnThisObject ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
+            gearIcon.enabled = gearIcon.sprite;
+            selectedBorder.color = Vector4.MoveTowards(selectedBorder.color, pointerIsHoveringOnThisObject & armorOption != null ? glowOnColor : glowOffColor, Time.deltaTime * selectedImageAnimationSpeed);
+            overlayCanvasGroup.alpha = Mathf.MoveTowards(overlayCanvasGroup.alpha, pointerIsHoveringOnThisObject & armorOption != null ? 1 : 0, Time.deltaTime * selectedImageAnimationSpeed);
         }
 
         private bool pointerIsHoveringOnThisObject;
