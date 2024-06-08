@@ -586,12 +586,9 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                if (!IsBlocking)
-                {
-                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-                    if (actionClip != null)
-                        animationHandler.PlayAction(actionClip);
-                }
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
             }
         }
 

@@ -94,6 +94,12 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => playerInput);
             yield return null;
+
+            foreach (InputAction action in playerInput.actions)
+            {
+                if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+            }
+
             yield return new WaitUntil(() => !attributes.GetComponent<PlayerMovementHandler>().IsCameraAnimating());
             StartCoroutine(DisplayNextAction());
         }
@@ -444,6 +450,8 @@ namespace Vi.UI
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.SetAllPlayersMobility(false);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
@@ -489,6 +497,14 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
+
+                yield return new WaitForSeconds(2);
+
+                currentOverlayMessage = "";
+
+                yield return new WaitUntil(() => canProceed);
+
+                currentOverlayMessage = "ENEMY KNOCKED OUT.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
@@ -660,7 +676,7 @@ namespace Vi.UI
                 }
             }
 
-            backgroundImage.enabled = !string.IsNullOrWhiteSpace(overlayText.text);
+            backgroundImage.enabled = !string.IsNullOrWhiteSpace(overlayText.text) | objectiveCompleteImage.color.a > 0;
 
             if (playerUI)
             {
@@ -794,7 +810,7 @@ namespace Vi.UI
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
-                canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
+                canProceed = attributes.BlockedRecently() | canProceed;
             }
             else if (currentActionIndex == 7) // Dodge
             {
