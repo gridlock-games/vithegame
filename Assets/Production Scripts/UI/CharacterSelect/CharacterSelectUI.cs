@@ -37,9 +37,7 @@ namespace Vi.UI
         [Header("Gear Section")]
         [SerializeField] private GameObject gearParent;
         [SerializeField] private Image primaryWeaponIcon;
-        [SerializeField] private Text primaryWeaponText;
         [SerializeField] private Image secondaryWeaponIcon;
-        [SerializeField] private Text secondaryWeaponText;
         [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
         [SerializeField] private Image[] equipmentImageValues;
 
@@ -541,9 +539,7 @@ namespace Vi.UI
                 loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
                 primaryWeaponIcon.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
-                primaryWeaponText.text = loadoutManager.PrimaryWeaponOption.name;
                 secondaryWeaponIcon.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
-                secondaryWeaponText.text = loadoutManager.SecondaryWeaponOption.name;
             }
             else
             {
