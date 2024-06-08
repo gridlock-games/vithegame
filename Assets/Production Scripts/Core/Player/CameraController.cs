@@ -68,8 +68,15 @@ namespace Vi.Player
             RefreshStatus();
 
             cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
-            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-            transform.LookAt(cameraInterp.transform);
+
+            CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+            CameraPositionClone.transform.LookAt(cameraInterp.transform);
+
+            targetPosition = CameraPositionClone.transform.position;
+            targetRotation = CameraPositionClone.transform.rotation;
+
+            transform.position = CameraPositionClone.transform.position;
+            transform.rotation = CameraPositionClone.transform.rotation;
 
             LateUpdate();
         }
@@ -88,6 +95,8 @@ namespace Vi.Player
             cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
+        Vector3 targetPosition;
+        Quaternion targetRotation;
         private void LateUpdate()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -140,12 +149,12 @@ namespace Vi.Player
             }
             else
             {
-                Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
+                Quaternion targetCameraInterpRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
                 if (weaponHandler.IsAiming())
                 {
                     cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
-                    cameraInterp.transform.rotation = targetRotation;
+                    cameraInterp.transform.rotation = targetCameraInterpRotation;
                 }
                 else
                 {
@@ -156,22 +165,28 @@ namespace Vi.Player
                        smoothTime
                     );
 
-                    Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetRotation, Time.deltaTime * orbitSpeed).eulerAngles;
+                    Vector3 eulers = Quaternion.Slerp(cameraInterp.transform.rotation, targetCameraInterpRotation, Time.deltaTime * orbitSpeed).eulerAngles;
                     eulers.z = 0;
                     cameraInterp.transform.eulerAngles = eulers;
                 }
 
                 currentPositionOffset = Vector3.MoveTowards(currentPositionOffset, weaponHandler.IsAiming() ? aimingPositionOffset : positionOffset, Time.deltaTime * aimingTransitionSpeed);
 
-                if (!IsAnimating)
+                CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
+                CameraPositionClone.transform.LookAt(cameraInterp.transform);
+
+                targetPosition = CameraPositionClone.transform.position;
+                targetRotation = CameraPositionClone.transform.rotation;
+
+                if (IsAnimating)
                 {
-                    transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-
-                    transform.LookAt(cameraInterp.transform);
-
-                    // Do the same thing for the clone transform
-                    CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
-                    CameraPositionClone.transform.LookAt(cameraInterp.transform);
+                    transform.position = targetPosition + animationPositionOffset;
+                    transform.rotation = targetRotation * animationRotationOffset;
+                }
+                else
+                {
+                    transform.position = targetPosition;
+                    transform.rotation = targetRotation;
 
                     // Move camera if there is a wall in the way
                     if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }
@@ -190,12 +205,24 @@ namespace Vi.Player
             animator.Play(stateName);
         }
 
+        public Vector3 GetCamDirection()
+        {
+            return IsAnimating ? CameraPositionClone.transform.forward : transform.forward;
+        }
+
+        Vector3 animationPositionOffset;
+        Quaternion animationRotationOffset;
         private void OnAnimatorMove()
         {
             if (IsAnimating)
             {
-                transform.position += animator.deltaPosition;
-                transform.rotation *= animator.deltaRotation;
+                animationPositionOffset += animator.deltaPosition;
+                animationRotationOffset *= animator.deltaRotation;
+            }
+            else
+            {
+                animationPositionOffset = Vector3.zero;
+                animationRotationOffset = Quaternion.identity;
             }
         }
     }

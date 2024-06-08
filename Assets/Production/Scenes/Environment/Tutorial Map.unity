@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028326, g: 0.22571333, b: 0.30692202, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -98,7 +98,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 7bda1a0b3977ba54fb4271d3102b4cad,
+    type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 5d63c635b0383434799ee2dfae095bd8,
     type: 2}
 --- !u!196 &4
@@ -115,8 +116,8 @@ NavMeshSettings:
     ledgeDropHeight: 0
     maxJumpAcrossDistance: 0
     minRegionArea: 2
-    manualCellSize: 0
-    cellSize: 0.16666667
+    manualCellSize: 1
+    cellSize: 0.07
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -2260,6 +2261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tutorialCanvas: {fileID: 1394462165}
+  backgroundImage: {fileID: 248134185}
   overlayText: {fileID: 840159706}
   timerText: {fileID: 1774242900}
   overlayImages:
@@ -2723,7 +2725,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b195f521a905b8649be282b0f3d32011,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 22.107367
+      value: 27.85
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b195f521a905b8649be282b0f3d32011,
         type: 3}
@@ -4360,10 +4362,11 @@ MonoBehaviour:
     teams: 02000000
     spawnPositions:
     - {x: -0.12, y: 4, z: 2.31}
-    - {x: 0, y: 4, z: -20.23}
+    - {x: 0, y: 4, z: -18}
     spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
+    spawnPriorities: 0000000001000000
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
