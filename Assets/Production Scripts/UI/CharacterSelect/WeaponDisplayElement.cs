@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Vi.UI
 {
-    public class WeaponDisplayEleent : MonoBehaviour
+    public class WeaponDisplayElement : MonoBehaviour
     {
 
     }
