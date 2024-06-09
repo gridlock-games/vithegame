@@ -117,6 +117,7 @@ namespace Vi.Core
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
+            isGrabbed.OnValueChanged += OnIsGrabbedChanged;
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
@@ -146,6 +147,7 @@ namespace Vi.Core
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
+            isGrabbed.OnValueChanged -= OnIsGrabbedChanged;
             statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
@@ -396,6 +398,8 @@ namespace Vi.Core
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }
+
+        private void OnIsGrabbedChanged(bool prev, bool current) { movementHandler.OnIsGrabbedChange(prev, current); }
 
         public Attributes GetGrabAssailant()
         {
