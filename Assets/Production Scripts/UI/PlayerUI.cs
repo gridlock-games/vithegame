@@ -55,6 +55,8 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability2;
         [SerializeField] private AbilityCard ability3;
         [SerializeField] private AbilityCard ability4;
+        [SerializeField] private Image dodgeIconImageOnPC;
+        [SerializeField] private Image dodgeCooldownImage;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
@@ -80,6 +82,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
+        [SerializeField] private Image mobileDodgeCooldownImage;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -393,6 +396,15 @@ namespace Vi.UI
             if (!weaponHandler.WeaponInitialized) { return; }
 
             scoreboardButton.gameObject.SetActive(Core.GameModeManagers.GameModeManager.Singleton);
+
+            float dodgeCooldownProgress = weaponHandler.GetWeapon().GetDodgeCooldownProgress();
+            mobileDodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
+            dodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
+
+            bool dodgeIsOnCooldown = !Mathf.Approximately(dodgeCooldownProgress, 1);
+            dodgeIconImageOnPC.enabled = dodgeIsOnCooldown;
+            dodgeCooldownImage.enabled = dodgeIsOnCooldown;
+            mobileDodgeCooldownImage.enabled = dodgeIsOnCooldown;
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
