@@ -911,11 +911,12 @@ namespace Vi.Core
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        private bool pingEnabled;
         private void RefreshStatus()
         {
-            pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
         }
+
+        private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void Update()
         {
@@ -944,7 +945,7 @@ namespace Vi.Core
             UpdateStamina();
             UpdateRage();
 
-            if (pingEnabled) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
+            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
         private float staminaDelayCooldown;
