@@ -149,6 +149,8 @@ namespace Vi.UI
         {
             if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
 
+            codeInputBoxParent.SetActive(false);
+
             OpenStats();
 
             originalSelectionBarGlowColor = selectionBarGlowImage.color;
@@ -166,7 +168,7 @@ namespace Vi.UI
             OpenCharacterSelect();
             finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
-            selectCharacterButton.onClick.AddListener(() => StartCoroutine(AutoConnectToHubServer()));
+            selectCharacterButton.onClick.AddListener(() => AutoConnectToHub());
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
 
             deleteCharacterButton.onClick.RemoveAllListeners();
@@ -865,12 +867,31 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
         }
 
-        public IEnumerator AutoConnectToHubServer()
+        private const string connectToServerCode = "217031";
+
+        private void AutoConnectToHub()
+        {
+            if (autoConnectToHubServerCoroutine != null) { StopCoroutine(autoConnectToHubServerCoroutine); }
+            autoConnectToHubServerCoroutine = StartCoroutine(AutoConnectToHubServer());
+        }
+
+        private Coroutine autoConnectToHubServerCoroutine;
+        private IEnumerator AutoConnectToHubServer()
         {
             selectCharacterButton.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion();
+
+            if (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("IsDiscordVerified")))
+            {
+                codeInputBoxParent.SetActive(true);
+
+                yield return new WaitUntil(() => codeInputField.text == connectToServerCode);
+
+                codeInputBoxParent.SetActive(false);
+                FasterPlayerPrefs.Singleton.SetString("IsDiscordVerified", true.ToString());
+            }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
@@ -888,6 +909,21 @@ namespace Vi.UI
             }
             
             selectCharacterButton.interactable = true;
+        }
+
+        [SerializeField] private GameObject codeInputBoxParent;
+        [SerializeField] private InputField codeInputField;
+
+        public void CloseCodeInputBox()
+        {
+            codeInputBoxParent.SetActive(false);
+            if (autoConnectToHubServerCoroutine != null) { StopCoroutine(autoConnectToHubServerCoroutine); }
+            selectCharacterButton.interactable = true;
+        }
+
+        public void OpenViDiscord()
+        {
+            Application.OpenURL("https://discord.gg/Ze2B8s5Ey3");
         }
 
         public void OpenServerBrowser()
