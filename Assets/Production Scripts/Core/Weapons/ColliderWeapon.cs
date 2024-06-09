@@ -30,17 +30,11 @@ namespace Vi.Core
             if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
             {
                 weaponTrailVFX.gameObject.SetActive(true);
-                weaponTrailVFX.SetBool("UseForce", true);
                 lastWeaponTrailActiveTime = Time.time;
             }
             else if (Time.time - lastWeaponTrailActiveTime > weaponTrailDeactivateDuration)
             {
                 weaponTrailVFX.gameObject.SetActive(false);
-                weaponTrailVFX.SetBool("UseForce", false);
-            }
-            else
-            {
-                weaponTrailVFX.SetBool("UseForce", false);
             }
         }
 
