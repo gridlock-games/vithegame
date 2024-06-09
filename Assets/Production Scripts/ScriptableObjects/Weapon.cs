@@ -434,6 +434,8 @@ namespace Vi.ScriptableObjects
 
         public bool IsDodgeOnCooldown() { return Time.time - lastDodgeActivateTime < dodgeCooldownDuration; }
 
+        public float GetDodgeCooldownProgress() { return Mathf.Clamp((Time.time - lastDodgeActivateTime) / dodgeCooldownDuration, 0, 1); }
+
         public ActionClip GetDodgeClip(float angle)
         {
             ActionClip dodgeClip;
