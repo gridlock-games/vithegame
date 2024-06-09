@@ -18,6 +18,25 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private GameObject weaponTrailVFX;
+        private const float weaponTrailDeactivateDuration = 0.2f;
+        private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
+        private void Update()
+        {
+            if (!weaponTrailVFX) { return; }
+            if (!parentWeaponHandler) { return; }
+
+            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
+            {
+                weaponTrailVFX.SetActive(true);
+                lastWeaponTrailActiveTime = Time.time;
+            }
+            else if (Time.time - lastWeaponTrailActiveTime > weaponTrailDeactivateDuration)
+            {
+                weaponTrailVFX.SetActive(false);
+            }
+        }
+
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 
