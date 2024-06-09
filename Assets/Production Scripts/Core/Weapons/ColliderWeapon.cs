@@ -60,20 +60,6 @@ namespace Vi.Core
             clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
         }
 
-        //private void Update()
-        //{
-        //    if (weaponTrail == null) { return; }
-
-        //    if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
-        //    {
-        //        weaponTrail.Activate();
-        //    }
-        //    else
-        //    {
-        //        weaponTrail.Deactivate(weaponTrailFadeTime);
-        //    }
-        //}
-
         private void OnDrawGizmos()
         {
             if (!parentWeaponHandler) { return; }
