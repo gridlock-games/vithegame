@@ -117,6 +117,7 @@ namespace Vi.Core
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
+            isGrabbed.OnValueChanged += OnIsGrabbedChanged;
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
@@ -146,6 +147,7 @@ namespace Vi.Core
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
+            isGrabbed.OnValueChanged -= OnIsGrabbedChanged;
             statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
@@ -397,6 +399,8 @@ namespace Vi.Core
 
         public bool IsGrabbed() { return isGrabbed.Value; }
 
+        private void OnIsGrabbedChanged(bool prev, bool current) { movementHandler.OnIsGrabbedChange(prev, current); }
+
         public Attributes GetGrabAssailant()
         {
             if (PlayerDataManager.Singleton.ContainsId(grabAssailantDataId.Value))
@@ -631,6 +635,8 @@ namespace Vi.Core
                     grabAttackClipName.Value = attack.name;
                     grabAssailantDataId.Value = attacker.GetPlayerDataId();
                     isGrabbed.Value = true;
+                    Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
                     attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 

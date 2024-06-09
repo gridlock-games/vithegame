@@ -25,6 +25,12 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
+        private float originalMass;
+        public override void OnIsGrabbedChange(bool prev, bool current)
+        {
+            movementPredictionRigidbody.mass = current ? Mathf.Infinity : originalMass;
+        }
+
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
         public Transform TargetToLockOn { get; private set; }
@@ -319,6 +325,7 @@ namespace Vi.Player
         {
             base.Awake();
             RefreshStatus();
+            originalMass = movementPredictionRigidbody.mass;
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;

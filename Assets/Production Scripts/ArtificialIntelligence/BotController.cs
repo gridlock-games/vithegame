@@ -23,6 +23,12 @@ namespace Vi.ArtificialIntelligence
 
         public override Vector3 GetPosition() { return currentPosition.Value; }
 
+        private float originalMass;
+        public override void OnIsGrabbedChange(bool prev, bool current)
+        {
+            networkColliderRigidbody.mass = current ? Mathf.Infinity : originalMass;
+        }
+
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
@@ -81,6 +87,7 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
             RefreshStatus();
+            originalMass = networkColliderRigidbody.mass;
         }
 
         private void Start()

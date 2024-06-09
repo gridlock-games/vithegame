@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using UnityEngine.VFX;
 
 namespace Vi.Core
 {
@@ -15,6 +16,25 @@ namespace Vi.Core
             foreach (Collider col in GetComponents<Collider>())
             {
                 col.enabled = NetworkManager.Singleton.IsServer;
+            }
+        }
+
+        [SerializeField] private VisualEffect weaponTrailVFX;
+        private const float weaponTrailDeactivateDuration = 0.2f;
+        private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
+        private void Update()
+        {
+            if (!weaponTrailVFX) { return; }
+            if (!parentWeaponHandler) { return; }
+
+            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
+            {
+                weaponTrailVFX.gameObject.SetActive(true);
+                lastWeaponTrailActiveTime = Time.time;
+            }
+            else if (Time.time - lastWeaponTrailActiveTime > weaponTrailDeactivateDuration)
+            {
+                weaponTrailVFX.gameObject.SetActive(false);
             }
         }
 
@@ -59,20 +79,6 @@ namespace Vi.Core
             if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
             clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
         }
-
-        //private void Update()
-        //{
-        //    if (weaponTrail == null) { return; }
-
-        //    if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
-        //    {
-        //        weaponTrail.Activate();
-        //    }
-        //    else
-        //    {
-        //        weaponTrail.Deactivate(weaponTrailFadeTime);
-        //    }
-        //}
 
         private void OnDrawGizmos()
         {

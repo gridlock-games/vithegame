@@ -78,10 +78,10 @@ namespace Vi.Core
                 }
             }
 
-            if (model)
+            WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
+            if (wearableEquipmentRendererDefinition != null)
             {
-                WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
-                if (wearableEquipmentRendererDefinition != null)
+                if (model)
                 {
                     for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
                     {
@@ -98,6 +98,13 @@ namespace Vi.Core
                         }
                     }
                 }
+                else // If there is no model, enable all the original skinned mesh renderers
+                {
+                    for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                    {
+                        wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
+                    }
+                }
             }
         }
 
@@ -107,6 +114,15 @@ namespace Vi.Core
             {
                 Destroy(wearableEquipmentInstances[equipmentType]);
                 wearableEquipmentInstances.Remove(equipmentType);
+            }
+
+            WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == equipmentType);
+            if (wearableEquipmentRendererDefinition != null)
+            {
+                for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                {
+                    wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
+                }
             }
         }
 

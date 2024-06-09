@@ -117,6 +117,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 378d36a439a9c2c46b94f118b72f64dc, type: 2}
+    - target: {fileID: -6920624728357480412, guid: 80693880eeecc2046a6224fd2ae6a6b3,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 480eecd78b496264191b3c6d0e107610, type: 2}
     - target: {fileID: -6833479802906322428, guid: 80693880eeecc2046a6224fd2ae6a6b3,
         type: 3}
       propertyPath: m_Layer
@@ -333,6 +338,11 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 130342650481765802, guid: 80693880eeecc2046a6224fd2ae6a6b3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 250444597581830041, guid: 80693880eeecc2046a6224fd2ae6a6b3,
         type: 3}
       propertyPath: m_Layer
       value: 7
@@ -593,4 +603,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equipmentType: 4
-  shouldDisableCharSkinRenderer: 0
+  shouldDisableCharSkinRenderer: 1
