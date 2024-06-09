@@ -74,7 +74,7 @@ namespace Vi.UI
             public void SetActive(bool isActive)
             {
                 teamTitleText.gameObject.SetActive(isActive);
-                transformParent.gameObject.SetActive(isActive);
+                transformParent.gameObject.SetActive(true);
                 addBotButton.gameObject.SetActive(isActive);
                 joinTeamButton.gameObject.SetActive(isActive);
             }
@@ -645,11 +645,14 @@ namespace Vi.UI
 
             bool leftTeamJoinInteractable = false;
             bool rightTeamJoinInteractable = false;
+            Dictionary<PlayerDataManager.Team, int> accountCardCounter = new Dictionary<PlayerDataManager.Team, int>();
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
             {
                 if (teamParentDict.ContainsKey(playerData.team))
                 {
-                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                    if (!accountCardCounter.ContainsKey(playerData.team)) { accountCardCounter.Add(playerData.team, 0); }
+
+                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardCounter[playerData.team] >= 4 ? rightTeamParent.transformParent : teamParentDict[playerData.team]).GetComponent<AccountCard>();
                     accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
 
                     if (playerData.id == (int)NetworkManager.LocalClientId)
@@ -657,6 +660,8 @@ namespace Vi.UI
                         leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
                         rightTeamJoinInteractable = teamParentDict[playerData.team] != rightTeamParent.transformParent;
                     }
+
+                    accountCardCounter[playerData.team] += 1;
                 }
             }
 
