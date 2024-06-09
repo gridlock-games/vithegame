@@ -631,6 +631,8 @@ namespace Vi.Core
                     grabAttackClipName.Value = attack.name;
                     grabAssailantDataId.Value = attacker.GetPlayerDataId();
                     isGrabbed.Value = true;
+                    Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
                     attacker.animationHandler.PlayAction(attacker.weaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
