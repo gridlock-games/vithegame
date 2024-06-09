@@ -148,6 +148,7 @@ namespace Vi.UI
         private void Awake()
         {
             if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
+            else { tutorialAlertBox.gameObject.SetActive(true); }
 
             codeInputBoxParent.SetActive(false);
 
