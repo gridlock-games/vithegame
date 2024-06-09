@@ -274,7 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponTrailVFX: {fileID: 6879302010000874572}
+  weaponTrailVFX: {fileID: 1899357410552983693}
 --- !u!1001 &5793805102853874034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -354,15 +354,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b65af2e0688e88f46abc8072889b2761, type: 3}
---- !u!4 &2893504486276223850 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8665050978951442968, guid: b65af2e0688e88f46abc8072889b2761,
+--- !u!2083052967 &1899357410552983693 stripped
+VisualEffect:
+  m_CorrespondingSourceObject: {fileID: 5349261006125617663, guid: b65af2e0688e88f46abc8072889b2761,
     type: 3}
   m_PrefabInstance: {fileID: 5793805102853874034}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6879302010000874572 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1089743230088052030, guid: b65af2e0688e88f46abc8072889b2761,
+--- !u!4 &2893504486276223850 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8665050978951442968, guid: b65af2e0688e88f46abc8072889b2761,
     type: 3}
   m_PrefabInstance: {fileID: 5793805102853874034}
   m_PrefabAsset: {fileID: 0}

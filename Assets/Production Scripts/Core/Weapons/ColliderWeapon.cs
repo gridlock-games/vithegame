@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using UnityEngine.VFX;
 
 namespace Vi.Core
 {
@@ -18,7 +19,7 @@ namespace Vi.Core
             }
         }
 
-        [SerializeField] private GameObject weaponTrailVFX;
+        [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
         private void Update()
@@ -28,12 +29,18 @@ namespace Vi.Core
 
             if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
             {
-                weaponTrailVFX.SetActive(true);
+                weaponTrailVFX.gameObject.SetActive(true);
+                weaponTrailVFX.SetBool("UseForce", true);
                 lastWeaponTrailActiveTime = Time.time;
             }
             else if (Time.time - lastWeaponTrailActiveTime > weaponTrailDeactivateDuration)
             {
-                weaponTrailVFX.SetActive(false);
+                weaponTrailVFX.gameObject.SetActive(false);
+                weaponTrailVFX.SetBool("UseForce", false);
+            }
+            else
+            {
+                weaponTrailVFX.SetBool("UseForce", false);
             }
         }
 
