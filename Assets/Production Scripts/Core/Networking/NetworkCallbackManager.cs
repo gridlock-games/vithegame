@@ -191,6 +191,7 @@ namespace Vi.Core
         private void OnClientStarted()
         {
             Debug.Log("Started Client at IP Address: " + networkTransport.ConnectionData.Address + " - Port: " + networkTransport.ConnectionData.Port + " - Payload: " + System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            if (createInstancesCoroutine != null) { StopCoroutine(createInstancesCoroutine); }
             StartCoroutine(ClientConnectTimeout());
         }
 
@@ -219,6 +220,14 @@ namespace Vi.Core
         {
             Debug.Log("Stopped Client " + wasHost);
 
+            if (createInstancesCoroutine != null) { StopCoroutine(createInstancesCoroutine); }
+            StartCoroutine(CreateInstances());
+        }
+
+        private Coroutine createInstancesCoroutine;
+        private IEnumerator CreateInstances()
+        {
+            yield return new WaitUntil(() => !NetSceneManager.DoesExist() | !PlayerDataManager.DoesExist());
             CreatePlayerDataManager(false);
             CreateNetSceneManager();
         }

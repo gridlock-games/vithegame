@@ -1,24 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
 
 namespace Vi.UI
 {
-  public class UISetting_Menu : MonoBehaviour
-  {
-
-    [SerializeField] private UIModificationMenu UILayoutSetting;
-    // Start is called before the first frame update
-    public void OpenUILayout()
+    public class UISetting_Menu : MonoBehaviour
     {
-      GameObject _settings = Instantiate(UILayoutSetting.gameObject);
-    }
+        [SerializeField] private UIModificationMenu UILayoutSetting;
+        public void OpenUILayout()
+        {
+            UILayoutSetting.gameObject.SetActive(true);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-
+        public void CloseUILayout()
+        {
+            UILayoutSetting.gameObject.SetActive(false);
+        }
     }
-  }
 }

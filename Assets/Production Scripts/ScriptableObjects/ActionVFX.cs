@@ -61,7 +61,7 @@ namespace Vi.ScriptableObjects
             foreach (ParticleSystem ps in GetComponentsInChildren<ParticleSystem>())
             {
                 ParticleSystem.MainModule main = ps.main;
-                main.cullingMode = NetworkManager.Singleton.IsServer ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
+                main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
 
             if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake); }

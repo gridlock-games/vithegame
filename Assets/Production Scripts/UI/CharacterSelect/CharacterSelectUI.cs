@@ -26,21 +26,19 @@ namespace Vi.UI
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
         [SerializeField] private Button goToTrainingRoomButton;
-        [SerializeField] private Sprite defaultEquipmentSprite;
         [SerializeField] private RectTransform selectionBarSelectedImage;
         [SerializeField] private Image selectionBarGlowImage;
         [SerializeField] private RectTransform selectionBarUnselectedImage;
         [SerializeField] private Button deleteCharacterButton;
+        [SerializeField] private GameObject statsAndGearParent;
         [Header("Stats Section")]
         [SerializeField] private GameObject statsParent;
         [Header("Gear Section")]
         [SerializeField] private GameObject gearParent;
-        [SerializeField] private Image primaryWeaponIcon;
-        [SerializeField] private Text primaryWeaponText;
-        [SerializeField] private Image secondaryWeaponIcon;
-        [SerializeField] private Text secondaryWeaponText;
+        [SerializeField] private WeaponDisplayElement primaryWeaponDisplayElement;
+        [SerializeField] private WeaponDisplayElement secondaryWeaponDisplayElement;
         [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
-        [SerializeField] private Image[] equipmentImageValues;
+        [SerializeField] private ArmorDisplayElement[] equipmentImageValues;
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
@@ -529,8 +527,8 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
             {
-                primaryWeaponIcon.gameObject.SetActive(true);
-                secondaryWeaponIcon.gameObject.SetActive(true);
+                primaryWeaponDisplayElement.gameObject.SetActive(true);
+                secondaryWeaponDisplayElement.gameObject.SetActive(true);
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
                     equipmentImageValues[i].gameObject.SetActive(true);
@@ -539,15 +537,13 @@ namespace Vi.UI
                 loadoutManager = previewObject.GetComponent<LoadoutManager>();
                 loadoutManager.ApplyLoadout(raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
-                primaryWeaponIcon.sprite = loadoutManager.PrimaryWeaponOption.weaponIcon;
-                primaryWeaponText.text = loadoutManager.PrimaryWeaponOption.name;
-                secondaryWeaponIcon.sprite = loadoutManager.SecondaryWeaponOption.weaponIcon;
-                secondaryWeaponText.text = loadoutManager.SecondaryWeaponOption.name;
+                primaryWeaponDisplayElement.Initialize(loadoutManager.PrimaryWeaponOption);
+                secondaryWeaponDisplayElement.Initialize(loadoutManager.SecondaryWeaponOption);
             }
             else
             {
-                primaryWeaponIcon.gameObject.SetActive(false);
-                secondaryWeaponIcon.gameObject.SetActive(false);
+                primaryWeaponDisplayElement.gameObject.SetActive(false);
+                secondaryWeaponDisplayElement.gameObject.SetActive(false);
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
                     equipmentImageValues[i].gameObject.SetActive(false);
@@ -603,8 +599,8 @@ namespace Vi.UI
 
             WebRequestManager.Singleton.RefreshServers();
 
-            primaryWeaponIcon.gameObject.SetActive(false);
-            secondaryWeaponIcon.gameObject.SetActive(false);
+            primaryWeaponDisplayElement.gameObject.SetActive(false);
+            secondaryWeaponDisplayElement.gameObject.SetActive(false);
             for (int i = 0; i < equipmentTypeKeys.Length; i++)
             {
                 equipmentImageValues[i].gameObject.SetActive(false);
@@ -618,8 +614,9 @@ namespace Vi.UI
         private bool lastClientState;
         private void Update()
         {
-            statsParent.SetActive(statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
-            gearParent.SetActive(!statsSelected & !string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+            statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
+            statsParent.SetActive(statsSelected);
+            gearParent.SetActive(!statsSelected);
 
             UpdateSelectionBarPositions();
 
@@ -692,14 +689,14 @@ namespace Vi.UI
 
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
-                    equipmentImageValues[i].sprite = loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]) == null ? defaultEquipmentSprite : loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]).GetIcon(raceAndGender);
+                    equipmentImageValues[i].Initialize(loadoutManager.GetEquippedEquipmentOption(equipmentTypeKeys[i]), raceAndGender);
                 }
             }
             else
             {
                 for (int i = 0; i < equipmentTypeKeys.Length; i++)
                 {
-                    equipmentImageValues[i].sprite = defaultEquipmentSprite;
+                    equipmentImageValues[i].Initialize(null, default);
                 }
             }
         }

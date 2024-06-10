@@ -446,7 +446,7 @@ namespace Vi.Core
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
-            lastClipPlayed = actionClip;
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
         }
 
         private Coroutine playStateAfterReachingEmptyCoroutine;

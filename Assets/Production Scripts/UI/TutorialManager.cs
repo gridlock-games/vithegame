@@ -13,6 +13,7 @@ namespace Vi.UI
     public class TutorialManager : MonoBehaviour
     {
         [SerializeField] private Canvas tutorialCanvas;
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private Text overlayText;
         [SerializeField] private Text timerText;
         [SerializeField] private Image[] overlayImages;
@@ -84,6 +85,8 @@ namespace Vi.UI
 
             objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
+            backgroundImage.enabled = false;
+
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
         }
 
@@ -91,6 +94,13 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => playerInput);
             yield return null;
+
+            foreach (InputAction action in playerInput.actions)
+            {
+                if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+            }
+
+            yield return new WaitUntil(() => !attributes.GetComponent<PlayerMovementHandler>().IsCameraAnimating());
             StartCoroutine(DisplayNextAction());
         }
 
@@ -103,8 +113,9 @@ namespace Vi.UI
 
         private int currentActionIndex = -1;
 
-        private const float fadeToBlackSpeed = 3;
         private const float colorDistance = 0.001f;
+
+        private const float forwardSpawnPosMultiplier = 2;
 
         private IEnumerator DisplayNextAction()
         {
@@ -152,7 +163,7 @@ namespace Vi.UI
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Look"] });
                     currentOverlaySprites = result.pressedSprites;
                 }
-                
+
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -253,6 +264,15 @@ namespace Vi.UI
                 {
                     playerInput.actions.FindAction(action.name).Disable();
                 }
+
+                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
+                bufferDurationBetweenActions = 6;
+                playerUI.SetFadeToBlack(true);
+                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
+                PlayerDataManager.Singleton.RespawnAllPlayers();
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 4) // Ability 1, 2, or 3
             {
@@ -279,6 +299,13 @@ namespace Vi.UI
                     abilityCard.transform.localScale = abilityNames.Contains(abilityCard.Ability.name) ? new Vector3(1.5f, 1.5f, 1.5f) : Vector3.one;
                     if (abilityNames.Contains(abilityCard.Ability.name)) { UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true)); }
                 }
+
+                yield return new WaitUntil(() => !IsTaskComplete() & ShouldCheckmarkBeDisplayed());
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = Vector3.one;
+                }
             }
             else if (currentActionIndex == 5) // Ability 4
             {
@@ -298,14 +325,21 @@ namespace Vi.UI
                     if (abilityNames.Contains(abilityCard.Ability.name)) UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, abilityCard.transform, true));
                 }
 
+                yield return new WaitUntil(() => !IsTaskComplete() & ShouldCheckmarkBeDisplayed());
+
+                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
+                {
+                    abilityCard.transform.localScale = Vector3.one;
+                }
+
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 6) // Block
             {
@@ -346,12 +380,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 7) // Dodge
             {
@@ -387,12 +421,12 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * 3, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 8) // Player Card
             {
@@ -412,11 +446,13 @@ namespace Vi.UI
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
                 playerUI.GetMainPlayerCard().transform.localScale = Vector3.one;
                 bufferDurationBetweenActions = 3;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.SetAllPlayersMobility(false);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
-                playerUI.SetFadeToBlack(false, fadeToBlackSpeed);
+                yield return new WaitForSeconds(0.5f);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
+                playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
@@ -461,6 +497,14 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
+
+                yield return new WaitForSeconds(2);
+
+                currentOverlayMessage = "";
+
+                yield return new WaitUntil(() => canProceed);
+
+                currentOverlayMessage = "ENEMY KNOCKED OUT.";
             }
             else if (currentActionIndex == 11) // Display victory or defeat message
             {
@@ -468,7 +512,7 @@ namespace Vi.UI
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
 
                 bufferDurationBetweenActions = 3;
-                playerUI.SetFadeToBlack(true, fadeToBlackSpeed);
+                playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
 
                 foreach (InputAction action in playerInput.actions)
@@ -479,7 +523,7 @@ namespace Vi.UI
                 // Set messages active here
                 while (mainGroup.alpha > colorDistance)
                 {
-                    mainGroup.alpha = Mathf.Lerp(mainGroup.alpha, 0, Time.deltaTime * endingMessageLerpSpeed);
+                    mainGroup.alpha = Mathf.MoveTowards(mainGroup.alpha, 0, Time.deltaTime * endingMessageSpeed);
                     yield return null;
                 }
                 mainGroup.alpha = 0;
@@ -494,7 +538,7 @@ namespace Vi.UI
                     {
                         yield return null;
                         elapsedTime += Time.deltaTime;
-                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageLerpSpeed);
+                        endingMessage.color = Vector4.MoveTowards(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 1), Time.deltaTime * endingMessageSpeed);
                     }
 
                     elapsedTime = 0;
@@ -502,7 +546,7 @@ namespace Vi.UI
                     {
                         yield return null;
                         elapsedTime += Time.deltaTime;
-                        endingMessage.color = Color.Lerp(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageLerpSpeed);
+                        endingMessage.color = Vector4.MoveTowards(endingMessage.color, new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0), Time.deltaTime * endingMessageSpeed);
                     }
                     endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
                 }
@@ -531,7 +575,7 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
-        private const float endingMessageLerpSpeed = 2;
+        private const float endingMessageSpeed = 1;
         private const float endingMessageDisplayDuration = 2;
 
         [SerializeField] private UIElementHighlight UIElementHighlightPrefab;
@@ -581,7 +625,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -593,7 +637,7 @@ namespace Vi.UI
                 if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 1), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 1);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -610,7 +654,7 @@ namespace Vi.UI
             else if (IsInBufferTime())
             {
                 overlayText.text = "";
-                objectiveCompleteImage.color = Color.Lerp(objectiveCompleteImage.color, new Color(1, 1, 1, 0), Time.deltaTime * animationSpeed);
+                objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
                 for (int i = 0; i < overlayImages.Length; i++)
                 {
@@ -632,6 +676,8 @@ namespace Vi.UI
                 }
             }
 
+            backgroundImage.enabled = !string.IsNullOrWhiteSpace(overlayText.text) | objectiveCompleteImage.color.a > 0;
+
             if (playerUI)
             {
                 if (currentActionIndex < 9) // Prepare to fight with NPC
@@ -645,7 +691,7 @@ namespace Vi.UI
                 image.gameObject.SetActive(image.sprite);
             }
 
-            float timerTextNum = (onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime));
+            float timerTextNum = onTaskCompleteBufferDuration - (Time.time - onTaskCompleteStartTime);
             timerText.text = timerEnabled & timerTextNum >= 0 ? timerTextNum.ToString("F0") : "";
 
             if (canProceed & !lastCanProceed)
@@ -732,7 +778,7 @@ namespace Vi.UI
                 {
                     if (botAttributes)
                     {
-                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * 3, botAttributes.transform.rotation, botAttributes.transform);
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }
@@ -764,7 +810,7 @@ namespace Vi.UI
                     WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
-                canProceed = attributes.GlowRenderer.IsRenderingBlock() | canProceed;
+                canProceed = attributes.BlockedRecently() | canProceed;
             }
             else if (currentActionIndex == 7) // Dodge
             {

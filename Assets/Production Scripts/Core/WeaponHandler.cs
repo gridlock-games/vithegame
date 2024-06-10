@@ -586,12 +586,9 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                if (!IsBlocking)
-                {
-                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-                    if (actionClip != null)
-                        animationHandler.PlayAction(actionClip);
-                }
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                if (actionClip != null)
+                    animationHandler.PlayAction(actionClip);
             }
         }
 
@@ -727,6 +724,7 @@ namespace Vi.Core
                         {
                             animationHandler.PlayAction(actionClip);
                             ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance);
+                            ability1PreviewInstance = null;
                         }
                     }
                 }
@@ -760,6 +758,7 @@ namespace Vi.Core
                         {
                             animationHandler.PlayAction(actionClip);
                             ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance);
+                            ability2PreviewInstance = null;
                         }
                     }
                 }
@@ -793,6 +792,7 @@ namespace Vi.Core
                         {
                             animationHandler.PlayAction(actionClip);
                             ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance);
+                            ability3PreviewInstance = null;
                         }
                     }
                 }
@@ -826,6 +826,7 @@ namespace Vi.Core
                         {
                             animationHandler.PlayAction(actionClip);
                             ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance);
+                            ability4PreviewInstance = null;
                         }
                     }
                 }

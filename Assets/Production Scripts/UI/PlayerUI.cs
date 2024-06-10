@@ -39,8 +39,7 @@ namespace Vi.UI
         public Button GetScoreboardButton() { return scoreboardButton; }
 
         private bool shouldFadeToBlack;
-        private float fadeToBlackSpeed = 8;
-        public void SetFadeToBlack(bool shouldFade, float speed) { shouldFadeToBlack = shouldFade; fadeToBlackSpeed = speed; }
+        public void SetFadeToBlack(bool shouldFade) { shouldFadeToBlack = shouldFade; }
 
         public Color GetFadeToBlackColor() { return fadeToBlackImage.color; }
 
@@ -260,6 +259,7 @@ namespace Vi.UI
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
             List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
+            bool ability1Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
             {
                 bool shouldBreak = false;
@@ -270,6 +270,7 @@ namespace Vi.UI
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability1.UpdateCard(abilities[0], binding.ToDisplayString());
+                        ability1Initialized = true;
                         shouldBreak = true;
                         break;
                     }
@@ -277,6 +278,9 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
+            if (!ability1Initialized) { ability1.UpdateCard(abilities[0], ""); }
+
+            bool ability2Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability2"].bindings)
             {
                 bool shouldBreak = false;
@@ -287,6 +291,7 @@ namespace Vi.UI
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability2.UpdateCard(abilities[1], binding.ToDisplayString());
+                        ability2Initialized = true;
                         shouldBreak = true;
                         break;
                     }
@@ -294,6 +299,9 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
+            if (!ability2Initialized) { ability2.UpdateCard(abilities[1], ""); }
+
+            bool ability3Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability3"].bindings)
             {
                 bool shouldBreak = false;
@@ -304,6 +312,7 @@ namespace Vi.UI
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability3.UpdateCard(abilities[2], binding.ToDisplayString());
+                        ability3Initialized = true;
                         shouldBreak = true;
                         break;
                     }
@@ -311,6 +320,9 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
+            if (!ability3Initialized) { ability3.UpdateCard(abilities[2], ""); }
+
+            bool ability4Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability4"].bindings)
             {
                 bool shouldBreak = false;
@@ -321,12 +333,15 @@ namespace Vi.UI
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
                         ability4.UpdateCard(abilities[3], binding.ToDisplayString());
+                        ability4Initialized = true;
                         shouldBreak = true;
                         break;
                     }
                 }
                 if (shouldBreak) { break; }
             }
+
+            if (!ability4Initialized) { ability4.UpdateCard(abilities[3], ""); }
 
             lastWeapon = weaponHandler.GetWeapon();
 
@@ -419,13 +434,13 @@ namespace Vi.UI
 
                 if (shouldFadeToBlack)
                 {
-                    fadeToBlackImage.color = Color.Lerp(fadeToBlackImage.color, Color.black, Time.deltaTime * fadeToBlackSpeed);
-                    fadeToWhiteImage.color = fadeToBlackImage.color;
+                    fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
+                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);
                 }
                 else
                 {
                     fadeToBlackImage.color = Color.clear;
-                    fadeToWhiteImage.color = Color.Lerp(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
                 }
             }
             else

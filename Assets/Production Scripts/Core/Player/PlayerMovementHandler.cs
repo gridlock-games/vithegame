@@ -12,7 +12,6 @@ namespace Vi.Player
     public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private Camera minimapCameraInstance;
 
         [Header("Locomotion Settings")]
         [SerializeField] private float angularSpeed = 540;
@@ -25,6 +24,8 @@ namespace Vi.Player
         }
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
+
+        public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
         public Transform TargetToLockOn { get; private set; }
         public void LockOnTarget(Transform target)
@@ -95,7 +96,7 @@ namespace Vi.Player
             Quaternion newRotation = movementPrediction.CurrentRotation;
             if (IsOwner)
             {
-                Vector3 camDirection = cameraController.transform.TransformDirection(Vector3.forward);
+                Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
@@ -329,6 +330,11 @@ namespace Vi.Player
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
+
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Map"))
+            {
+                cameraController.PlayAnimation("TutorialIntro");
+            }
         }
 
         private Camera mainCamera;
