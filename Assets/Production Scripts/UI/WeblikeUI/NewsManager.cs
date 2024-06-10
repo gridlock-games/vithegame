@@ -57,6 +57,8 @@ namespace Vi.UI
       else
       {
       }
+
+      getRequest.Dispose();
     }
 
     private void addQuitButton()
