@@ -722,7 +722,10 @@ namespace Vi.Core
                     {
                         if (ability1PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability1PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance);
                             ability1PreviewInstance = null;
                         }
@@ -756,7 +759,10 @@ namespace Vi.Core
                     {
                         if (ability2PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability2PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance);
                             ability2PreviewInstance = null;
                         }
@@ -790,7 +796,10 @@ namespace Vi.Core
                     {
                         if (ability3PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability3PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance);
                             ability3PreviewInstance = null;
                         }
@@ -824,7 +833,10 @@ namespace Vi.Core
                     {
                         if (ability4PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability4PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance);
                             ability4PreviewInstance = null;
                         }

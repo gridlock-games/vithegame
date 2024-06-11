@@ -7,6 +7,8 @@ namespace Vi.Core
 {
     public class ActionVFXPreview : ActionVFX
     {
+        public bool CanCast { get; private set; }
+
         private ParticleSystem ps;
         private Color originalParticleSystemColor;
         private Color noVFXWillBeSpawnedColor = Color.red;
@@ -24,6 +26,7 @@ namespace Vi.Core
             if (transformType == TransformType.Projectile)
             {
                 transform.LookAt(transform.parent.GetComponent<AnimationHandler>().GetAimPoint());
+                CanCast = true;
             }
             else if (transformType == TransformType.ConformToGround)
             {
@@ -43,6 +46,7 @@ namespace Vi.Core
                 }
 
                 ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
+                CanCast = bHit;
 
                 if (bHit)
                 {
@@ -55,6 +59,10 @@ namespace Vi.Core
                     Vector3 normal = new Vector3(0, 1, 0);
                     transform.rotation = Quaternion.LookRotation(Vector3.Cross(normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
                 }
+            }
+            else
+            {
+                CanCast = true;
             }
         }
 
