@@ -709,7 +709,7 @@ namespace Vi.Core
         private GameObject ability1PreviewInstance;
         public void Ability1(bool isPressed)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability1);
+            ActionClip actionClip = weaponInstance.GetAbility1();
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -722,7 +722,10 @@ namespace Vi.Core
                     {
                         if (ability1PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability1PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability1)) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance);
                             ability1PreviewInstance = null;
                         }
@@ -743,7 +746,7 @@ namespace Vi.Core
         private GameObject ability2PreviewInstance;
         public void Ability2(bool isPressed)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability2);
+            ActionClip actionClip = weaponInstance.GetAbility2();
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -756,7 +759,10 @@ namespace Vi.Core
                     {
                         if (ability2PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability2PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability2)) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance);
                             ability2PreviewInstance = null;
                         }
@@ -777,7 +783,7 @@ namespace Vi.Core
         private GameObject ability3PreviewInstance;
         public void Ability3(bool isPressed)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability3);
+            ActionClip actionClip = weaponInstance.GetAbility3();
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -790,7 +796,10 @@ namespace Vi.Core
                     {
                         if (ability3PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability3PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability3)) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance);
                             ability3PreviewInstance = null;
                         }
@@ -811,7 +820,7 @@ namespace Vi.Core
         private GameObject ability4PreviewInstance;
         public void Ability4(bool isPressed)
         {
-            ActionClip actionClip = GetAttack(Weapon.InputAttackType.Ability4);
+            ActionClip actionClip = weaponInstance.GetAbility4();
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -824,7 +833,10 @@ namespace Vi.Core
                     {
                         if (ability4PreviewInstance)
                         {
-                            animationHandler.PlayAction(actionClip);
+                            if (ability4PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
+                            {
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability4)) { animationHandler.PlayAction(actionClip); }
+                            }
                             ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance);
                             ability4PreviewInstance = null;
                         }
