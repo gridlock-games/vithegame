@@ -89,11 +89,11 @@ namespace Vi.UI
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Awake()
         {
+            lockedClients = new NetworkList<ulong>();
+
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
             returnToHubButton.onClick.AddListener(() => ReturnToHub());
-
-            lockedClients = new NetworkList<ulong>();
 
             CloseRoomSettings();
 
