@@ -373,6 +373,21 @@ namespace Vi.Core
                     break;
             }
 
+            if (isPreviewVFX)
+            {
+                ActionVFXPreview previewInstance = vfxInstance.GetComponent<ActionVFXPreview>();
+                previewInstance.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset;
+                previewInstance.vfxRotationOffset = actionClip.actionVFXList[0].vfxRotationOffset;
+                previewInstance.vfxSpawnType = actionClip.actionVFXList[0].vfxSpawnType;
+                previewInstance.transformType = actionClip.actionVFXList[0].transformType;
+                previewInstance.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
+                previewInstance.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+                previewInstance.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
+                previewInstance.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
+                previewInstance.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
+                previewInstance.weaponBone = actionClip.actionVFXList[0].weaponBone;
+            }
+
             if (vfxInstance)
             {
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))

@@ -20,7 +20,6 @@ namespace Vi.Core
             noVFXWillBeSpawnedColor.a = originalParticleSystemColor.a;
         }
 
-        private bool lastColorState;
         private void LateUpdate()
         {
             if (transformType == TransformType.Projectile)
