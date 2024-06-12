@@ -11,6 +11,7 @@ namespace Vi.UI
     {
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
+        [SerializeField] private Image[] abilityImages;
 
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
@@ -63,11 +64,16 @@ namespace Vi.UI
 
             if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
-            
+
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
 
             playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
             PlayerDataManager.Singleton.SetPlayerData(playerData);
+
+            for (int i = 0; i < abilityImages.Length; i++)
+            {
+                abilityImages[i].sprite = weaponOption.weapon.GetAbilities()[i].abilityImageIcon;
+            }
         }
 
         private GameObject weaponPreviewObject;
