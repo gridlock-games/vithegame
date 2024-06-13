@@ -6903,7 +6903,6 @@ MonoBehaviour:
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 30
-  agentDefenseCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -6916,13 +6915,12 @@ MonoBehaviour:
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.45
   recoveryNormalizedTime: 1
+  isAffectedByRage: 1
   damage: 3
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 4
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 5
   timeBetweenHits: 0.05
@@ -6959,9 +6957,6 @@ MonoBehaviour:
   previewActionVFXScale: {x: 0.5, y: 0.5, z: 0.5}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0
-  boxCastOriginPositionOffset: {x: 0, y: 0.5, z: 0}
-  boxCastHalfExtents: {x: 2, y: 1, z: 1}
-  boxCastDistance: 5
   maximumTargetingRotationAngle: 50
   canLunge: 0
   minLungeDistance: 2.5
