@@ -1027,6 +1027,7 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
+                weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
