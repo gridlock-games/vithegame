@@ -32,6 +32,12 @@ namespace Vi.Core
             Debug.LogError("Unknown weapon to reload " + weapon);
         }
 
+        public void ReloadAllWeapons()
+        {
+            primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount();
+            secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount();
+        }
+
         public void UseAmmo(Weapon weapon)
         {
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value--; return; }

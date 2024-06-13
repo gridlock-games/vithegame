@@ -633,6 +633,19 @@ namespace Vi.Core
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        public void OnDeath()
+        {
+            if (IsServer)
+            {
+                loadoutManager.ReloadAllWeapons();
+            }
+
+            if (IsOwner)
+            {
+                aiming.Value = false;
+            }
+        }
+
         void OnHeavyAttack(InputValue value)
         {
             HeavyAttack(value.isPressed);

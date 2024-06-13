@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -264,6 +265,10 @@ namespace Vi.UI
             }
             spectateButton.interactable = true;
             lockCharacterButton.interactable = true;
+
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(LockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
@@ -652,7 +657,10 @@ namespace Vi.UI
                 {
                     if (!accountCardCounter.ContainsKey(playerData.team)) { accountCardCounter.Add(playerData.team, 0); }
 
-                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardCounter[playerData.team] >= 4 ? rightTeamParent.transformParent : teamParentDict[playerData.team]).GetComponent<AccountCard>();
+                    Transform accountCardParent = teamParentDict[playerData.team];
+                    if (playerData.team == PlayerDataManager.Team.Competitor) { accountCardParent = accountCardCounter[playerData.team] >= 4 ? rightTeamParent.transformParent : teamParentDict[playerData.team]; }
+
+                    AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardParent).GetComponent<AccountCard>();
                     accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
 
                     if (playerData.id == (int)NetworkManager.LocalClientId)
@@ -689,7 +697,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            PlayerDataManager.Singleton.AddBotData(team, false);
+            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? 8 : 4);
         }
 
         private void ChooseLoadoutPreset(Button button, int loadoutSlot)
@@ -790,23 +798,60 @@ namespace Vi.UI
 
         private void LockCharacterLocal()
         {
-            lockCharacterButton.interactable = false;
             spectateButton.interactable = false;
             foreach (Button button in loadoutPresetButtons)
             {
                 button.interactable = false;
             }
+
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(UnlockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "UNLOCK";
         }
 
         private NetworkList<ulong> lockedClients;
 
         [Rpc(SendTo.Server, RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
 
+        private void UnlockCharacter()
+        {
+            if (lockedClients.Contains(NetworkManager.LocalClientId))
+            {
+                UnlockCharacterServerRpc(NetworkManager.LocalClientId);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)]
+        private void UnlockCharacterServerRpc(ulong clientId)
+        {
+            if (lockedClients.Contains(NetworkManager.LocalClientId))
+            {
+                lockedClients.Remove(clientId);
+            }
+        }
+
+        private void UnlockCharacterLocal()
+        {
+            spectateButton.interactable = true;
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = true;
+            }
+
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(UnlockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
+        }
+
         private void OnLockedClientListChange(NetworkListEvent<ulong> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<ulong>.EventType.Add)
             {
                 if (networkListEvent.Value == NetworkManager.LocalClientId) { LockCharacterLocal(); }
+            }
+            else if (networkListEvent.Type == NetworkListEvent<ulong>.EventType.Remove)
+            {
+                if (networkListEvent.Value == NetworkManager.LocalClientId) { UnlockCharacterLocal(); }
             }
         }
     }

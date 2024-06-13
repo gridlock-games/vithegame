@@ -16,7 +16,7 @@ namespace Vi.Utility
         private class MusicClip
         {
             public string[] sceneNamesToPlay;
-            public AudioClip song;
+            public AudioClip[] songs;
         }
 
         private static AudioManager _singleton;
@@ -190,7 +190,7 @@ namespace Vi.Utility
             }
 
             if (currentMusicClip == null) { isCrossfading = false; yield break; }
-            musicSource.clip = currentMusicClip.song;
+            musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[Random.Range(0, currentMusicClip.songs.Length)];
 
             while (true)
             {
@@ -229,14 +229,15 @@ namespace Vi.Utility
                         currentMusicClip = musicClip;
 
                         // If the clip we are changing to is not the same as the previous clip, and there is already a clip assigned to the music source
-                        if (musicSource.clip != musicClip.song & musicSource.clip)
+                        int randomIndex = Random.Range(0, currentMusicClip.songs.Length);
+                        if (musicSource.clip != (currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex]) & musicSource.clip)
                         {
                             if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
                             crossFadeCoroutine = StartCoroutine(CrossFadeBetweenSongs());
                         }
                         else
                         {
-                            musicSource.clip = musicClip.song;
+                            musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex];
                         }
                         break;
                     }
