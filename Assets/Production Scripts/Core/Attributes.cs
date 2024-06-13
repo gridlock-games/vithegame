@@ -126,7 +126,11 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
-            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+            if (IsOwner)
+            {
+                spawnedOnOwnerInstance.Value = true;
+                RefreshStatus();
+            }
         }
 
         private IEnumerator InitStats()

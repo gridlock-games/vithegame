@@ -431,11 +431,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(team, useDefaultPrimaryWeapon);
+                AddBotDataServerRpc(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam);
             }
         }
 
-        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1) { AddBotData(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam) { AddBotData(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam); }
 
         public void AddPlayerData(PlayerData playerData)
         {

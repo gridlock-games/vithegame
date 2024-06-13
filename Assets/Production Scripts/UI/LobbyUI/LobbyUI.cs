@@ -824,7 +824,7 @@ namespace Vi.UI
         [Rpc(SendTo.Server, RequireOwnership = false)]
         private void UnlockCharacterServerRpc(ulong clientId)
         {
-            if (lockedClients.Contains(NetworkManager.LocalClientId))
+            if (lockedClients.Contains(clientId))
             {
                 lockedClients.Remove(clientId);
             }
@@ -839,7 +839,7 @@ namespace Vi.UI
             }
 
             lockCharacterButton.onClick.RemoveAllListeners();
-            lockCharacterButton.onClick.AddListener(UnlockCharacter);
+            lockCharacterButton.onClick.AddListener(LockCharacter);
             lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
         }
 
