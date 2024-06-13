@@ -266,6 +266,10 @@ namespace Vi.UI
             spectateButton.interactable = true;
             lockCharacterButton.interactable = true;
 
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(LockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
+
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
             RefreshGameMode();
@@ -794,23 +798,60 @@ namespace Vi.UI
 
         private void LockCharacterLocal()
         {
-            lockCharacterButton.interactable = false;
             spectateButton.interactable = false;
             foreach (Button button in loadoutPresetButtons)
             {
                 button.interactable = false;
             }
+
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(UnlockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "UNLOCK";
         }
 
         private NetworkList<ulong> lockedClients;
 
         [Rpc(SendTo.Server, RequireOwnership = false)] private void LockCharacterServerRpc(ulong clientId) { lockedClients.Add(clientId); }
 
+        private void UnlockCharacter()
+        {
+            if (lockedClients.Contains(NetworkManager.LocalClientId))
+            {
+                UnlockCharacterServerRpc(NetworkManager.LocalClientId);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)]
+        private void UnlockCharacterServerRpc(ulong clientId)
+        {
+            if (lockedClients.Contains(NetworkManager.LocalClientId))
+            {
+                lockedClients.Remove(clientId);
+            }
+        }
+
+        private void UnlockCharacterLocal()
+        {
+            spectateButton.interactable = true;
+            foreach (Button button in loadoutPresetButtons)
+            {
+                button.interactable = true;
+            }
+
+            lockCharacterButton.onClick.RemoveAllListeners();
+            lockCharacterButton.onClick.AddListener(UnlockCharacter);
+            lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
+        }
+
         private void OnLockedClientListChange(NetworkListEvent<ulong> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<ulong>.EventType.Add)
             {
                 if (networkListEvent.Value == NetworkManager.LocalClientId) { LockCharacterLocal(); }
+            }
+            else if (networkListEvent.Type == NetworkListEvent<ulong>.EventType.Remove)
+            {
+                if (networkListEvent.Value == NetworkManager.LocalClientId) { UnlockCharacterLocal(); }
             }
         }
     }
