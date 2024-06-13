@@ -65,7 +65,7 @@ PrefabInstance:
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
       propertyPath: TriggerModule.radiusScale
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5221624446088252454, guid: c5bc3324b9ff3364c9484f45a4dcf49f,
         type: 3}
@@ -252,8 +252,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 7, y: 6.1412807, z: 7}
-  m_Center: {x: 0.017044704, y: 2.0558832, z: 0.12564597}
+  m_Size: {x: 4.343712, y: 6.1412807, z: 3.854402}
+  m_Center: {x: -0.09945679, y: 2.0558832, z: 0.24214809}
 --- !u!114 &259419675064962899
 MonoBehaviour:
   m_ObjectHideFlags: 0
