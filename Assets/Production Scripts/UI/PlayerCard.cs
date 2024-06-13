@@ -14,18 +14,28 @@ namespace Vi.UI
         [Header("True Value Images")]
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image staminaFillImage;
-        [SerializeField] private Image defenseFillImage;
+        [SerializeField] private Image spiritFillImage;
         [SerializeField] private Image rageFillImage;
 
         [Header("Interm Images")]
         [SerializeField] private Image interimHealthFillImage;
         [SerializeField] private Image interimStaminaFillImage;
-        [SerializeField] private Image interimDefenseFillImage;
+        [SerializeField] private Image interimSpiritFillImage;
         [SerializeField] private Image interimRageFillImage;
 
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
+
+        [Header("Other Stamina UI")]
+        [SerializeField] private Text staminaText;
+        [SerializeField] private Image bottomStaminaBorder;
+        [SerializeField] private Image staminaBackground;
+
+        [Header("Other Spirit UI")]
+        [SerializeField] private Text spiritText;
+        [SerializeField] private Image bottomSpiritBorder;
+        [SerializeField] private Image spiritBackground;
 
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
@@ -35,6 +45,21 @@ namespace Vi.UI
             this.attributes = attributes;
             if (!canvas) { canvas = GetComponent<Canvas>(); }
             canvas.enabled = attributes != null;
+        }
+
+        public void DisableStaminaAndSpiritDisplay()
+        {
+            staminaFillImage.gameObject.SetActive(false);
+            interimStaminaFillImage.gameObject.SetActive(false);
+            staminaText.gameObject.SetActive(false);
+            bottomStaminaBorder.gameObject.SetActive(false);
+            staminaBackground.gameObject.SetActive(false);
+
+            spiritFillImage.gameObject.SetActive(false);
+            interimSpiritFillImage.gameObject.SetActive(false);
+            spiritText.gameObject.SetActive(false);
+            bottomSpiritBorder.gameObject.SetActive(false);
+            spiritBackground.gameObject.SetActive(false);
         }
 
         private Canvas canvas;
@@ -57,12 +82,12 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = 0;
             staminaFillImage.fillAmount = 0;
-            defenseFillImage.fillAmount = 0;
+            spiritFillImage.fillAmount = 0;
             rageFillImage.fillAmount = 0;
 
             interimHealthFillImage.fillAmount = 0;
             interimStaminaFillImage.fillAmount = 0;
-            interimDefenseFillImage.fillAmount = 0;
+            interimSpiritFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
         }
 
@@ -76,12 +101,12 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
-            defenseFillImage.fillAmount = attributes.GetSpirit() / attributes.GetMaxSpirit();
+            spiritFillImage.fillAmount = attributes.GetSpirit() / attributes.GetMaxSpirit();
             rageFillImage.fillAmount = attributes.GetRage() / attributes.GetMaxRage();
 
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * fillSpeed);
             interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
-            interimDefenseFillImage.fillAmount = Mathf.Lerp(interimDefenseFillImage.fillAmount, attributes.GetSpirit() / attributes.GetMaxSpirit(), Time.deltaTime * fillSpeed);
+            interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, attributes.GetSpirit() / attributes.GetMaxSpirit(), Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
 
             if (!playerUI)
