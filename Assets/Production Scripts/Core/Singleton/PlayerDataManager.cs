@@ -405,10 +405,17 @@ namespace Vi.Core
         };
 
         private int botClientId = 0;
-        public void AddBotData(Team team, bool useDefaultPrimaryWeapon)
+        public void AddBotData(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1)
         {
+            if (team == Team.Spectator) { Debug.LogError("Trying to add a bot as a spectator!"); return; }
+
             if (IsServer)
             {
+                if (limitTotalNumberOfPlayersOnTeam > -1)
+                {
+                    if (GetPlayerDataListWithoutSpectators().Where(item => item.team == team).ToArray().Length >= limitTotalNumberOfPlayersOnTeam) { return; }
+                }
+
                 botClientId--;
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
@@ -428,7 +435,7 @@ namespace Vi.Core
             }
         }
 
-        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon) { AddBotData(team, useDefaultPrimaryWeapon); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1) { AddBotData(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam); }
 
         public void AddPlayerData(PlayerData playerData)
         {
