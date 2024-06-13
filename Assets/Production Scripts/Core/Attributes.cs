@@ -114,6 +114,7 @@ namespace Vi.Core
         {
             if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
@@ -144,6 +145,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
@@ -169,6 +171,14 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+        }
+
+        private void OnSpiritChanged(float prev, float current)
+        {
+            if (Mathf.Approximately(current, 0))
+            {
+                spiritRegenActivateTime = Time.time;
             }
         }
 
@@ -951,6 +961,9 @@ namespace Vi.Core
             UpdateStamina();
             UpdateRage();
 
+            // Regen for 50 seconds
+            if (Time.time - spiritRegenActivateTime <= 50) { UpdateSpirit(); }
+            
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
@@ -960,6 +973,13 @@ namespace Vi.Core
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
             if (staminaDelayCooldown > 0) { return; }
             AddStamina(weaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
+        }
+
+        private float spiritRegenActivateTime = Mathf.NegativeInfinity;
+        private const float spiritRegenRate = 2;
+        private void UpdateSpirit()
+        {
+            AddSpirit(spiritRegenRate * Time.deltaTime);
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
