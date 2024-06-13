@@ -358,6 +358,8 @@ namespace Vi.UI
             if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager,
                 loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon,
                 loadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
+
+            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim);
         }
 
         private void UpdateActiveUIElements()
