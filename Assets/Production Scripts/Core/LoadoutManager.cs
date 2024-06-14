@@ -199,10 +199,12 @@ namespace Vi.Core
                 case 1:
                     weaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(secondaryWeaponInstance);
+                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
                     weaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(primaryWeaponInstance);
+                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");
