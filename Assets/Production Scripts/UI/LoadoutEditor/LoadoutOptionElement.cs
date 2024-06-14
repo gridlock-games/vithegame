@@ -11,6 +11,7 @@ namespace Vi.UI
         [SerializeField] private Image backgroundImage;
         [SerializeField] private Image iconImage;
         [SerializeField] private Text itemNameText;
+        [SerializeField] private Sprite defaultSprite;
 
         public void InitializeWeapon(CharacterReference.WeaponOption weaponOption)
         {
@@ -23,8 +24,8 @@ namespace Vi.UI
         {
             if (wearableEquipmentOption == null)
             {
-                iconImage.sprite = null;
-                iconImage.color = Color.red;
+                iconImage.sprite = defaultSprite;
+                iconImage.color = Color.white;
                 itemNameText.text = "None";
             }
             else
