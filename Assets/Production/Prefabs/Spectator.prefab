@@ -166,11 +166,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 397865669
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
+  SpawnWithObservers: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &1742114345670383643
@@ -186,6 +187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 7
+  collisionPositionOffset: -0.3
 --- !u!114 &8229825891610268455
 MonoBehaviour:
   m_ObjectHideFlags: 0

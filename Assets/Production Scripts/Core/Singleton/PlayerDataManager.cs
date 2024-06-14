@@ -1000,7 +1000,8 @@ namespace Vi.Core
                 yield break;
             }
 
-            if (GetPlayerData(playerData.id).team == Team.Spectator)
+            bool isSpectator = GetPlayerData(playerData.id).team == Team.Spectator;
+            if (isSpectator)
             {
                 playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
@@ -1014,10 +1015,15 @@ namespace Vi.Core
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
 
+            NetworkObject netObj = playerObjectToSpawn.GetComponent<NetworkObject>();
             if (playerData.id >= 0)
-                playerObjectToSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+            {
+                netObj.SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+            }
             else
-                playerObjectToSpawn.GetComponent<NetworkObject>().Spawn(true);
+            {
+                netObj.Spawn(true);
+            }
 
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             spawnPlayerRunning = false;

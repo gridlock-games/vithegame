@@ -35,6 +35,18 @@ namespace Vi.Player
                 GetComponent<ActionMapHandler>().enabled = false;
             }
             PlayerDataManager.Singleton.AddSpectatorInstance(OwnerClientId, NetworkObject);
+
+            if (IsServer)
+            {
+                StartCoroutine(ShowToOwnerPlayerAfterSpawn());
+            }
+        }
+
+        private IEnumerator ShowToOwnerPlayerAfterSpawn()
+        {
+            yield return new WaitUntil(() => IsSpawned);
+            Debug.Log("Showing spectator object to " + OwnerClientId);
+            NetworkObject.NetworkShow(OwnerClientId);
         }
 
         public override void OnNetworkDespawn()
