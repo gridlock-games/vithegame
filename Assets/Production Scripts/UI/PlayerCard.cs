@@ -27,6 +27,11 @@ namespace Vi.UI
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
+        [Header("Other Health UI")]
+        [SerializeField] private Text healthText;
+        [SerializeField] private Image topHealthBorder;
+        [SerializeField] private Image healthBackground;
+
         [Header("Other Stamina UI")]
         [SerializeField] private Text staminaText;
         [SerializeField] private Image bottomStaminaBorder;
@@ -60,6 +65,17 @@ namespace Vi.UI
             spiritText.gameObject.SetActive(false);
             bottomSpiritBorder.gameObject.SetActive(false);
             spiritBackground.gameObject.SetActive(false);
+
+            ((RectTransform)nameDisplay.transform).anchoredPosition = new Vector2(((RectTransform)healthText.transform).anchoredPosition.x, ((RectTransform)healthText.transform).anchoredPosition.y + 20);
+            ((RectTransform)nameDisplay.transform).anchorMax = ((RectTransform)healthText.transform).anchorMax;
+            ((RectTransform)nameDisplay.transform).anchorMin = ((RectTransform)healthText.transform).anchorMin;
+            ((RectTransform)nameDisplay.transform).pivot = ((RectTransform)healthText.transform).pivot;
+
+            ((RectTransform)healthText.transform).anchoredPosition = ((RectTransform)staminaText.transform).anchoredPosition;
+            ((RectTransform)topHealthBorder.transform).anchoredPosition = ((RectTransform)bottomStaminaBorder.transform).anchoredPosition;
+            ((RectTransform)healthBackground.transform).anchoredPosition = ((RectTransform)staminaBackground.transform).anchoredPosition;
+            ((RectTransform)healthFillImage.transform).anchoredPosition = ((RectTransform)staminaFillImage.transform).anchoredPosition;
+            ((RectTransform)interimHealthFillImage.transform).anchoredPosition = ((RectTransform)interimStaminaFillImage.transform).anchoredPosition;
         }
 
         private Canvas canvas;
