@@ -45,7 +45,6 @@ namespace Vi.Player
         private IEnumerator ShowToOwnerPlayerAfterSpawn()
         {
             yield return new WaitUntil(() => IsSpawned);
-            Debug.Log("Showing spectator object to " + OwnerClientId);
             NetworkObject.NetworkShow(OwnerClientId);
         }
 
