@@ -52,6 +52,11 @@ namespace Vi.UI
             canvas.enabled = attributes != null;
         }
 
+        public bool IsMainCard()
+        {
+            return !nameDisplay.gameObject.activeSelf;
+        }
+
         public void DisableStaminaAndSpiritDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
@@ -65,11 +70,6 @@ namespace Vi.UI
             spiritText.gameObject.SetActive(false);
             bottomSpiritBorder.gameObject.SetActive(false);
             spiritBackground.gameObject.SetActive(false);
-
-            ((RectTransform)nameDisplay.transform).anchoredPosition = new Vector2(((RectTransform)healthText.transform).anchoredPosition.x, ((RectTransform)healthText.transform).anchoredPosition.y + 20);
-            ((RectTransform)nameDisplay.transform).anchorMax = ((RectTransform)healthText.transform).anchorMax;
-            ((RectTransform)nameDisplay.transform).anchorMin = ((RectTransform)healthText.transform).anchorMin;
-            ((RectTransform)nameDisplay.transform).pivot = ((RectTransform)healthText.transform).pivot;
 
             ((RectTransform)healthText.transform).anchoredPosition = ((RectTransform)staminaText.transform).anchoredPosition;
             ((RectTransform)topHealthBorder.transform).anchoredPosition = ((RectTransform)bottomStaminaBorder.transform).anchoredPosition;
