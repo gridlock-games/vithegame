@@ -105,7 +105,7 @@ RectTransform:
   m_GameObject: {fileID: 414150114579382445}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.10000001, y: 0.10000001, z: 0.10000001}
+  m_LocalScale: {x: 0.11999999, y: 0.11999999, z: 0.11999999}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2175611378237745671}
@@ -113,7 +113,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 87.9}
+  m_AnchoredPosition: {x: 85, y: 50}
   m_SizeDelta: {x: 5000, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5908255053176442960
@@ -678,15 +678,24 @@ MonoBehaviour:
   nameDisplay: {fileID: 7401489532861140048}
   healthFillImage: {fileID: 8825118740436756027}
   staminaFillImage: {fileID: 8777073071513388713}
-  defenseFillImage: {fileID: 2717308279120147160}
+  spiritFillImage: {fileID: 2717308279120147160}
   rageFillImage: {fileID: 1679784692164774126}
   interimHealthFillImage: {fileID: 7297089366903985045}
   interimStaminaFillImage: {fileID: 6837854231243790151}
-  interimDefenseFillImage: {fileID: 1128668944168095683}
+  interimSpiritFillImage: {fileID: 1128668944168095683}
   interimRageFillImage: {fileID: 1679784692164774126}
   statusImageParent: {fileID: 4375269428043147127}
   statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}
+  healthText: {fileID: 3819835944573705657}
+  topHealthBorder: {fileID: 325743918710596908}
+  healthBackground: {fileID: 2357147163449420224}
+  staminaText: {fileID: 4985747223212512818}
+  bottomStaminaBorder: {fileID: 680216261824040332}
+  staminaBackground: {fileID: 1498557213719423090}
+  spiritText: {fileID: 3613936795393325988}
+  bottomSpiritBorder: {fileID: 1456438271516473357}
+  spiritBackground: {fileID: 8088568553903798972}
 --- !u!1 &2274119490182361912
 GameObject:
   m_ObjectHideFlags: 0
@@ -1861,7 +1870,7 @@ GameObject:
   - component: {fileID: 940708146152976056}
   - component: {fileID: 2354949698674971948}
   m_Layer: 5
-  m_Name: DefenseText
+  m_Name: SpiritText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1971,7 +1980,7 @@ GameObject:
   - component: {fileID: 2191696722786918647}
   - component: {fileID: 2717308279120147160}
   m_Layer: 5
-  m_Name: DefenseFill
+  m_Name: SpiritFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2123,7 +2132,7 @@ GameObject:
   - component: {fileID: 6492376128605425030}
   - component: {fileID: 1128668944168095683}
   m_Layer: 5
-  m_Name: InterimDefenseFill
+  m_Name: InterimSpiritFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

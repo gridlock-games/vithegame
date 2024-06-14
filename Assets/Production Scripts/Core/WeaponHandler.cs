@@ -264,7 +264,7 @@ namespace Vi.Core
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
-                    attributes.TryAddStatus(status.status, status.value, status.duration, status.delay);
+                    attributes.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
                 }
             }
         }
@@ -632,6 +632,19 @@ namespace Vi.Core
         public bool CanAim { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public void OnDeath()
+        {
+            if (IsServer)
+            {
+                loadoutManager.ReloadAllWeapons();
+            }
+
+            if (IsOwner)
+            {
+                aiming.Value = false;
+            }
+        }
 
         void OnHeavyAttack(InputValue value)
         {

@@ -405,10 +405,17 @@ namespace Vi.Core
         };
 
         private int botClientId = 0;
-        public void AddBotData(Team team, bool useDefaultPrimaryWeapon)
+        public void AddBotData(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1)
         {
+            if (team == Team.Spectator) { Debug.LogError("Trying to add a bot as a spectator!"); return; }
+
             if (IsServer)
             {
+                if (limitTotalNumberOfPlayersOnTeam > -1)
+                {
+                    if (GetPlayerDataListWithoutSpectators().Where(item => item.team == team).ToArray().Length >= limitTotalNumberOfPlayersOnTeam) { return; }
+                }
+
                 botClientId--;
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
@@ -424,11 +431,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(team, useDefaultPrimaryWeapon);
+                AddBotDataServerRpc(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam);
             }
         }
 
-        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon) { AddBotData(team, useDefaultPrimaryWeapon); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam) { AddBotData(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -993,7 +1000,8 @@ namespace Vi.Core
                 yield break;
             }
 
-            if (GetPlayerData(playerData.id).team == Team.Spectator)
+            bool isSpectator = GetPlayerData(playerData.id).team == Team.Spectator;
+            if (isSpectator)
             {
                 playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
             }
@@ -1007,10 +1015,15 @@ namespace Vi.Core
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
 
+            NetworkObject netObj = playerObjectToSpawn.GetComponent<NetworkObject>();
             if (playerData.id >= 0)
-                playerObjectToSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+            {
+                netObj.SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+            }
             else
-                playerObjectToSpawn.GetComponent<NetworkObject>().Spawn(true);
+            {
+                netObj.Spawn(true);
+            }
 
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             spawnPlayerRunning = false;

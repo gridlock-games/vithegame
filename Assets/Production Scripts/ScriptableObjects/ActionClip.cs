@@ -72,13 +72,15 @@ namespace Vi.ScriptableObjects
             public float value;
             public float duration;
             public float delay;
+            public bool associatedWithCurrentWeapon;
 
-            public StatusPayload(Status status, float value, float duration, float delay)
+            public StatusPayload(Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
             {
                 this.status = status;
                 this.value = value;
                 this.duration = duration;
                 this.delay = delay;
+                this.associatedWithCurrentWeapon = associatedWithCurrentWeapon;
             }
 
             public bool Equals(StatusPayload other) { return status == other.status; }
@@ -89,6 +91,7 @@ namespace Vi.ScriptableObjects
                 serializer.SerializeValue(ref value);
                 serializer.SerializeValue(ref duration);
                 serializer.SerializeValue(ref delay);
+                serializer.SerializeValue(ref associatedWithCurrentWeapon);
             }
         }
 

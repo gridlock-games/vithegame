@@ -32,6 +32,12 @@ namespace Vi.Core
             Debug.LogError("Unknown weapon to reload " + weapon);
         }
 
+        public void ReloadAllWeapons()
+        {
+            primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount();
+            secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount();
+        }
+
         public void UseAmmo(Weapon weapon)
         {
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value--; return; }
@@ -193,10 +199,12 @@ namespace Vi.Core
                 case 1:
                     weaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(secondaryWeaponInstance);
+                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
                     weaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(primaryWeaponInstance);
+                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");

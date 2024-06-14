@@ -109,8 +109,7 @@ namespace Vi.Core
             {
                 if (!addPlayerDataRunning & !NetSceneManager.Singleton.IsBusyLoadingScenes())
                 {
-                    PlayerDataManager.Team clientTeam = NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") ? PlayerDataManager.Team.Peaceful : PlayerDataManager.Team.Competitor;
-
+                    PlayerDataManager.Team clientTeam;
                     if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
                     {
                         clientTeam = PlayerDataManager.Team.Peaceful;

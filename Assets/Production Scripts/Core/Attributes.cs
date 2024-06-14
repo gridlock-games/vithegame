@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
-using Vi.ScriptableObjects;
-using Vi.Core.GameModeManagers;
-using Vi.Utility;
 using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
+using Vi.Core.GameModeManagers;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -114,6 +114,7 @@ namespace Vi.Core
         {
             if (IsServer) { StartCoroutine(InitStats()); }
             HP.OnValueChanged += OnHPChanged;
+            spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
@@ -125,7 +126,11 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
-            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+            if (IsOwner)
+            {
+                spawnedOnOwnerInstance.Value = true;
+                RefreshStatus();
+            }
         }
 
         private IEnumerator InitStats()
@@ -144,6 +149,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             HP.OnValueChanged -= OnHPChanged;
+            spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
@@ -169,6 +175,14 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+        }
+
+        private void OnSpiritChanged(float prev, float current)
+        {
+            if (Mathf.Approximately(current, 0))
+            {
+                spiritRegenActivateTime = Time.time;
             }
         }
 
@@ -465,7 +479,7 @@ namespace Vi.Core
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
                 {
-                    TryAddStatus(status.status, status.value, status.duration, status.delay);
+                    TryAddStatus(status.status, status.value, status.duration, status.delay, false);
                 }
                 return false;
             }
@@ -728,7 +742,7 @@ namespace Vi.Core
         {
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
-                TryAddStatus(status.status, status.value, status.duration, status.delay);
+                TryAddStatus(status.status, status.value, status.duration, status.delay, false);
             }
 
             // Ailments
@@ -951,6 +965,9 @@ namespace Vi.Core
             UpdateStamina();
             UpdateRage();
 
+            // Regen for 50 seconds
+            if (Time.time - spiritRegenActivateTime <= 50) { UpdateSpirit(); }
+            
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
@@ -960,6 +977,13 @@ namespace Vi.Core
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
             if (staminaDelayCooldown > 0) { return; }
             AddStamina(weaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
+        }
+
+        private float spiritRegenActivateTime = Mathf.NegativeInfinity;
+        private const float spiritRegenRate = 2;
+        private void UpdateSpirit()
+        {
+            AddSpirit(spiritRegenRate * Time.deltaTime);
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
@@ -1027,6 +1051,7 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
+                weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
@@ -1123,10 +1148,10 @@ namespace Vi.Core
 
         private NetworkList<int> activeStatuses;
 
-        public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay)
+        public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
         {
             if (!IsServer) { Debug.LogError("Attributes.TryAddStatus() should only be called on the server"); return false; }
-            statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay));
+            statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay, associatedWithCurrentWeapon));
             return true;
         }
 
@@ -1146,6 +1171,24 @@ namespace Vi.Core
             yield return null;
             yield return null;
             stopAllStatuses = false;
+        }
+
+        private bool stopAllStatusesAssociatedWithWeapon;
+        public void RemoveAllStatusesAssociatedWithWeapon()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatusesAssociatedWithWeapon() should only be called on the server"); return; }
+
+            if (stopAllStatusesAssociatedWithWeaponCoroutine != null) { StopCoroutine(stopAllStatusesAssociatedWithWeaponCoroutine); }
+            stopAllStatusesAssociatedWithWeapon = true;
+            stopAllStatusesAssociatedWithWeaponCoroutine = StartCoroutine(ResetStopAllStatusesAssociatedWithWeaponBool());
+        }
+
+        private Coroutine stopAllStatusesAssociatedWithWeaponCoroutine;
+        private IEnumerator ResetStopAllStatusesAssociatedWithWeaponBool()
+        {
+            yield return null;
+            yield return null;
+            stopAllStatusesAssociatedWithWeapon = false;
         }
 
         private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
@@ -1234,6 +1277,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1247,6 +1294,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1260,6 +1311,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1273,6 +1328,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1286,6 +1345,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1299,6 +1362,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1311,6 +1378,10 @@ namespace Vi.Core
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
                     TryRemoveStatus(statusPayload);
@@ -1321,6 +1392,10 @@ namespace Vi.Core
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
                     TryRemoveStatus(statusPayload);
@@ -1331,6 +1406,10 @@ namespace Vi.Core
                     {
                         ProcessEnvironmentDamage(GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
                     TryRemoveStatus(statusPayload);
@@ -1342,6 +1421,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1355,6 +1438,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1366,6 +1453,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1376,6 +1467,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1386,6 +1481,10 @@ namespace Vi.Core
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
 
@@ -1397,6 +1496,10 @@ namespace Vi.Core
                     {
                         AddHP(weaponHandler.GetWeapon().GetMaxHP() / GetHP() * 10 * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
                         yield return null;
                     }
                     TryRemoveStatus(statusPayload);
