@@ -944,7 +944,27 @@ namespace Vi.Core
 
             if (!IsSpawned) { return; }
 
-            GlowRenderer.RenderInvincible(IsInvincible());
+            bool isInvincibleThisFrame = IsInvincible();
+            if (!isInvincibleThisFrame)
+            {
+                if (!IsLocalPlayer)
+                {
+                    if (animationHandler.IsGrabAttacking())
+                    {
+                        isInvincibleThisFrame = true;
+                    }
+                    else if (IsGrabbed())
+                    {
+                        Attributes grabAssailant = GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            if (!grabAssailant.IsLocalPlayer) { isInvincibleThisFrame = true; }
+                        }
+                    }
+                }
+            }
+
+            GlowRenderer.RenderInvincible(isInvincibleThisFrame);
             GlowRenderer.RenderUninterruptable(IsUninterruptable());
 
             if (!IsServer) { return; }

@@ -55,25 +55,5 @@ namespace Vi.Core
                 attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject);
             }
         }
-
-        //private void OnTriggerEnter(Collider other)
-        //{
-        //    if (!IsServer) { return; }
-        //    if (other.TryGetComponent(out NetworkCollider networkCollider))
-        //    {
-        //        int index = attributesToDamage.IndexOf(networkCollider.Attributes);
-        //        if (index >= 0) { attributesToDamage.RemoveAt(index); }
-        //    }
-        //}
-
-        //private void OnTriggerExit(Collider other)
-        //{
-        //    if (!IsServer) { return; }
-        //    if (other.TryGetComponent(out NetworkCollider networkCollider))
-        //    {
-        //        int index = attributesToDamage.IndexOf(networkCollider.Attributes);
-        //        if (index == -1) { attributesToDamage.Add(networkCollider.Attributes); }
-        //    }
-        //}
     }
 }

@@ -16,11 +16,19 @@ namespace Vi.UI
 
         private Spectator spectator;
         private CanvasGroup[] canvasGroups;
-        private void Start()
+
+        private void Awake()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            RefreshStatus();
+        }
 
+        private void OnEnable()
+        {
+            RefreshStatus();
+        }
+
+        private void Start()
+        {
             spectator = GetComponentInParent<Spectator>();
 
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
