@@ -607,6 +607,7 @@ namespace Vi.Core.GameModeManagers
             public static PlayerScore operator +(PlayerScore x, PlayerScore y)
             {
                 if (x.id != y.id) { Debug.LogError("Adding two player score structs that don't have the same id!"); }
+                if (x.roundWins > y.roundWins) { Debug.LogError("Adding two player score structs where the left argument has more round wins than the right!"); }
 
                 return new PlayerScore
                 {
