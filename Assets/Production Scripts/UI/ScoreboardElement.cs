@@ -49,7 +49,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.ContainsId(playerDataId))
             {
                 disconnectedPlayerIcon.enabled = false;
-                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetCumulativePlayerScore(playerDataId);
+                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(playerDataId);
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
@@ -57,9 +57,9 @@ namespace Vi.UI
                 }
                 playerNameText.text = playerData.character.name.ToString();
                 roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.kills.ToString();
-                deathsText.text = playerScore.deaths.ToString();
-                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+                killsText.text = playerScore.cumulativeKills.ToString();
+                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
             }
             else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
             {
@@ -72,9 +72,9 @@ namespace Vi.UI
                 }
                 playerNameText.text = playerData.character.name.ToString();
                 roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.kills.ToString();
-                deathsText.text = playerScore.deaths.ToString();
-                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+                killsText.text = playerScore.cumulativeKills.ToString();
+                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
             }
             else
             {

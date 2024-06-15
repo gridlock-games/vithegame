@@ -22,8 +22,8 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
-            int killerIndex = scoreListForThisRound.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-            if (scoreListForThisRound[killerIndex].kills >= killsToWinRound)
+            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
+            if (scoreList[killerIndex].killsThisRound >= killsToWinRound)
             {
                 OnRoundEnd(new int[] { killer.GetPlayerDataId() });
             }
@@ -84,13 +84,13 @@ namespace Vi.Core.GameModeManagers
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
             int localPlayerKey = PlayerDataManager.Singleton.GetLocalPlayerObject().Key;
-            int localIndex = scoreListForThisRound.IndexOf(new PlayerScore(localPlayerKey));
+            int localIndex = scoreList.IndexOf(new PlayerScore(localPlayerKey));
             if (localIndex == -1)
             {
                 // If we're a spectator
                 List<PlayerScore> scoreList = new List<PlayerScore>();
                 PlayerScore localPlayerScore;
-                foreach (PlayerScore playerScore in this.scoreListForThisRound)
+                foreach (PlayerScore playerScore in this.scoreList)
                 {
                     if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
                     {
@@ -102,15 +102,15 @@ namespace Vi.Core.GameModeManagers
                     }
                 }
                 // Find player score with second highest kills
-                scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+                scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ToList();
                 if (scoreList.Count > 1)
-                    return PlayerDataManager.Singleton.GetPlayerData(scoreList[1].id).character.name + ": " + scoreList[1].kills.ToString();
+                    return PlayerDataManager.Singleton.GetPlayerData(scoreList[1].id).character.name + ": " + scoreList[1].killsThisRound.ToString();
                 else
                     return string.Empty;
             }
             else
             {
-                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreListForThisRound[localIndex].kills;
+                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreList[localIndex].killsThisRound;
             }
         }
 
@@ -120,7 +120,7 @@ namespace Vi.Core.GameModeManagers
 
             List<PlayerScore> scoreList = new List<PlayerScore>();
             PlayerScore localPlayerScore;
-            foreach (PlayerScore playerScore in this.scoreListForThisRound)
+            foreach (PlayerScore playerScore in this.scoreList)
             {
                 if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
                 {
@@ -132,9 +132,9 @@ namespace Vi.Core.GameModeManagers
                 }
             }
             // Find player score with highest kills
-            scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+            scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ToList();
             if (scoreList.Count > 0)
-                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].kills.ToString();
+                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].killsThisRound.ToString();
             else
                 return string.Empty;
         }

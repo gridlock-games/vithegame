@@ -36,8 +36,7 @@ namespace Vi.Core.GameModeManagers
 
         public string GetRoundResultMessage() { return roundResultMessage.Value.ToString(); }
         public string GetGameEndMessage() { return gameEndMessage.Value.ToString(); }
-        protected NetworkList<PlayerScore> scoreListForThisRound;
-        private NetworkList<PlayerScore> cumulativeScoreList;
+        protected NetworkList<PlayerScore> scoreList;
         private NetworkList<DisconnectedPlayerScore> disconnectedScoreList;
 
         private List<int> gameItemSpawnIndexTracker = new List<int>();
@@ -175,15 +174,17 @@ namespace Vi.Core.GameModeManagers
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int killerIndex = scoreListForThisRound.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-                PlayerScore killerScore = scoreListForThisRound[killerIndex];
-                killerScore.kills += 1;
-                scoreListForThisRound[killerIndex] = killerScore;
+                int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
+                PlayerScore killerScore = scoreList[killerIndex];
+                killerScore.cumulativeKills += 1;
+                killerScore.killsThisRound += 1;
+                scoreList[killerIndex] = killerScore;
 
-                int victimIndex = scoreListForThisRound.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreListForThisRound[victimIndex];
-                victimScore.deaths += 1;
-                scoreListForThisRound[victimIndex] = victimScore;
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.cumulativeDeaths += 1;
+                victimScore.deathsThisRound += 1;
+                scoreList[victimIndex] = victimScore;
 
                 killHistory.Add(new KillHistoryElement(killer, victim));
             }
@@ -193,10 +194,11 @@ namespace Vi.Core.GameModeManagers
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int victimIndex = scoreListForThisRound.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreListForThisRound[victimIndex];
-                victimScore.deaths += 1;
-                scoreListForThisRound[victimIndex] = victimScore;
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.cumulativeDeaths += 1;
+                victimScore.deathsThisRound += 1;
+                scoreList[victimIndex] = victimScore;
 
                 killHistory.Add(new KillHistoryElement(victim));
             }
@@ -220,16 +222,17 @@ namespace Vi.Core.GameModeManagers
         private bool isFirstRound = true;
         protected virtual void OnRoundStart()
         {
-            for (int i = 0; i < scoreListForThisRound.Count; i++)
+            for (int i = 0; i < scoreList.Count; i++)
             {
-                PlayerScore playerScore = scoreListForThisRound[i];
-                scoreListForThisRound[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
+                PlayerScore playerScore = scoreList[i];
+                playerScore.ResetRoundVariables();
+                scoreList[i] = playerScore;
             }
             for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
                 FixedString64Bytes charId = disconnectedScoreList[i].characterId;
                 PlayerScore playerScore = disconnectedScoreList[i].playerScore;
-                playerScore = new PlayerScore(playerScore.id, playerScore.roundWins);
+                playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
             if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
@@ -243,7 +246,7 @@ namespace Vi.Core.GameModeManagers
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {
-                int index = scoreListForThisRound.IndexOf(new PlayerScore(id));
+                int index = scoreList.IndexOf(new PlayerScore(id));
 
                 if (index == -1)
                 {
@@ -265,9 +268,9 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    PlayerScore score = scoreListForThisRound[index];
+                    PlayerScore score = scoreList[index];
                     score.roundWins += 1;
-                    scoreListForThisRound[index] = score;
+                    scoreList[index] = score;
 
                     if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
                 }
@@ -299,7 +302,7 @@ namespace Vi.Core.GameModeManagers
             _singleton = this;
             if (IsServer)
             {
-                scoreListForThisRound.OnListChanged += OnScoreListForThisRoundChange;
+                scoreList.OnListChanged += OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
@@ -315,7 +318,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (IsServer)
             {
-                scoreListForThisRound.OnListChanged -= OnScoreListForThisRoundChange;
+                scoreList.OnListChanged -= OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
@@ -330,19 +333,19 @@ namespace Vi.Core.GameModeManagers
             else
             {
                 PlayerScore playerScore = new PlayerScore(id);
-                if (scoreListForThisRound.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
+                if (scoreList.Contains(playerScore)) { Debug.LogError("Player score with id: " + id + " has already been added!"); return; }
 
                 int index = disconnectedScoreList.IndexOf(new DisconnectedPlayerScore(characterId, playerScore));
                 if (index == -1)
                 {
-                    scoreListForThisRound.Add(playerScore);
+                    scoreList.Add(playerScore);
                 }
                 else
                 {
-                    playerScore.kills = disconnectedScoreList[index].playerScore.kills;
-                    playerScore.deaths = disconnectedScoreList[index].playerScore.deaths;
+                    playerScore.killsThisRound = disconnectedScoreList[index].playerScore.killsThisRound;
+                    playerScore.deathsThisRound = disconnectedScoreList[index].playerScore.deathsThisRound;
                     playerScore.roundWins = disconnectedScoreList[index].playerScore.roundWins;
-                    scoreListForThisRound.Add(playerScore);
+                    scoreList.Add(playerScore);
                     disconnectedScoreList.RemoveAt(index);
                 }
             }
@@ -354,18 +357,11 @@ namespace Vi.Core.GameModeManagers
             AddPlayerScore(id, characterId);
         }
 
-        public PlayerScore GetPlayerScoreForThisRound(int id)
+        public PlayerScore GetPlayerScore(int id)
         {
-            int index = scoreListForThisRound.IndexOf(new PlayerScore(id));
+            int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Could not find player score with id: " + id); return new PlayerScore(); }
-            return scoreListForThisRound[index];
-        }
-
-        public PlayerScore GetCumulativePlayerScore(int id)
-        {
-            int index = cumulativeScoreList.IndexOf(new PlayerScore(id));
-            if (index == -1) { Debug.LogError("Could not find cumulative player score with id: " + id); return new PlayerScore(); }
-            return cumulativeScoreList[index];
+            return scoreList[index];
         }
 
         public PlayerScore GetDisconnectedPlayerScore(int id)
@@ -380,10 +376,10 @@ namespace Vi.Core.GameModeManagers
 
         public void RemovePlayerScore(int id, FixedString64Bytes characterId)
         {
-            int index = scoreListForThisRound.IndexOf(new PlayerScore(id));
+            int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Trying to remove score from list, but can't find it for id: " + id); return; }
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreListForThisRound[index])); }
-            scoreListForThisRound.RemoveAt(index);
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index])); }
+            scoreList.RemoveAt(index);
         }
 
         private void OnRoundTimerChange(float prev, float current)
@@ -432,17 +428,17 @@ namespace Vi.Core.GameModeManagers
         protected List<PlayerScore> GetHighestKillPlayers()
         {
             List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
-            for (int i = 0; i < scoreListForThisRound.Count; i++)
+            for (int i = 0; i < scoreList.Count; i++)
             {
-                PlayerScore playerScore = scoreListForThisRound[i];
+                PlayerScore playerScore = scoreList[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
-                    if (playerScore.kills > highestKillPlayerScores[0].kills)
+                    if (playerScore.killsThisRound > highestKillPlayerScores[0].killsThisRound)
                     {
                         highestKillPlayerScores.Clear();
                         highestKillPlayerScores.Add(playerScore);
                     }
-                    else if (playerScore.kills == highestKillPlayerScores[0].kills)
+                    else if (playerScore.killsThisRound == highestKillPlayerScores[0].killsThisRound)
                     {
                         highestKillPlayerScores.Add(playerScore);
                     }
@@ -461,8 +457,7 @@ namespace Vi.Core.GameModeManagers
 
         protected void Awake()
         {
-            scoreListForThisRound = new NetworkList<PlayerScore>();
-            cumulativeScoreList = new NetworkList<PlayerScore>();
+            scoreList = new NetworkList<PlayerScore>();
             disconnectedScoreList = new NetworkList<DisconnectedPlayerScore>();
             killHistory = new NetworkList<KillHistoryElement>();
 
@@ -502,48 +497,23 @@ namespace Vi.Core.GameModeManagers
 
         private void OnScoreListForThisRoundChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
-            switch (networkListEvent.Type)
-            {
-                case NetworkListEvent<PlayerScore>.EventType.Add:
-                    cumulativeScoreList.Add(networkListEvent.Value);
-                    break;
-                case NetworkListEvent<PlayerScore>.EventType.Insert:
-                    cumulativeScoreList.Insert(networkListEvent.Index, networkListEvent.Value);
-                    break;
-                case NetworkListEvent<PlayerScore>.EventType.Remove:
-                    cumulativeScoreList.Remove(networkListEvent.Value);
-                    break;
-                case NetworkListEvent<PlayerScore>.EventType.RemoveAt:
-                    cumulativeScoreList.RemoveAt(networkListEvent.Index);
-                    break;
-                case NetworkListEvent<PlayerScore>.EventType.Value:
-                    cumulativeScoreList[networkListEvent.Index] += networkListEvent.Value;
-                    break;
-                case NetworkListEvent<PlayerScore>.EventType.Clear:
-                    cumulativeScoreList.Clear();
-                    break;
-                default:
-                    Debug.LogError("Unsure how to handle network score list event type " + networkListEvent.Type);
-                    break;
-            }
-
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
                 if (!gameOver & !IsWaitingForPlayers)
                 {
-                    if (scoreListForThisRound.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                    if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
                 }
             }
         }
 
         public void SubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
-            scoreListForThisRound.OnListChanged += onListChangedDelegate;
+            scoreList.OnListChanged += onListChangedDelegate;
         }
 
         public void UnsubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
         {
-            scoreListForThisRound.OnListChanged -= onListChangedDelegate;
+            scoreList.OnListChanged -= onListChangedDelegate;
         }
 
         public bool IsWaitingForPlayers { get; private set; } = true;
@@ -579,24 +549,26 @@ namespace Vi.Core.GameModeManagers
         public struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>
         {
             public int id;
-            public int kills;
-            public int deaths;
+            public int cumulativeKills;
+            public int killsThisRound;
+            public int cumulativeDeaths;
+            public int deathsThisRound;
             public int roundWins;
 
             public PlayerScore(int id)
             {
                 this.id = id;
-                kills = 0;
-                deaths = 0;
+                cumulativeKills = 0;
+                killsThisRound = 0;
+                cumulativeDeaths = 0;
+                deathsThisRound = 0;
                 roundWins = 0;
             }
 
-            public PlayerScore(int id, int roundWins)
+            public void ResetRoundVariables()
             {
-                this.id = id;
-                kills = 0;
-                deaths = 0;
-                this.roundWins = roundWins;
+                killsThisRound = 0;
+                deathsThisRound = 0;
             }
 
             public bool Equals(PlayerScore other)
@@ -604,25 +576,13 @@ namespace Vi.Core.GameModeManagers
                 return id == other.id;
             }
 
-            public static PlayerScore operator +(PlayerScore x, PlayerScore y)
-            {
-                if (x.id != y.id) { Debug.LogError("Adding two player score structs that don't have the same id!"); }
-                if (x.roundWins > y.roundWins) { Debug.LogError("Adding two player score structs where the left argument has more round wins than the right!"); }
-
-                return new PlayerScore
-                {
-                    id = x.id,
-                    kills = x.kills + y.kills,
-                    deaths = x.deaths + y.deaths,
-                    roundWins = y.roundWins
-                };
-            }
-
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
-                serializer.SerializeValue(ref kills);
-                serializer.SerializeValue(ref deaths);
+                serializer.SerializeValue(ref cumulativeKills);
+                serializer.SerializeValue(ref killsThisRound);
+                serializer.SerializeValue(ref cumulativeDeaths);
+                serializer.SerializeValue(ref deathsThisRound);
                 serializer.SerializeValue(ref roundWins);
             }
         }

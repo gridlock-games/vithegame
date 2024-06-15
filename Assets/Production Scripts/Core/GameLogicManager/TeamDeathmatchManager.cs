@@ -31,8 +31,8 @@ namespace Vi.Core.GameModeManagers
             int killerTeamScore = 0;
             foreach (int killerTeamId in killerTeamIds)
             {
-                int index = scoreListForThisRound.IndexOf(new PlayerScore(killerTeamId));
-                killerTeamScore += scoreListForThisRound[index].kills;
+                int index = scoreList.IndexOf(new PlayerScore(killerTeamId));
+                killerTeamScore += scoreList[index].killsThisRound;
             }
 
             if (killerTeamScore >= killsToWinRound)
@@ -79,8 +79,8 @@ namespace Vi.Core.GameModeManagers
                 int killSum = 0;
                 foreach (Attributes attributes in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team))
                 {
-                    int index = scoreListForThisRound.IndexOf(new PlayerScore(attributes.GetPlayerDataId()));
-                    killSum += scoreListForThisRound[index].kills;
+                    int index = scoreList.IndexOf(new PlayerScore(attributes.GetPlayerDataId()));
+                    killSum += scoreList[index].killsThisRound;
                 }
                 killCountByTeam.Add(team, killSum);
             }
@@ -116,17 +116,17 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Red Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                return "Red Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
             }
             else
             {
                 if (localTeam == PlayerDataManager.Team.Red)
                 {
-                    return "Your Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
                 }
                 else if (localTeam == PlayerDataManager.Team.Blue)
                 {
-                    return "Your Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
                 }
                 else
                 {
@@ -143,17 +143,17 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Blue Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                return "Blue Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
             }
             else
             {
                 if (localTeam == PlayerDataManager.Team.Red)
                 {
-                    return "Enemy Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                    return "Enemy Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
                 }
                 else if (localTeam == PlayerDataManager.Team.Blue)
                 {
-                    return "Enemy Team: " + GetPlayerScoreForThisRound(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                    return "Enemy Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
                 }
                 else
                 {
