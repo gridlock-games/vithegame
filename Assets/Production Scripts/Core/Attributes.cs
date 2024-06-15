@@ -986,7 +986,7 @@ namespace Vi.Core
             UpdateRage();
 
             // Regen for 50 seconds
-            if (Time.time - spiritRegenActivateTime <= 50) { UpdateSpirit(); }
+            if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
             
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
