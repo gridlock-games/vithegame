@@ -822,10 +822,12 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.RemoveAt:
                     if (IsServer)
                     {
-
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+
+                        // If there is a local player for this id, despawn it
+                        if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
