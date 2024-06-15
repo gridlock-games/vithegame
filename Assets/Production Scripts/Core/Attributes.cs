@@ -458,6 +458,20 @@ namespace Vi.Core
 
         private const float rageDamageMultiplier = 1.15f;
 
+        private Dictionary<Attributes, float> damageMappingThisLife = new Dictionary<Attributes, float>();
+
+        private void AddDamageToMapping(Attributes attacker, float damage)
+        {
+            if (damageMappingThisLife.ContainsKey(attacker))
+            {
+                damageMappingThisLife[attacker] += damage;
+            }
+            else
+            {
+                damageMappingThisLife.Add(attacker, damage);
+            }
+        }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -636,6 +650,7 @@ namespace Vi.Core
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
+            bool hitReactionWasPlayed = false;
             if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
@@ -661,7 +676,11 @@ namespace Vi.Core
                         | animationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None))
+                        {
+                            animationHandler.PlayAction(hitReaction);
+                            hitReactionWasPlayed = true;
+                        }
                     }
                 }
             }
@@ -674,6 +693,7 @@ namespace Vi.Core
             {
                 RenderBlock(impactPosition);
                 AddHP(HPDamage);
+                AddDamageToMapping(attacker, HPDamage);
             }
             else // Not blocking
             {
@@ -683,6 +703,7 @@ namespace Vi.Core
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
                     AddHP(HPDamage);
+                    AddDamageToMapping(attacker, HPDamage);
                 }
             }
 
@@ -699,7 +720,7 @@ namespace Vi.Core
             if (attack.shouldFlinch | IsRaging())
             {
                 movementHandler.Flinch(attack.GetFlinchAmount());
-                animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle));
+                if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
             }
 
             lastAttackingAttributes = attacker;
@@ -1071,6 +1092,7 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
+                damageMappingThisLife.Clear();
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
