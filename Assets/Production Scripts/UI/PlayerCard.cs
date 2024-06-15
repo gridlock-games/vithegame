@@ -85,6 +85,7 @@ namespace Vi.UI
         }
 
         private PlayerUI playerUI;
+        private List<Material> tintMaterialInstances = new List<Material>();
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
@@ -105,9 +106,20 @@ namespace Vi.UI
             interimStaminaFillImage.fillAmount = 0;
             interimSpiritFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
+
+            foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
+            {
+                graphic.material = new Material(graphic.material);
+                tintMaterialInstances.Add(graphic.material);
+            }
         }
 
+        private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
+        private static readonly Color deathTintColor = new Color(100 / 255f, 100 / 255f, 100 / 255f, 1);
+
         public const float fillSpeed = 4;
+
+        private Color lastColorTarget = aliveTintColor;
         private void Update()
         {
             if (!attributes) { canvas.enabled = false; return; }
@@ -143,6 +155,19 @@ namespace Vi.UI
                         }
                     }
                 }
+            }
+
+            if (!IsMainCard())
+            {
+                Color colorTarget = attributes.GetAilment() == ActionClip.Ailment.Death ? deathTintColor : aliveTintColor;
+                if (colorTarget != lastColorTarget)
+                {
+                    foreach (Material material in tintMaterialInstances)
+                    {
+                        material.color = colorTarget;
+                    }
+                }
+                lastColorTarget = colorTarget;
             }
         }
     }
