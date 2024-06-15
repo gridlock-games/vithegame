@@ -11,7 +11,6 @@ namespace Vi.UI
     {
         [SerializeField] private KillFeedElement[] killFeedElementInstances;
 
-        //private List<GameModeManager.KillHistoryElement> cachedKillHistory = new List<GameModeManager.KillHistoryElement>();
         private List<int> displayedKillHistoryIndices = new List<int>();
 
         private bool isPreview;
