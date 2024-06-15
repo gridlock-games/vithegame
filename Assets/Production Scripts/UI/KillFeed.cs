@@ -25,12 +25,12 @@ namespace Vi.UI
         {
             previewKillHistoryList = new List<GameModeManager.KillHistoryElement>()
             {
-                new GameModeManager.KillHistoryElement(false),
-                new GameModeManager.KillHistoryElement(false),
-                new GameModeManager.KillHistoryElement(true),
-                new GameModeManager.KillHistoryElement(false),
-                new GameModeManager.KillHistoryElement(false),
-                new GameModeManager.KillHistoryElement(true)
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Player),
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.PlayerWithAssist),
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Environment),
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Player),
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.PlayerWithAssist),
+                new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Environment)
             };
         }
 

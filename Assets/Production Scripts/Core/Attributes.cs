@@ -53,6 +53,7 @@ namespace Vi.Core
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
+            damageMappingThisLife.Clear();
             HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
             spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             stamina.Value = 0;
@@ -459,6 +460,8 @@ namespace Vi.Core
         private const float rageDamageMultiplier = 1.15f;
 
         private Dictionary<Attributes, float> damageMappingThisLife = new Dictionary<Attributes, float>();
+
+        public Dictionary<Attributes, float> GetDamageMappingThisLife() { return damageMappingThisLife; }
 
         private void AddDamageToMapping(Attributes attacker, float damage)
         {
@@ -1093,6 +1096,7 @@ namespace Vi.Core
             if (current == ActionClip.Ailment.Death)
             {
                 damageMappingThisLife.Clear();
+                lastAttackingAttributes = null;
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }

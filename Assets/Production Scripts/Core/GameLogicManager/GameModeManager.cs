@@ -88,6 +88,7 @@ namespace Vi.Core.GameModeManagers
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {
             public FixedString64Bytes killerName;
+            public FixedString64Bytes assistName;
             public FixedString64Bytes victimName;
             public FixedString64Bytes weaponName;
             public KillType killType;
@@ -95,6 +96,16 @@ namespace Vi.Core.GameModeManagers
             public KillHistoryElement(Attributes killer, Attributes victim)
             {
                 killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                assistName = "";
+                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                killType = KillType.Player;
+            }
+
+            public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
+            {
+                killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                assistName = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId()).character.name;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
@@ -103,33 +114,49 @@ namespace Vi.Core.GameModeManagers
             public KillHistoryElement(Attributes victim)
             {
                 killerName = "";
+                assistName = "";
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name.ToString();
                 weaponName = "Environment";
                 killType = KillType.Environment;
             }
 
-            public KillHistoryElement(bool isEnvironmentKill)
+            public KillHistoryElement(KillType killType)
             {
-                if (isEnvironmentKill)
+                this.killType = killType;
+                var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+                switch (killType)
                 {
-                    killerName = "";
-                    victimName = "Victim";
-                    weaponName = "Environment";
-                    killType = KillType.Environment;
+                    case KillType.Player:
+                        killerName = "Killer";
+                        assistName = "";
+                        victimName = "Victim";
+                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        return;
+                    case KillType.PlayerWithAssist:
+                        killerName = "Killer";
+                        assistName = "Assist";
+                        victimName = "Victim";
+                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        return;
+                    case KillType.Environment:
+                        killerName = "";
+                        assistName = "";
+                        victimName = "Victim";
+                        weaponName = "Environment";
+                        return;
+                    default:
+                        Debug.LogError("Unsure how to handle kill type" + killType);
+                        break;
                 }
-                else
-                {
-                    var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-                    killerName = "Killer";
-                    victimName = "Victim";
-                    weaponName = weaponOptions[Random.Range(0, weaponOptions.Length-1)].weapon.name;
-                    killType = KillType.Player;
-                }
+                killerName = "";
+                assistName = "";
+                victimName = "";
+                weaponName = "";
             }
 
             public Sprite GetKillFeedIcon(KillHistoryElement killHistoryElement)
             {
-                if (killType == KillType.Player)
+                if (killType == KillType.Player | killType == KillType.PlayerWithAssist)
                     return System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString()).killFeedIcon;
                 else if (killType == KillType.Environment)
                     return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
@@ -141,12 +168,14 @@ namespace Vi.Core.GameModeManagers
             public enum KillType
             {
                 Player,
+                PlayerWithAssist,
                 Environment
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref killerName);
+                serializer.SerializeValue(ref assistName);
                 serializer.SerializeValue(ref victimName);
                 serializer.SerializeValue(ref weaponName);
                 serializer.SerializeValue(ref killType);
@@ -186,9 +215,20 @@ namespace Vi.Core.GameModeManagers
                 victimScore.deathsThisRound += 1;
                 scoreList[victimIndex] = victimScore;
 
-                killHistory.Add(new KillHistoryElement(killer, victim));
+                // Damage is in negative numbers
+                Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
+                if (assist)
+                {
+                    killHistory.Add(new KillHistoryElement(killer, assist, victim));
+                }
+                else
+                {
+                    killHistory.Add(new KillHistoryElement(killer, victim));
+                }
             }
         }
+
+        private const float minAssistDamage = 30;
 
         public virtual void OnEnvironmentKill(Attributes victim)
         {

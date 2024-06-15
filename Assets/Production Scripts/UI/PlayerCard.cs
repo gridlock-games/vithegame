@@ -85,6 +85,11 @@ namespace Vi.UI
             canvas = GetComponent<Canvas>();
         }
 
+        private void OnEnable()
+        {
+            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
+        }
+
         [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
 
         private PlayerUI playerUI;
@@ -117,8 +122,6 @@ namespace Vi.UI
                 graphic.material = new Material(graphic.material);
                 tintMaterialInstances.Add(graphic.material);
             }
-
-            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
