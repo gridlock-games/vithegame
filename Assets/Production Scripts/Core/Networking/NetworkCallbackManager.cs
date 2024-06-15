@@ -122,7 +122,6 @@ namespace Vi.Core
                     {
                         clientTeam = PlayerDataManager.Team.Spectator;
                     }
-                    clientTeam = PlayerDataManager.Team.Red;
 
                     PlayerDataInput data = playerDataQueue.Dequeue();
                     StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
