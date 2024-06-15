@@ -8,31 +8,44 @@ namespace Vi.UI
 {
     public class KillFeedElement : MonoBehaviour
     {
+        [SerializeField] private GameObject killerParent;
         [SerializeField] private Text killerText;
+        [SerializeField] private GameObject assistParent;
+        [SerializeField] private Text assistText;
+        [SerializeField] private GameObject victimParent;
         [SerializeField] private Text victimText;
         [SerializeField] private Image causeOfDeathImage;
 
         private float initializationTime = Mathf.NegativeInfinity;
         public void Initialize(GameModeManager.KillHistoryElement killHistoryElement)
         {
-            if (killHistoryElement.killType == GameModeManager.KillHistoryElement.KillType.Player)
+            switch (killHistoryElement.killType)
             {
-                killerText.gameObject.SetActive(true);
-                killerText.text = killHistoryElement.killerName.ToString();
-                victimText.text = killHistoryElement.victimName.ToString();
-                causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
+                case GameModeManager.KillHistoryElement.KillType.Player:
+                    killerParent.SetActive(true);
+                    killerText.text = killHistoryElement.killerName.ToString();
+                    assistParent.SetActive(false);
+                    victimText.text = killHistoryElement.victimName.ToString();
+                    causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
+                    break;
+                case GameModeManager.KillHistoryElement.KillType.PlayerWithAssist:
+                    killerParent.SetActive(true);
+                    killerText.text = killHistoryElement.killerName.ToString();
+                    assistParent.SetActive(true);
+                    assistText.text = killHistoryElement.assistName.ToString();
+                    victimText.text = killHistoryElement.victimName.ToString();
+                    causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
+                    break;
+                case GameModeManager.KillHistoryElement.KillType.Environment:
+                    killerParent.SetActive(false);
+                    assistParent.SetActive(false);
+                    victimText.text = killHistoryElement.victimName.ToString();
+                    causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle kill type " + killHistoryElement.killType);
+                    break;
             }
-            else if (killHistoryElement.killType == GameModeManager.KillHistoryElement.KillType.Environment)
-            {
-                killerText.gameObject.SetActive(false);
-                victimText.text = killHistoryElement.victimName.ToString();
-                causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
-            }
-            else
-            {
-                Debug.LogError("Not sure how to handle kill history kill type: " + killHistoryElement.killType);
-            }
-
             initializationTime = Time.time;
         }
 
