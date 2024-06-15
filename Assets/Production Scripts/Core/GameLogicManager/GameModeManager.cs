@@ -219,7 +219,7 @@ namespace Vi.Core.GameModeManagers
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
-        private bool isFirstRound = true;
+        public int RoundCount { get; private set; } = 0;
         protected virtual void OnRoundStart()
         {
             for (int i = 0; i < scoreList.Count; i++)
@@ -235,8 +235,8 @@ namespace Vi.Core.GameModeManagers
                 playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
-            if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
-            isFirstRound = false;
+            RoundCount += 1;
+            if (RoundCount != 1) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
             killHistory.Clear();
         }
 
@@ -553,6 +553,10 @@ namespace Vi.Core.GameModeManagers
             public int killsThisRound;
             public int cumulativeDeaths;
             public int deathsThisRound;
+            public int cumulativeAssists;
+            public int assistsThisRound;
+            public int cumulativeDamageDealt;
+            public int damageDealtThisRound;
             public int roundWins;
 
             public PlayerScore(int id)
@@ -562,6 +566,10 @@ namespace Vi.Core.GameModeManagers
                 killsThisRound = 0;
                 cumulativeDeaths = 0;
                 deathsThisRound = 0;
+                cumulativeAssists = 0;
+                assistsThisRound = 0;
+                cumulativeDamageDealt = 0;
+                damageDealtThisRound = 0;
                 roundWins = 0;
             }
 
@@ -569,6 +577,7 @@ namespace Vi.Core.GameModeManagers
             {
                 killsThisRound = 0;
                 deathsThisRound = 0;
+                assistsThisRound = 0;
             }
 
             public bool Equals(PlayerScore other)
@@ -583,6 +592,10 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeValue(ref killsThisRound);
                 serializer.SerializeValue(ref cumulativeDeaths);
                 serializer.SerializeValue(ref deathsThisRound);
+                serializer.SerializeValue(ref cumulativeAssists);
+                serializer.SerializeValue(ref assistsThisRound);
+                serializer.SerializeValue(ref cumulativeDamageDealt);
+                serializer.SerializeValue(ref damageDealtThisRound);
                 serializer.SerializeValue(ref roundWins);
             }
         }
