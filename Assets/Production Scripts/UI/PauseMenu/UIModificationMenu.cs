@@ -49,10 +49,6 @@ namespace Vi.UI
                         weaponCard.SetPreviewOn(weaponCard.name.Contains("Primary") ? LoadoutManager.WeaponSlotType.Primary : LoadoutManager.WeaponSlotType.Secondary);
                         continue;
                     }
-                    if (copyChildren[childIndex].TryGetComponent(out PlayerCard playerCard))
-                    {
-                        if (!playerCard.IsMainCard()) { playerCard.DisableStaminaAndSpiritDisplay(); }
-                    }
                     if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
                     if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 

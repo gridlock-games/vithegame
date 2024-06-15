@@ -53,12 +53,12 @@ namespace Vi.UI
             canvas.enabled = attributes != null;
         }
 
-        public bool IsMainCard()
+        private bool IsMainCard()
         {
             return !nameDisplay.gameObject.activeSelf;
         }
 
-        public void DisableStaminaAndSpiritDisplay()
+        private void DisableStaminaAndSpiritDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
             interimStaminaFillImage.gameObject.SetActive(false);
@@ -117,6 +117,8 @@ namespace Vi.UI
                 graphic.material = new Material(graphic.material);
                 tintMaterialInstances.Add(graphic.material);
             }
+
+            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);

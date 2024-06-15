@@ -201,11 +201,6 @@ namespace Vi.UI
         private CanvasGroup[] canvasGroups;
         private void Start()
         {
-            foreach (PlayerCard playerCard in teammatePlayerCards)
-            {
-                playerCard.DisableStaminaAndSpiritDisplay();
-            }
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();

@@ -22,8 +22,8 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(Attributes killer, Attributes victim)
         {
             base.OnPlayerKill(killer, victim);
-            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-            if (scoreList[killerIndex].kills >= killsToWinRound)
+            int killerIndex = scoreListForThisRound.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
+            if (scoreListForThisRound[killerIndex].kills >= killsToWinRound)
             {
                 OnRoundEnd(new int[] { killer.GetPlayerDataId() });
             }
@@ -84,13 +84,13 @@ namespace Vi.Core.GameModeManagers
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
             int localPlayerKey = PlayerDataManager.Singleton.GetLocalPlayerObject().Key;
-            int localIndex = scoreList.IndexOf(new PlayerScore(localPlayerKey));
+            int localIndex = scoreListForThisRound.IndexOf(new PlayerScore(localPlayerKey));
             if (localIndex == -1)
             {
                 // If we're a spectator
                 List<PlayerScore> scoreList = new List<PlayerScore>();
                 PlayerScore localPlayerScore;
-                foreach (PlayerScore playerScore in this.scoreList)
+                foreach (PlayerScore playerScore in this.scoreListForThisRound)
                 {
                     if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
                     {
@@ -110,7 +110,7 @@ namespace Vi.Core.GameModeManagers
             }
             else
             {
-                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreList[localIndex].kills;
+                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreListForThisRound[localIndex].kills;
             }
         }
 
@@ -120,7 +120,7 @@ namespace Vi.Core.GameModeManagers
 
             List<PlayerScore> scoreList = new List<PlayerScore>();
             PlayerScore localPlayerScore;
-            foreach (PlayerScore playerScore in this.scoreList)
+            foreach (PlayerScore playerScore in this.scoreListForThisRound)
             {
                 if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
                 {

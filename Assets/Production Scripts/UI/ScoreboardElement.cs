@@ -49,7 +49,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.ContainsId(playerDataId))
             {
                 disconnectedPlayerIcon.enabled = false;
-                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(playerDataId);
+                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetCumulativePlayerScore(playerDataId);
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
