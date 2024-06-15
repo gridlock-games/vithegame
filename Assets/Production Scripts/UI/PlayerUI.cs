@@ -437,12 +437,12 @@ namespace Vi.UI
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
 
                     // Order player cards by distance
-                    teammateAttributes.Where(item => item.GetAilment() != ActionClip.Ailment.Death).OrderBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    List<Attributes> orderedTeammateAttributes = teammateAttributes.OrderBy(item => item.GetAilment() == ActionClip.Ailment.Death).ThenBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
-                        if (i < teammateAttributes.Count)
+                        if (i < orderedTeammateAttributes.Count)
                         {
-                            teammatePlayerCards[i].Initialize(teammateAttributes[i]);
+                            teammatePlayerCards[i].Initialize(orderedTeammateAttributes[i]);
                         }
                         else
                         {
