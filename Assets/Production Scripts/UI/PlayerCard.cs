@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -52,12 +53,12 @@ namespace Vi.UI
             canvas.enabled = attributes != null;
         }
 
-        public bool IsMainCard()
+        private bool IsMainCard()
         {
             return !nameDisplay.gameObject.activeSelf;
         }
 
-        public void DisableStaminaAndSpiritDisplay()
+        private void DisableStaminaAndSpiritDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
             interimStaminaFillImage.gameObject.SetActive(false);
@@ -84,17 +85,26 @@ namespace Vi.UI
             canvas = GetComponent<Canvas>();
         }
 
+        private void OnEnable()
+        {
+            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
+        }
+
+        [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
+
         private PlayerUI playerUI;
         private List<Material> tintMaterialInstances = new List<Material>();
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
 
+            List<Graphic> graphicsToTint = this.graphicsToTint.ToList();
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
                 statusIcon.InitializeStatusIcon(status);
                 statusIcons.Add(statusIcon);
+                graphicsToTint.AddRange(statusIcon.GetComponentsInChildren<Graphic>());
             }
 
             healthFillImage.fillAmount = 0;
@@ -107,7 +117,7 @@ namespace Vi.UI
             interimSpiritFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
 
-            foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
+            foreach (Graphic graphic in graphicsToTint)
             {
                 graphic.material = new Material(graphic.material);
                 tintMaterialInstances.Add(graphic.material);

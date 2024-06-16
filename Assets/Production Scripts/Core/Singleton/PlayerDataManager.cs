@@ -152,6 +152,7 @@ namespace Vi.Core
 
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
         {
+            { Team.Competitor, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Red, Color.red },
             { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255) },
             { Team.Yellow, Color.yellow },
@@ -822,10 +823,12 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.RemoveAt:
                     if (IsServer)
                     {
-
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+
+                        // If there is a local player for this id, despawn it
+                        if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:

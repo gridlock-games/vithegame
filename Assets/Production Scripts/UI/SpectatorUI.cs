@@ -44,16 +44,6 @@ namespace Vi.UI
             
             leftPlayerCards = leftPlayerCardsTemp.ToArray();
             rightPlayerCards = rightPlayerCardsTemp.ToArray();
-
-            foreach (PlayerCard playerCard in leftPlayerCards)
-            {
-                playerCard.DisableStaminaAndSpiritDisplay();
-            }
-
-            foreach (PlayerCard playerCard in rightPlayerCards)
-            {
-                playerCard.DisableStaminaAndSpiritDisplay();
-            }
         }
 
         private void RefreshStatus()

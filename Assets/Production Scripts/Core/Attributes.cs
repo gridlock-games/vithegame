@@ -53,6 +53,7 @@ namespace Vi.Core
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
+            damageMappingThisLife.Clear();
             HP.Value = weaponHandler.GetWeapon().GetMaxHP() * hpPercentage;
             spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             stamina.Value = 0;
@@ -458,6 +459,22 @@ namespace Vi.Core
 
         private const float rageDamageMultiplier = 1.15f;
 
+        private Dictionary<Attributes, float> damageMappingThisLife = new Dictionary<Attributes, float>();
+
+        public Dictionary<Attributes, float> GetDamageMappingThisLife() { return damageMappingThisLife; }
+
+        private void AddDamageToMapping(Attributes attacker, float damage)
+        {
+            if (damageMappingThisLife.ContainsKey(attacker))
+            {
+                damageMappingThisLife[attacker] += damage;
+            }
+            else
+            {
+                damageMappingThisLife.Add(attacker, damage);
+            }
+        }
+
         private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -636,6 +653,7 @@ namespace Vi.Core
                 hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
             }
 
+            bool hitReactionWasPlayed = false;
             if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
@@ -661,7 +679,11 @@ namespace Vi.Core
                         | animationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None)) { animationHandler.PlayAction(hitReaction); }
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None))
+                        {
+                            animationHandler.PlayAction(hitReaction);
+                            hitReactionWasPlayed = true;
+                        }
                     }
                 }
             }
@@ -673,7 +695,10 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
+                float prevHP = GetHP();
                 AddHP(HPDamage);
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                AddDamageToMapping(attacker, HPDamage);
             }
             else // Not blocking
             {
@@ -682,7 +707,10 @@ namespace Vi.Core
                 if (HPDamage != 0)
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
+                    float prevHP = GetHP();
                     AddHP(HPDamage);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                    AddDamageToMapping(attacker, HPDamage);
                 }
             }
 
@@ -699,7 +727,7 @@ namespace Vi.Core
             if (attack.shouldFlinch | IsRaging())
             {
                 movementHandler.Flinch(attack.GetFlinchAmount());
-                animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle));
+                if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
             }
 
             lastAttackingAttributes = attacker;
@@ -986,7 +1014,7 @@ namespace Vi.Core
             UpdateRage();
 
             // Regen for 50 seconds
-            if (Time.time - spiritRegenActivateTime <= 50) { UpdateSpirit(); }
+            if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
             
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
@@ -1071,6 +1099,8 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
+                damageMappingThisLife.Clear();
+                lastAttackingAttributes = null;
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }

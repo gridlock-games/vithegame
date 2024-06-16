@@ -13,11 +13,14 @@ namespace Vi.UI
         [SerializeField] private Text playerNameText;
         [SerializeField] private Text roundWinsText;
         [SerializeField] private Text killsText;
+        [SerializeField] private Text assistsText;
         [SerializeField] private Text deathsText;
         [SerializeField] private Text kdRatioText;
+        [SerializeField] private Text damageDealtText;
+        [SerializeField] private Text damageRecievedText;
         [SerializeField] private Image[] backgroundImagesToColor = new Image[0];
 
-        public int playerDataId;
+        [HideInInspector] public int playerDataId;
         private bool initialized;
 
         public void Initialize(int playerDataId)
@@ -40,7 +43,6 @@ namespace Vi.UI
         private void Update()
         {
             if (!initialized) { return; }
-
             UpdateUI();
         }
 
@@ -57,9 +59,12 @@ namespace Vi.UI
                 }
                 playerNameText.text = playerData.character.name.ToString();
                 roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.kills.ToString();
-                deathsText.text = playerScore.deaths.ToString();
-                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+                killsText.text = playerScore.cumulativeKills.ToString();
+                assistsText.text = playerScore.cumulativeAssists.ToString();
+                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
+                damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
+                damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
             }
             else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
             {
@@ -72,9 +77,12 @@ namespace Vi.UI
                 }
                 playerNameText.text = playerData.character.name.ToString();
                 roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.kills.ToString();
-                deathsText.text = playerScore.deaths.ToString();
-                kdRatioText.text = playerScore.deaths == 0 ? playerScore.kills.ToString("F2") : (playerScore.kills / (float)playerScore.deaths).ToString("F2");
+                killsText.text = playerScore.cumulativeKills.ToString();
+                assistsText.text = playerScore.cumulativeAssists.ToString();
+                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
+                damageDealtText.text = playerScore.cumulativeDamageDealt.ToString();
+                damageRecievedText.text = playerScore.damageRecievedThisRound.ToString();
             }
             else
             {

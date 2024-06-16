@@ -38,7 +38,7 @@ namespace Vi.UI
             Server = server;
             serverNameText.text = server.label;
             playerCountText.text = server.population.ToString();
-            regionText.text = "NA";
+            regionText.text = "MNL";
             pingText.text = "";
             UIParent.StartCoroutine(PingServer());
         }
