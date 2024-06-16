@@ -23,7 +23,6 @@ namespace Vi.UI
         private float initializationTime = Mathf.NegativeInfinity;
         public void Initialize(GameModeManager.KillHistoryElement killHistoryElement)
         {
-            Debug.Log(killHistoryElement.killType);
             switch (killHistoryElement.killType)
             {
                 case GameModeManager.KillHistoryElement.KillType.Player:

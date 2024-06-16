@@ -190,8 +190,11 @@ namespace Vi.Core.GameModeManagers
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref killerName);
+                serializer.SerializeValue(ref killerNetObjId);
                 serializer.SerializeValue(ref assistName);
+                serializer.SerializeValue(ref assistNetObjId);
                 serializer.SerializeValue(ref victimName);
+                serializer.SerializeValue(ref victimNetObjId);
                 serializer.SerializeValue(ref weaponName);
                 serializer.SerializeValue(ref killType);
             }
