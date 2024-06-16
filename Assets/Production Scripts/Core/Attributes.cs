@@ -695,7 +695,9 @@ namespace Vi.Core
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition);
+                float prevHP = GetHP();
                 AddHP(HPDamage);
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
                 AddDamageToMapping(attacker, HPDamage);
             }
             else // Not blocking
@@ -705,7 +707,9 @@ namespace Vi.Core
                 if (HPDamage != 0)
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
+                    float prevHP = GetHP();
                     AddHP(HPDamage);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
                     AddDamageToMapping(attacker, HPDamage);
                 }
             }

@@ -217,6 +217,24 @@ namespace Vi.Core.GameModeManagers
             return killHistoryList;
         }
 
+        public virtual void OnDamageOccuring(Attributes attacker, Attributes victim, float HPDamage)
+        {
+            if (nextGameActionTimer.Value <= 0)
+            {
+                int attackerIndex = scoreList.IndexOf(new PlayerScore(attacker.GetPlayerDataId()));
+                PlayerScore attackerScore = scoreList[attackerIndex];
+                attackerScore.cumulativeDamageDealt += HPDamage;
+                attackerScore.damageDealtThisRound += HPDamage;
+                scoreList[attackerIndex] = attackerScore;
+
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.cumulativeDamageRecieved += HPDamage;
+                victimScore.damageRecievedThisRound += HPDamage;
+                scoreList[victimIndex] = victimScore;
+            }
+        }
+
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
             if (nextGameActionTimer.Value <= 0)
@@ -619,10 +637,10 @@ namespace Vi.Core.GameModeManagers
             public int deathsThisRound;
             public int cumulativeAssists;
             public int assistsThisRound;
-            public int cumulativeDamageDealt;
-            public int damageDealtThisRound;
-            public int cumulativeDamageRecieved;
-            public int damageRecievedThisRound;
+            public float cumulativeDamageDealt;
+            public float damageDealtThisRound;
+            public float cumulativeDamageRecieved;
+            public float damageRecievedThisRound;
             public int roundWins;
 
             public PlayerScore(int id)
