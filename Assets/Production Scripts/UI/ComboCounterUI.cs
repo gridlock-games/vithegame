@@ -24,11 +24,13 @@ namespace Vi.UI
 
         private const float shakeAmount = 300;
 
+        private const int minHitsToDisplayUI = 1;
+
         private void Update()
         {
-            if (attributes.GetComboCounter() > 0) { comboCounterText.text = attributes.GetComboCounter().ToString(); }
+            if (attributes.GetComboCounter() > minHitsToDisplayUI) { comboCounterText.text = attributes.GetComboCounter().ToString(); }
 
-            if (attributes.GetComboCounter() == 0)
+            if (attributes.GetComboCounter() <= minHitsToDisplayUI)
             {
                 transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.zero, Time.deltaTime * 8);
             }

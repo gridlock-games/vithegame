@@ -12,36 +12,34 @@ namespace Vi.UI
     {
         [SerializeField] private Text nameDisplay;
 
-        [Header("True Value Images")]
-        [SerializeField] private Image healthFillImage;
-        [SerializeField] private Image staminaFillImage;
-        [SerializeField] private Image spiritFillImage;
-        [SerializeField] private Image rageFillImage;
-
-        [Header("Interm Images")]
-        [SerializeField] private Image interimHealthFillImage;
-        [SerializeField] private Image interimStaminaFillImage;
-        [SerializeField] private Image interimSpiritFillImage;
-        [SerializeField] private Image interimRageFillImage;
-
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
-        [Header("Other Health UI")]
+        [Header("Health UI")]
         [SerializeField] private Text healthText;
+        [SerializeField] private Image healthFillImage;
+        [SerializeField] private Image interimHealthFillImage;
         [SerializeField] private Image topHealthBorder;
         [SerializeField] private Image healthBackground;
 
-        [Header("Other Stamina UI")]
+        [Header("Stamina UI")]
         [SerializeField] private Text staminaText;
+        [SerializeField] private Image staminaFillImage;
+        [SerializeField] private Image interimStaminaFillImage;
         [SerializeField] private Image bottomStaminaBorder;
         [SerializeField] private Image staminaBackground;
 
-        [Header("Other Spirit UI")]
+        [Header("Spirit UI")]
         [SerializeField] private Text spiritText;
+        [SerializeField] private Image spiritFillImage;
+        [SerializeField] private Image interimSpiritFillImage;
         [SerializeField] private Image bottomSpiritBorder;
         [SerializeField] private Image spiritBackground;
+
+        [Header("Rage UI")]
+        [SerializeField] private Image rageFillImage;
+        [SerializeField] private Image interimRageFillImage;
 
         private Attributes attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
@@ -136,6 +134,10 @@ namespace Vi.UI
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (nameDisplay.isActiveAndEnabled) { nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString(); }
+
+            healthText.text = "HP " + attributes.GetHP().ToString("F0") + " / " + attributes.GetMaxHP().ToString("F0");
+            staminaText.text = "ST " + attributes.GetStamina().ToString("F0") + " / " + attributes.GetMaxStamina().ToString("F0");
+            spiritText.text = "SP " + attributes.GetSpirit().ToString("F0") + " / " + attributes.GetMaxSpirit().ToString("F0");
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();

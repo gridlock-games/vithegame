@@ -27,6 +27,7 @@ namespace Vi.UI
             foreach (Renderer r in renderers)
             {
                 r.enabled = attributes.IsSpawned;
+                if (!r.enabled) { continue; }
 
                 foreach (Material mat in r.materials)
                 {

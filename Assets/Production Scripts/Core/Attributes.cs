@@ -66,7 +66,7 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP())
+            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
                 HP.Value = weaponHandler.GetWeapon().GetMaxHP();
             else if (HP.Value + amount < 0)
                 HP.Value = 0;
@@ -79,7 +79,7 @@ namespace Vi.Core
             if (activateCooldown)
                 staminaDelayCooldown = weaponHandler.GetWeapon().GetStaminaDelay();
 
-            if (stamina.Value + amount > weaponHandler.GetWeapon().GetMaxStamina())
+            if (stamina.Value + amount > weaponHandler.GetWeapon().GetMaxStamina() & stamina.Value <= weaponHandler.GetWeapon().GetMaxStamina())
                 stamina.Value = weaponHandler.GetWeapon().GetMaxStamina();
             else if (stamina.Value + amount < 0)
                 stamina.Value = 0;
@@ -92,7 +92,7 @@ namespace Vi.Core
             if (amount < 0) { amount *= spiritReductionMultiplier; }
             if (amount > 0) { amount *= spiritIncreaseMultiplier; }
 
-            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit())
+            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit() & spirit.Value <= weaponHandler.GetWeapon().GetMaxSpirit())
                 spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             else if (spirit.Value + amount < 0)
                 spirit.Value = 0;
@@ -102,7 +102,7 @@ namespace Vi.Core
 
         public void AddRage(float amount)
         {
-            if (rage.Value + amount > weaponHandler.GetWeapon().GetMaxRage())
+            if (rage.Value + amount > weaponHandler.GetWeapon().GetMaxRage() & rage.Value <= weaponHandler.GetWeapon().GetMaxRage())
                 rage.Value = weaponHandler.GetWeapon().GetMaxRage();
             else if (rage.Value + amount < 0)
                 rage.Value = 0;
