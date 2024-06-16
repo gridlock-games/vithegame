@@ -88,16 +88,22 @@ namespace Vi.Core.GameModeManagers
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {
             public FixedString64Bytes killerName;
+            public ulong killerNetObjId;
             public FixedString64Bytes assistName;
+            public ulong assistNetObjId;
             public FixedString64Bytes victimName;
+            public ulong victimNetObjId;
             public FixedString64Bytes weaponName;
             public KillType killType;
 
             public KillHistoryElement(Attributes killer, Attributes victim)
             {
                 killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                killerNetObjId = killer.NetworkObjectId;
                 assistName = "";
+                assistNetObjId = 0;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                victimNetObjId = victim.NetworkObjectId;
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
             }
@@ -105,17 +111,23 @@ namespace Vi.Core.GameModeManagers
             public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
             {
                 killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                killerNetObjId = killer.NetworkObjectId;
                 assistName = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId()).character.name;
+                assistNetObjId = assist.NetworkObjectId;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                victimNetObjId = victim.NetworkObjectId;
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
-                killType = KillType.Player;
+                killType = KillType.PlayerWithAssist;
             }
 
             public KillHistoryElement(Attributes victim)
             {
                 killerName = "";
+                killerNetObjId = 0;
                 assistName = "";
+                assistNetObjId = 0;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name.ToString();
+                victimNetObjId = victim.NetworkObjectId;
                 weaponName = "Environment";
                 killType = KillType.Environment;
             }
@@ -123,6 +135,9 @@ namespace Vi.Core.GameModeManagers
             public KillHistoryElement(KillType killType)
             {
                 this.killType = killType;
+                killerNetObjId = 0;
+                assistNetObjId = 0;
+                victimNetObjId = 0;
                 var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
                 switch (killType)
                 {
@@ -217,6 +232,7 @@ namespace Vi.Core.GameModeManagers
 
                 // Damage is in negative numbers
                 Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
+                Debug.Log("ASSIST " + assist);
                 if (assist)
                 {
                     killHistory.Add(new KillHistoryElement(killer, assist, victim));
