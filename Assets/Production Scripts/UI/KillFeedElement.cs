@@ -26,6 +26,7 @@ namespace Vi.UI
             switch (killHistoryElement.killType)
             {
                 case GameModeManager.KillHistoryElement.KillType.Player:
+                    Debug.Log(killHistoryElement.killerName.ToString() + " killed " + killHistoryElement.victimName.ToString());
                     killerParent.SetActive(true);
                     killerText.text = killHistoryElement.killerName.ToString();
                     assistParent.SetActive(false);
@@ -33,6 +34,7 @@ namespace Vi.UI
                     causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
                     break;
                 case GameModeManager.KillHistoryElement.KillType.PlayerWithAssist:
+                    Debug.Log(killHistoryElement.killerName.ToString() + " killed " + killHistoryElement.victimName.ToString() + " with assist from " + killHistoryElement.assistName.ToString());
                     killerParent.SetActive(true);
                     killerText.text = killHistoryElement.killerName.ToString();
                     assistParent.SetActive(true);
@@ -41,6 +43,7 @@ namespace Vi.UI
                     causeOfDeathImage.sprite = killHistoryElement.GetKillFeedIcon(killHistoryElement);
                     break;
                 case GameModeManager.KillHistoryElement.KillType.Environment:
+                    Debug.Log("Environment killed " + killHistoryElement.victimName.ToString());
                     killerParent.SetActive(false);
                     assistParent.SetActive(false);
                     victimText.text = killHistoryElement.victimName.ToString();

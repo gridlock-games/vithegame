@@ -252,7 +252,7 @@ namespace Vi.Core.GameModeManagers
                 scoreList[victimIndex] = victimScore;
 
                 // Damage is in negative numbers
-                Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
+                Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
                 if (assist)
                 {
                     int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
