@@ -27,6 +27,7 @@ namespace Vi.UI
         Attributes attributes;
         WeaponHandler weaponHandler;
         AnimationHandler animationHandler;
+        LoadoutManager loadoutManager;
         PlayerUI playerUI;
         private void FindPlayerInput()
         {
@@ -40,6 +41,7 @@ namespace Vi.UI
                 attributes = localPlayer;
                 weaponHandler = localPlayer.GetComponent<WeaponHandler>();
                 animationHandler = localPlayer.GetComponent<AnimationHandler>();
+                loadoutManager = localPlayer.GetComponent<LoadoutManager>();
                 playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
 
                 foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
@@ -454,7 +456,42 @@ namespace Vi.UI
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
-            else if (currentActionIndex == 9) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Swap Weapons
+            {
+                onTaskCompleteBufferDuration = 2;
+                checkmarkDuration = 1;
+                bufferDurationBetweenActions = 2;
+
+                currentOverlayMessage = "Switch Weapons";
+
+                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Weapon1"]);
+                if (controlSchemeSpriteList.Count > 0)
+                {
+                    currentOverlaySprites = controlSchemeSpriteList;
+                }
+                else if (controlScheme.name != "Touchscreen")
+                {
+                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Weapon1"], playerInput.actions["Weapon2"] });
+                    currentOverlaySprites = result.releasedSprites;
+                }
+
+                foreach (InputAction action in playerInput.actions)
+                {
+                    if (action.name.Contains("Weapon1") | action.name.Contains("Weapon2")) { playerInput.actions.FindAction(action.name).Enable(); }
+                }
+
+                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+
+                foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
+                {
+                    weaponCard.SetActive(true);
+                }
+
+                playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
+
+                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetSwitchWeaponButton().transform, true));
+            }
+            else if (currentActionIndex == 10) // Prepare to fight with NPC
             {
                 onTaskCompleteBufferDuration = 5;
                 checkmarkDuration = 0;
@@ -487,7 +524,7 @@ namespace Vi.UI
                 playerUI.GetScoreboardButton().gameObject.SetActive(true);
                 playerUI.GetLoadoutMenuButton().gameObject.SetActive(true);
             }
-            else if (currentActionIndex == 10) // Fight with NPC
+            else if (currentActionIndex == 11) // Fight with NPC
             {
                 onTaskCompleteBufferDuration = 1;
                 checkmarkDuration = 1;
@@ -506,7 +543,7 @@ namespace Vi.UI
 
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
             }
-            else if (currentActionIndex == 11) // Display victory or defeat message
+            else if (currentActionIndex == 12) // Display victory or defeat message
             {
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
@@ -828,11 +865,15 @@ namespace Vi.UI
                     canProceed = botAttributes.GetComboCounter() > 0 | canProceed;
                 }
             }
-            else if (currentActionIndex == 9) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Swap Weapons
+            {
+                canProceed = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Secondary | canProceed;
+            }
+            else if (currentActionIndex == 10) // Prepare to fight with NPC
             {
                 canProceed = true;
             }
-            else if (currentActionIndex == 10) // Fight with NPC
+            else if (currentActionIndex == 11) // Fight with NPC
             {
                 bool botIsDead = false;
                 if (botAttributes)
@@ -841,7 +882,7 @@ namespace Vi.UI
                 }
                 canProceed = botIsDead | canProceed;
             }
-            else if (currentActionIndex == 11) // Display victory or defeat message
+            else if (currentActionIndex == 12) // Display victory or defeat message
             {
 
             }

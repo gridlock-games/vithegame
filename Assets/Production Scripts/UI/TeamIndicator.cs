@@ -33,14 +33,15 @@ namespace Vi.UI
                     if (mat.HasProperty("_Glow"))
                     {
                         //mat.color = attributes.GetRelativeTeamColor();
-                        
+
+                        var team = attributes.GetTeam();
                         if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
-                            mat.color = PlayerDataManager.GetTeamColor(attributes.GetTeam());
+                            mat.color = PlayerDataManager.GetTeamColor(team);
                         else
                             mat.color = Color.black;
 
                         mat.SetFloat(_Glow, glowAmount);
-                        mat.SetFloat(_Transparency, mat.color == Color.black ? 0 : 1);
+                        mat.SetFloat(_Transparency, mat.color == Color.black | team == PlayerDataManager.Team.Competitor ? 0 : 1);
                     }
                 }
                 r.enabled = attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
