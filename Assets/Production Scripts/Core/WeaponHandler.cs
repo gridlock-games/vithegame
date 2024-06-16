@@ -455,6 +455,7 @@ namespace Vi.Core
         }
 
         public bool IsInAnticipation { get; private set; }
+        private bool isAboutToAttack;
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
 
@@ -488,6 +489,7 @@ namespace Vi.Core
             if (currentActionClipWeapon != weaponInstance.name)
             {
                 IsInAnticipation = false;
+                isAboutToAttack = false;
                 IsAttacking = false;
                 IsInRecovery = false;
             }
@@ -500,10 +502,17 @@ namespace Vi.Core
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
+
+                    isAboutToAttack = false;
+                    if (IsInAnticipation)
+                    {
+                        isAboutToAttack = normalizedTime >= CurrentActionClip.attackingNormalizedTime - isAboutToAttackNormalizedTimeOffset;
+                    }
                 }
                 else
                 {
                     IsInAnticipation = false;
+                    isAboutToAttack = false;
                     IsAttacking = false;
                     IsInRecovery = false;
                 }
@@ -556,6 +565,7 @@ namespace Vi.Core
             else
             {
                 IsInAnticipation = false;
+                isAboutToAttack = false;
                 IsAttacking = false;
                 IsInRecovery = false;
             }
@@ -565,6 +575,11 @@ namespace Vi.Core
                 if (IsInAnticipation)
                 {
                     Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+
+                    if (CurrentActionClip.aimDuringAttack & isAboutToAttack)
+                    {
+                        Aim(CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+                    }
                 }
                 else if (IsAttacking)
                 {
@@ -584,6 +599,8 @@ namespace Vi.Core
                 Aim(false);
             }
         }
+
+        private const float isAboutToAttackNormalizedTimeOffset = 0.2f;
 
         [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
 

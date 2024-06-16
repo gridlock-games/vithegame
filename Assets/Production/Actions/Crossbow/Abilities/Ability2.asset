@@ -4627,8 +4627,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.45
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.35
   isAffectedByRage: 1
   damage: 2
   healAmount: 0
@@ -4636,7 +4636,7 @@ MonoBehaviour:
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 2
+  maxHitLimit: 1
   timeBetweenHits: 0.15
   isBlockable: 1
   isUninterruptable: 0
@@ -4669,9 +4669,9 @@ MonoBehaviour:
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0
-  aimDuringAttack: 0
+  aimDuringAttack: 1
   aimDuringRecovery: 0
   shouldAimBody: 0
   shouldAimOffHand: 0
-  requireAmmo: 0
+  requireAmmo: 1
   requiredAmmoAmount: 1
