@@ -152,6 +152,7 @@ namespace Vi.Core
 
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
         {
+            { Team.Competitor, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Red, Color.red },
             { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255) },
             { Team.Yellow, Color.yellow },

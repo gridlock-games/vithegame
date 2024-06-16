@@ -72,7 +72,7 @@ namespace Vi.UI
                 PlayerDataManager.Team team = elementList[i].GetTeam();
                 if (team != lastTeam)
                 {
-                    if (PlayerDataManager.GetTeamColor(team) != Color.black)
+                    if (team != PlayerDataManager.Team.Competitor)
                     {
                         GameObject dividerLine = Instantiate(teamDividerScoreboardLine, scoreboardElementParent);
                         dividerLine.GetComponentInChildren<Image>().color = PlayerDataManager.GetTeamColor(team);

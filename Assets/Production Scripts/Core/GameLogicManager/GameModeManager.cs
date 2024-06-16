@@ -621,6 +621,8 @@ namespace Vi.Core.GameModeManagers
             public int assistsThisRound;
             public int cumulativeDamageDealt;
             public int damageDealtThisRound;
+            public int cumulativeDamageRecieved;
+            public int damageRecievedThisRound;
             public int roundWins;
 
             public PlayerScore(int id)
@@ -634,6 +636,8 @@ namespace Vi.Core.GameModeManagers
                 assistsThisRound = 0;
                 cumulativeDamageDealt = 0;
                 damageDealtThisRound = 0;
+                cumulativeDamageRecieved = 0;
+                damageRecievedThisRound = 0;
                 roundWins = 0;
             }
 
@@ -660,6 +664,8 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeValue(ref assistsThisRound);
                 serializer.SerializeValue(ref cumulativeDamageDealt);
                 serializer.SerializeValue(ref damageDealtThisRound);
+                serializer.SerializeValue(ref cumulativeDamageRecieved);
+                serializer.SerializeValue(ref damageRecievedThisRound);
                 serializer.SerializeValue(ref roundWins);
             }
         }
