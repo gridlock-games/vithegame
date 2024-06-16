@@ -759,7 +759,7 @@ namespace Vi.Core
                         }
                     }
                 }
-                else // If there is no preview VFX
+                else if (GetAttack(Weapon.InputAttackType.Ability1) & isPressed) // If there is no preview VFX
                 {
                     animationHandler.PlayAction(actionClip);
                 }
@@ -796,7 +796,7 @@ namespace Vi.Core
                         }
                     }
                 }
-                else // If there is no preview VFX
+                else if (GetAttack(Weapon.InputAttackType.Ability2) & isPressed) // If there is no preview VFX
                 {
                     animationHandler.PlayAction(actionClip);
                 }
@@ -833,7 +833,7 @@ namespace Vi.Core
                         }
                     }
                 }
-                else // If there is no preview VFX
+                else if (GetAttack(Weapon.InputAttackType.Ability3) & isPressed) // If there is no preview VFX
                 {
                     animationHandler.PlayAction(actionClip);
                 }
@@ -870,7 +870,7 @@ namespace Vi.Core
                         }
                     }
                 }
-                else // If there is no preview VFX
+                else if (GetAttack(Weapon.InputAttackType.Ability4) & isPressed) // If there is no preview VFX
                 {
                     animationHandler.PlayAction(actionClip);
                 }
