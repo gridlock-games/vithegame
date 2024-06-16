@@ -235,9 +235,14 @@ namespace Vi.Core.GameModeManagers
 
                 // Damage is in negative numbers
                 Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
-                Debug.Log("ASSIST " + assist);
                 if (assist)
                 {
+                    int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
+                    PlayerScore assistScore = scoreList[assistIndex];
+                    assistScore.cumulativeAssists += 1;
+                    assistScore.assistsThisRound += 1;
+                    scoreList[assistIndex] = assistScore;
+
                     killHistory.Add(new KillHistoryElement(killer, assist, victim));
                 }
                 else
