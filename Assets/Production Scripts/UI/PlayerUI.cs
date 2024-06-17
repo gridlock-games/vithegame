@@ -9,6 +9,7 @@ using System.Linq;
 using Unity.Netcode;
 using Vi.Player;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -446,7 +447,13 @@ namespace Vi.UI
                     }
                 }
 
-                if (shouldFadeToBlack)
+                bool gameModeManagerShouldFadeToBlack = false;
+                if (GameModeManager.Singleton)
+                {
+                    gameModeManagerShouldFadeToBlack = GameModeManager.Singleton.ShouldFadeToBlack();
+                }
+
+                if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
                 {
                     fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
                     fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);

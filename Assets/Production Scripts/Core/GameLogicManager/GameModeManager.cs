@@ -17,7 +17,7 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private GameObject UIPrefab;
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
-        [SerializeField] private float nextGameActionDuration = 10;
+        private const float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private float respawnTime = 5;
 
@@ -301,7 +301,9 @@ namespace Vi.Core.GameModeManagers
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
-        public int RoundCount { get; private set; } = 0;
+        public int GetRoundCount() { return roundCount.Value; }
+
+        private NetworkVariable<int> roundCount = new NetworkVariable<int>();
         protected virtual void OnRoundStart()
         {
             for (int i = 0; i < scoreList.Count; i++)
@@ -317,8 +319,7 @@ namespace Vi.Core.GameModeManagers
                 playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
-            RoundCount += 1;
-            if (RoundCount != 1) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
+            roundCount.Value += 1;
             killHistory.Clear();
         }
 
@@ -374,7 +375,7 @@ namespace Vi.Core.GameModeManagers
         }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
-        public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value / 2).ToString("F0"); }
+        public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
         private GameObject UIInstance;
         public override void OnNetworkSpawn()
@@ -491,8 +492,23 @@ namespace Vi.Core.GameModeManagers
             OnRoundEnd(highestKillIdList.ToArray());
         }
 
+        public bool ShouldFadeToBlack()
+        {
+            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & roundCount.Value > 0;
+        }
+
+        private List<int> respawnsCalledByRoundCount = new List<int>();
         private void OnNextGameActionTimerChange(float prev, float current)
         {
+            if (current <= nextGameActionDuration / 2 & prev > nextGameActionDuration / 2)
+            {
+                if (!respawnsCalledByRoundCount.Contains(roundCount.Value))
+                {
+                    respawnsCalledByRoundCount.Add(roundCount.Value);
+                    PlayerDataManager.Singleton.RespawnAllPlayers();
+                }
+            }
+
             PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {

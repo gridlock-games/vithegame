@@ -159,7 +159,7 @@ namespace Vi.Core.GameModeManagers
             }
             else
             {
-                string message = PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Secured Round " + RoundCount.ToString() + " ";
+                string message = PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Secured Round " + GetRoundCount().ToString() + " ";
                 roundResultMessage.Value = message;
             }
         }
