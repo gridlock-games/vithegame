@@ -115,7 +115,7 @@ namespace Vi.Core
 
         public bool IsLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
+            List<PlayerData> playerDataList = GetPlayerDataListWithSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -127,7 +127,7 @@ namespace Vi.Core
 
         public KeyValuePair<bool, PlayerData> GetLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
+            List<PlayerData> playerDataList = GetPlayerDataListWithSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -1074,7 +1074,7 @@ namespace Vi.Core
             }
         }
 
-        public List<PlayerData> GetPlayerDataListWithSpectators() { return cachedPlayerDataList; }
+        public List<PlayerData> GetPlayerDataListWithSpectators() { return cachedPlayerDataList.ToList(); }
 
         public List<PlayerData> GetPlayerDataListWithoutSpectators() { return cachedPlayerDataList.Where(item => item.team != Team.Spectator).ToList(); }
 
