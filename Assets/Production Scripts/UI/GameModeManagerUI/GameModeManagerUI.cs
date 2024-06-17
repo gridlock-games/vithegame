@@ -70,7 +70,16 @@ namespace Vi.UI
             else
             {
                 roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
-                roundResultText.text = gameModeManager.IsWaitingForPlayers ? "WAITING FOR PLAYERS" : gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString();
+                roundResultText.text = gameModeManager.IsWaitingForPlayers ? "WAITING FOR PLAYERS" : gameModeManager.GetRoundResultMessage();
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
+                }
             }
 
             gameEndText.text = gameModeManager.GetGameEndMessage();

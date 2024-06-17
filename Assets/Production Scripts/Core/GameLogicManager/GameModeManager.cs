@@ -377,6 +377,7 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplayRoundStartMessage() { return roundDuration - roundTimer.Value <= 1; }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
         private GameObject UIInstance;
