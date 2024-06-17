@@ -230,7 +230,8 @@ namespace Vi.UI
             // Teams
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                leftTeamParent.joinTeamButton.onClick.Invoke();
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
             }
 
             if (IsServer)
