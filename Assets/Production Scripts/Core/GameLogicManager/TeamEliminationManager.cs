@@ -150,7 +150,7 @@ namespace Vi.Core.GameModeManagers
                 GetViEssenceInstance().NetworkObject.Despawn(true);
             }
             if (viEssenceSpawningCoroutine != null) { StopCoroutine(viEssenceSpawningCoroutine); }
-            if (gameOver) { return; }
+            if (gameOver.Value) { return; }
 
             if (winningPlayersDataIds.Length == 0)
             {

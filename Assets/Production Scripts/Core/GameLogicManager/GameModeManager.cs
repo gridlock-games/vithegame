@@ -286,16 +286,16 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        protected bool gameOver;
+        protected NetworkVariable<bool> gameOver = new NetworkVariable<bool>();
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {
-            gameOver = true;
+            gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
         }
 
         private void EndGamePrematurely(string gameEndMessage)
         {
-            gameOver = true;
+            gameOver.Value = true;
             this.gameEndMessage.Value = gameEndMessage;
             roundResultMessage.Value = "Game Over! ";
             nextGameActionTimer.Value = nextGameActionDuration;
@@ -396,7 +396,7 @@ namespace Vi.Core.GameModeManagers
                     AddPlayerScore(playerData.id, playerData.character._id);
                 }
                 //roundTimer.Value = roundDuration;
-                nextGameActionTimer.Value = nextGameActionDuration;
+                nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
         }
 
@@ -497,7 +497,7 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldFadeToBlack()
         {
-            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver;
+            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
         }
 
         public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
@@ -505,7 +505,7 @@ namespace Vi.Core.GameModeManagers
         private List<int> respawnsCalledByRoundCount = new List<int>();
         private void OnNextGameActionTimerChange(float prev, float current)
         {
-            if (!gameOver & GetRoundCount() > 0)
+            if (!gameOver.Value & GetRoundCount() > 0)
             {
                 if (current <= nextGameActionDuration / 2 & prev > nextGameActionDuration / 2)
                 {
@@ -521,7 +521,7 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
-                if (gameOver)
+                if (gameOver.Value)
                 {
                     if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { NetSceneManager.Singleton.LoadScene("Lobby"); }
                 }
@@ -606,7 +606,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
-                if (!gameOver & !IsWaitingForPlayers)
+                if (!gameOver.Value & !IsWaitingForPlayers)
                 {
                     if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
                 }
@@ -648,7 +648,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (nextGameActionTimer.Value > 0)
                     nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
-                else if (!gameOver)
+                else if (!gameOver.Value)
                     roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
             }
         }
