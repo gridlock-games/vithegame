@@ -37,7 +37,7 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        private const string APIURL = "154.90.35.191:81/";
+        private const string APIURL = "154.90.35.191/";
 
         public bool IsRefreshingServers { get; private set; }
         public Server[] LobbyServers { get; private set; } = new Server[0];

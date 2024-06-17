@@ -27,7 +27,7 @@ namespace ViNetAnalytics
         }
 
         private bool alreadyCapture = false;
-        private const string APIURL = "154.90.35.191:81/";
+        private const string APIURL = "154.90.35.191/";
         public Deviceinfo capturedData;
         public bool dataPrivacyAnonymousPermission = true;
 

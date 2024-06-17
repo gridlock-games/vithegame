@@ -19,7 +19,7 @@ namespace Vi.UI
     [SerializeField] private GameObject mainMenuGameObject;
     [SerializeField] private Texture2D defaultLoadingImage;
 
-    private string NewsAPIURL = "154.90.35.191:81/";
+    private string NewsAPIURL = "154.90.35.191/";
     private List<NewsData> newsData = new List<NewsData>();
     private List<Button> newsButtonList = new List<Button>();
 

@@ -45,7 +45,7 @@ using Vi.Core;
     }
 
 
-    private const string APIURL = "154.90.35.191:81/";
+    private const string APIURL = "154.90.35.191/";
 
     public void CreateDirectory(string savePath)
     {
