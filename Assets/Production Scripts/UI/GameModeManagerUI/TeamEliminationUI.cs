@@ -31,12 +31,25 @@ namespace Vi.UI
         {
             base.Update();
 
-            if (gameModeManager.ShouldDisplayRoundStartMessage())
+            if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
             {
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
                 {
                     roundResultText.enabled = true;
-                    roundResultText.text = "Fight for " + PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
+                    PlayerDataManager.Team team = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team;
+                    if (team == PlayerDataManager.Team.Spectator)
+                        roundResultText.text = "Fight!";
+                    else
+                        roundResultText.text = "Fight for " + PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
+                }
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
                 }
             }
 

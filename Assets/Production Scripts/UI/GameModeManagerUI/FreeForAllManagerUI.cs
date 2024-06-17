@@ -20,10 +20,19 @@ namespace Vi.UI
         {
             base.Update();
 
-            if (gameModeManager.ShouldDisplayRoundStartMessage())
+            if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
             {
                 roundResultText.enabled = true;
-                roundResultText.text = "Fight!";
+                roundResultText.text = "Fight for Glory!";
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
+                }
             }
         }
     }

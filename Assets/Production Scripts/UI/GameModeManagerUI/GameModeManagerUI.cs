@@ -62,7 +62,7 @@ namespace Vi.UI
             roundTimerText.text = gameModeManager.GetRoundTimerDisplayString();
             roundTimerText.color = gameModeManager.IsInOvertime() ? Color.red : Color.white;
 
-            if (gameModeManager.ShouldDisplayRoundStartMessage())
+            if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
             {
                 roundResultText.enabled = false;
                 roundResultText.text = string.Empty;
