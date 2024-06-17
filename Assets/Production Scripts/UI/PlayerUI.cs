@@ -483,11 +483,28 @@ namespace Vi.UI
 
                 respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
 
+                bool alreadyFading = false;
+                bool gameModeManagerShouldFadeToBlack = false;
+                if (GameModeManager.Singleton)
+                {
+                    gameModeManagerShouldFadeToBlack = GameModeManager.Singleton.ShouldFadeToBlack();
+                }
+
+                if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
+                {
+                    fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
+                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);
+                    alreadyFading = true;
+                }
+
                 if (attributes.IsRespawning)
                 {
-                    fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
-                    fadeToWhiteImage.color = fadeToBlackImage.color;
-
+                    if (!alreadyFading)
+                    {
+                        fadeToBlackImage.color = Color.Lerp(Color.clear, Color.black, attributes.GetRespawnTimeAsPercentage());
+                        fadeToWhiteImage.color = fadeToBlackImage.color;
+                    }
+                    
                     if (attributes.isWaitingForSpawnPoint)
                     {
                         if (waitingToFindViableSpawnPointText.text == "") { waitingToFindViableSpawnPointText.text = "Waiting for viable spawn point..."; }

@@ -1009,11 +1009,20 @@ namespace Vi.Core
             if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
             if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
 
-            UpdateStamina();
-            UpdateRage();
+            bool canRegenStats = true;
+            if (GameModeManager.Singleton)
+            {
+                canRegenStats = !GameModeManager.Singleton.WaitingToPlayGame();
+            }
 
-            // Regen for 50 seconds
-            if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
+            if (canRegenStats)
+            {
+                UpdateStamina();
+                UpdateRage();
+
+                // Regen for 50 seconds
+                if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
+            }
             
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
