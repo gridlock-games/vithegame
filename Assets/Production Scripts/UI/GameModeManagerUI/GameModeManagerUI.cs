@@ -62,8 +62,16 @@ namespace Vi.UI
             roundTimerText.text = gameModeManager.GetRoundTimerDisplayString();
             roundTimerText.color = gameModeManager.IsInOvertime() ? Color.red : Color.white;
 
-            roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
-            roundResultText.text = gameModeManager.IsWaitingForPlayers ? "WAITING FOR PLAYERS" : gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString();
+            if (gameModeManager.ShouldDisplayRoundStartMessage())
+            {
+                roundResultText.enabled = false;
+                roundResultText.text = string.Empty;
+            }
+            else
+            {
+                roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
+                roundResultText.text = gameModeManager.IsWaitingForPlayers ? "WAITING FOR PLAYERS" : gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString();
+            }
 
             gameEndText.text = gameModeManager.GetGameEndMessage();
         }

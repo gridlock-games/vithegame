@@ -374,7 +374,9 @@ namespace Vi.Core.GameModeManagers
                 return minutes.ToString() + ":" + seconds.ToString("F2");
         }
 
-        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0 | roundDuration - roundTimer.Value <= 1; }
+        public bool ShouldDisplayRoundStartMessage() { return roundDuration - roundTimer.Value <= 1; }
+
+        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
         private GameObject UIInstance;

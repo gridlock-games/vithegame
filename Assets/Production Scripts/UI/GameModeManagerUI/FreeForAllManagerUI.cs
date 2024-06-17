@@ -15,5 +15,16 @@ namespace Vi.UI
             base.Start();
             killsToWinRoundThresholdText.text = "Kills To Win Round: " + gameModeManager.GetComponent<FreeForAllManager>().GetKillsToWinRound();
         }
+
+        private new void Update()
+        {
+            base.Update();
+
+            if (gameModeManager.ShouldDisplayRoundStartMessage())
+            {
+                roundResultText.enabled = true;
+                roundResultText.text = "Fight!";
+            }
+        }
     }
 }
