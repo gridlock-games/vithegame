@@ -698,20 +698,20 @@ namespace Vi.Core
                 float prevHP = GetHP();
                 AddHP(HPDamage);
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                AddDamageToMapping(attacker, HPDamage);
+                AddDamageToMapping(attacker, prevHP - GetHP());
             }
             else // Not blocking
             {
-                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
-
                 if (HPDamage != 0)
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attacker, HPDamage);
+                    AddDamageToMapping(attacker, prevHP - GetHP());
                 }
+
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
             }
 
             attacker.comboCounter.Value += 1;
@@ -799,13 +799,12 @@ namespace Vi.Core
                     }
                     else
                     {
+                        if (attackAilment == ActionClip.Ailment.Death)
+                        {
+                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                            SetKiller(attacker);
+                        }
                         ailment.Value = attackAilment;
-                    }
-
-                    if (ailment.Value == ActionClip.Ailment.Death)
-                    {
-                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-                        SetKiller(attacker);
                     }
                 }
                 else // If this attack's ailment is none
@@ -1101,6 +1100,7 @@ namespace Vi.Core
             {
                 damageMappingThisLife.Clear();
                 lastAttackingAttributes = null;
+
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
@@ -1276,7 +1276,7 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier = 1;
+        private float damageMultiplier = 5;
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
