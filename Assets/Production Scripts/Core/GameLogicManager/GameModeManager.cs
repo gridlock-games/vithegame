@@ -374,7 +374,7 @@ namespace Vi.Core.GameModeManagers
                 return minutes.ToString() + ":" + seconds.ToString("F2");
         }
 
-        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0 & roundDuration - roundTimer.Value <= 1; }
+        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0 | roundDuration - roundTimer.Value <= 1; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
         private GameObject UIInstance;
@@ -494,7 +494,7 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldFadeToBlack()
         {
-            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0;
+            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver;
         }
 
         public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
@@ -510,7 +510,7 @@ namespace Vi.Core.GameModeManagers
                     {
                         respawnsCalledByRoundCount.Add(GetRoundCount());
                         PlayerDataManager.Singleton.RespawnAllPlayers();
-                        roundResultMessage.Value = "Round " + GetRoundCount() + 1.ToString() + " is About to Start ";
+                        roundResultMessage.Value = "Round " + (GetRoundCount() + 1).ToString() + " is About to Start ";
                     }
                 }
             }
