@@ -71,6 +71,9 @@ namespace Vi.UI
             public Transform transformParent;
             public Button addBotButton;
             public Button joinTeamButton;
+            public Button editTeamNameButton;
+            public InputField teamNameOverrideInputField;
+            public InputField teamPrefixOverrideInputField;
 
             public void SetActive(bool isActive)
             {
@@ -78,6 +81,23 @@ namespace Vi.UI
                 transformParent.gameObject.SetActive(true);
                 addBotButton.gameObject.SetActive(isActive);
                 joinTeamButton.gameObject.SetActive(isActive);
+                editTeamNameButton.gameObject.SetActive(isActive);
+                teamNameOverrideInputField.gameObject.SetActive(false);
+                teamPrefixOverrideInputField.gameObject.SetActive(false);
+            }
+
+            public void ToggleTeamNameEditMode()
+            {
+                if (teamNameOverrideInputField.gameObject.activeSelf)
+                {
+                    teamNameOverrideInputField.gameObject.SetActive(false);
+                    teamPrefixOverrideInputField.gameObject.SetActive(false);
+                }
+                else
+                {
+                    teamNameOverrideInputField.gameObject.SetActive(true);
+                    teamPrefixOverrideInputField.gameObject.SetActive(true);
+                }
             }
         }
 
@@ -122,6 +142,9 @@ namespace Vi.UI
             SyncRoomSettingsFields();
 
             StartCoroutine(Init());
+
+            leftTeamParent.editTeamNameButton.onClick.AddListener(() => leftTeamParent.ToggleTeamNameEditMode());
+            rightTeamParent.editTeamNameButton.onClick.AddListener(() => rightTeamParent.ToggleTeamNameEditMode());
         }
 
         private void SyncRoomSettingsFields()
@@ -570,6 +593,9 @@ namespace Vi.UI
 
             leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
             rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
+
+            leftTeamParent.editTeamNameButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & leftTeamParent.teamTitleText.text != "");
+            rightTeamParent.editTeamNameButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & rightTeamParent.teamTitleText.text != "");
 
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)

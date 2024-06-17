@@ -182,6 +182,22 @@ namespace Vi.Core
             //}
         }
 
+        private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
+
+        private Dictionary<Team, string> teamNameOverrides = new Dictionary<Team, string>();
+
+        public void SetTeamNameOverride(Team team, string newName)
+        {
+            if (teamNameOverrides.ContainsKey(team))
+            {
+                teamNameOverrides.Add(team, newName);
+            }
+            else
+            {
+                teamNameOverrides[team] = newName;
+            }
+        }
+
         public static string GetTeamText(Team team)
         {
             switch (team)
