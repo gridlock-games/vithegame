@@ -423,18 +423,6 @@ namespace Vi.UI
 
             // Timer logic
             KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
-            //bool canStartGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
-            //foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
-            //{
-            //    if (playerData.id >= 0)
-            //    {
-            //        if (!lockedClients.Contains((ulong)playerData.id))
-            //        {
-            //            canStartGame = false;
-            //            break;
-            //        }
-            //    }
-            //}
 
             bool canStartGame = characterLockTimer.Value <= 0;
             if (!canStartGame)
