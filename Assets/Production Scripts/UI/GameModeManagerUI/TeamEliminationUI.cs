@@ -45,7 +45,7 @@ namespace Vi.UI
 
                 if (gameModeManager.ShouldDisplayNextGameActionTimer())
                 {
-                    roundResultText.text += gameModeManager.GetNextGameActionTimerDisplayString();
+                    roundResultText.text += " " + gameModeManager.GetNextGameActionTimerDisplayString();
                 }
                 else
                 {
