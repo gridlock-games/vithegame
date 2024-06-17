@@ -17,7 +17,7 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private GameObject UIPrefab;
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
-        [SerializeField] private float nextGameActionDuration = 5;
+        [SerializeField] private float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private float respawnTime = 5;
 
@@ -290,14 +290,14 @@ namespace Vi.Core.GameModeManagers
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {
             gameOver = true;
-            gameEndMessage.Value = "Returning to lobby!";
+            gameEndMessage.Value = "Returning to Lobby";
         }
 
         private void EndGamePrematurely(string gameEndMessage)
         {
             gameOver = true;
             this.gameEndMessage.Value = gameEndMessage;
-            roundResultMessage.Value = "Game over! ";
+            roundResultMessage.Value = "Game Over! ";
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
@@ -374,7 +374,7 @@ namespace Vi.Core.GameModeManagers
         }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
-        public string GetNextGameActionTimerDisplayString() { return ((int)Mathf.Ceil(nextGameActionTimer.Value)).ToString(); }
+        public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value / 2).ToString("F0"); }
 
         private GameObject UIInstance;
         public override void OnNetworkSpawn()

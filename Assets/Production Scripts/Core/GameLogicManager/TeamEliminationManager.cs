@@ -19,7 +19,7 @@ namespace Vi.Core.GameModeManagers
             base.OnNetworkSpawn();
             if (IsServer)
             {
-                roundResultMessage.Value = "Team elimination starting! ";
+                roundResultMessage.Value = "Team Elimination Starting! ";
                 StartCoroutine(CreateDamageCircle());
             }
         }
@@ -137,8 +137,8 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnGameEnd(winningPlayersDataIds);
             damageCircleInstance.NetworkObject.Despawn(true);
-            roundResultMessage.Value = "Game over! ";
-            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team wins the match!";
+            roundResultMessage.Value = "Game Over! ";
+            gameEndMessage.Value = PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Wins the Match!";
         }
 
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
@@ -154,12 +154,12 @@ namespace Vi.Core.GameModeManagers
 
             if (winningPlayersDataIds.Length == 0)
             {
-                string message = "Round draw! ";
+                string message = "Round Draw! ";
                 roundResultMessage.Value = message;
             }
             else
             {
-                string message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team + " team has won the round! ";
+                string message = PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Secured Round " + RoundCount.ToString() + " ";
                 roundResultMessage.Value = message;
             }
         }
@@ -209,7 +209,7 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Red Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                return PlayerDataManager.GetTeamText(PlayerDataManager.Team.Red) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
             }
             else
             {
@@ -236,7 +236,7 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Blue Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                return PlayerDataManager.GetTeamText(PlayerDataManager.Team.Blue) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
             }
             else
             {

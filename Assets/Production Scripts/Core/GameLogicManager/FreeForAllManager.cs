@@ -16,7 +16,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            if (IsServer) { roundResultMessage.Value = "Free for all starting! "; }
+            if (IsServer) { roundResultMessage.Value = "Free for All Starting! "; }
         }
 
         public override void OnPlayerKill(Attributes killer, Attributes victim)
@@ -32,8 +32,8 @@ namespace Vi.Core.GameModeManagers
         protected override void OnGameEnd(int[] winningPlayersDataIds)
         {
             base.OnGameEnd(winningPlayersDataIds);
-            roundResultMessage.Value = "Game over! ";
-            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " wins the free for all!";
+            roundResultMessage.Value = "Game Over! ";
+            gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " Wins the Free for All!";
         }
 
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
@@ -43,15 +43,15 @@ namespace Vi.Core.GameModeManagers
             string message;
             if (winningPlayersDataIds.Length > 1)
             {
-                message = winningPlayersDataIds.Length.ToString() + " players are tied for first place! ";
+                message = winningPlayersDataIds.Length.ToString() + " Players are Tied for First Place! ";
             }
             else if (winningPlayersDataIds.Length == 0)
             {
-                message = "Round draw! ";
+                message = "Round Draw! ";
             }
             else
             {
-                message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " has won the round! ";
+                message = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " Has Won the Round! ";
             }
             roundResultMessage.Value = message;
         }
