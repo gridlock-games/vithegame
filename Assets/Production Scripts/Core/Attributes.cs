@@ -799,12 +799,12 @@ namespace Vi.Core
                     }
                     else
                     {
-                        if (attackAilment == ActionClip.Ailment.Death)
+                        ailment.Value = attackAilment;
+                        if (ailment.Value == ActionClip.Ailment.Death)
                         {
                             if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
                             SetKiller(attacker);
                         }
-                        ailment.Value = attackAilment;
                     }
                 }
                 else // If this attack's ailment is none
@@ -1098,9 +1098,7 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
-                damageMappingThisLife.Clear();
-                lastAttackingAttributes = null;
-
+                StartCoroutine(ClearDamageMappingAfter1Frame());
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
@@ -1113,6 +1111,13 @@ namespace Vi.Core
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
+        }
+
+        private IEnumerator ClearDamageMappingAfter1Frame()
+        {
+            yield return null;
+            damageMappingThisLife.Clear();
+            lastAttackingAttributes = null;
         }
 
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
