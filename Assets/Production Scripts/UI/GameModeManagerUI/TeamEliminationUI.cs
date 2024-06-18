@@ -40,7 +40,7 @@ namespace Vi.UI
                     if (team == PlayerDataManager.Team.Spectator)
                         roundResultText.text = "Fight!";
                     else
-                        roundResultText.text = "Fight for " + PlayerDataManager.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
+                        roundResultText.text = "Fight for " + PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
                 }
 
                 if (gameModeManager.ShouldDisplayNextGameActionTimer())

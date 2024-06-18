@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Utility;
-using UnityEngine.AI;
+using Newtonsoft.Json;
 
 namespace Vi.Core
 {
@@ -184,22 +184,45 @@ namespace Vi.Core
 
         private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
 
-        private Dictionary<Team, string> teamNameOverrides = new Dictionary<Team, string>();
+        private Dictionary<Team, TeamNameOverride> teamNameOverrides = new Dictionary<Team, TeamNameOverride>();
 
-        public void SetTeamNameOverride(Team team, string newName)
+        private struct TeamNameOverride
         {
-            if (teamNameOverrides.ContainsKey(team))
+            public string teamName;
+            public string prefix;
+
+            public TeamNameOverride(string teamName, string prefix)
             {
-                teamNameOverrides.Add(team, newName);
-            }
-            else
-            {
-                teamNameOverrides[team] = newName;
+                this.teamName = teamName;
+                this.prefix = prefix;
             }
         }
 
-        public static string GetTeamText(Team team)
+        public void SetTeamNameOverride(Team team, string teamName, string prefix)
         {
+            if (teamNameOverrides.ContainsKey(team))
+            {
+                teamNameOverrides[team] = new TeamNameOverride(teamName, prefix);
+                if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+            }
+            else
+            {
+                teamNameOverrides.Add(team, new TeamNameOverride(teamName, prefix));
+                if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+            }
+            string stringToAssign = JsonConvert.SerializeObject(teamNameOverrides);
+            teamNameOverridesJson.Value = stringToAssign ?? "";
+        }
+
+        public string GetTeamText(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
+            }
+
             switch (team)
             {
                 case Team.Environment:
