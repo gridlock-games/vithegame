@@ -229,6 +229,31 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public PlayerDataManager.Team GetLeftScoreTeam()
+        {
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            if (localTeam == PlayerDataManager.Team.Spectator)
+            {
+                return PlayerDataManager.Team.Red;
+            }
+            else
+            {
+                if (localTeam == PlayerDataManager.Team.Red)
+                {
+                    return PlayerDataManager.Team.Red;
+                }
+                else if (localTeam == PlayerDataManager.Team.Blue)
+                {
+                    return PlayerDataManager.Team.Blue;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle team " + localTeam);
+                    return PlayerDataManager.Team.Red;
+                }
+            }
+        }
+
         public override string GetRightScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
@@ -252,6 +277,31 @@ namespace Vi.Core.GameModeManagers
                 {
                     Debug.LogError("Not sure how to handle team " + localTeam);
                     return string.Empty;
+                }
+            }
+        }
+
+        public PlayerDataManager.Team GetRightScoreTeam()
+        {
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            if (localTeam == PlayerDataManager.Team.Spectator)
+            {
+                return PlayerDataManager.Team.Blue;
+            }
+            else
+            {
+                if (localTeam == PlayerDataManager.Team.Red)
+                {
+                    return PlayerDataManager.Team.Blue;
+                }
+                else if (localTeam == PlayerDataManager.Team.Blue)
+                {
+                    return PlayerDataManager.Team.Red;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle team " + localTeam);
+                    return PlayerDataManager.Team.Blue;
                 }
             }
         }

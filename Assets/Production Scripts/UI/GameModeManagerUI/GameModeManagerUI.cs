@@ -9,6 +9,8 @@ namespace Vi.UI
 {
     public class GameModeManagerUI : MonoBehaviour
     {
+        [SerializeField] protected Image leftScoreTeamColorImage;
+        [SerializeField] protected Image rightScoreTeamColorImage;
         [SerializeField] protected Text leftScoreText;
         [SerializeField] protected Text rightScoreText;
         [SerializeField] protected Text roundTimerText;
@@ -32,6 +34,9 @@ namespace Vi.UI
 
             leftScoreText.text = gameModeManager.GetLeftScoreString();
             rightScoreText.text = gameModeManager.GetRightScoreString();
+
+            leftScoreTeamColorImage.enabled = false;
+            rightScoreTeamColorImage.enabled = false;
         }
 
         private void OnDestroy()
