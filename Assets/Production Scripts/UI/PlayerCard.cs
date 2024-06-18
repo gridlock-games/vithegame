@@ -133,7 +133,11 @@ namespace Vi.UI
             if (!attributes) { canvas.enabled = false; return; }
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
-            if (nameDisplay.isActiveAndEnabled) { nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString(); }
+            if (nameDisplay.isActiveAndEnabled)
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+            }
 
             healthText.text = "HP " + attributes.GetHP().ToString("F0") + " / " + attributes.GetMaxHP().ToString("F0");
             staminaText.text = "ST " + attributes.GetStamina().ToString("F0") + " / " + attributes.GetMaxStamina().ToString("F0");

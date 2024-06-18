@@ -217,7 +217,6 @@ namespace Vi.Core
         public string GetTeamText(Team team)
         {
             Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
-
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
@@ -233,6 +232,26 @@ namespace Vi.Core
                 default:
                     return team.ToString() + " Team";
             }
+        }
+
+        public string GetTeamPrefix(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix + " | "; }
+            }
+            return "";
+        }
+
+        public string GetTeamPrefixRaw(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix; }
+            }
+            return "";
         }
 
         public enum GameMode
