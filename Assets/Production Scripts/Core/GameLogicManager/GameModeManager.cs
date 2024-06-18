@@ -88,48 +88,90 @@ namespace Vi.Core.GameModeManagers
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {
             public FixedString64Bytes killerName;
+            public ulong killerNetObjId;
+            public FixedString64Bytes assistName;
+            public ulong assistNetObjId;
             public FixedString64Bytes victimName;
+            public ulong victimNetObjId;
             public FixedString64Bytes weaponName;
             public KillType killType;
 
             public KillHistoryElement(Attributes killer, Attributes victim)
             {
                 killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                killerNetObjId = killer.NetworkObjectId;
+                assistName = "";
+                assistNetObjId = 0;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                victimNetObjId = victim.NetworkObjectId;
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
+            }
+
+            public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
+            {
+                killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                killerNetObjId = killer.NetworkObjectId;
+                assistName = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId()).character.name;
+                assistNetObjId = assist.NetworkObjectId;
+                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+                victimNetObjId = victim.NetworkObjectId;
+                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                killType = KillType.PlayerWithAssist;
             }
 
             public KillHistoryElement(Attributes victim)
             {
                 killerName = "";
+                killerNetObjId = 0;
+                assistName = "";
+                assistNetObjId = 0;
                 victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name.ToString();
+                victimNetObjId = victim.NetworkObjectId;
                 weaponName = "Environment";
                 killType = KillType.Environment;
             }
 
-            public KillHistoryElement(bool isEnvironmentKill)
+            public KillHistoryElement(KillType killType)
             {
-                if (isEnvironmentKill)
+                this.killType = killType;
+                killerNetObjId = 0;
+                assistNetObjId = 0;
+                victimNetObjId = 0;
+                var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+                switch (killType)
                 {
-                    killerName = "";
-                    victimName = "Victim";
-                    weaponName = "Environment";
-                    killType = KillType.Environment;
+                    case KillType.Player:
+                        killerName = "Killer";
+                        assistName = "";
+                        victimName = "Victim";
+                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        return;
+                    case KillType.PlayerWithAssist:
+                        killerName = "Killer";
+                        assistName = "Assist";
+                        victimName = "Victim";
+                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        return;
+                    case KillType.Environment:
+                        killerName = "";
+                        assistName = "";
+                        victimName = "Victim";
+                        weaponName = "Environment";
+                        return;
+                    default:
+                        Debug.LogError("Unsure how to handle kill type" + killType);
+                        break;
                 }
-                else
-                {
-                    var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-                    killerName = "Killer";
-                    victimName = "Victim";
-                    weaponName = weaponOptions[Random.Range(0, weaponOptions.Length-1)].weapon.name;
-                    killType = KillType.Player;
-                }
+                killerName = "";
+                assistName = "";
+                victimName = "";
+                weaponName = "";
             }
 
             public Sprite GetKillFeedIcon(KillHistoryElement killHistoryElement)
             {
-                if (killType == KillType.Player)
+                if (killType == KillType.Player | killType == KillType.PlayerWithAssist)
                     return System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString()).killFeedIcon;
                 else if (killType == KillType.Environment)
                     return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
@@ -141,13 +183,18 @@ namespace Vi.Core.GameModeManagers
             public enum KillType
             {
                 Player,
+                PlayerWithAssist,
                 Environment
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref killerName);
+                serializer.SerializeValue(ref killerNetObjId);
+                serializer.SerializeValue(ref assistName);
+                serializer.SerializeValue(ref assistNetObjId);
                 serializer.SerializeValue(ref victimName);
+                serializer.SerializeValue(ref victimNetObjId);
                 serializer.SerializeValue(ref weaponName);
                 serializer.SerializeValue(ref killType);
             }
@@ -170,23 +217,60 @@ namespace Vi.Core.GameModeManagers
             return killHistoryList;
         }
 
+        public virtual void OnDamageOccuring(Attributes attacker, Attributes victim, float HPDamage)
+        {
+            if (nextGameActionTimer.Value <= 0)
+            {
+                int attackerIndex = scoreList.IndexOf(new PlayerScore(attacker.GetPlayerDataId()));
+                PlayerScore attackerScore = scoreList[attackerIndex];
+                attackerScore.cumulativeDamageDealt += HPDamage;
+                attackerScore.damageDealtThisRound += HPDamage;
+                scoreList[attackerIndex] = attackerScore;
+
+                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
+                PlayerScore victimScore = scoreList[victimIndex];
+                victimScore.cumulativeDamageRecieved += HPDamage;
+                victimScore.damageRecievedThisRound += HPDamage;
+                scoreList[victimIndex] = victimScore;
+            }
+        }
+
         public virtual void OnPlayerKill(Attributes killer, Attributes victim)
         {
             if (nextGameActionTimer.Value <= 0)
             {
                 int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
                 PlayerScore killerScore = scoreList[killerIndex];
-                killerScore.kills += 1;
+                killerScore.cumulativeKills += 1;
+                killerScore.killsThisRound += 1;
                 scoreList[killerIndex] = killerScore;
 
                 int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
                 PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.deaths += 1;
+                victimScore.cumulativeDeaths += 1;
+                victimScore.deathsThisRound += 1;
                 scoreList[victimIndex] = victimScore;
 
-                killHistory.Add(new KillHistoryElement(killer, victim));
+                // Damage is in negative numbers
+                Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
+                if (assist)
+                {
+                    int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
+                    PlayerScore assistScore = scoreList[assistIndex];
+                    assistScore.cumulativeAssists += 1;
+                    assistScore.assistsThisRound += 1;
+                    scoreList[assistIndex] = assistScore;
+
+                    killHistory.Add(new KillHistoryElement(killer, assist, victim));
+                }
+                else
+                {
+                    killHistory.Add(new KillHistoryElement(killer, victim));
+                }
             }
         }
+
+        private const float minAssistDamage = 30;
 
         public virtual void OnEnvironmentKill(Attributes victim)
         {
@@ -194,7 +278,8 @@ namespace Vi.Core.GameModeManagers
             {
                 int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
                 PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.deaths += 1;
+                victimScore.cumulativeDeaths += 1;
+                victimScore.deathsThisRound += 1;
                 scoreList[victimIndex] = victimScore;
 
                 killHistory.Add(new KillHistoryElement(victim));
@@ -216,23 +301,24 @@ namespace Vi.Core.GameModeManagers
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
-        private bool isFirstRound = true;
+        public int RoundCount { get; private set; } = 0;
         protected virtual void OnRoundStart()
         {
             for (int i = 0; i < scoreList.Count; i++)
             {
                 PlayerScore playerScore = scoreList[i];
-                scoreList[i] = new PlayerScore(playerScore.id, playerScore.roundWins);
+                playerScore.ResetRoundVariables();
+                scoreList[i] = playerScore;
             }
             for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
                 FixedString64Bytes charId = disconnectedScoreList[i].characterId;
                 PlayerScore playerScore = disconnectedScoreList[i].playerScore;
-                playerScore = new PlayerScore(playerScore.id, playerScore.roundWins);
+                playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
-            if (!isFirstRound) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
-            isFirstRound = false;
+            RoundCount += 1;
+            if (RoundCount != 1) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
             killHistory.Clear();
         }
 
@@ -298,7 +384,7 @@ namespace Vi.Core.GameModeManagers
             _singleton = this;
             if (IsServer)
             {
-                scoreList.OnListChanged += OnScoreListChange;
+                scoreList.OnListChanged += OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
@@ -314,7 +400,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (IsServer)
             {
-                scoreList.OnListChanged -= OnScoreListChange;
+                scoreList.OnListChanged -= OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
@@ -338,8 +424,8 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    playerScore.kills = disconnectedScoreList[index].playerScore.kills;
-                    playerScore.deaths = disconnectedScoreList[index].playerScore.deaths;
+                    playerScore.killsThisRound = disconnectedScoreList[index].playerScore.killsThisRound;
+                    playerScore.deathsThisRound = disconnectedScoreList[index].playerScore.deathsThisRound;
                     playerScore.roundWins = disconnectedScoreList[index].playerScore.roundWins;
                     scoreList.Add(playerScore);
                     disconnectedScoreList.RemoveAt(index);
@@ -373,7 +459,7 @@ namespace Vi.Core.GameModeManagers
         public void RemovePlayerScore(int id, FixedString64Bytes characterId)
         {
             int index = scoreList.IndexOf(new PlayerScore(id));
-            if (index == -1) { Debug.LogError("Trying to remove score list, but can't find it for id: " + id); return; }
+            if (index == -1) { Debug.LogError("Trying to remove score from list, but can't find it for id: " + id); return; }
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index])); }
             scoreList.RemoveAt(index);
         }
@@ -429,12 +515,12 @@ namespace Vi.Core.GameModeManagers
                 PlayerScore playerScore = scoreList[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
-                    if (playerScore.kills > highestKillPlayerScores[0].kills)
+                    if (playerScore.killsThisRound > highestKillPlayerScores[0].killsThisRound)
                     {
                         highestKillPlayerScores.Clear();
                         highestKillPlayerScores.Add(playerScore);
                     }
-                    else if (playerScore.kills == highestKillPlayerScores[0].kills)
+                    else if (playerScore.killsThisRound == highestKillPlayerScores[0].killsThisRound)
                     {
                         highestKillPlayerScores.Add(playerScore);
                     }
@@ -491,7 +577,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
+        private void OnScoreListForThisRoundChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
@@ -545,24 +631,39 @@ namespace Vi.Core.GameModeManagers
         public struct PlayerScore : INetworkSerializable, System.IEquatable<PlayerScore>
         {
             public int id;
-            public int kills;
-            public int deaths;
+            public int cumulativeKills;
+            public int killsThisRound;
+            public int cumulativeDeaths;
+            public int deathsThisRound;
+            public int cumulativeAssists;
+            public int assistsThisRound;
+            public float cumulativeDamageDealt;
+            public float damageDealtThisRound;
+            public float cumulativeDamageRecieved;
+            public float damageRecievedThisRound;
             public int roundWins;
 
             public PlayerScore(int id)
             {
                 this.id = id;
-                kills = 0;
-                deaths = 0;
+                cumulativeKills = 0;
+                killsThisRound = 0;
+                cumulativeDeaths = 0;
+                deathsThisRound = 0;
+                cumulativeAssists = 0;
+                assistsThisRound = 0;
+                cumulativeDamageDealt = 0;
+                damageDealtThisRound = 0;
+                cumulativeDamageRecieved = 0;
+                damageRecievedThisRound = 0;
                 roundWins = 0;
             }
 
-            public PlayerScore(int id, int roundWins)
+            public void ResetRoundVariables()
             {
-                this.id = id;
-                kills = 0;
-                deaths = 0;
-                this.roundWins = roundWins;
+                killsThisRound = 0;
+                deathsThisRound = 0;
+                assistsThisRound = 0;
             }
 
             public bool Equals(PlayerScore other)
@@ -573,8 +674,16 @@ namespace Vi.Core.GameModeManagers
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
-                serializer.SerializeValue(ref kills);
-                serializer.SerializeValue(ref deaths);
+                serializer.SerializeValue(ref cumulativeKills);
+                serializer.SerializeValue(ref killsThisRound);
+                serializer.SerializeValue(ref cumulativeDeaths);
+                serializer.SerializeValue(ref deathsThisRound);
+                serializer.SerializeValue(ref cumulativeAssists);
+                serializer.SerializeValue(ref assistsThisRound);
+                serializer.SerializeValue(ref cumulativeDamageDealt);
+                serializer.SerializeValue(ref damageDealtThisRound);
+                serializer.SerializeValue(ref cumulativeDamageRecieved);
+                serializer.SerializeValue(ref damageRecievedThisRound);
                 serializer.SerializeValue(ref roundWins);
             }
         }

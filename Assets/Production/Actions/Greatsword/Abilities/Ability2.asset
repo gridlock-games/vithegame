@@ -7760,13 +7760,14 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: d4782136c87b54843aa40e35b75b4629, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 18
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 5
     value: 0.15
     duration: 5
     delay: 0
+    associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 6737512766313445128, guid: 588f6402083c64cb2a6d65c23d40846d, type: 3}

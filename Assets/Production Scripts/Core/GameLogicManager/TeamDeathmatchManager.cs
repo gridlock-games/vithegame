@@ -32,7 +32,7 @@ namespace Vi.Core.GameModeManagers
             foreach (int killerTeamId in killerTeamIds)
             {
                 int index = scoreList.IndexOf(new PlayerScore(killerTeamId));
-                killerTeamScore += scoreList[index].kills;
+                killerTeamScore += scoreList[index].killsThisRound;
             }
 
             if (killerTeamScore >= killsToWinRound)
@@ -80,7 +80,7 @@ namespace Vi.Core.GameModeManagers
                 foreach (Attributes attributes in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team))
                 {
                     int index = scoreList.IndexOf(new PlayerScore(attributes.GetPlayerDataId()));
-                    killSum += scoreList[index].kills;
+                    killSum += scoreList[index].killsThisRound;
                 }
                 killCountByTeam.Add(team, killSum);
             }

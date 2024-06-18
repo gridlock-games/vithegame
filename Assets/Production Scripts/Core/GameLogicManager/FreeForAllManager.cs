@@ -23,7 +23,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnPlayerKill(killer, victim);
             int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-            if (scoreList[killerIndex].kills >= killsToWinRound)
+            if (scoreList[killerIndex].killsThisRound >= killsToWinRound)
             {
                 OnRoundEnd(new int[] { killer.GetPlayerDataId() });
             }
@@ -102,15 +102,15 @@ namespace Vi.Core.GameModeManagers
                     }
                 }
                 // Find player score with second highest kills
-                scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+                scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ToList();
                 if (scoreList.Count > 1)
-                    return PlayerDataManager.Singleton.GetPlayerData(scoreList[1].id).character.name + ": " + scoreList[1].kills.ToString();
+                    return PlayerDataManager.Singleton.GetPlayerData(scoreList[1].id).character.name + ": " + scoreList[1].killsThisRound.ToString();
                 else
                     return string.Empty;
             }
             else
             {
-                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreList[localIndex].kills;
+                return PlayerDataManager.Singleton.GetPlayerData(localPlayerKey).character.name + ": " + scoreList[localIndex].killsThisRound;
             }
         }
 
@@ -132,9 +132,9 @@ namespace Vi.Core.GameModeManagers
                 }
             }
             // Find player score with highest kills
-            scoreList = scoreList.OrderByDescending(item => item.kills).ToList();
+            scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ToList();
             if (scoreList.Count > 0)
-                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].kills.ToString();
+                return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].killsThisRound.ToString();
             else
                 return string.Empty;
         }

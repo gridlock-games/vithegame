@@ -49,10 +49,6 @@ namespace Vi.UI
                         weaponCard.SetPreviewOn(weaponCard.name.Contains("Primary") ? LoadoutManager.WeaponSlotType.Primary : LoadoutManager.WeaponSlotType.Secondary);
                         continue;
                     }
-                    if (copyChildren[childIndex].TryGetComponent(out PlayerCard playerCard))
-                    {
-                        if (!playerCard.IsMainCard()) { playerCard.DisableStaminaAndSpiritDisplay(); }
-                    }
                     if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
                     if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 
@@ -61,6 +57,8 @@ namespace Vi.UI
                         if (c is Graphic) { continue; }
                         if (c is Canvas) { continue; }
                         if (c is GraphicRaycaster) { continue; }
+                        if (c is LayoutGroup) { continue; }
+                        if (c is ContentSizeFitter) { continue; }
                         if (c.GetType().ToString() == "DuloGames.UI.UIHighlightTransition") { continue; }
                         c.enabled = false;
                     }
