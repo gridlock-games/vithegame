@@ -200,19 +200,28 @@ namespace Vi.Core
 
         public void SetTeamNameOverride(Team team, string teamName, string prefix)
         {
-            if (teamNameOverrides.ContainsKey(team))
+            if (IsServer)
             {
-                teamNameOverrides[team] = new TeamNameOverride(teamName, prefix);
-                if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                if (teamNameOverrides.ContainsKey(team))
+                {
+                    teamNameOverrides[team] = new TeamNameOverride(teamName, prefix);
+                    if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                }
+                else
+                {
+                    teamNameOverrides.Add(team, new TeamNameOverride(teamName, prefix));
+                    if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                }
+                string stringToAssign = JsonConvert.SerializeObject(teamNameOverrides);
+                teamNameOverridesJson.Value = stringToAssign ?? "";
             }
             else
             {
-                teamNameOverrides.Add(team, new TeamNameOverride(teamName, prefix));
-                if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                SetTeamNameOverrideServerRpc(team, teamName, prefix);
             }
-            string stringToAssign = JsonConvert.SerializeObject(teamNameOverrides);
-            teamNameOverridesJson.Value = stringToAssign ?? "";
         }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void SetTeamNameOverrideServerRpc(Team team, string teamName, string prefix) { SetTeamNameOverride(team, teamName, prefix); }
 
         public string GetTeamText(Team team)
         {
