@@ -384,9 +384,9 @@ namespace Vi.Core.GameModeManagers
             float seconds = roundTimer.Value - (minutes * 60);
 
             if (overtime.Value)
-                return "+" + minutes.ToString() + ":" + seconds.ToString("F2");
+                return "+" + minutes.ToString() + ":" + seconds.ToString("F0");
             else
-                return minutes.ToString() + ":" + seconds.ToString("F2");
+                return minutes.ToString() + ":" + seconds.ToString("F0");
         }
 
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
