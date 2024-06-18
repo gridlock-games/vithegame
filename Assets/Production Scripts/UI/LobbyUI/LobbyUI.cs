@@ -8,6 +8,7 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
+using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
@@ -158,6 +159,7 @@ namespace Vi.UI
 
             leftTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { leftTeamParent.ApplyTeamNameOverride(); });
             rightTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { rightTeamParent.ApplyTeamNameOverride(); });
+
         }
 
         private void SyncRoomSettingsFields()
@@ -897,5 +899,16 @@ namespace Vi.UI
                 if (networkListEvent.Value == NetworkManager.LocalClientId) { UnlockCharacterLocal(); }
             }
         }
+
+    public void HandlePlatformAPI()
+    {
+
+      //Rich presence
+      if (PlatformRichPresence.instance != null)
+      {
+        //Change logic here that would handle scenario where the player is host.
+        PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
+      }
+    }
     }
 }

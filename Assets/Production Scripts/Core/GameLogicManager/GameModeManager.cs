@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Linq;
 using Vi.Utility;
 using Unity.Collections;
+using jomarcentermjm.PlatformAPI;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -15,6 +16,8 @@ namespace Vi.Core.GameModeManagers
         protected static GameModeManager _singleton;
 
         [SerializeField] private GameObject UIPrefab;
+        [SerializeField] private GameObject RPPrefab;
+
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         private const float nextGameActionDuration = 10;
@@ -395,11 +398,12 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
-        private GameObject UIInstance;
+    private GameObject UIInstance;
+    private GameObject RPInstance;
         public override void OnNetworkSpawn()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
-
+            if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
             if (IsServer)
             {
@@ -750,5 +754,6 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeNetworkSerializable(ref playerScore);
             }
         }
-    }
+
+  }
 }
