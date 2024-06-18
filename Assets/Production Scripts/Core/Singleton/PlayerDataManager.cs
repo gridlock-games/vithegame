@@ -248,7 +248,13 @@ namespace Vi.Core
             Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
-                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix + " | "; }
+                if (teamNameOverrides.ContainsKey(team))
+                {
+                    if (string.IsNullOrWhiteSpace(teamNameOverrides[team].prefix))
+                        return "";
+                    else
+                        return teamNameOverrides[team].prefix + " | ";
+                }
             }
             return "";
         }
