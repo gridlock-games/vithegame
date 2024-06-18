@@ -44,6 +44,8 @@ namespace Vi.UI
             
             leftPlayerCards = leftPlayerCardsTemp.ToArray();
             rightPlayerCards = rightPlayerCardsTemp.ToArray();
+
+            UpdateAttributesList();
         }
 
         private void RefreshStatus()
@@ -64,12 +66,20 @@ namespace Vi.UI
             spectator.GetComponent<ActionMapHandler>().OpenScoreboard();
         }
 
-        private void Update()
+        private void UpdateAttributesList()
         {
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
             List<Attributes> initializedAttributesList = new List<Attributes>();
+
+            foreach (PlayerCard playerCard in leftPlayerCards)
+            {
+                playerCard.Initialize(null);
+            }
+
+            foreach (PlayerCard playerCard in rightPlayerCards)
+            {
+                playerCard.Initialize(null);
+            }
 
             if (gameModeInfo.possibleTeams.Length == 1)
             {
@@ -126,6 +136,13 @@ namespace Vi.UI
             }
 
             spectator.SetPlayerList(initializedAttributesList);
+        }
+
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateAttributesList(); }
         }
     }
 }

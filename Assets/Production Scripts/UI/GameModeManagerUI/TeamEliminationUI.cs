@@ -21,10 +21,10 @@ namespace Vi.UI
             teamEliminationManager = gameModeManager.GetComponent<TeamEliminationManager>();
             originalViLogoSprite = viLogoImage.sprite;
 
-            //leftScoreTeamColorImage.enabled = true;
-            //leftScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetLeftScoreTeam());
-            //rightScoreTeamColorImage.enabled = true;
-            //rightScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetRightScoreTeam());
+            leftScoreTeamColorImage.enabled = true;
+            leftScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetLeftScoreTeam());
+            rightScoreTeamColorImage.enabled = true;
+            rightScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetRightScoreTeam());
         }
 
         private const float colorTransitionSpeed = 2;
