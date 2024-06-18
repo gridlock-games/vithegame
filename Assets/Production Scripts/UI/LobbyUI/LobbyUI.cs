@@ -71,6 +71,11 @@ namespace Vi.UI
             public Transform transformParent;
             public Button addBotButton;
             public Button joinTeamButton;
+            public Button editTeamNameButton;
+            public InputField teamNameOverrideInputField;
+            public InputField teamPrefixOverrideInputField;
+
+            [HideInInspector] public PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
 
             public void SetActive(bool isActive)
             {
@@ -78,6 +83,28 @@ namespace Vi.UI
                 transformParent.gameObject.SetActive(true);
                 addBotButton.gameObject.SetActive(isActive);
                 joinTeamButton.gameObject.SetActive(isActive);
+                editTeamNameButton.gameObject.SetActive(isActive);
+                teamNameOverrideInputField.gameObject.SetActive(false);
+                teamPrefixOverrideInputField.gameObject.SetActive(false);
+            }
+
+            public void ToggleTeamNameEditMode()
+            {
+                if (teamNameOverrideInputField.gameObject.activeSelf)
+                {
+                    teamNameOverrideInputField.gameObject.SetActive(false);
+                    teamPrefixOverrideInputField.gameObject.SetActive(false);
+                }
+                else
+                {
+                    teamNameOverrideInputField.gameObject.SetActive(true);
+                    teamPrefixOverrideInputField.gameObject.SetActive(true);
+                }
+            }
+
+            public void ApplyTeamNameOverride()
+            {
+                PlayerDataManager.Singleton.SetTeamNameOverride(team, teamNameOverrideInputField.text, teamPrefixOverrideInputField.text);
             }
         }
 
@@ -122,6 +149,15 @@ namespace Vi.UI
             SyncRoomSettingsFields();
 
             StartCoroutine(Init());
+
+            leftTeamParent.editTeamNameButton.onClick.AddListener(() => leftTeamParent.ToggleTeamNameEditMode());
+            rightTeamParent.editTeamNameButton.onClick.AddListener(() => rightTeamParent.ToggleTeamNameEditMode());
+
+            leftTeamParent.teamNameOverrideInputField.onEndEdit.AddListener(delegate { leftTeamParent.ApplyTeamNameOverride(); });
+            rightTeamParent.teamNameOverrideInputField.onEndEdit.AddListener(delegate { rightTeamParent.ApplyTeamNameOverride(); });
+
+            leftTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { leftTeamParent.ApplyTeamNameOverride(); });
+            rightTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { rightTeamParent.ApplyTeamNameOverride(); });
         }
 
         private void SyncRoomSettingsFields()
@@ -197,21 +233,32 @@ namespace Vi.UI
             leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
             rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
 
+            leftTeamParent.teamNameOverrideInputField.text = "";
+            leftTeamParent.teamPrefixOverrideInputField.text = "";
+
+            rightTeamParent.teamNameOverrideInputField.text = "";
+            rightTeamParent.teamPrefixOverrideInputField.text = "";
+
+            leftTeamParent.ApplyTeamNameOverride();
+            rightTeamParent.ApplyTeamNameOverride();
+
             for (int i = 0; i < possibleTeams.Length; i++)
             {
                 if (i == 0)
                 {
-                    leftTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
+                    leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(possibleTeams[i]);
                     teamParentDict.Add(possibleTeams[i], leftTeamParent.transformParent);
                     PlayerDataManager.Team teamValue = possibleTeams[i];
+                    leftTeamParent.team = teamValue;
                     leftTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     leftTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                 }
                 else if (i == 1)
                 {
-                    rightTeamParent.teamTitleText.text = PlayerDataManager.GetTeamText(possibleTeams[i]);
+                    rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(possibleTeams[i]);
                     teamParentDict.Add(possibleTeams[i], rightTeamParent.transformParent);
                     PlayerDataManager.Team teamValue = possibleTeams[i];
+                    rightTeamParent.team = teamValue;
                     rightTeamParent.addBotButton.onClick.AddListener(delegate { AddBot(teamValue); });
                     rightTeamParent.joinTeamButton.onClick.AddListener(delegate { ChangeTeam(teamValue); });
                 }
@@ -230,7 +277,8 @@ namespace Vi.UI
             // Teams
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                leftTeamParent.joinTeamButton.onClick.Invoke();
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
             }
 
             if (IsServer)
@@ -423,18 +471,6 @@ namespace Vi.UI
 
             // Timer logic
             KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
-            //bool canStartGame = playerDataListWithoutSpectators.Count != 0 & lobbyLeaderKvp.Key & lockedClients.Contains((ulong)lobbyLeaderKvp.Value.id);
-            //foreach (PlayerDataManager.PlayerData playerData in playerDataListWithoutSpectators)
-            //{
-            //    if (playerData.id >= 0)
-            //    {
-            //        if (!lockedClients.Contains((ulong)playerData.id))
-            //        {
-            //            canStartGame = false;
-            //            break;
-            //        }
-            //    }
-            //}
 
             bool canStartGame = characterLockTimer.Value <= 0;
             if (!canStartGame)
@@ -499,7 +535,8 @@ namespace Vi.UI
             }
 
             bool roomSettingsParsedProperly = true;
-            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            bool isLobbyLeader = PlayerDataManager.Singleton.IsLobbyLeader();
+            if (isLobbyLeader)
             {
                 string gameModeSettings = "";
                 foreach (CustomSettingsParent.CustomSettingsInputField customSettingsInputField in System.Array.Find(customSettingsParents, item => item.gameMode == PlayerDataManager.Singleton.GetGameMode()).inputFields)
@@ -557,7 +594,7 @@ namespace Vi.UI
 
             startGameButton.interactable = !startGameCalled.Value & !startGameServerRpcInProgress;
 
-            startGameButton.gameObject.SetActive(canCountDown & canStartGame & PlayerDataManager.Singleton.IsLobbyLeader());
+            startGameButton.gameObject.SetActive(canCountDown & canStartGame & isLobbyLeader);
             lockCharacterButton.gameObject.SetActive(!(canCountDown & canStartGame));
 
             if (canStartGame & canCountDown)
@@ -573,14 +610,20 @@ namespace Vi.UI
                 characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
             }
 
-            roomSettingsButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown));
+            roomSettingsButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
             
-            leftTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
-            rightTeamParent.addBotButton.gameObject.SetActive(PlayerDataManager.Singleton.IsLobbyLeader() & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
+            leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
+            rightTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
             leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
             rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
+
+            leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(rightTeamParent.transformParent));
+            rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
+            
+            if (leftTeamParent.teamTitleText.gameObject.activeInHierarchy) { leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team); }
+            if (rightTeamParent.teamTitleText.gameObject.activeInHierarchy) { rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team); }
 
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
+using Vi.Core;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -18,9 +20,14 @@ namespace Vi.UI
             base.Start();
             teamEliminationManager = gameModeManager.GetComponent<TeamEliminationManager>();
             originalViLogoSprite = viLogoImage.sprite;
+
+            //leftScoreTeamColorImage.enabled = true;
+            //leftScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetLeftScoreTeam());
+            //rightScoreTeamColorImage.enabled = true;
+            //rightScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetRightScoreTeam());
         }
 
-        private const float colorTransitionSpeed = 8;
+        private const float colorTransitionSpeed = 2;
         private const float colorTransitionThreshold = 0.1f;
         private readonly static Color onColor = new Color(1, 1, 1, 1);
         private readonly static Color offColor = new Color(1, 1, 1, 0);
@@ -29,9 +36,31 @@ namespace Vi.UI
         {
             base.Update();
 
+            if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
+            {
+                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+                {
+                    roundResultText.enabled = true;
+                    PlayerDataManager.Team team = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team;
+                    if (team == PlayerDataManager.Team.Spectator)
+                        roundResultText.text = "Fight!";
+                    else
+                        roundResultText.text = "Fight for " + PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
+                }
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += " " + gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
+                }
+            }
+
             if (teamEliminationManager.IsViEssenceSpawned())
             {
-                viLogoImage.color = Color.Lerp(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
+                viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
                 if (1 - viLogoImage.color.a < colorTransitionThreshold)
                 {
                     viLogoImage.sprite = viEssenceIcon;
@@ -41,12 +70,12 @@ namespace Vi.UI
                 if (viLogoImage.sprite == viEssenceIcon)
                 {
                     // Transition to On Color
-                    viLogoImage.color = Color.Lerp(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
+                    viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
                 }
                 else // Vi logo image has sprite of vi logo
                 {
                     // Transition to the off color
-                    viLogoImage.color = Color.Lerp(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
+                    viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
                     // Once the alpha is less than the transition threshold, change to the vi essence icon
                     if (viLogoImage.color.a < colorTransitionThreshold) { viLogoImage.sprite = viEssenceIcon; }
                 }
@@ -57,14 +86,14 @@ namespace Vi.UI
                 if (viLogoImage.sprite == viEssenceIcon)
                 {
                     // Transition to the off color
-                    viLogoImage.color = Color.Lerp(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
+                    viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
                     // Once the alpha is less than the transition threshold, change to the original vi logo
                     if (viLogoImage.color.a < colorTransitionThreshold) { viLogoImage.sprite = originalViLogoSprite; }
                 }
                 else // Vi logo image has sprite of vi logo
                 {
                     // Transition to On Color
-                    viLogoImage.color = Color.Lerp(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
+                    viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
                 }
             }
         }

@@ -79,7 +79,9 @@ namespace Vi.UI
 
         private void UpdateNameTextAndColors()
         {
-            nameDisplay.text = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.name.ToString();
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameBackground.color = relativeTeamColor;
             nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
