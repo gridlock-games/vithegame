@@ -30,7 +30,7 @@ namespace jomarcentermjm.PlatformAPI
       DontDestroyOnLoad(gameObject);
     }
 
-    public void UpdatePlatformStatus(string title, string description = "", string linethree = "", string richpresenceKey = "#StatusGeneral", string mainImageID = null, string subImageID = null, string mainImageDesc = "", string subImageDesc= "")
+    public void UpdatePlatformStatus(string title, string description = "", string linethree = "", string richpresenceKey = "#StatusGeneral", string mainImageID = null, string mainImageDesc = "", string subImageID = null, string subImageDesc= "")
     {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX 
       Debug.Log("Updating Platform Status");

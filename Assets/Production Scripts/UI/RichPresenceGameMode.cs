@@ -43,7 +43,7 @@ namespace Vi.UI
       if (PlatformRichPresence.instance != null)
       {
         //Change logic here that would handle scenario where the player is host.
-        PlatformRichPresence.instance.UpdatePlatformStatus("in-game", $"{StageName} - {GameModeName}", $"Round {RoundNumber} - {LScore} : {RScore}");
+        PlatformRichPresence.instance.UpdatePlatformStatus($"Round {RoundNumber} - {LScore} : {RScore}", $"{StageName} - {GameModeName} ", $"Round {RoundNumber} - {LScore} : {RScore}","#StatusGeneral", "freeforall", "Free For All");
       }
     }
   }
