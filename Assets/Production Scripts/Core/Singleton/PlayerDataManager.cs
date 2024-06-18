@@ -482,7 +482,7 @@ namespace Vi.Core
                 List<string> potentialNames = botNames[botCharacter.raceAndGender];
                 potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
                 botCharacter.name = potentialNames[Random.Range(0, potentialNames.Count)];
-                if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { Debug.LogError("Bot " + botClientId + " name is empty!"); }
+                if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
