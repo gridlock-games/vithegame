@@ -657,7 +657,7 @@ namespace Vi.UI
 
             if (IsTaskComplete())
             {
-                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+                if (currentActionIndex == 11) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = new Color(1, 1, 1, 0);
@@ -669,7 +669,7 @@ namespace Vi.UI
             }
             else if (ShouldCheckmarkBeDisplayed())
             {
-                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+                if (currentActionIndex == 11) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = new Color(1, 1, 1, 1);
@@ -715,7 +715,7 @@ namespace Vi.UI
 
             if (playerUI)
             {
-                if (currentActionIndex < 9) // Prepare to fight with NPC
+                if (currentActionIndex < 10) // Prepare to fight with NPC
                 {
                     playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 }
