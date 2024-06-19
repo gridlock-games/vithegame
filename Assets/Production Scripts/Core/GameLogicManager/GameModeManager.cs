@@ -648,7 +648,6 @@ namespace Vi.Core.GameModeManagers
         {
             isEvaluatingRoundEndAnimations = true;
             yield return null;
-            Debug.Log("Evaluating round end animations " + scoresToEvaluate.Count);
 
             // If there is no victor, do not evaluate the round end
             if (scoresToEvaluate.TrueForAll(item => !item.Item1))
@@ -665,9 +664,7 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (attributes.TryGetComponent(out AnimationHandler animationHandler))
                     {
-                        Debug.Log(attributes.name + " " + isVictor);
-                        animationHandler.Animator.CrossFade(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
-                        StartCoroutine(ResetAnimation(animationHandler));
+                        StartCoroutine(PlayAnimation(animationHandler, isVictor));
                     }
                 }
             }
@@ -675,9 +672,18 @@ namespace Vi.Core.GameModeManagers
             isEvaluatingRoundEndAnimations = false;
         }
 
+        private IEnumerator PlayAnimation(AnimationHandler animationHandler, bool isVictor)
+        {
+            yield return new WaitUntil(() => animationHandler.IsAtRest());
+
+            animationHandler.Animator.CrossFade(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+
+            yield return ResetAnimation(animationHandler);
+        }
+
         private IEnumerator ResetAnimation(AnimationHandler animationHandler)
         {
-            yield return new WaitForSeconds(5);
+            yield return new WaitUntil(() => nextGameActionTimer.Value <= (nextGameActionDuration / 2f));
             if (animationHandler)
             {
                 animationHandler.Animator.CrossFade("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
