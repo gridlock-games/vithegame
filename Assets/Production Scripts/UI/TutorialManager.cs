@@ -498,10 +498,6 @@ namespace Vi.UI
 
                 timerEnabled = true;
                 currentOverlayMessage = "Prepare To Fight!";
-                foreach (InputAction action in playerInput.actions)
-                {
-                    playerInput.actions.FindAction(action.name).Enable();
-                }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
 
@@ -532,6 +528,10 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Enable();
+                }
 
                 yield return new WaitForSeconds(2);
 
