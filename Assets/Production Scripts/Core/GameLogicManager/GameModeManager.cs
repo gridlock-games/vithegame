@@ -634,15 +634,32 @@ namespace Vi.Core.GameModeManagers
                 }
             }
 
-            if (networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins)
+            if (networkListEvent.Type == NetworkListEvent<PlayerScore>.EventType.Value)
             {
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                if (networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins)
                 {
-                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
+                    foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                     {
-                        animationHandler.Animator.CrossFade("Victory", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                        if (attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
+                        {
+                            if (attributes.TryGetComponent(out AnimationHandler animationHandler))
+                            {
+                                animationHandler.Animator.CrossFade("Victory", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                                StartCoroutine(ResetVictoryAnimation(animationHandler));
+
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        private IEnumerator ResetVictoryAnimation(AnimationHandler animationHandler)
+        {
+            yield return new WaitForSeconds(5);
+            if (animationHandler)
+            {
+                animationHandler.Animator.CrossFade("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
             }
         }
 
