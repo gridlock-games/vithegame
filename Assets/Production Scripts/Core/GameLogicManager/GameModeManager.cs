@@ -104,7 +104,7 @@ namespace Vi.Core.GameModeManagers
                 PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
                 killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
                 killerNetObjId = killer.NetworkObjectId;
-                
+
                 assistName = "";
                 assistNetObjId = 0;
 
@@ -376,7 +376,7 @@ namespace Vi.Core.GameModeManagers
                     if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
                 }
             }
-            
+
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
@@ -398,8 +398,8 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
-    private GameObject UIInstance;
-    private GameObject RPInstance;
+        private GameObject UIInstance;
+        private GameObject RPInstance;
         public override void OnNetworkSpawn()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
@@ -537,7 +537,6 @@ namespace Vi.Core.GameModeManagers
                 }
             }
 
-            PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
                 if (gameOver.Value)
@@ -785,6 +784,5 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeNetworkSerializable(ref playerScore);
             }
         }
-
-  }
+    }
 }
