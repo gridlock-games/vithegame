@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Utility;
-using UnityEngine.AI;
+using Newtonsoft.Json;
 
 namespace Vi.Core
 {
@@ -115,7 +115,7 @@ namespace Vi.Core
 
         public bool IsLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
+            List<PlayerData> playerDataList = GetPlayerDataListWithSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -127,7 +127,7 @@ namespace Vi.Core
 
         public KeyValuePair<bool, PlayerData> GetLobbyLeader()
         {
-            List<PlayerData> playerDataList = GetPlayerDataListWithoutSpectators();
+            List<PlayerData> playerDataList = GetPlayerDataListWithSpectators();
             playerDataList.RemoveAll(item => item.id < 0);
             playerDataList = playerDataList.OrderBy(item => item.id).ToList();
 
@@ -182,8 +182,55 @@ namespace Vi.Core
             //}
         }
 
-        public static string GetTeamText(Team team)
+        private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
+
+        private Dictionary<Team, TeamNameOverride> teamNameOverrides = new Dictionary<Team, TeamNameOverride>();
+
+        private struct TeamNameOverride
         {
+            public string teamName;
+            public string prefix;
+
+            public TeamNameOverride(string teamName, string prefix)
+            {
+                this.teamName = teamName;
+                this.prefix = prefix;
+            }
+        }
+
+        public void SetTeamNameOverride(Team team, string teamName, string prefix)
+        {
+            if (IsServer)
+            {
+                if (teamNameOverrides.ContainsKey(team))
+                {
+                    teamNameOverrides[team] = new TeamNameOverride(teamName, prefix);
+                    if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                }
+                else
+                {
+                    teamNameOverrides.Add(team, new TeamNameOverride(teamName, prefix));
+                    if (string.IsNullOrWhiteSpace(teamName)) { teamNameOverrides.Remove(team); }
+                }
+                string stringToAssign = JsonConvert.SerializeObject(teamNameOverrides);
+                teamNameOverridesJson.Value = stringToAssign ?? "";
+            }
+            else
+            {
+                SetTeamNameOverrideServerRpc(team, teamName, prefix);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void SetTeamNameOverrideServerRpc(Team team, string teamName, string prefix) { SetTeamNameOverride(team, teamName, prefix); }
+
+        public string GetTeamText(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
+            }
+
             switch (team)
             {
                 case Team.Environment:
@@ -194,6 +241,32 @@ namespace Vi.Core
                 default:
                     return team.ToString() + " Team";
             }
+        }
+
+        public string GetTeamPrefix(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team))
+                {
+                    if (string.IsNullOrWhiteSpace(teamNameOverrides[team].prefix))
+                        return "";
+                    else
+                        return teamNameOverrides[team].prefix + " | ";
+                }
+            }
+            return "";
+        }
+
+        public string GetTeamPrefixRaw(Team team)
+        {
+            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
+            if (teamNameOverrides != null)
+            {
+                if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix; }
+            }
+            return "";
         }
 
         public enum GameMode
@@ -424,6 +497,7 @@ namespace Vi.Core
                 List<string> potentialNames = botNames[botCharacter.raceAndGender];
                 potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
                 botCharacter.name = potentialNames[Random.Range(0, potentialNames.Count)];
+                if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
 
                 PlayerData botData = new PlayerData(botClientId,
                     botCharacter,
@@ -1073,7 +1147,7 @@ namespace Vi.Core
             }
         }
 
-        public List<PlayerData> GetPlayerDataListWithSpectators() { return cachedPlayerDataList; }
+        public List<PlayerData> GetPlayerDataListWithSpectators() { return cachedPlayerDataList.ToList(); }
 
         public List<PlayerData> GetPlayerDataListWithoutSpectators() { return cachedPlayerDataList.Where(item => item.team != Team.Spectator).ToList(); }
 

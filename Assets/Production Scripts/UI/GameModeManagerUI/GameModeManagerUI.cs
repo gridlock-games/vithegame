@@ -9,6 +9,8 @@ namespace Vi.UI
 {
     public class GameModeManagerUI : MonoBehaviour
     {
+        [SerializeField] protected Image leftScoreTeamColorImage;
+        [SerializeField] protected Image rightScoreTeamColorImage;
         [SerializeField] protected Text leftScoreText;
         [SerializeField] protected Text rightScoreText;
         [SerializeField] protected Text roundTimerText;
@@ -32,6 +34,9 @@ namespace Vi.UI
 
             leftScoreText.text = gameModeManager.GetLeftScoreString();
             rightScoreText.text = gameModeManager.GetRightScoreString();
+
+            leftScoreTeamColorImage.enabled = false;
+            rightScoreTeamColorImage.enabled = false;
         }
 
         private void OnDestroy()
@@ -62,8 +67,30 @@ namespace Vi.UI
             roundTimerText.text = gameModeManager.GetRoundTimerDisplayString();
             roundTimerText.color = gameModeManager.IsInOvertime() ? Color.red : Color.white;
 
-            roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
-            roundResultText.text = gameModeManager.IsWaitingForPlayers ? "WAITING FOR PLAYERS" : gameModeManager.GetRoundResultMessage() + gameModeManager.GetNextGameActionTimerDisplayString();
+            if (gameModeManager.IsWaitingForPlayers)
+            {
+                roundResultText.enabled = true;
+                roundResultText.text = "WAITING FOR PLAYERS";
+            }
+            else if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
+            {
+                roundResultText.enabled = false;
+                roundResultText.text = string.Empty;
+            }
+            else
+            {
+                roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
+                roundResultText.text = gameModeManager.GetRoundResultMessage();
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
+                }
+            }
 
             gameEndText.text = gameModeManager.GetGameEndMessage();
         }

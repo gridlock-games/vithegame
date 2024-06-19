@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Linq;
 using Vi.Utility;
 using Unity.Collections;
+using jomarcentermjm.PlatformAPI;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -15,9 +16,11 @@ namespace Vi.Core.GameModeManagers
         protected static GameModeManager _singleton;
 
         [SerializeField] private GameObject UIPrefab;
+        [SerializeField] private GameObject RPPrefab;
+
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
-        [SerializeField] private float nextGameActionDuration = 5;
+        private const float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private float respawnTime = 5;
 
@@ -98,24 +101,35 @@ namespace Vi.Core.GameModeManagers
 
             public KillHistoryElement(Attributes killer, Attributes victim)
             {
-                killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
                 killerNetObjId = killer.NetworkObjectId;
+                
                 assistName = "";
                 assistNetObjId = 0;
-                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+
+                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
                 victimNetObjId = victim.NetworkObjectId;
+
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
             }
 
             public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
             {
-                killerName = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId()).character.name;
+                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
                 killerNetObjId = killer.NetworkObjectId;
-                assistName = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId()).character.name;
+
+                PlayerDataManager.PlayerData assistData = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId());
+                assistName = PlayerDataManager.Singleton.GetTeamPrefix(assistData.team) + assistData.character.name;
                 assistNetObjId = assist.NetworkObjectId;
-                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name;
+
+                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
                 victimNetObjId = victim.NetworkObjectId;
+
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.PlayerWithAssist;
             }
@@ -124,10 +138,14 @@ namespace Vi.Core.GameModeManagers
             {
                 killerName = "";
                 killerNetObjId = 0;
+
                 assistName = "";
                 assistNetObjId = 0;
-                victimName = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId()).character.name.ToString();
+
+                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
                 victimNetObjId = victim.NetworkObjectId;
+
                 weaponName = "Environment";
                 killType = KillType.Environment;
             }
@@ -252,7 +270,7 @@ namespace Vi.Core.GameModeManagers
                 scoreList[victimIndex] = victimScore;
 
                 // Damage is in negative numbers
-                Attributes assist = killer.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value < -minAssistDamage).OrderBy(item => item.Value).FirstOrDefault().Key;
+                Attributes assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
                 if (assist)
                 {
                     int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
@@ -286,22 +304,24 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        protected bool gameOver;
+        protected NetworkVariable<bool> gameOver = new NetworkVariable<bool>();
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {
-            gameOver = true;
-            gameEndMessage.Value = "Returning to lobby!";
+            gameOver.Value = true;
+            gameEndMessage.Value = "Returning to Lobby";
         }
 
         private void EndGamePrematurely(string gameEndMessage)
         {
-            gameOver = true;
+            gameOver.Value = true;
             this.gameEndMessage.Value = gameEndMessage;
-            roundResultMessage.Value = "Game over! ";
+            roundResultMessage.Value = "Game Over! ";
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
-        public int RoundCount { get; private set; } = 0;
+        public int GetRoundCount() { return roundCount.Value; }
+
+        private NetworkVariable<int> roundCount = new NetworkVariable<int>();
         protected virtual void OnRoundStart()
         {
             for (int i = 0; i < scoreList.Count; i++)
@@ -317,8 +337,7 @@ namespace Vi.Core.GameModeManagers
                 playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
-            RoundCount += 1;
-            if (RoundCount != 1) { PlayerDataManager.Singleton.RespawnAllPlayers(); }
+            roundCount.Value += 1;
             killHistory.Clear();
         }
 
@@ -368,19 +387,23 @@ namespace Vi.Core.GameModeManagers
             float seconds = roundTimer.Value - (minutes * 60);
 
             if (overtime.Value)
-                return "+" + minutes.ToString() + ":" + seconds.ToString("F2");
+                return "+" + minutes.ToString() + ":" + seconds.ToString("F0");
             else
-                return minutes.ToString() + ":" + seconds.ToString("F2");
+                return minutes.ToString() + ":" + seconds.ToString("F0");
         }
 
-        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
-        public string GetNextGameActionTimerDisplayString() { return ((int)Mathf.Ceil(nextGameActionTimer.Value)).ToString(); }
+        public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
 
-        private GameObject UIInstance;
+        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
+        public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
+
+    private GameObject UIInstance;
+    private GameObject RPInstance;
         public override void OnNetworkSpawn()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
-
+            if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
             if (IsServer)
             {
@@ -392,7 +415,7 @@ namespace Vi.Core.GameModeManagers
                     AddPlayerScore(playerData.id, playerData.character._id);
                 }
                 //roundTimer.Value = roundDuration;
-                nextGameActionTimer.Value = nextGameActionDuration;
+                nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
         }
 
@@ -491,12 +514,33 @@ namespace Vi.Core.GameModeManagers
             OnRoundEnd(highestKillIdList.ToArray());
         }
 
+        public bool ShouldFadeToBlack()
+        {
+            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
+        }
+
+        public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
+
+        private List<int> respawnsCalledByRoundCount = new List<int>();
         private void OnNextGameActionTimerChange(float prev, float current)
         {
+            if (!gameOver.Value & GetRoundCount() > 0)
+            {
+                if (current <= nextGameActionDuration / 2 & prev > nextGameActionDuration / 2)
+                {
+                    if (!respawnsCalledByRoundCount.Contains(GetRoundCount()))
+                    {
+                        respawnsCalledByRoundCount.Add(GetRoundCount());
+                        PlayerDataManager.Singleton.RespawnAllPlayers();
+                        roundResultMessage.Value = "Round " + (GetRoundCount() + 1).ToString() + " is About to Start ";
+                    }
+                }
+            }
+
             PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
-                if (gameOver)
+                if (gameOver.Value)
                 {
                     if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { NetSceneManager.Singleton.LoadScene("Lobby"); }
                 }
@@ -581,7 +625,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
-                if (!gameOver & !IsWaitingForPlayers)
+                if (!gameOver.Value & !IsWaitingForPlayers)
                 {
                     if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
                 }
@@ -623,7 +667,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (nextGameActionTimer.Value > 0)
                     nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
-                else if (!gameOver)
+                else if (!gameOver.Value)
                     roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
             }
         }
@@ -710,5 +754,6 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeNetworkSerializable(ref playerScore);
             }
         }
-    }
+
+  }
 }

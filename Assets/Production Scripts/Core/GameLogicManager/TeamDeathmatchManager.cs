@@ -51,7 +51,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
-            if (gameOver) { return; }
+            if (gameOver.Value) { return; }
 
             if (winningPlayersDataIds.Length == 0)
             {

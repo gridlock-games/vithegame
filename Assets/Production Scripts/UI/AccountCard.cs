@@ -17,6 +17,7 @@ namespace Vi.UI
         [SerializeField] private Sprite unlockedSprite;
 
         private int playerDataId;
+        private bool initialized;
         public void Initialize(int playerDataId, bool isLocked)
         {
             this.playerDataId = playerDataId;
@@ -29,6 +30,17 @@ namespace Vi.UI
             lobbyLeaderImage.gameObject.SetActive(PlayerDataManager.Singleton.GetLobbyLeader().Value.id == playerDataId);
 
             kickButton.gameObject.SetActive(!lobbyLeaderImage.gameObject.activeSelf & PlayerDataManager.Singleton.IsLobbyLeader());
+
+            initialized = true;
+        }
+
+        private void Update()
+        {
+            if (initialized)
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+                nameDisplayText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+            }
         }
 
         public void KickPlayer()

@@ -698,20 +698,20 @@ namespace Vi.Core
                 float prevHP = GetHP();
                 AddHP(HPDamage);
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                AddDamageToMapping(attacker, HPDamage);
+                AddDamageToMapping(attacker, prevHP - GetHP());
             }
             else // Not blocking
             {
-                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
-
                 if (HPDamage != 0)
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attacker, HPDamage);
+                    AddDamageToMapping(attacker, prevHP - GetHP());
                 }
+
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
             }
 
             attacker.comboCounter.Value += 1;
@@ -800,12 +800,11 @@ namespace Vi.Core
                     else
                     {
                         ailment.Value = attackAilment;
-                    }
-
-                    if (ailment.Value == ActionClip.Ailment.Death)
-                    {
-                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-                        SetKiller(attacker);
+                        if (ailment.Value == ActionClip.Ailment.Death)
+                        {
+                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                            SetKiller(attacker);
+                        }
                     }
                 }
                 else // If this attack's ailment is none
@@ -1010,11 +1009,20 @@ namespace Vi.Core
             if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
             if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
 
-            UpdateStamina();
-            UpdateRage();
+            bool canRegenStats = true;
+            if (GameModeManager.Singleton)
+            {
+                canRegenStats = !GameModeManager.Singleton.WaitingToPlayGame();
+            }
 
-            // Regen for 50 seconds
-            if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
+            if (canRegenStats)
+            {
+                UpdateStamina();
+                UpdateRage();
+
+                // Regen for 50 seconds
+                if (Time.time - spiritRegenActivateTime <= 50 & !weaponHandler.IsBlocking) { UpdateSpirit(); }
+            }
             
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
@@ -1099,8 +1107,7 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
-                damageMappingThisLife.Clear();
-                lastAttackingAttributes = null;
+                StartCoroutine(ClearDamageMappingAfter1Frame());
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
@@ -1113,6 +1120,13 @@ namespace Vi.Core
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
+        }
+
+        private IEnumerator ClearDamageMappingAfter1Frame()
+        {
+            yield return null;
+            damageMappingThisLife.Clear();
+            lastAttackingAttributes = null;
         }
 
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
