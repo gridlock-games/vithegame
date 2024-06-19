@@ -757,6 +757,7 @@ namespace Vi.Core
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
                 AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
+                yield return new WaitUntil(() => attributes.GetGrabAssailant());
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();

@@ -976,14 +976,6 @@ namespace Vi.Core
             }
         }
 
-        public void SetAllPlayersMobility(bool canMove)
-        {
-            foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
-            {
-                kvp.Value.GetComponent<MovementHandler>().SetCanMove(canMove);
-            }
-        }
-
         private void EndSpawnPlayerCoroutine()
         {
             if (!IsServer) { Debug.LogError("PlayerDataManager.EndSpawnPlayerCoroutine() shold only be called on the server!"); return; }

@@ -104,7 +104,7 @@ namespace Vi.Core.GameModeManagers
                 PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
                 killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
                 killerNetObjId = killer.NetworkObjectId;
-                
+
                 assistName = "";
                 assistNetObjId = 0;
 
@@ -376,7 +376,7 @@ namespace Vi.Core.GameModeManagers
                     if (score.roundWins >= numberOfRoundsWinsToWinGame) { shouldEndGame = true; }
                 }
             }
-            
+
             if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
@@ -398,16 +398,16 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
-    private GameObject UIInstance;
-    private GameObject RPInstance;
+        private GameObject UIInstance;
+        private GameObject RPInstance;
         public override void OnNetworkSpawn()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
             if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
+            scoreList.OnListChanged += OnScoreListChange;
             if (IsServer)
             {
-                scoreList.OnListChanged += OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
@@ -421,9 +421,9 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkDespawn()
         {
+            scoreList.OnListChanged -= OnScoreListChange;
             if (IsServer)
             {
-                scoreList.OnListChanged -= OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
@@ -537,7 +537,6 @@ namespace Vi.Core.GameModeManagers
                 }
             }
 
-            PlayerDataManager.Singleton.SetAllPlayersMobility(nextGameActionTimer.Value <= 0);
             if (current == 0 & prev > 0)
             {
                 if (gameOver.Value)
@@ -621,14 +620,67 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        private void OnScoreListForThisRoundChange(NetworkListEvent<PlayerScore> networkListEvent)
+        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+            if (IsServer)
             {
-                if (!gameOver.Value & !IsWaitingForPlayers)
+                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
                 {
-                    if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                    if (!gameOver.Value & !IsWaitingForPlayers)
+                    {
+                        if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                    }
                 }
+            }
+
+            if (networkListEvent.Type == NetworkListEvent<PlayerScore>.EventType.Value)
+            {
+                scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+            }
+        }
+
+        private List<(bool, PlayerScore)> scoresToEvaluate = new List<(bool, PlayerScore)>();
+
+        private bool isEvaluatingRoundEndAnimations;
+        private IEnumerator EvaluateRoundEndAnimations()
+        {
+            isEvaluatingRoundEndAnimations = true;
+            yield return null;
+            Debug.Log("Evaluating round end animations " + scoresToEvaluate.Count);
+
+            // If there is no victor, do not evaluate the round end
+            if (scoresToEvaluate.TrueForAll(item => !item.Item1))
+            {
+                scoresToEvaluate.Clear();
+                isEvaluatingRoundEndAnimations = false;
+                yield break;
+            }
+
+            foreach ((bool isVictor, PlayerScore playerScore) in scoresToEvaluate)
+            {
+                Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
+                if (attributes)
+                {
+                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
+                    {
+                        Debug.Log(attributes.name + " " + isVictor);
+                        animationHandler.Animator.CrossFade(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                        StartCoroutine(ResetAnimation(animationHandler));
+                    }
+                }
+            }
+            scoresToEvaluate.Clear();
+            isEvaluatingRoundEndAnimations = false;
+        }
+
+        private IEnumerator ResetAnimation(AnimationHandler animationHandler)
+        {
+            yield return new WaitForSeconds(5);
+            if (animationHandler)
+            {
+                animationHandler.Animator.CrossFade("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
             }
         }
 
@@ -754,6 +806,5 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeNetworkSerializable(ref playerScore);
             }
         }
-
-  }
+    }
 }
