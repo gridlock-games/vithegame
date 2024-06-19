@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using Vi.Core;
 using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
@@ -11,12 +12,27 @@ namespace Vi.UI
   {
 
     protected GameModeManager gameModeManager;
+    PlayerDataManager.GameMode gameModeID;
+    List<string> gameModeNameList = new List<string>() {
+                "None",
+            "Free For All",
+            "Team Elimination",
+            "Essence War",
+            "Outpost Rush",
+            "Team Deathmatch"
+    };
+    string gameModeName;
+    string mapName;
     // Start is called before the first frame update
     void Start()
     {
       gameModeManager = FindFirstObjectByType<GameModeManager>();
-      gameModeManager.SubscribeScoreListCallback(delegate { OnListChange(); });
+      gameModeID = PlayerDataManager.Singleton.GetGameMode();
+      gameModeName = gameModeNameList[(int)gameModeID];
+      mapName = PlayerDataManager.Singleton.GetMapName();
 
+      gameModeManager.SubscribeScoreListCallback(delegate { OnListChange(); });
+      
 
     }
 
@@ -27,7 +43,7 @@ namespace Vi.UI
 
     protected void OnListChange()
     {
-      HandlePlatformAPI(gameModeManager.GetLeftScoreString(), gameModeManager.GetRightScoreString(), gameModeManager.GetRoundCount().ToString());
+      HandlePlatformAPI(gameModeManager.GetLeftScoreString(), gameModeManager.GetRightScoreString(), gameModeManager.GetRoundCount().ToString(), mapName, gameModeName);
     }
 
     // Update is called once per frame
