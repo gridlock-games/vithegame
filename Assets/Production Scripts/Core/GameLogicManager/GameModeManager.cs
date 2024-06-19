@@ -405,9 +405,9 @@ namespace Vi.Core.GameModeManagers
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
             if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
+            scoreList.OnListChanged += OnScoreListChange;
             if (IsServer)
             {
-                scoreList.OnListChanged += OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged += OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
@@ -421,9 +421,9 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkDespawn()
         {
+            scoreList.OnListChanged -= OnScoreListChange;
             if (IsServer)
             {
-                scoreList.OnListChanged -= OnScoreListForThisRoundChange;
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
@@ -621,13 +621,27 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        private void OnScoreListForThisRoundChange(NetworkListEvent<PlayerScore> networkListEvent)
+        private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+            if (IsServer)
             {
-                if (!gameOver.Value & !IsWaitingForPlayers)
+                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
                 {
-                    if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                    if (!gameOver.Value & !IsWaitingForPlayers)
+                    {
+                        if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                    }
+                }
+            }
+
+            if (networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins)
+            {
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
+                    {
+                        animationHandler.Animator.CrossFade("Victory", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                    }
                 }
             }
         }
