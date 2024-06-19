@@ -14,21 +14,33 @@ namespace Vi.UI
     protected GameModeManager gameModeManager;
     PlayerDataManager.GameMode gameModeID;
     List<string> gameModeNameList = new List<string>() {
-                "None",
+            "None",
             "Free For All",
             "Team Elimination",
             "Essence War",
             "Outpost Rush",
             "Team Deathmatch"
     };
+
+    List<string> gameModeDiscordInfoIDList = new List<string>() {
+            "None",
+            "freeforall",
+            "teamelim",
+            "EssenceWar",
+            "OutpostRush",
+            "TeamDeathmatch"
+    };
+
     string gameModeName;
     string mapName;
+    string gameModeDiscordInfoID;
     // Start is called before the first frame update
     void Start()
     {
       gameModeManager = FindFirstObjectByType<GameModeManager>();
       gameModeID = PlayerDataManager.Singleton.GetGameMode();
       gameModeName = gameModeNameList[(int)gameModeID];
+      gameModeDiscordInfoID = gameModeDiscordInfoIDList[(int)gameModeID];
       mapName = PlayerDataManager.Singleton.GetMapName();
 
       gameModeManager.SubscribeScoreListCallback(delegate { OnListChange(); });
@@ -59,7 +71,7 @@ namespace Vi.UI
       if (PlatformRichPresence.instance != null)
       {
         //Change logic here that would handle scenario where the player is host.
-        PlatformRichPresence.instance.UpdatePlatformStatus($"Round {RoundNumber} - {LScore} : {RScore}", $"{StageName} - {GameModeName} ", $"Round {RoundNumber} - {LScore} : {RScore}","#StatusGeneral", "freeforall", "Free For All");
+        PlatformRichPresence.instance.UpdatePlatformStatus($"Round {RoundNumber} - {LScore} : {RScore}", $"{StageName} - {GameModeName} ", $"Round {RoundNumber} - {LScore} : {RScore}","#StatusGeneral", gameModeDiscordInfoID, gameModeName);
       }
     }
   }
