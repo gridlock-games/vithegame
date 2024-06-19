@@ -635,25 +635,47 @@ namespace Vi.Core.GameModeManagers
 
             if (networkListEvent.Type == NetworkListEvent<PlayerScore>.EventType.Value)
             {
-                if (networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins)
-                {
-                    foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                    {
-                        if (attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death)
-                        {
-                            if (attributes.TryGetComponent(out AnimationHandler animationHandler))
-                            {
-                                animationHandler.Animator.CrossFade("Victory", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
-                                StartCoroutine(ResetVictoryAnimation(animationHandler));
-
-                            }
-                        }
-                    }
-                }
+                scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
             }
         }
 
-        private IEnumerator ResetVictoryAnimation(AnimationHandler animationHandler)
+        private List<(bool, PlayerScore)> scoresToEvaluate = new List<(bool, PlayerScore)>();
+
+        private bool isEvaluatingRoundEndAnimations;
+        private IEnumerator EvaluateRoundEndAnimations()
+        {
+            isEvaluatingRoundEndAnimations = true;
+            yield return null;
+            Debug.Log("Evaluating round end animations " + scoresToEvaluate.Count);
+
+            // If there is no victor, do not evaluate the round end
+            if (scoresToEvaluate.TrueForAll(item => !item.Item1))
+            {
+                scoresToEvaluate.Clear();
+                isEvaluatingRoundEndAnimations = false;
+                yield break;
+            }
+
+            foreach ((bool isVictor, PlayerScore playerScore) in scoresToEvaluate)
+            {
+                Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
+                if (attributes)
+                {
+                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
+                    {
+                        Debug.Log(attributes.name + " " + isVictor);
+                        animationHandler.Animator.CrossFade(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                        StartCoroutine(ResetAnimation(animationHandler));
+                    }
+                }
+            }
+            scoresToEvaluate.Clear();
+            isEvaluatingRoundEndAnimations = false;
+        }
+
+        private IEnumerator ResetAnimation(AnimationHandler animationHandler)
         {
             yield return new WaitForSeconds(5);
             if (animationHandler)
