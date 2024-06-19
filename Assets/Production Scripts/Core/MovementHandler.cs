@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -102,15 +103,11 @@ namespace Vi.Core
             moveInput = value.Get<Vector2>();
         }
 
-        private NetworkVariable<bool> canMove = new NetworkVariable<bool>(true);
-
-        public bool CanMove() { return canMove.Value; }
-
-        public void SetCanMove(bool canMove)
-        {
-            if (!IsServer) { Debug.LogError("MovementHandler.SetCanMove() should only be called on the server!"); return; }
-            this.canMove.Value = canMove;
-        }
+        public bool CanMove()
+		{
+			if (GameModeManager.Singleton) { return !GameModeManager.Singleton.ShouldDisplayNextGameAction(); }
+			return true;
+		}
 	}
 
 	public static class ExtDebug

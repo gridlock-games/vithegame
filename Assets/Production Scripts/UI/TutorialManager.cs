@@ -450,7 +450,6 @@ namespace Vi.UI
                 bufferDurationBetweenActions = 3;
                 playerUI.SetFadeToBlack(true);
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
-                PlayerDataManager.Singleton.SetAllPlayersMobility(false);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
@@ -499,10 +498,6 @@ namespace Vi.UI
 
                 timerEnabled = true;
                 currentOverlayMessage = "Prepare To Fight!";
-                foreach (InputAction action in playerInput.actions)
-                {
-                    playerInput.actions.FindAction(action.name).Enable();
-                }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
 
@@ -530,10 +525,13 @@ namespace Vi.UI
                 checkmarkDuration = 1;
                 bufferDurationBetweenActions = 0;
 
-                PlayerDataManager.Singleton.SetAllPlayersMobility(true);
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
                 currentOverlayMessage = "Defeat The Enemy.";
+                foreach (InputAction action in playerInput.actions)
+                {
+                    playerInput.actions.FindAction(action.name).Enable();
+                }
 
                 yield return new WaitForSeconds(2);
 
@@ -659,7 +657,7 @@ namespace Vi.UI
 
             if (IsTaskComplete())
             {
-                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+                if (currentActionIndex == 11) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = new Color(1, 1, 1, 0);
@@ -671,7 +669,7 @@ namespace Vi.UI
             }
             else if (ShouldCheckmarkBeDisplayed())
             {
-                if (currentActionIndex == 10) { Time.timeScale = 0.5f; }
+                if (currentActionIndex == 11) { Time.timeScale = 0.5f; }
 
                 overlayText.text = currentOverlayMessage;
                 objectiveCompleteImage.color = new Color(1, 1, 1, 1);
@@ -717,7 +715,7 @@ namespace Vi.UI
 
             if (playerUI)
             {
-                if (currentActionIndex < 9) // Prepare to fight with NPC
+                if (currentActionIndex < 10) // Prepare to fight with NPC
                 {
                     playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 }
