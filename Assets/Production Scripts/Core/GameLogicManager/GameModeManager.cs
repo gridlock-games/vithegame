@@ -87,6 +87,49 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
+        protected GameItem SpawnGameItem(GameItem gameItemPrefab, PlayerSpawnPoints.TransformData spawnPoint)
+        {
+            if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
+
+            GameItem gameItemInstance = Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
+            gameItemInstance.NetworkObject.Spawn(true);
+            return gameItemInstance;
+        }
+
+        protected List<PlayerSpawnPoints.TransformData> GetGameItemSpawnPoints()
+        {
+            if (!IsServer) { Debug.LogError("GameModeManager.GetGameItemSpawnPoints() should only be called from the server!"); return null; }
+
+            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+
+            bool shouldResetSpawnTracker = false;
+            foreach (int index in gameItemSpawnIndexTracker)
+            {
+                try
+                {
+                    possibleSpawnPoints.RemoveAt(index);
+                }
+                catch
+                {
+                    shouldResetSpawnTracker = true;
+                    break;
+                }
+            }
+
+            if (shouldResetSpawnTracker)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
+            else if (possibleSpawnPoints.Count == 0)
+            {
+                gameItemSpawnIndexTracker.Clear();
+                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            }
+
+            return possibleSpawnPoints;
+        }
+
         [SerializeField] private Sprite environmentKillFeedIcon;
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {

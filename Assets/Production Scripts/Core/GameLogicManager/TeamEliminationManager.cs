@@ -52,6 +52,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (CanSpawnViEssence())
                 {
+                    //var possibleSpawnPoints = GetGameItemSpawnPoints().Where(item => damageCircleInstance.IsPointInsideDamageCircleBounds(item.position));
                     viEssenceNetObjId.Value = SpawnGameItem(viEssencePrefab).NetworkObjectId;
                     GetViEssenceInstance().Initialize(this, damageCircleInstance);
                 }
