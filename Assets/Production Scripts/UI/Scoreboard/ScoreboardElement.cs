@@ -9,6 +9,9 @@ namespace Vi.UI
 {
     public class ScoreboardElement : MonoBehaviour
     {
+        [SerializeField] private bool isPreviewObject;
+        [SerializeField] private RectTransform playerNameParent;
+        [SerializeField] private RectTransform roundWinsParent;
         [SerializeField] private Image disconnectedPlayerIcon;
         [SerializeField] private Text playerNameText;
         [SerializeField] private Text roundWinsText;
@@ -26,8 +29,15 @@ namespace Vi.UI
         public void Initialize(int playerDataId)
         {
             this.playerDataId = playerDataId;
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
             UpdateUI();
             initialized = true;
+        }
+
+        public void HideRoundWinsColumn()
+        {
+            playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x + roundWinsParent.sizeDelta.x);
+            roundWinsParent.gameObject.SetActive(false);
         }
 
         public PlayerDataManager.Team GetTeam()
@@ -38,6 +48,12 @@ namespace Vi.UI
         private void Start()
         {
             disconnectedPlayerIcon.enabled = false;
+
+            if (isPreviewObject)
+            {
+                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
+                enabled = false;
+            }
         }
 
         private void Update()
