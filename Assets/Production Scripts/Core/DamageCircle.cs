@@ -22,6 +22,11 @@ namespace Vi.Core
             targetScale = transform.localScale;
         }
 
+        public bool IsPointInsideDamageCircleBounds(Vector3 point)
+        {
+            return Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(point.x, point.z)) < targetScale.x;
+        }
+
         private Collider[] damageCircleColliders;
         private void Start()
         {

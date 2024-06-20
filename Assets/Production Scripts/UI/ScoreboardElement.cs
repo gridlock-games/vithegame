@@ -57,7 +57,7 @@ namespace Vi.UI
                 {
                     backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
                 }
-                playerNameText.text = playerData.character.name.ToString();
+                playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
                 roundWinsText.text = playerScore.roundWins.ToString();
                 killsText.text = playerScore.cumulativeKills.ToString();
                 assistsText.text = playerScore.cumulativeAssists.ToString();
@@ -75,7 +75,7 @@ namespace Vi.UI
                 {
                     backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
                 }
-                playerNameText.text = playerData.character.name.ToString();
+                playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
                 roundWinsText.text = playerScore.roundWins.ToString();
                 killsText.text = playerScore.cumulativeKills.ToString();
                 assistsText.text = playerScore.cumulativeAssists.ToString();
