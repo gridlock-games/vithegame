@@ -7,6 +7,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2175711673442429057, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4838265236051290010, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4906405404110402352, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6033386616281239676, guid: db0a7040c757dec4c80d62a6a180e4da,
         type: 3}
       propertyPath: m_RootOrder
@@ -85,7 +100,27 @@ PrefabInstance:
     - target: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
         type: 3}
       propertyPath: m_Name
-      value: shield_base_2
+      value: Petrified_Maw
+      objectReference: {fileID: 0}
+    - target: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6930320716071187562, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8557398734274424230, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600727560603094665, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db0a7040c757dec4c80d62a6a180e4da, type: 3}
@@ -120,7 +155,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponTrailMaterial: {fileID: 2100000, guid: bd5ef410d675441c78ce115ba4c6e478, type: 2}
-  weaponTrailGranularity: 60
-  weaponTrailDuration: 0.5
-  weaponTrailFadeTime: 0.25
+  weaponTrailVFX: {fileID: 0}
