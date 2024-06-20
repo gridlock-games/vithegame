@@ -21,7 +21,7 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
-            AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound);
+            AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound, true);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -30,19 +30,23 @@ namespace Vi.Core.GameModeManagers
 
             if (other.transform.root.TryGetComponent(out Attributes attributes))
             {
-                List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam());
-                if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1)
-                {
-                    PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
-                    teamEliminationManager.OnViEssenceActivation();
-                    NetworkObject.Despawn(true);
-                }
-                else if (attributes.GetComponent<WeaponHandler>().IsAttacking)
-                {
-                    damageCircle.Shrink();
-                    teamEliminationManager.OnViEssenceActivation();
-                    NetworkObject.Despawn(true);
-                }
+                damageCircle.Shrink();
+                teamEliminationManager.OnViEssenceActivation();
+                NetworkObject.Despawn(true);
+
+                //List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam());
+                //if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1)
+                //{
+                //    PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
+                //    teamEliminationManager.OnViEssenceActivation();
+                //    NetworkObject.Despawn(true);
+                //}
+                //else if (attributes.GetComponent<WeaponHandler>().IsAttacking)
+                //{
+                //    damageCircle.Shrink();
+                //    teamEliminationManager.OnViEssenceActivation();
+                //    NetworkObject.Despawn(true);
+                //}
             }
         }
 

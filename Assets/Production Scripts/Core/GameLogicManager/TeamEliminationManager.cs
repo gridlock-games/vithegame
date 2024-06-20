@@ -48,10 +48,13 @@ namespace Vi.Core.GameModeManagers
 
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (CanSpawnViEssence()) // If we are in a 1vX situation
+            else if (CanSpawnViEssenceGameLogicCondition()) // If we are in a 1vX situation
             {
-                viEssenceNetObjId.Value = SpawnGameItem(viEssencePrefab).NetworkObjectId;
-                GetViEssenceInstance().Initialize(this, damageCircleInstance);
+                if (CanSpawnViEssence())
+                {
+                    viEssenceNetObjId.Value = SpawnGameItem(viEssencePrefab).NetworkObjectId;
+                    GetViEssenceInstance().Initialize(this, damageCircleInstance);
+                }
             }
             else // If we cannot spawn vi essence, destroy it if it exists
             {
@@ -90,10 +93,13 @@ namespace Vi.Core.GameModeManagers
 
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (CanSpawnViEssence()) // If we are in a 1vX situation
+            else if (CanSpawnViEssenceGameLogicCondition()) // If we are in a 1vX situation
             {
-                viEssenceNetObjId.Value = SpawnGameItem(viEssencePrefab).NetworkObjectId;
-                GetViEssenceInstance().Initialize(this, damageCircleInstance);
+                if (CanSpawnViEssence())
+                {
+                    viEssenceNetObjId.Value = SpawnGameItem(viEssencePrefab).NetworkObjectId;
+                    GetViEssenceInstance().Initialize(this, damageCircleInstance);
+                }
             }
             else // If we cannot spawn vi essence, destroy it if it exists
             {
@@ -108,7 +114,7 @@ namespace Vi.Core.GameModeManagers
         private Coroutine viEssenceSpawningCoroutine;
         public void OnViEssenceActivation()
         {
-            if (CanSpawnViEssence()) { viEssenceSpawningCoroutine = StartCoroutine(SpawnNewViEssenceAfterDelay()); }
+            if (CanSpawnViEssenceGameLogicCondition()) { viEssenceSpawningCoroutine = StartCoroutine(SpawnNewViEssenceAfterDelay()); }
         }
 
         private IEnumerator SpawnNewViEssenceAfterDelay()
@@ -125,7 +131,11 @@ namespace Vi.Core.GameModeManagers
         private bool CanSpawnViEssence()
         {
             if (IsViEssenceSpawned()) { return false; }
+            return CanSpawnViEssenceGameLogicCondition();
+        }
 
+        private bool CanSpawnViEssenceGameLogicCondition()
+        {
             List<Attributes> redTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
             List<Attributes> blueTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
 
