@@ -11,7 +11,7 @@ namespace Vi.UI
 {
     public class Scoreboard : MonoBehaviour
     {
-        [SerializeField] private GameObject teamDividerScoreboardLine;
+        [SerializeField] private ScoreboardTeamDividerElement teamDividerScoreboardLine;
         [SerializeField] private ScoreboardElement scoreboardElementPrefab;
         [SerializeField] private Transform scoreboardElementParent;
         [SerializeField] private Text scoreboardHeaderText;
@@ -74,10 +74,9 @@ namespace Vi.UI
                 {
                     if (team != PlayerDataManager.Team.Competitor)
                     {
-                        GameObject dividerLine = Instantiate(teamDividerScoreboardLine, scoreboardElementParent);
-                        dividerLine.GetComponentInChildren<Image>().color = PlayerDataManager.GetTeamColor(team);
-                        dividerLine.GetComponentInChildren<Text>().text = team + " Team";
-                        dividerLine.transform.SetSiblingIndex(i + dividerCounter);
+                        ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, scoreboardElementParent).GetComponent<ScoreboardTeamDividerElement>();
+                        dividerElement.Initialize(team);
+                        dividerElement.transform.SetSiblingIndex(i + dividerCounter);
                         dividerCounter++;
                         lastTeam = team;
                     }
