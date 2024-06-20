@@ -91,6 +91,7 @@ namespace Vi.Utility
                 while (true)
                 {
                     if (!audioSource.isPlaying) { audioSource.PlayOneShot(audioClip, volume); }
+                    yield return null;
                 }
             }
             else
