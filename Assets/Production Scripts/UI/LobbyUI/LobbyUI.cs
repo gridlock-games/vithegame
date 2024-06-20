@@ -147,6 +147,7 @@ namespace Vi.UI
                 }
             }
 
+            HandlePlatformAPI();
             SyncRoomSettingsFields();
 
             StartCoroutine(Init());
