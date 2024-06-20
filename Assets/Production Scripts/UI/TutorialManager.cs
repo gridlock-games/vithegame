@@ -7,6 +7,7 @@ using Vi.Player;
 using Vi.Utility;
 using UnityEngine.UI;
 using Unity.Netcode;
+using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
@@ -29,6 +30,7 @@ namespace Vi.UI
         AnimationHandler animationHandler;
         LoadoutManager loadoutManager;
         PlayerUI playerUI;
+
         private void FindPlayerInput()
         {
             if (playerInput) { return; }
@@ -88,7 +90,7 @@ namespace Vi.UI
             objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
             backgroundImage.enabled = false;
-
+            HandlePlatformAPI();
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
         }
 
@@ -889,5 +891,13 @@ namespace Vi.UI
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
             }
         }
+
+        void HandlePlatformAPI()
+    {
+      if (PlatformRichPresence.instance != null)
+      {
+        PlatformRichPresence.instance.UpdatePlatformStatus("Learning the ropes", "Playing tutorial");
+      }
+    }
     }
 }

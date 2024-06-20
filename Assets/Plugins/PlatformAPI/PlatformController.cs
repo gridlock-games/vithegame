@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
 using Steamworks;
 #endif
 namespace jomarcentermjm.PlatformAPI
@@ -18,7 +18,8 @@ namespace jomarcentermjm.PlatformAPI
     PSN,
     Xbox,
     meta,
-    Nintendo
+    Nintendo,
+    serverHeadless
   }
   public class PlatformController : MonoBehaviour
   {
@@ -41,7 +42,7 @@ namespace jomarcentermjm.PlatformAPI
     void Start()
     {
 
-      if (activePlayform == GamePlatform.Steam)
+      if (activePlayform == GamePlatform.Steam && Application.platform != RuntimePlatform.LinuxServer)
       {
         AttmptSteam();
         AttemptDiscord();
@@ -55,7 +56,7 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttmptSteam()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
@@ -64,11 +65,11 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttemptDiscord()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       this.gameObject.AddComponent<DiscordManager>();
       return true;
 #endif
-            return false;
+      return false;
     }
   }
 }
