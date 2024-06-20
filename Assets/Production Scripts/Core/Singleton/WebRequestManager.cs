@@ -638,6 +638,32 @@ namespace Vi.Core
             foreach (Character character in Characters)
             {
                 yield return GetCharacterInventory(character._id.ToString());
+
+                List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
+                CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+                bool itemWasAdded = false;
+                foreach (var option in armorOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
+                    {
+                        itemWasAdded = true;
+                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
+                    }
+                }
+
+                foreach (var option in weaponOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
+                    {
+                        itemWasAdded = true;
+                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
+                    }
+                }
+
+                if (itemWasAdded) { yield return GetCharacterInventory(character._id.ToString()); }
             }
 
             IsRefreshingCharacters = false;

@@ -30,7 +30,7 @@ MonoBehaviour:
     skinOptions:
     - {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785, type: 3}
   weaponOptions:
-  - name: Brawler
+  - name: Bluesteel Raptor
     weaponIcon: {fileID: 21300000, guid: 4f3708475ffed84468c0eef2e996949e, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 4f3708475ffed84468c0eef2e996949e, type: 3}
     animationController: {fileID: 22100000, guid: 57913356d0e72f74d9e4d2960e45cecd,
@@ -39,7 +39,7 @@ MonoBehaviour:
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 5513925cc1a5fd644ab816b40ca94a3d,
       type: 3}
     itemWebId: 661ecf1c55a26cdaadf23e04
-  - name: Great Sword
+  - name: Flintblade
     weaponIcon: {fileID: 21300000, guid: f9b2259d312fff64e8bdbc61f2a5e512, type: 3}
     killFeedIcon: {fileID: 21300000, guid: f9b2259d312fff64e8bdbc61f2a5e512, type: 3}
     animationController: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
@@ -48,7 +48,7 @@ MonoBehaviour:
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: ae398536bf363f849b1251753e5231fe,
       type: 3}
     itemWebId: 661ecf1c55a26cdaadf23e12
-  - name: Bow
+  - name: Sylvan Sentinel
     weaponIcon: {fileID: 21300000, guid: 7205829b964a2964cb2ab8d8bc6ff488, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 7205829b964a2964cb2ab8d8bc6ff488, type: 3}
     animationController: {fileID: 22100000, guid: fa5b32109bd18054b881861885a53fbc,
@@ -57,7 +57,7 @@ MonoBehaviour:
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: af22b4a2825753b48b9a67d4cb444187,
       type: 3}
     itemWebId: 661ecf1d55a26cdaadf23e1e
-  - name: Axe
+  - name: Woodwarden Cleaver
     weaponIcon: {fileID: 21300000, guid: 1c6c9b62244737d4983e23b0df34a5ab, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 1c6c9b62244737d4983e23b0df34a5ab, type: 3}
     animationController: {fileID: 22100000, guid: 414a7cada5a607b44a35e325ccc79aee,
@@ -66,7 +66,7 @@ MonoBehaviour:
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: f56c8fe4c780d8c4dac0ae5c53a2e46d,
       type: 3}
     itemWebId: 661ecf1d55a26cdaadf23e29
-  - name: Lance
+  - name: Polearm
     weaponIcon: {fileID: 21300000, guid: a85a35217e24b7e45a152c3a865b69ea, type: 3}
     killFeedIcon: {fileID: 21300000, guid: a85a35217e24b7e45a152c3a865b69ea, type: 3}
     animationController: {fileID: 22100000, guid: d75bcc1cafc95df48b9dc2e7ed6eab05,
@@ -75,6 +75,15 @@ MonoBehaviour:
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 160fe5d2b5a3d9c4bb29d5efb734085c,
       type: 3}
     itemWebId: 661ecf1d55a26cdaadf23e36
+  - name: Crimson Gleam
+    weaponIcon: {fileID: 21300000, guid: f9b2259d312fff64e8bdbc61f2a5e512, type: 3}
+    killFeedIcon: {fileID: 21300000, guid: f9b2259d312fff64e8bdbc61f2a5e512, type: 3}
+    animationController: {fileID: 22100000, guid: 195a02ba6206b7647a9a8d7c618cf308,
+      type: 2}
+    weapon: {fileID: 11400000, guid: 060ad1d37d0be174b811c5077dafdd72, type: 2}
+    weaponPreviewPrefab: {fileID: 9120665817193852633, guid: ae398536bf363f849b1251753e5231fe,
+      type: 3}
+    itemWebId: 66749f58eec2c1a2900b44f5
   emptyWearableEquipment: {fileID: 4940541453049098453, guid: 0d63d1c715aa4c14d9842fd63a41c092,
     type: 3}
   equipmentOptions:

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
-  m_Name: GreatSwordWeapon
+  m_Name: CrimsonGleam
   m_EditorClassIdentifier: 
   runSpeed: 6
   walkSpeed: 1
@@ -19,9 +19,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaRecoveryRate: 7
   staminaDelay: 1
-  maxDefense: 100
-  defenseRecoveryRate: 5
-  defenseDelay: 1
+  maxSpirit: 100
   maxRage: 100
   rageRecoveryRate: 0
   shouldUseAmmo: 0
@@ -45,7 +43,7 @@ MonoBehaviour:
   - skinPrefab: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 8020639262707093223, guid: e8d1f50829e54a39b15f8894546c4d8f,
+    - weaponPrefab: {fileID: 8020639262707093223, guid: 0d5163b8ffe25f443b95c0284e32ce82,
         type: 3}
       weaponBone: 18
       weaponPositionOffset: {x: 0.00099, y: -0.00047, z: 0.00009}
@@ -62,7 +60,7 @@ MonoBehaviour:
   - skinPrefab: {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 8020639262707093223, guid: e8d1f50829e54a39b15f8894546c4d8f,
+    - weaponPrefab: {fileID: 8020639262707093223, guid: 0d5163b8ffe25f443b95c0284e32ce82,
         type: 3}
       weaponBone: 18
       weaponPositionOffset: {x: 0.0604, y: -0.0273, z: -0.0521}
@@ -150,7 +148,7 @@ MonoBehaviour:
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: e62bb40f06cd24e488ad552625161e2f, type: 2}
   grabAttackClipList: []
-  dodgeStaminaCost: 20
+  dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
   dodgeFR: {fileID: 11400000, guid: c0bb9f32a0406bb4fbc7033646e9143f, type: 2}

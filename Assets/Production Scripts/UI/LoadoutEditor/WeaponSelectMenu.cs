@@ -40,15 +40,17 @@ namespace Vi.UI
 
         private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, int loadoutSlot)
         {
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            string inventoryItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
+            if (string.IsNullOrWhiteSpace(inventoryItemId)) { Debug.LogError("Unable to find inventory item for weapon option " + weaponOption.name); return; }
+
             foreach (Button b in buttonList)
             {
                 b.interactable = true;
             }
             button.interactable = false;
 
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
-            string inventoryItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:
