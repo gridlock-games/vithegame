@@ -42,7 +42,7 @@ namespace jomarcentermjm.PlatformAPI
     void Start()
     {
 
-      if (activePlayform == GamePlatform.Steam && Application.isBatchMode)
+      if (activePlayform == GamePlatform.Steam && Application.platform != RuntimePlatform.LinuxServer)
       {
         AttmptSteam();
         AttemptDiscord();
