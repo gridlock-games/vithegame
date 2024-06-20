@@ -1036,7 +1036,7 @@ namespace Vi.Core
         }
 
         private float spiritRegenActivateTime = Mathf.NegativeInfinity;
-        private const float spiritRegenRate = 2;
+        private const float spiritRegenRate = 3;
         private void UpdateSpirit()
         {
             AddSpirit(spiritRegenRate * Time.deltaTime);

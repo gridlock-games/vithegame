@@ -21,7 +21,7 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
-            AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound);
+            AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound, true);
         }
 
         private void OnTriggerEnter(Collider other)
