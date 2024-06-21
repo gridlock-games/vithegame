@@ -124,7 +124,7 @@ namespace Vi.Core
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToGameLogicManager());
 
             if (IsOwner)
@@ -159,7 +159,7 @@ namespace Vi.Core
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
+            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -1036,7 +1036,7 @@ namespace Vi.Core
         }
 
         private float spiritRegenActivateTime = Mathf.NegativeInfinity;
-        private const float spiritRegenRate = 2;
+        private const float spiritRegenRate = 3;
         private void UpdateSpirit()
         {
             AddSpirit(spiritRegenRate * Time.deltaTime);

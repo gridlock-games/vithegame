@@ -13,7 +13,7 @@ namespace Vi.Core
 
         private void Awake()
         {
-            foreach (Collider col in GetComponents<Collider>())
+            foreach (Collider col in GetComponentsInChildren<Collider>())
             {
                 col.enabled = NetworkManager.Singleton.IsServer;
             }

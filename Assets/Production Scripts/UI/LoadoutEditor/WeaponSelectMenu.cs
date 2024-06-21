@@ -21,15 +21,19 @@ namespace Vi.UI
             this.weaponType = weaponType;
             this.playerDataId = playerDataId;
             Button invokeThis = null;
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
+                // If this weapon option isn't in our inventory, continue
+                if (!WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
+
                 LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
 
                 // Always keep other weapon's button non-interactable
-                if (weaponOption.itemWebId != otherWeapon.itemWebId) { buttonList.Add(button); }
+                if (weaponOption.weapon.GetWeaponClass() != otherWeapon.weapon.GetWeaponClass()) { buttonList.Add(button); }
                 else { button.interactable = false; }
 
                 if (weaponOption.itemWebId == initialOption.itemWebId) { invokeThis = button; }
@@ -40,15 +44,17 @@ namespace Vi.UI
 
         private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, int loadoutSlot)
         {
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            string inventoryItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
+            if (string.IsNullOrWhiteSpace(inventoryItemId)) { Debug.LogError("Unable to find inventory item for weapon option " + weaponOption.name); return; }
+
             foreach (Button b in buttonList)
             {
                 b.interactable = true;
             }
             button.interactable = false;
 
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
-            string inventoryItemId = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == weaponOption.itemWebId).id;
             switch (weaponType)
             {
                 case LoadoutManager.WeaponSlotType.Primary:

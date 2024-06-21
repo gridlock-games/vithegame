@@ -76,7 +76,7 @@ namespace Vi.Editor
                 yield return new WaitUntil(() => Keyboard.current.spaceKey.isPressed);
                 yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
 
-                cam.clearFlags = CameraClearFlags.Depth;
+                cam.clearFlags = CameraClearFlags.SolidColor;
 
                 yield return new WaitForEndOfFrame();
 
@@ -85,6 +85,26 @@ namespace Vi.Editor
                 Texture2D screenshotTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
                 Rect rect = new Rect(0, 0, width, height);
                 screenshotTexture.ReadPixels(rect, 0, 0);
+                screenshotTexture.Apply();
+
+                // Get a copy of the color data from the source Texture2D, in high-precision float format.
+                // Each element in the array represents the color data for an individual pixel.
+                int mipLevel = 0;
+                Color[] pixels = screenshotTexture.GetPixels(mipLevel);
+
+                // If required, manipulate the pixels before applying them to the destination Texture2D.
+                // This example code reverses the array, which rotates the image 180 degrees.
+
+                Color[] newPixels = new Color[pixels.Length];
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    newPixels[i] = pixels[i] == Color.black ? Color.clear : pixels[i];
+                }
+
+                // Set the pixels of the destination Texture2D.
+                screenshotTexture.SetPixels(newPixels, mipLevel);
+
+                // Apply changes to the destination Texture2D, which uploads its data to the GPU.
                 screenshotTexture.Apply();
 
                 byte[] byteArray = screenshotTexture.EncodeToPNG();

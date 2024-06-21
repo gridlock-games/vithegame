@@ -138,6 +138,8 @@ namespace Vi.Core
 
         public void CancelAllActions(float transitionTime)
         {
+            if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
+
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
@@ -147,6 +149,19 @@ namespace Vi.Core
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();
             attributes.RemoveAllStatuses();
+            weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+
+            CancelAllActionsClientRpc(transitionTime);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void CancelAllActionsClientRpc(float transitionTime)
+        {
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            Animator.CrossFade("Empty", transitionTime, actionsLayer);
+            Animator.CrossFade("Empty", transitionTime, flinchLayer);
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 
@@ -757,6 +772,7 @@ namespace Vi.Core
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
                 AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
+                yield return new WaitUntil(() => attributes.GetGrabAssailant());
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();

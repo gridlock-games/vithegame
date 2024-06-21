@@ -8,6 +8,19 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "Weapon", menuName = "Production/Weapon")]
     public class Weapon : ScriptableObject
     {
+        public enum WeaponClass
+        {
+            Brawler,
+            Greatsword,
+            Bow,
+            Hammer,
+            Lance
+        }
+
+        [SerializeField] private WeaponClass weaponClass;
+
+        public WeaponClass GetWeaponClass() { return weaponClass; }
+
         [Header("Locomotion")]
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float walkSpeed = 2.5f;

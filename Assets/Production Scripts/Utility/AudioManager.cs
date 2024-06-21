@@ -77,17 +77,28 @@ namespace Vi.Utility
         /// <summary>
         /// Plays an audio clip in 3D sound space while following a transform's position
         /// </summary>
-        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, float volume = 1)
+        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume = 1)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow);
-            StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, volume));
+            StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
         }
 
-        private IEnumerator Play3DSoundPrefabOnTransform(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefabOnTransform(AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume = 1)
         {
             RegisterAudioSource(audioSource);
-            audioSource.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSource.isPlaying);
+            if (shouldLoop)
+            {
+                while (true)
+                {
+                    if (!audioSource.isPlaying) { audioSource.PlayOneShot(audioClip, volume); }
+                    yield return null;
+                }
+            }
+            else
+            {
+                audioSource.PlayOneShot(audioClip, volume);
+                yield return new WaitUntil(() => !audioSource.isPlaying);
+            }
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 

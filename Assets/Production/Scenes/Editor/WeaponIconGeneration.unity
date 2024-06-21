@@ -161,7 +161,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.41553932, g: 0.46672896, b: 0.5471698, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -254,17 +254,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldProcessWeapons: 0
+  shouldProcessWeapons: 1
   weaponsToGenerate:
+  - weapon: {fileID: 11400000, guid: 34ca3ff156bce574e9623ae5181055dd, type: 2}
+    transformDatas:
+    - position: {x: -0.42, y: 0, z: -0.21}
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: 8339cc3fdcf680a4e82e7cdb5b54e5f6, type: 2}
+    transformDatas:
+    - position: {x: -0.54, y: 0, z: -0.15}
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: 74d3b6a036d204a419c50418c8eb65cb, type: 2}
+    transformDatas:
+    - position: {x: -0.45, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
+    transformDatas:
+    - position: {x: -0.54, y: 0, z: -0.058}
+      rotation: {x: -0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
+    transformDatas:
+    - position: {x: -0.5, y: -0.15, z: 0}
+      rotation: {x: -0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: ac028e91a77bd1540a0f8cbfd4342dbd, type: 2}
+    transformDatas:
+    - position: {x: -0.58, y: -0.04, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: fa814df82eba57745b02124f71419f83, type: 2}
+    transformDatas:
+    - position: {x: -0.55, y: -0.03, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: f35638378d4d50b4b988b47de13fe721, type: 2}
+    transformDatas:
+    - position: {x: -0.6, y: -0.12, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
     transformDatas:
     - position: {x: -0.9, y: 0, z: -0.15}
       rotation: {x: -0, y: 180, z: 0}
     - position: {x: -0.9, y: 0, z: 0.15}
       rotation: {x: -0, y: 180, z: 0}
-  - weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
+  - weapon: {fileID: 11400000, guid: 730971d05a0eefb46890429729ae874e, type: 2}
     transformDatas:
-    - position: {x: -0.5, y: -0.15, z: 0}
+    - position: {x: -0.9, y: -0.1, z: -0.15}
+      rotation: {x: 10.000005, y: 199.99998, z: -0.00000010836805}
+    - position: {x: -0.9, y: -0.1, z: 0.15}
+      rotation: {x: 10.000005, y: 199.99998, z: -0.00000010836805}
+  - weapon: {fileID: 11400000, guid: 81aa861858f132841bb8972c43fdc38a, type: 2}
+    transformDatas:
+    - position: {x: -0.75, y: -0.03, z: 0.21}
+      rotation: {x: 0, y: 180, z: 340}
+    - position: {x: -0.75, y: -0.03, z: -0.21}
+      rotation: {x: 0, y: 180, z: 340}
+  - weapon: {fileID: 11400000, guid: 02c1cba239f378d46806eefeb4547ea6, type: 2}
+    transformDatas:
+    - position: {x: -1.13, y: -0.03, z: 0.14}
+      rotation: {x: 0, y: 180, z: 0}
+    - position: {x: -1.13, y: -0.03, z: -0.14}
+      rotation: {x: 0, y: 180, z: 0}
+  - weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
+    transformDatas:
+    - position: {x: -0.279, y: 0, z: -0.153}
       rotation: {x: -0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
     transformDatas:
@@ -272,15 +322,25 @@ MonoBehaviour:
       rotation: {x: -0, y: 0, z: 0}
     - position: {x: -0.489, y: 0.036, z: 0}
       rotation: {x: -0, y: 180, z: 0}
-  - weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
+  - weapon: {fileID: 11400000, guid: a7404c483eb8721438c7e2d4a8a9a6cb, type: 2}
     transformDatas:
-    - position: {x: -0.54, y: 0, z: -0.058}
-      rotation: {x: -0, y: 0, z: 0}
-  - weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
+    - position: {x: -0.55, y: -0.05, z: -0.39}
+      rotation: {x: 0, y: 0, z: 0}
+    - position: {x: -0.6, y: 0, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
+  - weapon: {fileID: 11400000, guid: 060ad1d37d0be174b811c5077dafdd72, type: 2}
     transformDatas:
-    - position: {x: -0.279, y: 0, z: -0.153}
-      rotation: {x: -0, y: 0, z: 0}
-  shouldProcessEquipmentOptions: 1
+    - position: {x: -0.57, y: 0, z: -0.51}
+      rotation: {x: 0, y: 0, z: 0}
+    - position: {x: -0.57, y: 0, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
+  - weapon: {fileID: 11400000, guid: b3d943d201794084aa7f2c30ca4643c0, type: 2}
+    transformDatas:
+    - position: {x: -0.49, y: 0, z: -0.36}
+      rotation: {x: 0, y: 0, z: 0}
+    - position: {x: -0.56, y: 0, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
+  shouldProcessEquipmentOptions: 0
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:
