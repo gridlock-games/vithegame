@@ -29,7 +29,7 @@ namespace Vi.UI
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
 
                 // Always keep other weapon's button non-interactable
-                if (weaponOption.itemWebId != otherWeapon.itemWebId) { buttonList.Add(button); }
+                if (weaponOption.weapon.GetWeaponClass() != otherWeapon.weapon.GetWeaponClass()) { buttonList.Add(button); }
                 else { button.interactable = false; }
 
                 if (weaponOption.itemWebId == initialOption.itemWebId) { invokeThis = button; }
