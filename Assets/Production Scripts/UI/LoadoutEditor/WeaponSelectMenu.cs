@@ -21,8 +21,12 @@ namespace Vi.UI
             this.weaponType = weaponType;
             this.playerDataId = playerDataId;
             Button invokeThis = null;
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
+                // If this weapon option isn't in our inventory, continue
+                if (!WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
+
                 LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
