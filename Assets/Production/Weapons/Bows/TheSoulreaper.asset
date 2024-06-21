@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
-  m_Name: CrossbowWeapon
+  m_Name: TheSoulreaper
   m_EditorClassIdentifier: 
   runSpeed: 5
   walkSpeed: 2.5
@@ -19,9 +19,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaRecoveryRate: 7
   staminaDelay: 1
-  maxDefense: 100
-  defenseRecoveryRate: 5
-  defenseDelay: 1
+  maxSpirit: 100
   maxRage: 100
   rageRecoveryRate: 0
   shouldUseAmmo: 1
@@ -45,7 +43,7 @@ MonoBehaviour:
   - skinPrefab: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2860689685286978219, guid: 2df1e2b48b02e3345b89a3fb27ba68c2,
+    - weaponPrefab: {fileID: 2860689685286978219, guid: 3b2334004caaa1f41a67b8739b15256d,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: -0.00093, y: 0.00038, z: 0.00034}
@@ -62,7 +60,7 @@ MonoBehaviour:
   - skinPrefab: {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2860689685286978219, guid: 2df1e2b48b02e3345b89a3fb27ba68c2,
+    - weaponPrefab: {fileID: 2860689685286978219, guid: 3b2334004caaa1f41a67b8739b15256d,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: -0.06745024, y: 0.02705508, z: 0.0139305}
@@ -144,7 +142,7 @@ MonoBehaviour:
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 475f1bc6d5a637e40aa2c9cb2aa3eab9, type: 2}
   grabAttackClipList: []
-  dodgeStaminaCost: 20
+  dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
   dodgeFR: {fileID: 11400000, guid: c0bb9f32a0406bb4fbc7033646e9143f, type: 2}
