@@ -638,6 +638,32 @@ namespace Vi.Core
             foreach (Character character in Characters)
             {
                 yield return GetCharacterInventory(character._id.ToString());
+
+                List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
+                CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+                bool itemWasAdded = false;
+                foreach (var option in armorOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
+                    {
+                        itemWasAdded = true;
+                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
+                    }
+                }
+
+                foreach (var option in weaponOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
+                    {
+                        itemWasAdded = true;
+                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
+                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
+                    }
+                }
+
+                if (itemWasAdded) { yield return GetCharacterInventory(character._id.ToString()); }
             }
 
             IsRefreshingCharacters = false;
@@ -982,6 +1008,7 @@ namespace Vi.Core
 
             var beltOption = armorOptions.Find(item => item.name == "Runic Belt");
             var capeOption = armorOptions.Find(item => item.name == "Runic Cape");
+
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.name == "Runic Chest").itemWebId,
@@ -992,8 +1019,8 @@ namespace Vi.Core
                 armorOptions.Find(item => item.name == "Runic Gloves").itemWebId,
                 capeOption == null ? "" : capeOption.itemWebId,
                 "",
-                System.Array.Find(weaponOptions, item => item.weapon.name == "GreatSwordWeapon").itemWebId,
-                System.Array.Find(weaponOptions, item => item.weapon.name == "CrossbowWeapon").itemWebId,
+                System.Array.Find(weaponOptions, item => item.name == "Flintblade").itemWebId,
+                System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel").itemWebId,
                 true);
         }
 
@@ -1032,14 +1059,10 @@ namespace Vi.Core
             int robeIndex = Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
             int weapon1Index = useDefaultPrimaryWeapon ? 1 : Random.Range(0, weaponOptions.Length);
-            int weapon2Index = Random.Range(0, weaponOptions.Length);
 
-            if (weapon1Index == weapon2Index)
-            {
-                weapon2Index++;
-                // If weapon 2 index is out of the weapon options range, set it to 0
-                if (weapon2Index >= weaponOptions.Length) { weapon2Index = 0; }
-            }
+            var weaponOptionsOfDifferentClass = System.Array.FindAll(weaponOptions, item => item.weapon.GetWeaponClass() != weaponOptions[weapon1Index].weapon.GetWeaponClass());
+            int weapon2Index = Random.Range(0, weaponOptionsOfDifferentClass.Length);
+            weapon2Index = System.Array.FindIndex(weaponOptions, item => item.itemWebId == weaponOptionsOfDifferentClass[weapon2Index].itemWebId);
 
             return new Loadout("1",
                 helmOptions.Count == 0 ? "" : (helmIndex == -1 ? "" : helmOptions[helmIndex].itemWebId),
