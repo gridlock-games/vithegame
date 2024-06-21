@@ -46,11 +46,12 @@ namespace jomarcentermjm.PlatformAPI
         }
 #endif
       }
-            else
-            {
+      else
+      {
         Debug.LogError($"Achievement {ID} does not exist. Did you type it in correctly?");
-            }
-        }
+      }
+    }
+
     public void UpdateStats(string ID, int value)
     {
       StatisticsScriptableObject stats = StatisticsList.Find(x => x.StatisticsID == ID);
@@ -65,12 +66,12 @@ namespace jomarcentermjm.PlatformAPI
         }
 #endif
       }
-            else
-            {
+      else
+      {
         Debug.LogError($"Stats {ID} does not exist. Did you type it in correctly?");
       }
+    }
 
-        }
     public int GetStats(GamePlatform platform, string ID)
     {
       StatisticsScriptableObject stats = StatisticsList.Find(x => x.StatisticsID == ID);
@@ -86,12 +87,12 @@ namespace jomarcentermjm.PlatformAPI
         }
 #endif
       }
-            else
-            {
+      else
+      {
         Debug.LogError($"Stats {ID} does not exist. Did you type it in correctly?");
       }
 
-            return output;
+      return output;
     }
   }
 }
