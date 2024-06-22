@@ -41,14 +41,17 @@ namespace jomarcentermjm.PlatformAPI
 
     void Start()
     {
-
-      if (activePlayform == GamePlatform.Steam && Application.platform != RuntimePlatform.LinuxServer)
+      if (Application.platform != RuntimePlatform.LinuxServer || Application.platform != RuntimePlatform.WindowsServer || Application.platform != RuntimePlatform.OSXServer)
       {
-        AttmptSteam();
-        AttemptDiscord();
+        if (activePlayform == GamePlatform.Steam)
+        {
+          AttmptSteam();
+          AttemptDiscord();
+        }
       }
     }
 
+    
     public GamePlatform getPlatform()
     {
       return activePlayform;
