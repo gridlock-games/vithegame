@@ -584,18 +584,16 @@ namespace Vi.Core
             HPDamage *= attacker.damageMultiplier;
             HPDamage *= damageMultiplier;
 
-            float spiritPercentage = GetSpirit() / GetMaxSpirit();
-
             bool shouldPlayHitReaction = false;
             switch (hitReaction.GetHitReactionType())
             {
                 case ActionClip.HitReactionType.Normal:
-                    if (spiritPercentage >= notBlockingSpiritHitReactionPercentage)
+                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
                     {
                         AddSpirit(HPDamage * 0.7f);
                         HPDamage *= 0.7f;
                     }
-                    else if (spiritPercentage > 0)
+                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
                     {
                         AddSpirit(HPDamage * 0.7f);
                         shouldPlayHitReaction = true;
@@ -609,12 +607,12 @@ namespace Vi.Core
                     break;
                 case ActionClip.HitReactionType.Blocking:
                     lastBlockTime = Time.time;
-                    if (spiritPercentage >= blockingSpiritHitReactionPercentage)
+                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage)
                     {
                         AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
-                    else if (spiritPercentage > 0)
+                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
                     {
                         AddSpirit(Mathf.NegativeInfinity);
                         AddStamina(-GetMaxStamina() * 0.3f);
@@ -624,9 +622,13 @@ namespace Vi.Core
                     else // Spirit is at 0
                     {
                         AddStamina(-GetMaxStamina() * 0.3f);
-                        if (GetStamina() < GetMaxStamina() * 0.3f)
+                        if (GetStamina() <= 0)
                         {
                             if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
+                            hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
+                            hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
+                            hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
+                            hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
                         }
                         shouldPlayHitReaction = true;
                     }
