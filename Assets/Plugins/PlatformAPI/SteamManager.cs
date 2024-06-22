@@ -8,7 +8,11 @@
 #define DISABLESTEAMWORKS
 #endif
 
-	using UnityEngine;
+#if (UNITY_SERVER)
+#define DISABLESTEAMWORKS
+#endif
+
+using UnityEngine;
 #if !DISABLESTEAMWORKS
 	using System.Collections;
 	using Steamworks;
