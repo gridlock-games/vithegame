@@ -147,7 +147,7 @@ namespace Vi.UI
                 }
             }
 
-            HandlePlatformAPI();
+            //HandlePlatformAPI();
             SyncRoomSettingsFields();
 
             StartCoroutine(Init());
@@ -901,15 +901,15 @@ namespace Vi.UI
             }
         }
 
-    public void HandlePlatformAPI()
-    {
+    //public void HandlePlatformAPI()
+    //{
 
-      //Rich presence
-      if (PlatformRichPresence.instance != null)
-      {
-        //Change logic here that would handle scenario where the player is host.
-        PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
-      }
-    }
+    //  //Rich presence
+    //  if (PlatformRichPresence.instance != null)
+    //  {
+    //    //Change logic here that would handle scenario where the player is host.
+    //    PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
+    //  }
+    //}
     }
 }
