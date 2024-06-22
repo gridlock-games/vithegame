@@ -13,13 +13,37 @@ namespace Vi.Core
 
         public void Shrink()
         {
+            if (!IsServer) { Debug.LogError("DamageCircle.Shrink() should only be called on the server"); return; }
+
             targetScale = Vector3.MoveTowards(targetScale, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
+            ShrinkClientRpc();
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void ShrinkClientRpc()
+        {
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = true;
+            }
         }
 
         public void ResetDamageCircle()
         {
+            if (!IsServer) { Debug.LogError("DamageCircle.ResetDamageCircle() should only be called on the server"); return; }
+
             transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
             targetScale = transform.localScale;
+            ResetDamageCircleClientRpc();
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void ResetDamageCircleClientRpc()
+        {
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = false;
+            }
         }
 
         public bool IsPointInsideDamageCircleBounds(Vector3 point)
@@ -33,6 +57,11 @@ namespace Vi.Core
             transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
             targetScale = transform.localScale;
             damageCircleColliders = GetComponentsInChildren<Collider>();
+
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = false;
+            }
         }
 
         private Vector3 targetScale;
