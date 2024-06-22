@@ -110,11 +110,13 @@ namespace Vi.UI
         {
             if (!playerInput) { return; }
             if (playerInput.currentControlScheme == lastEvaluatedControlScheme) { return; }
+            List<GameObject> gameObjectsAlreadySetActive = new List<GameObject>();
             foreach (ControlSchemeDefinition controlSchemeDefinition in controlSchemeDefinitions)
             {
                 foreach (GameObject g in controlSchemeDefinition.gameObjectsToEnable)
                 {
-                    g.SetActive(playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName);
+                    if (!gameObjectsAlreadySetActive.Contains(g)) { g.SetActive(playerInput.currentControlScheme == controlSchemeDefinition.controlSchemeName); }
+                    if (g.activeSelf) { gameObjectsAlreadySetActive.Add(g); }
                 }
 
                 foreach (MoveUIDefinition moveUIDefinition in controlSchemeDefinition.objectsToMove)
