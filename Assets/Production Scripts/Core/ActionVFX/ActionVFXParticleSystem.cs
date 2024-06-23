@@ -116,9 +116,18 @@ namespace Vi.Core
             hitCounter.Clear();
         }
 
+        private bool particleEnterCalledThisFrame;
+        private void LateUpdate()
+        {
+            particleEnterCalledThisFrame = false;
+        }
+
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+
+            if (particleEnterCalledThisFrame) { return; }
+            particleEnterCalledThisFrame = true;
 
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
