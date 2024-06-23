@@ -42,6 +42,7 @@ namespace Vi.UI
         [SerializeField] private MapOption mapOptionPrefab;
         [SerializeField] private Transform mapOptionParent;
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
+        [SerializeField] private GameModeInfoUI gameModeInfoUI;
         [SerializeField] private CustomSettingsParent[] customSettingsParents;
 
         [System.Serializable]
@@ -147,7 +148,7 @@ namespace Vi.UI
                 }
             }
 
-            HandlePlatformAPI();
+            //HandlePlatformAPI();
             SyncRoomSettingsFields();
 
             StartCoroutine(Init());
@@ -295,6 +296,18 @@ namespace Vi.UI
                 foreach (int clientId in botClientIds)
                 {
                     PlayerDataManager.Singleton.KickPlayer(clientId);
+                }
+            }
+
+            // Show game mode info UI
+            if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
+            {
+                string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
+                if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                {
+                    FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
+                    gameModeInfoUI.gameObject.SetActive(true);
+                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
                 }
             }
         }
@@ -459,8 +472,6 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
-            //if (Input.GetKeyDown(KeyCode.Escape)) { CloseRoomSettings(); }
-            
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
@@ -733,6 +744,18 @@ namespace Vi.UI
         {
             roomSettingsParent.SetActive(true);
             lobbyUIParent.SetActive(false);
+
+            // Show game mode info UI
+            if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
+            {
+                string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
+                if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                {
+                    FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
+                    gameModeInfoUI.gameObject.SetActive(true);
+                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                }
+            }
         }
 
         public void CloseRoomSettings()
@@ -901,15 +924,15 @@ namespace Vi.UI
             }
         }
 
-    public void HandlePlatformAPI()
-    {
+    //public void HandlePlatformAPI()
+    //{
 
-      //Rich presence
-      if (PlatformRichPresence.instance != null)
-      {
-        //Change logic here that would handle scenario where the player is host.
-        PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
-      }
-    }
+    //  //Rich presence
+    //  if (PlatformRichPresence.instance != null)
+    //  {
+    //    //Change logic here that would handle scenario where the player is host.
+    //    PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
+    //  }
+    //}
     }
 }
