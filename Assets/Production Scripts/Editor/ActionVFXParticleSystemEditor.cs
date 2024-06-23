@@ -8,7 +8,7 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(ActionVFXParticleSystem))]
     [CanEditMultipleObjects]
-    public class ActionVFXParticleSystemEditor : ActionVFXEditor
+    public class ActionVFXParticleSystemEditor : GameInteractiveActionVFXEditor
     {
         private SerializedProperty spShouldUseAttackerPositionForHitAngles;
 

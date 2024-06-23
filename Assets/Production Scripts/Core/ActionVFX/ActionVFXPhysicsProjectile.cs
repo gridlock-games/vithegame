@@ -8,15 +8,12 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ActionVFXPhysicsProjectile : ActionVFX
+    public class ActionVFXPhysicsProjectile : GameInteractiveActionVFX
     {
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
         [SerializeField] private float timeToActivateGravity = 0;
         [SerializeField] private float killDistance = 50;
-        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
 
-        private Attributes attacker;
-        private ActionClip attack;
         private bool initialized;
 
         public void InitializeVFX(Attributes attacker, ActionClip attack)
@@ -60,17 +57,6 @@ namespace Vi.Core
         private void Update()
         {
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
-        }
-
-        private new void OnDisable()
-        {
-            base.OnDisable();
-            foreach (GameObject prefab in VFXToPlayOnDestroy)
-            {
-                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
-                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
-            }
         }
 
         private void OnTriggerEnter(Collider other)

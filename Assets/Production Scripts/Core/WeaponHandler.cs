@@ -398,7 +398,7 @@ namespace Vi.Core
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
@@ -406,7 +406,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
@@ -419,44 +419,6 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
-        }
-
-        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
-        {
-            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!particleSystem.isPlaying) { break; }
-                }
-            }
-
-            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!audioSource.isPlaying) { break; }
-                }
-            }
-
-            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!visualEffect.HasAnySystemAwake()) { break; }
-                }
-            }
-
-            ObjectPoolingManager.ReturnObjectToPool(vfxInstance);
         }
 
         public bool IsInAnticipation { get; private set; }

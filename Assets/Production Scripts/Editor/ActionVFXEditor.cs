@@ -28,6 +28,8 @@ namespace Vi.Editor
         protected SerializedProperty spAudioClipToPlayOnAwake;
         protected SerializedProperty spAudioClipToPlayOnDestroy;
 
+        private SerializedProperty spVFXToPlayOnDestroy;
+
         protected void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
@@ -47,6 +49,8 @@ namespace Vi.Editor
 
             spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
             spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
+
+            spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
         }
 
         public override void OnInspectorGUI()
@@ -76,6 +80,8 @@ namespace Vi.Editor
 
             EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
+
+            EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);
 
             serializedObject.ApplyModifiedProperties();
         }

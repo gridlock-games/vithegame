@@ -8,7 +8,7 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(FollowUpVFX))]
     [CanEditMultipleObjects]
-    public class FollowUpVFXEditor : ActionVFXEditor
+    public class FollowUpVFXEditor : GameInteractiveActionVFXEditor
     {
         private SerializedProperty spShouldAffectSelf;
         private SerializedProperty spShouldAffectTeammates;
