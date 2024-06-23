@@ -148,8 +148,11 @@ namespace Vi.Core
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
                         ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
-                        if (shooterWeapon) { shooterWeapons.Add(shooterWeapon); }
-                        CanAim = shooterWeapon | CanAim;
+                        if (shooterWeapon)
+                        {
+                            shooterWeapons.Add(shooterWeapon);
+                            CanAim = shooterWeapon.CanADS() | CanAim;
+                        }
                     }
                     broken = true;
                     break;

@@ -10,6 +10,7 @@ namespace Vi.Core
     public class ShooterWeapon : RuntimeWeapon
     {
         [Header("Shooter Settings")]
+        [SerializeField] private bool canADS = true;
         [SerializeField] private Transform projectileSpawnPoint;
         [SerializeField] private Projectile projectile;
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 5);
@@ -20,6 +21,7 @@ namespace Vi.Core
         [SerializeField] private LimbReferences.BodyAimType bodyAimType = LimbReferences.BodyAimType.Normal;
         [SerializeField] private List<InverseKinematicsData> IKData = new List<InverseKinematicsData>();
 
+        public bool CanADS() { return canADS; }
         public Transform GetProjectileSpawnPoint() { return projectileSpawnPoint; }
         public LimbReferences.Hand GetAimHand() { return aimHand; }
         public Vector3 GetAimHandIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).aimHandIKOffset; }
