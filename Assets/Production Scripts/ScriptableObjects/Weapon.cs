@@ -14,7 +14,8 @@ namespace Vi.ScriptableObjects
             Greatsword,
             Bow,
             Hammer,
-            Lance
+            Lance,
+            Staff
         }
 
         [SerializeField] private WeaponClass weaponClass;

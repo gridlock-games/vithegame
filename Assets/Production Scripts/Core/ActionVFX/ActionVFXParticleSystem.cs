@@ -7,7 +7,7 @@ using Unity.Netcode;
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ActionVFXParticleSystem : ActionVFX
+    public class ActionVFXParticleSystem : GameInteractiveActionVFX
     {
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
         [SerializeField] private bool shouldOverrideMaxHits;
@@ -15,9 +15,6 @@ namespace Vi.Core
         [SerializeField] private bool scaleVFXBasedOnEdges;
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
-
-        private Attributes attacker;
-        private ActionClip attack;
 
         public void InitializeVFX(Attributes attacker, ActionClip attack)
         {
@@ -116,9 +113,18 @@ namespace Vi.Core
             hitCounter.Clear();
         }
 
+        private bool particleEnterCalledThisFrame;
+        private void LateUpdate()
+        {
+            particleEnterCalledThisFrame = false;
+        }
+
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
+
+            if (particleEnterCalledThisFrame) { return; }
+            particleEnterCalledThisFrame = true;
 
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);

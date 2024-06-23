@@ -99,6 +99,8 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
+  followUpVFXToPlayOnDestroy: []
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
@@ -114,9 +116,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccfb7ebf44a80f8408efada6ad352880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 0
+  onActivateVFXSpawnNormalizedTime: 0
+  raycastOffset: {x: 0, y: 2, z: 3}
+  raycastMaxDistance: 5
+  crossProductDirection: {x: 1, y: 0, z: 0}
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy:
+  - {fileID: 1453165119930241201, guid: 595e15cd00fae9b42b6f06e5f39a760c, type: 3}
+  followUpVFXToPlayOnDestroy: []
   duration: 3
   radius: 2
   forceMultiplier: 5
-  VFXToPlayOnDestroy:
-  - {fileID: 1453165119930241201, guid: 595e15cd00fae9b42b6f06e5f39a760c, type: 3}
   ailmentToTriggerOnEnd: 1

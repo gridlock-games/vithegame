@@ -67,9 +67,16 @@ namespace Vi.ScriptableObjects
             if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false); }
         }
 
+        [SerializeField] private GameObject[] VFXToPlayOnDestroy = new GameObject[0];
+
         protected void OnDisable()
         {
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnAwake, transform.position); }
+            
+            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            {
+                FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -87,12 +88,19 @@ namespace Vi.Core
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
-            if (other.isTrigger) { return; }
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
                 networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
+            }
+            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            {
+                actionVFX.OnHit(attacker);
+            }
+            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
+            {
+                gameItem.OnHit(attacker);
             }
             else
             {
@@ -113,7 +121,7 @@ namespace Vi.Core
             {
                 GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                 if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
+                PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(g));
             }
         }
 

@@ -7,6 +7,9 @@ namespace Vi.Core.GameModeManagers
 {
     public class GameItem : NetworkBehaviour
     {
-        
+        public virtual void OnHit(Attributes attacker)
+        {
+            
+        }
     }
 }
