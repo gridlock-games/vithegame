@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using UnityEngine.VFX;
-using Vi.ScriptableObjects;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -74,6 +74,10 @@ namespace Vi.Core
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
                 actionVFX.OnHit(parentAttributes);
+            }
+            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
+            {
+                gameItem.OnHit(parentAttributes);
             }
         }
 

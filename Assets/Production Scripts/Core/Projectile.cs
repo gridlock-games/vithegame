@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -96,6 +97,10 @@ namespace Vi.Core
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
                 actionVFX.OnHit(attacker);
+            }
+            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
+            {
+                gameItem.OnHit(attacker);
             }
             else
             {
