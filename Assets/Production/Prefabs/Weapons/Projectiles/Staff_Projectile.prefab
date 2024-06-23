@@ -294,7 +294,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killDistance: 8
-  VFXToPlayOnDestroy: []
+  VFXToPlayOnDestroy:
+  - {fileID: 2655287871382509185, guid: e4c023fabdf979948ba53afd1e4f11fa, type: 3}
   soundToPlayOnSpawn: {fileID: 8300000, guid: 866aad696ee7e45cfadcc1af291a0b0d, type: 3}
 --- !u!114 &3107967498327579398
 MonoBehaviour:
