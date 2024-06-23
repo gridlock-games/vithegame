@@ -137,7 +137,7 @@ namespace Vi.Core
         private IEnumerator InitStats()
         {
             yield return new WaitUntil(() => weaponHandler.GetWeapon() != null);
-            HP.Value = weaponHandler.GetWeapon().GetMaxHP() / 4;
+            HP.Value = weaponHandler.GetWeapon().GetMaxHP();
             spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
         }
 
