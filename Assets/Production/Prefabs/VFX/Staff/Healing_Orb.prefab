@@ -48469,6 +48469,9 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy:
+  - {fileID: 1659498523229177339, guid: cdd5d1f3cb0e19342a70d68b4401e1b3, type: 3}
+  followUpVFXToPlayOnDestroy: []
   shouldUseAttackerPositionForHitAngles: 0
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
