@@ -280,7 +280,7 @@ MonoBehaviour:
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 10
+  maxHitLimit: 6
   timeBetweenHits: 0.05
   isBlockable: 0
   isUninterruptable: 0
@@ -290,7 +290,7 @@ MonoBehaviour:
   ailment: 4
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
-  ailmentHitDefinition: 010000
+  ailmentHitDefinition: 000000000101
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 0
