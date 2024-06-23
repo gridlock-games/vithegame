@@ -10,7 +10,7 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(WeaponHandler))]
-    public class Attributes : CombatAgent
+    public class Attributes : NetworkBehaviour
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 
