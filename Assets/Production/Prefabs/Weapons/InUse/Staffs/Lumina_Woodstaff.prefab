@@ -79,9 +79,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canADS: 0
   projectileSpawnPoint: {fileID: 6049529673539774852}
-  projectile: {fileID: 2116712592617969172, guid: 3d57fd6cdde3a134aa01786a0dd8f495,
+  projectile: {fileID: 747944658870220374, guid: 8003eff23bb7beb4396ce0ed2691b05c,
     type: 3}
-  projectileForce: {x: 0, y: 0, z: 40}
+  projectileForce: {x: 0, y: 0, z: 5}
   ammoCountDamageMultipliers:
   - 1
   - 1
@@ -93,7 +93,7 @@ MonoBehaviour:
   bodyAimType: 0
   IKData:
   - raceAndGender: 0
-    aimHandIKOffset: {x: 0, y: -1.07, z: -2.07}
+    aimHandIKOffset: {x: 9.8, y: 49.18, z: -6.1}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 1
     aimHandIKOffset: {x: 0, y: 0.24, z: 0.64}

@@ -112,6 +112,7 @@ namespace Vi.Core
             shooterWeapons.Clear();
 
             CanAim = false;
+            canADS = false;
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -151,7 +152,8 @@ namespace Vi.Core
                         if (shooterWeapon)
                         {
                             shooterWeapons.Add(shooterWeapon);
-                            CanAim = shooterWeapon.CanADS() | CanAim;
+                            CanAim = true;
+                            canADS = shooterWeapon.CanADS() | canADS;
                         }
                     }
                     broken = true;
@@ -525,16 +527,23 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        if (weaponInstances[weaponBone])
+                        if (weaponInstances.TryGetValue(weaponBone, out RuntimeWeapon runtimeWeapon))
                         {
-                            // Don't play sound effects for shooter weapons here
-                            if (weaponInstances[weaponBone].GetComponent<ShooterWeapon>()) { continue; }
+                            if (runtimeWeapon)
+                            {
+                                // Don't play sound effects for shooter weapons here
+                                if (runtimeWeapon is ShooterWeapon) { continue; }
 
-                            AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
-                            if (attackSoundEffect)
-                                AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);
-                            else if (Application.isEditor)
-                                Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                                AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
+                                if (attackSoundEffect)
+                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position);
+                                else if (Application.isEditor)
+                                    Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                            }
+                            else
+                            {
+                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            }
                         }
                         else
                         {
@@ -650,6 +659,7 @@ namespace Vi.Core
         }
 
         public bool CanAim { get; private set; }
+        private bool canADS;
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -684,7 +694,7 @@ namespace Vi.Core
                 if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
             }
 
-            if (CanAim)
+            if (canADS)
             {
                 if (NetworkObject.IsPlayerObject)
                 {
