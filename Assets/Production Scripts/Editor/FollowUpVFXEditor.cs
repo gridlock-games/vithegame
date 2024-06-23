@@ -28,6 +28,8 @@ namespace Vi.Editor
 
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.LabelField("Follow Up VFX", EditorStyles.whiteLargeLabel);
+
             EditorGUILayout.PropertyField(spShouldAffectSelf);
             EditorGUILayout.PropertyField(spShouldAffectTeammates);
             EditorGUILayout.PropertyField(spShouldAffectEnemies);

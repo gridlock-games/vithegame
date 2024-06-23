@@ -87,12 +87,15 @@ namespace Vi.Core
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
-            if (other.isTrigger) { return; }
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
                 networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
+            }
+            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            {
+                actionVFX.OnHit(attacker);
             }
             else
             {

@@ -35,6 +35,9 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            EditorGUILayout.LabelField("Action VFX Particle System", EditorStyles.whiteLargeLabel);
+
             EditorGUILayout.PropertyField(spShouldUseAttackerPositionForHitAngles);
 
             EditorGUILayout.PropertyField(spShouldOverrideMaxHits);

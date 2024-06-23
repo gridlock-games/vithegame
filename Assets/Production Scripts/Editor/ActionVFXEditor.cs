@@ -55,6 +55,7 @@ namespace Vi.Editor
 
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.LabelField("Action VFX", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spVFXPositionOffset);
             EditorGUILayout.PropertyField(spVFXRotationOffset);
 
@@ -82,6 +83,7 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
 
             EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);
+            EditorGUILayout.Space();
 
             serializedObject.ApplyModifiedProperties();
         }

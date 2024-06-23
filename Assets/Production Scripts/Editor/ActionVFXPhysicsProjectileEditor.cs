@@ -25,6 +25,7 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            EditorGUILayout.LabelField("Action VFX Physics Projectile", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spProjectileForce);
             EditorGUILayout.PropertyField(spTimeToActivateGravity);
             EditorGUILayout.PropertyField(spKillDistance);
