@@ -676,26 +676,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameDisplay: {fileID: 7401489532861140048}
-  healthFillImage: {fileID: 8825118740436756027}
-  staminaFillImage: {fileID: 8777073071513388713}
-  spiritFillImage: {fileID: 2717308279120147160}
-  rageFillImage: {fileID: 1679784692164774126}
-  interimHealthFillImage: {fileID: 7297089366903985045}
-  interimStaminaFillImage: {fileID: 6837854231243790151}
-  interimSpiritFillImage: {fileID: 1128668944168095683}
-  interimRageFillImage: {fileID: 1679784692164774126}
   statusImageParent: {fileID: 4375269428043147127}
   statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}
   healthText: {fileID: 3819835944573705657}
+  healthFillImage: {fileID: 8825118740436756027}
+  interimHealthFillImage: {fileID: 7297089366903985045}
   topHealthBorder: {fileID: 325743918710596908}
   healthBackground: {fileID: 2357147163449420224}
   staminaText: {fileID: 4985747223212512818}
+  staminaFillImage: {fileID: 8777073071513388713}
+  interimStaminaFillImage: {fileID: 6837854231243790151}
   bottomStaminaBorder: {fileID: 680216261824040332}
   staminaBackground: {fileID: 1498557213719423090}
   spiritText: {fileID: 3613936795393325988}
+  spiritFillImage: {fileID: 2717308279120147160}
+  interimSpiritFillImage: {fileID: 1128668944168095683}
   bottomSpiritBorder: {fileID: 1456438271516473357}
   spiritBackground: {fileID: 8088568553903798972}
+  rageFillImage: {fileID: 1679784692164774126}
+  interimRageFillImage: {fileID: 1679784692164774126}
   graphicsToTint:
   - {fileID: 2357147163449420224}
   - {fileID: 1498557213719423090}
