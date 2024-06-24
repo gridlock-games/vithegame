@@ -36,7 +36,7 @@ namespace Vi.UI
                         if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
                         {
                             mat.color = attributes.GetRelativeTeamColor();
-                            mat.SetFloat(_Transparency, attributes.GetTeam() == PlayerDataManager.Team.Competitor ? 0 : 1);
+                            mat.SetFloat(_Transparency, attributes.GetTeam() == PlayerDataManager.Team.Competitor | attributes.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
                         }
                         else
                         {

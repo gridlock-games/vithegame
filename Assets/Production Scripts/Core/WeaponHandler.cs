@@ -38,20 +38,22 @@ namespace Vi.Core
         }
 
         public bool WeaponInitialized { get; private set; }
-        public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
+        public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
+        public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
             if (IsOwner) { aiming.Value = false; }
 
             weaponInstance = weapon;
-            StartCoroutine(SwapAnimatorController(runtimeAnimatorController));
+            AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
+            StartCoroutine(SwapAnimatorController());
             EquipWeapon();
             WeaponInitialized = true;
         }
 
-        private IEnumerator SwapAnimatorController(RuntimeAnimatorController runtimeAnimatorController)
+        private IEnumerator SwapAnimatorController()
         {
             yield return new WaitUntil(() => !animationHandler.IsAiming());
-            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
+            animationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
