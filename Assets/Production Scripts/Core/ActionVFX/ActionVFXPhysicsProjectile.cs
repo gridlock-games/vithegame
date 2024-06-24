@@ -19,7 +19,7 @@ namespace Vi.Core
 
         public void InitializeVFX(Attributes attacker, ActionClip attack)
         {
-            if (initialized) { Debug.LogError("ActionVFXPhysicsProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
+            ClearInitialization();
 
             this.attacker = attacker;
             this.attack = attack;
@@ -104,7 +104,6 @@ namespace Vi.Core
 
             if (!other.isTrigger | shouldDestroy)
             {
-                ClearInitialization();
                 ObjectPoolingManager.ReturnObjectToPool(gameObject);
             }
         }
