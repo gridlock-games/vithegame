@@ -89,6 +89,7 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
+            bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
@@ -96,10 +97,12 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
+                shouldDestroy = true;
                 actionVFX.OnHit(attacker);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
             {
+                shouldDestroy = true;
                 gameItem.OnHit(attacker);
             }
             else
@@ -111,7 +114,8 @@ namespace Vi.Core
                     if (otherProjectile.attacker == attacker) { return; }
                 }
             }
-            NetworkObject.Despawn(true);
+
+            if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
         }
 
         private new void OnDestroy()

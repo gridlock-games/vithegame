@@ -570,7 +570,6 @@ namespace Vi.Core
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
-            //AddSpirit(-attack.spiritDamage);
             if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
@@ -607,13 +606,15 @@ namespace Vi.Core
                     break;
                 case ActionClip.HitReactionType.Blocking:
                     lastBlockTime = Time.time;
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage)
+                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
                     {
+                        Debug.Log("1");
                         AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
+                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
                     {
+                        Debug.Log("2");
                         AddSpirit(Mathf.NegativeInfinity);
                         AddStamina(-GetMaxStamina() * 0.3f);
                         shouldPlayHitReaction = true;
@@ -621,6 +622,7 @@ namespace Vi.Core
                     }
                     else // Spirit is at 0
                     {
+                        Debug.Log("3");
                         AddStamina(-GetMaxStamina() * 0.3f);
                         if (GetStamina() <= 0)
                         {
