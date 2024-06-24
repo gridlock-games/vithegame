@@ -608,21 +608,18 @@ namespace Vi.Core
                     lastBlockTime = Time.time;
                     if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
                     {
-                        Debug.Log("1");
                         AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
                     else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
                     {
-                        Debug.Log("2");
-                        AddSpirit(Mathf.NegativeInfinity);
+                        AddSpirit(-GetMaxSpirit());
                         AddStamina(-GetMaxStamina() * 0.3f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
                     }
                     else // Spirit is at 0
                     {
-                        Debug.Log("3");
                         AddStamina(-GetMaxStamina() * 0.3f);
                         if (GetStamina() <= 0)
                         {
