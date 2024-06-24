@@ -112,6 +112,7 @@ namespace Vi.Core
             shooterWeapons.Clear();
 
             CanAim = false;
+            canADS = false;
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -148,8 +149,12 @@ namespace Vi.Core
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
                         ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
-                        if (shooterWeapon) { shooterWeapons.Add(shooterWeapon); }
-                        CanAim = shooterWeapon | CanAim;
+                        if (shooterWeapon)
+                        {
+                            shooterWeapons.Add(shooterWeapon);
+                            CanAim = true;
+                            canADS = shooterWeapon.CanADS() | canADS;
+                        }
                     }
                     broken = true;
                     break;
@@ -393,7 +398,7 @@ namespace Vi.Core
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
@@ -401,7 +406,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
@@ -414,44 +419,6 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
-        }
-
-        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
-        {
-            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!particleSystem.isPlaying) { break; }
-                }
-            }
-
-            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!audioSource.isPlaying) { break; }
-                }
-            }
-
-            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!visualEffect.HasAnySystemAwake()) { break; }
-                }
-            }
-
-            ObjectPoolingManager.ReturnObjectToPool(vfxInstance);
         }
 
         public bool IsInAnticipation { get; private set; }
@@ -522,16 +489,23 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        if (weaponInstances[weaponBone])
+                        if (weaponInstances.TryGetValue(weaponBone, out RuntimeWeapon runtimeWeapon))
                         {
-                            // Don't play sound effects for shooter weapons here
-                            if (weaponInstances[weaponBone].GetComponent<ShooterWeapon>()) { continue; }
+                            if (runtimeWeapon)
+                            {
+                                // Don't play sound effects for shooter weapons here
+                                if (runtimeWeapon is ShooterWeapon) { continue; }
 
-                            AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
-                            if (attackSoundEffect)
-                                AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);
-                            else if (Application.isEditor)
-                                Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                                AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
+                                if (attackSoundEffect)
+                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position);
+                                else if (Application.isEditor)
+                                    Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                            }
+                            else
+                            {
+                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            }
                         }
                         else
                         {
@@ -647,6 +621,7 @@ namespace Vi.Core
         }
 
         public bool CanAim { get; private set; }
+        private bool canADS;
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -681,7 +656,7 @@ namespace Vi.Core
                 if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
             }
 
-            if (CanAim)
+            if (canADS)
             {
                 if (NetworkObject.IsPlayerObject)
                 {

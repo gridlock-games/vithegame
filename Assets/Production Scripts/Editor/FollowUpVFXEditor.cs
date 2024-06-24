@@ -8,7 +8,7 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(FollowUpVFX))]
     [CanEditMultipleObjects]
-    public class FollowUpVFXEditor : ActionVFXEditor
+    public class FollowUpVFXEditor : GameInteractiveActionVFXEditor
     {
         private SerializedProperty spShouldAffectSelf;
         private SerializedProperty spShouldAffectTeammates;
@@ -28,6 +28,8 @@ namespace Vi.Editor
 
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.LabelField("Follow Up VFX", EditorStyles.whiteLargeLabel);
+
             EditorGUILayout.PropertyField(spShouldAffectSelf);
             EditorGUILayout.PropertyField(spShouldAffectTeammates);
             EditorGUILayout.PropertyField(spShouldAffectEnemies);

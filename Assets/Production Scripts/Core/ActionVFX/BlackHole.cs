@@ -8,12 +8,11 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(FollowUpVFX))]
-    public class BlackHole : MonoBehaviour
+    public class BlackHole : GameInteractiveActionVFX
     {
         [SerializeField] private float duration = 3;
         [SerializeField] private float radius = 2;
         [SerializeField] private float forceMultiplier = 10;
-        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
         [SerializeField] private ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
         private float startTime;
@@ -25,8 +24,9 @@ namespace Vi.Core
             ps = GetComponent<ParticleSystem>();
         }
 
-        private void OnEnable()
+        private new void OnEnable()
         {
+            base.OnEnable();
             startTime = Time.time;
         }
 
@@ -71,8 +71,9 @@ namespace Vi.Core
             }
         }
 
-        private void OnDisable()
+        private new void OnDisable()
         {
+            base.OnDisable();
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
@@ -110,11 +111,6 @@ namespace Vi.Core
                 {
                     rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
                 }
-            }
-
-            foreach (GameObject prefab in VFXToPlayOnDestroy)
-            {
-                PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
         }
 

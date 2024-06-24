@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.VFX;
 
 namespace Vi.Utility
 {
@@ -184,6 +185,44 @@ namespace Vi.Utility
                 obj.SetActive(false);
                 pool.InactiveObjects.Add(obj);
             }
+        }
+
+        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
+        {
+            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!particleSystem.isPlaying) { break; }
+                }
+            }
+
+            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
+            if (audioSource)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!audioSource.isPlaying) { break; }
+                }
+            }
+
+            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
+            if (visualEffect)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!vfxInstance) { yield break; }
+                    if (!visualEffect.HasAnySystemAwake()) { break; }
+                }
+            }
+
+            ReturnObjectToPool(vfxInstance);
         }
     }
 
