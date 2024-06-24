@@ -404,14 +404,13 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    animatorOverrideController["GrabReaction"] = attributes.GetGrabReactionClip();
+                    weaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attributes.GetGrabReactionClip();
                 }
                 else
                 {
-                    animatorOverrideController["GrabAttack"] = actionClip.grabAttackClip;
+                    weaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
 
@@ -822,8 +821,7 @@ namespace Vi.Core
         // Coroutine for setting invincibility status during a dodge
         private void SetInvincibleStatusOnDodge(string actionStateName)
         {
-            AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
-            attributes.SetInviniciblity(animatorOverrideController[actionStateName].length * 0.35f);
+            attributes.SetInviniciblity(weaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
