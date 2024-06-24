@@ -139,19 +139,29 @@ namespace Vi.UI
                 nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
             }
 
-            healthText.text = "HP " + attributes.GetHP().ToString("F0") + " / " + attributes.GetMaxHP().ToString("F0");
-            staminaText.text = "ST " + attributes.GetStamina().ToString("F0") + " / " + attributes.GetMaxStamina().ToString("F0");
-            spiritText.text = "SP " + attributes.GetSpirit().ToString("F0") + " / " + attributes.GetMaxSpirit().ToString("F0");
+            float HP = attributes.GetHP();
+            float stamina = attributes.GetStamina();
+            float spirit = attributes.GetSpirit();
+            float rage = attributes.GetRage();
 
-            healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
-            staminaFillImage.fillAmount = attributes.GetStamina() / attributes.GetMaxStamina();
-            spiritFillImage.fillAmount = attributes.GetSpirit() / attributes.GetMaxSpirit();
-            rageFillImage.fillAmount = attributes.GetRage() / attributes.GetMaxRage();
+            float maxHP = attributes.GetMaxHP();
+            float maxStamina = attributes.GetMaxStamina();
+            float maxSpirit = attributes.GetMaxSpirit();
+            float maxRage = attributes.GetMaxRage();
 
-            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * fillSpeed);
-            interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, attributes.GetStamina() / attributes.GetMaxStamina(), Time.deltaTime * fillSpeed);
-            interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, attributes.GetSpirit() / attributes.GetMaxSpirit(), Time.deltaTime * fillSpeed);
-            interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, attributes.GetRage() / attributes.GetMaxRage(), Time.deltaTime * fillSpeed);
+            healthText.text = "HP " + (HP < 10 & !Mathf.Approximately(0, HP) ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+            staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+            spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+
+            healthFillImage.fillAmount = HP / maxHP;
+            staminaFillImage.fillAmount = stamina / maxStamina;
+            spiritFillImage.fillAmount = spirit / maxSpirit;
+            rageFillImage.fillAmount = rage / maxRage;
+
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
+            interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
+            interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
+            interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, rage / maxRage, Time.deltaTime * fillSpeed);
 
             if (!playerUI)
             {

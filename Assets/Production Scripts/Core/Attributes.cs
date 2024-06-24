@@ -1109,6 +1109,7 @@ namespace Vi.Core
             if (current == ActionClip.Ailment.Death)
             {
                 StartCoroutine(ClearDamageMappingAfter1Frame());
+                spiritRegenActivateTime = Mathf.NegativeInfinity;
                 weaponHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
