@@ -771,15 +771,14 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                AnimatorOverrideController animatorOverrideController = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.animationController : loadoutManager.SecondaryWeaponOption.animationController;
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     yield return new WaitUntil(() => attributes.GetGrabAssailant());
-                    animatorOverrideController["Grab_Reaction"] = attributes.GetGrabReactionClip();
+                    weaponHandler.AnimatorOverrideControllerInstance["Grab_Reaction"] = attributes.GetGrabReactionClip();
                 }
                 else
                 {
-                    animatorOverrideController["Grab_Attack"] = actionClip.grabAttackClip;
+                    weaponHandler.AnimatorOverrideControllerInstance["Grab_Attack"] = actionClip.grabAttackClip;
                 }
             }
 
