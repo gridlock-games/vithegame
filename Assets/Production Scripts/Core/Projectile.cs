@@ -93,7 +93,8 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
+                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
+                if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
@@ -108,8 +109,7 @@ namespace Vi.Core
             else
             {
                 // Dont despawn projectiles that come from the same attacker
-                Projectile otherProjectile = other.GetComponentInParent<Projectile>();
-                if (otherProjectile)
+                if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
                 {
                     if (otherProjectile.attacker == attacker) { return; }
                 }
