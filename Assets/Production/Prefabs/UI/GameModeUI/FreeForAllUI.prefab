@@ -119,6 +119,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 206.5342
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.775887
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 801.27905
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 129.21378
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 517.5917
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 129.21378
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 187.10355
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.775887
+      objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_Pivot.x
@@ -310,6 +350,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &6496362794858210969 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7744647505305684082, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6554387962942687702 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7757707048149690173, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -336,6 +382,9 @@ MonoBehaviour:
   gameEndText: {fileID: 7358106834012291673}
   roundResultText: {fileID: 9219390616446255447}
   roundWinThresholdText: {fileID: 2185388288731214311}
+  canvasGroupsToAffectOpacity:
+  - {fileID: 6496362794858210969}
+  MVPCanvasGroup: {fileID: 0}
   killsToWinRoundThresholdText: {fileID: 6271930216214367342}
 --- !u!114 &7358106834012291673 stripped
 MonoBehaviour:

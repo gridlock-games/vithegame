@@ -347,11 +347,21 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public PlayerScore GetMVPScore() { return MVPScore.Value; }
+
         protected NetworkVariable<bool> gameOver = new NetworkVariable<bool>();
+        protected NetworkVariable<PlayerScore> MVPScore = new NetworkVariable<PlayerScore>();
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {
             gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
+
+            List<PlayerScore> highestKillPlayers = GetHighestKillPlayers();
+            if (highestKillPlayers.Count > 1)
+            {
+                float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
+                MVPScore.Value = highestKillPlayers.Find(item => item.cumulativeDamageDealt == highestDamage);
+            }
         }
 
         private void EndGamePrematurely(string gameEndMessage)
@@ -605,11 +615,13 @@ namespace Vi.Core.GameModeManagers
 
         private IEnumerator DisplayPostGameEvents()
         {
-            // MVP Presentation
-            postGameStatus.Value = PostGameStatus.MVP;
-
-            yield return new WaitForSeconds(5);
-
+            if (GetMVPScore().isValid)
+            {
+                // MVP Presentation
+                postGameStatus.Value = PostGameStatus.MVP;
+                yield return new WaitForSeconds(5);
+            }
+            
             // Scoreboard
             postGameStatus.Value = PostGameStatus.Scoreboard;
 
@@ -621,10 +633,20 @@ namespace Vi.Core.GameModeManagers
 
         protected List<PlayerScore> GetHighestKillPlayers()
         {
-            List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
+            List<PlayerScore> allPlayerScores = new List<PlayerScore>();
             for (int i = 0; i < scoreList.Count; i++)
             {
-                PlayerScore playerScore = scoreList[i];
+                allPlayerScores.Add(scoreList[i]);
+            }
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
+            {
+                allPlayerScores.Add(disconnectedScoreList[i].playerScore);
+            }
+
+            List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
+            for (int i = 0; i < allPlayerScores.Count; i++)
+            {
+                PlayerScore playerScore = allPlayerScores[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
                     if (playerScore.killsThisRound > highestKillPlayerScores[0].killsThisRound)
@@ -811,6 +833,7 @@ namespace Vi.Core.GameModeManagers
             public float cumulativeDamageRecieved;
             public float damageRecievedThisRound;
             public int roundWins;
+            public bool isValid;
 
             public PlayerScore(int id)
             {
@@ -826,6 +849,7 @@ namespace Vi.Core.GameModeManagers
                 cumulativeDamageRecieved = 0;
                 damageRecievedThisRound = 0;
                 roundWins = 0;
+                isValid = true;
             }
 
             public void ResetRoundVariables()
@@ -854,6 +878,7 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeValue(ref cumulativeDamageRecieved);
                 serializer.SerializeValue(ref damageRecievedThisRound);
                 serializer.SerializeValue(ref roundWins);
+                serializer.SerializeValue(ref isValid);
             }
         }
 

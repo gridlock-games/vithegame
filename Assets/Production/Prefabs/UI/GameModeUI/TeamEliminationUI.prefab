@@ -7,6 +7,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 206.5342
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.775887
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 801.27905
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 129.21378
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 517.5917
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 129.21378
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 187.10355
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.775887
+      objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_Pivot.x
@@ -115,7 +155,7 @@ PrefabInstance:
     - target: {fileID: 7757707048149690173, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_Name
-      value: TeamEliminationUI Variant
+      value: TeamEliminationUI
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3608509046203378177, guid: 7314c07a3d8a63949ae8ae9b21ff2076, type: 3}
@@ -206,8 +246,17 @@ MonoBehaviour:
   gameEndText: {fileID: 857272660121023587}
   roundResultText: {fileID: 1299641660415604589}
   roundWinThresholdText: {fileID: 8335200626675337181}
+  canvasGroupsToAffectOpacity:
+  - {fileID: 4025985339453722787}
+  MVPCanvasGroup: {fileID: 0}
   viLogoImage: {fileID: 4829998238901348818}
   viEssenceIcon: {fileID: 21300000, guid: 4cef6eae1d34f7148af1b6854cf5bc47, type: 3}
+--- !u!225 &4025985339453722787 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7744647505305684082, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 6675935031586560209}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4480477547405839137 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7100053581447861232, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
