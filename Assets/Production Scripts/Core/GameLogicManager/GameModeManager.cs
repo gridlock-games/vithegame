@@ -584,13 +584,39 @@ namespace Vi.Core.GameModeManagers
             {
                 if (gameOver.Value)
                 {
-                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { NetSceneManager.Singleton.LoadScene("Lobby"); }
+                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { StartCoroutine(DisplayPostGameEvents()); }
                 }
                 else
                 {
                     roundTimer.Value = roundDuration;
                 }
             }
+        }
+
+        public enum PostGameStatus
+        {
+            None,
+            MVP,
+            Scoreboard
+        }
+
+        public PostGameStatus GetPostGameStatus() { return postGameStatus.Value; }
+        private NetworkVariable<PostGameStatus> postGameStatus = new NetworkVariable<PostGameStatus>(PostGameStatus.None);
+
+        private IEnumerator DisplayPostGameEvents()
+        {
+            // MVP Presentation
+            postGameStatus.Value = PostGameStatus.MVP;
+
+            yield return new WaitForSeconds(5);
+
+            // Scoreboard
+            postGameStatus.Value = PostGameStatus.Scoreboard;
+
+            yield return new WaitForSeconds(5);
+
+            // Return to Lobby
+            NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
         protected List<PlayerScore> GetHighestKillPlayers()

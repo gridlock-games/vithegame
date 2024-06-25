@@ -93,6 +93,19 @@ namespace Vi.UI
             }
 
             gameEndText.text = gameModeManager.GetGameEndMessage();
+
+            switch (gameModeManager.GetPostGameStatus())
+            {
+                case GameModeManager.PostGameStatus.None:
+                    break;
+                case GameModeManager.PostGameStatus.MVP:
+                    break;
+                case GameModeManager.PostGameStatus.Scoreboard:
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
+                    break;
+            }
         }
     }
 }
