@@ -69,6 +69,7 @@ namespace Vi.Core
 
         public bool CanAim()
         {
+            if (!lastClipPlayed) { return true; }
             if (IsAtRest())
             {
                 return true;

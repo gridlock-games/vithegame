@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -293,6 +294,14 @@ namespace Vi.Player
             }
         }
 
+
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
+        private new void Awake()
+        {
+            base.Awake();
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+        }
+
         private Vector3 targetPosition;
         private void Start()
         {
@@ -318,6 +327,17 @@ namespace Vi.Player
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
 
         [SerializeField] private float collisionPositionOffset = -0.3f;
+
+        public ulong GetRoundTripTime() { return roundTripTime.Value; }
+
+        private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
+        private void RefreshStatus()
+        {
+            pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+        }
+
+        private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private new void Update()
         {
@@ -406,6 +426,8 @@ namespace Vi.Player
                 transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
             ResetLookInput();
+
+            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
     }
 }

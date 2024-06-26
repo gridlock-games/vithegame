@@ -4,11 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
 using Vi.Utility;
+using Vi.Core;
+using Vi.Player;
+using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
     public class GameModeManagerUI : MonoBehaviour
     {
+        [Header("Base UI")]
         [SerializeField] protected Image leftScoreTeamColorImage;
         [SerializeField] protected Image rightScoreTeamColorImage;
         [SerializeField] protected Text leftScoreText;
@@ -17,13 +22,16 @@ namespace Vi.UI
         [SerializeField] protected Text gameEndText;
         [SerializeField] protected Text roundResultText;
         [SerializeField] protected Text roundWinThresholdText;
+        [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
+
+        [Header("MVP Presentation")]
+        [SerializeField] private CanvasGroup MVPCanvasGroup;
+        [SerializeField] private AccountCard MVPAccountCard;
+        [SerializeField] private Camera MVPPresentationCamera;
 
         protected GameModeManager gameModeManager;
-
-        private CanvasGroup[] canvasGroups;
         protected void Start()
         {
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
             gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
@@ -37,6 +45,16 @@ namespace Vi.UI
 
             leftScoreTeamColorImage.enabled = false;
             rightScoreTeamColorImage.enabled = false;
+
+            MVPPresentationCamera.enabled = false;
+            StartCoroutine(SetCameraOrientation());
+        }
+
+        private IEnumerator SetCameraOrientation()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
+            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
         }
 
         private void OnDestroy()
@@ -52,7 +70,7 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
+            foreach (CanvasGroup canvasGroup in canvasGroupsToAffectOpacity)
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
@@ -93,6 +111,66 @@ namespace Vi.UI
             }
 
             gameEndText.text = gameModeManager.GetGameEndMessage();
+
+            switch (gameModeManager.GetPostGameStatus())
+            {
+                case GameModeManager.PostGameStatus.None:
+                    MVPCanvasGroup.alpha = 0;
+                    break;
+                case GameModeManager.PostGameStatus.MVP:
+                    if (!MVPPreviewObject) { StartCoroutine(CreateMVPPreview()); }
+                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                    MVPAccountCard.Initialize(gameModeManager.GetMVPScore().id, true);
+                    break;
+                case GameModeManager.PostGameStatus.Scoreboard:
+                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
+                    if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+                    {
+                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId);
+                        if (playerData.team == PlayerDataManager.Team.Spectator)
+                        {
+                            PlayerDataManager.Singleton.GetLocalSpectatorObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                        }
+                        else
+                        {
+                            PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                        }
+                    }
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
+                    break;
+            }
         }
+
+        private const float opacityTransitionSpeed = 2;
+
+        private IEnumerator CreateMVPPreview()
+        {
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
+
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            // Instantiate the player model
+            MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
+                Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation));
+
+            AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
+            animationHandler.ChangeCharacter(character);
+            MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+
+            MVPPresentationCamera.enabled = true;
+
+            yield return new WaitUntil(() => animationHandler.Animator);
+
+            animationHandler.Animator.CrossFade("LightAttack1", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+        }
+
+        private GameObject MVPPreviewObject;
     }
 }

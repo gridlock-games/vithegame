@@ -485,11 +485,12 @@ namespace Vi.UI
 
             // Timer logic
             KeyValuePair<bool, PlayerDataManager.PlayerData> lobbyLeaderKvp = PlayerDataManager.Singleton.GetLobbyLeader();
+            bool isLobbyLeader = PlayerDataManager.Singleton.IsLobbyLeader();
 
             bool canStartGame = characterLockTimer.Value <= 0;
             if (!canStartGame)
             {
-                if (lobbyLeaderKvp.Key) // If a lobby leader exists
+                if (lobbyLeaderKvp.Key | isLobbyLeader) // If a lobby leader exists
                 {
                     // Start game is true if all players have locked in, or if the lock timer is at 0.
                     canStartGame = playerDataListWithoutSpectators.TrueForAll(item => lockedClients.Contains((ulong)item.id) | item.id < 0);
@@ -549,7 +550,6 @@ namespace Vi.UI
             }
 
             bool roomSettingsParsedProperly = true;
-            bool isLobbyLeader = PlayerDataManager.Singleton.IsLobbyLeader();
             if (isLobbyLeader)
             {
                 string gameModeSettings = "";
