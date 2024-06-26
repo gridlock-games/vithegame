@@ -153,7 +153,7 @@ namespace Vi.Core
             Animator.Play("Empty", flinchLayer);
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
-            attributes.RemoveAllStatuses();
+            if (IsServer) { attributes.RemoveAllStatuses(); }
         }
 
         public void CancelAllActions(float transitionTime)
