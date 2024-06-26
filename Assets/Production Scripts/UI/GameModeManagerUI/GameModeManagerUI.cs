@@ -6,6 +6,8 @@ using Vi.Core.GameModeManagers;
 using Vi.Utility;
 using Vi.Core;
 using Vi.Player;
+using Vi.ScriptableObjects;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -25,6 +27,7 @@ namespace Vi.UI
         [Header("MVP Presentation")]
         [SerializeField] private CanvasGroup MVPCanvasGroup;
         [SerializeField] private AccountCard MVPAccountCard;
+        [SerializeField] private Camera MVPPresentationCamera;
 
         protected GameModeManager gameModeManager;
         protected void Start()
@@ -42,6 +45,16 @@ namespace Vi.UI
 
             leftScoreTeamColorImage.enabled = false;
             rightScoreTeamColorImage.enabled = false;
+
+            MVPPresentationCamera.enabled = false;
+            StartCoroutine(SetCameraOrientation());
+        }
+
+        private IEnumerator SetCameraOrientation()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
+            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
         }
 
         private void OnDestroy()
@@ -105,6 +118,7 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.MVP:
+                    if (!MVPPreviewObject) { StartCoroutine(CreateMVPPreview()); }
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.Initialize(gameModeManager.GetMVPScore().id, true);
                     break;
@@ -123,5 +137,33 @@ namespace Vi.UI
         }
 
         private const float opacityTransitionSpeed = 2;
+
+        private IEnumerator CreateMVPPreview()
+        {
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
+
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            // Instantiate the player model
+            MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
+                Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation));
+
+            AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
+            animationHandler.ChangeCharacter(character);
+            MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+
+            MVPPresentationCamera.enabled = true;
+
+            yield return new WaitUntil(() => animationHandler.Animator);
+
+            animationHandler.Animator.CrossFade("LightAttack1", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+        }
+
+        private GameObject MVPPreviewObject;
     }
 }

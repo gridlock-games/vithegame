@@ -490,7 +490,7 @@ namespace Vi.UI
             bool canStartGame = characterLockTimer.Value <= 0;
             if (!canStartGame)
             {
-                if (isLobbyLeader) // If a lobby leader exists
+                if (lobbyLeaderKvp.Key | isLobbyLeader) // If a lobby leader exists
                 {
                     // Start game is true if all players have locked in, or if the lock timer is at 0.
                     canStartGame = playerDataListWithoutSpectators.TrueForAll(item => lockedClients.Contains((ulong)item.id) | item.id < 0);

@@ -627,7 +627,7 @@ namespace Vi.Core.GameModeManagers
             {
                 // MVP Presentation
                 postGameStatus.Value = PostGameStatus.MVP;
-                yield return new WaitForSeconds(5);
+                yield return new WaitForSeconds(60);
             }
             
             // Scoreboard

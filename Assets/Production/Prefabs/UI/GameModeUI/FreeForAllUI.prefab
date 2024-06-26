@@ -122,17 +122,17 @@ PrefabInstance:
     - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 206.5342
+      value: 211.97478
       objectReference: {fileID: 0}
     - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 51.775887
+      value: 52.45596
       objectReference: {fileID: 0}
     - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 801.27905
+      value: 799.2875
       objectReference: {fileID: 0}
     - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -142,7 +142,7 @@ PrefabInstance:
     - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 517.5917
+      value: 515.94006
       objectReference: {fileID: 0}
     - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -152,12 +152,12 @@ PrefabInstance:
     - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 187.10355
+      value: 189.82384
       objectReference: {fileID: 0}
     - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 51.775887
+      value: 52.45596
       objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -314,6 +314,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!20 &3430916691335124574 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2215811530945411253, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4949354014722338629 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8499021565615636910, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -404,6 +410,7 @@ MonoBehaviour:
   - {fileID: 6496362794858210969}
   MVPCanvasGroup: {fileID: 5071807923183610826}
   MVPAccountCard: {fileID: 2075066947893440008}
+  MVPPresentationCamera: {fileID: 3430916691335124574}
   killsToWinRoundThresholdText: {fileID: 6271930216214367342}
 --- !u!114 &7358106834012291673 stripped
 MonoBehaviour:

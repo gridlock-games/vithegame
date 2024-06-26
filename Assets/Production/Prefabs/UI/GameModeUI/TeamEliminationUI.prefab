@@ -10,17 +10,17 @@ PrefabInstance:
     - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 206.5342
+      value: 211.97478
       objectReference: {fileID: 0}
     - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 51.775887
+      value: 52.45596
       objectReference: {fileID: 0}
     - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 801.27905
+      value: 799.2875
       objectReference: {fileID: 0}
     - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -30,7 +30,7 @@ PrefabInstance:
     - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 517.5917
+      value: 515.94006
       objectReference: {fileID: 0}
     - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -40,12 +40,12 @@ PrefabInstance:
     - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 187.10355
+      value: 189.82384
       objectReference: {fileID: 0}
     - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 51.775887
+      value: 52.45596
       objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -256,6 +256,7 @@ MonoBehaviour:
   - {fileID: 4025985339453722787}
   MVPCanvasGroup: {fileID: 3141882721095736816}
   MVPAccountCard: {fileID: 8157291859401513010}
+  MVPPresentationCamera: {fileID: 4784383365912109156}
   viLogoImage: {fileID: 4829998238901348818}
   viEssenceIcon: {fileID: 21300000, guid: 4cef6eae1d34f7148af1b6854cf5bc47, type: 3}
 --- !u!225 &4025985339453722787 stripped
@@ -276,6 +277,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!20 &4784383365912109156 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2215811530945411253, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 6675935031586560209}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4829998238901348818 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2279444029944344835, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
