@@ -124,10 +124,17 @@ namespace Vi.UI
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
-                    KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                    if (localPlayerKvp.Value)
+                    if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
                     {
-                        localPlayerKvp.Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId);
+                        if (playerData.team == PlayerDataManager.Team.Spectator)
+                        {
+                            PlayerDataManager.Singleton.GetLocalSpectatorObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                        }
+                        else
+                        {
+                            PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                        }
                     }
                     break;
                 default:

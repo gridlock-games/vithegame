@@ -809,6 +809,18 @@ namespace Vi.Core
             localSpectators.Remove(clientId);
         }
 
+        public KeyValuePair<ulong, NetworkObject> GetLocalSpectatorObject()
+        {
+            try
+            {
+                return localSpectators.First(kvp => kvp.Value.IsLocalPlayer);
+            }
+            catch
+            {
+                return new KeyValuePair<ulong, NetworkObject>(NetworkManager.LocalClientId, null);
+            }
+        }
+
         private void Start()
         {
             NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
