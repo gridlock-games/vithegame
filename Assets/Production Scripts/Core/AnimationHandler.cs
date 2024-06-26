@@ -799,21 +799,22 @@ namespace Vi.Core
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
+            bool shouldWaitAFrameBeforePlaying = false;
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    Debug.Log("Waiting for grab assailant");
                     yield return new WaitUntil(() => attributes.GetGrabAssailant());
-                    Debug.Log(attributes.GetGrabReactionClip());
                     weaponHandler.AnimatorOverrideControllerInstance["Grab_Reaction"] = attributes.GetGrabReactionClip();
                 }
                 else
                 {
-                    Debug.Log(actionClip);
                     weaponHandler.AnimatorOverrideControllerInstance["Grab_Attack"] = actionClip.grabAttackClip;
                 }
+                shouldWaitAFrameBeforePlaying = true;
             }
+
+            if (shouldWaitAFrameBeforePlaying) { yield return null; }
 
             // Play the action clip based on its type
             if (actionClip.ailment != ActionClip.Ailment.Death)
