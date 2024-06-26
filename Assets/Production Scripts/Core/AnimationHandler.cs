@@ -137,12 +137,38 @@ namespace Vi.Core
             return currentStateInfo.IsName(lastClipPlayed.name + "_Loop") | currentStateInfo.IsName(lastClipPlayed.name + "_Enhance") | currentStateInfo.IsName(lastClipPlayed.name + "_Start");
         }
 
+        public void OnDeath()
+        {
+            Debug.Log("OnDeath");
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
+
+            Animator.Play("Empty", actionsLayer);
+            Animator.Play("Empty", flinchLayer);
+            attributes.SetInviniciblity(0);
+            attributes.SetUninterruptable(0);
+            attributes.RemoveAllStatuses();
+        }
+
         public void CancelAllActions(float transitionTime)
         {
+            Debug.Log("Cancel all actions");
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);
@@ -160,6 +186,12 @@ namespace Vi.Core
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);

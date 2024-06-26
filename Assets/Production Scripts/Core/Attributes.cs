@@ -1111,6 +1111,7 @@ namespace Vi.Core
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 weaponHandler.OnDeath();
+                animationHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
@@ -1292,7 +1293,7 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier = 1;
+        private float damageMultiplier = 8;
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
