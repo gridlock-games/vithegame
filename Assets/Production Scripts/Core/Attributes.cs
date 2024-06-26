@@ -1293,7 +1293,7 @@ namespace Vi.Core
             return true;
         }
 
-        private float damageMultiplier = 8;
+        private float damageMultiplier = 1;
         private float damageReductionMultiplier = 1;
         private float damageReceivedMultiplier = 1;
         private float healingMultiplier = 1;
