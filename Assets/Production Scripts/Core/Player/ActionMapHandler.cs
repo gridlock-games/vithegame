@@ -98,6 +98,7 @@ namespace Vi.Player
 
             if (isOn)
             {
+                if (scoreboardInstance) { return; }
                 scoreboardInstance = Instantiate(scoreboardPrefab);
             }
             else
