@@ -71,6 +71,7 @@ namespace Vi.UI
             {
                 if (wearableEquipmentOption.equipmentType != equipmentType) { continue; }
                 if (wearableEquipmentOption.GetModel(playerData.character.raceAndGender, null) == null) { continue; }
+                if (!WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Exists(item => item.itemId == wearableEquipmentOption.itemWebId)) { continue; }
 
                 LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 ele.InitializeEquipment(wearableEquipmentOption, playerData.character.raceAndGender);
