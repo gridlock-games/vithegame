@@ -139,7 +139,6 @@ namespace Vi.Core
 
         public void OnDeath()
         {
-            Debug.Log("OnDeath");
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
@@ -158,7 +157,6 @@ namespace Vi.Core
 
         public void CancelAllActions(float transitionTime)
         {
-            Debug.Log("Cancel all actions");
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
