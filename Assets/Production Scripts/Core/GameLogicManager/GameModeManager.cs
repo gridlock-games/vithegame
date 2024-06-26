@@ -362,6 +362,14 @@ namespace Vi.Core.GameModeManagers
                 float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
                 MVPScore.Value = highestKillPlayers.Find(item => item.cumulativeDamageDealt == highestDamage);
             }
+            else if (highestKillPlayers.Count == 1) // If there is only 1 entry in the list
+            {
+                MVPScore.Value = highestKillPlayers[0];
+            }
+            else
+            {
+                Debug.LogError("Couldn't find an MVP!");
+            }
         }
 
         private void EndGamePrematurely(string gameEndMessage)

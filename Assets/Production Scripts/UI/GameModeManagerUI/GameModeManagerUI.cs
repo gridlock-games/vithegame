@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
 using Vi.Utility;
+using Vi.Core;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -108,6 +110,11 @@ namespace Vi.UI
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
+                    KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                    if (localPlayerKvp.Value)
+                    {
+                        localPlayerKvp.Value.GetComponent<ActionMapHandler>().OpenScoreboard();
+                    }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());

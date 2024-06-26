@@ -242,6 +242,8 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerDataManager.Team GetLeftScoreTeam()
         {
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Red; }
+
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
@@ -294,6 +296,8 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerDataManager.Team GetRightScoreTeam()
         {
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Blue; }
+
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
