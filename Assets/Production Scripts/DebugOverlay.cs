@@ -5,6 +5,8 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
+using Vi.Player;
+using Unity.Netcode;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -56,8 +58,18 @@ public class DebugOverlay : MonoBehaviour
 
     private void RefreshPing()
     {
-        if (!localPlayer) { pingValue = 0; return; }
-        pingValue = localPlayer.GetRoundTripTime();
+        if (localPlayer)
+        {
+            pingValue = localPlayer.GetRoundTripTime();
+        }
+        else if (localSpectator)
+        {
+            pingValue = localSpectator.GetRoundTripTime();
+        }
+        else
+        {
+            pingValue = 0;
+        }
     }
 
     public void Log(string logString, string stackTrace, LogType type)
@@ -79,11 +91,15 @@ public class DebugOverlay : MonoBehaviour
     private ulong pingValue;
 
     private Attributes localPlayer;
+    private Spectator localSpectator;
     private void FindLocalPlayer()
     {
         if (localPlayer) { return; }
+        if (localSpectator) { return; }
         if (!PlayerDataManager.DoesExist()) { return; }
         localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+        NetworkObject specGO = PlayerDataManager.Singleton.GetLocalSpectatorObject().Value;
+        if (specGO) { localSpectator = specGO.GetComponent<Spectator>(); }
     }
 
     private void RefreshStatus()
@@ -154,7 +170,7 @@ public class DebugOverlay : MonoBehaviour
         {
             FindLocalPlayer();
             bool pingTextEvaluated = false;
-            if (localPlayer)
+            if (localPlayer | localSpectator)
             {
                 pingText.text = pingValue.ToString() + "ms";
                 dividerText.text = fpsEnabled ? "|" : "";
