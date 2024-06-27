@@ -6,11 +6,11 @@ TerrainLayer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Sentinel Ground
-  m_DiffuseTexture: {fileID: 2800000, guid: c639d73f0a150e141a3193f21c1cb0e5, type: 3}
-  m_NormalMapTexture: {fileID: 2800000, guid: cbb72f6919e75fd4dad0016ea6d1ef4b, type: 3}
-  m_MaskMapTexture: {fileID: 2800000, guid: ea853f2e6112ceb4799c6bfbb055d777, type: 3}
-  m_TileSize: {x: 20, y: 20}
+  m_Name: Neutral Ground
+  m_DiffuseTexture: {fileID: 2800000, guid: 69ed5a03341f7ab4d9c697528d459e3f, type: 3}
+  m_NormalMapTexture: {fileID: 0}
+  m_MaskMapTexture: {fileID: 0}
+  m_TileSize: {x: 25, y: 25}
   m_TileOffset: {x: 0, y: 0}
   m_Specular: {r: 0, g: 0, b: 0, a: 0}
   m_Metallic: 0
@@ -19,4 +19,4 @@ TerrainLayer:
   m_DiffuseRemapMin: {x: 0, y: 0, z: 0, w: 0}
   m_DiffuseRemapMax: {x: 1, y: 1, z: 1, w: 1}
   m_MaskMapRemapMin: {x: 0, y: 0, z: 0, w: 0}
-  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 0}
+  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 1}
