@@ -961,7 +961,10 @@ namespace Vi.Core
 
         private void RefreshStatus()
         {
-            pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            if (IsOwner)
+            {
+                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            }
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -1111,6 +1114,7 @@ namespace Vi.Core
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 weaponHandler.OnDeath();
+                animationHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());

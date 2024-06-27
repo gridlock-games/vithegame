@@ -27,6 +27,8 @@ namespace Vi.Player
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                RefreshStatus();
             }
             else
             {
@@ -300,6 +302,7 @@ namespace Vi.Player
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            RefreshStatus();
         }
 
         private Vector3 targetPosition;
@@ -334,13 +337,18 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            if (IsOwner)
+            {
+                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            }
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private new void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             base.Update();
             if (!IsLocalPlayer) { return; }
 

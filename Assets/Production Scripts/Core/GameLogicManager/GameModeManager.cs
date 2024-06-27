@@ -356,19 +356,22 @@ namespace Vi.Core.GameModeManagers
             gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
 
-            List<PlayerScore> highestKillPlayers = GetHighestKillPlayers();
-            if (highestKillPlayers.Count > 1)
+            if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
             {
-                float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
-                MVPScore.Value = highestKillPlayers.Find(item => item.cumulativeDamageDealt == highestDamage);
-            }
-            else if (highestKillPlayers.Count == 1) // If there is only 1 entry in the list
-            {
-                MVPScore.Value = highestKillPlayers[0];
-            }
-            else
-            {
-                Debug.LogError("Couldn't find an MVP!");
+                List<PlayerScore> highestKillPlayers = GetHighestKillPlayers();
+                if (highestKillPlayers.Count > 1)
+                {
+                    float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
+                    MVPScore.Value = highestKillPlayers.Find(item => item.cumulativeDamageDealt == highestDamage);
+                }
+                else if (highestKillPlayers.Count == 1) // If there is only 1 entry in the list
+                {
+                    MVPScore.Value = highestKillPlayers[0];
+                }
+                else
+                {
+                    Debug.LogError("Couldn't find an MVP!");
+                }
             }
         }
 
@@ -456,6 +459,7 @@ namespace Vi.Core.GameModeManagers
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public bool IsGameOver() { return gameOver.Value; }
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 

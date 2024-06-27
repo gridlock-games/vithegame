@@ -235,7 +235,7 @@ namespace Vi.ScriptableObjects
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
-            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
+            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId) & !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType));
 
             // Clone Folder Structure first
             string destinationTopFolder = @"Assets\Production\Prefabs\WearableEquipment";
@@ -329,6 +329,9 @@ namespace Vi.ScriptableObjects
                     foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
                     {
                         string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                        string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
+                        if (File.Exists(prefabVariantPath)) { continue; }
+
                         Directory.CreateDirectory(dest);
 
                         GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
@@ -378,7 +381,6 @@ namespace Vi.ScriptableObjects
                             WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType);
                             if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
 
-                            string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
                             PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
                             DestroyImmediate(modelSource);
 

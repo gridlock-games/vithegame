@@ -137,12 +137,36 @@ namespace Vi.Core
             return currentStateInfo.IsName(lastClipPlayed.name + "_Loop") | currentStateInfo.IsName(lastClipPlayed.name + "_Enhance") | currentStateInfo.IsName(lastClipPlayed.name + "_Start");
         }
 
+        public void OnDeath()
+        {
+            if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
+
+            Animator.Play("Empty", actionsLayer);
+            Animator.Play("Empty", flinchLayer);
+            attributes.SetInviniciblity(0);
+            attributes.SetUninterruptable(0);
+            if (IsServer) { attributes.RemoveAllStatuses(); }
+        }
+
         public void CancelAllActions(float transitionTime)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);
@@ -160,6 +184,12 @@ namespace Vi.Core
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+
+            hitReactionIsStarting = false;
+            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
+            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
+
+            if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);
@@ -774,11 +804,11 @@ namespace Vi.Core
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
                     yield return new WaitUntil(() => attributes.GetGrabAssailant());
-                    weaponHandler.AnimatorOverrideControllerInstance["Grab_Reaction"] = attributes.GetGrabReactionClip();
+                    weaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attributes.GetGrabReactionClip();
                 }
                 else
                 {
-                    weaponHandler.AnimatorOverrideControllerInstance["Grab_Attack"] = actionClip.grabAttackClip;
+                    weaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
 
