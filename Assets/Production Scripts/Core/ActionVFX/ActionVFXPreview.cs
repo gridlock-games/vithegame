@@ -61,31 +61,20 @@ namespace Vi.Core
                     if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherFloorHit.point, Color.magenta, Time.deltaTime); }
                 }
 
-                ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
-                CanCast = bHit;
-
-                if (bHit)
+                if (bHit & fartherBHit)
                 {
-                    if (fartherBHit)
-                    {
-                        transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                        Quaternion groundRotation = Quaternion.LookRotation(fartherFloorHit.point - transform.position, lookRotationUpDirection);
-                        transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
-                    }
-                    else
-                    {
-                        transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                        Quaternion groundRotation = Quaternion.LookRotation(Vector3.Cross(floorHit.normal, crossProductDirection), lookRotationUpDirection);
-                        transform.rotation = groundRotation * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
-                    }
+                    transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
+                    Quaternion groundRotation = Quaternion.LookRotation(fartherFloorHit.point - transform.position, lookRotationUpDirection);
+                    transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
+
+                    CanCast = true;
                 }
                 else
                 {
                     transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
-                    Vector3 normal = new Vector3(0, 1, 0);
-                    Quaternion groundRotation = Quaternion.LookRotation(Vector3.Cross(normal, crossProductDirection), lookRotationUpDirection);
-                    transform.rotation = groundRotation * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                    transform.rotation = transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
                 }
+                ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
             }
             else
             {

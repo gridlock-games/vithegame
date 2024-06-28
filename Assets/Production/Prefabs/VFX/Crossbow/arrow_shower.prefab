@@ -34426,13 +34426,16 @@ MonoBehaviour:
   transformType: 4
   onActivateVFXSpawnNormalizedTime: 0.5
   raycastOffset: {x: 0, y: 2, z: 8}
+  fartherRaycastOffset: {x: 0, y: 4, z: 9}
   raycastMaxDistance: 50
-  crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 1afddc9070ee1cc48890de3a2e898efc,
     type: 3}
   audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
+  followUpVFXToPlayOnDestroy: []
+  shouldDestroyOnEnemyHit: 0
   shouldUseAttackerPositionForHitAngles: 0
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
