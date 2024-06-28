@@ -114,7 +114,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 512.94635, y: 129.41325}
+  m_SizeDelta: {x: 519.43964, y: 130.48285}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4097134337240977548
 CanvasRenderer:
@@ -623,6 +623,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2350534858321600750}
   - component: {fileID: 8592756189447898401}
+  - component: {fileID: 7114400852570474424}
   m_Layer: 5
   m_Name: MVP Presentation
   m_TagString: Untagged
@@ -661,10 +662,32 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1669132565601788581}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!223 &7114400852570474424
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669132565601788581}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &1969402936266705351
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,7 +763,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 144.98094}
-  m_SizeDelta: {x: 795.1097, y: 129.41325}
+  m_SizeDelta: {x: 804.4022, y: 130.48285}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5694737114806260832
 CanvasRenderer:
@@ -1648,7 +1671,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 95, y: -109.98901}
-  m_SizeDelta: {x: 211.99835, y: 53.491337}
+  m_SizeDelta: {x: 215.97426, y: 53.494286}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &178896850956810782
 CanvasRenderer:
@@ -2300,7 +2323,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -95, y: -83.24188}
-  m_SizeDelta: {x: 189.7223, y: 53.491337}
+  m_SizeDelta: {x: 194.47708, y: 53.494286}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &3177007659339409790
 CanvasRenderer:
@@ -2573,6 +2596,9 @@ MonoBehaviour:
   MVPCanvasGroup: {fileID: 8592756189447898401}
   MVPAccountCard: {fileID: 3283451991084073187}
   MVPPresentationCamera: {fileID: 2215811530945411253}
+  MVPKillsText: {fileID: 7331267047892496993}
+  MVPDeathsText: {fileID: 8800985494278265268}
+  MVPAssistsText: {fileID: 4922618374310089498}
 --- !u!225 &7744647505305684082
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2599,7 +2625,7 @@ GameObject:
   - component: {fileID: 2347048821256617058}
   - component: {fileID: 6643034202349908386}
   m_Layer: 5
-  m_Name: Assists Value
+  m_Name: Deaths Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2823,7 +2849,7 @@ GameObject:
   - component: {fileID: 2434405583527853170}
   - component: {fileID: 1831197319404631585}
   m_Layer: 5
-  m_Name: Assists Header
+  m_Name: Deaths Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
