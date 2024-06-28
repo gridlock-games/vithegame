@@ -447,13 +447,19 @@ namespace Vi.Core.GameModeManagers
 
         public string GetRoundTimerDisplayString()
         {
-            int minutes = (int)roundTimer.Value / 60;
-            float seconds = roundTimer.Value - (minutes * 60);
+            int roundTimerValue = Mathf.CeilToInt(roundTimer.Value);
+
+            int minutes = roundTimerValue / 60;
+            int seconds = roundTimerValue - (minutes * 60);
+
+            // Add a 0 in front of a single digit second
+            string secondsString = seconds.ToString();
+            if (secondsString.Length == 1) { secondsString = "0" + secondsString; }
 
             if (overtime.Value)
-                return "+" + minutes.ToString() + ":" + seconds.ToString("F0");
+                return "+" + minutes.ToString() + ":" + secondsString;
             else
-                return minutes.ToString() + ":" + seconds.ToString("F0");
+                return minutes.ToString() + ":" + secondsString;
         }
 
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
