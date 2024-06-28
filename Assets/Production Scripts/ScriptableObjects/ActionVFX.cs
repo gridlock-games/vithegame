@@ -38,6 +38,7 @@ namespace Vi.ScriptableObjects
 
         // Only used for TransformType.ConformToGround
         public Vector3 raycastOffset = new Vector3(0, 2, 3);
+        public Vector3 fartherRaycastOffset = new Vector3(0, 4, 5);
         public float raycastMaxDistance = 5;
         public Vector3 crossProductDirection = new Vector3(1, 0, 0);
         public Vector3 lookRotationUpDirection = new Vector3(0, 1, 0);

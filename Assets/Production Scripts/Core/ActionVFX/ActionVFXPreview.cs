@@ -31,11 +31,15 @@ namespace Vi.Core
             {
                 Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
                 RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                if (Application.isEditor) { Debug.DrawRay(startPos, Vector3.down * raycastMaxDistance, Color.red, 3); }
+                Vector3 fartherStartPos = transform.parent.position + transform.parent.rotation * fartherRaycastOffset;
+                RaycastHit[] fartherAllHits = Physics.RaycastAll(fartherStartPos, Vector3.down, raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                System.Array.Sort(fartherAllHits, (x, y) => x.distance.CompareTo(y.distance));
 
                 bool bHit = false;
+                bool fartherBHit = false;
                 RaycastHit floorHit = new RaycastHit();
+                RaycastHit fartherFloorHit = new RaycastHit();
 
                 foreach (RaycastHit hit in allHits)
                 {
@@ -44,19 +48,43 @@ namespace Vi.Core
                     break;
                 }
 
+                foreach (RaycastHit hit in fartherAllHits)
+                {
+                    fartherBHit = true;
+                    fartherFloorHit = hit;
+                    break;
+                }
+
+                if (Application.isEditor)
+                {
+                    if (bHit) { Debug.DrawLine(startPos, floorHit.point, Color.red, Time.deltaTime); }
+                    if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherFloorHit.point, Color.magenta, Time.deltaTime); }
+                }
+
                 ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
                 CanCast = bHit;
 
                 if (bHit)
                 {
-                    transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                    transform.rotation = Quaternion.LookRotation(Vector3.Cross(floorHit.normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                    if (fartherBHit)
+                    {
+                        transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
+                        Quaternion groundRotation = Quaternion.LookRotation(fartherFloorHit.point - transform.position, lookRotationUpDirection);
+                        transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
+                    }
+                    else
+                    {
+                        transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
+                        Quaternion groundRotation = Quaternion.LookRotation(Vector3.Cross(floorHit.normal, crossProductDirection), lookRotationUpDirection);
+                        transform.rotation = groundRotation * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                    }
                 }
                 else
                 {
                     transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
                     Vector3 normal = new Vector3(0, 1, 0);
-                    transform.rotation = Quaternion.LookRotation(Vector3.Cross(normal, crossProductDirection), lookRotationUpDirection) * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                    Quaternion groundRotation = Quaternion.LookRotation(Vector3.Cross(normal, crossProductDirection), lookRotationUpDirection);
+                    transform.rotation = groundRotation * transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
                 }
             }
             else
