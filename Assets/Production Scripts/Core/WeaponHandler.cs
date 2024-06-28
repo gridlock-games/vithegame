@@ -284,8 +284,8 @@ namespace Vi.Core
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
             actionPreviewVFXPrefab.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+            actionPreviewVFXPrefab.fartherRaycastOffset = actionClip.actionVFXList[0].fartherRaycastOffset;
             actionPreviewVFXPrefab.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
-            actionPreviewVFXPrefab.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
             actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
             actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
 
@@ -337,18 +337,27 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
+                    Vector3 fartherStartPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.fartherRaycastOffset;
                     bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    if (Application.isEditor) { Debug.DrawRay(startPos, Vector3.down * actionVFXPrefab.raycastMaxDistance, Color.red, 3); }
+                    bool fartherBHit = Physics.Raycast(fartherStartPos, Vector3.down, out RaycastHit fartherHit, actionVFXPrefab.raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
-                    if (bHit)
+                    if (Application.isEditor)
                     {
+                        if (bHit) { Debug.DrawLine(startPos, hit.point, Color.red, 2); }
+                        if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherHit.point, Color.magenta, 2); }
+                    }
+
+                    if (bHit & fartherBHit)
+                    {
+                        Vector3 spawnPosition = hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        Quaternion groundRotation = Quaternion.LookRotation(fartherHit.point - spawnPosition, actionVFXPrefab.lookRotationUpDirection);
                         vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(hit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            groundRotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
-                    else if (isPreviewVFX)
+                    else
                     {
                         vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
@@ -389,8 +398,8 @@ namespace Vi.Core
                 previewInstance.transformType = actionClip.actionVFXList[0].transformType;
                 previewInstance.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
                 previewInstance.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+                previewInstance.fartherRaycastOffset = actionClip.actionVFXList[0].fartherRaycastOffset;
                 previewInstance.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
-                previewInstance.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
                 previewInstance.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
                 previewInstance.weaponBone = actionClip.actionVFXList[0].weaponBone;
             }

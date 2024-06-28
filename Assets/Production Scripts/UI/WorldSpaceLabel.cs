@@ -83,7 +83,7 @@ namespace Vi.UI
 
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameDisplay.color = Color.white;
-            healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
+            healthFillImage.color = relativeTeamColor == Color.black | attributes.GetTeam() == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
         }
 
         private void RefreshRendererToFollow()

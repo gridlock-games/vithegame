@@ -725,10 +725,13 @@ namespace Vi.Core
                 }
             }
 
-            if (attack.shouldFlinch | IsRaging())
+            if (!IsUninterruptable())
             {
-                movementHandler.Flinch(attack.GetFlinchAmount());
-                if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                if (attack.shouldFlinch | IsRaging())
+                {
+                    movementHandler.Flinch(attack.GetFlinchAmount());
+                    if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                }
             }
 
             lastAttackingAttributes = attacker;

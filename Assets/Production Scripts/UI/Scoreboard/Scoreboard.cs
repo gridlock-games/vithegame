@@ -72,7 +72,7 @@ namespace Vi.UI
                 PlayerDataManager.Team team = elementList[i].GetTeam();
                 if (team != lastTeam)
                 {
-                    if (team != PlayerDataManager.Team.Competitor)
+                    if (team != PlayerDataManager.Team.Competitor & team != PlayerDataManager.Team.Peaceful)
                     {
                         ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, scoreboardElementParent).GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);

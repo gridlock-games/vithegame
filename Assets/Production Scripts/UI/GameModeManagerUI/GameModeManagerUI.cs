@@ -28,6 +28,9 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup MVPCanvasGroup;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
+        [SerializeField] private Text MVPKillsText;
+        [SerializeField] private Text MVPDeathsText;
+        [SerializeField] private Text MVPAssistsText;
 
         protected GameModeManager gameModeManager;
         protected void Start()
@@ -147,6 +150,16 @@ namespace Vi.UI
 
         private IEnumerator CreateMVPPreview()
         {
+            MVPKillsText.text = "";
+            MVPDeathsText.text = "";
+            MVPAssistsText.text = "";
+
+            yield return new WaitUntil(() => gameModeManager.GetMVPScore().isValid);
+
+            MVPKillsText.text = gameModeManager.GetMVPScore().cumulativeKills.ToString();
+            MVPDeathsText.text = gameModeManager.GetMVPScore().cumulativeDeaths.ToString();
+            MVPAssistsText.text = gameModeManager.GetMVPScore().cumulativeAssists.ToString();
+
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
 
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
@@ -168,7 +181,7 @@ namespace Vi.UI
 
             yield return new WaitUntil(() => animationHandler.Animator);
 
-            animationHandler.Animator.CrossFade("LightAttack1", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFade("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private GameObject MVPPreviewObject;
