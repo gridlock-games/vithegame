@@ -648,8 +648,11 @@ namespace Vi.UI
             if (lastPlayersString != playersString)
             {
                 RefreshPlayerCards();
-                characterLockTimer.Value = characterLockTime;
-                startGameTimer.Value = startGameTime;
+                if (IsServer)
+                {
+                    characterLockTimer.Value = characterLockTime;
+                    startGameTimer.Value = startGameTime;
+                }
             }
             lastPlayersString = playersString;
 
