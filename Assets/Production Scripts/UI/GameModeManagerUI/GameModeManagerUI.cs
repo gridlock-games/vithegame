@@ -147,6 +147,8 @@ namespace Vi.UI
 
         private IEnumerator CreateMVPPreview()
         {
+            yield return new WaitUntil(() => gameModeManager.GetMVPScore().isValid);
+
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
 
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
