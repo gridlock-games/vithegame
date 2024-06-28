@@ -267,18 +267,18 @@ namespace Vi.ScriptableObjects
                     {
                         string materialName = "";
                         string filename = Path.GetFileNameWithoutExtension(textureFilePath);
-                        if (filename.Contains("Cloth"))
+                        if (filename.Contains("Cloth") | filename.Contains("cloth"))
                         {
                             materialName = "M_Cloth";
                         }
-                        else if (filename.Contains("Armor"))
+                        else if (filename.Contains("Armor") | filename.Contains("armor"))
                         {
                             materialName = "M_Armor";
                         }
                         else
                         {
-                            Debug.LogError("Not sure how to handle texture path - " + filename);
-                            continue;
+                            Debug.LogWarning("Not sure how to handle texture path - " + filename);
+                            materialName = "M_Armor";
                         }
 
                         if (filename.Contains("Normal"))
@@ -352,8 +352,8 @@ namespace Vi.ScriptableObjects
                                 }
                                 else
                                 {
-                                    Debug.LogError("Not sure how to handle material - " + skinnedMeshRenderer.sharedMaterials[i]);
-                                    newMaterials[i] = null;
+                                    Debug.LogWarning("Not sure how to handle material - " + skinnedMeshRenderer.sharedMaterials[i]);
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Armor"]);
                                 }
                             }
                             skinnedMeshRenderer.sharedMaterials = newMaterials;
