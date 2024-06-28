@@ -645,7 +645,12 @@ namespace Vi.UI
                 playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
             }
 
-            if (lastPlayersString != playersString) { RefreshPlayerCards(); }
+            if (lastPlayersString != playersString)
+            {
+                RefreshPlayerCards();
+                characterLockTimer.Value = characterLockTime;
+                startGameTimer.Value = startGameTime;
+            }
             lastPlayersString = playersString;
 
             if (IsClient)
