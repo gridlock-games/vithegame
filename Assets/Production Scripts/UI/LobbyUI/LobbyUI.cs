@@ -314,6 +314,12 @@ namespace Vi.UI
 
         private IEnumerator Init()
         {
+            primaryWeaponIcon.enabled = false;
+            secondaryWeaponIcon.enabled = false;
+
+            primaryWeaponText.enabled = false;
+            secondaryWeaponText.enabled = false;
+
             foreach (Button button in loadoutPresetButtons)
             {
                 button.interactable = false;
@@ -322,7 +328,13 @@ namespace Vi.UI
             lockCharacterButton.interactable = false;
             
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-            
+
+            primaryWeaponIcon.enabled = true;
+            secondaryWeaponIcon.enabled = true;
+
+            primaryWeaponText.enabled = true;
+            secondaryWeaponText.enabled = true;
+
             foreach (Button button in loadoutPresetButtons)
             {
                 button.interactable = true;
@@ -333,8 +345,6 @@ namespace Vi.UI
             lockCharacterButton.onClick.RemoveAllListeners();
             lockCharacterButton.onClick.AddListener(LockCharacter);
             lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
-
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
             RefreshGameMode();
 
