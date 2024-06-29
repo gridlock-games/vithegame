@@ -88,8 +88,6 @@ namespace Vi.Core
                         if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                         {
                             SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                            if (equipmentSkinnedMeshRenderers.Length > 1)
-                                equipmentSkinnedMeshRenderers[1].materials = wearableEquipmentRendererDefinition.skinnedMeshRenderers[0].materials;
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
                         }
                         else
