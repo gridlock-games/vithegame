@@ -880,6 +880,8 @@ namespace Vi.Core
             }
         }
 
+        public Weapon.ArmorType GetArmorType() { return animatorReference.GetArmorType(); }
+
         AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {

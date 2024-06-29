@@ -102,12 +102,45 @@ namespace Vi.ScriptableObjects
             return attackSoundEffect.attackSoundEffects[Random.Range(0, attackSoundEffect.attackSoundEffects.Length)];
         }
 
-        public AudioClip drawSoundEffect;
-        public AudioClip sheatheSoundEffect;
+        public enum ArmorType
+        {
+            Cloth,
+            Metal,
+            Flesh
+        }
 
-        [Header("Recieve Hit Effects")]
-        public AudioClip hitAudioClip;
-        public AudioClip knockbackHitAudioClip;
+        [System.Serializable]
+        private class InflictHitSoundEffect
+        {
+            public ActionClip.Ailment ailment;
+            public ArmorType armorType;
+            public AudioClip[] hitSounds = new AudioClip[0];
+        }
+
+        [Header("Hit Effects")]
+        [SerializeField] private List<InflictHitSoundEffect> inflictHitSoundEffects = new List<InflictHitSoundEffect>();
+
+        public AudioClip GetInflictHitSoundEffect(ArmorType armorType, ActionClip.Ailment ailment)
+        {
+            InflictHitSoundEffect inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.ailment == ailment);
+            if (inflictHitSoundEffect == null)
+            {
+                inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);
+                if (inflictHitSoundEffect == null)
+                {
+                    return inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None).hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                }
+                else // If armor effect isn't null
+                {
+                    return inflictHitSoundEffect.hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                }
+            }
+            else // If ailment effect isn't null
+            {
+                return inflictHitSoundEffect.hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+            }
+        }
+
         public GameObject hitVFXPrefab;
 
         [Header("Block Effects")]

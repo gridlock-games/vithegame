@@ -327,8 +327,10 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
+            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
+                attackAilment = ActionClip.Ailment.Death;
                 ailment.Value = ActionClip.Ailment.Death;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
@@ -349,7 +351,7 @@ namespace Vi.Core
                 animationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, false);
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, animationHandler.GetArmorType(), attackAilment);
             AddHP(damage);
             return true;
         }
@@ -705,7 +707,7 @@ namespace Vi.Core
             {
                 if (HPDamage != 0)
                 {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
+                    RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), attackAilment);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -903,25 +905,25 @@ namespace Vi.Core
         private const float attackerRageToBeAddedOnHit = 2;
         private const float victimRageToBeAddedOnHit = 1;
 
-        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, ActionClip.Ailment ailment)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, ailment), impactPosition);
 
-            RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
+            RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, ailment);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, ailment), impactPosition);
         }
 
         private void RenderHitGlowOnly()

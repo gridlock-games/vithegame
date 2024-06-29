@@ -34,9 +34,24 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e36e94847e1aa4a87af96873e4ad3e8f, type: 3}
     - {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
     - {fileID: 8300000, guid: dc3b04d3711af434d9ef28039a29950f, type: 3}
-  drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
-  sheatheSoundEffect: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
   hitAudioClip: {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
+  inflictHitSoundEffects:
+  - ailment: 1
+    armorType: 0
+    hitSounds:
+    - {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f, type: 3}
+  - ailment: 0
+    armorType: 0
+    hitSounds:
+    - {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
+  - ailment: 0
+    armorType: 1
+    hitSounds:
+    - {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
+  - ailment: 0
+    armorType: 2
+    hitSounds:
+    - {fileID: 8300000, guid: 9fef7f786a92f4f1f9051a811a7734ac, type: 3}
   knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
     type: 3}
   hitVFXPrefab: {fileID: 1008842686038376, guid: 42c427f9d12527f4b86f4e770b4ce034,
