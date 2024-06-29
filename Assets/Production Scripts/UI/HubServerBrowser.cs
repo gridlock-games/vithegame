@@ -26,6 +26,11 @@ namespace Vi.UI
             errorText.text = "";
         }
 
+        private void OnEnable()
+        {
+            RefreshServerBrowser();
+        }
+
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
         List<WebRequestManager.Server> emptyLobbyServerList = new List<WebRequestManager.Server>();
         private float lastErrorTextDisplayTime = Mathf.NegativeInfinity;

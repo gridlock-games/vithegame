@@ -4,34 +4,41 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ActionVFXPhysicsProjectile : ActionVFX
+    public class ActionVFXPhysicsProjectile : GameInteractiveActionVFX
     {
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
         [SerializeField] private float timeToActivateGravity = 0;
         [SerializeField] private float killDistance = 50;
-        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
 
-        private Attributes attacker;
-        private ActionClip attack;
         private bool initialized;
 
         public void InitializeVFX(Attributes attacker, ActionClip attack)
         {
-            if (initialized) { Debug.LogError("ActionVFXPhysicsProjectile.Initialize() already called, why are you calling it again idiot?"); return; }
+            ClearInitialization();
 
             this.attacker = attacker;
             this.attack = attack;
             initialized = true;
 
-            GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
+            rb.AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
         }
 
+        private void ClearInitialization()
+        {
+            attacker = null;
+            attack = null;
+            initialized = false;
+        }
+
+        private Rigidbody rb;
         private void Awake()
         {
+            rb = GetComponent<Rigidbody>();
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -46,9 +53,9 @@ namespace Vi.Core
 
         private IEnumerator ActivateGravityCoroutine()
         {
-            GetComponent<Rigidbody>().useGravity = false;
+            rb.useGravity = false;
             yield return new WaitForSeconds(timeToActivateGravity);
-            GetComponent<Rigidbody>().useGravity = true;
+            rb.useGravity = true;
         }
 
         private Vector3 startPosition;
@@ -62,29 +69,43 @@ namespace Vi.Core
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
         }
 
-        private new void OnDisable()
-        {
-            base.OnDisable();
-            foreach (GameObject prefab in VFXToPlayOnDestroy)
-            {
-                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
-                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(g));
-            }
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
-            if (other.isTrigger) { return; }
 
+            bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                if (NetworkManager.Singleton.IsServer) networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                if (NetworkManager.Singleton.IsServer)
+                {
+                    bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                }
+            }
+            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            {
+                shouldDestroy = true;
+                actionVFX.OnHit(attacker);
+            }
+            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
+            {
+                shouldDestroy = true;
+                gameItem.OnHit(attacker);
+            }
+            else
+            {
+                // Dont despawn projectiles that come from the same attacker
+                if (other.transform.root.TryGetComponent(out ActionVFXPhysicsProjectile otherProjectile))
+                {
+                    if (otherProjectile.attacker == attacker) { return; }
+                }
             }
 
-            Destroy(gameObject);
+            if (!other.isTrigger | shouldDestroy)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(gameObject);
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(ActionVFXParticleSystem))]
     [CanEditMultipleObjects]
-    public class ActionVFXParticleSystemEditor : ActionVFXEditor
+    public class ActionVFXParticleSystemEditor : GameInteractiveActionVFXEditor
     {
         private SerializedProperty spShouldUseAttackerPositionForHitAngles;
 
@@ -35,6 +35,9 @@ namespace Vi.Editor
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            EditorGUILayout.LabelField("Action VFX Particle System", EditorStyles.whiteLargeLabel);
+
             EditorGUILayout.PropertyField(spShouldUseAttackerPositionForHitAngles);
 
             EditorGUILayout.PropertyField(spShouldOverrideMaxHits);

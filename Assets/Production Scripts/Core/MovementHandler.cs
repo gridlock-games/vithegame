@@ -105,7 +105,7 @@ namespace Vi.Core
 
         public bool CanMove()
 		{
-			if (GameModeManager.Singleton) { return !GameModeManager.Singleton.ShouldDisplayNextGameAction(); }
+			if (GameModeManager.Singleton) { return !GameModeManager.Singleton.ShouldDisplayNextGameAction() & !GameModeManager.Singleton.IsGameOver(); }
 			return true;
 		}
 	}

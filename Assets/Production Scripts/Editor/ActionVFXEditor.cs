@@ -17,8 +17,8 @@ namespace Vi.Editor
         private SerializedProperty spTransformType;
 
         private SerializedProperty spRaycastOffset;
+        private SerializedProperty spFartherRaycastOffset;
         private SerializedProperty spRaycastMaxDistance;
-        private SerializedProperty spCrossProductDirection;
         private SerializedProperty spLookRotationUpDirection;
 
         private SerializedProperty spOnActivateVFXSpawnNormalizedTime;
@@ -27,6 +27,8 @@ namespace Vi.Editor
 
         protected SerializedProperty spAudioClipToPlayOnAwake;
         protected SerializedProperty spAudioClipToPlayOnDestroy;
+
+        private SerializedProperty spVFXToPlayOnDestroy;
 
         protected void OnEnable()
         {
@@ -37,8 +39,8 @@ namespace Vi.Editor
             spTransformType = serializedObject.FindProperty("transformType");
 
             spRaycastOffset = serializedObject.FindProperty("raycastOffset");
+            spFartherRaycastOffset = serializedObject.FindProperty("fartherRaycastOffset");
             spRaycastMaxDistance = serializedObject.FindProperty("raycastMaxDistance");
-            spCrossProductDirection = serializedObject.FindProperty("crossProductDirection");
             spLookRotationUpDirection = serializedObject.FindProperty("lookRotationUpDirection");
 
             spOnActivateVFXSpawnNormalizedTime = serializedObject.FindProperty("onActivateVFXSpawnNormalizedTime");
@@ -47,10 +49,13 @@ namespace Vi.Editor
 
             spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
             spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
+
+            spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
         }
 
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.LabelField("Action VFX", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spVFXPositionOffset);
             EditorGUILayout.PropertyField(spVFXRotationOffset);
 
@@ -64,8 +69,8 @@ namespace Vi.Editor
             if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.ConformToGround)
             {
                 EditorGUILayout.PropertyField(spRaycastOffset);
+                EditorGUILayout.PropertyField(spFartherRaycastOffset);
                 EditorGUILayout.PropertyField(spRaycastMaxDistance);
-                EditorGUILayout.PropertyField(spCrossProductDirection);
                 EditorGUILayout.PropertyField(spLookRotationUpDirection);
             }
 
@@ -76,6 +81,9 @@ namespace Vi.Editor
 
             EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
+
+            EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);
+            EditorGUILayout.Space();
 
             serializedObject.ApplyModifiedProperties();
         }

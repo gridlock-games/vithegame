@@ -11,6 +11,15 @@ namespace Vi.Core
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
 
+        [Header("MVP Presentation Info")]
+        public Vector3 previewCharacterPosition;
+
+        public static readonly Vector3 previewCharacterPositionOffset = new Vector3(0, 0.3f, -7);
+        public static readonly Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
+
+        public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 2.033f, -9.592f);
+        public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(18.07f, 0, 0);
+
         [Header("Damage Circle")]
         [SerializeField] private Vector3 damageCircleMaxScale = new Vector3(100, 200, 100);
         [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);

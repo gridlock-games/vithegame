@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -26,6 +27,8 @@ namespace Vi.Player
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                RefreshStatus();
             }
             else
             {
@@ -293,6 +296,15 @@ namespace Vi.Player
             }
         }
 
+
+        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
+        private new void Awake()
+        {
+            base.Awake();
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            RefreshStatus();
+        }
+
         private Vector3 targetPosition;
         private void Start()
         {
@@ -312,15 +324,33 @@ namespace Vi.Player
         }
 
         private Attributes followTarget;
+        private float followCamAngleOffset;
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
 
         private const float lerpSpeed = 8;
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
+        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
 
         [SerializeField] private float collisionPositionOffset = -0.3f;
 
+        public ulong GetRoundTripTime() { return roundTripTime.Value; }
+
+        private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
+
+        private void RefreshStatus()
+        {
+            if (IsOwner)
+            {
+                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            }
+        }
+
+        private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private new void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             base.Update();
             if (!IsLocalPlayer) { return; }
 
@@ -362,6 +392,7 @@ namespace Vi.Player
                 environmentViewPosition = Vector3.zero;
                 environmentViewRotation = Quaternion.identity;
                 followTarget = null;
+                followCamAngleOffset = 0;
             }
 
             if (shouldViewEnvironment)
@@ -373,13 +404,15 @@ namespace Vi.Player
             }
             else if (followTarget)
             {
-                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * followTargetOffset;
-                Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position - transform.position);
+                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
+                Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position + followTargetLookAtPositionOffset - transform.position);
 
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lerpSpeed);
                 
                 this.targetPosition = transform.position;
+
+                followCamAngleOffset += GetLookInput().x;
             }
             else
             {
@@ -406,6 +439,8 @@ namespace Vi.Player
                 transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
             ResetLookInput();
+
+            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
     }
 }

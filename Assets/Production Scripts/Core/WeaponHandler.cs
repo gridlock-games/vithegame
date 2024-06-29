@@ -38,20 +38,22 @@ namespace Vi.Core
         }
 
         public bool WeaponInitialized { get; private set; }
-        public void SetNewWeapon(Weapon weapon, RuntimeAnimatorController runtimeAnimatorController)
+        public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
+        public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
             if (IsOwner) { aiming.Value = false; }
 
             weaponInstance = weapon;
-            StartCoroutine(SwapAnimatorController(runtimeAnimatorController));
+            AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
+            StartCoroutine(SwapAnimatorController());
             EquipWeapon();
             WeaponInitialized = true;
         }
 
-        private IEnumerator SwapAnimatorController(RuntimeAnimatorController runtimeAnimatorController)
+        private IEnumerator SwapAnimatorController()
         {
             yield return new WaitUntil(() => !animationHandler.IsAiming());
-            animationHandler.Animator.runtimeAnimatorController = runtimeAnimatorController;
+            animationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
@@ -112,6 +114,7 @@ namespace Vi.Core
             shooterWeapons.Clear();
 
             CanAim = false;
+            canADS = false;
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -148,8 +151,12 @@ namespace Vi.Core
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
                         ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
-                        if (shooterWeapon) { shooterWeapons.Add(shooterWeapon); }
-                        CanAim = shooterWeapon | CanAim;
+                        if (shooterWeapon)
+                        {
+                            shooterWeapons.Add(shooterWeapon);
+                            CanAim = true;
+                            canADS = shooterWeapon.CanADS() | canADS;
+                        }
                     }
                     broken = true;
                     break;
@@ -277,8 +284,8 @@ namespace Vi.Core
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
             actionPreviewVFXPrefab.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+            actionPreviewVFXPrefab.fartherRaycastOffset = actionClip.actionVFXList[0].fartherRaycastOffset;
             actionPreviewVFXPrefab.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
-            actionPreviewVFXPrefab.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
             actionPreviewVFXPrefab.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
             actionPreviewVFXPrefab.weaponBone = actionClip.actionVFXList[0].weaponBone;
 
@@ -330,18 +337,27 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
+                    Vector3 fartherStartPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.fartherRaycastOffset;
                     bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    if (Application.isEditor) { Debug.DrawRay(startPos, Vector3.down * actionVFXPrefab.raycastMaxDistance, Color.red, 3); }
+                    bool fartherBHit = Physics.Raycast(fartherStartPos, Vector3.down, out RaycastHit fartherHit, actionVFXPrefab.raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
-                    if (bHit)
+                    if (Application.isEditor)
                     {
+                        if (bHit) { Debug.DrawLine(startPos, hit.point, Color.red, 2); }
+                        if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherHit.point, Color.magenta, 2); }
+                    }
+
+                    if (bHit & fartherBHit)
+                    {
+                        Vector3 spawnPosition = hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        Quaternion groundRotation = Quaternion.LookRotation(fartherHit.point - spawnPosition, actionVFXPrefab.lookRotationUpDirection);
                         vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
-                            Quaternion.LookRotation(Vector3.Cross(hit.normal, actionVFXPrefab.crossProductDirection), actionVFXPrefab.lookRotationUpDirection) * attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
+                            groundRotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                             isPreviewVFX ? attackerTransform : null
                         );
                     }
-                    else if (isPreviewVFX)
+                    else
                     {
                         vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
@@ -382,8 +398,8 @@ namespace Vi.Core
                 previewInstance.transformType = actionClip.actionVFXList[0].transformType;
                 previewInstance.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
                 previewInstance.raycastOffset = actionClip.actionVFXList[0].raycastOffset;
+                previewInstance.fartherRaycastOffset = actionClip.actionVFXList[0].fartherRaycastOffset;
                 previewInstance.raycastMaxDistance = actionClip.actionVFXList[0].raycastMaxDistance;
-                previewInstance.crossProductDirection = actionClip.actionVFXList[0].crossProductDirection;
                 previewInstance.lookRotationUpDirection = actionClip.actionVFXList[0].lookRotationUpDirection;
                 previewInstance.weaponBone = actionClip.actionVFXList[0].weaponBone;
             }
@@ -393,7 +409,7 @@ namespace Vi.Core
                 if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                 {
                     actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
                 else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                 {
@@ -401,7 +417,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(vfxInstance));
                 }
 
                 if (isPreviewVFX) { vfxInstance.transform.localScale = actionClip.previewActionVFXScale; }
@@ -414,44 +430,6 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
-        }
-
-        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
-        {
-            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!particleSystem.isPlaying) { break; }
-                }
-            }
-
-            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!audioSource.isPlaying) { break; }
-                }
-            }
-
-            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!visualEffect.HasAnySystemAwake()) { break; }
-                }
-            }
-
-            ObjectPoolingManager.ReturnObjectToPool(vfxInstance);
         }
 
         public bool IsInAnticipation { get; private set; }
@@ -522,16 +500,23 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponBone weaponBone in CurrentActionClip.effectedWeaponBones)
                     {
-                        if (weaponInstances[weaponBone])
+                        if (weaponInstances.TryGetValue(weaponBone, out RuntimeWeapon runtimeWeapon))
                         {
-                            // Don't play sound effects for shooter weapons here
-                            if (weaponInstances[weaponBone].GetComponent<ShooterWeapon>()) { continue; }
+                            if (runtimeWeapon)
+                            {
+                                // Don't play sound effects for shooter weapons here
+                                if (runtimeWeapon is ShooterWeapon) { continue; }
 
-                            AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
-                            if (attackSoundEffect)
-                                AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, weaponInstances[weaponBone].transform.position);
-                            else if (Application.isEditor)
-                                Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                                AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
+                                if (attackSoundEffect)
+                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position);
+                                else if (Application.isEditor)
+                                    Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
+                            }
+                            else
+                            {
+                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            }
                         }
                         else
                         {
@@ -647,6 +632,7 @@ namespace Vi.Core
         }
 
         public bool CanAim { get; private set; }
+        private bool canADS;
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -681,7 +667,7 @@ namespace Vi.Core
                 if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
             }
 
-            if (CanAim)
+            if (canADS)
             {
                 if (NetworkObject.IsPlayerObject)
                 {

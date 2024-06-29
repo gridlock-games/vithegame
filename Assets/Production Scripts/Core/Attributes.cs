@@ -10,7 +10,7 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(WeaponHandler))]
-    public class Attributes : CombatAgent
+    public class Attributes : NetworkBehaviour
     {
         [SerializeField] private GameObject worldSpaceLabelPrefab;
 
@@ -570,7 +570,6 @@ namespace Vi.Core
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
             AddStamina(-attack.staminaDamage);
-            //AddSpirit(-attack.spiritDamage);
             if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
 
@@ -607,14 +606,14 @@ namespace Vi.Core
                     break;
                 case ActionClip.HitReactionType.Blocking:
                     lastBlockTime = Time.time;
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage)
+                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
                     {
                         AddSpirit(HPDamage * 0.5f);
                         HPDamage = 0;
                     }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
+                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
                     {
-                        AddSpirit(Mathf.NegativeInfinity);
+                        AddSpirit(-GetMaxSpirit());
                         AddStamina(-GetMaxStamina() * 0.3f);
                         shouldPlayHitReaction = true;
                         HPDamage *= 0.7f;
@@ -726,10 +725,13 @@ namespace Vi.Core
                 }
             }
 
-            if (attack.shouldFlinch | IsRaging())
+            if (!IsUninterruptable())
             {
-                movementHandler.Flinch(attack.GetFlinchAmount());
-                if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                if (attack.shouldFlinch | IsRaging())
+                {
+                    movementHandler.Flinch(attack.GetFlinchAmount());
+                    if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                }
             }
 
             lastAttackingAttributes = attacker;
@@ -906,7 +908,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
-            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
 
@@ -917,7 +919,7 @@ namespace Vi.Core
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
         {
             GlowRenderer.RenderHit();
-            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
             AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
         }
@@ -942,7 +944,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
             GlowRenderer.RenderBlock();
-            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
 
             RenderBlockClientRpc(impactPosition);
@@ -952,7 +954,7 @@ namespace Vi.Core
         private void RenderBlockClientRpc(Vector3 impactPosition)
         {
             GlowRenderer.RenderBlock();
-            PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
         }
 
@@ -962,7 +964,10 @@ namespace Vi.Core
 
         private void RefreshStatus()
         {
-            pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            if (IsOwner)
+            {
+                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            }
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -1110,7 +1115,9 @@ namespace Vi.Core
             if (current == ActionClip.Ailment.Death)
             {
                 StartCoroutine(ClearDamageMappingAfter1Frame());
+                spiritRegenActivateTime = Mathf.NegativeInfinity;
                 weaponHandler.OnDeath();
+                animationHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());

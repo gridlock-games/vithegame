@@ -235,7 +235,7 @@ namespace Vi.ScriptableObjects
         [ContextMenu("Refresh Equipment List")]
         private void RefreshEquipmentList()
         {
-            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId));
+            equipmentOptions.RemoveAll(item => string.IsNullOrEmpty(item.itemWebId) & !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType));
 
             // Clone Folder Structure first
             string destinationTopFolder = @"Assets\Production\Prefabs\WearableEquipment";
@@ -267,18 +267,18 @@ namespace Vi.ScriptableObjects
                     {
                         string materialName = "";
                         string filename = Path.GetFileNameWithoutExtension(textureFilePath);
-                        if (filename.Contains("Cloth"))
+                        if (filename.Contains("Cloth") | filename.Contains("cloth"))
                         {
                             materialName = "M_Cloth";
                         }
-                        else if (filename.Contains("Armor"))
+                        else if (filename.Contains("Armor") | filename.Contains("armor"))
                         {
                             materialName = "M_Armor";
                         }
                         else
                         {
-                            Debug.LogError("Not sure how to handle texture path - " + filename);
-                            continue;
+                            Debug.LogWarning("Not sure how to handle texture path - " + filename);
+                            materialName = "M_Armor";
                         }
 
                         if (filename.Contains("Normal"))
@@ -329,6 +329,9 @@ namespace Vi.ScriptableObjects
                     foreach (string modelFilePath in Directory.GetFiles(Path.Join(armorSetFolder, "Mesh"), "*.fbx", SearchOption.TopDirectoryOnly))
                     {
                         string dest = Path.Join(Path.Join(destinationTopFolder, raceAndGender.ToString()), armorSetName);
+                        string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
+                        if (File.Exists(prefabVariantPath)) { continue; }
+
                         Directory.CreateDirectory(dest);
 
                         GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(modelFilePath);
@@ -349,8 +352,8 @@ namespace Vi.ScriptableObjects
                                 }
                                 else
                                 {
-                                    Debug.LogError("Not sure how to handle material - " + skinnedMeshRenderer.sharedMaterials[i]);
-                                    newMaterials[i] = null;
+                                    Debug.LogWarning("Not sure how to handle material - " + skinnedMeshRenderer.sharedMaterials[i]);
+                                    newMaterials[i] = AssetDatabase.LoadAssetAtPath<Material>(materialDictionary["M_Armor"]);
                                 }
                             }
                             skinnedMeshRenderer.sharedMaterials = newMaterials;
@@ -378,7 +381,6 @@ namespace Vi.ScriptableObjects
                             WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType);
                             if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
 
-                            string prefabVariantPath = Path.Join(dest, Path.GetFileNameWithoutExtension(modelFilePath) + ".prefab");
                             PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
                             DestroyImmediate(modelSource);
 

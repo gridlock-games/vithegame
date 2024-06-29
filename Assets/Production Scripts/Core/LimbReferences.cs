@@ -42,6 +42,19 @@ namespace Vi.Core
                             rightHandAimBodyInvertedConstraint.data.offset = bodyAimIKOffset;
                         }
                         break;
+                    case BodyAimType.None:
+                        if (rightHandAimBodyConstraint)
+                        {
+                            rightHandAimBodyConstraint.weight = 0;
+                            rightHandAimBodyConstraint.data.offset = Vector3.zero;
+                        }
+
+                        if (rightHandAimBodyInvertedConstraint)
+                        {
+                            rightHandAimBodyInvertedConstraint.weight = 0;
+                            rightHandAimBodyInvertedConstraint.data.offset = Vector3.zero;
+                        }
+                        break;
                     default:
                         Debug.LogError("Not sure how to handle body type " + bodyAimType);
                         break;
@@ -67,6 +80,19 @@ namespace Vi.Core
                         {
                             leftHandAimBodyInvertedConstraint.weight = shouldAimBody ? 1 : 0;
                             leftHandAimBodyInvertedConstraint.data.offset = bodyAimIKOffset;
+                        }
+                        break;
+                    case BodyAimType.None:
+                        if (leftHandAimBodyConstraint)
+                        {
+                            leftHandAimBodyConstraint.weight = 0;
+                            leftHandAimBodyConstraint.data.offset = Vector3.zero;
+                        }
+
+                        if (leftHandAimBodyInvertedConstraint)
+                        {
+                            leftHandAimBodyInvertedConstraint.weight = 0;
+                            leftHandAimBodyInvertedConstraint.data.offset = Vector3.zero;
                         }
                         break;
                     default:
@@ -196,7 +222,8 @@ namespace Vi.Core
         public enum BodyAimType
         {
             Normal,
-            Inverted
+            Inverted,
+            None
         }
 
         private enum Axis

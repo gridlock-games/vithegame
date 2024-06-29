@@ -24,6 +24,8 @@ namespace Vi.Core.GameModeManagers
         [Header("Leave respawn time as 0 to disable respawns")]
         [SerializeField] private float respawnTime = 5;
 
+        protected const float overtimeDuration = 20;
+
         public int GetNumberOfRoundsWinsToWinGame() { return numberOfRoundsWinsToWinGame; }
 
         public float GetRespawnTime() { return respawnTime; }
@@ -347,11 +349,32 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public PlayerScore GetMVPScore() { return MVPScore.Value; }
+
         protected NetworkVariable<bool> gameOver = new NetworkVariable<bool>();
+        protected NetworkVariable<PlayerScore> MVPScore = new NetworkVariable<PlayerScore>();
         protected virtual void OnGameEnd(int[] winningPlayersDataIds)
         {
             gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
+
+            if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
+            {
+                List<PlayerScore> highestKillPlayers = GetHighestKillPlayers();
+                if (highestKillPlayers.Count > 1)
+                {
+                    float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
+                    MVPScore.Value = highestKillPlayers.Find(item => item.cumulativeDamageDealt == highestDamage);
+                }
+                else if (highestKillPlayers.Count == 1) // If there is only 1 entry in the list
+                {
+                    MVPScore.Value = highestKillPlayers[0];
+                }
+                else
+                {
+                    Debug.LogError("Couldn't find an MVP!");
+                }
+            }
         }
 
         private void EndGamePrematurely(string gameEndMessage)
@@ -426,18 +449,25 @@ namespace Vi.Core.GameModeManagers
 
         public string GetRoundTimerDisplayString()
         {
-            int minutes = (int)roundTimer.Value / 60;
-            float seconds = roundTimer.Value - (minutes * 60);
+            int roundTimerValue = Mathf.CeilToInt(roundTimer.Value);
+
+            int minutes = roundTimerValue / 60;
+            int seconds = roundTimerValue - (minutes * 60);
+
+            // Add a 0 in front of a single digit second
+            string secondsString = seconds.ToString();
+            if (secondsString.Length == 1) { secondsString = "0" + secondsString; }
 
             if (overtime.Value)
-                return "+" + minutes.ToString() + ":" + seconds.ToString("F0");
+                return "+" + minutes.ToString() + ":" + secondsString;
             else
-                return minutes.ToString() + ":" + seconds.ToString("F0");
+                return minutes.ToString() + ":" + secondsString;
         }
 
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
 
         public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public bool IsGameOver() { return gameOver.Value; }
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
@@ -584,7 +614,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (gameOver.Value)
                 {
-                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { NetSceneManager.Singleton.LoadScene("Lobby"); }
+                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { StartCoroutine(DisplayPostGameEvents()); }
                 }
                 else
                 {
@@ -593,12 +623,50 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public enum PostGameStatus
+        {
+            None,
+            MVP,
+            Scoreboard
+        }
+
+        public PostGameStatus GetPostGameStatus() { return postGameStatus.Value; }
+        private NetworkVariable<PostGameStatus> postGameStatus = new NetworkVariable<PostGameStatus>(PostGameStatus.None);
+
+        private IEnumerator DisplayPostGameEvents()
+        {
+            if (GetMVPScore().isValid)
+            {
+                // MVP Presentation
+                postGameStatus.Value = PostGameStatus.MVP;
+                yield return new WaitForSeconds(7.5f);
+            }
+            
+            // Scoreboard
+            postGameStatus.Value = PostGameStatus.Scoreboard;
+
+            yield return new WaitForSeconds(7.5f);
+
+            // Return to Lobby
+            NetSceneManager.Singleton.LoadScene("Lobby");
+        }
+
         protected List<PlayerScore> GetHighestKillPlayers()
         {
-            List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
+            List<PlayerScore> allPlayerScores = new List<PlayerScore>();
             for (int i = 0; i < scoreList.Count; i++)
             {
-                PlayerScore playerScore = scoreList[i];
+                allPlayerScores.Add(scoreList[i]);
+            }
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
+            {
+                allPlayerScores.Add(disconnectedScoreList[i].playerScore);
+            }
+
+            List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
+            for (int i = 0; i < allPlayerScores.Count; i++)
+            {
+                PlayerScore playerScore = allPlayerScores[i];
                 if (highestKillPlayerScores.Count > 0)
                 {
                     if (playerScore.killsThisRound > highestKillPlayerScores[0].killsThisRound)
@@ -785,6 +853,7 @@ namespace Vi.Core.GameModeManagers
             public float cumulativeDamageRecieved;
             public float damageRecievedThisRound;
             public int roundWins;
+            public bool isValid;
 
             public PlayerScore(int id)
             {
@@ -800,6 +869,7 @@ namespace Vi.Core.GameModeManagers
                 cumulativeDamageRecieved = 0;
                 damageRecievedThisRound = 0;
                 roundWins = 0;
+                isValid = true;
             }
 
             public void ResetRoundVariables()
@@ -828,6 +898,7 @@ namespace Vi.Core.GameModeManagers
                 serializer.SerializeValue(ref cumulativeDamageRecieved);
                 serializer.SerializeValue(ref damageRecievedThisRound);
                 serializer.SerializeValue(ref roundWins);
+                serializer.SerializeValue(ref isValid);
             }
         }
 

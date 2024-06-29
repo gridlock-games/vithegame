@@ -24,7 +24,6 @@ namespace Vi.UI
         [Header("Object Assignments")]
         [SerializeField] private Text nameDisplay;
         [SerializeField] private RectTransform healthBarParent;
-        [SerializeField] private Image nameBackground;
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
 
@@ -83,9 +82,8 @@ namespace Vi.UI
             nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
 
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
-            nameBackground.color = relativeTeamColor;
-            nameDisplay.color = relativeTeamColor == Color.black ? Color.white : Color.black;
-            healthFillImage.color = relativeTeamColor == Color.black ? Color.red : relativeTeamColor;
+            nameDisplay.color = Color.white;
+            healthFillImage.color = relativeTeamColor == Color.black | attributes.GetTeam() == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
         }
 
         private void RefreshRendererToFollow()

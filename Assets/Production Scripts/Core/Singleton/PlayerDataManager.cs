@@ -148,7 +148,12 @@ namespace Vi.Core
             return true;
         }
 
-        public bool CanHit(Attributes attacker, Attributes victim) { return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team) & attacker != victim; }
+        public bool CanHit(Attributes attacker, Attributes victim)
+        {
+            if (!attacker) { return false; }
+            if (!victim) { return false; }
+            return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team) & attacker != victim;
+        }
 
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
         {
@@ -802,6 +807,18 @@ namespace Vi.Core
         public void RemoveSpectatorInstance(ulong clientId)
         {
             localSpectators.Remove(clientId);
+        }
+
+        public KeyValuePair<ulong, NetworkObject> GetLocalSpectatorObject()
+        {
+            try
+            {
+                return localSpectators.First(kvp => kvp.Value.IsLocalPlayer);
+            }
+            catch
+            {
+                return new KeyValuePair<ulong, NetworkObject>(NetworkManager.LocalClientId, null);
+            }
         }
 
         private void Start()

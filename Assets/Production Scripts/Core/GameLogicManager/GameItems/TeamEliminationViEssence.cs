@@ -37,12 +37,20 @@ namespace Vi.Core.GameModeManagers
                     teamEliminationManager.OnViEssenceActivation();
                     NetworkObject.Despawn(true);
                 }
-                else if (attributes.GetComponent<WeaponHandler>().IsAttacking)
-                {
-                    damageCircle.Shrink();
-                    teamEliminationManager.OnViEssenceActivation();
-                    NetworkObject.Despawn(true);
-                }
+            }
+        }
+
+        public override void OnHit(Attributes attacker)
+        {
+            if (!IsServer) { Debug.LogError("TeamEliminationViEssence.OnHit() should only be called on the server!"); return; }
+
+            List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attacker.GetTeam());
+            // If the number of dead players on the attacker's team is greater than 1
+            if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1)
+            {
+                damageCircle.Shrink();
+                teamEliminationManager.OnViEssenceActivation();
+                NetworkObject.Despawn(true);
             }
         }
 

@@ -420,7 +420,7 @@ namespace Vi.Player
         Vector3 forceAccumulated;
         public override void AddForce(Vector3 force)
         {
-            forceAccumulated += force * Time.fixedDeltaTime;
+            if (!attributes.IsGrabbed() & !animationHandler.IsGrabAttacking()) { forceAccumulated += force * Time.fixedDeltaTime; }
         }
 
         private float positionStrength = 1;

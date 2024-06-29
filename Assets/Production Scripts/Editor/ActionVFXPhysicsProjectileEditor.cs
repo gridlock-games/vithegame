@@ -8,12 +8,11 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(ActionVFXPhysicsProjectile))]
     [CanEditMultipleObjects]
-    public class ActionVFXPhysicsProjectileEditor : ActionVFXEditor
+    public class ActionVFXPhysicsProjectileEditor : GameInteractiveActionVFXEditor
     {
         private SerializedProperty spProjectileForce;
         private SerializedProperty spTimeToActivateGravity;
         private SerializedProperty spKillDistance;
-        private SerializedProperty spVFXToPlayOnDestroy;
 
         private new void OnEnable()
         {
@@ -21,16 +20,15 @@ namespace Vi.Editor
             spProjectileForce = serializedObject.FindProperty("projectileForce");
             spTimeToActivateGravity = serializedObject.FindProperty("timeToActivateGravity");
             spKillDistance = serializedObject.FindProperty("killDistance");
-            spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
         }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            EditorGUILayout.LabelField("Action VFX Physics Projectile", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spProjectileForce);
             EditorGUILayout.PropertyField(spTimeToActivateGravity);
             EditorGUILayout.PropertyField(spKillDistance);
-            EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);
             serializedObject.ApplyModifiedProperties();
         }
     }

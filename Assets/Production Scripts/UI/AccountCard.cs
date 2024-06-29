@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -29,7 +30,7 @@ namespace Vi.UI
 
             lobbyLeaderImage.gameObject.SetActive(PlayerDataManager.Singleton.GetLobbyLeader().Value.id == playerDataId);
 
-            kickButton.gameObject.SetActive(!lobbyLeaderImage.gameObject.activeSelf & PlayerDataManager.Singleton.IsLobbyLeader());
+            kickButton.gameObject.SetActive(!lobbyLeaderImage.gameObject.activeSelf & PlayerDataManager.Singleton.IsLobbyLeader() & !GameModeManager.Singleton);
 
             initialized = true;
         }
