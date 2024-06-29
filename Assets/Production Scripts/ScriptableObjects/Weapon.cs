@@ -23,6 +23,14 @@ namespace Vi.ScriptableObjects
 
         public WeaponClass GetWeaponClass() { return weaponClass; }
 
+        public enum WeaponMaterial
+        {
+            Metal,
+            Wood,
+            Bone,
+            Ice
+        }
+
         [Header("Locomotion")]
         [SerializeField] private float runSpeed = 5;
         [SerializeField] private float walkSpeed = 2.5f;
@@ -158,8 +166,29 @@ namespace Vi.ScriptableObjects
 
         public GameObject hitVFXPrefab;
 
-        [Header("Block Effects")]
-        public AudioClip blockAudioClip;
+        [System.Serializable]
+        private class BlockSoundEffect
+        {
+            public WeaponMaterial attackingWeaponMaterial;
+            public AudioClip[] hitSounds;
+        }
+
+        [SerializeField] private List<BlockSoundEffect> blockingHitSoundEffects = new List<BlockSoundEffect>();
+
+        public AudioClip GetBlockingHitSoundEffect(WeaponMaterial attackingWeaponMaterial)
+        {
+            BlockSoundEffect blockingHitSoundEffect;
+            if (blockingHitSoundEffects.Exists(item => item.attackingWeaponMaterial == attackingWeaponMaterial))
+            {
+                blockingHitSoundEffect = blockingHitSoundEffects.Find(item => item.attackingWeaponMaterial == attackingWeaponMaterial);
+            }
+            else
+            {
+                blockingHitSoundEffect = blockingHitSoundEffects[0];
+            }
+            return blockingHitSoundEffect.hitSounds[Random.Range(0, blockingHitSoundEffect.hitSounds.Length)];
+        }
+
         public GameObject blockVFXPrefab;
 
         public enum WeaponBone

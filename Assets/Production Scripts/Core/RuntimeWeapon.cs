@@ -8,6 +8,10 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
+        [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
+
+        public Weapon.WeaponMaterial GetWeaponMaterial() { return weaponMaterial; }
+
         private List<RuntimeWeapon> associatedRuntimeWeapons = new List<RuntimeWeapon>();
         public void SetAssociatedRuntimeWeapons(List<RuntimeWeapon> runtimeWeapons)
         {
