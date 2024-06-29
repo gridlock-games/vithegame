@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2366f1228d39c2a4888e534bbdeab576, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioMixerGroup: {fileID: 24300002, guid: 1e232a9270ce92047a140f9c8fe14f49, type: 2}
   audioSourcePrefab: {fileID: 1966421921068733855, guid: 7540728959cc9cc4188124a1defba4f3,
     type: 3}
   musicClips:
@@ -68,6 +69,14 @@ MonoBehaviour:
     - {fileID: 8300000, guid: dfd1e52f06cf34cb68948e142fc02c10, type: 3}
     - {fileID: 8300000, guid: db95e422b24e4488d8512b26387fb51e, type: 3}
     - {fileID: 8300000, guid: f8f04bbb423424868b7cb11f2053b00c, type: 3}
+  - sceneNamesToPlay:
+    - Player Hub
+    songs:
+    - {fileID: 8300000, guid: 6a540851df9824693819cb6eceee5ce1, type: 3}
+    - {fileID: 8300000, guid: d0520580cc7b3466696466bb0b2c6dcd, type: 3}
+    - {fileID: 8300000, guid: f9fbe427f672949beb743bfd16f3cd7a, type: 3}
+    - {fileID: 8300000, guid: d3df899e6fd50400bae04bbe75ad02c7, type: 3}
+    - {fileID: 8300000, guid: 8acc0071e49de426bb266890a77665da, type: 3}
 --- !u!82 &7774390028603397925
 AudioSource:
   m_ObjectHideFlags: 0

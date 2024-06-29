@@ -232,7 +232,11 @@ namespace Vi.Core
 
             if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
             {
-                ActionClip lungeClip = weaponHandler.GetWeapon().GetLungeClip();
+                ActionClip lungeClip = Instantiate(weaponHandler.GetWeapon().GetLungeClip());
+                lungeClip.name = lungeClip.name.Replace("(Clone)", "");
+                lungeClip.isInvincible = actionClip.isInvincible;
+                lungeClip.isUninterruptable = actionClip.isUninterruptable;
+
                 if (AreActionClipRequirementsMet(lungeClip))
                 {
                     // Lunge mechanic
@@ -879,6 +883,8 @@ namespace Vi.Core
                 animatorReference.ApplyWearableEquipment(wearableEquipmentOption, raceAndGender);
             }
         }
+
+        public Weapon.ArmorType GetArmorType() { return animatorReference.GetArmorType(); }
 
         AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)

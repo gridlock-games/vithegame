@@ -327,8 +327,10 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
+            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
+                attackAilment = ActionClip.Ailment.Death;
                 ailment.Value = ActionClip.Ailment.Death;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
@@ -349,7 +351,7 @@ namespace Vi.Core
                 animationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, false);
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, animationHandler.GetArmorType(), Weapon.WeaponBone.Root, attackAilment);
             AddHP(damage);
             return true;
         }
@@ -695,7 +697,7 @@ namespace Vi.Core
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                RenderBlock(impactPosition);
+                RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
                 float prevHP = GetHP();
                 AddHP(HPDamage);
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -705,7 +707,7 @@ namespace Vi.Core
             {
                 if (HPDamage != 0)
                 {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
+                    RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -903,25 +905,25 @@ namespace Vi.Core
         private const float attackerRageToBeAddedOnHit = 2;
         private const float victimRageToBeAddedOnHit = 1;
 
-        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition);
 
-            RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
+            RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition);
         }
 
         private void RenderHitGlowOnly()
@@ -939,23 +941,23 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
         }
 
-        private void RenderBlock(Vector3 impactPosition)
+        private void RenderBlock(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition);
 
-            RenderBlockClientRpc(impactPosition);
+            RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void RenderBlockClientRpc(Vector3 impactPosition)
+        private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition);
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }

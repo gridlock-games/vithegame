@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
@@ -215,12 +214,18 @@ namespace Vi.Utility
 
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private void OnSceneUnload(Scene scene)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private MusicClip currentMusicClip;

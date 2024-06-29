@@ -28,7 +28,7 @@ namespace Vi.Core
             if (!weaponTrailVFX) { return; }
             if (!parentWeaponHandler) { return; }
 
-            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone) & !isStowed)
+            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone) & !isStowed)
             {
                 weaponTrailVFX.gameObject.SetActive(true);
                 lastWeaponTrailActiveTime = Time.time;
@@ -49,7 +49,7 @@ namespace Vi.Core
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
             if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
-            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
+            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
@@ -98,7 +98,7 @@ namespace Vi.Core
                 {
                     if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                         {
                             if (parentWeaponHandler.IsInAnticipation)
                                 Gizmos.color = Color.yellow;
@@ -134,7 +134,7 @@ namespace Vi.Core
                 {
                     if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                         {
                             if (parentWeaponHandler.IsInAnticipation)
                                 Gizmos.color = Color.yellow;
