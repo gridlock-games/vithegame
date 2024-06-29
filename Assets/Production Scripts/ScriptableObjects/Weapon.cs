@@ -94,7 +94,6 @@ namespace Vi.ScriptableObjects
             public AudioClip[] attackSoundEffects = new AudioClip[0];
         }
 
-        [Header("Rest Of Settings")]
         [SerializeField] private List<AttackSoundEffect> attackSoundEffects = new List<AttackSoundEffect>();
         public AudioClip GetAttackSoundEffect(WeaponBone weaponBone)
         {
