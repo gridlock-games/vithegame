@@ -36,11 +36,17 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3453cd8b30d3140f4ab5d9690580490e, type: 3}
   - weaponBone: 15
     attackSoundEffects:
+    - {fileID: 8300000, guid: bfb189a9933cb4b31b12f6d9d495593b, type: 3}
+    - {fileID: 8300000, guid: 32d0f2a1f36cb4425b5a32126f3ff240, type: 3}
+    - {fileID: 8300000, guid: bda2974b2cd5d4f2bb642cf8acb1fef8, type: 3}
+    - {fileID: 8300000, guid: f4a7752e82d4f4cf3b725faaab9d4d00, type: 3}
+    - {fileID: 8300000, guid: ed910ec28c89b4ee59d399d390b6143f, type: 3}
     - {fileID: 8300000, guid: 9b2a437d2ea804cea90c3b2c1653f0e6, type: 3}
+    - {fileID: 8300000, guid: c798fe8bbfc1247fe856b149c1457659, type: 3}
   inflictHitSoundEffects:
   - ailment: 1
     armorType: 0
-    weaponBones: 12000000
+    weaponBones: 120000000f000000
     hitSounds:
     - {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f, type: 3}
   - ailment: 0
@@ -106,6 +112,40 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 00754cb3cd466433a8086ceb38c6020e, type: 3}
     - {fileID: 8300000, guid: a8b0cdf19794d44a8aa43af947b3a21e, type: 3}
     - {fileID: 8300000, guid: aa5eb5c42c139404b8659a5755af6d25, type: 3}
+  - ailment: 0
+    armorType: 0
+    weaponBones: 0f000000
+    hitSounds:
+    - {fileID: 8300000, guid: 23ebaa75f38ad49e0806635dc27d6fdd, type: 3}
+    - {fileID: 8300000, guid: 1d1d3ac0296164482920398c7f1b236b, type: 3}
+    - {fileID: 8300000, guid: 6e5ea23e366794f7a8dc7e6684a496d9, type: 3}
+    - {fileID: 8300000, guid: 8a2f62f08ee20411db4c61fe87e98947, type: 3}
+    - {fileID: 8300000, guid: a69059a7bce384fffa87216f574e257e, type: 3}
+    - {fileID: 8300000, guid: e3a9249478d2c45f383318b11150cd2c, type: 3}
+  - ailment: 0
+    armorType: 1
+    weaponBones: 0f000000
+    hitSounds:
+    - {fileID: 8300000, guid: 31c8cc9b120b24fb5843fe9c1f0f6a87, type: 3}
+    - {fileID: 8300000, guid: bd6b305174950473abf8cf03951bf252, type: 3}
+    - {fileID: 8300000, guid: b02a825048ebe40bd8d53717a1fe9c6f, type: 3}
+    - {fileID: 8300000, guid: 9c4981a3eb9944ae6b4ccf9a33744a9a, type: 3}
+    - {fileID: 8300000, guid: 3f1bf93cf6470499993792f73c331864, type: 3}
+    - {fileID: 8300000, guid: 6e7b3cc2a09c64d1b9cbdbcd991ad3b1, type: 3}
+    - {fileID: 8300000, guid: ec1899a3be0314201980dd2bb9ffd6e1, type: 3}
+    - {fileID: 8300000, guid: a8a955058beea48d09fa5e813f45b993, type: 3}
+    - {fileID: 8300000, guid: 64b36d3684c23469fa933b9420a2d53d, type: 3}
+    - {fileID: 8300000, guid: dda172cd7536b4e3ca4d3c88ab5b2f95, type: 3}
+  - ailment: 0
+    armorType: 0
+    weaponBones: 0f000000
+    hitSounds:
+    - {fileID: 8300000, guid: 23ebaa75f38ad49e0806635dc27d6fdd, type: 3}
+    - {fileID: 8300000, guid: 1d1d3ac0296164482920398c7f1b236b, type: 3}
+    - {fileID: 8300000, guid: 6e5ea23e366794f7a8dc7e6684a496d9, type: 3}
+    - {fileID: 8300000, guid: 8a2f62f08ee20411db4c61fe87e98947, type: 3}
+    - {fileID: 8300000, guid: a69059a7bce384fffa87216f574e257e, type: 3}
+    - {fileID: 8300000, guid: e3a9249478d2c45f383318b11150cd2c, type: 3}
   hitVFXPrefab: {fileID: 1008842686038376, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
   blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
