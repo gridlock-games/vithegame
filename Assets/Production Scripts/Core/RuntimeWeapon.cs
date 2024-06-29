@@ -79,9 +79,9 @@ namespace Vi.Core
             return true;
         }
 
-        protected Weapon.WeaponBone weaponBone;
+        public Weapon.WeaponBone WeaponBone { get; private set; }
 
-        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.weaponBone = weaponBone; }
+        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
 
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;

@@ -72,7 +72,7 @@ namespace Vi.Core
             if (!parentWeaponHandler) { return; }
             if (!parentWeaponHandler.IsAiming(aimHand)) { return; }
             if (!parentWeaponHandler.IsAttacking) { return; }
-            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone)) { return; }
+            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
             bool shouldUseAmmo = parentWeaponHandler.ShouldUseAmmo();
             if (shouldUseAmmo)
@@ -119,7 +119,7 @@ namespace Vi.Core
             {
                 if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(weaponBone))
+                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                     {
                         if (parentWeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;

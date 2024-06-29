@@ -40,10 +40,12 @@ MonoBehaviour:
   inflictHitSoundEffects:
   - ailment: 1
     armorType: 0
+    weaponBones: 12000000
     hitSounds:
     - {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f, type: 3}
   - ailment: 0
     armorType: 0
+    weaponBones: 12000000
     hitSounds:
     - {fileID: 8300000, guid: ee9b0360d5acc47ba97703cc3149271c, type: 3}
     - {fileID: 8300000, guid: b69391cd5e2834a2e932d7583cf1c3a5, type: 3}
@@ -52,6 +54,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 8dcd8ac6459c043a59e462caf63aa710, type: 3}
   - ailment: 0
     armorType: 1
+    weaponBones: 12000000
     hitSounds:
     - {fileID: 8300000, guid: 6821d9474001541dfac633d91899167e, type: 3}
     - {fileID: 8300000, guid: f673df5e04fd0412c95a88f69cdf70b1, type: 3}
@@ -81,6 +84,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 798926338393246fba3b21b295d85599, type: 3}
   - ailment: 0
     armorType: 2
+    weaponBones: 12000000
     hitSounds:
     - {fileID: 8300000, guid: 78a0996d0ae8b4b84982ddcecf69bfa1, type: 3}
     - {fileID: 8300000, guid: 86ba81f58342e4021b497550de8d3dc2, type: 3}

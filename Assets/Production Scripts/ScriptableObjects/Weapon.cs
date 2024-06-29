@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -114,13 +115,25 @@ namespace Vi.ScriptableObjects
         {
             public ActionClip.Ailment ailment;
             public ArmorType armorType;
+            public WeaponBone[] weaponBones = new WeaponBone[] { WeaponBone.Root };
             public AudioClip[] hitSounds = new AudioClip[0];
         }
 
         [SerializeField] private List<InflictHitSoundEffect> inflictHitSoundEffects = new List<InflictHitSoundEffect>();
 
-        public AudioClip GetInflictHitSoundEffect(ArmorType armorType, ActionClip.Ailment ailment)
+        public AudioClip GetInflictHitSoundEffect(ArmorType armorType, WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
+            List<InflictHitSoundEffect> inflictHitSoundEffects;
+            if (this.inflictHitSoundEffects.Exists(item => item.weaponBones.Contains(weaponBone)))
+            {
+                inflictHitSoundEffects = this.inflictHitSoundEffects.FindAll(item => item.weaponBones.Contains(weaponBone));
+            }
+            else
+            {
+                Debug.LogWarning("Weapon bone " + weaponBone + " doesn't have inflict hit sound effects on weapon " + this);
+                inflictHitSoundEffects = this.inflictHitSoundEffects;
+            }
+
             InflictHitSoundEffect inflictHitSoundEffect = ailment == ActionClip.Ailment.None ? null : inflictHitSoundEffects.Find(item => item.ailment == ailment);
             if (inflictHitSoundEffect == null)
             {
