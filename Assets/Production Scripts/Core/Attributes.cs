@@ -912,6 +912,7 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
+            Debug.Log(armorType + " " + weapon.GetInflictHitSoundEffect(armorType, ailment));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, ailment), impactPosition);
 
             RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, ailment);

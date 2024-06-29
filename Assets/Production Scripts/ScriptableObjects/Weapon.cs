@@ -117,12 +117,11 @@ namespace Vi.ScriptableObjects
             public AudioClip[] hitSounds = new AudioClip[0];
         }
 
-        [Header("Hit Effects")]
         [SerializeField] private List<InflictHitSoundEffect> inflictHitSoundEffects = new List<InflictHitSoundEffect>();
 
         public AudioClip GetInflictHitSoundEffect(ArmorType armorType, ActionClip.Ailment ailment)
         {
-            InflictHitSoundEffect inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.ailment == ailment);
+            InflictHitSoundEffect inflictHitSoundEffect = ailment == ActionClip.Ailment.None ? null : inflictHitSoundEffects.Find(item => item.ailment == ailment);
             if (inflictHitSoundEffect == null)
             {
                 inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);

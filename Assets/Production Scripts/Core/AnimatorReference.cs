@@ -124,16 +124,32 @@ namespace Vi.Core
             }
         }
 
+        private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
+        {
+            CharacterReference.EquipmentType.Chest,
+            CharacterReference.EquipmentType.Gloves,
+            CharacterReference.EquipmentType.Helm,
+            CharacterReference.EquipmentType.Pants,
+            CharacterReference.EquipmentType.Shoulders
+        };
+
         public Weapon.ArmorType GetArmorType()
         {
-            if (wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Chest))
+            Dictionary<Weapon.ArmorType, int> armorTypeCounts = new Dictionary<Weapon.ArmorType, int>();
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
             {
-                return wearableEquipmentInstances[CharacterReference.EquipmentType.Chest].armorType;
+                if (!equipmentTypesToEvaluateForArmorType.Contains(kvp.Value.equipmentType)) { continue; }
+
+                if (armorTypeCounts.ContainsKey(kvp.Value.armorType))
+                {
+                    armorTypeCounts[kvp.Value.armorType] += 1;
+                }
+                else
+                {
+                    armorTypeCounts.Add(kvp.Value.armorType, 1);
+                }
             }
-            else
-            {
-                return Weapon.ArmorType.Flesh;
-            }
+            return armorTypeCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
         }
 
         [System.Serializable]
