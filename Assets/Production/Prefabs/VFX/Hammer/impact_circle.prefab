@@ -5044,6 +5044,11 @@ MonoBehaviour:
   transformType: 1
   onActivateVFXSpawnNormalizedTime: 0.2
   raycastOffset: {x: 0, y: 2, z: 0}
-  crossProductDirection: {x: 1, y: 0, z: 0}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
+  raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 8300000, guid: 1dcd56213007d4bbd99ebcb809fa3c82,
+    type: 3}
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
