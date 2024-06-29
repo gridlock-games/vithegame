@@ -124,7 +124,11 @@ namespace Vi.ScriptableObjects
         public AudioClip GetInflictHitSoundEffect(ArmorType armorType, WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             List<InflictHitSoundEffect> inflictHitSoundEffects;
-            if (this.inflictHitSoundEffects.Exists(item => item.weaponBones.Contains(weaponBone)))
+            if (weaponBone == WeaponBone.Root)
+            {
+                inflictHitSoundEffects = this.inflictHitSoundEffects;
+            }
+            else if (this.inflictHitSoundEffects.Exists(item => item.weaponBones.Contains(weaponBone)))
             {
                 inflictHitSoundEffects = this.inflictHitSoundEffects.FindAll(item => item.weaponBones.Contains(weaponBone));
             }
