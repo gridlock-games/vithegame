@@ -90,7 +90,7 @@ namespace Vi.ScriptableObjects
         private class AttackSoundEffect
         {
             public WeaponBone weaponBone = WeaponBone.RightHand;
-            public AudioClip attackSoundEffect;
+            public AudioClip[] attackSoundEffects = new AudioClip[0];
         }
 
         [Header("Rest Of Settings")]
@@ -99,7 +99,7 @@ namespace Vi.ScriptableObjects
         {
             AttackSoundEffect attackSoundEffect = attackSoundEffects.Find(item => item.weaponBone == weaponBone);
             if (attackSoundEffect == null) { return null; }
-            return attackSoundEffects.Find(item => item.weaponBone == weaponBone).attackSoundEffect;
+            return attackSoundEffect.attackSoundEffects[Random.Range(0, attackSoundEffect.attackSoundEffects.Length)];
         }
 
         public AudioClip drawSoundEffect;
