@@ -215,12 +215,18 @@ namespace Vi.Utility
 
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private void OnSceneUnload(Scene scene)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private MusicClip currentMusicClip;
