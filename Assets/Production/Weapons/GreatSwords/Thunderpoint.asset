@@ -28,35 +28,15 @@ MonoBehaviour:
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffects:
-    - {fileID: 8300000, guid: 3f091fae7a50648d2a92d8791ea52a28, type: 3}
-    - {fileID: 8300000, guid: c58e79d3dfec0474b93e77adf872453c, type: 3}
-    - {fileID: 8300000, guid: 5f928036bcaa64ab888791bc9307f506, type: 3}
-    - {fileID: 8300000, guid: d46ed7340aafd4a82ab24fde8bdf9a42, type: 3}
-    - {fileID: 8300000, guid: 813b9b05b76b84962a3f590f45a6ae43, type: 3}
-    - {fileID: 8300000, guid: a74684f992ded407fa6d837dba58dead, type: 3}
-    - {fileID: 8300000, guid: 062910c3da45f420f96c7daa2efbc62d, type: 3}
-    - {fileID: 8300000, guid: b8725c3c9be684543bdb9479ee973c60, type: 3}
-    - {fileID: 8300000, guid: 97ea652c88a1247b590b2d588c30e13f, type: 3}
-    - {fileID: 8300000, guid: 754b3d9f9fe8a4f7ca282542c8793557, type: 3}
-    - {fileID: 8300000, guid: b45a63547a97244a28706b117d9866c9, type: 3}
-    - {fileID: 8300000, guid: f3cf0a4e284824e51915139c2616a908, type: 3}
-    - {fileID: 8300000, guid: 3033b168b6d19418a929a27d30aed122, type: 3}
-    - {fileID: 8300000, guid: f40abe98e8af64999a3f2811e709c673, type: 3}
-    - {fileID: 8300000, guid: 277bc7bea03164ce19f438faab25ab0a, type: 3}
-    - {fileID: 8300000, guid: 38ed0792920d9470f8e6542230188882, type: 3}
-    - {fileID: 8300000, guid: 131eb0e8bccff4e89ad11f9a79a8d769, type: 3}
-    - {fileID: 8300000, guid: 87829d59623854673bdd1606fdf5582f, type: 3}
-    - {fileID: 8300000, guid: c5bf01fde0ad742c0945a5ced44fc29b, type: 3}
-    - {fileID: 8300000, guid: cfabd06e11ea648c8aaa83a2b94c979f, type: 3}
-    - {fileID: 8300000, guid: 6a7fd675ad1ac49b6b90e06ed3144d52, type: 3}
-    - {fileID: 8300000, guid: 8903d848979d84e4599d00a13e7dc519, type: 3}
-    - {fileID: 8300000, guid: 09a6e212c6c164835989bee99e097bcc, type: 3}
-    - {fileID: 8300000, guid: b3082819c3c054e3786c664a14eb6502, type: 3}
-    - {fileID: 8300000, guid: 92f41b6c9949c425b94c60b7db740a3f, type: 3}
+    - {fileID: 8300000, guid: f3e26d89608a14a16b9a6e9584d37c54, type: 3}
+    - {fileID: 8300000, guid: 09f9c8bcfed164f999eb4c581fadc39e, type: 3}
+    - {fileID: 8300000, guid: f0120301498b64fd995fe1faf275fc62, type: 3}
+    - {fileID: 8300000, guid: 090ec6a915a6e4e0796169ec65d40f2a, type: 3}
+    - {fileID: 8300000, guid: 2b97beac12c3d4111a8debc8a81e2049, type: 3}
+    - {fileID: 8300000, guid: 3453cd8b30d3140f4ab5d9690580490e, type: 3}
   - weaponBone: 15
     attackSoundEffects:
     - {fileID: 8300000, guid: 9b2a437d2ea804cea90c3b2c1653f0e6, type: 3}
-  hitAudioClip: {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
   inflictHitSoundEffects:
   - ailment: 1
     armorType: 0
@@ -65,17 +45,63 @@ MonoBehaviour:
   - ailment: 0
     armorType: 0
     hitSounds:
-    - {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
+    - {fileID: 8300000, guid: ee9b0360d5acc47ba97703cc3149271c, type: 3}
+    - {fileID: 8300000, guid: b69391cd5e2834a2e932d7583cf1c3a5, type: 3}
+    - {fileID: 8300000, guid: 100b1a2351ca0417eb4045b6ca170995, type: 3}
+    - {fileID: 8300000, guid: e004aad5594e341d38276440dbdbd026, type: 3}
+    - {fileID: 8300000, guid: 8dcd8ac6459c043a59e462caf63aa710, type: 3}
   - ailment: 0
     armorType: 1
     hitSounds:
-    - {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
+    - {fileID: 8300000, guid: 6821d9474001541dfac633d91899167e, type: 3}
+    - {fileID: 8300000, guid: f673df5e04fd0412c95a88f69cdf70b1, type: 3}
+    - {fileID: 8300000, guid: deab6f65f18b841fba4794950f0a64a0, type: 3}
+    - {fileID: 8300000, guid: 9be7cd17b2a3f46b794b211080abe193, type: 3}
+    - {fileID: 8300000, guid: d7379183cb4384d4e8884182e04396b4, type: 3}
+    - {fileID: 8300000, guid: fe21989c688164fff92e9b4c233faca6, type: 3}
+    - {fileID: 8300000, guid: 6b99c26ac30e84817b11be76d39a815e, type: 3}
+    - {fileID: 8300000, guid: 1fa0345fbcf1f496d9419d193e792ecf, type: 3}
+    - {fileID: 8300000, guid: 5efba0a5e5a56436997e361c72d6a923, type: 3}
+    - {fileID: 8300000, guid: 6fd59e7ba50b840efb9bd323edf6f541, type: 3}
+    - {fileID: 8300000, guid: e4bb2366e6443448f8a97ef877e50e7f, type: 3}
+    - {fileID: 8300000, guid: 2dddfb84b95874bf8a0c5f122f9a5095, type: 3}
+    - {fileID: 8300000, guid: a91708ebb246a429aa1d9afd28fcce53, type: 3}
+    - {fileID: 8300000, guid: c96538c7ec70541329a38abdda03a495, type: 3}
+    - {fileID: 8300000, guid: 1e044f275ae5a404195e7cfbe913d9eb, type: 3}
+    - {fileID: 8300000, guid: 25c8e66b930384f18ad3748b9c43dc02, type: 3}
+    - {fileID: 8300000, guid: 0a32eec47ac9e4abcbe459cba3ba0025, type: 3}
+    - {fileID: 8300000, guid: fcbdc328687034360bee821fb67f5ac4, type: 3}
+    - {fileID: 8300000, guid: 079b83ecf0b634c1c85bc9c7378a7d16, type: 3}
+    - {fileID: 8300000, guid: ad8c92c0df90c43e39bd99ce40531335, type: 3}
+    - {fileID: 8300000, guid: bd02bd09b787745bc8667e0119dee33f, type: 3}
+    - {fileID: 8300000, guid: e032e914c3b77469db35f0d4a2ddc68e, type: 3}
+    - {fileID: 8300000, guid: ad8c92c0df90c43e39bd99ce40531335, type: 3}
+    - {fileID: 8300000, guid: 9e3275c22607b4311b59c780be1a1a6e, type: 3}
+    - {fileID: 8300000, guid: c6d3200b3987949d4b81a1d5e6b5fcf3, type: 3}
+    - {fileID: 8300000, guid: 798926338393246fba3b21b295d85599, type: 3}
   - ailment: 0
     armorType: 2
     hitSounds:
-    - {fileID: 8300000, guid: b076da57ea1554799bb3f254a7398ec0, type: 3}
-  knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
-    type: 3}
+    - {fileID: 8300000, guid: 78a0996d0ae8b4b84982ddcecf69bfa1, type: 3}
+    - {fileID: 8300000, guid: 86ba81f58342e4021b497550de8d3dc2, type: 3}
+    - {fileID: 8300000, guid: bf138ab4b52ec418fb0e816c70b7bb9b, type: 3}
+    - {fileID: 8300000, guid: 63d723d5673974c7fa42deab3a41e30a, type: 3}
+    - {fileID: 8300000, guid: baf0dd2bbba184d15b4b359b2f738565, type: 3}
+    - {fileID: 8300000, guid: 197b107d7ca5c4b48ae6c20b90deb953, type: 3}
+    - {fileID: 8300000, guid: 23a1a4605b8814502bd24f6754bd38c5, type: 3}
+    - {fileID: 8300000, guid: f8e5c9b5781664ce1a9101d367099c3c, type: 3}
+    - {fileID: 8300000, guid: 8031bfc22db424c8a8dcc24a5e285595, type: 3}
+    - {fileID: 8300000, guid: c60c3521710864c2ab4e1378160ad363, type: 3}
+    - {fileID: 8300000, guid: cb674eb605ce04c06accd1c410a60e23, type: 3}
+    - {fileID: 8300000, guid: 8b7774e12c0114b2c81d6c2c2848599a, type: 3}
+    - {fileID: 8300000, guid: b164c85fbdffe439397e2737d674352b, type: 3}
+    - {fileID: 8300000, guid: 5fcd7dcc591f64773a89bf07b5893e57, type: 3}
+    - {fileID: 8300000, guid: 4c62c66e7989443de98aba45f9da490c, type: 3}
+    - {fileID: 8300000, guid: 98d03be99512e4654b41dfab01260e84, type: 3}
+    - {fileID: 8300000, guid: 193ac49b48d9b4f70b06dec718d0123a, type: 3}
+    - {fileID: 8300000, guid: 00754cb3cd466433a8086ceb38c6020e, type: 3}
+    - {fileID: 8300000, guid: a8b0cdf19794d44a8aa43af947b3a21e, type: 3}
+    - {fileID: 8300000, guid: aa5eb5c42c139404b8659a5755af6d25, type: 3}
   hitVFXPrefab: {fileID: 1008842686038376, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
   blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
