@@ -658,13 +658,16 @@ namespace Vi.UI
 
             if (IsClient)
             {
-                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
                 {
-                    spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
-                }
-                else
-                {
-                    spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
+                    if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                    {
+                        spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
+                    }
+                    else
+                    {
+                        spectateButton.GetComponentInChildren<Text>().text = "SPECTATE";
+                    }
                 }
             }
 
