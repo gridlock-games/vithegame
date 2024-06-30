@@ -509,7 +509,7 @@ namespace Vi.Core
 
                                 AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
                                 if (attackSoundEffect)
-                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position);
+                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position, Weapon.attackSoundEffectVolume);
                                 else if (Application.isEditor)
                                     Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
                             }
