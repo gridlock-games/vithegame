@@ -95,6 +95,8 @@ namespace Vi.ScriptableObjects
         public bool ShouldUseAmmo() { return shouldUseAmmo; }
         public int GetMaxAmmoCount() { return maxAmmoCount; }
 
+        public const float attackSoundEffectVolume = 0.25f;
+
         [System.Serializable]
         private class AttackSoundEffect
         {
@@ -116,6 +118,8 @@ namespace Vi.ScriptableObjects
             Metal,
             Flesh
         }
+
+        public const float hitSoundEffectVolume = 1;
 
         [System.Serializable]
         private class InflictHitSoundEffect

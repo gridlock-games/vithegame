@@ -200,6 +200,8 @@ namespace Vi.Core
 
         private const float abilityCancelledDuringAnticipationCooldownReductionPercent = 0.1f;
 
+        private List<int> actionSoundEffectIdTracker = new List<int>();
+
         public void SetActionClip(ActionClip actionClip, string weaponName)
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
@@ -229,6 +231,17 @@ namespace Vi.Core
             }
 
             actionVFXTracker.Clear();
+            actionSoundEffectIdTracker.Clear();
+
+            // Action sound effect logic here for normalized time of 0
+            foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+            {
+                if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                {
+                    AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                    actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                }
+            }
 
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
@@ -350,7 +363,8 @@ namespace Vi.Core
                     if (bHit & fartherBHit)
                     {
                         Vector3 spawnPosition = hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset;
-                        Quaternion groundRotation = Quaternion.LookRotation(fartherHit.point - spawnPosition, actionVFXPrefab.lookRotationUpDirection);
+                        Vector3 rel = fartherHit.point - spawnPosition;
+                        Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, actionVFXPrefab.lookRotationUpDirection);
                         vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
                             hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
                             groundRotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
@@ -454,12 +468,22 @@ namespace Vi.Core
             if (animationHandler.IsActionClipPlaying(CurrentActionClip))
             {
                 float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                // Action VFX spawning here
                 foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                 {
                     if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                     if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                     {
                         SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                    }
+                }
+                // Action sound effect logic here
+                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+                {
+                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
+                    {
+                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
                     }
                 }
             }
@@ -509,7 +533,7 @@ namespace Vi.Core
 
                                 AudioClip attackSoundEffect = weaponInstance.GetAttackSoundEffect(weaponBone);
                                 if (attackSoundEffect)
-                                    AudioManager.Singleton.PlayClipAtPoint(gameObject, attackSoundEffect, runtimeWeapon.transform.position);
+                                    AudioManager.Singleton.PlayClipOnTransform(runtimeWeapon.transform, attackSoundEffect, false, Weapon.attackSoundEffectVolume);
                                 else if (Application.isEditor)
                                     Debug.LogWarning("No attack sound effect for weapon " + weaponInstance.name + " on bone - " + weaponBone);
                             }

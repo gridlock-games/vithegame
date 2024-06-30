@@ -38,7 +38,7 @@ namespace Vi.Utility
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
-            registeredAudioSources.Add(audioSource);
+            if (!registeredAudioSources.Contains(audioSource)) { registeredAudioSources.Add(audioSource); }
         }
 
         /// <summary>
@@ -78,28 +78,55 @@ namespace Vi.Utility
         /// </summary>
         public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume = 1)
         {
-            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow);
-            StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
+            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation);
+            StartCoroutine(Play3DSoundPrefabOnTransform(transformToFollow, g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
         }
 
-        private IEnumerator Play3DSoundPrefabOnTransform(AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume = 1)
+        private List<(AudioSource, Transform)> audioSourcesFollowingTransforms = new List<(AudioSource, Transform)>();
+        private IEnumerator Play3DSoundPrefabOnTransform(Transform transformToFollow, AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume = 1)
         {
             RegisterAudioSource(audioSource);
+            audioSourcesFollowingTransforms.Add((audioSource, transformToFollow));
             if (shouldLoop)
             {
                 while (true)
                 {
-                    if (!audioSource.isPlaying) { audioSource.PlayOneShot(audioClip, volume); }
-                    yield return null;
+                    audioSource.PlayOneShot(audioClip, volume);
+                    while (true)
+                    {
+                        yield return null;
+                        if (!audioSource.isPlaying) { break; }
+                        if (!transformToFollow) { break; }
+                        if (!transformToFollow.gameObject.activeInHierarchy) { break; }
+                    }
                 }
             }
             else
             {
                 audioSource.PlayOneShot(audioClip, volume);
-                yield return new WaitUntil(() => !audioSource.isPlaying);
+                while (true)
+                {
+                    yield return null;
+                    if (!audioSource.isPlaying) { break; }
+                    if (!transformToFollow) { break; }
+                    if (!transformToFollow.gameObject.activeInHierarchy) { break; }
+                }
             }
+            audioSourcesFollowingTransforms.Remove((audioSource, transformToFollow));
+
+            // Fade audio clip out
+            while (true)
+            {
+                if (!audioSource.isPlaying) { break; }
+                audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
+                if (Mathf.Approximately(0, audioSource.volume)) { break; }
+                yield return null;
+            }
+
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
+
+        private const float audioSourceFadeOutSpeed = 1.5f;
 
         public void Play2DClip(AudioClip audioClip, float volume = 1)
         {
@@ -184,6 +211,17 @@ namespace Vi.Utility
             }
 
             lastTimeScale = Time.timeScale;
+        }
+
+        private void LateUpdate()
+        {
+            foreach ((AudioSource audioSource, Transform transformToFollow) in audioSourcesFollowingTransforms)
+            {
+                if (!audioSource) { Debug.LogError("There is a null audio source in the audio source follow list"); continue; }
+                if (!transformToFollow) { Debug.LogError("There is a null transform in the audio source follow list"); continue; }
+                audioSource.transform.position = transformToFollow.position;
+                audioSource.transform.rotation = transformToFollow.rotation;
+            }
         }
 
         private bool isCrossfading;

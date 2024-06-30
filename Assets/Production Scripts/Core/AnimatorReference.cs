@@ -130,7 +130,8 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Gloves,
             CharacterReference.EquipmentType.Helm,
             CharacterReference.EquipmentType.Pants,
-            CharacterReference.EquipmentType.Shoulders
+            CharacterReference.EquipmentType.Shoulders,
+            CharacterReference.EquipmentType.Boots
         };
 
         public Weapon.ArmorType GetArmorType()

@@ -19,6 +19,8 @@ namespace Vi.Core
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
         public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
+        public CharacterReference.RaceAndGender GetRaceAndGender() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).character.raceAndGender; }
+
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
@@ -789,7 +791,8 @@ namespace Vi.Core
                     Vector3 endPos = hitSourcePosition;
                     startPos.y = 0;
                     endPos.y = 0;
-                    ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
+                    Vector3 rel = endPos - startPos;
+                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
 
                     shouldApplyAilment = true;
 
@@ -912,7 +915,7 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition, Weapon.hitSoundEffectVolume);
 
             RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
         }
@@ -923,7 +926,7 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition, Weapon.hitSoundEffectVolume);
         }
 
         private void RenderHitGlowOnly()
@@ -947,7 +950,7 @@ namespace Vi.Core
 
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
 
             RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
         }
@@ -957,7 +960,7 @@ namespace Vi.Core
         {
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }

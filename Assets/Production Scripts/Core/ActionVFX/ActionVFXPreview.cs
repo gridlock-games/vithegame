@@ -64,7 +64,8 @@ namespace Vi.Core
                 if (bHit & fartherBHit)
                 {
                     transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                    Quaternion groundRotation = Quaternion.LookRotation(fartherFloorHit.point - transform.position, lookRotationUpDirection);
+                    Vector3 rel = fartherFloorHit.point - transform.position;
+                    Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, lookRotationUpDirection);
                     transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
 
                     CanCast = true;
