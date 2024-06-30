@@ -789,7 +789,8 @@ namespace Vi.Core
                     Vector3 endPos = hitSourcePosition;
                     startPos.y = 0;
                     endPos.y = 0;
-                    ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
+                    Vector3 rel = endPos - startPos;
+                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
 
                     shouldApplyAilment = true;
 
