@@ -113,8 +113,20 @@ namespace Vi.Utility
                 }
             }
             audioSourcesFollowingTransforms.Remove((audioSource, transformToFollow));
+
+            // Fade audio clip out
+            while (true)
+            {
+                if (!audioSource.isPlaying) { break; }
+                audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
+                if (Mathf.Approximately(0, audioSource.volume)) { break; }
+                yield return null;
+            }
+
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
+
+        private const float audioSourceFadeOutSpeed = 1.5f;
 
         public void Play2DClip(AudioClip audioClip, float volume = 1)
         {
