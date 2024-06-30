@@ -95,7 +95,7 @@ namespace Vi.ScriptableObjects
         public bool ShouldUseAmmo() { return shouldUseAmmo; }
         public int GetMaxAmmoCount() { return maxAmmoCount; }
 
-        public const float attackSoundEffectVolume = 0.5f;
+        public const float attackSoundEffectVolume = 0.25f;
 
         [System.Serializable]
         private class AttackSoundEffect
