@@ -489,7 +489,7 @@ namespace Vi.Core
                     if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                     {
                         actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                        PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
+                        PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
                     else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                     {
@@ -497,9 +497,11 @@ namespace Vi.Core
                     }
                     else
                     {
-                        PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
+                        PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
+                    Transform parent = netObj.transform.parent;
                     netObj.Spawn(true);
+                    netObj.TrySetParent(parent);
                 }
             }
             else if (!isPreviewVFX & actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
