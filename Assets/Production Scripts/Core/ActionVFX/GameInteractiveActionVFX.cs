@@ -32,6 +32,7 @@ namespace Vi.Core
 
         public virtual void OnHit(Attributes attacker)
         {
+            if (!IsSpawned) { return; }
             if (shouldDestroyOnEnemyHit)
             {
                 if (PlayerDataManager.Singleton.CanHit(attacker, this.attacker))

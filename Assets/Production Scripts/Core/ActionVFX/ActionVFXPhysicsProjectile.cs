@@ -79,6 +79,7 @@ namespace Vi.Core
         private bool despawnCalled;
         private void Update()
         {
+            if (!IsSpawned) { return; }
             if (!IsServer) { return; }
             if (despawnCalled) { return; }
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); despawnCalled = true; }
