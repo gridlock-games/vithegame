@@ -71,17 +71,19 @@ namespace Vi.ScriptableObjects
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
         }
 
+        private const float actionVFXSoundEffectVolume = 0.7f;
+
         private IEnumerator PlayAwakeAudioClip()
         {
             yield return new WaitForSeconds(awakeAudioClipDelay);
-            AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false);
+            AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
         }
 
         [SerializeField] private GameObject[] VFXToPlayOnDestroy = new GameObject[0];
 
         protected void OnDisable()
         {
-            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position); }
+            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }
             
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
