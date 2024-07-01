@@ -25,6 +25,7 @@ namespace Vi.UI
         private void OnEnable()
         {
             RefreshStatus();
+            UpdateAttributesList();
         }
 
         private void Start()
@@ -44,8 +45,6 @@ namespace Vi.UI
             
             leftPlayerCards = leftPlayerCardsTemp.ToArray();
             rightPlayerCards = rightPlayerCardsTemp.ToArray();
-
-            UpdateAttributesList();
         }
 
         private void RefreshStatus()
