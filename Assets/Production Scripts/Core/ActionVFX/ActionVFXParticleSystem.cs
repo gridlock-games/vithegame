@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(NetworkRigidbody))]
     public class ActionVFXParticleSystem : GameInteractiveActionVFX
     {
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
-    public class ActionVFX : MonoBehaviour
+    [RequireComponent(typeof(NetworkObject))]
+    [RequireComponent(typeof(NetworkTransform))]
+    public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType
         {

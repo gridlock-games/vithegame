@@ -5,10 +5,12 @@ using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(NetworkRigidbody))]
     public class ActionVFXPhysicsProjectile : GameInteractiveActionVFX
     {
         [SerializeField] private Vector3 projectileForce = new Vector3(0, 0, 3);
