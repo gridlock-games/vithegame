@@ -575,14 +575,18 @@ namespace Vi.Core
             {
                 float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
                 // Action VFX spawning here
-                foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
+                if (IsServer)
                 {
-                    if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
-                    if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                    foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
-                        SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                        if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                        if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                        {
+                            SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                        }
                     }
                 }
+                
                 // Action sound effect logic here
                 foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
