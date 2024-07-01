@@ -46,6 +46,7 @@ namespace Vi.ScriptableObjects
         public Weapon.WeaponBone weaponBone = Weapon.WeaponBone.RightHand;
 
         [SerializeField] protected AudioClip audioClipToPlayOnAwake;
+        [SerializeField] protected float awakeAudioClipDelay;
         [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
         protected void OnEnable()
@@ -64,7 +65,13 @@ namespace Vi.ScriptableObjects
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
 
-            if (audioClipToPlayOnAwake) { AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false); }
+            if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
+        }
+
+        private IEnumerator PlayAwakeAudioClip()
+        {
+            yield return new WaitForSeconds(awakeAudioClipDelay);
+            AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false);
         }
 
         [SerializeField] private GameObject[] VFXToPlayOnDestroy = new GameObject[0];
