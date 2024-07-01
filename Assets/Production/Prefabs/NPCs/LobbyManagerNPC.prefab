@@ -69,8 +69,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: d6014c744b58ef646be61358b725885d, type: 3}
-    m_FontSize: 200
+    m_Font: {fileID: 12800000, guid: fd8b48b178d55804e9351227508f9866, type: 3}
+    m_FontSize: 180
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
@@ -151,7 +151,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 2}
-  m_SizeDelta: {x: 145.1, y: 54.4}
+  m_SizeDelta: {x: 129.1, y: 62.100002}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &73519393474410085
 CanvasRenderer:
@@ -174,15 +174,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.27450982}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 62ad93339a41e644ab326e72448eceba, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 4dd70ec2220ae427b9b92a2d02dca9f0, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -851,7 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2448939177
+  GlobalObjectIdHash: 3750811709
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1809,7 +1809,7 @@ PrefabInstance:
     - target: {fileID: 5205780964695959625, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5205780964695959629, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
@@ -1989,12 +1989,12 @@ PrefabInstance:
     - target: {fileID: 5205780965580700416, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5205780965580700416, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5205780965669099699, guid: b5c71fa6efda0d74da97af3d8a588165,
         type: 3}
