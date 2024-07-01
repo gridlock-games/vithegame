@@ -721,11 +721,14 @@ namespace Vi.Core
 
             attacker.comboCounter.Value += 1;
 
-            foreach (ActionVFX actionVFX in attack.actionVFXList)
+            if (IsServer)
             {
-                if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
-                    weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                    if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                    }
                 }
             }
 
@@ -1108,12 +1111,15 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            if (IsServer)
             {
-                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
                 {
-                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
-                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                        StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                    }
                 }
             }
 

@@ -48,7 +48,7 @@ namespace Vi.Utility
         /// <param name="audioClip"></param>
         /// <param name="position"></param>
         /// <param name="volume"></param>
-        public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume = 1)
+        public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, position, Quaternion.identity);
             if (objectToDestroyWith)
@@ -57,7 +57,7 @@ namespace Vi.Utility
                 StartCoroutine(Play3DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume)
         {
             RegisterAudioSource(audioSource);
             audioSource.volume = volume;
@@ -67,7 +67,7 @@ namespace Vi.Utility
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
 
-        private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
         {
             RegisterAudioSource(audioSource);
             audioSource.volume = volume;
@@ -80,14 +80,14 @@ namespace Vi.Utility
         /// <summary>
         /// Plays an audio clip in 3D sound space while following a transform's position
         /// </summary>
-        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume = 1)
+        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation);
             StartCoroutine(Play3DSoundPrefabOnTransform(transformToFollow, g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
         }
 
         private List<(AudioSource, Transform)> audioSourcesFollowingTransforms = new List<(AudioSource, Transform)>();
-        private IEnumerator Play3DSoundPrefabOnTransform(Transform transformToFollow, AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume = 1)
+        private IEnumerator Play3DSoundPrefabOnTransform(Transform transformToFollow, AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume)
         {
             RegisterAudioSource(audioSource);
             audioSourcesFollowingTransforms.Add((audioSource, transformToFollow));
@@ -136,13 +136,13 @@ namespace Vi.Utility
 
         private const float audioSourceFadeOutSpeed = 1.5f;
 
-        public void Play2DClip(AudioClip audioClip, float volume = 1)
+        public void Play2DClip(AudioClip audioClip, float volume)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab);
             StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
         {
             audioSource.spatialBlend = 0;
             audioSource.volume = volume;

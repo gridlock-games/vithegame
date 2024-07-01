@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 
@@ -15,24 +15,29 @@ namespace Vi.Core
         protected Attributes attacker;
         protected ActionClip attack;
 
-        private new void OnDisable()
+        public override void OnNetworkDespawn()
         {
-            base.OnDisable();
-            foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
+            base.OnNetworkDespawn();
+            if (IsServer)
             {
-                GameObject g = ObjectPoolingManager.SpawnObject(prefab.gameObject, transform.position, transform.rotation);
-                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(g));
+                foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
+                {
+                    NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
+                    netObj.Spawn();
+                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                    PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
+                }
             }
         }
 
         public virtual void OnHit(Attributes attacker)
         {
+            if (!IsSpawned) { return; }
             if (shouldDestroyOnEnemyHit)
             {
                 if (PlayerDataManager.Singleton.CanHit(attacker, this.attacker))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(gameObject);
+                    NetworkObject.Despawn(true);
                 }
             }
         }
