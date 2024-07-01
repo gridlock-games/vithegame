@@ -123,9 +123,18 @@ namespace Vi.Core
             base.OnDestroy();
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
-                GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
-                if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(g));
+                if (prefab.GetComponent<FollowUpVFX>())
+                {
+                    NetworkObject netObj = Instantiate(prefab, transform.position, transform.rotation).GetComponent<NetworkObject>();
+                    netObj.Spawn();
+                    netObj.GetComponent<FollowUpVFX>().Initialize(attacker, attack);
+                    PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
+                }
+                else
+                {
+                    GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(g));
+                }
             }
         }
 

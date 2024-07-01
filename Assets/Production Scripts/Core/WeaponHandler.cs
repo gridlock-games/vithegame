@@ -484,7 +484,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    if (!IsServer) { Debug.LogError("Why the fuck are we the server here!?"); return null; }
+                    if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
                     if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                     {
@@ -514,7 +514,7 @@ namespace Vi.Core
             return vfxInstance;
         }
 
-        private static IEnumerator DespawnVFXAfterPlaying(NetworkObject vfxInstance)
+        public static IEnumerator DespawnVFXAfterPlaying(NetworkObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem)

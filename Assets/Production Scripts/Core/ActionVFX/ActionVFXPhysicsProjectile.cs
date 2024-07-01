@@ -26,8 +26,6 @@ namespace Vi.Core
             this.attacker = attacker;
             this.attack = attack;
             initialized = true;
-
-            rb.AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
         }
 
         private void ClearInitialization()
@@ -53,6 +51,18 @@ namespace Vi.Core
             StartCoroutine(ActivateGravityCoroutine());
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            StartCoroutine(AddForceAfter1Frame());
+        }
+
+        private IEnumerator AddForceAfter1Frame()
+        {
+            yield return null;
+            rb.AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
+        }
+
         private IEnumerator ActivateGravityCoroutine()
         {
             rb.useGravity = false;
@@ -66,24 +76,25 @@ namespace Vi.Core
             startPosition = transform.position;
         }
 
+        private bool despawnCalled;
         private void Update()
         {
-            if (Vector3.Distance(transform.position, startPosition) > killDistance) { Destroy(gameObject); }
+            if (!IsServer) { return; }
+            if (despawnCalled) { return; }
+            if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); despawnCalled = true; }
         }
 
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
+            if (!IsServer) { return; }
 
             bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                if (NetworkManager.Singleton.IsServer)
-                {
-                    bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
-                    if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
-                }
+                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
@@ -106,7 +117,7 @@ namespace Vi.Core
 
             if (!other.isTrigger | shouldDestroy)
             {
-                ObjectPoolingManager.ReturnObjectToPool(gameObject);
+                NetworkObject.Despawn(true);
             }
         }
     }

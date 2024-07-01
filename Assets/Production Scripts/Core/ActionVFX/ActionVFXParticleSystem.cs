@@ -27,6 +27,8 @@ namespace Vi.Core
         private ParticleSystem[] particleSystems;
         private void Awake()
         {
+            GetComponent<Rigidbody>().useGravity = false;
+
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {

@@ -22,9 +22,10 @@ namespace Vi.Core
             {
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
-                    GameObject g = Instantiate(prefab.gameObject, transform.position, transform.rotation);
-                    g.GetComponent<NetworkObject>().Spawn();
-                    if (g.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                    NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
+                    netObj.Spawn();
+                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                    PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
                 }
             }
         }
@@ -35,7 +36,7 @@ namespace Vi.Core
             {
                 if (PlayerDataManager.Singleton.CanHit(attacker, this.attacker))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(gameObject);
+                    NetworkObject.Despawn(true);
                 }
             }
         }
