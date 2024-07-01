@@ -40,7 +40,7 @@ PrefabInstance:
     - target: {fileID: 2439428452925413717, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2670817242
+      value: 1260409227
       objectReference: {fileID: 0}
     - target: {fileID: 2690909250846329952, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
@@ -237,7 +237,12 @@ PrefabInstance:
         type: 3}
       propertyPath: audioClipToPlayOnAwake
       value: 
-      objectReference: {fileID: 8300000, guid: 3fcd75af82505488da7678172ecc70e4, type: 3}
+      objectReference: {fileID: 8300000, guid: 555ce67f049164b7bae84754dba5366b, type: 3}
+    - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
+      propertyPath: audioClipToPlayOnDestroy
+      value: 
+      objectReference: {fileID: 8300000, guid: 92799b739dd444b1dbfeb717d02842a9, type: 3}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
       propertyPath: VFXToPlayOnDestroy.Array.size

@@ -81,7 +81,7 @@ namespace Vi.ScriptableObjects
 
         protected void OnDisable()
         {
-            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnAwake, transform.position); }
+            if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position); }
             
             foreach (GameObject prefab in VFXToPlayOnDestroy)
             {
