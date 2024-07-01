@@ -87,6 +87,7 @@ namespace Vi.Core
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
+            if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
             bool shouldDestroy = false;
