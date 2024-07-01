@@ -34,7 +34,7 @@ namespace Vi.Utility
         }
 
         List<AudioSource> registeredAudioSources = new List<AudioSource>();
-        public void RegisterAudioSource(AudioSource audioSource)
+        private void RegisterAudioSource(AudioSource audioSource)
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
