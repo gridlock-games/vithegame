@@ -34,7 +34,7 @@ namespace Vi.Utility
         }
 
         List<AudioSource> registeredAudioSources = new List<AudioSource>();
-        public void RegisterAudioSource(AudioSource audioSource)
+        private void RegisterAudioSource(AudioSource audioSource)
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
@@ -60,7 +60,9 @@ namespace Vi.Utility
         private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
             RegisterAudioSource(audioSource);
-            audioSource.PlayOneShot(audioClip, volume);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
             yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
@@ -68,7 +70,9 @@ namespace Vi.Utility
         private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
             RegisterAudioSource(audioSource);
-            audioSource.PlayOneShot(audioClip, volume);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
             yield return new WaitUntil(() => !audioSource.isPlaying);
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }
@@ -91,7 +95,9 @@ namespace Vi.Utility
             {
                 while (true)
                 {
-                    audioSource.PlayOneShot(audioClip, volume);
+                    audioSource.volume = volume;
+                    audioSource.clip = audioClip;
+                    audioSource.Play();
                     while (true)
                     {
                         yield return null;
@@ -103,7 +109,9 @@ namespace Vi.Utility
             }
             else
             {
-                audioSource.PlayOneShot(audioClip, volume);
+                audioSource.volume = volume;
+                audioSource.clip = audioClip;
+                audioSource.Play();
                 while (true)
                 {
                     yield return null;
@@ -137,7 +145,9 @@ namespace Vi.Utility
         private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
         {
             audioSource.spatialBlend = 0;
-            audioSource.PlayOneShot(audioClip, volume);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
             yield return new WaitUntil(() => !audioSource.isPlaying);
             ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
         }

@@ -46,6 +46,10 @@ namespace Vi.Editor
             foreach (WeaponPositioningData weaponPositioningData in weaponsToGenerate)
             {
                 cam.clearFlags = CameraClearFlags.Skybox;
+
+                string destinationPath = Path.Join("Assets/Production/Images/Weapon Icons", weaponPositioningData.weapon.name + ".png");
+                if (File.Exists(destinationPath)) { continue; }
+
                 Dictionary<GameObject, int> transformCrosswalk = new Dictionary<GameObject, int>();
 
                 foreach (var data in weaponPositioningData.weapon.GetWeaponModelData())
@@ -94,7 +98,6 @@ namespace Vi.Editor
 
                 // If required, manipulate the pixels before applying them to the destination Texture2D.
                 // This example code reverses the array, which rotates the image 180 degrees.
-
                 Color[] newPixels = new Color[pixels.Length];
                 for (int i = 0; i < pixels.Length; i++)
                 {
@@ -108,7 +111,6 @@ namespace Vi.Editor
                 screenshotTexture.Apply();
 
                 byte[] byteArray = screenshotTexture.EncodeToPNG();
-                string destinationPath = Path.Join("Assets/Production/Images/Weapon Icons", weaponPositioningData.weapon.name + ".png");
                 File.WriteAllBytes(destinationPath, byteArray);
 
                 foreach (KeyValuePair<GameObject, int> kvp in transformCrosswalk)
@@ -160,6 +162,9 @@ namespace Vi.Editor
                     {
                         if (!model.GetComponentInChildren<SkinnedMeshRenderer>()) { Debug.LogError(model.name + " has no skinned mesh renderer"); continue; }
 
+                        string destinationPath = Path.Join("Assets/Production/Images/Equipment Icons", equipmentOption.name + "-" + raceAndGender.ToString() + ".png");
+                        if (File.Exists(destinationPath)) { continue; }
+
                         cam.clearFlags = CameraClearFlags.Skybox;
 
                         GameObject instance = Instantiate(model.gameObject);
@@ -209,8 +214,26 @@ namespace Vi.Editor
                         screenshotTexture.ReadPixels(rect, 0, 0);
                         screenshotTexture.Apply();
 
+                        // Get a copy of the color data from the source Texture2D, in high-precision float format.
+                        // Each element in the array represents the color data for an individual pixel.
+                        int mipLevel = 0;
+                        Color[] pixels = screenshotTexture.GetPixels(mipLevel);
+
+                        // If required, manipulate the pixels before applying them to the destination Texture2D.
+                        // This example code reverses the array, which rotates the image 180 degrees.
+                        Color[] newPixels = new Color[pixels.Length];
+                        for (int i = 0; i < pixels.Length; i++)
+                        {
+                            newPixels[i] = pixels[i] == Color.black ? Color.clear : pixels[i];
+                        }
+
+                        // Set the pixels of the destination Texture2D.
+                        screenshotTexture.SetPixels(newPixels, mipLevel);
+
+                        // Apply changes to the destination Texture2D, which uploads its data to the GPU.
+                        screenshotTexture.Apply();
+
                         byte[] byteArray = screenshotTexture.EncodeToPNG();
-                        string destinationPath = Path.Join("Assets/Production/Images/Equipment Icons", equipmentOption.name + "-" + raceAndGender.ToString() + ".png");
                         File.WriteAllBytes(destinationPath, byteArray);
 
                         Destroy(instance);
@@ -226,6 +249,9 @@ namespace Vi.Editor
                     {
                         if (!model.GetComponentInChildren<SkinnedMeshRenderer>()) { Debug.LogError(model.name + " has no skinned mesh renderer"); continue; }
 
+                        string destinationPath = Path.Join("Assets/Production/Images/Equipment Icons", equipmentOption.name + "-" + raceAndGender.ToString() + ".png");
+                        if (File.Exists(destinationPath)) { continue; }
+
                         cam.clearFlags = CameraClearFlags.Skybox;
 
                         GameObject instance = Instantiate(model.gameObject);
@@ -276,7 +302,6 @@ namespace Vi.Editor
                         screenshotTexture.Apply();
 
                         byte[] byteArray = screenshotTexture.EncodeToPNG();
-                        string destinationPath = Path.Join("Assets/Production/Images/Equipment Icons", equipmentOption.name + "-" + raceAndGender.ToString() + ".png");
                         File.WriteAllBytes(destinationPath, byteArray);
 
                         Destroy(instance);

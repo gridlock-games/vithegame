@@ -254,7 +254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldProcessWeapons: 1
+  shouldProcessWeapons: 0
   weaponsToGenerate:
   - weapon: {fileID: 11400000, guid: 34ca3ff156bce574e9623ae5181055dd, type: 2}
     transformDatas:
@@ -348,7 +348,7 @@ MonoBehaviour:
     transformDatas:
     - position: {x: -0.279, y: 0, z: -0.153}
       rotation: {x: -0, y: 0, z: 0}
-  shouldProcessEquipmentOptions: 0
+  shouldProcessEquipmentOptions: 1
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:
