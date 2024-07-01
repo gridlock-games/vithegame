@@ -75,6 +75,27 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1678338494779658425}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5796537484098628570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494871026038834521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 559323971
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &-5467905512432266006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,14 +114,16 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
-  crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   followUpVFXToPlayOnDestroy: []
+  shouldDestroyOnEnemyHit: 0
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
@@ -122,16 +145,49 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
-  crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy:
   - {fileID: 1453165119930241201, guid: 595e15cd00fae9b42b6f06e5f39a760c, type: 3}
   followUpVFXToPlayOnDestroy: []
+  shouldDestroyOnEnemyHit: 0
   duration: 3
   radius: 2
   forceMultiplier: 5
   ailmentToTriggerOnEnd: 1
+--- !u!114 &4468287924467602658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494871026038834521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
