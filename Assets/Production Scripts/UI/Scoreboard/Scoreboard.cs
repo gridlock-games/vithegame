@@ -23,7 +23,9 @@ namespace Vi.UI
         [Header("2 Teams")]
         [SerializeField] private ScoreboardElement scoreboardElementPrefabHalf;
         [SerializeField] private GameObject doubleTeamParent;
+        [SerializeField] private Transform teamDividerParentLeft;
         [SerializeField] private Transform scoreboardElementParentLeft;
+        [SerializeField] private Transform teamDividerParentRight;
         [SerializeField] private Transform scoreboardElementParentRight;
 
         public void CloseSelf()
@@ -120,11 +122,16 @@ namespace Vi.UI
                         int teamIndex = System.Array.IndexOf(teams, team);
                         if (teamIndex == -1) { Debug.LogError(team + " scoreboard team header's team isn't in the possible teams list!"); continue; }
 
-                        ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight).GetComponent<ScoreboardTeamDividerElement>();
+                        ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, teamIndex == 0 ? teamDividerParentLeft : teamDividerParentRight).GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);
                         dividerElement.transform.SetSiblingIndex(i + dividerCounter);
                         dividerCounter++;
                         lastTeam = team;
+
+                        RectTransform rt = (RectTransform)dividerElement.transform;
+                        rt.anchorMin = new Vector2(0, 0);
+                        rt.anchorMax = new Vector2(1, 1);
+                        rt.pivot = new Vector2(0.5f, 0.5f);
                     }
                 }
                 elementList[i].transform.SetSiblingIndex(i + dividerCounter);
