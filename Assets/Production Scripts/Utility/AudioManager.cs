@@ -101,6 +101,7 @@ namespace Vi.Utility
                     while (true)
                     {
                         yield return null;
+                        if (!audioSource) { break; }
                         if (!audioSource.isPlaying) { break; }
                         if (!transformToFollow) { break; }
                         if (!transformToFollow.gameObject.activeInHierarchy) { break; }
@@ -115,6 +116,7 @@ namespace Vi.Utility
                 while (true)
                 {
                     yield return null;
+                    if (!audioSource) { break; }
                     if (!audioSource.isPlaying) { break; }
                     if (!transformToFollow) { break; }
                     if (!transformToFollow.gameObject.activeInHierarchy) { break; }
@@ -123,15 +125,19 @@ namespace Vi.Utility
             audioSourcesFollowingTransforms.Remove((audioSource, transformToFollow));
 
             // Fade audio clip out
-            while (true)
+            if (audioSource)
             {
-                if (!audioSource.isPlaying) { break; }
-                audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
-                if (Mathf.Approximately(0, audioSource.volume)) { break; }
-                yield return null;
+                while (true)
+                {
+                    if (!audioSource) { break; }
+                    if (!audioSource.isPlaying) { break; }
+                    audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
+                    if (Mathf.Approximately(0, audioSource.volume)) { break; }
+                    yield return null;
+                }
             }
 
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         private const float audioSourceFadeOutSpeed = 1.5f;
