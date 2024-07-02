@@ -127,11 +127,6 @@ namespace Vi.UI
                         dividerElement.transform.SetSiblingIndex(i + dividerCounter);
                         dividerCounter++;
                         lastTeam = team;
-
-                        RectTransform rt = (RectTransform)dividerElement.transform;
-                        rt.anchorMin = new Vector2(0, 0);
-                        rt.anchorMax = new Vector2(1, 1);
-                        rt.pivot = new Vector2(0.5f, 0.5f);
                     }
                 }
                 elementList[i].transform.SetSiblingIndex(i + dividerCounter);
