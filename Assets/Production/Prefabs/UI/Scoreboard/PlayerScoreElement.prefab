@@ -110,8 +110,8 @@ RectTransform:
   - {fileID: 3279139268913000058}
   - {fileID: 3914194807445164247}
   - {fileID: 469037066464567267}
-  - {fileID: 2438478455637429596}
   - {fileID: 3538579789809780235}
+  - {fileID: 2438478455637429596}
   - {fileID: 3202728577284612303}
   - {fileID: 6253470223243268811}
   - {fileID: 973134612097038383}
@@ -161,6 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e126d7d97c25e074cb8e56869591bde1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPreviewObject: 0
   playerNameParent: {fileID: 3279139268913000058}
   roundWinsParent: {fileID: 3914194807445164247}
   disconnectedPlayerIcon: {fileID: 7275484339451797086}
@@ -1305,7 +1306,7 @@ RectTransform:
   - {fileID: 5154972212737056306}
   - {fileID: 8969739772562372843}
   m_Father: {fileID: 8472139578323966923}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1541,7 +1542,7 @@ RectTransform:
   - {fileID: 1956777204023007675}
   - {fileID: 3455727758442403872}
   m_Father: {fileID: 8472139578323966923}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
