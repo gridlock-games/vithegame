@@ -773,10 +773,9 @@ namespace Vi.Core.GameModeManagers
                 Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
                 if (attributes)
                 {
-                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
-                    {
-                        StartCoroutine(PlayAnimation(animationHandler, isVictor));
-                    }
+                    if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
+
+                    if (attributes.TryGetComponent(out AnimationHandler animationHandler)) { StartCoroutine(PlayAnimation(animationHandler, isVictor)); }
                 }
             }
             scoresToEvaluate.Clear();
