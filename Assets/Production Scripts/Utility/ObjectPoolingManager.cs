@@ -174,6 +174,8 @@ namespace Vi.Utility
 
         public static void ReturnObjectToPool(GameObject obj)
         {
+            if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
+
             PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == obj.name.Replace("(Clone)", ""));
 
             if (pool == null)

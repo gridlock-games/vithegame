@@ -247,12 +247,29 @@ namespace Vi.Utility
 
         private void LateUpdate()
         {
-            foreach ((AudioSource audioSource, Transform transformToFollow) in audioSourcesFollowingTransforms)
+            List<int> indexesToRemove = new List<int>();
+            for (int i = 0; i < audioSourcesFollowingTransforms.Count; i++)
             {
-                if (!audioSource) { Debug.LogError("There is a null audio source in the audio source follow list"); continue; }
-                if (!transformToFollow) { Debug.LogError("There is a null transform in the audio source follow list"); continue; }
+                (AudioSource audioSource, Transform transformToFollow) = audioSourcesFollowingTransforms[i];
+                if (!audioSource)
+                {
+                    Debug.LogWarning("There is a null audio source in the audio source follow list");
+                    indexesToRemove.Add(i);
+                    continue;
+                }
+                if (!transformToFollow)
+                {
+                    Debug.LogWarning("There is a null transform in the audio source follow list");
+                    indexesToRemove.Add(i);
+                    continue;
+                }
                 audioSource.transform.position = transformToFollow.position;
                 audioSource.transform.rotation = transformToFollow.rotation;
+            }
+
+            foreach (int index in indexesToRemove.OrderByDescending(item => item))
+            {
+                audioSourcesFollowingTransforms.RemoveAt(index);
             }
         }
 
