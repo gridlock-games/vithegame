@@ -78,9 +78,10 @@ namespace Vi.UI
                 killsText.text = playerScore.cumulativeKills.ToString();
                 assistsText.text = playerScore.cumulativeAssists.ToString();
                 deathsText.text = playerScore.cumulativeDeaths.ToString();
-                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
-                damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
-                damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
+
+                if (kdRatioText) kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
+                if (damageDealtText) damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
+                if (damageRecievedText) damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
             }
             else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
             {
@@ -96,9 +97,10 @@ namespace Vi.UI
                 killsText.text = playerScore.cumulativeKills.ToString();
                 assistsText.text = playerScore.cumulativeAssists.ToString();
                 deathsText.text = playerScore.cumulativeDeaths.ToString();
-                kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
-                damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
-                damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
+
+                if (kdRatioText) kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
+                if (damageDealtText) damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
+                if (damageRecievedText) damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
             }
             else
             {

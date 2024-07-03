@@ -63,8 +63,14 @@ namespace Vi.Utility
             audioSource.volume = volume;
             audioSource.clip = audioClip;
             audioSource.Play();
-            yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            while (true)
+            {
+                if (!invoker) { break; }
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
@@ -73,8 +79,13 @@ namespace Vi.Utility
             audioSource.volume = volume;
             audioSource.clip = audioClip;
             audioSource.Play();
-            yield return new WaitUntil(() => !audioSource.isPlaying);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         /// <summary>
@@ -101,6 +112,7 @@ namespace Vi.Utility
                     while (true)
                     {
                         yield return null;
+                        if (!audioSource) { break; }
                         if (!audioSource.isPlaying) { break; }
                         if (!transformToFollow) { break; }
                         if (!transformToFollow.gameObject.activeInHierarchy) { break; }
@@ -115,6 +127,7 @@ namespace Vi.Utility
                 while (true)
                 {
                     yield return null;
+                    if (!audioSource) { break; }
                     if (!audioSource.isPlaying) { break; }
                     if (!transformToFollow) { break; }
                     if (!transformToFollow.gameObject.activeInHierarchy) { break; }
@@ -123,15 +136,19 @@ namespace Vi.Utility
             audioSourcesFollowingTransforms.Remove((audioSource, transformToFollow));
 
             // Fade audio clip out
-            while (true)
+            if (audioSource)
             {
-                if (!audioSource.isPlaying) { break; }
-                audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
-                if (Mathf.Approximately(0, audioSource.volume)) { break; }
-                yield return null;
+                while (true)
+                {
+                    if (!audioSource) { break; }
+                    if (!audioSource.isPlaying) { break; }
+                    audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
+                    if (Mathf.Approximately(0, audioSource.volume)) { break; }
+                    yield return null;
+                }
             }
 
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         private const float audioSourceFadeOutSpeed = 1.5f;
@@ -148,8 +165,13 @@ namespace Vi.Utility
             audioSource.volume = volume;
             audioSource.clip = audioClip;
             audioSource.Play();
-            yield return new WaitUntil(() => !audioSource.isPlaying);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         private void Awake()
