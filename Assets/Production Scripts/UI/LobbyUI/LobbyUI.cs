@@ -329,6 +329,9 @@ namespace Vi.UI
             
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
+            // Do not remove this, it handles a fringe case for refreshing the local player's team properly
+            yield return null;
+
             primaryWeaponIcon.enabled = true;
             secondaryWeaponIcon.enabled = true;
 
