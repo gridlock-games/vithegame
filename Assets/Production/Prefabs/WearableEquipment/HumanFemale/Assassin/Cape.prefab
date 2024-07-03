@@ -499,7 +499,7 @@ MonoBehaviour:
       cameraCullingMethod: 0
       cameraCullingRenderers: []
     normalAxis: 1
-    gravity: 5
+    gravity: 7
     gravityDirection:
       x: 0
       y: -1
@@ -507,7 +507,7 @@ MonoBehaviour:
     gravityFalloff: 0
     stablizationTimeAfterReset: 0.1
     damping:
-      value: 0.05
+      value: 0.1
       useCurve: 0
       curve:
         serializedVersion: 2
@@ -564,7 +564,7 @@ MonoBehaviour:
       anchor: {fileID: 0}
       anchorInertia: 0
       worldInertia: 1
-      movementInertiaSmoothing: 0.5
+      movementInertiaSmoothing: 0.6
       movementSpeedLimit:
         value: 5
         use: 1
@@ -578,7 +578,7 @@ MonoBehaviour:
       localRotationSpeedLimit:
         value: 720
         use: 0
-      depthInertia: 0
+      depthInertia: 0.7
       centrifualAcceleration: 0
       particleSpeedLimit:
         value: 4
@@ -587,7 +587,7 @@ MonoBehaviour:
       teleportDistance: 0.5
       teleportRotation: 90
     tetherConstraint:
-      distanceCompression: 0.9
+      distanceCompression: 0.5
     distanceConstraint:
       stiffness:
         value: 1
@@ -621,7 +621,7 @@ MonoBehaviour:
     angleRestorationConstraint:
       useAngleRestoration: 1
       stiffness:
-        value: 0.2
+        value: 0.15
         useCurve: 1
         curve:
           serializedVersion: 2
@@ -630,16 +630,16 @@ MonoBehaviour:
             time: 0
             value: 1
             inSlope: 0
-            outSlope: -0.8
+            outSlope: 0
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
             time: 1
-            value: 0.2
-            inSlope: -0.8
-            outSlope: 0
+            value: 0.09678346
+            inSlope: -0.7
+            outSlope: -0.7
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
@@ -650,9 +650,9 @@ MonoBehaviour:
       velocityAttenuation: 0.8
       gravityFalloff: 0
     angleLimitConstraint:
-      useAngleLimit: 0
+      useAngleLimit: 1
       limitAngle:
-        value: 60
+        value: 45
         useCurve: 1
         curve:
           serializedVersion: 2
@@ -660,8 +660,8 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 0
             value: 0
-            inSlope: 0
-            outSlope: 1
+            inSlope: 2
+            outSlope: 2
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
@@ -669,7 +669,7 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 1
             value: 1
-            inSlope: 1
+            inSlope: 0
             outSlope: 0
             tangentMode: 0
             weightedMode: 0
@@ -740,7 +740,7 @@ MonoBehaviour:
       stiffness: 1
     colliderCollisionConstraint:
       mode: 1
-      friction: 0.05
+      friction: 0.1
       colliderList: []
       collisionBones: []
       limitDistance:
@@ -1108,7 +1108,7 @@ MonoBehaviour:
       cameraCullingMethod: 0
       cameraCullingRenderers: []
     normalAxis: 1
-    gravity: 5
+    gravity: 7
     gravityDirection:
       x: 0
       y: -1
@@ -1116,7 +1116,7 @@ MonoBehaviour:
     gravityFalloff: 0
     stablizationTimeAfterReset: 0.1
     damping:
-      value: 0.05
+      value: 0.1
       useCurve: 0
       curve:
         serializedVersion: 2
@@ -1173,7 +1173,7 @@ MonoBehaviour:
       anchor: {fileID: 0}
       anchorInertia: 0
       worldInertia: 1
-      movementInertiaSmoothing: 0.5
+      movementInertiaSmoothing: 0.6
       movementSpeedLimit:
         value: 5
         use: 1
@@ -1187,7 +1187,7 @@ MonoBehaviour:
       localRotationSpeedLimit:
         value: 720
         use: 0
-      depthInertia: 0
+      depthInertia: 0.7
       centrifualAcceleration: 0
       particleSpeedLimit:
         value: 4
@@ -1196,7 +1196,7 @@ MonoBehaviour:
       teleportDistance: 0.5
       teleportRotation: 90
     tetherConstraint:
-      distanceCompression: 0.9
+      distanceCompression: 0.5
     distanceConstraint:
       stiffness:
         value: 1
@@ -1230,7 +1230,7 @@ MonoBehaviour:
     angleRestorationConstraint:
       useAngleRestoration: 1
       stiffness:
-        value: 0.2
+        value: 0.15
         useCurve: 1
         curve:
           serializedVersion: 2
@@ -1239,16 +1239,16 @@ MonoBehaviour:
             time: 0
             value: 1
             inSlope: 0
-            outSlope: -0.8
+            outSlope: 0
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
             time: 1
-            value: 0.2
-            inSlope: -0.8
-            outSlope: 0
+            value: 0.09678346
+            inSlope: -0.7
+            outSlope: -0.7
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
@@ -1259,9 +1259,9 @@ MonoBehaviour:
       velocityAttenuation: 0.8
       gravityFalloff: 0
     angleLimitConstraint:
-      useAngleLimit: 0
+      useAngleLimit: 1
       limitAngle:
-        value: 60
+        value: 45
         useCurve: 1
         curve:
           serializedVersion: 2
@@ -1269,8 +1269,8 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 0
             value: 0
-            inSlope: 0
-            outSlope: 1
+            inSlope: 2
+            outSlope: 2
             tangentMode: 0
             weightedMode: 0
             inWeight: 0
@@ -1278,7 +1278,7 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 1
             value: 1
-            inSlope: 1
+            inSlope: 0
             outSlope: 0
             tangentMode: 0
             weightedMode: 0
@@ -1349,7 +1349,7 @@ MonoBehaviour:
       stiffness: 1
     colliderCollisionConstraint:
       mode: 1
-      friction: 0.05
+      friction: 0.1
       colliderList: []
       collisionBones: []
       limitDistance:
