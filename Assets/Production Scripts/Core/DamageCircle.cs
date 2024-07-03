@@ -73,7 +73,7 @@ namespace Vi.Core
             
             if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, Time.deltaTime * shrinkSpeed); }
 
-            if (GameModeManager.Singleton.ShouldDisplayNextGameAction()) { return; }
+            if (GameModeManager.Singleton.ShouldDisplayNextGameAction() | GameModeManager.Singleton.IsGameOver()) { return; }
 
             List<Attributes> attributesToDamage = new List<Attributes>();
             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
