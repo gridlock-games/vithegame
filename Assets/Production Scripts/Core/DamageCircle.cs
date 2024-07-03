@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -67,9 +68,12 @@ namespace Vi.Core
         private Vector3 targetScale;
         private void Update()
         {
+            if (!GameModeManager.Singleton) { Debug.LogError("Damage circle should only be present when there is a game mode manager!"); return; }
             if (!IsServer) { return; }
             
             if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, Time.deltaTime * shrinkSpeed); }
+
+            if (GameModeManager.Singleton.ShouldDisplayNextGameAction()) { return; }
 
             List<Attributes> attributesToDamage = new List<Attributes>();
             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
