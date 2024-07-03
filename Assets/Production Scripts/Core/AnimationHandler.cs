@@ -168,6 +168,8 @@ namespace Vi.Core
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
+            if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
+
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);
             attributes.SetInviniciblity(0);
@@ -190,6 +192,8 @@ namespace Vi.Core
             if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
+
+            if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
             Animator.CrossFade("Empty", transitionTime, actionsLayer);
             Animator.CrossFade("Empty", transitionTime, flinchLayer);
@@ -437,6 +441,8 @@ namespace Vi.Core
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
+            if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
+
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
@@ -448,6 +454,8 @@ namespace Vi.Core
                     weaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
+
+            if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
@@ -512,6 +520,43 @@ namespace Vi.Core
             string stateName = GetActionClipAnimationStateName(actionClip);
             yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(stateName));
             hitReactionIsStarting = false;
+        }
+
+        private Coroutine evaluateGrabAttackHitsCoroutine;
+        private IEnumerator EvaluateGrabAttackHits(ActionClip grabAttackClip)
+        {
+            if (grabAttackClip.GetClipType() != ActionClip.ClipType.GrabAttack) { Debug.LogError("AnimationHandler.EvaluateGrabAttackHits() should only be called with a grab attack action clip!"); yield break; }
+
+            // Wait until grab attack is playing fully
+            yield return new WaitUntil(() => weaponHandler.CurrentActionClip == grabAttackClip);
+            yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(grabAttackClip));
+
+            // Wait for a grab victim to be assigned
+            yield return new WaitUntil(() => attributes.GetGrabVictim());
+            int successfulHits = 0;
+            Attributes grabVictim = attributes.GetGrabVictim();
+            while (true)
+            {
+                // If the grab attack is done playing, stop evaluating hits
+                if (!IsActionClipPlaying(grabAttackClip)) { Debug.Log("Break 1"); break; }
+                // If the grab victim disconnects, stop evaluating hits
+                if (!grabVictim) { Debug.Log("Break 2"); break; }
+
+                // If we are attacking, evaluate a hit
+                if (weaponHandler.IsAttacking)
+                {
+                    bool hitSucesss = grabVictim.ProcessMeleeHit(attributes, grabAttackClip, weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[0]],
+                    grabVictim.transform.position, attributes.transform.position);
+
+                    if (hitSucesss)
+                    {
+                        successfulHits++;
+                    }
+                }
+
+                if (successfulHits >= grabAttackClip.maxHitLimit) { Debug.Log("Break 3"); break; }
+                yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits());
+            }
         }
 
         public bool AreActionClipRequirementsMet(ActionClip actionClip)

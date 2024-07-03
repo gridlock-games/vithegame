@@ -413,6 +413,7 @@ namespace Vi.Core
         }
 
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
+        private NetworkVariable<int> grabVictimDataId = new NetworkVariable<int>();
         private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
@@ -425,6 +426,18 @@ namespace Vi.Core
             if (PlayerDataManager.Singleton.ContainsId(grabAssailantDataId.Value))
             {
                 return PlayerDataManager.Singleton.GetPlayerObjectById(grabAssailantDataId.Value);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Attributes GetGrabVictim()
+        {
+            if (PlayerDataManager.Singleton.ContainsId(grabVictimDataId.Value))
+            {
+                return PlayerDataManager.Singleton.GetPlayerObjectById(grabVictimDataId.Value);
             }
             else
             {
@@ -449,6 +462,8 @@ namespace Vi.Core
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
+                grabAssailantDataId.Value = default;
+                grabVictimDataId.Value = default;
             }
 
             if (animationHandler.IsGrabAttacking())
@@ -671,6 +686,7 @@ namespace Vi.Core
                 {
                     grabAttackClipName.Value = attack.name;
                     grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                    attacker.grabVictimDataId.Value = GetPlayerDataId();
                     isGrabbed.Value = true;
                     Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
                     movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
@@ -1216,6 +1232,8 @@ namespace Vi.Core
             yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
             yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             isGrabbed.Value = false;
+            grabAssailantDataId.Value = default;
+            grabVictimDataId.Value = default;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()

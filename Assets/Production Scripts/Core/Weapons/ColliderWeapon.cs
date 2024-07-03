@@ -51,6 +51,9 @@ namespace Vi.Core
             if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
             if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
+            // Don't evaluate grab attacks here, it's evaluated in the animation handler script
+            if (parentWeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
+
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (parentAttributes == networkCollider.Attributes) { return; }

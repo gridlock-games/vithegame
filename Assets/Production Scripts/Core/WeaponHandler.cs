@@ -15,10 +15,9 @@ namespace Vi.Core
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
         private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
-        public Weapon GetWeapon()
-        {
-            return weaponInstance;
-        }
+        public Weapon GetWeapon() { return weaponInstance; }
+
+        public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
 
         private Weapon weaponInstance;
         private Attributes attributes;
