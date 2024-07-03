@@ -93,6 +93,8 @@ namespace Vi.Core
         private Collider[] colliders;
         private Renderer[] renderers;
 
+        public Vector3 GetClosetPointFromAttributes(Attributes victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
+
         protected void Start()
         {
             parentAttributes = transform.root.GetComponent<Attributes>();

@@ -535,18 +535,22 @@ namespace Vi.Core
             yield return new WaitUntil(() => attributes.GetGrabVictim());
             int successfulHits = 0;
             Attributes grabVictim = attributes.GetGrabVictim();
+            int weaponBoneIndex = -1;
             while (true)
             {
                 // If the grab attack is done playing, stop evaluating hits
-                if (!IsActionClipPlaying(grabAttackClip)) { Debug.Log("Break 1"); break; }
+                if (!IsActionClipPlaying(grabAttackClip)) { break; }
                 // If the grab victim disconnects, stop evaluating hits
-                if (!grabVictim) { Debug.Log("Break 2"); break; }
+                if (!grabVictim) { break; }
 
                 // If we are attacking, evaluate a hit
                 if (weaponHandler.IsAttacking)
                 {
-                    bool hitSucesss = grabVictim.ProcessMeleeHit(attributes, grabAttackClip, weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[0]],
-                    grabVictim.transform.position, attributes.transform.position);
+                    weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
+                    RuntimeWeapon runtimeWeapon = weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
+
+                    bool hitSucesss = grabVictim.ProcessMeleeHit(attributes, grabAttackClip, runtimeWeapon,
+                        runtimeWeapon.GetClosetPointFromAttributes(grabVictim), attributes.transform.position);
 
                     if (hitSucesss)
                     {
@@ -554,7 +558,7 @@ namespace Vi.Core
                     }
                 }
 
-                if (successfulHits >= grabAttackClip.maxHitLimit) { Debug.Log("Break 3"); break; }
+                if (successfulHits >= grabAttackClip.maxHitLimit) { break; }
                 yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits());
             }
         }

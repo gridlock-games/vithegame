@@ -235,6 +235,10 @@ namespace Vi.Core
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
+        public NetworkCollider NetworkCollider { get; private set; }
+
+        public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
+
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
