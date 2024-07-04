@@ -138,11 +138,10 @@ namespace Vi.Core
         }
 
         public static event UnityAction<Scene> sceneLoaded;
-        public static event UnityAction<Scene> sceneUnloaded;
+        public static event UnityAction sceneUnloaded;
 
         private void SceneHandleLoaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
-            Debug.Log("ON SCENE LOAD " + sceneHandle.Result.Scene.name);
             // If this scene is part of an environment scene payload
             if (System.Array.Exists(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name) & scenePayload.sceneType == SceneType.Environment))
             {
@@ -182,11 +181,8 @@ namespace Vi.Core
 
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
-            Debug.Log("ON SCENE UNLOAD " + sceneHandle.Result.Scene.name);
-
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
-
-            sceneUnloaded.Invoke(sceneHandle.Result.Scene);
+            sceneUnloaded.Invoke();
         }
 
         private void UnloadAllScenePayloadsOfType(SceneType sceneType)
@@ -300,6 +296,7 @@ namespace Vi.Core
         {
             _singleton = this;
             activeSceneGroupIndicies = new NetworkList<int>();
+            Debug.Log("NET SCENE MANAGER AWAKE");
         }
 
         public bool ShouldSpawnPlayer()

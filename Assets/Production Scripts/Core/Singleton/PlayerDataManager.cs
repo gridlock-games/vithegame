@@ -777,7 +777,7 @@ namespace Vi.Core
             }
         }
 
-        void OnSceneUnload(Scene scene)
+        void OnSceneUnload()
         {
             if (IsServer)
             {
