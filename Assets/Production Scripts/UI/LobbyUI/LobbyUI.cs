@@ -790,7 +790,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? 8 : 4);
+            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? NetworkCallbackManager.maxActivePlayersInLobby : 4);
         }
 
         private void ChooseLoadoutPreset(Button button, int loadoutSlot)

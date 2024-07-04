@@ -116,7 +116,22 @@ namespace Vi.Core
                     }
                     else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                     {
-                        clientTeam = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count >= 8 ? PlayerDataManager.Team.Spectator : PlayerDataManager.Team.Competitor;
+                        PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
+                        List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
+                        if (playerDataListWithoutSpectators.Count >= maxActivePlayersInLobby)
+                        {
+                            clientTeam = PlayerDataManager.Team.Spectator;
+                        }
+                        else // The lobby isn't full yet
+                        {
+                            Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
+                            foreach (PlayerDataManager.Team possibleTeam in gameModeInfo.possibleTeams)
+                            {
+                                teamCounts.Add(possibleTeam, playerDataListWithoutSpectators.Where(item => item.team == possibleTeam).ToArray().Length);
+                            }
+                            // Get the team with the lowest player count
+                            clientTeam = teamCounts.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
+                        }
                     }
                     else // Game in progress
                     {
