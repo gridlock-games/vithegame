@@ -119,7 +119,7 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                shouldDestroy = true;
+                shouldDestroy = actionVFX.ShouldBlockProjectiles();
                 actionVFX.OnHit(attacker);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
@@ -136,7 +136,7 @@ namespace Vi.Core
                 }
             }
 
-            if (!other.isTrigger | shouldDestroy) { Debug.Log(other); NetworkObject.Despawn(true); }
+            if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
         }
 
         private new void OnDestroy()
