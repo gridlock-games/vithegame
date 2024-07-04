@@ -81,7 +81,8 @@ namespace Vi.Core
                         {
                             if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
                             {
-                                AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                Debug.Log("Playing whoosh sound");
+                                AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
                                 nearbyWhooshPlayed = true;
                             }
                         }
