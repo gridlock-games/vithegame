@@ -61,6 +61,7 @@ namespace Vi.Utility
         {
             RegisterAudioSource(audioSource);
             audioSource.volume = volume;
+            audioSource.panStereo = 0;
             audioSource.clip = audioClip;
             audioSource.Play();
             while (true)
@@ -77,6 +78,7 @@ namespace Vi.Utility
         {
             RegisterAudioSource(audioSource);
             audioSource.volume = volume;
+            audioSource.panStereo = 0;
             audioSource.clip = audioClip;
             audioSource.Play();
             while (true)
@@ -93,8 +95,8 @@ namespace Vi.Utility
         /// </summary>
         public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume)
         {
-            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation);
-            StartCoroutine(Play3DSoundPrefabOnTransform(transformToFollow, g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
+            AudioSource audioSource = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation).GetComponent<AudioSource>();
+            StartCoroutine(Play3DSoundPrefabOnTransform(transformToFollow, audioSource, audioClip, shouldLoop, volume));
         }
 
         private List<(AudioSource, Transform)> audioSourcesFollowingTransforms = new List<(AudioSource, Transform)>();
@@ -102,12 +104,13 @@ namespace Vi.Utility
         {
             RegisterAudioSource(audioSource);
             audioSourcesFollowingTransforms.Add((audioSource, transformToFollow));
+            audioSource.volume = volume;
+            audioSource.panStereo = 0;
+            audioSource.clip = audioClip;
             if (shouldLoop)
             {
                 while (true)
                 {
-                    audioSource.volume = volume;
-                    audioSource.clip = audioClip;
                     audioSource.Play();
                     while (true)
                     {
@@ -121,8 +124,6 @@ namespace Vi.Utility
             }
             else
             {
-                audioSource.volume = volume;
-                audioSource.clip = audioClip;
                 audioSource.Play();
                 while (true)
                 {
@@ -153,15 +154,17 @@ namespace Vi.Utility
 
         private const float audioSourceFadeOutSpeed = 1.5f;
 
-        public void Play2DClip(AudioClip audioClip, float volume)
+        public AudioSource Play2DClip(AudioClip audioClip, float volume)
         {
-            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab);
-            StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
+            AudioSource audioSource = ObjectPoolingManager.SpawnObject(audioSourcePrefab).GetComponent<AudioSource>();
+            StartCoroutine(Play2DSoundPrefab(audioSource, audioClip, volume));
+            return audioSource;
         }
 
         private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
         {
             audioSource.spatialBlend = 0;
+            audioSource.panStereo = 0;
             audioSource.volume = volume;
             audioSource.clip = audioClip;
             audioSource.Play();

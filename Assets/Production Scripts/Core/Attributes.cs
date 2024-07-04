@@ -165,6 +165,11 @@ namespace Vi.Core
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
+        [SerializeField] private AudioClip heartbeatSoundEffect;
+        private AudioSource heartbeatAudioSource;
+        private const float heartbeatVolume = 1;
+        private const float heartbeatHPPercentageThreshold = 0.1f;
+
         private void OnHPChanged(float prev, float current)
         {
             if (current < prev)
@@ -178,6 +183,28 @@ namespace Vi.Core
             else if (current > prev)
             {
                 GlowRenderer.RenderHeal();
+            }
+
+            if (IsLocalPlayer)
+            {
+                if (heartbeatAudioSource)
+                {
+                    if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
+                    {
+                        if (!heartbeatAudioSource.isPlaying) { heartbeatAudioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume); }
+                    }
+                    else
+                    {
+                        if (heartbeatAudioSource.isPlaying) { heartbeatAudioSource.Stop(); }
+                    }
+                }
+                else // No heart beat audio source
+                {
+                    if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
+                    {
+                        heartbeatAudioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+                    }
+                }
             }
         }
 
@@ -1152,6 +1179,11 @@ namespace Vi.Core
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
+
+                if (heartbeatAudioSource)
+                {
+                    if (heartbeatAudioSource.isPlaying) { heartbeatAudioSource.Stop(); }
+                }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
