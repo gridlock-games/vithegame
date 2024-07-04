@@ -661,14 +661,23 @@ namespace Vi.Core
         }
 
         private static PlayerDataManager _singleton;
-
         private void Awake()
         {
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
+        }
+
+        private void OnEnable()
+        {
             NetSceneManager.sceneLoaded += OnSceneLoad;
             NetSceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDisable()
+        {
+            NetSceneManager.sceneLoaded -= OnSceneLoad;
+            NetSceneManager.sceneUnloaded -= OnSceneUnload;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
