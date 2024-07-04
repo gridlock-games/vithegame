@@ -97,6 +97,7 @@ namespace Vi.ScriptableObjects
 
         public const float attackSoundEffectVolume = 0.25f;
         public const float projectileNearbyWhooshVolume = 1;
+        public const float projectileNearbyWhooshDistanceThreshold = 5;
 
         [System.Serializable]
         private class AttackSoundEffect

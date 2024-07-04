@@ -296,7 +296,12 @@ MonoBehaviour:
   killDistance: 8
   VFXToPlayOnDestroy:
   - {fileID: 2655287871382509185, guid: e4c023fabdf979948ba53afd1e4f11fa, type: 3}
-  soundToPlayOnSpawn: {fileID: 8300000, guid: 866aad696ee7e45cfadcc1af291a0b0d, type: 3}
+  soundToPlayOnSpawn:
+  - {fileID: 8300000, guid: 9b73b5696b59c4f4ca123cd408fd0cdf, type: 3}
+  - {fileID: 8300000, guid: ea357c613b0ba4851a51fc1237499b04, type: 3}
+  - {fileID: 8300000, guid: 866aad696ee7e45cfadcc1af291a0b0d, type: 3}
+  - {fileID: 8300000, guid: 37d437eb1722649fda26ff2a2bbd4ea8, type: 3}
+  whooshNearbySound: []
 --- !u!114 &3107967498327579398
 MonoBehaviour:
   m_ObjectHideFlags: 0

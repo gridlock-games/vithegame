@@ -14,8 +14,8 @@ namespace Vi.Core
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
-        [SerializeField] private AudioClip soundToPlayOnSpawn;
-        [SerializeField] private AudioClip whooshNearbySound;
+        [SerializeField] private AudioClip[] soundToPlayOnSpawn = new AudioClip[0];
+        [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -42,11 +42,10 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
-            if (soundToPlayOnSpawn) { AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position, Weapon.attackSoundEffectVolume); }
-            if (whooshNearbySound) { AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound, true, Weapon.projectileNearbyWhooshVolume); }
-
             startPosition = transform.position;
 
+            if (soundToPlayOnSpawn.Length > 0) { AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume); }
+            
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -68,8 +67,29 @@ namespace Vi.Core
             }
         }
 
+        private bool nearbyWhooshPlayed;
         private void Update()
         {
+            if (IsClient)
+            {
+                if (whooshNearbySound.Length > 0)
+                {
+                    if (!nearbyWhooshPlayed)
+                    {
+                        KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                        if (localPlayerKvp.Value)
+                        {
+                            if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
+                            {
+                                Debug.Log("Playing whoosh sound");
+                                AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                nearbyWhooshPlayed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (!IsServer) { return; }
 
             if (Vector3.Distance(transform.position, startPosition) > killDistance)
