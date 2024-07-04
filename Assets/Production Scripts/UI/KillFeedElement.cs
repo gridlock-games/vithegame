@@ -58,15 +58,21 @@ namespace Vi.UI
                 // Local Player Kill
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.killerNetObjId, out NetworkObject netObj))
                 {
-                    localPlayerBackgroundImage.color = Color.red;
-                    localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
+                    if (netObj.IsLocalPlayer)
+                    {
+                        localPlayerBackgroundImage.color = Color.red;
+                        localPlayerBackgroundImage.enabled = true;
+                    }
                 }
 
                 // Local Player Assist
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.assistNetObjId, out netObj))
                 {
-                    localPlayerBackgroundImage.color = Color.yellow;
-                    localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
+                    if (netObj.IsLocalPlayer)
+                    {
+                        localPlayerBackgroundImage.color = Color.yellow;
+                        localPlayerBackgroundImage.enabled = true;
+                    }
                 }
 
                 // Local Player Death
