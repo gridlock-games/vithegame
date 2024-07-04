@@ -81,7 +81,6 @@ namespace Vi.Core
                         {
                             if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
                             {
-                                Debug.Log("Playing whoosh sound");
                                 AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
                                 nearbyWhooshPlayed = true;
                             }
@@ -137,7 +136,7 @@ namespace Vi.Core
                 }
             }
 
-            if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
+            if (!other.isTrigger | shouldDestroy) { Debug.Log(other); NetworkObject.Despawn(true); }
         }
 
         private new void OnDestroy()
