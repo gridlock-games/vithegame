@@ -15,6 +15,7 @@ namespace Vi.Core
         [SerializeField] private int killDistance = 500;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
         [SerializeField] private AudioClip soundToPlayOnSpawn;
+        [SerializeField] private AudioClip whooshNearbySound;
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -41,7 +42,8 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
-            AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position, Weapon.attackSoundEffectVolume);
+            if (soundToPlayOnSpawn) { AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position, Weapon.attackSoundEffectVolume); }
+            if (whooshNearbySound) { AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound, true, Weapon.projectileNearbyWhooshVolume); }
 
             startPosition = transform.position;
 
