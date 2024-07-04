@@ -55,22 +55,26 @@ namespace Vi.UI
             backgroundImage.color = nonLocalDeathBackgroundColor;
             if (NetworkManager.Singleton.SpawnManager != null)
             {
+                // Local Player Kill
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.killerNetObjId, out NetworkObject netObj))
                 {
                     localPlayerBackgroundImage.color = Color.red;
                     localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
                 }
-                else if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.assistNetObjId, out netObj))
+
+                // Local Player Assist
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.assistNetObjId, out netObj))
                 {
                     localPlayerBackgroundImage.color = Color.yellow;
                     localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
                 }
-                else if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.victimNetObjId, out netObj))
+
+                // Local Player Death
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.victimNetObjId, out netObj))
                 {
                     if (netObj.IsLocalPlayer) { backgroundImage.color = localDeathBackgroundColor; }
                 }
             }
-
             initializationTime = Time.time;
         }
 
