@@ -220,6 +220,48 @@ namespace Vi.ScriptableObjects
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
 
+        [System.Serializable]
+        private class ActionClipSoundEffect
+        {
+            public CharacterReference.RaceAndGender[] raceAndGenders = new CharacterReference.RaceAndGender[] { CharacterReference.RaceAndGender.Universal };
+            public AudioClip[] audioClips;
+            public float normalizedPlayTime;
+        }
+
+        [SerializeField] private List<ActionClipSoundEffect> actionClipSoundEffects = new List<ActionClipSoundEffect>();
+
+        public struct ActionSoundEffect
+        {
+            public int id;
+            public AudioClip audioClip;
+            public float normalizedPlayTime;
+
+            public ActionSoundEffect(int id, AudioClip audioClip, float normalizedPlayTime)
+            {
+                this.id = id;
+                this.audioClip = audioClip;
+                this.normalizedPlayTime = normalizedPlayTime;
+            }
+        }
+
+        public List<ActionSoundEffect> GetActionClipSoundEffects(CharacterReference.RaceAndGender raceAndGender, List<int> idsToExclude)
+        {
+            List<ActionClipSoundEffect> filteredEffects = actionClipSoundEffects.FindAll(item => item.raceAndGenders.Contains(raceAndGender));
+            List<ActionSoundEffect> returnList = new List<ActionSoundEffect>();
+            for (int i = 0; i < filteredEffects.Count; i++)
+            {
+                if (idsToExclude.Contains(i)) { continue; }
+
+                ActionClipSoundEffect actionClipSoundEffect = filteredEffects[i];
+                returnList.Add(new ActionSoundEffect(i,
+                    actionClipSoundEffect.audioClips[Random.Range(0, actionClipSoundEffect.audioClips.Length)],
+                    actionClipSoundEffect.normalizedPlayTime));
+            }
+            return returnList;
+        }
+
+        public const float actionClipSoundEffectVolume = 1;
+
         public List<StatusPayload> statusesToApplyToSelfOnActivate = new List<StatusPayload>();
         public List<StatusPayload> statusesToApplyToTargetOnHit = new List<StatusPayload>();
         public List<StatusPayload> statusesToApplyToTeammateOnHit = new List<StatusPayload>();

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(NetworkRigidbody))]
     public class ActionVFXParticleSystem : GameInteractiveActionVFX
     {
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
@@ -25,6 +27,8 @@ namespace Vi.Core
         private ParticleSystem[] particleSystems;
         private void Awake()
         {
+            GetComponent<Rigidbody>().useGravity = false;
+
             particleSystems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem ps in particleSystems)
             {

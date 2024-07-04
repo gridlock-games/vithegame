@@ -37,8 +37,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3721360468853069914, guid: 82f717fbf9bbd57439863c36b801fff0,
         type: 3}
+      propertyPath: audioClipToPlayOnAwake
+      value: 
+      objectReference: {fileID: 8300000, guid: a3fb0abf9ecd447bdabd638be199edb4, type: 3}
+    - target: {fileID: 3721360468853069914, guid: 82f717fbf9bbd57439863c36b801fff0,
+        type: 3}
       propertyPath: onActivateVFXSpawnNormalizedTime
       value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 6553866435251638193, guid: 82f717fbf9bbd57439863c36b801fff0,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3857915650
       objectReference: {fileID: 0}
     - target: {fileID: 8049695311191997003, guid: 82f717fbf9bbd57439863c36b801fff0,
         type: 3}

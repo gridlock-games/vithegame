@@ -8,6 +8,10 @@ namespace Vi.Core
 {
     public class RuntimeWeapon : MonoBehaviour
     {
+        [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
+
+        public Weapon.WeaponMaterial GetWeaponMaterial() { return weaponMaterial; }
+
         private List<RuntimeWeapon> associatedRuntimeWeapons = new List<RuntimeWeapon>();
         public void SetAssociatedRuntimeWeapons(List<RuntimeWeapon> runtimeWeapons)
         {
@@ -79,15 +83,17 @@ namespace Vi.Core
             return true;
         }
 
-        protected Weapon.WeaponBone weaponBone;
+        public Weapon.WeaponBone WeaponBone { get; private set; }
 
-        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.weaponBone = weaponBone; }
+        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
 
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;
 
         private Collider[] colliders;
         private Renderer[] renderers;
+
+        public Vector3 GetClosetPointFromAttributes(Attributes victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
         protected void Start()
         {

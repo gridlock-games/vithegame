@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
@@ -35,11 +34,11 @@ namespace Vi.Utility
         }
 
         List<AudioSource> registeredAudioSources = new List<AudioSource>();
-        public void RegisterAudioSource(AudioSource audioSource)
+        private void RegisterAudioSource(AudioSource audioSource)
         {
             audioSource.spatialBlend = 1;
             audioSource.minDistance = 5;
-            registeredAudioSources.Add(audioSource);
+            if (!registeredAudioSources.Contains(audioSource)) { registeredAudioSources.Add(audioSource); }
         }
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace Vi.Utility
         /// <param name="audioClip"></param>
         /// <param name="position"></param>
         /// <param name="volume"></param>
-        public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume = 1)
+        public void PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, position, Quaternion.identity);
             if (objectToDestroyWith)
@@ -58,62 +57,121 @@ namespace Vi.Utility
                 StartCoroutine(Play3DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource, AudioClip audioClip, float volume)
         {
             RegisterAudioSource(audioSource);
-            audioSource.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSource.isPlaying | !invoker);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
+            while (true)
+            {
+                if (!invoker) { break; }
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
-        private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
         {
             RegisterAudioSource(audioSource);
-            audioSource.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSource.isPlaying);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         /// <summary>
         /// Plays an audio clip in 3D sound space while following a transform's position
         /// </summary>
-        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume = 1)
+        public void PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume)
         {
-            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow);
-            StartCoroutine(Play3DSoundPrefabOnTransform(g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
+            GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation);
+            StartCoroutine(Play3DSoundPrefabOnTransform(transformToFollow, g.GetComponent<AudioSource>(), audioClip, shouldLoop, volume));
         }
 
-        private IEnumerator Play3DSoundPrefabOnTransform(AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume = 1)
+        private List<(AudioSource, Transform)> audioSourcesFollowingTransforms = new List<(AudioSource, Transform)>();
+        private IEnumerator Play3DSoundPrefabOnTransform(Transform transformToFollow, AudioSource audioSource, AudioClip audioClip, bool shouldLoop, float volume)
         {
             RegisterAudioSource(audioSource);
+            audioSourcesFollowingTransforms.Add((audioSource, transformToFollow));
             if (shouldLoop)
             {
                 while (true)
                 {
-                    if (!audioSource.isPlaying) { audioSource.PlayOneShot(audioClip, volume); }
-                    yield return null;
+                    audioSource.volume = volume;
+                    audioSource.clip = audioClip;
+                    audioSource.Play();
+                    while (true)
+                    {
+                        yield return null;
+                        if (!audioSource) { break; }
+                        if (!audioSource.isPlaying) { break; }
+                        if (!transformToFollow) { break; }
+                        if (!transformToFollow.gameObject.activeInHierarchy) { break; }
+                    }
                 }
             }
             else
             {
-                audioSource.PlayOneShot(audioClip, volume);
-                yield return new WaitUntil(() => !audioSource.isPlaying);
+                audioSource.volume = volume;
+                audioSource.clip = audioClip;
+                audioSource.Play();
+                while (true)
+                {
+                    yield return null;
+                    if (!audioSource) { break; }
+                    if (!audioSource.isPlaying) { break; }
+                    if (!transformToFollow) { break; }
+                    if (!transformToFollow.gameObject.activeInHierarchy) { break; }
+                }
             }
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            audioSourcesFollowingTransforms.Remove((audioSource, transformToFollow));
+
+            // Fade audio clip out
+            if (audioSource)
+            {
+                while (true)
+                {
+                    if (!audioSource) { break; }
+                    if (!audioSource.isPlaying) { break; }
+                    audioSource.volume = Mathf.MoveTowards(audioSource.volume, 0, Time.deltaTime * audioSourceFadeOutSpeed);
+                    if (Mathf.Approximately(0, audioSource.volume)) { break; }
+                    yield return null;
+                }
+            }
+
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
-        public void Play2DClip(AudioClip audioClip, float volume = 1)
+        private const float audioSourceFadeOutSpeed = 1.5f;
+
+        public void Play2DClip(AudioClip audioClip, float volume)
         {
             GameObject g = ObjectPoolingManager.SpawnObject(audioSourcePrefab);
             StartCoroutine(Play2DSoundPrefab(g.GetComponent<AudioSource>(), audioClip, volume));
         }
 
-        private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume = 1)
+        private IEnumerator Play2DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
         {
             audioSource.spatialBlend = 0;
-            audioSource.PlayOneShot(audioClip, volume);
-            yield return new WaitUntil(() => !audioSource.isPlaying);
-            ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject);
+            audioSource.volume = volume;
+            audioSource.clip = audioClip;
+            audioSource.Play();
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
         }
 
         private void Awake()
@@ -187,6 +245,34 @@ namespace Vi.Utility
             lastTimeScale = Time.timeScale;
         }
 
+        private void LateUpdate()
+        {
+            List<int> indexesToRemove = new List<int>();
+            for (int i = 0; i < audioSourcesFollowingTransforms.Count; i++)
+            {
+                (AudioSource audioSource, Transform transformToFollow) = audioSourcesFollowingTransforms[i];
+                if (!audioSource)
+                {
+                    Debug.LogWarning("There is a null audio source in the audio source follow list");
+                    indexesToRemove.Add(i);
+                    continue;
+                }
+                if (!transformToFollow)
+                {
+                    Debug.LogWarning("There is a null transform in the audio source follow list");
+                    indexesToRemove.Add(i);
+                    continue;
+                }
+                audioSource.transform.position = transformToFollow.position;
+                audioSource.transform.rotation = transformToFollow.rotation;
+            }
+
+            foreach (int index in indexesToRemove.OrderByDescending(item => item))
+            {
+                audioSourcesFollowingTransforms.RemoveAt(index);
+            }
+        }
+
         private bool isCrossfading;
         private Coroutine crossFadeCoroutine;
         private IEnumerator CrossFadeBetweenSongs()
@@ -215,12 +301,18 @@ namespace Vi.Utility
 
         private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private void OnSceneUnload(Scene scene)
         {
-            RefreshMusicClip();
+            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
+            {
+                RefreshMusicClip();
+            }
         }
 
         private MusicClip currentMusicClip;

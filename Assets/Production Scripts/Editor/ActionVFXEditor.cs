@@ -26,6 +26,7 @@ namespace Vi.Editor
         private SerializedProperty spWeaponBone;
 
         protected SerializedProperty spAudioClipToPlayOnAwake;
+        protected SerializedProperty spAwakeAudioClipDelay;
         protected SerializedProperty spAudioClipToPlayOnDestroy;
 
         private SerializedProperty spVFXToPlayOnDestroy;
@@ -48,6 +49,7 @@ namespace Vi.Editor
             spWeaponBone = serializedObject.FindProperty("weaponBone");
 
             spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
+            spAwakeAudioClipDelay = serializedObject.FindProperty("awakeAudioClipDelay");
             spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
 
             spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
@@ -80,6 +82,7 @@ namespace Vi.Editor
             }
 
             EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
+            EditorGUILayout.PropertyField(spAwakeAudioClipDelay);
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
 
             EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);

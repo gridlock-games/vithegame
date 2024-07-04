@@ -349,7 +349,9 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 7830744759515969986, guid: fa58b7bbcd367d642828526727044890, type: 3}
     - {fileID: 3497094938622122046, guid: 9376041f4f506d94fa51cf3e6a7c479b, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: c881fc07be5250045b81332a8c82e6c3, type: 3}
+    - {fileID: 21300000, guid: a40adccf72680c74da68ae53858d519a, type: 3}
   - name: Assassin Boots
     equipmentType: 1
     itemWebId: 667f27aaea2df2c20ce25898
@@ -357,7 +359,9 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 3326138393951176630, guid: a5329746e81c5ea48ac414e64b2afb71, type: 3}
     - {fileID: 1767781102236740586, guid: 4db2dbb5168a5af4e931d53a266fc9e7, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: 8cdc10c72bff1404cbb7a292a4f21cd9, type: 3}
+    - {fileID: 21300000, guid: e853a445269c9d648ac190d613ae936e, type: 3}
   - name: Assassin Chest
     equipmentType: 3
     itemWebId: 667f27abea2df2c20ce2589a
@@ -365,7 +369,9 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 4500617072886132026, guid: 16e2c0c2661113143bc01a02ec5f83eb, type: 3}
     - {fileID: 4673163311507882856, guid: 41333f7d06e90b44180304a059c2e5bc, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: a40d2e74a0f7a204a97b9b0ec8a88ade, type: 3}
+    - {fileID: 21300000, guid: 545550e113457454f9911da38166a4aa, type: 3}
   - name: Assassin Helm
     equipmentType: 5
     itemWebId: 667f27abea2df2c20ce2589c
@@ -373,7 +379,9 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 7406966896484744889, guid: 546bda282672fe9498f61d90bab8fa5c, type: 3}
     - {fileID: 5144768678742532080, guid: 5cd1fc5c874ec2c4b8a11ad5caef2953, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: 2d06d25a65fde9b4081cd4ed69851383, type: 3}
+    - {fileID: 21300000, guid: 59b64510ec20bcd4aad209bfaf7ed85f, type: 3}
   - name: Assassin Pants
     equipmentType: 6
     itemWebId: 667f27abea2df2c20ce2589e
@@ -381,7 +389,9 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 2247963779651151487, guid: 39c68098ddb800940aa6593dc21c3660, type: 3}
     - {fileID: 3464823441149913952, guid: c5f8e70b4fc88834a9eb2753e502d7ab, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: 9c6ca90196c24984697e41bceb34e037, type: 3}
+    - {fileID: 21300000, guid: 97ea2626a0f412f44bdb9133c3c3527c, type: 3}
   - name: Assassin Shoulders
     equipmentType: 8
     itemWebId: 667f27acea2df2c20ce258a0
@@ -389,12 +399,27 @@ MonoBehaviour:
     wearableEquipmentOptions:
     - {fileID: 5738330021159345886, guid: 320907e3d17c6e446a46630baf4d30fc, type: 3}
     - {fileID: 1432434168705815661, guid: bfb0e33d90dc59c4cab5b6ba1860ca77, type: 3}
-    equipmentIcons: []
+    equipmentIcons:
+    - {fileID: 21300000, guid: 349f79d5cb4d2854ea99169499873844, type: 3}
+    - {fileID: 21300000, guid: c3d683ec857f5714db2390cb04f94fef, type: 3}
   - name: Assassin Gloves
     equipmentType: 4
     itemWebId: 667f27acea2df2c20ce258a2
-    raceAndGenders: 00000000
+    raceAndGenders: 0000000001000000
     wearableEquipmentOptions:
     - {fileID: 5175558174358472165, guid: b4be7ac4d4b14a04b84b158392c3f04a, type: 3}
-    equipmentIcons: []
+    - {fileID: 3695060663615811259, guid: 64d4f772930b9e04d8eacdf9247840db, type: 3}
+    equipmentIcons:
+    - {fileID: 21300000, guid: cdadce76e877d5549b249e073eb196f5, type: 3}
+    - {fileID: 21300000, guid: bcabc359fc052114db8032546e21b776, type: 3}
+  - name: Assassin Cape
+    equipmentType: 2
+    itemWebId: 66842d1b198268e6325a6b76
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7008941732449025597, guid: 44adf38f32f4ea44f944da0e84877498, type: 3}
+    - {fileID: 7980503783723967595, guid: 108284de1ec1a994d8077f5fca52a925, type: 3}
+    equipmentIcons:
+    - {fileID: 21300000, guid: 4d1b57420b9b4124b807a86e6c2a51c5, type: 3}
+    - {fileID: 21300000, guid: fd29a4b12cfa8ef41a50991539b65cb0, type: 3}
   characterMaterialOptions: []

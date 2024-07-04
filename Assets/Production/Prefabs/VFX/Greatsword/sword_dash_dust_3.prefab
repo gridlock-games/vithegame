@@ -9,6 +9,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2307277777639303676, guid: 8d3f722683f794ac18e8fafdb835723e,
         type: 3}
+      propertyPath: audioClipToPlayOnAwake
+      value: 
+      objectReference: {fileID: 8300000, guid: 67c42589560d84063aebc95c9db2c2f0, type: 3}
+    - target: {fileID: -2307277777639303676, guid: 8d3f722683f794ac18e8fafdb835723e,
+        type: 3}
       propertyPath: onActivateVFXSpawnNormalizedTime
       value: 0.57
       objectReference: {fileID: 0}
@@ -16,6 +21,11 @@ PrefabInstance:
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
       value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 2770853617174208726, guid: 8d3f722683f794ac18e8fafdb835723e,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2631911771
       objectReference: {fileID: 0}
     - target: {fileID: 6930328920461549744, guid: 8d3f722683f794ac18e8fafdb835723e,
         type: 3}

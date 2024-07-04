@@ -90,6 +90,8 @@ namespace Vi.Editor
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
 
+        private SerializedProperty spActionClipSoundEffects;
+
         private SerializedProperty spStatusesToApplyToSelfOnActivate;
         private SerializedProperty spStatusesToApplyToTargetOnHit;
         private SerializedProperty spStatusesToApplyToTeammateOnHit;
@@ -100,9 +102,6 @@ namespace Vi.Editor
 
         private SerializedProperty spUseRotationalTargetingSystem;
         private SerializedProperty spLimitAttackMotionBasedOnTarget;
-        //private SerializedProperty spBoxCastOriginPositionOffset;
-        //private SerializedProperty spBoxCastHalfExtents;
-        //private SerializedProperty spBoxCastDistance;
         private SerializedProperty spMaximumTargetingRotationAngle;
 
         private SerializedProperty spCanLunge;
@@ -192,6 +191,8 @@ namespace Vi.Editor
             spCanBeCancelledByHeavyAttacks = serializedObject.FindProperty("canBeCancelledByHeavyAttacks");
             spCanBeCancelledByAbilities = serializedObject.FindProperty("canBeCancelledByAbilities");
 
+            spActionClipSoundEffects = serializedObject.FindProperty("actionClipSoundEffects");
+
             spStatusesToApplyToSelfOnActivate = serializedObject.FindProperty("statusesToApplyToSelfOnActivate");
             spStatusesToApplyToTargetOnHit = serializedObject.FindProperty("statusesToApplyToTargetOnHit");
             spStatusesToApplyToTeammateOnHit = serializedObject.FindProperty("statusesToApplyToTeammateOnHit");
@@ -202,9 +203,6 @@ namespace Vi.Editor
 
             spUseRotationalTargetingSystem = serializedObject.FindProperty("useRotationalTargetingSystem");
             spLimitAttackMotionBasedOnTarget = serializedObject.FindProperty("limitAttackMotionBasedOnTarget");
-            //spBoxCastOriginPositionOffset = serializedObject.FindProperty("boxCastOriginPositionOffset");
-            //spBoxCastHalfExtents = serializedObject.FindProperty("boxCastHalfExtents");
-            //spBoxCastDistance = serializedObject.FindProperty("boxCastDistance");
             spMaximumTargetingRotationAngle = serializedObject.FindProperty("maximumTargetingRotationAngle");
 
             spCanLunge = serializedObject.FindProperty("canLunge");
@@ -348,6 +346,11 @@ namespace Vi.Editor
                 }
             }
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Audio Settings", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.PropertyField(spActionClipSoundEffects);
+
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
             EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);

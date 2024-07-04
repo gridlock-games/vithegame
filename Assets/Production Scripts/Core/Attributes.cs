@@ -19,6 +19,8 @@ namespace Vi.Core
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
         public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
 
+        public CharacterReference.RaceAndGender GetRaceAndGender() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).character.raceAndGender; }
+
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
@@ -233,6 +235,10 @@ namespace Vi.Core
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
+        public NetworkCollider NetworkCollider { get; private set; }
+
+        public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
+
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
@@ -327,8 +333,10 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
+            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
+                attackAilment = ActionClip.Ailment.Death;
                 ailment.Value = ActionClip.Ailment.Death;
                 animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
 
@@ -349,7 +357,7 @@ namespace Vi.Core
                 animationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, false);
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, animationHandler.GetArmorType(), Weapon.WeaponBone.Root, attackAilment);
             AddHP(damage);
             return true;
         }
@@ -409,6 +417,7 @@ namespace Vi.Core
         }
 
         private NetworkVariable<int> grabAssailantDataId = new NetworkVariable<int>();
+        private NetworkVariable<int> grabVictimDataId = new NetworkVariable<int>();
         private NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
@@ -421,6 +430,18 @@ namespace Vi.Core
             if (PlayerDataManager.Singleton.ContainsId(grabAssailantDataId.Value))
             {
                 return PlayerDataManager.Singleton.GetPlayerObjectById(grabAssailantDataId.Value);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Attributes GetGrabVictim()
+        {
+            if (PlayerDataManager.Singleton.ContainsId(grabVictimDataId.Value))
+            {
+                return PlayerDataManager.Singleton.GetPlayerObjectById(grabVictimDataId.Value);
             }
             else
             {
@@ -445,6 +466,8 @@ namespace Vi.Core
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
+                grabAssailantDataId.Value = default;
+                grabVictimDataId.Value = default;
             }
 
             if (animationHandler.IsGrabAttacking())
@@ -667,6 +690,7 @@ namespace Vi.Core
                 {
                     grabAttackClipName.Value = attack.name;
                     grabAssailantDataId.Value = attacker.GetPlayerDataId();
+                    attacker.grabVictimDataId.Value = GetPlayerDataId();
                     isGrabbed.Value = true;
                     Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
                     movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
@@ -695,7 +719,7 @@ namespace Vi.Core
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                RenderBlock(impactPosition);
+                RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
                 float prevHP = GetHP();
                 AddHP(HPDamage);
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -705,7 +729,7 @@ namespace Vi.Core
             {
                 if (HPDamage != 0)
                 {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, attackAilment == ActionClip.Ailment.Knockdown);
+                    RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -717,11 +741,14 @@ namespace Vi.Core
 
             attacker.comboCounter.Value += 1;
 
-            foreach (ActionVFX actionVFX in attack.actionVFXList)
+            if (IsServer)
             {
-                if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
-                    weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                    if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                    }
                 }
             }
 
@@ -787,7 +814,8 @@ namespace Vi.Core
                     Vector3 endPos = hitSourcePosition;
                     startPos.y = 0;
                     endPos.y = 0;
-                    ailmentRotation.Value = Quaternion.LookRotation(endPos - startPos, Vector3.up);
+                    Vector3 rel = endPos - startPos;
+                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
 
                     shouldApplyAilment = true;
 
@@ -903,25 +931,25 @@ namespace Vi.Core
         private const float attackerRageToBeAddedOnHit = 2;
         private const float victimRageToBeAddedOnHit = 1;
 
-        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition, Weapon.hitSoundEffectVolume);
 
-            RenderHitClientRpc(attackerNetObjId, impactPosition, isKnockdown);
+            RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, bool isKnockdown)
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().hitVFXPrefab, impactPosition, Quaternion.identity)));
             Weapon weapon = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<WeaponHandler>().GetWeapon();
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, isKnockdown ? weapon.knockbackHitAudioClip : weapon.hitAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weapon.GetInflictHitSoundEffect(armorType, weaponBone, ailment), impactPosition, Weapon.hitSoundEffectVolume);
         }
 
         private void RenderHitGlowOnly()
@@ -939,23 +967,23 @@ namespace Vi.Core
             GlowRenderer.RenderHit();
         }
 
-        private void RenderBlock(Vector3 impactPosition)
+        private void RenderBlock(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
 
-            RenderBlockClientRpc(impactPosition);
+            RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void RenderBlockClientRpc(Vector3 impactPosition)
+        private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             GlowRenderer.RenderBlock();
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(weaponHandler.GetWeapon().blockVFXPrefab, impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().blockAudioClip, impactPosition);
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, weaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
@@ -1103,12 +1131,15 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+            if (IsServer)
             {
-                if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
                 {
-                    GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
-                    StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        GameObject instance = weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                        StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                    }
                 }
             }
 
@@ -1205,6 +1236,8 @@ namespace Vi.Core
             yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
             yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
             isGrabbed.Value = false;
+            grabAssailantDataId.Value = default;
+            grabVictimDataId.Value = default;
         }
 
         public List<ActionClip.Status> GetActiveStatuses()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -21,6 +22,14 @@ namespace Vi.ScriptableObjects
         [SerializeField] private WeaponClass weaponClass;
 
         public WeaponClass GetWeaponClass() { return weaponClass; }
+
+        public enum WeaponMaterial
+        {
+            Metal,
+            Wood,
+            Bone,
+            Ice
+        }
 
         [Header("Locomotion")]
         [SerializeField] private float runSpeed = 5;
@@ -86,6 +95,8 @@ namespace Vi.ScriptableObjects
         public bool ShouldUseAmmo() { return shouldUseAmmo; }
         public int GetMaxAmmoCount() { return maxAmmoCount; }
 
+        public const float attackSoundEffectVolume = 0.25f;
+
         [System.Serializable]
         private class AttackSoundEffect
         {
@@ -93,7 +104,6 @@ namespace Vi.ScriptableObjects
             public AudioClip[] attackSoundEffects = new AudioClip[0];
         }
 
-        [Header("Rest Of Settings")]
         [SerializeField] private List<AttackSoundEffect> attackSoundEffects = new List<AttackSoundEffect>();
         public AudioClip GetAttackSoundEffect(WeaponBone weaponBone)
         {
@@ -102,16 +112,87 @@ namespace Vi.ScriptableObjects
             return attackSoundEffect.attackSoundEffects[Random.Range(0, attackSoundEffect.attackSoundEffects.Length)];
         }
 
-        public AudioClip drawSoundEffect;
-        public AudioClip sheatheSoundEffect;
+        public enum ArmorType
+        {
+            Cloth,
+            Metal,
+            Flesh
+        }
 
-        [Header("Recieve Hit Effects")]
-        public AudioClip hitAudioClip;
-        public AudioClip knockbackHitAudioClip;
+        public const float hitSoundEffectVolume = 1;
+
+        [System.Serializable]
+        private class InflictHitSoundEffect
+        {
+            public ActionClip.Ailment ailment;
+            public ArmorType armorType;
+            public WeaponBone[] weaponBones = new WeaponBone[] { WeaponBone.Root };
+            public AudioClip[] hitSounds = new AudioClip[0];
+        }
+
+        [SerializeField] private List<InflictHitSoundEffect> inflictHitSoundEffects = new List<InflictHitSoundEffect>();
+
+        public AudioClip GetInflictHitSoundEffect(ArmorType armorType, WeaponBone weaponBone, ActionClip.Ailment ailment)
+        {
+            List<InflictHitSoundEffect> inflictHitSoundEffects;
+            if (weaponBone == WeaponBone.Root)
+            {
+                inflictHitSoundEffects = this.inflictHitSoundEffects;
+            }
+            else if (this.inflictHitSoundEffects.Exists(item => item.weaponBones.Contains(weaponBone)))
+            {
+                inflictHitSoundEffects = this.inflictHitSoundEffects.FindAll(item => item.weaponBones.Contains(weaponBone));
+            }
+            else
+            {
+                Debug.LogWarning("Weapon bone " + weaponBone + " doesn't have inflict hit sound effects on weapon " + this);
+                inflictHitSoundEffects = this.inflictHitSoundEffects;
+            }
+
+            InflictHitSoundEffect inflictHitSoundEffect = ailment == ActionClip.Ailment.None ? null : inflictHitSoundEffects.Find(item => item.ailment == ailment);
+            if (inflictHitSoundEffect == null)
+            {
+                inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);
+                if (inflictHitSoundEffect == null)
+                {
+                    return inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None).hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                }
+                else // If armor effect isn't null
+                {
+                    return inflictHitSoundEffect.hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                }
+            }
+            else // If ailment effect isn't null
+            {
+                return inflictHitSoundEffect.hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+            }
+        }
+
         public GameObject hitVFXPrefab;
 
-        [Header("Block Effects")]
-        public AudioClip blockAudioClip;
+        [System.Serializable]
+        private class BlockSoundEffect
+        {
+            public WeaponMaterial attackingWeaponMaterial;
+            public AudioClip[] hitSounds;
+        }
+
+        [SerializeField] private List<BlockSoundEffect> blockingHitSoundEffects = new List<BlockSoundEffect>();
+
+        public AudioClip GetBlockingHitSoundEffect(WeaponMaterial attackingWeaponMaterial)
+        {
+            BlockSoundEffect blockingHitSoundEffect;
+            if (blockingHitSoundEffects.Exists(item => item.attackingWeaponMaterial == attackingWeaponMaterial))
+            {
+                blockingHitSoundEffect = blockingHitSoundEffects.Find(item => item.attackingWeaponMaterial == attackingWeaponMaterial);
+            }
+            else
+            {
+                blockingHitSoundEffect = blockingHitSoundEffects[0];
+            }
+            return blockingHitSoundEffect.hitSounds[Random.Range(0, blockingHitSoundEffect.hitSounds.Length)];
+        }
+
         public GameObject blockVFXPrefab;
 
         public enum WeaponBone

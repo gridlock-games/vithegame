@@ -10,6 +10,7 @@ namespace Vi.ScriptableObjects
     public class WearableEquipment : MonoBehaviour
     {
         public CharacterReference.EquipmentType equipmentType;
+        public Weapon.ArmorType armorType = Weapon.ArmorType.Cloth;
         public bool shouldDisableCharSkinRenderer;
 
         private const bool shouldDebugWarnings = false;

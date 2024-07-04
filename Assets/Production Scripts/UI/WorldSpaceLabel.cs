@@ -76,6 +76,7 @@ namespace Vi.UI
             canvas.worldCamera = mainCamera;
         }
 
+        private PlayerDataManager.Team team;
         private void UpdateNameTextAndColors()
         {
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
@@ -83,7 +84,8 @@ namespace Vi.UI
 
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameDisplay.color = Color.white;
-            healthFillImage.color = relativeTeamColor == Color.black | attributes.GetTeam() == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
+            team = attributes.GetTeam();
+            healthFillImage.color = relativeTeamColor == Color.black | team == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
         }
 
         private void RefreshRendererToFollow()
@@ -172,7 +174,7 @@ namespace Vi.UI
                     if (localPlayerKvp.Value.GetComponent<WeaponHandler>().CanAim) { healthBarLocalScaleTarget = Vector3.one; }
                 }
             }
-            healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
+            healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
 
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
