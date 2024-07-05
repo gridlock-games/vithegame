@@ -166,7 +166,6 @@ namespace Vi.Core
         }
 
         [SerializeField] private AudioClip heartbeatSoundEffect;
-        private AudioSource heartbeatAudioSource;
         private const float heartbeatVolume = 1;
         private const float heartbeatHPPercentageThreshold = 0.1f;
 
@@ -187,25 +186,30 @@ namespace Vi.Core
 
             if (IsLocalPlayer)
             {
-                if (heartbeatAudioSource)
+                if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
                 {
-                    if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
-                    {
-                        if (!heartbeatAudioSource.isPlaying) { heartbeatAudioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume); }
-                    }
-                    else
-                    {
-                        if (heartbeatAudioSource.isPlaying) { heartbeatAudioSource.Stop(); }
-                    }
-                }
-                else // No heart beat audio source
-                {
-                    if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
-                    {
-                        heartbeatAudioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
-                    }
+                    if (!heartbeatSoundIsPlaying) { StartCoroutine(PlayHeartbeatSound()); }
                 }
             }
+        }
+
+        private bool heartbeatSoundIsPlaying;
+        private IEnumerator PlayHeartbeatSound()
+        {
+            heartbeatSoundIsPlaying = true;
+            AudioSource audioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                if (GetAilment() == ActionClip.Ailment.Death) { break; }
+                if (GetHP() / GetMaxHP() >= heartbeatHPPercentageThreshold) { break; }
+                yield return null;
+            }
+
+            if (audioSource) { if (audioSource.isPlaying) { audioSource.Stop(); } }
+            heartbeatSoundIsPlaying = false;
         }
 
         private void OnSpiritChanged(float prev, float current)
@@ -1179,11 +1183,6 @@ namespace Vi.Core
                 animationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
-
-                if (heartbeatAudioSource)
-                {
-                    if (heartbeatAudioSource.isPlaying) { heartbeatAudioSource.Stop(); }
-                }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
