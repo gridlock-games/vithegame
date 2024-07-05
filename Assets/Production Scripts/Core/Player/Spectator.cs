@@ -58,6 +58,7 @@ namespace Vi.Player
             if (IsLocalPlayer)
             {
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+                Cursor.lockState = CursorLockMode.None;
             }
         }
 
