@@ -22,13 +22,14 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                RefreshStatus();
+
                 GetComponent<PlayerInput>().enabled = true;
                 GetComponent<Camera>().enabled = true;
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-
-                RefreshStatus();
             }
             else
             {
