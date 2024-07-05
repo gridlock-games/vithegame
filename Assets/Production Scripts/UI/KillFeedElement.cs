@@ -105,7 +105,6 @@ namespace Vi.UI
                 }
             }
             initializationTime = Time.time;
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
         }
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
@@ -132,6 +131,7 @@ namespace Vi.UI
 
         private const float fadeTime = 4;
         private Color lastTargetColor;
+        private float lastWidthEvaluated;
         private void Update()
         {
             for (int i = 0; i < tintMaterialInstances.Count; i++)
@@ -140,6 +140,9 @@ namespace Vi.UI
                 if (IsNotRunning()) { targetColor.a = 0; }
                 if (lastTargetColor != targetColor) { tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime); }
             }
+
+            float targetWidth = transformToCopyWidthFrom.sizeDelta.x;
+            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated)) { rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth); }
         }
     }
 }
