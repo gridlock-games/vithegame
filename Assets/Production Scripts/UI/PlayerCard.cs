@@ -38,6 +38,9 @@ namespace Vi.UI
         [SerializeField] private Image spiritBackground;
 
         [Header("Rage UI")]
+        [SerializeField] private RenderTexture ragingRT;
+        [SerializeField] private RenderTexture rageReadyRT;
+        [SerializeField] private RawImage rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
