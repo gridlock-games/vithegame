@@ -63,9 +63,9 @@ namespace Vi.UI
             else // We are a spectator or the server
             {
                 // TODO Set this to be the team color
-                killerText.color = PlayerDataManager.GetTeamColor(killHistoryElement.killerTeam);
-                assistText.color = PlayerDataManager.GetTeamColor(killHistoryElement.assistTeam);
-                victimText.color = PlayerDataManager.GetTeamColor(killHistoryElement.victimTeam);
+                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.killerTeam);
+                assistText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.assistTeam);
+                victimText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.victimTeam);
             }
 
             localPlayerBackgroundImage.enabled = false;
@@ -105,6 +105,7 @@ namespace Vi.UI
                 }
             }
             initializationTime = Time.time;
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
         }
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
@@ -130,15 +131,15 @@ namespace Vi.UI
         }
 
         private const float fadeTime = 4;
+        private Color lastTargetColor;
         private void Update()
         {
             for (int i = 0; i < tintMaterialInstances.Count; i++)
             {
                 Color targetColor = Color.white;
                 if (IsNotRunning()) { targetColor.a = 0; }
-                tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime);
+                if (lastTargetColor != targetColor) { tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime); }
             }
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
         }
     }
 }

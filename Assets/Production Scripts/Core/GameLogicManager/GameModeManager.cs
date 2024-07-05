@@ -216,9 +216,9 @@ namespace Vi.Core.GameModeManagers
                 killerNetObjId = 0;
                 assistNetObjId = 0;
                 victimNetObjId = 0;
-                killerTeam = PlayerDataManager.Team.Environment;
-                assistTeam = PlayerDataManager.Team.Environment;
-                victimTeam = PlayerDataManager.Team.Environment;
+                killerTeam = PlayerDataManager.Team.Competitor;
+                assistTeam = PlayerDataManager.Team.Competitor;
+                victimTeam = PlayerDataManager.Team.Competitor;
                 var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
                 switch (killType)
                 {

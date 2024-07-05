@@ -163,7 +163,8 @@ namespace Vi.Core
             { Team.Yellow, Color.yellow },
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
-            { Team.Purple, Color.magenta }
+            { Team.Purple, Color.magenta },
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) }
         };
 
         public static Color GetTeamColor(Team team)
