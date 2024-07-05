@@ -145,9 +145,9 @@ namespace Vi.ScriptableObjects
         [SerializeField] private AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
-        public AnimationCurve GetHitReactionRootMotionForwardMultiplier() { return hitReactionRootMotionForwardMultiplier; }
-        public AnimationCurve GetHitReactionRootMotionSidesMultiplier() { return hitReactionRootMotionSidesMultiplier; }
-        public AnimationCurve GetHitReactionRootMotionVerticalMultiplier() { return hitReactionRootMotionVerticalMultiplier; }
+        public AnimationCurve GetHitReactionRootMotionForwardMultiplier() { if (GetClipType() != ClipType.HitReaction) { Debug.LogError("Should only get hit reaction mutliplier curves on hit reaction clips " + this); } return hitReactionRootMotionForwardMultiplier; }
+        public AnimationCurve GetHitReactionRootMotionSidesMultiplier() { if (GetClipType() != ClipType.HitReaction) { Debug.LogError("Should only get hit reaction mutliplier curves on hit reaction clips " + this); } return hitReactionRootMotionSidesMultiplier; }
+        public AnimationCurve GetHitReactionRootMotionVerticalMultiplier() { if (GetClipType() != ClipType.HitReaction) { Debug.LogError("Should only get hit reaction mutliplier curves on hit reaction clips " + this); } return hitReactionRootMotionVerticalMultiplier; }
 
         public void SetHitReactionRootMotionMultipliers(ActionClip attackClip)
         {

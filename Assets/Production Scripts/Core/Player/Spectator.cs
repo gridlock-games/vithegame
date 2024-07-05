@@ -353,6 +353,12 @@ namespace Vi.Player
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             base.Update();
+
+            if (IsServer)
+            {
+                if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
+            }
+
             if (!IsLocalPlayer) { return; }
 
             #if UNITY_IOS || UNITY_ANDROID
@@ -440,8 +446,6 @@ namespace Vi.Player
                 transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
             ResetLookInput();
-
-            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
     }
 }
