@@ -375,10 +375,11 @@ namespace Vi.UI
 
         private Vector3 equippedWeaponCardTargetLocalPosition;
         private Vector3 stowedWeaponCardTargetLocalPosition;
-        private Resolution lastResolutionEvaluated;
+        private int lastWidthEvaluated;
+        private int lastHeightEvaluated;
         private void RefreshWeaponCardTargetPositions()
         {
-            if (Screen.currentResolution.width == lastResolutionEvaluated.width & Screen.currentResolution.height == lastResolutionEvaluated.height) { return; }
+            if (Screen.width == lastWidthEvaluated & Screen.height == lastHeightEvaluated) { return; }
 
             if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
 
@@ -388,7 +389,8 @@ namespace Vi.UI
             equippedWeaponCardTargetLocalPosition = primaryWeaponCard.transform.localPosition;
             stowedWeaponCardTargetLocalPosition = secondaryWeaponCard.transform.localPosition;
 
-            lastResolutionEvaluated = Screen.currentResolution;
+            lastWidthEvaluated = Screen.width;
+            lastHeightEvaluated = Screen.height;
         }
 
         private const float weaponCardAnimationSpeed = 8;
