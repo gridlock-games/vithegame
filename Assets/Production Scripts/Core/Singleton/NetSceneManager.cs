@@ -296,7 +296,6 @@ namespace Vi.Core
         {
             _singleton = this;
             activeSceneGroupIndicies = new NetworkList<int>();
-            Debug.Log("NET SCENE MANAGER AWAKE");
         }
 
         public bool ShouldSpawnPlayer()
