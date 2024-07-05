@@ -1146,7 +1146,7 @@ namespace Vi.Core
             }
         }
 
-        private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
+        public bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
         [Rpc(SendTo.Server)]
         private void ActivateRageServerRpc()

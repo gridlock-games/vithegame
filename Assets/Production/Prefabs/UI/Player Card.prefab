@@ -581,8 +581,11 @@ MonoBehaviour:
   bottomSpiritBorder: {fileID: 1456438271516473357}
   spiritBackground: {fileID: 8088568553903798972}
   ragingRT: {fileID: 8400000, guid: e5584dcd3550792419a7a57efd1a4783, type: 2}
+  ragingPreviewPrefab: {fileID: 7137470201679090826, guid: c0753479f6b42dd45bd59c7b28697355,
+    type: 3}
   rageReadyRT: {fileID: 8400000, guid: 3bd71b23b417a914b9a25448b268fdfb, type: 2}
-  rageChargingRT: {fileID: 0}
+  rageReadyPreviewPrefab: {fileID: 7137470201679090826, guid: c9cb094c5cf126c47b3d2eb0e766af35,
+    type: 3}
   rageStatusIndicator: {fileID: 7472773967375568070}
   rageFillImage: {fileID: 1679784692164774126}
   interimRageFillImage: {fileID: 1679784692164774126}
@@ -1009,8 +1012,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
