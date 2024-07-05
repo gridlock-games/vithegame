@@ -40,7 +40,6 @@ namespace Vi.Utility
         }
 
         private const float defaultVolume = 1;
-        private const float defaultPitch = 1;
         private const float defaultPanning = 0;
         private const float defaultSpatialBlend = 1;
         private const float defaultMaxDistance = 100;
@@ -48,7 +47,7 @@ namespace Vi.Utility
         private void ResetAudioSourceProperties(AudioSource audioSource)
         {
             audioSource.volume = defaultVolume;
-            audioSource.pitch = defaultPitch;
+            audioSource.pitch = Time.timeScale;
             audioSource.panStereo = defaultPanning;
             audioSource.spatialBlend = defaultSpatialBlend;
             audioSource.maxDistance = defaultMaxDistance;
