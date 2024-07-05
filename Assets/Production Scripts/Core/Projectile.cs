@@ -83,6 +83,7 @@ namespace Vi.Core
                             {
                                 Debug.Log("Playing whoosh sound");
                                 AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                audioSource.maxDistance = 20;
                                 nearbyWhooshPlayed = true;
                             }
                         }
