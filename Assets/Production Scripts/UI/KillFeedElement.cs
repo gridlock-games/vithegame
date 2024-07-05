@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -51,6 +52,22 @@ namespace Vi.UI
                     break;
             }
 
+            // Evaluate colors
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+            if (localPlayerKvp.Value)
+            {
+                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetRelativeTeamColor();
+                assistText.color = killHistoryElement.assistTeam == PlayerDataManager.Team.Competitor | killHistoryElement.assistTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetRelativeTeamColor();
+                victimText.color = killHistoryElement.victimTeam == PlayerDataManager.Team.Competitor | killHistoryElement.victimTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetRelativeTeamColor();
+            }
+            else // We are a spectator or the server
+            {
+                // TODO Set this to be the team color
+                killerText.color = PlayerDataManager.GetTeamColor(killHistoryElement.killerTeam);
+                assistText.color = PlayerDataManager.GetTeamColor(killHistoryElement.assistTeam);
+                victimText.color = PlayerDataManager.GetTeamColor(killHistoryElement.victimTeam);
+            }
+
             localPlayerBackgroundImage.enabled = false;
             backgroundImage.color = nonLocalDeathBackgroundColor;
             if (NetworkManager.Singleton.SpawnManager != null)
@@ -62,6 +79,7 @@ namespace Vi.UI
                     {
                         localPlayerBackgroundImage.color = Color.red;
                         localPlayerBackgroundImage.enabled = true;
+                        killerText.color = Color.white;
                     }
                 }
 
@@ -72,13 +90,18 @@ namespace Vi.UI
                     {
                         localPlayerBackgroundImage.color = Color.yellow;
                         localPlayerBackgroundImage.enabled = true;
+                        assistText.color = Color.white;
                     }
                 }
 
                 // Local Player Death
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.victimNetObjId, out netObj))
                 {
-                    if (netObj.IsLocalPlayer) { backgroundImage.color = localDeathBackgroundColor; }
+                    if (netObj.IsLocalPlayer)
+                    {
+                        backgroundImage.color = localDeathBackgroundColor;
+                        victimText.color = Color.white;
+                    }
                 }
             }
             initializationTime = Time.time;
