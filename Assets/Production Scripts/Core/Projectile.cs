@@ -44,7 +44,11 @@ namespace Vi.Core
         {
             startPosition = transform.position;
 
-            if (soundToPlayOnSpawn.Length > 0) { AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume); }
+            if (soundToPlayOnSpawn.Length > 0)
+            {
+                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
+                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
+            }
             
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
