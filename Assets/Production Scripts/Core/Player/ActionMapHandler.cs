@@ -63,14 +63,6 @@ namespace Vi.Player
             }
         }
 
-        private void OnDestroy()
-        {
-            if (TryGetComponent(out NetworkObject netObj))
-            {
-                if (netObj.IsLocalPlayer) { Cursor.lockState = CursorLockMode.None; }
-            }
-        }
-
         [SerializeField] private GameObject scoreboardPrefab;
         GameObject scoreboardInstance;
         void OnScoreboard(InputValue value)
