@@ -670,14 +670,14 @@ namespace Vi.Core
 
         private void OnEnable()
         {
-            NetSceneManager.sceneLoaded += OnSceneLoad;
-            NetSceneManager.sceneUnloaded += OnSceneUnload;
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
         }
 
         private void OnDisable()
         {
-            NetSceneManager.sceneLoaded -= OnSceneLoad;
-            NetSceneManager.sceneUnloaded -= OnSceneUnload;
+            EventDelegateManager.sceneLoaded -= OnSceneLoad;
+            EventDelegateManager.sceneUnloaded -= OnSceneUnload;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
