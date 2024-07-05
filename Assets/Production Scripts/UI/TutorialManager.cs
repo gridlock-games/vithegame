@@ -478,7 +478,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Weapon1") | action.name.Contains("Weapon2")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Weapon1") | action.name.Contains("Weapon2") | action.name.Contains("SwitchWeapon")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());

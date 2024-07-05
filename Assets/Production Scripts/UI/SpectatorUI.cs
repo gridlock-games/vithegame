@@ -38,8 +38,6 @@ namespace Vi.UI
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 leftPlayerCardsTemp.RemoveAt(leftPlayerCardsTemp.Count - 1);
-                leftPlayerCardsTemp.RemoveAt(leftPlayerCardsTemp.Count - 1);
-                rightPlayerCardsTemp.RemoveAt(rightPlayerCardsTemp.Count - 1);
                 rightPlayerCardsTemp.RemoveAt(rightPlayerCardsTemp.Count - 1);
             }
             

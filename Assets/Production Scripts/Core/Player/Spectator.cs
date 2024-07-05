@@ -22,13 +22,14 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                RefreshStatus();
+
                 GetComponent<PlayerInput>().enabled = true;
                 GetComponent<Camera>().enabled = true;
                 GetComponent<AudioListener>().enabled = true;
                 GetComponent<ActionMapHandler>().enabled = true;
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-
-                RefreshStatus();
             }
             else
             {
@@ -58,6 +59,7 @@ namespace Vi.Player
             if (IsLocalPlayer)
             {
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+                Cursor.lockState = CursorLockMode.None;
             }
         }
 
@@ -352,6 +354,12 @@ namespace Vi.Player
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             base.Update();
+
+            if (IsServer)
+            {
+                if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
+            }
+
             if (!IsLocalPlayer) { return; }
 
             #if UNITY_IOS || UNITY_ANDROID
@@ -439,8 +447,6 @@ namespace Vi.Player
                 transform.eulerAngles = new Vector3(xAngle, transform.eulerAngles.y + lookInput.x, 0);
             }
             ResetLookInput();
-
-            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
     }
 }

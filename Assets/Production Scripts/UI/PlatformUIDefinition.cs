@@ -200,13 +200,15 @@ namespace Vi.UI
                     if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(g); }
                 }
             }
-            lastEvaluatedResolution = Screen.currentResolution;
+            lastWidthEvaluated = Screen.width;
+            lastHeightEvaluated = Screen.height;
         }
 
-        private Resolution lastEvaluatedResolution;
+        private int lastWidthEvaluated;
+        private int lastHeightEvaluated;
         private void EvaluateUIDefinitionsInUpdate()
         {
-            if (Screen.currentResolution.width == lastEvaluatedResolution.width & Screen.currentResolution.height == lastEvaluatedResolution.height) { return; }
+            if (Screen.currentResolution.width == lastWidthEvaluated & Screen.currentResolution.height == lastHeightEvaluated) { return; }
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
@@ -224,7 +226,8 @@ namespace Vi.UI
                     }
                 }
             }
-            lastEvaluatedResolution = Screen.currentResolution;
+            lastWidthEvaluated = Screen.width;
+            lastHeightEvaluated = Screen.height;
         }
 
         private Dictionary<RectTransform, Vector2> originalPositionMap = new Dictionary<RectTransform, Vector2>();

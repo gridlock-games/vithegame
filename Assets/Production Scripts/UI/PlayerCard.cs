@@ -54,6 +54,18 @@ namespace Vi.UI
             this.attributes = attributes;
             if (!canvas) { canvas = GetComponent<Canvas>(); }
             canvas.enabled = attributes != null;
+
+            if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
+            if (attributes) { StartCoroutine(SetNameText()); }
+        }
+
+        private Coroutine setNameTextCoroutine;
+
+        private IEnumerator SetNameText()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()));
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
         }
 
         private bool IsMainCard()
@@ -151,16 +163,20 @@ namespace Vi.UI
         public const float fillSpeed = 4;
 
         private Color lastColorTarget = aliveTintColor;
+
+        private float lastHP = -1;
+        private float lastStamina = -1;
+        private float lastSpirit = -1;
+        private float lastRage = -1;
+
+        private float lastMaxHP = -1;
+        private float lastMaxStamina = -1;
+        private float lastMaxSpirit = -1;
+        private float lastMaxRage = -1;
+
         private void Update()
         {
             if (!attributes) { canvas.enabled = false; return; }
-            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
-
-            if (nameDisplay.isActiveAndEnabled)
-            {
-                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-                nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
-            }
 
             float HP = attributes.GetHP();
             float stamina = attributes.GetStamina();
@@ -172,15 +188,40 @@ namespace Vi.UI
             float maxSpirit = attributes.GetMaxSpirit();
             float maxRage = attributes.GetMaxRage();
 
-            healthText.text = "HP " + (HP < 10 & !Mathf.Approximately(0, HP) ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
-            staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
-            spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+            if (!Mathf.Approximately(lastHP, HP) | Mathf.Approximately(lastMaxHP, maxHP))
+            {
+                healthText.text = "HP " + (HP < 10 & !Mathf.Approximately(0, HP) ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+                healthFillImage.fillAmount = HP / maxHP;
+            }
 
-            healthFillImage.fillAmount = HP / maxHP;
-            staminaFillImage.fillAmount = stamina / maxStamina;
-            spiritFillImage.fillAmount = spirit / maxSpirit;
-            rageFillImage.fillAmount = rage / maxRage;
+            if (!Mathf.Approximately(lastStamina, stamina) | Mathf.Approximately(lastMaxStamina, maxStamina))
+            {
+                staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+                staminaFillImage.fillAmount = stamina / maxStamina;
+            }
 
+            if (!Mathf.Approximately(lastSpirit, spirit) | Mathf.Approximately(lastMaxSpirit, maxSpirit))
+            {
+                spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+                spiritFillImage.fillAmount = spirit / maxSpirit;
+            }
+
+            if (!Mathf.Approximately(lastRage, rage) | Mathf.Approximately(lastMaxRage, maxRage))
+            {
+                rageFillImage.fillAmount = rage / maxRage;
+            }
+
+            lastHP = HP;
+            lastStamina = stamina;
+            lastSpirit = spirit;
+            lastRage = rage;
+
+            lastMaxHP = maxHP;
+            lastMaxStamina = maxStamina;
+            lastMaxSpirit = maxSpirit;
+            lastMaxRage = maxRage;
+
+            // Interim images - these update every frame
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
             interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
             interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
@@ -219,21 +260,52 @@ namespace Vi.UI
                 lastColorTarget = colorTarget;
             }
 
+            RageStatus currentRageStatus;
             if (attributes.IsRaging())
             {
-                rageStatusIndicator.texture = ragingRT;
-                rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                currentRageStatus = RageStatus.IsRaging;
             }
             else if (attributes.CanActivateRage())
             {
-                rageStatusIndicator.texture = rageReadyRT;
-                rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                currentRageStatus = RageStatus.CanActivateRage;
             }
             else // Cannot activate rage and we are not raging
             {
-                rageStatusIndicator.texture = null;
-                rageStatusIndicator.color = new Color(1, 1, 1, 0);
+                currentRageStatus = RageStatus.CannotActivateRage;
             }
+
+            if (currentRageStatus != lastRageStatus)
+            {
+                switch (currentRageStatus)
+                {
+                    case RageStatus.IsRaging:
+                        rageStatusIndicator.texture = ragingRT;
+                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        break;
+                    case RageStatus.CanActivateRage:
+                        rageStatusIndicator.texture = rageReadyRT;
+                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        break;
+                    case RageStatus.CannotActivateRage:
+                        rageStatusIndicator.texture = null;
+                        rageStatusIndicator.color = new Color(1, 1, 1, 0);
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle rage status " + currentRageStatus);
+                        break;
+                }
+            }
+            lastRageStatus = currentRageStatus;
+        }
+
+        private RageStatus lastRageStatus = RageStatus.None;
+
+        private enum RageStatus
+        {
+            None,
+            IsRaging,
+            CanActivateRage,
+            CannotActivateRage
         }
     }
 }
