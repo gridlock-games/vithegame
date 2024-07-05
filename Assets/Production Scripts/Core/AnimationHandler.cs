@@ -234,8 +234,6 @@ namespace Vi.Core
                 if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
             }
 
-            if (IsLocalPlayer) { Debug.Log(actionClip); }
-
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
