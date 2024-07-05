@@ -122,13 +122,17 @@ namespace Vi.ScriptableObjects
         public HitReactionType GetHitReactionType() { return hitReactionType; }
 
         public bool shouldApplyRootMotion = true;
-        public AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
-        public AnimationCurve attackRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        public AnimationCurve GetRootMotionForwardMultiplier() { return rootMotionForwardMultiplier; }
+        public AnimationCurve GetRootMotionSidesMultiplier() { return rootMotionSidesMultiplier; }
+        public AnimationCurve GetRootMotionVerticalMultiplier() { return rootMotionVerticalMultiplier; }
+
+        [SerializeField] private AnimationCurve attackRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve attackRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve attackRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
 
         public bool shouldFlinch;
         [SerializeField] private Vector2 flinchAmountMin = new Vector2(-10, -10);
@@ -137,9 +141,23 @@ namespace Vi.ScriptableObjects
         public Vector2 GetFlinchAmount() { return new Vector2(Random.Range(flinchAmountMin.x, flinchAmountMax.x), Random.Range(flinchAmountMin.y, flinchAmountMax.y)); }
 
         public bool shouldPlayHitReaction = true;
-        public AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        public AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve hitReactionRootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+        [SerializeField] private AnimationCurve hitReactionRootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
+
+        public AnimationCurve GetHitReactionRootMotionForwardMultiplier() { return hitReactionRootMotionForwardMultiplier; }
+        public AnimationCurve GetHitReactionRootMotionSidesMultiplier() { return hitReactionRootMotionSidesMultiplier; }
+        public AnimationCurve GetHitReactionRootMotionVerticalMultiplier() { return hitReactionRootMotionVerticalMultiplier; }
+
+        public void SetHitReactionRootMotionMultipliers(ActionClip attackClip)
+        {
+            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip!"); return; }
+            if (GetClipType() != ClipType.HitReaction) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called on a hit reaction!"); return; }
+
+            hitReactionRootMotionForwardMultiplier = attackClip.attackRootMotionForwardMultiplier;
+            hitReactionRootMotionSidesMultiplier = attackClip.attackRootMotionSidesMultiplier;
+            hitReactionRootMotionVerticalMultiplier = attackClip.attackRootMotionVerticalMultiplier;
+        }
 
         [SerializeField] private AnimationCurve debugForwardMotion;
         [SerializeField] private AnimationCurve debugSidesMotion;
