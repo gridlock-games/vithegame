@@ -30,9 +30,9 @@ namespace Vi.Core
 
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
+            else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, CachedPlayerData.team)) { return Color.red; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return Color.red; }
             else { return Color.cyan; }
         }
 

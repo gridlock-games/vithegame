@@ -554,8 +554,6 @@ namespace Vi.Core
 
         public PlayerData GetPlayerData(int clientId) { return cachedPlayerDataList.Find(item => item.id == clientId); }
 
-        public PlayerData GetPlayerData(ulong clientId) { return cachedPlayerDataList.Find(item => item.id == (int)clientId); }
-
         public PlayerData GetDisconnectedPlayerData(int clientId)
         {
             for (int i = 0; i < disconnectedPlayerDataList.Count; i++)
@@ -872,6 +870,8 @@ namespace Vi.Core
         {
             SyncCachedPlayerDataList();
 
+            if ((int)NetworkManager.LocalClientId == networkListEvent.Value.id) { LocalPlayerData = networkListEvent.Value; }
+
             switch (networkListEvent.Type)
             {
                 case NetworkListEvent<PlayerData>.EventType.Add:
@@ -921,6 +921,8 @@ namespace Vi.Core
             if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
         }
+
+        public PlayerData LocalPlayerData;
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
 
@@ -1101,7 +1103,7 @@ namespace Vi.Core
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData((int)clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
