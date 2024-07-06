@@ -651,7 +651,7 @@ namespace Vi.Core
                     }
                     else // Spirit is at 0
                     {
-                        AddSpirit(attack.damage);
+                        AddSpirit(HPDamage);
                         shouldPlayHitReaction = true;
                     }
                     break;
@@ -672,6 +672,7 @@ namespace Vi.Core
                     else // Spirit is at 0
                     {
                         AddStamina(-GetMaxStamina() * 0.3f);
+                        AddSpirit(HPDamage);
                         if (GetStamina() <= 0)
                         {
                             if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
@@ -753,7 +754,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (HPDamage != 0)
+                if (!Mathf.Approximately(HPDamage, 0))
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
