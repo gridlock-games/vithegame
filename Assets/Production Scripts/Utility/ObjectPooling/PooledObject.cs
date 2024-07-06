@@ -14,15 +14,5 @@ namespace Vi.Utility
         public int GetPooledObjectIndex() { return pooledObjectIndex; }
 
         public void SetPooledObjectIndex(int index) { pooledObjectIndex = index; }
-
-        private void Awake()
-        {
-            Debug.Log(this + " awake");
-        }
-
-        private void OnDestroy()
-        {
-            Debug.Log(this + " destroy");
-        }
     }
 }

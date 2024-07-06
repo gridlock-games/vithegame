@@ -52,6 +52,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
+                if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
@@ -79,6 +80,7 @@ namespace Vi.Utility
             {
                 // If there are no inactive objects, create a new one
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation).GetComponent<PooledObject>();
+                if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
