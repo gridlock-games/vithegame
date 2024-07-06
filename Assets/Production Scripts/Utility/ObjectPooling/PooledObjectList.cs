@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-//using System.IO;
-//using UnityEditor;
+using System.IO;
+using UnityEditor;
 
 namespace Vi.Utility
 {
@@ -22,28 +22,30 @@ namespace Vi.Utility
             }
         }
 
-        //[ContextMenu("Find Unregistered Pooled Objects")]
-        //private void FindUnregisteredPooledObjects()
-        //{
-        //    foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
-        //    {
-        //        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-        //        if (!prefab) { continue; }
-        //        if (prefab.TryGetComponent(out PooledObject pooledObject))
-        //        {
-        //            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
-        //        }
-        //    }
+# if UNITY_EDITOR
+        [ContextMenu("Find Unregistered Pooled Objects")]
+        private void FindUnregisteredPooledObjects()
+        {
+            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (!prefab) { continue; }
+                if (prefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                }
+            }
 
-        //    foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories))
-        //    {
-        //        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-        //        if (!prefab) { continue; }
-        //        if (prefab.TryGetComponent(out PooledObject pooledObject))
-        //        {
-        //            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
-        //        }
-        //    }
-        //}
+            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (!prefab) { continue; }
+                if (prefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                }
+            }
+        }
+#endif
     }
 }
