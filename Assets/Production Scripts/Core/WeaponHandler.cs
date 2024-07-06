@@ -1034,7 +1034,7 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
+                CharacterReference.RaceAndGender raceAndGender = attributes.CachedPlayerData.character.raceAndGender;
                 animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());

@@ -17,9 +17,9 @@ namespace Vi.Core
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
-        public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
+        public PlayerDataManager.Team GetTeam() { return CachedPlayerData.team; }
 
-        public CharacterReference.RaceAndGender GetRaceAndGender() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).character.raceAndGender; }
+        public CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
@@ -32,8 +32,16 @@ namespace Vi.Core
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, CachedPlayerData.team)) { return Color.red; }
             else { return Color.cyan; }
+        }
+
+        public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
+
+        public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
+        {
+            if (playerData.id != GetPlayerDataId()) { Debug.LogError("Player data doesn't have the same id!"); return; }
+            CachedPlayerData = playerData;
         }
 
         public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
@@ -125,7 +133,7 @@ namespace Vi.Core
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
-            StartCoroutine(AddPlayerObjectToGameLogicManager());
+            StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner)
             {
@@ -141,7 +149,7 @@ namespace Vi.Core
             spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
         }
 
-        private IEnumerator AddPlayerObjectToGameLogicManager()
+        private IEnumerator AddPlayerObjectToPlayerDataManager()
         {
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
             PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);

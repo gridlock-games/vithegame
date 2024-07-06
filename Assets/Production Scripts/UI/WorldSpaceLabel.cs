@@ -79,7 +79,7 @@ namespace Vi.UI
         private PlayerDataManager.Team team;
         private void UpdateNameTextAndColors()
         {
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            PlayerDataManager.PlayerData playerData = attributes.CachedPlayerData;
             nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
 
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
