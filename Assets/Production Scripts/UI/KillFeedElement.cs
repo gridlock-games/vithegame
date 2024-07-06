@@ -138,7 +138,11 @@ namespace Vi.UI
             {
                 Color targetColor = Color.white;
                 if (IsNotRunning()) { targetColor.a = 0; }
-                if (lastTargetColor != targetColor) { tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime); }
+                if (lastTargetColor != targetColor)
+                {
+                    tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime);
+                    lastTargetColor = targetColor;
+                }
             }
 
             float targetWidth = transformToCopyWidthFrom.sizeDelta.x;
