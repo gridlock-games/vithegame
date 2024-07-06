@@ -164,7 +164,7 @@ namespace Vi.UI
                     tintMaterialInstances[i].color = colorResult;
                     colorList.Add(colorResult);
                 }
-                if (colorList.TrueForAll(item => item == targetColor)) { Debug.Log("Kill feed element break"); break; }
+                if (colorList.TrueForAll(item => item == targetColor)) { break; }
                 yield return null;
             }
         }
