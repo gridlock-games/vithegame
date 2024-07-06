@@ -39,7 +39,49 @@ namespace Vi.Utility
             }
         }
 
+        private void OnEnable()
+        {
+            EventDelegateManager.sceneLoaded += PoolInitialObjects;
+            EventDelegateManager.sceneUnloaded += RemoveNullObjects;
+        }
+
+        private void OnDisable()
+        {
+            EventDelegateManager.sceneLoaded -= PoolInitialObjects;
+            EventDelegateManager.sceneUnloaded -= RemoveNullObjects;
+        }
+
+        private void PoolInitialObjects(Scene scene)
+        {
+            foreach (PooledObject pooledObject in pooledObjectList.GetPooledObjects())
+            {
+                for (int i = 0; i < pooledObject.GetNumberOfObjectsToPool(); i++)
+                {
+                    if (objectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool()) { SpawnObjectForInitialPool(pooledObject); }
+                }
+            }
+        }
+
+        private void RemoveNullObjects()
+        {
+            for (int i = 0; i < objectPools.Count; i++)
+            {
+                objectPools[i].RemoveAll(item => !item);
+            }
+        }
+
         private static List<List<PooledObject>> objectPools = new List<List<PooledObject>>();
+
+        private static void SpawnObjectForInitialPool(PooledObject objectToSpawn)
+        {
+            if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return; }
+
+            PooledObject spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
+            if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
+            spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
+
+            ReturnObjectToPool(spawnableObj);
+        }
 
         public static PooledObject SpawnObject(PooledObject objectToSpawn)
         {

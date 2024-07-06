@@ -21,19 +21,6 @@ namespace Vi.Utility
             {
                 if (pooledObjects[i]) { pooledObjects[i].SetPooledObjectIndex(i); }
             }
-            //ObjectPoolingManager.Singleton.StartCoroutine(InstantiateInitialObjects());
-        }
-
-        private IEnumerator InstantiateInitialObjects()
-        {
-            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == ObjectPoolingManager.instantiationSceneName);
-            foreach (PooledObject pooledObject in pooledObjects)
-            {
-                for (int i = 0; i < pooledObject.GetNumberOfObjectsToPool(); i++)
-                {
-                    PooledObject pooledObjectInstance = ObjectPoolingManager.SpawnObject(pooledObject);
-                }
-            }
         }
 
         [ContextMenu("Find Unregistered Pooled Objects")]

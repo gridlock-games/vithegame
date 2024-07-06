@@ -673,12 +673,18 @@ namespace Vi.Core
         {
             EventDelegateManager.sceneLoaded += OnSceneLoad;
             EventDelegateManager.sceneUnloaded += OnSceneUnload;
+
+            NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
         private void OnDisable()
         {
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
             EventDelegateManager.sceneUnloaded -= OnSceneUnload;
+
+            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
@@ -828,19 +834,6 @@ namespace Vi.Core
             {
                 return new KeyValuePair<ulong, NetworkObject>(NetworkManager.LocalClientId, null);
             }
-        }
-
-        private void Start()
-        {
-            NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
-            NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
-            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
         }
 
         private void Update()

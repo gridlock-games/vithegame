@@ -4966,7 +4966,6 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
 --- !u!114 &8542004802694422489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4979,8 +4978,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfObjectsToPool: 5
-  pooledObjectIndex: -1
+  numberOfObjectsToPool: 1
+  pooledObjectIndex: 2
 --- !u!114 &6032705678385102053
 MonoBehaviour:
   m_ObjectHideFlags: 0
