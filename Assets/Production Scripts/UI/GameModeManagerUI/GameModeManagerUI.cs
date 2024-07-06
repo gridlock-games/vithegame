@@ -37,6 +37,7 @@ namespace Vi.UI
         {
             RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
+            OnScoreListChanged();
             gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
             roundResultText.enabled = false;
