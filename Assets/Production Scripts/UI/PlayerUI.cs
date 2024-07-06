@@ -499,7 +499,7 @@ namespace Vi.UI
                 else
                 {
                     killerCard.Initialize(null);
-                    killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name : "Unknown");
+                    killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
                 }
 
                 respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";

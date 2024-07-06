@@ -18,6 +18,11 @@ namespace Vi.Core
 
             targetScale = Vector3.MoveTowards(targetScale, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
             ShrinkClientRpc();
+
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = true;
+            }
         }
 
         [Rpc(SendTo.NotServer)]
@@ -52,12 +57,12 @@ namespace Vi.Core
             return Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(point.x, point.z)) < targetScale.x;
         }
 
-        private Collider[] damageCircleColliders;
+        private CapsuleCollider capsuleCollider;
         private void Start()
         {
             transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
             targetScale = transform.localScale;
-            damageCircleColliders = GetComponentsInChildren<Collider>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
 
             foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
             {
@@ -75,22 +80,19 @@ namespace Vi.Core
 
             if (GameModeManager.Singleton.ShouldDisplayNextGameAction() | GameModeManager.Singleton.IsGameOver()) { return; }
 
-            List<Attributes> attributesToDamage = new List<Attributes>();
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            Vector3 bottom = new Vector3(capsuleCollider.center.x, capsuleCollider.center.y - (capsuleCollider.height * transform.localScale.y / 2), capsuleCollider.center.z);
+            Vector3 top = new Vector3(capsuleCollider.center.x, capsuleCollider.center.y + (capsuleCollider.height * transform.localScale.y / 2), capsuleCollider.center.z);
+            Collider[] collidersInside = Physics.OverlapCapsule(bottom, top, capsuleCollider.radius * transform.localScale.x, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
+            List<Attributes> attributesInside = new List<Attributes>();
+            foreach (Collider col in collidersInside)
             {
-                foreach (Collider col in damageCircleColliders)
-                {
-                    if (!col.bounds.Contains(attributes.transform.position))
-                    {
-                        attributesToDamage.Add(attributes);
-                        break;
-                    }
-                }
+                if (col.TryGetComponent(out NetworkCollider networkCollider)) { attributesInside.Add(networkCollider.Attributes); }
             }
 
-            foreach (Attributes attributes in attributesToDamage)
+            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
             {
-                attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject);
+                if (!attributesInside.Contains(attributes)) { attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject); }
             }
         }
     }

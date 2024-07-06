@@ -711,7 +711,7 @@ namespace Vi.UI
         private GameObject previewObject;
         private void CreateCharacterPreview()
         {
-            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
