@@ -227,7 +227,7 @@ namespace Vi.Core
 
         [Rpc(SendTo.Server, RequireOwnership = false)] private void SetTeamNameOverrideServerRpc(Team team, string teamName, string prefix) { SetTeamNameOverride(team, teamName, prefix); }
 
-        public bool TeamNameOverridesUpdated { get; private set; }
+        public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
             if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
@@ -238,7 +238,7 @@ namespace Vi.Core
         private IEnumerator ResetTeamNameOverridesUpdatedBool()
         {
             yield return null;
-            TeamNameOverridesUpdated = false;
+            TeamNameOverridesUpdatedThisFrame = false;
         }
 
         public string GetTeamText(Team team)

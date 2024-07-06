@@ -496,13 +496,16 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
-            if (PlayerDataManager.Singleton.TeamNameOverridesUpdated)
+            if (PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame)
             {
                 leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
                 leftTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(leftTeamParent.team));
 
                 rightTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team));
                 rightTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(rightTeamParent.team));
+
+                leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team);
+                rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team);
             }
 
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
@@ -669,9 +672,6 @@ namespace Vi.UI
             leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
             
-            if (leftTeamParent.teamTitleText.gameObject.activeInHierarchy) { leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team); }
-            if (rightTeamParent.teamTitleText.gameObject.activeInHierarchy) { rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team); }
-
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
