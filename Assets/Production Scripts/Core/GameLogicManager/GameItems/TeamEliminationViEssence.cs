@@ -30,8 +30,8 @@ namespace Vi.Core.GameModeManagers
 
             if (other.transform.root.TryGetComponent(out Attributes attributes))
             {
-                List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam());
-                if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1)
+                List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
+                if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 0)
                 {
                     PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
                     teamEliminationManager.OnViEssenceActivation();

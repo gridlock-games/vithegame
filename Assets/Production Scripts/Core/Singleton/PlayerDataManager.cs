@@ -177,15 +177,6 @@ namespace Vi.Core
             {
                 return Color.black;
             }
-
-            //if (ColorUtility.TryParseHtmlString(team.ToString(), out Color color))
-            //{
-            //    return color;
-            //}
-            //else
-            //{
-            //    return Color.black;
-            //}
         }
 
         private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
@@ -223,11 +214,32 @@ namespace Vi.Core
             }
             else
             {
-                SetTeamNameOverrideServerRpc(team, teamName, prefix);
+                if (IsLobbyLeader())
+                {
+                    SetTeamNameOverrideServerRpc(team, teamName, prefix);
+                }
+                else
+                {
+                    Debug.LogError("Trying to set team name overrides when we're not the lobby leader!");
+                }
             }
         }
 
         [Rpc(SendTo.Server, RequireOwnership = false)] private void SetTeamNameOverrideServerRpc(Team team, string teamName, string prefix) { SetTeamNameOverride(team, teamName, prefix); }
+
+        public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
+        private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
+        {
+            if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
+            teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
+        }
+
+        private Coroutine teamNameOverridesWasUpdatedThisFrameCoroutine;
+        private IEnumerator ResetTeamNameOverridesUpdatedBool()
+        {
+            yield return null;
+            TeamNameOverridesUpdatedThisFrame = false;
+        }
 
         public string GetTeamText(Team team)
         {
@@ -823,6 +835,7 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
+            teamNameOverridesJson.OnValueChanged += OnTeamNameOverridesJsonChange;
             NetworkManager.NetworkTickSystem.Tick += Tick;
 
             if (IsServer)
@@ -836,6 +849,7 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
+            teamNameOverridesJson.OnValueChanged -= OnTeamNameOverridesJsonChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
 
             localPlayers.Clear();
@@ -922,7 +936,7 @@ namespace Vi.Core
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
         }
 
-        public PlayerData LocalPlayerData;
+        public PlayerData LocalPlayerData { get; private set; }
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
 
