@@ -230,6 +230,7 @@ namespace Vi.Core
         public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
+            TeamNameOverridesUpdatedThisFrame = true;
             if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
             teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
         }
