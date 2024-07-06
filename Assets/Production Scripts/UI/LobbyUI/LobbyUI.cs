@@ -349,10 +349,17 @@ namespace Vi.UI
             primaryWeaponText.enabled = true;
             secondaryWeaponText.enabled = true;
 
-            foreach (Button button in loadoutPresetButtons)
+            // Initialze loadout presset buttons
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
             {
-                button.interactable = true;
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
             }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
+
             spectateButton.interactable = true;
             lockCharacterButton.interactable = true;
 
@@ -376,23 +383,7 @@ namespace Vi.UI
             if (IsClient)
             {
                 StartCoroutine(UpdateCharacterPreview());
-                StartCoroutine(InitializeLoadoutButtons());
             }
-        }
-
-        private IEnumerator InitializeLoadoutButtons()
-        {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-
-            int activeLoadoutSlot = 0;
-            for (int i = 0; i < loadoutPresetButtons.Length; i++)
-            {
-                Button button = loadoutPresetButtons[i];
-                int var = i;
-                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
-                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
-            }
-            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
         public override void OnNetworkDespawn()
