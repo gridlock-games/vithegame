@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4024358980
+  GlobalObjectIdHash: 3799388084
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -73,7 +73,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkColliderRigidbody: {fileID: 1932007755210931332}
-  collisionPushDampeningFactor: 1
   angularSpeed: 540
   runSpeed: 5
   runAnimationTransitionSpeed: 5
@@ -107,11 +106,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 7095846274849915327, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
-  teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
+  heartbeatSoundEffect: {fileID: 0}
+  rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
-  rageAtMaxVFXPrefab: {fileID: 336164999827634716, guid: 5a308568762c642ed83c871052987399,
+  ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
     type: 3}
-  ragingVFXPrefab: {fileID: 4984412621585767899, guid: b5cd0ef0388361744a299cefe6d989d4,
+  teamIndicatorPrefab: {fileID: -9076160948696418514, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3

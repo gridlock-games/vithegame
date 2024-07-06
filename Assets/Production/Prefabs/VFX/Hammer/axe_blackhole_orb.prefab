@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 559323971
+  GlobalObjectIdHash: 761906137
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -124,7 +124,9 @@ MonoBehaviour:
   audioClipToPlayOnDestroy: {fileID: 8300000, guid: 5b0a3f85c9474433c86f969773917bfa,
     type: 3}
   VFXToPlayOnDestroy: []
+  pooledVFXToPlayOnDestroy: []
   followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
@@ -155,8 +157,11 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy:
-  - {fileID: 1453165119930241201, guid: 595e15cd00fae9b42b6f06e5f39a760c, type: 3}
+  - {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff, type: 3}
+  pooledVFXToPlayOnDestroy:
+  - {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff, type: 3}
   followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
   duration: 3
   radius: 2

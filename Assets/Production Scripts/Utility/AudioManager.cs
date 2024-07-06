@@ -8,7 +8,7 @@ namespace Vi.Utility
 {
     public class AudioManager : MonoBehaviour
     {
-        [SerializeField] private GameObject audioSourcePrefab;
+        [SerializeField] private PooledObject audioSourcePrefab;
         [SerializeField] private MusicClip[] musicClips;
 
         [System.Serializable]
@@ -86,7 +86,7 @@ namespace Vi.Utility
                 if (!audioSource.isPlaying) { break; }
                 yield return null;
             }
-            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
         private IEnumerator Play3DSoundPrefab(AudioSource audioSource, AudioClip audioClip, float volume)
@@ -98,7 +98,7 @@ namespace Vi.Utility
                 if (!audioSource.isPlaying) { break; }
                 yield return null;
             }
-            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace Vi.Utility
                 }
             }
 
-            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
         private const float audioSourceFadeOutSpeed = 1.5f;
@@ -189,7 +189,7 @@ namespace Vi.Utility
                 if (!audioSource.isPlaying) { break; }
                 yield return null;
             }
-            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.gameObject); }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
         private void Awake()

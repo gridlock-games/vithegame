@@ -3,35 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.VFX;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Utility
 {
     public class ObjectPoolingManager : MonoBehaviour
     {
         public const string cullingOverrideTag = "DoNotCull";
-
-        public static List<PooledObjectInfo> ObjectPools = new List<PooledObjectInfo>();
-
+        public const string instantiationSceneName = "Base";
         private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
 
-        public static GameObject SpawnObject(GameObject objectToSpawn)
-        {
-            PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == objectToSpawn.name);
+        [SerializeField] private PooledObjectList pooledObjectList;
 
-            // If this pool doesn't exist, create it
-            if (pool == null)
+        private PooledObjectList pooledObjectListInstance;
+
+        public static ObjectPoolingManager Singleton
+        {
+            get
             {
-                pool = new PooledObjectInfo() { LookUpString = objectToSpawn.name };
-                ObjectPools.Add(pool);
+                if (!_singleton) { Debug.LogError("Object Pooling Manager is null"); }
+                return _singleton;
             }
+        }
+
+        private static ObjectPoolingManager _singleton;
+        private void Awake()
+        {
+            _singleton = this;
+            DontDestroyOnLoad(gameObject);
+            pooledObjectListInstance = Instantiate(pooledObjectList);
+
+            for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
+            {
+                objectPools.Add(new List<PooledObject>());
+            }
+        }
+
+        private static List<List<PooledObject>> objectPools = new List<List<PooledObject>>();
+
+        public static PooledObject SpawnObject(PooledObject objectToSpawn)
+        {
+            if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
 
             // Check if there are any inactive objects in the pool
-            GameObject spawnableObj = pool.InactiveObjects.FirstOrDefault();
+            PooledObject spawnableObj = objectPools[objectToSpawn.GetPooledObjectIndex()].FirstOrDefault();
 
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
-                spawnableObj = Instantiate(objectToSpawn);
+                spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
@@ -41,31 +61,24 @@ namespace Vi.Utility
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
-                pool.InactiveObjects.Remove(spawnableObj);
-                spawnableObj.SetActive(true);
+                objectPools[objectToSpawn.GetPooledObjectIndex()].Remove(spawnableObj);
+                spawnableObj.gameObject.SetActive(true);
             }
 
             return spawnableObj;
         }
 
-        public static GameObject SpawnObject(GameObject objectToSpawn, Vector3 spawnPosition, Quaternion spawnRotation)
+        public static PooledObject SpawnObject(PooledObject objectToSpawn, Vector3 spawnPosition, Quaternion spawnRotation)
         {
-            PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == objectToSpawn.name);
-
-            // If this pool doesn't exist, create it
-            if (pool == null)
-            {
-                pool = new PooledObjectInfo() { LookUpString = objectToSpawn.name };
-                ObjectPools.Add(pool);
-            }
+            if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
 
             // Check if there are any inactive objects in the pool
-            GameObject spawnableObj = pool.InactiveObjects.FirstOrDefault();
+            PooledObject spawnableObj = objectPools[objectToSpawn.GetPooledObjectIndex()].FirstOrDefault();
 
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
-                spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation);
+                spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation).GetComponent<PooledObject>();
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
@@ -75,31 +88,24 @@ namespace Vi.Utility
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
-                pool.InactiveObjects.Remove(spawnableObj);
-                spawnableObj.SetActive(true);
+                objectPools[objectToSpawn.GetPooledObjectIndex()].Remove(spawnableObj);
+                spawnableObj.gameObject.SetActive(true);
             }
 
             return spawnableObj;
         }
 
-        public static GameObject SpawnObject(GameObject objectToSpawn, Transform parentTransform)
+        public static PooledObject SpawnObject(PooledObject objectToSpawn, Transform parentTransform)
         {
-            PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == objectToSpawn.name);
-
-            // If this pool doesn't exist, create it
-            if (pool == null)
-            {
-                pool = new PooledObjectInfo() { LookUpString = objectToSpawn.name };
-                ObjectPools.Add(pool);
-            }
+            if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
 
             // Check if there are any inactive objects in the pool
-            GameObject spawnableObj = pool.InactiveObjects.FirstOrDefault();
+            PooledObject spawnableObj = objectPools[objectToSpawn.GetPooledObjectIndex()].FirstOrDefault();
 
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
-                spawnableObj = Instantiate(objectToSpawn, parentTransform);
+                spawnableObj = Instantiate(objectToSpawn.gameObject, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
                     spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
@@ -120,31 +126,24 @@ namespace Vi.Utility
                         objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
                         objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
                 }
-                pool.InactiveObjects.Remove(spawnableObj);
-                spawnableObj.SetActive(true);
+                objectPools[objectToSpawn.GetPooledObjectIndex()].Remove(spawnableObj);
+                spawnableObj.gameObject.SetActive(true);
             }
 
             return spawnableObj;
         }
 
-        public static GameObject SpawnObject(GameObject objectToSpawn, Vector3 spawnPosition, Quaternion spawnRotation, Transform parentTransform)
+        public static PooledObject SpawnObject(PooledObject objectToSpawn, Vector3 spawnPosition, Quaternion spawnRotation, Transform parentTransform)
         {
-            PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == objectToSpawn.name);
-
-            // If this pool doesn't exist, create it
-            if (pool == null)
-            {
-                pool = new PooledObjectInfo() { LookUpString = objectToSpawn.name };
-                ObjectPools.Add(pool);
-            }
+            if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
 
             // Check if there are any inactive objects in the pool
-            GameObject spawnableObj = pool.InactiveObjects.FirstOrDefault();
+            PooledObject spawnableObj = objectPools[objectToSpawn.GetPooledObjectIndex()].FirstOrDefault();
 
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
-                spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation, parentTransform);
+                spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
                     spawnableObj.transform.localScale = new Vector3(objectToSpawn.transform.localScale.x / parentTransform.lossyScale.x,
@@ -165,31 +164,24 @@ namespace Vi.Utility
                         objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
                         objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
                 }
-                pool.InactiveObjects.Remove(spawnableObj);
-                spawnableObj.SetActive(true);
+                objectPools[objectToSpawn.GetPooledObjectIndex()].Remove(spawnableObj);
+                spawnableObj.gameObject.SetActive(true);
             }
 
             return spawnableObj;
         }
 
-        public static void ReturnObjectToPool(GameObject obj)
+        public static void ReturnObjectToPool(PooledObject obj)
         {
             if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
 
-            PooledObjectInfo pool = ObjectPools.Find(item => item.LookUpString == obj.name.Replace("(Clone)", ""));
+            if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
-            if (pool == null)
-            {
-                Debug.LogWarning("Trying to release an object that hasn't been pooled: " + obj.name);
-            }
-            else
-            {
-                obj.SetActive(false);
-                pool.InactiveObjects.Add(obj);
-            }
+            obj.gameObject.SetActive(false);
+            objectPools[obj.GetPooledObjectIndex()].Add(obj);
         }
 
-        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(GameObject vfxInstance)
+        public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(PooledObject vfxInstance)
         {
             ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
             if (particleSystem)
@@ -226,11 +218,5 @@ namespace Vi.Utility
 
             ReturnObjectToPool(vfxInstance);
         }
-    }
-
-    public class PooledObjectInfo
-    {
-        public string LookUpString;
-        public List<GameObject> InactiveObjects = new List<GameObject>();
     }
 }

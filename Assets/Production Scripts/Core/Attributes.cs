@@ -36,8 +36,6 @@ namespace Vi.Core
             else { return Color.cyan; }
         }
 
-        [SerializeField] private GameObject teamIndicatorPrefab;
-
         public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
         public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
         public float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
@@ -222,10 +220,10 @@ namespace Vi.Core
 
         private const float rageEndPercent = 0.01f;
 
-        [SerializeField] private GameObject rageAtMaxVFXPrefab;
-        [SerializeField] private GameObject ragingVFXPrefab;
-        private GameObject rageAtMaxVFXInstance;
-        private GameObject ragingVFXInstance;
+        [SerializeField] private PooledObject rageAtMaxVFXPrefab;
+        [SerializeField] private PooledObject ragingVFXPrefab;
+        private PooledObject rageAtMaxVFXInstance;
+        private PooledObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
@@ -285,7 +283,8 @@ namespace Vi.Core
             RefreshStatus();
         }
 
-        private GameObject teamIndicatorInstance;
+        [SerializeField] private PooledObject teamIndicatorPrefab;
+        private PooledObject teamIndicatorInstance;
         private void Start()
         {
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);

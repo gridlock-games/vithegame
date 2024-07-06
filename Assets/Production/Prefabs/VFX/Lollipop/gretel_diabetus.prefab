@@ -9669,8 +9669,11 @@ GameObject:
   - component: {fileID: 198246879123670484}
   - component: {fileID: 199001336000980014}
   - component: {fileID: 1748327304602985885}
+  - component: {fileID: 4533700736274441028}
   - component: {fileID: 8611427939797993859}
   - component: {fileID: 5784690167455077155}
+  - component: {fileID: 5004307782574194970}
+  - component: {fileID: 2239545072360762801}
   m_Layer: 0
   m_Name: gretel_diabetus
   m_TagString: Untagged
@@ -14576,9 +14579,45 @@ MonoBehaviour:
   transformType: 1
   onActivateVFXSpawnNormalizedTime: 0.2
   raycastOffset: {x: 0, y: 2, z: 0}
-  crossProductDirection: {x: 1, y: 0, z: 0}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
+  raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
+  pooledVFXToPlayOnDestroy: []
+  followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
+  shouldDestroyOnEnemyHit: 0
+  shouldUseAttackerPositionForHitAngles: 0
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
+  scaleVFXBasedOnEdges: 0
+  boundsPoint: {x: 0, y: 0, z: 2.5}
+  boundsLocalAxis: {x: 0, y: -1, z: 0}
+--- !u!114 &4533700736274441028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447245624076032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 763875317
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!54 &8611427939797993859
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -14608,6 +14647,49 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 3.55
   m_Center: {x: 0, y: 0.00999999, z: 0}
+--- !u!114 &5004307782574194970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447245624076032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &2239545072360762801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447245624076032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1472489269183330
 GameObject:
   m_ObjectHideFlags: 0
