@@ -661,14 +661,23 @@ namespace Vi.Core
         }
 
         private static PlayerDataManager _singleton;
-
         private void Awake()
         {
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
-            SceneManager.sceneLoaded += OnSceneLoad;
-            SceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnEnable()
+        {
+            NetSceneManager.sceneLoaded += OnSceneLoad;
+            NetSceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDisable()
+        {
+            NetSceneManager.sceneLoaded -= OnSceneLoad;
+            NetSceneManager.sceneUnloaded -= OnSceneUnload;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
@@ -757,13 +766,12 @@ namespace Vi.Core
         }
 
         private PlayerSpawnPoints playerSpawnPoints;
-        void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        void OnSceneLoad(Scene scene)
         {
             foreach (GameObject g in scene.GetRootGameObjects())
             {
                 if (g.TryGetComponent(out playerSpawnPoints)) { break; }
             }
-            //Debug.Log(scene.name + " " + playerSpawnPoints);
 
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
@@ -778,7 +786,7 @@ namespace Vi.Core
             }
         }
 
-        void OnSceneUnload(Scene scene)
+        void OnSceneUnload()
         {
             if (IsServer)
             {

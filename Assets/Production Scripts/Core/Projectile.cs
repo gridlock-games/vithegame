@@ -14,7 +14,8 @@ namespace Vi.Core
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
         [SerializeField] private GameObject[] VFXToPlayOnDestroy;
-        [SerializeField] private AudioClip soundToPlayOnSpawn;
+        [SerializeField] private AudioClip[] soundToPlayOnSpawn = new AudioClip[0];
+        [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -41,10 +42,14 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
-            AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn, transform.position, Weapon.attackSoundEffectVolume);
-
             startPosition = transform.position;
 
+            if (soundToPlayOnSpawn.Length > 0)
+            {
+                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
+                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
+            }
+            
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -66,8 +71,29 @@ namespace Vi.Core
             }
         }
 
+        private bool nearbyWhooshPlayed;
         private void Update()
         {
+            if (IsClient)
+            {
+                if (whooshNearbySound.Length > 0)
+                {
+                    if (!nearbyWhooshPlayed)
+                    {
+                        KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                        if (localPlayerKvp.Value)
+                        {
+                            if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
+                            {
+                                AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                audioSource.maxDistance = 20;
+                                nearbyWhooshPlayed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (!IsServer) { return; }
 
             if (Vector3.Distance(transform.position, startPosition) > killDistance)
@@ -98,7 +124,7 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                shouldDestroy = true;
+                shouldDestroy = actionVFX.ShouldBlockProjectiles();
                 actionVFX.OnHit(attacker);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))

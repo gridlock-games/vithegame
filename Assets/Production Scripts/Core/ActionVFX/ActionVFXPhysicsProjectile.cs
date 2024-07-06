@@ -100,7 +100,7 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                shouldDestroy = true;
+                shouldDestroy = actionVFX.ShouldBlockProjectiles();
                 actionVFX.OnHit(attacker);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))

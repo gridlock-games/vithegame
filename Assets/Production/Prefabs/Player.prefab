@@ -132,7 +132,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraController: {fileID: 3945128956232022059}
-  minimapCameraInstance: {fileID: 0}
   angularSpeed: 540
   runAnimationTransitionSpeed: 5
   movementPredictionRigidbody: {fileID: 3111202478790198839}
@@ -179,6 +178,8 @@ MonoBehaviour:
   worldSpaceLabelPrefab: {fileID: 7095846274849915327, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
   teamIndicatorPrefab: {fileID: 4910361421448362994, guid: eac704ebbf678b243822e8816fda0732,
+    type: 3}
+  heartbeatSoundEffect: {fileID: 8300000, guid: d22fc966ad7a64afd923f2e84ef54228,
     type: 3}
   rageAtMaxVFXPrefab: {fileID: 336164999827634716, guid: 5a308568762c642ed83c871052987399,
     type: 3}

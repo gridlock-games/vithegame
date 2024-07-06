@@ -329,6 +329,9 @@ namespace Vi.UI
             
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
+            // Do not remove this, it handles a fringe case for refreshing the local player's team properly
+            yield return null;
+
             primaryWeaponIcon.enabled = true;
             secondaryWeaponIcon.enabled = true;
 
@@ -787,7 +790,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? 8 : 4);
+            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? NetworkCallbackManager.maxActivePlayersInLobby : 4);
         }
 
         private void ChooseLoadoutPreset(Button button, int loadoutSlot)

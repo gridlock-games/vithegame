@@ -153,7 +153,7 @@ namespace Vi.UI
                 newAnchoredX = modifiedRect.anchoredPosition.x,
                 newAnchoredY = modifiedRect.anchoredPosition.y
             });
-            
+
             FasterPlayerPrefs.Singleton.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
         }
 
@@ -163,9 +163,9 @@ namespace Vi.UI
             Start();
         }
 
-    public void closeUI()
-    {
-      Destroy(gameObject);
-    }
+        public void CloseUI()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

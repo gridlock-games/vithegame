@@ -38,6 +38,11 @@ namespace Vi.UI
         [SerializeField] private Image spiritBackground;
 
         [Header("Rage UI")]
+        [SerializeField] private RenderTexture ragingRT;
+        [SerializeField] private GameObject ragingPreviewPrefab;
+        [SerializeField] private RenderTexture rageReadyRT;
+        [SerializeField] private GameObject rageReadyPreviewPrefab;
+        [SerializeField] private RawImage rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
@@ -89,10 +94,16 @@ namespace Vi.UI
             }
         }
 
+        private static GameObject ragingPreviewInstance;
+        private static GameObject rageReadyPreviewInstance;
+
         private Canvas canvas;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+
+            if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
+            if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
         }
 
         private void OnEnable()
@@ -206,6 +217,22 @@ namespace Vi.UI
                     }
                 }
                 lastColorTarget = colorTarget;
+            }
+
+            if (attributes.IsRaging())
+            {
+                rageStatusIndicator.texture = ragingRT;
+                rageStatusIndicator.color = new Color(1, 1, 1, 1);
+            }
+            else if (attributes.CanActivateRage())
+            {
+                rageStatusIndicator.texture = rageReadyRT;
+                rageStatusIndicator.color = new Color(1, 1, 1, 1);
+            }
+            else // Cannot activate rage and we are not raging
+            {
+                rageStatusIndicator.texture = null;
+                rageStatusIndicator.color = new Color(1, 1, 1, 0);
             }
         }
     }
