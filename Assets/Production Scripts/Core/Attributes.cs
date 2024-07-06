@@ -140,6 +140,8 @@ namespace Vi.Core
                 spawnedOnOwnerInstance.Value = true;
                 RefreshStatus();
             }
+
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         private IEnumerator InitStats()
@@ -289,6 +291,8 @@ namespace Vi.Core
             movementHandler = GetComponent<MovementHandler>();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             RefreshStatus();
+
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         [SerializeField] private PooledObject teamIndicatorPrefab;

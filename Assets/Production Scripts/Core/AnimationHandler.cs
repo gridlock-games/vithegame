@@ -1001,7 +1001,7 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            StartCoroutine(ChangeCharacterCoroutine(PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character));
+            StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
         }
 
         Attributes attributes;
