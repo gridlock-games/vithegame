@@ -237,15 +237,6 @@ namespace Vi.UI
             leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
             rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
 
-            leftTeamParent.teamNameOverrideInputField.text = "";
-            leftTeamParent.teamPrefixOverrideInputField.text = "";
-
-            rightTeamParent.teamNameOverrideInputField.text = "";
-            rightTeamParent.teamPrefixOverrideInputField.text = "";
-
-            leftTeamParent.ApplyTeamNameOverride();
-            rightTeamParent.ApplyTeamNameOverride();
-
             for (int i = 0; i < possibleTeams.Length; i++)
             {
                 if (i == 0)
@@ -274,6 +265,26 @@ namespace Vi.UI
 
             leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
             rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
+
+            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            {
+                leftTeamParent.teamNameOverrideInputField.text = "";
+                leftTeamParent.teamPrefixOverrideInputField.text = "";
+
+                rightTeamParent.teamNameOverrideInputField.text = "";
+                rightTeamParent.teamPrefixOverrideInputField.text = "";
+
+                leftTeamParent.ApplyTeamNameOverride();
+                rightTeamParent.ApplyTeamNameOverride();
+            }
+            else
+            {
+                leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
+                leftTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(leftTeamParent.team));
+
+                rightTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team));
+                rightTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(rightTeamParent.team));
+            }
 
             // Maps
             RefreshMapOptions();

@@ -177,15 +177,6 @@ namespace Vi.Core
             {
                 return Color.black;
             }
-
-            //if (ColorUtility.TryParseHtmlString(team.ToString(), out Color color))
-            //{
-            //    return color;
-            //}
-            //else
-            //{
-            //    return Color.black;
-            //}
         }
 
         private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
