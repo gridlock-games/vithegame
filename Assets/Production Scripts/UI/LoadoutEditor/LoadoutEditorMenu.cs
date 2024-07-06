@@ -71,7 +71,7 @@ namespace Vi.UI
             {
                 Button button = loadoutButtons[i];
                 int var = i;
-                if (PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+                if (attributes.CachedPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
                 button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(delegate { OpenLoadout(button, var); });
             }
@@ -86,7 +86,7 @@ namespace Vi.UI
                 b.interactable = button != b;
             }
 
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+            PlayerDataManager.PlayerData playerData = attributes.CachedPlayerData;
             WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot+1).ToString()));

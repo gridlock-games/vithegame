@@ -13,7 +13,7 @@ namespace Vi.Core
     {
         [Header("Projectile Settings")]
         [SerializeField] private int killDistance = 500;
-        [SerializeField] private GameObject[] VFXToPlayOnDestroy;
+        [SerializeField] private PooledObject[] VFXToPlayOnDestroy;
         [SerializeField] private AudioClip[] soundToPlayOnSpawn = new AudioClip[0];
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
 
@@ -147,7 +147,7 @@ namespace Vi.Core
         private new void OnDestroy()
         {
             base.OnDestroy();
-            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 if (prefab.GetComponent<FollowUpVFX>())
                 {
@@ -158,8 +158,8 @@ namespace Vi.Core
                 }
                 else
                 {
-                    GameObject g = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
-                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(g));
+                    PooledObject obj = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(obj));
                 }
             }
         }

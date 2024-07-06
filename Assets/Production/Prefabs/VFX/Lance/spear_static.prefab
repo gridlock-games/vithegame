@@ -212,6 +212,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6472516138733651341, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3224558166
+      objectReference: {fileID: 0}
     - target: {fileID: 8982059310851640879, guid: 9eb2c7039c9ad4f0f93389abbe340c3a,
         type: 3}
       propertyPath: vfxPositionOffset.x
@@ -274,13 +279,18 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
-  crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
+  pooledVFXToPlayOnDestroy: []
+  followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
+  shouldDestroyOnEnemyHit: 0
   projectileForce: {x: 0, y: 0, z: 3}
   timeToActivateGravity: 0
   killDistance: 50
-  VFXToPlayOnDestroy: []

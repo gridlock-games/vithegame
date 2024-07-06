@@ -17,9 +17,9 @@ namespace Vi.Core
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
-        public PlayerDataManager.Team GetTeam() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team; }
+        public PlayerDataManager.Team GetTeam() { return CachedPlayerData.team; }
 
-        public CharacterReference.RaceAndGender GetRaceAndGender() { return PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).character.raceAndGender; }
+        public CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
@@ -30,13 +30,19 @@ namespace Vi.Core
 
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
+            else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (IsLocalPlayer) { return Color.white; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team, PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()).team)) { return Color.red; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return Color.red; }
             else { return Color.cyan; }
         }
 
-        [SerializeField] private GameObject teamIndicatorPrefab;
+        public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
+
+        public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
+        {
+            if (playerData.id != GetPlayerDataId()) { Debug.LogError("Player data doesn't have the same id!"); return; }
+            CachedPlayerData = playerData;
+        }
 
         public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
         public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
@@ -127,7 +133,7 @@ namespace Vi.Core
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
-            StartCoroutine(AddPlayerObjectToGameLogicManager());
+            StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner)
             {
@@ -143,7 +149,7 @@ namespace Vi.Core
             spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
         }
 
-        private IEnumerator AddPlayerObjectToGameLogicManager()
+        private IEnumerator AddPlayerObjectToPlayerDataManager()
         {
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
             PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
@@ -222,10 +228,10 @@ namespace Vi.Core
 
         private const float rageEndPercent = 0.01f;
 
-        [SerializeField] private GameObject rageAtMaxVFXPrefab;
-        [SerializeField] private GameObject ragingVFXPrefab;
-        private GameObject rageAtMaxVFXInstance;
-        private GameObject ragingVFXInstance;
+        [SerializeField] private PooledObject rageAtMaxVFXPrefab;
+        [SerializeField] private PooledObject ragingVFXPrefab;
+        private PooledObject rageAtMaxVFXInstance;
+        private PooledObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
@@ -285,7 +291,8 @@ namespace Vi.Core
             RefreshStatus();
         }
 
-        private GameObject teamIndicatorInstance;
+        [SerializeField] private PooledObject teamIndicatorPrefab;
+        private PooledObject teamIndicatorInstance;
         private void Start()
         {
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
@@ -652,7 +659,7 @@ namespace Vi.Core
                     }
                     else // Spirit is at 0
                     {
-                        AddSpirit(attack.damage);
+                        AddSpirit(HPDamage);
                         shouldPlayHitReaction = true;
                     }
                     break;
@@ -673,6 +680,7 @@ namespace Vi.Core
                     else // Spirit is at 0
                     {
                         AddStamina(-GetMaxStamina() * 0.3f);
+                        AddSpirit(HPDamage);
                         if (GetStamina() <= 0)
                         {
                             if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
@@ -754,7 +762,7 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (HPDamage != 0)
+                if (!Mathf.Approximately(HPDamage, 0))
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();

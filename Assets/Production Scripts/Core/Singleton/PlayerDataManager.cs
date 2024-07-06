@@ -308,6 +308,8 @@ namespace Vi.Core
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
+
+            playerObject.SetCachedPlayerData(Singleton.GetPlayerData(playerObject.GetPlayerDataId()));
         }
 
         public void RemovePlayerObject(int clientId)
@@ -333,12 +335,12 @@ namespace Vi.Core
             {
                 if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return new List<Attributes>(); }
             }
-            return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team == team & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team == team & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
         public List<Attributes> GetActivePlayerObjects(Attributes attributesToExclude = null)
         {
-            return localPlayers.Where(kvp => GetPlayerData(kvp.Value.GetPlayerDataId()).team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
         public Attributes GetPlayerObjectById(int id)
@@ -550,16 +552,7 @@ namespace Vi.Core
             AddPlayerData(playerData);
         }
 
-        public PlayerData GetPlayerData(int clientId)
-        {
-            for (int i = 0; i < cachedPlayerDataList.Count; i++)
-            {
-                PlayerData playerData = cachedPlayerDataList[i];
-                if (playerData.id == clientId) { return playerData; }
-            }
-            Debug.LogError("Could not find player data with ID: " + clientId);
-            return new PlayerData();
-        }
+        public PlayerData GetPlayerData(int clientId) { return cachedPlayerDataList.Find(item => item.id == clientId); }
 
         public PlayerData GetDisconnectedPlayerData(int clientId)
         {
@@ -569,24 +562,6 @@ namespace Vi.Core
                 if (clientId == disconnectedPlayerData.playerData.id) { return disconnectedPlayerData.playerData; }
             }
             Debug.LogError("Could not find disconnected player data with ID: " + clientId);
-            return new PlayerData();
-        }
-
-        public PlayerData GetPlayerData(ulong clientId)
-        {
-            try
-            {
-                for (int i = 0; i < cachedPlayerDataList.Count; i++)
-                {
-                    PlayerData playerData = cachedPlayerDataList[i];
-                    if (playerData.id == (int)clientId) { return playerData; }
-                }
-                Debug.LogError("Could not find player data with ID: " + clientId);
-            }
-            catch
-            {
-                return new PlayerData();
-            }
             return new PlayerData();
         }
 
@@ -673,12 +648,18 @@ namespace Vi.Core
         {
             EventDelegateManager.sceneLoaded += OnSceneLoad;
             EventDelegateManager.sceneUnloaded += OnSceneUnload;
+
+            NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
         }
 
         private void OnDisable()
         {
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
             EventDelegateManager.sceneUnloaded -= OnSceneUnload;
+
+            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
+            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
@@ -830,19 +811,6 @@ namespace Vi.Core
             }
         }
 
-        private void Start()
-        {
-            NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
-            NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
-            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
-        }
-
         private void Update()
         {
             if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
@@ -902,6 +870,8 @@ namespace Vi.Core
         {
             SyncCachedPlayerDataList();
 
+            if ((int)NetworkManager.LocalClientId == networkListEvent.Value.id) { LocalPlayerData = networkListEvent.Value; }
+
             switch (networkListEvent.Type)
             {
                 case NetworkListEvent<PlayerData>.EventType.Add:
@@ -936,6 +906,8 @@ namespace Vi.Core
                     {
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].GetComponent<LoadoutManager>();
                         loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
+
+                        localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
@@ -949,6 +921,8 @@ namespace Vi.Core
             if (resetDataListBoolCoroutine != null) { StopCoroutine(resetDataListBoolCoroutine); }
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
         }
+
+        public PlayerData LocalPlayerData;
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
 
@@ -1113,7 +1087,7 @@ namespace Vi.Core
             NetworkObject netObj = playerObjectToSpawn.GetComponent<NetworkObject>();
             if (playerData.id >= 0)
             {
-                netObj.SpawnAsPlayerObject((ulong)GetPlayerData(playerData.id).id, true);
+                netObj.SpawnAsPlayerObject((ulong)playerData.id, true);
             }
             else
             {
@@ -1129,7 +1103,7 @@ namespace Vi.Core
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
         {
-            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData(clientId).character.name + " has disconnected.");
+            Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData((int)clientId).character.name + " has disconnected.");
             if (IsServer) { RemovePlayerData((int)clientId); }
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {

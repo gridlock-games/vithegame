@@ -41,11 +41,11 @@ namespace Vi.UI
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
                 {
                     roundResultText.enabled = true;
-                    PlayerDataManager.Team team = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team;
+                    PlayerDataManager.Team team = PlayerDataManager.Singleton.LocalPlayerData.team;
                     if (team == PlayerDataManager.Team.Spectator)
                         roundResultText.text = "Fight!";
                     else
-                        roundResultText.text = "Fight for " + PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId).team) + "'s Glory!";
+                        roundResultText.text = "Fight for " + PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.LocalPlayerData.team) + "'s Glory!";
                 }
 
                 if (gameModeManager.ShouldDisplayNextGameActionTimer())

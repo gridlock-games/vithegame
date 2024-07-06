@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(PooledObject))]
     public class ActionVFXPreview : ActionVFX
     {
         public bool CanCast { get; private set; }

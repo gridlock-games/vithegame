@@ -113,7 +113,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return "Red Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
@@ -140,7 +140,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return "Blue Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
