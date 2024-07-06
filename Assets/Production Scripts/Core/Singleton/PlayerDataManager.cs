@@ -214,7 +214,14 @@ namespace Vi.Core
             }
             else
             {
-                SetTeamNameOverrideServerRpc(team, teamName, prefix);
+                if (IsLobbyLeader())
+                {
+                    SetTeamNameOverrideServerRpc(team, teamName, prefix);
+                }
+                else
+                {
+                    Debug.LogError("Trying to set team name overrides when we're not the lobby leader!");
+                }
             }
         }
 
@@ -223,9 +230,11 @@ namespace Vi.Core
         public bool TeamNameOverridesUpdated { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
-            StartCoroutine(ResetTeamNameOverridesUpdatedBool());
+            if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
+            teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
         }
 
+        private Coroutine teamNameOverridesWasUpdatedThisFrameCoroutine;
         private IEnumerator ResetTeamNameOverridesUpdatedBool()
         {
             yield return null;
@@ -927,7 +936,7 @@ namespace Vi.Core
             resetDataListBoolCoroutine = StartCoroutine(ResetDataListWasUpdatedBool());
         }
 
-        public PlayerData LocalPlayerData;
+        public PlayerData LocalPlayerData { get; private set; }
 
         public bool DataListWasUpdatedThisFrame { get; private set; } = false;
 

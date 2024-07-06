@@ -496,6 +496,15 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
+            if (PlayerDataManager.Singleton.TeamNameOverridesUpdated)
+            {
+                leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
+                leftTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(leftTeamParent.team));
+
+                rightTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team));
+                rightTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(rightTeamParent.team));
+            }
+
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());

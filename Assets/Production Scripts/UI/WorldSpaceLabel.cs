@@ -118,7 +118,7 @@ namespace Vi.UI
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
-            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateNameTextAndColors(); }
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.TeamNameOverridesUpdated) { UpdateNameTextAndColors(); }
 
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
