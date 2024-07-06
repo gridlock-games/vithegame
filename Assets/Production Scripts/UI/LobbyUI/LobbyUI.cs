@@ -371,7 +371,14 @@ namespace Vi.UI
 
             RefreshPlayerCards();
 
-            if (!IsSpawned) { Destroy(gameObject); }
+            if (IsSpawned)
+            {
+                CreateCharacterPreview();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -379,11 +386,6 @@ namespace Vi.UI
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
-
-            if (IsClient)
-            {
-                StartCoroutine(UpdateCharacterPreview());
-            }
         }
 
         public override void OnNetworkDespawn()
@@ -707,9 +709,9 @@ namespace Vi.UI
         }
 
         private GameObject previewObject;
-        private IEnumerator UpdateCharacterPreview()
+        private void CreateCharacterPreview()
         {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
