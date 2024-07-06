@@ -142,7 +142,11 @@ namespace Vi.UI
             }
 
             float targetWidth = transformToCopyWidthFrom.sizeDelta.x;
-            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated)) { rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth); }
+            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated))
+            {
+                rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
+                lastWidthEvaluated = targetWidth;
+            }
         }
     }
 }
