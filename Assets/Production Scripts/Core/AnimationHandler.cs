@@ -142,10 +142,6 @@ namespace Vi.Core
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
 
-            hitReactionIsStarting = false;
-            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
-            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
-
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
             Animator.Play("Empty", actionsLayer);
@@ -161,10 +157,6 @@ namespace Vi.Core
 
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
-
-            hitReactionIsStarting = false;
-            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
-            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
@@ -186,10 +178,6 @@ namespace Vi.Core
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
-
-            hitReactionIsStarting = false;
-            if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
-            if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
@@ -213,7 +201,6 @@ namespace Vi.Core
         };
 
         // This method plays the action on the server
-        private bool hitReactionIsStarting;
         private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
             WaitingForActionToPlay = false;
@@ -221,7 +208,7 @@ namespace Vi.Core
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (!movementHandler.CanMove()) { return; }
-            if ((attributes.IsRooted() | hitReactionIsStarting) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
+            if ((attributes.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
             if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
@@ -237,7 +224,6 @@ namespace Vi.Core
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (hitReactionIsStarting) { return; }
                 if (attributes.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
             }
 
@@ -485,14 +471,7 @@ namespace Vi.Core
                         heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                         break;
                     case ActionClip.ClipType.HitReaction:
-                        hitReactionIsStarting = true;
-
-                        if (hitReactionIsStartingCoroutine != null) { StopCoroutine(hitReactionIsStartingCoroutine); }
-                        hitReactionIsStartingCoroutine = StartCoroutine(ResetHitReactionIsStarting(actionClip));
-
-                        if (playStateAfterReachingEmptyCoroutine != null) { StopCoroutine(playStateAfterReachingEmptyCoroutine); }
-                        playStateAfterReachingEmptyCoroutine = StartCoroutine(PlayStateAfterReachingEmpty(animationStateName, transitionTime));
-                        
+                        Animator.CrossFade(animationStateName, transitionTime, actionsLayer, 0);
                         break;
                     case ActionClip.ClipType.FlashAttack:
                         Animator.CrossFade(animationStateName, transitionTime, actionsLayer, 0);
@@ -515,22 +494,6 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
-        }
-
-        private Coroutine playStateAfterReachingEmptyCoroutine;
-        private IEnumerator PlayStateAfterReachingEmpty(string animationStateName, float transitionTime)
-        {
-            Animator.CrossFade("Empty", 0, actionsLayer);
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName("Empty"));
-            Animator.CrossFade(animationStateName, transitionTime, actionsLayer);
-        }
-
-        private Coroutine hitReactionIsStartingCoroutine;
-        private IEnumerator ResetHitReactionIsStarting(ActionClip actionClip)
-        {
-            string stateName = GetActionClipAnimationStateName(actionClip);
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayer).IsName(stateName));
-            hitReactionIsStarting = false;
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
