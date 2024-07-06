@@ -31,7 +31,7 @@ namespace Vi.UI
 
                 foreach (Material mat in r.materials)
                 {
-                    if (mat.HasProperty("_Glow"))
+                    if (mat.HasProperty(_Glow))
                     {
                         if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
                         {

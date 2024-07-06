@@ -40,7 +40,6 @@ namespace Vi.Utility
         }
 
         private const float defaultVolume = 1;
-        private const float defaultPitch = 1;
         private const float defaultPanning = 0;
         private const float defaultSpatialBlend = 1;
         private const float defaultMaxDistance = 100;
@@ -48,7 +47,7 @@ namespace Vi.Utility
         private void ResetAudioSourceProperties(AudioSource audioSource)
         {
             audioSource.volume = defaultVolume;
-            audioSource.pitch = defaultPitch;
+            audioSource.pitch = Time.timeScale;
             audioSource.panStereo = defaultPanning;
             audioSource.spatialBlend = defaultSpatialBlend;
             audioSource.maxDistance = defaultMaxDistance;
@@ -196,14 +195,18 @@ namespace Vi.Utility
         private void Awake()
         {
             _singleton = this;
-            SceneManager.sceneLoaded += OnSceneLoad;
-            SceneManager.sceneUnloaded += OnSceneUnload;
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            SceneManager.sceneLoaded -= OnSceneLoad;
-            SceneManager.sceneUnloaded -= OnSceneUnload;
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDisable()
+        {
+            EventDelegateManager.sceneLoaded -= OnSceneLoad;
+            EventDelegateManager.sceneUnloaded -= OnSceneUnload;
         }
 
         private AudioSource musicSource;
@@ -318,7 +321,7 @@ namespace Vi.Utility
             isCrossfading = false;
         }
 
-        private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        private void OnSceneLoad(Scene scene)
         {
             if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
             {
@@ -326,12 +329,9 @@ namespace Vi.Utility
             }
         }
 
-        private void OnSceneUnload(Scene scene)
+        private void OnSceneUnload()
         {
-            if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
-            {
-                RefreshMusicClip();
-            }
+            RefreshMusicClip();
         }
 
         private MusicClip currentMusicClip;

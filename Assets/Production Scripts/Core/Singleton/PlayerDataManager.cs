@@ -163,7 +163,8 @@ namespace Vi.Core
             { Team.Yellow, Color.yellow },
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
-            { Team.Purple, Color.magenta }
+            { Team.Purple, Color.magenta },
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) }
         };
 
         public static Color GetTeamColor(Team team)
@@ -670,14 +671,14 @@ namespace Vi.Core
 
         private void OnEnable()
         {
-            NetSceneManager.sceneLoaded += OnSceneLoad;
-            NetSceneManager.sceneUnloaded += OnSceneUnload;
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
         }
 
         private void OnDisable()
         {
-            NetSceneManager.sceneLoaded -= OnSceneLoad;
-            NetSceneManager.sceneUnloaded -= OnSceneUnload;
+            EventDelegateManager.sceneLoaded -= OnSceneLoad;
+            EventDelegateManager.sceneUnloaded -= OnSceneUnload;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
