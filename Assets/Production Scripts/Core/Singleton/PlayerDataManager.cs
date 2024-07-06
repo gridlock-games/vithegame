@@ -220,6 +220,18 @@ namespace Vi.Core
 
         [Rpc(SendTo.Server, RequireOwnership = false)] private void SetTeamNameOverrideServerRpc(Team team, string teamName, string prefix) { SetTeamNameOverride(team, teamName, prefix); }
 
+        public bool TeamNameOverridesUpdated { get; private set; }
+        private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
+        {
+            StartCoroutine(ResetTeamNameOverridesUpdatedBool());
+        }
+
+        private IEnumerator ResetTeamNameOverridesUpdatedBool()
+        {
+            yield return null;
+            TeamNameOverridesUpdated = false;
+        }
+
         public string GetTeamText(Team team)
         {
             Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
@@ -814,6 +826,7 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
+            teamNameOverridesJson.OnValueChanged += OnTeamNameOverridesJsonChange;
             NetworkManager.NetworkTickSystem.Tick += Tick;
 
             if (IsServer)
@@ -827,6 +840,7 @@ namespace Vi.Core
         {
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
+            teamNameOverridesJson.OnValueChanged -= OnTeamNameOverridesJsonChange;
             NetworkManager.NetworkTickSystem.Tick -= Tick;
 
             localPlayers.Clear();
