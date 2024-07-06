@@ -163,7 +163,8 @@ namespace Vi.Core
             { Team.Yellow, Color.yellow },
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
-            { Team.Purple, Color.magenta }
+            { Team.Purple, Color.magenta },
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) }
         };
 
         public static Color GetTeamColor(Team team)
@@ -661,14 +662,23 @@ namespace Vi.Core
         }
 
         private static PlayerDataManager _singleton;
-
         private void Awake()
         {
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
-            SceneManager.sceneLoaded += OnSceneLoad;
-            SceneManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnEnable()
+        {
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDisable()
+        {
+            EventDelegateManager.sceneLoaded -= OnSceneLoad;
+            EventDelegateManager.sceneUnloaded -= OnSceneUnload;
         }
 
         public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
@@ -757,13 +767,12 @@ namespace Vi.Core
         }
 
         private PlayerSpawnPoints playerSpawnPoints;
-        void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+        void OnSceneLoad(Scene scene)
         {
             foreach (GameObject g in scene.GetRootGameObjects())
             {
                 if (g.TryGetComponent(out playerSpawnPoints)) { break; }
             }
-            //Debug.Log(scene.name + " " + playerSpawnPoints);
 
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
@@ -778,7 +787,7 @@ namespace Vi.Core
             }
         }
 
-        void OnSceneUnload(Scene scene)
+        void OnSceneUnload()
         {
             if (IsServer)
             {

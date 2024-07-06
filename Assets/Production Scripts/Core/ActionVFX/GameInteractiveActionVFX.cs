@@ -10,7 +10,10 @@ namespace Vi.Core
     public class GameInteractiveActionVFX : ActionVFX
     {
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
+        [SerializeField] private bool shouldBlockProjectiles;
         [SerializeField] private bool shouldDestroyOnEnemyHit;
+
+        public bool ShouldBlockProjectiles() { return shouldBlockProjectiles; }
 
         protected Attributes attacker;
         protected ActionClip attack;

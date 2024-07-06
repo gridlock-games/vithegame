@@ -96,6 +96,10 @@ namespace Vi.ScriptableObjects
         public int GetMaxAmmoCount() { return maxAmmoCount; }
 
         public const float attackSoundEffectVolume = 0.25f;
+        public const float projectileNearbyWhooshVolume = 0.75f;
+        public const float projectileNearbyWhooshDistanceThreshold = 5;
+
+        public const float attackSoundEffectMaxDistance = 50;
 
         [System.Serializable]
         private class AttackSoundEffect

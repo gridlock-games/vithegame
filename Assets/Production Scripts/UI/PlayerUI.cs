@@ -195,8 +195,8 @@ namespace Vi.UI
             RefreshStatus();
         }
 
-        private Vector3 equippedWeaponCardAnchoredPosition;
-        private Vector3 stowedWeaponCardAnchoredPosition;
+        private Vector2 equippedWeaponCardTargetAnchoredPosition;
+        private Vector2 stowedWeaponCardTargetAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
@@ -209,8 +209,9 @@ namespace Vi.UI
                 statusIcons.Add(statusIcon);
             }
 
-            equippedWeaponCardAnchoredPosition = primaryWeaponCard.transform.localPosition;
-            stowedWeaponCardAnchoredPosition = secondaryWeaponCard.transform.localPosition;
+            equippedWeaponCardTargetAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
+            stowedWeaponCardTargetAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
+            RefreshWeaponCardTargetPositions();
 
             RectTransform rt = (RectTransform)moveJoystick.transform.parent;
             moveJoystickOriginalAnchoredPosition = rt.anchoredPosition;
@@ -372,6 +373,26 @@ namespace Vi.UI
             }
         }
 
+        private Vector3 equippedWeaponCardTargetLocalPosition;
+        private Vector3 stowedWeaponCardTargetLocalPosition;
+        private int lastWidthEvaluated;
+        private int lastHeightEvaluated;
+        private void RefreshWeaponCardTargetPositions()
+        {
+            if (Screen.width == lastWidthEvaluated & Screen.height == lastHeightEvaluated) { return; }
+
+            if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
+
+            ((RectTransform)primaryWeaponCard.transform).anchoredPosition = equippedWeaponCardTargetAnchoredPosition;
+            ((RectTransform)secondaryWeaponCard.transform).anchoredPosition = stowedWeaponCardTargetAnchoredPosition;
+
+            equippedWeaponCardTargetLocalPosition = primaryWeaponCard.transform.localPosition;
+            stowedWeaponCardTargetLocalPosition = secondaryWeaponCard.transform.localPosition;
+
+            lastWidthEvaluated = Screen.width;
+            lastHeightEvaluated = Screen.height;
+        }
+
         private const float weaponCardAnimationSpeed = 8;
         private void UpdateWeaponCardPositions()
         {
@@ -379,8 +400,8 @@ namespace Vi.UI
 
             bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
 
-            primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardAnchoredPosition : stowedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
-            secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardAnchoredPosition : equippedWeaponCardAnchoredPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardTargetLocalPosition : stowedWeaponCardTargetLocalPosition, Time.deltaTime * weaponCardAnimationSpeed);
+            secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardTargetLocalPosition : equippedWeaponCardTargetLocalPosition, Time.deltaTime * weaponCardAnimationSpeed);
         }
 
         private void OnEnable()
@@ -520,6 +541,7 @@ namespace Vi.UI
                 }
             }
             UpdateActiveUIElements();
+            RefreshWeaponCardTargetPositions();
             UpdateWeaponCardPositions();
             UpdateWeapon(playerInput.currentControlScheme != lastControlScheme);
 

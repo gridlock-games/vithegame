@@ -262,9 +262,18 @@ namespace Vi.Core
                 Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
                 {
-                    worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.rootMotionSidesMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionSidesMultiplier.Evaluate(normalizedTime);
-                    worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.rootMotionVerticalMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionVerticalMultiplier.Evaluate(normalizedTime);
-                    worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.rootMotionForwardMultiplier.Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.hitReactionRootMotionForwardMultiplier.Evaluate(normalizedTime);
+                    if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                    {
+                        worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime) * weaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                    }
+                    else
+                    {
+                        worldSpaceRootMotion.x *= weaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.y *= weaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.z *= weaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                    }
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;

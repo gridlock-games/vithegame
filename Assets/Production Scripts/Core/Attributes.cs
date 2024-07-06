@@ -165,6 +165,10 @@ namespace Vi.Core
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
+        [SerializeField] private AudioClip heartbeatSoundEffect;
+        private const float heartbeatVolume = 1;
+        private const float heartbeatHPPercentageThreshold = 0.1f;
+
         private void OnHPChanged(float prev, float current)
         {
             if (current < prev)
@@ -179,6 +183,33 @@ namespace Vi.Core
             {
                 GlowRenderer.RenderHeal();
             }
+
+            if (IsLocalPlayer)
+            {
+                if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
+                {
+                    if (!heartbeatSoundIsPlaying) { StartCoroutine(PlayHeartbeatSound()); }
+                }
+            }
+        }
+
+        private bool heartbeatSoundIsPlaying;
+        private IEnumerator PlayHeartbeatSound()
+        {
+            heartbeatSoundIsPlaying = true;
+            AudioSource audioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+
+            while (true)
+            {
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                if (GetAilment() == ActionClip.Ailment.Death) { break; }
+                if (GetHP() / GetMaxHP() >= heartbeatHPPercentageThreshold) { break; }
+                yield return null;
+            }
+
+            if (audioSource) { if (audioSource.isPlaying) { audioSource.Stop(); } }
+            heartbeatSoundIsPlaying = false;
         }
 
         private void OnSpiritChanged(float prev, float current)
@@ -598,9 +629,7 @@ namespace Vi.Core
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
-            hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
-            hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
+            hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
             float HPDamage = -attack.damage;
             HPDamage *= attacker.damageMultiplier;
@@ -648,9 +677,7 @@ namespace Vi.Core
                         {
                             if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
                             hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
-                            hitReaction.hitReactionRootMotionForwardMultiplier = attack.attackRootMotionForwardMultiplier;
-                            hitReaction.hitReactionRootMotionSidesMultiplier = attack.attackRootMotionSidesMultiplier;
-                            hitReaction.hitReactionRootMotionVerticalMultiplier = attack.attackRootMotionVerticalMultiplier;
+                            hitReaction.SetHitReactionRootMotionMultipliers(attack);
                         }
                         shouldPlayHitReaction = true;
                     }
@@ -1115,7 +1142,7 @@ namespace Vi.Core
             }
         }
 
-        private bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
+        public bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
 
         [Rpc(SendTo.Server)]
         private void ActivateRageServerRpc()

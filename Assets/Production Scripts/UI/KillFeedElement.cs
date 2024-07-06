@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -51,26 +52,58 @@ namespace Vi.UI
                     break;
             }
 
+            // Evaluate colors
+            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+            if (localPlayerKvp.Value)
+            {
+                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.killerTeam ? Color.cyan : Color.red;
+                assistText.color = killHistoryElement.assistTeam == PlayerDataManager.Team.Competitor | killHistoryElement.assistTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.assistTeam ? Color.cyan : Color.red;
+                victimText.color = killHistoryElement.victimTeam == PlayerDataManager.Team.Competitor | killHistoryElement.victimTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.victimTeam ? Color.cyan : Color.red;
+            }
+            else // We are a spectator or the server
+            {
+                // TODO Set this to be the team color
+                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.killerTeam);
+                assistText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.assistTeam);
+                victimText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.victimTeam);
+            }
+
             localPlayerBackgroundImage.enabled = false;
             backgroundImage.color = nonLocalDeathBackgroundColor;
             if (NetworkManager.Singleton.SpawnManager != null)
             {
+                // Local Player Kill
                 if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.killerNetObjId, out NetworkObject netObj))
                 {
-                    localPlayerBackgroundImage.color = Color.red;
-                    localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
+                    if (netObj.IsLocalPlayer)
+                    {
+                        localPlayerBackgroundImage.color = Color.red;
+                        localPlayerBackgroundImage.enabled = true;
+                        killerText.color = Color.white;
+                    }
                 }
-                else if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.assistNetObjId, out netObj))
+
+                // Local Player Assist
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.assistNetObjId, out netObj))
                 {
-                    localPlayerBackgroundImage.color = Color.yellow;
-                    localPlayerBackgroundImage.enabled = netObj.IsLocalPlayer;
+                    if (netObj.IsLocalPlayer)
+                    {
+                        localPlayerBackgroundImage.color = Color.yellow;
+                        localPlayerBackgroundImage.enabled = true;
+                        assistText.color = Color.white;
+                    }
                 }
-                else if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.victimNetObjId, out netObj))
+
+                // Local Player Death
+                if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(killHistoryElement.victimNetObjId, out netObj))
                 {
-                    if (netObj.IsLocalPlayer) { backgroundImage.color = localDeathBackgroundColor; }
+                    if (netObj.IsLocalPlayer)
+                    {
+                        backgroundImage.color = localDeathBackgroundColor;
+                        victimText.color = Color.white;
+                    }
                 }
             }
-
             initializationTime = Time.time;
         }
 
@@ -97,15 +130,19 @@ namespace Vi.UI
         }
 
         private const float fadeTime = 4;
+        private Color lastTargetColor;
+        private float lastWidthEvaluated;
         private void Update()
         {
             for (int i = 0; i < tintMaterialInstances.Count; i++)
             {
                 Color targetColor = Color.white;
                 if (IsNotRunning()) { targetColor.a = 0; }
-                tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime);
+                if (lastTargetColor != targetColor) { tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime); }
             }
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
+
+            float targetWidth = transformToCopyWidthFrom.sizeDelta.x;
+            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated)) { rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth); }
         }
     }
 }

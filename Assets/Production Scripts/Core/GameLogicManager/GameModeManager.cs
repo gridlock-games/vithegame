@@ -136,11 +136,17 @@ namespace Vi.Core.GameModeManagers
         public struct KillHistoryElement : INetworkSerializable, System.IEquatable<KillHistoryElement>
         {
             public FixedString64Bytes killerName;
+            public PlayerDataManager.Team killerTeam;
             public ulong killerNetObjId;
+
             public FixedString64Bytes assistName;
+            public PlayerDataManager.Team assistTeam;
             public ulong assistNetObjId;
+
             public FixedString64Bytes victimName;
+            public PlayerDataManager.Team victimTeam;
             public ulong victimNetObjId;
+
             public FixedString64Bytes weaponName;
             public KillType killType;
 
@@ -148,13 +154,16 @@ namespace Vi.Core.GameModeManagers
             {
                 PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
                 killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
+                killerTeam = killerData.team;
                 killerNetObjId = killer.NetworkObjectId;
 
                 assistName = "";
+                assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
                 PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
                 victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
+                victimTeam = victimData.team;
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
@@ -165,14 +174,17 @@ namespace Vi.Core.GameModeManagers
             {
                 PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
                 killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
+                killerTeam = killerData.team;
                 killerNetObjId = killer.NetworkObjectId;
 
                 PlayerDataManager.PlayerData assistData = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId());
                 assistName = PlayerDataManager.Singleton.GetTeamPrefix(assistData.team) + assistData.character.name;
+                assistTeam = assistData.team;
                 assistNetObjId = assist.NetworkObjectId;
 
                 PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
                 victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
+                victimTeam = victimData.team;
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
@@ -182,13 +194,16 @@ namespace Vi.Core.GameModeManagers
             public KillHistoryElement(Attributes victim)
             {
                 killerName = "";
+                killerTeam = PlayerDataManager.Team.Environment;
                 killerNetObjId = 0;
 
                 assistName = "";
+                assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
                 PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
                 victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
+                victimTeam = PlayerDataManager.Team.Environment;
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = "Environment";
@@ -201,6 +216,9 @@ namespace Vi.Core.GameModeManagers
                 killerNetObjId = 0;
                 assistNetObjId = 0;
                 victimNetObjId = 0;
+                killerTeam = PlayerDataManager.Team.Competitor;
+                assistTeam = PlayerDataManager.Team.Competitor;
+                victimTeam = PlayerDataManager.Team.Competitor;
                 var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
                 switch (killType)
                 {
@@ -253,11 +271,17 @@ namespace Vi.Core.GameModeManagers
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref killerName);
+                serializer.SerializeValue(ref killerTeam);
                 serializer.SerializeValue(ref killerNetObjId);
+
                 serializer.SerializeValue(ref assistName);
+                serializer.SerializeValue(ref assistTeam);
                 serializer.SerializeValue(ref assistNetObjId);
+
                 serializer.SerializeValue(ref victimName);
+                serializer.SerializeValue(ref victimTeam);
                 serializer.SerializeValue(ref victimNetObjId);
+
                 serializer.SerializeValue(ref weaponName);
                 serializer.SerializeValue(ref killType);
             }
@@ -773,10 +797,9 @@ namespace Vi.Core.GameModeManagers
                 Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
                 if (attributes)
                 {
-                    if (attributes.TryGetComponent(out AnimationHandler animationHandler))
-                    {
-                        StartCoroutine(PlayAnimation(animationHandler, isVictor));
-                    }
+                    if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
+
+                    if (attributes.TryGetComponent(out AnimationHandler animationHandler)) { StartCoroutine(PlayAnimation(animationHandler, isVictor)); }
                 }
             }
             scoresToEvaluate.Clear();

@@ -6,6 +6,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
+using UnityEngine.Events;
 
 namespace Vi.Core
 {
@@ -102,6 +103,7 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
+                        handle.Completed += SceneHandleLoaded;
                         PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle, AsyncOperationUI.LoadingType.Loading));
                         PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
@@ -116,12 +118,14 @@ namespace Vi.Core
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
+                        handle.Completed += SceneHandleLoaded;
                         PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle, AsyncOperationUI.LoadingType.Loading));
                         PersistentLocalObjects.Singleton.SceneHandles.Add(handle);
                     }
                     break;
                 case SceneType.Environment:
                     AsyncOperationHandle<SceneInstance> handle2 = Addressables.LoadSceneAsync(scenePayload.sceneReferences[0], LoadSceneMode.Additive);
+                    handle2.Completed += SceneHandleLoaded;
                     PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, handle2, AsyncOperationUI.LoadingType.Loading));
                     PersistentLocalObjects.Singleton.SceneHandles.Add(handle2);
                     break;
@@ -131,6 +135,51 @@ namespace Vi.Core
             }
             //Debug.Log("Loading " + scenePayload.name);
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Add(scenePayload);
+        }
+
+        private void SceneHandleLoaded(AsyncOperationHandle<SceneInstance> sceneHandle)
+        {
+            // If this scene is part of an environment scene payload
+            if (System.Array.Exists(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name) & scenePayload.sceneType == SceneType.Environment))
+            {
+                if (SceneManager.GetActiveScene() != sceneHandle.Result.Scene)
+                {
+                    SceneManager.SetActiveScene(sceneHandle.Result.Scene);
+                }
+            }
+
+            PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
+
+            // Need to check singleton because this object may be despawned and not know
+            if (NetworkManager.Singleton.IsServer)
+            {
+                foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
+                {
+                    if (g.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (!networkObject.IsSpawned) { networkObject.Spawn(true); }
+                    }
+                }
+            }
+
+            if (NetworkManager.Singleton.IsClient)
+            {
+                foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
+                {
+                    if (g.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (!networkObject.IsSpawned) { Destroy(g); }
+                    }
+                }
+            }
+
+            EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
+        }
+
+        private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
+        {
+            PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
+            EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
         private void UnloadAllScenePayloadsOfType(SceneType sceneType)
@@ -204,10 +253,12 @@ namespace Vi.Core
         {
             foreach (SceneReference scene in scenePayload.sceneReferences)
             {
-                AsyncOperationHandle<SceneInstance> handle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
-                if (!handle.IsValid()) { continue; }
-                PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, Addressables.UnloadSceneAsync(handle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects), AsyncOperationUI.LoadingType.Unloading));
-                PersistentLocalObjects.Singleton.SceneHandles.Remove(handle);
+                AsyncOperationHandle<SceneInstance> loadedHandle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
+                if (!loadedHandle.IsValid()) { continue; }
+                AsyncOperationHandle<SceneInstance> unloadHandle = Addressables.UnloadSceneAsync(loadedHandle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                unloadHandle.Completed += SceneHandleUnloaded;
+                PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, unloadHandle, AsyncOperationUI.LoadingType.Unloading));
+                PersistentLocalObjects.Singleton.SceneHandles.Remove(loadedHandle);
             }
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Remove(scenePayload);
         }
@@ -241,16 +292,7 @@ namespace Vi.Core
         private void Awake()
         {
             _singleton = this;
-
-            SceneManager.sceneLoaded += OnSceneLoad;
-            SceneManager.sceneUnloaded += OnSceneUnload;
-
             activeSceneGroupIndicies = new NetworkList<int>();
-        }
-
-        private void Update()
-        {
-            PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
         }
 
         public bool ShouldSpawnPlayer()
@@ -296,44 +338,6 @@ namespace Vi.Core
             return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Environment).Count > 0;
         }
 
-        private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
-        {
-            //Debug.Log("Loaded " + scene.name);
-            // Need to check singleton because this object may be despawned and not know
-            if (NetworkManager.Singleton.IsServer)
-            {
-                foreach (GameObject g in scene.GetRootGameObjects())
-                {
-                    if (g.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        if (!networkObject.IsSpawned) { networkObject.Spawn(true); }
-                    }
-                }
-            }
-
-            if (NetworkManager.Singleton.IsClient)
-            {
-                foreach (GameObject g in scene.GetRootGameObjects())
-                {
-                    if (g.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        if (!networkObject.IsSpawned) { Destroy(g); }
-                    }
-                }
-            }
-
-            foreach (ScenePayload scenePayload in System.Array.FindAll(scenePayloads, item => item.sceneType == SceneType.Environment & System.Array.Exists(item.sceneReferences, x => x.SceneName == scene.name)))
-            {
-                SceneManager.SetActiveScene(scene);
-                break;
-            }
-        }
-
-        private void OnSceneUnload(Scene scene)
-        {
-            //Debug.Log("Unloaded " + scene.name);
-        }
-        
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)
         {
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
