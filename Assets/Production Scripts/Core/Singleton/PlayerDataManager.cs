@@ -1055,17 +1055,19 @@ namespace Vi.Core
             if (playerSpawnPoints)
             {
                 (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
-                float waitTime = 0;
-                while (!spawnPointFound)
+                if (playerData.team != Team.Peaceful & playerData.team != Team.Spectator)
                 {
-                    isWaitingForSpawnPoint.Value = true;
-                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
-                    yield return null;
-                    waitTime += Time.deltaTime;
-                    if (waitTime > maxSpawnPointWaitTime) { break; }
+                    float waitTime = 0;
+                    while (!spawnPointFound)
+                    {
+                        isWaitingForSpawnPoint.Value = true;
+                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
+                        yield return null;
+                        waitTime += Time.deltaTime;
+                        if (waitTime > maxSpawnPointWaitTime) { break; }
+                    }
+                    isWaitingForSpawnPoint.Value = false;
                 }
-                isWaitingForSpawnPoint.Value = false;
-
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
