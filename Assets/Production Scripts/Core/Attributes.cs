@@ -775,7 +775,7 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            StartHitStop(attacker);
+            if (isMeleeHit) { StartHitStop(attacker); }
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
