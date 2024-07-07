@@ -936,6 +936,12 @@ namespace Vi.Core
                         loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
+
+                        if (networkListEvent.PreviousValue.channel != networkListEvent.Value.channel)
+                        {
+                            channelCounts[networkListEvent.PreviousValue.channel]--;
+                            channelCounts[networkListEvent.Value.channel]++;
+                        }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
@@ -1191,6 +1197,16 @@ namespace Vi.Core
         private const int defaultChannel = 0;
         private const int maxChannels = 5;
         private const int maxPlayersInChannel = 3;
+
+        public List<int> GetChannelCountList()
+        {
+            List<int> channelCountsList = new List<int>();
+            for (int i = 0; i < channelCounts.Count; i++)
+            {
+                channelCountsList.Add(channelCounts[i]);
+            }
+            return channelCountsList;
+        }
 
         public int GetBestChannel()
         {

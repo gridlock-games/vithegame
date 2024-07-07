@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Utility;
+using TMPro;
 
 namespace Vi.UI
 {
@@ -18,6 +19,8 @@ namespace Vi.UI
         [SerializeField] private SettingMenuController settingMenu;
         [SerializeField] private Button returnToCharSelectButton;
         [SerializeField] private Text applicationVersionText;
+        [SerializeField] private GameObject channelDropdownParent;
+        [SerializeField] private TMP_Dropdown channelDropdown;
 
         public void OpenSettingsMenu()
         {
@@ -74,6 +77,34 @@ namespace Vi.UI
             returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
 
             applicationVersionText.text = "Version: " + Application.version;
+
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+            {
+                channelDropdownParent.SetActive(true);
+
+                channelDropdown.ClearOptions();
+                List<string> channelOptions = new List<string>();
+                List<int> channelCountList = PlayerDataManager.Singleton.GetChannelCountList();
+                for (int i = 0; i < channelCountList.Count; i++)
+                {
+                    channelOptions.Add("Channel " + (i + 1).ToString());
+                }
+                channelDropdown.AddOptions(channelOptions);
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.Singleton.LocalClientId);
+                channelDropdown.value = playerData.channel;
+                channelDropdown.onValueChanged.AddListener(delegate { OnChannelDropdownChange(); });
+            }
+            else
+            {
+                channelDropdownParent.SetActive(false);
+            }
+        }
+
+        private void OnChannelDropdownChange()
+        {
+            var playerData = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.Singleton.LocalClientId);
+            playerData.channel = channelDropdown.value;
+            PlayerDataManager.Singleton.SetPlayerData(playerData);
         }
 
         public IEnumerator ReturnToCharacterSelect()
