@@ -829,18 +829,21 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
 
-            shouldShake = true;
-            attacker.shouldShake = false;
-
-            hitFreezeStartTime = Time.time;
-            attacker.hitFreezeStartTime = Time.time;
-
             if (isMeleeHit)
             {
+                shouldShake = true;
+                attacker.shouldShake = false;
+
+                hitFreezeStartTime = Time.time;
+                attacker.hitFreezeStartTime = Time.time;
+
                 StartHitStopClientRpc(attacker.NetworkObjectId);
             }
             else
             {
+                shouldShake = true;
+                hitFreezeStartTime = Time.time;
+
                 StartHitStopClientRpc();
             }
         }
