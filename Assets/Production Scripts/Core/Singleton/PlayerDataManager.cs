@@ -956,16 +956,19 @@ namespace Vi.Core
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
             (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
-            float waitTime = 0;
-            while (!spawnPointFound)
+            if (attributesToRespawn.GetTeam() != Team.Peaceful & attributesToRespawn.GetTeam() != Team.Spectator)
             {
-                attributesToRespawn.isWaitingForSpawnPoint = true;
-                (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
-                yield return null;
-                waitTime += Time.deltaTime;
-                if (waitTime > maxSpawnPointWaitTime) { break; }
+                float waitTime = 0;
+                while (!spawnPointFound)
+                {
+                    attributesToRespawn.isWaitingForSpawnPoint = true;
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+                    yield return null;
+                    waitTime += Time.deltaTime;
+                    if (waitTime > maxSpawnPointWaitTime) { break; }
+                }
             }
-
+            
             attributesToRespawn.isWaitingForSpawnPoint = false;
 
             Vector3 spawnPosition = transformData.position;
