@@ -85,18 +85,20 @@ namespace Vi.Core
             string payload = System.Text.Encoding.ASCII.GetString(connectionData);
             //Debug.Log("ClientId: " + clientId + " has been approved. Payload: " + payload);
 
-            playerDataQueue.Enqueue(new PlayerDataInput(payload, clientId));
+            playerDataQueue.Enqueue(new PlayerDataInput(payload, clientId, PlayerDataManager.Singleton.GetBestChannel()));
         }
 
         private struct PlayerDataInput
         {
             public string characterId;
             public ulong clientId;
+            public int channel;
 
-            public PlayerDataInput(string characterId, ulong clientId)
+            public PlayerDataInput(string characterId, ulong clientId, int channel)
             {
                 this.characterId = characterId;
                 this.clientId = clientId;
+                this.channel = channel;
             }
         }
 
@@ -139,7 +141,7 @@ namespace Vi.Core
                     }
 
                     PlayerDataInput data = playerDataQueue.Dequeue();
-                    StartCoroutine(AddPlayerData(data.characterId, data.clientId, clientTeam));
+                    StartCoroutine(AddPlayerData(data.characterId, data.clientId, data.channel, clientTeam));
                 }
             }
 
@@ -152,7 +154,7 @@ namespace Vi.Core
         private bool lastConnectedClientState;
 
         private bool addPlayerDataRunning;
-        private IEnumerator AddPlayerData(string characterId, ulong clientId, PlayerDataManager.Team team)
+        private IEnumerator AddPlayerData(string characterId, ulong clientId, int channel, PlayerDataManager.Team team)
         {
             addPlayerDataRunning = true;
 
@@ -160,7 +162,13 @@ namespace Vi.Core
             WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
             // If the game crashed, or the player disconnected for some reason, don't add their data
-            if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId)) { PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId, WebRequestManager.Singleton.CharacterById, team)); }
+            if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId))
+            {
+                PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId,
+                    channel,
+                    WebRequestManager.Singleton.CharacterById,
+                    team));
+            }
             
             addPlayerDataRunning = false;
         }

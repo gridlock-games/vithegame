@@ -156,12 +156,29 @@ namespace Vi.Core
 
             NetworkObject.NetworkShow(OwnerClientId);
 
-            foreach (ulong id in NetworkManager.ConnectedClientsIds)
+            PlayerDataManager.PlayerData thisPlayerData = PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId());
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
-                if (!NetworkObject.IsNetworkVisibleTo(id))
+                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                if (networkId == 0) { continue; }
+                if (networkId == OwnerClientId) { continue; }
+
+                if (playerData.channel == thisPlayerData.channel)
                 {
-                    NetworkObject.NetworkShow(id);
+                    if (!NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        NetworkObject.NetworkShow(networkId);
+                    }
                 }
+                else
+                {
+                    if (NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        NetworkObject.NetworkHide(networkId);
+                    }
+                }
+
+                
             }
         }
 

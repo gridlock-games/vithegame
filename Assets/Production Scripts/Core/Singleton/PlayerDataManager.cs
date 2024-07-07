@@ -521,6 +521,7 @@ namespace Vi.Core
                 if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
 
                 PlayerData botData = new PlayerData(botClientId,
+                    defaultChannel,
                     botCharacter,
                     team);
                 AddPlayerData(botData);
@@ -655,6 +656,14 @@ namespace Vi.Core
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
+
+            List<int> initialChannelCounts = new List<int>();
+            for (int i = 0; i < maxChannels; i++)
+            {
+                initialChannelCounts.Add(0);
+            }
+
+            channelCounts = new NetworkList<int>(initialChannelCounts);
         }
 
         private void OnEnable()
@@ -900,6 +909,8 @@ namespace Vi.Core
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+
+                        channelCounts[networkListEvent.Value.channel]++;
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -914,6 +925,8 @@ namespace Vi.Core
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+
+                        channelCounts[networkListEvent.Value.channel]--;
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
@@ -1173,34 +1186,48 @@ namespace Vi.Core
             return playerDatas;
         }
 
+        private NetworkList<int> channelCounts;
+
+        private const int defaultChannel = 0;
+        private const int maxChannels = 5;
+        private const int maxPlayersInChannel = 3;
+
+        public int GetBestChannel()
+        {
+            for (int channelIndex = 0; channelIndex < channelCounts.Count; channelIndex++)
+            {
+                if (channelCounts[channelIndex] < maxPlayersInChannel)
+                {
+                    return channelIndex;
+                }
+            }
+            return defaultChannel;
+        }
+
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
-        [System.Serializable]
-        private struct TeamDefinition
-        {
-            public Team team;
-            public ulong clientId;
-        }
-
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
+            public int channel;
             public WebRequestManager.Character character;
             public Team team;
 
             public PlayerData(int id)
             {
                 this.id = id;
+                channel = defaultChannel;
                 character = new();
                 team = Team.Environment;
             }
 
-            public PlayerData(int id, WebRequestManager.Character character, Team team)
+            public PlayerData(int id, int channel, WebRequestManager.Character character, Team team)
             {
                 this.id = id;
+                this.channel = channel;
                 this.character = character;
                 this.team = team;
             }
@@ -1213,6 +1240,7 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
+                serializer.SerializeValue(ref channel);
                 serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
             }
