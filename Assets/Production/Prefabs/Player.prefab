@@ -116,7 +116,7 @@ MonoBehaviour:
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
+  SpawnWithObservers: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &3945128955595459578
@@ -183,13 +183,7 @@ MonoBehaviour:
     type: 3}
   ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
     type: 3}
-  pooledRageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
-    type: 3}
-  pooledRagingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
-    type: 3}
   teamIndicatorPrefab: {fileID: -9076160948696418514, guid: eac704ebbf678b243822e8816fda0732,
-    type: 3}
-  pooledTeamIndicatorPrefab: {fileID: -9076160948696418514, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3

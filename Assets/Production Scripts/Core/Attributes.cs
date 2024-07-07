@@ -121,7 +121,12 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitStats()); }
+            if (IsServer)
+            {
+                StartCoroutine(InitStats());
+                StartCoroutine(SetVisibilityAfterSpawn());
+            }
+
             HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
@@ -142,6 +147,22 @@ namespace Vi.Core
             }
 
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+        }
+
+        private IEnumerator SetVisibilityAfterSpawn()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.SetVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            yield return new WaitUntil(() => IsSpawned);
+
+            NetworkObject.NetworkShow(OwnerClientId);
+
+            foreach (ulong id in NetworkManager.ConnectedClientsIds)
+            {
+                if (!NetworkObject.IsNetworkVisibleTo(id))
+                {
+                    NetworkObject.NetworkShow(id);
+                }
+            }
         }
 
         private IEnumerator InitStats()

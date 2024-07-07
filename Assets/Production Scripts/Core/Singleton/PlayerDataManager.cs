@@ -1089,7 +1089,7 @@ namespace Vi.Core
                 yield break;
             }
 
-            bool isSpectator = GetPlayerData(playerData.id).team == Team.Spectator;
+            bool isSpectator = playerData.team == Team.Spectator;
             if (isSpectator)
             {
                 playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
