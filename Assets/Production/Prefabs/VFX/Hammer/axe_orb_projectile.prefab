@@ -252,7 +252,7 @@ PrefabInstance:
         type: 3}
       propertyPath: VFXToPlayOnDestroy.Array.data[0]
       value: 
-      objectReference: {fileID: 1453165119930241201, guid: 595e15cd00fae9b42b6f06e5f39a760c,
+      objectReference: {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff,
         type: 3}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
@@ -267,9 +267,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
+      propertyPath: pooledVFXToPlayOnDestroy.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
       propertyPath: followUpVFXToPlayOnDestroy.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
+      propertyPath: pooledVFXToPlayOnDestroy.Array.data[0]
+      value: 
+      objectReference: {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff,
+        type: 3}
     - target: {fileID: 9166887201689669424, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
       propertyPath: followUpVFXToPlayOnDestroy.Array.data[0]

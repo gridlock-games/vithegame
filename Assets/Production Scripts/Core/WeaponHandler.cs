@@ -316,7 +316,7 @@ namespace Vi.Core
             {
                 case ActionVFX.TransformType.Stationary:
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? attackerTransform : null);
 
@@ -324,7 +324,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ParentToOriginator:
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
 
@@ -332,7 +332,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[actionVFXPrefab.weaponBone].transform.position, weaponInstances[actionVFXPrefab.weaponBone].transform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[actionVFXPrefab.weaponBone].transform : null);
 
@@ -341,7 +341,7 @@ namespace Vi.Core
                 case ActionVFX.TransformType.Projectile:
                     if (isPreviewVFX)
                     {
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
                         vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         break;
                     }
@@ -351,7 +351,7 @@ namespace Vi.Core
                         if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                         {
                             if (isPreviewVFX)
-                                vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
+                                vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null).gameObject;
                             else
                                 vfxInstance = Instantiate(actionVFXPrefab.gameObject, shooterWeapon.GetProjectileSpawnPoint().position, shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null);
 
@@ -360,7 +360,7 @@ namespace Vi.Core
                         else
                         {
                             if (isPreviewVFX)
-                                vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
+                                vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null).gameObject;
                             else
                                 vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
                             
@@ -388,11 +388,11 @@ namespace Vi.Core
 
                         if (isPreviewVFX)
                         {
-                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
+                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(),
                                 hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
                                 groundRotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                                 isPreviewVFX ? attackerTransform : null
-                            );
+                            ).gameObject;
                         }
                         else
                         {
@@ -407,11 +407,11 @@ namespace Vi.Core
                     {
                         if (isPreviewVFX)
                         {
-                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject,
+                            vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(),
                                 attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
                                 attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                                 isPreviewVFX ? attackerTransform : null
-                            );
+                            ).gameObject;
                         }
                         else
                         {
@@ -427,7 +427,7 @@ namespace Vi.Core
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
                     
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), victimTransform);
 
@@ -437,7 +437,7 @@ namespace Vi.Core
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFXPrefab); break; }
                     
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset)).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, victimTransform.position, victimTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset));
 
@@ -445,7 +445,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.AimAtTarget:
                     if (isPreviewVFX)
-                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
+                        vfxInstance = ObjectPoolingManager.SpawnObject(actionVFXPrefab.GetComponent<PooledObject>(), attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null).gameObject;
                     else
                         vfxInstance = Instantiate(actionVFXPrefab.gameObject, attackerTransform.position, attackerTransform.rotation, isPreviewVFX ? attackerTransform : null);
 
@@ -893,7 +893,7 @@ namespace Vi.Core
                             {
                                 if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability1)) { animationHandler.PlayAction(actionClip); }
                             }
-                            ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance);
+                            ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance.GetComponent<PooledObject>());
                             ability1PreviewInstance = null;
                         }
                     }
@@ -930,7 +930,7 @@ namespace Vi.Core
                             {
                                 if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability2)) { animationHandler.PlayAction(actionClip); }
                             }
-                            ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance);
+                            ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance.GetComponent<PooledObject>());
                             ability2PreviewInstance = null;
                         }
                     }
@@ -967,7 +967,7 @@ namespace Vi.Core
                             {
                                 if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability3)) { animationHandler.PlayAction(actionClip); }
                             }
-                            ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance);
+                            ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance.GetComponent<PooledObject>());
                             ability3PreviewInstance = null;
                         }
                     }
@@ -1004,7 +1004,7 @@ namespace Vi.Core
                             {
                                 if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability4)) { animationHandler.PlayAction(actionClip); }
                             }
-                            ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance);
+                            ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance.GetComponent<PooledObject>());
                             ability4PreviewInstance = null;
                         }
                     }
@@ -1034,7 +1034,7 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                CharacterReference.RaceAndGender raceAndGender = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId()).character.raceAndGender;
+                CharacterReference.RaceAndGender raceAndGender = attributes.CachedPlayerData.character.raceAndGender;
                 animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());

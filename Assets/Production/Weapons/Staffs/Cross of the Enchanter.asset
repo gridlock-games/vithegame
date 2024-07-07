@@ -27,18 +27,18 @@ MonoBehaviour:
   maxAmmoCount: 0
   attackSoundEffects:
   - weaponBone: 18
-    attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
+    attackSoundEffects: []
   - weaponBone: 5
-    attackSoundEffect: {fileID: 8300000, guid: 3e90d8d9986f647b7b7bd193b2399458, type: 3}
-  drawSoundEffect: {fileID: 8300000, guid: 9f819c03d98d04eed982c4633d9a8479, type: 3}
-  sheatheSoundEffect: {fileID: 8300000, guid: ec5b102aa3bfd4afabe344f209d29ef0, type: 3}
-  hitAudioClip: {fileID: 8300000, guid: 99ace9ddb8b8b48b7baf9df95c8d771b, type: 3}
-  knockbackHitAudioClip: {fileID: 8300000, guid: defd2ad8bedbe453f94c94c4590bcf2f,
+    attackSoundEffects: []
+  inflictHitSoundEffects: []
+  hitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
-  hitVFXPrefab: {fileID: 1008842686038376, guid: 42c427f9d12527f4b86f4e770b4ce034,
+  pooledHitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
-  blockAudioClip: {fileID: 8300000, guid: fb94972ad123749059532c7e4551c620, type: 3}
-  blockVFXPrefab: {fileID: 1812881953744270, guid: ed0c022a338d3384d9ee622d354a94e2,
+  blockingHitSoundEffects: []
+  blockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
+    type: 3}
+  pooledBlockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
     type: 3}
   weaponModelData:
   - skinPrefab: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df,

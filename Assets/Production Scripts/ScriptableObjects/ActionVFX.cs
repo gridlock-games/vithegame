@@ -8,8 +8,6 @@ using Unity.Netcode.Components;
 namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(NetworkObject))]
-    [RequireComponent(typeof(NetworkTransform))]
     public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType
@@ -79,13 +77,13 @@ namespace Vi.ScriptableObjects
             AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
         }
 
-        [SerializeField] private GameObject[] VFXToPlayOnDestroy = new GameObject[0];
+        [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];
 
         protected void OnDisable()
         {
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }
             
-            foreach (GameObject prefab in VFXToPlayOnDestroy)
+            foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }

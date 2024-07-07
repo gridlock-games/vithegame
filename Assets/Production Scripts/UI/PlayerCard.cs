@@ -64,8 +64,7 @@ namespace Vi.UI
         private IEnumerator SetNameText()
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()));
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.CachedPlayerData.team) + attributes.CachedPlayerData.character.name.ToString();
         }
 
         private bool IsMainCard()

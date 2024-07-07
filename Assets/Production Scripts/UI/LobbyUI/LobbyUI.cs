@@ -219,7 +219,7 @@ namespace Vi.UI
             // Put the local team into the first index
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
                 int teamIndex = System.Array.IndexOf(possibleTeams, localTeam);
                 if (teamIndex != -1)
                 {
@@ -281,7 +281,7 @@ namespace Vi.UI
             // Teams
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
                 if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
             }
 
@@ -379,7 +379,7 @@ namespace Vi.UI
                 Button button = loadoutPresetButtons[i];
                 int var = i;
                 button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
-                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
+                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
             }
             loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
         }
@@ -434,7 +434,7 @@ namespace Vi.UI
 
         public void SwitchToSpectate()
         {
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
             if (playerData.team == PlayerDataManager.Team.Spectator)
             {
                 playerData.team = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0];
@@ -673,7 +673,7 @@ namespace Vi.UI
             {
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
                 {
-                    if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                    if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
                     {
                         spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
                     }
@@ -700,7 +700,7 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.LocalClientId).character;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
@@ -801,7 +801,7 @@ namespace Vi.UI
             }
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
 
@@ -836,7 +836,7 @@ namespace Vi.UI
         {
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
                 playerData.team = team;
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }

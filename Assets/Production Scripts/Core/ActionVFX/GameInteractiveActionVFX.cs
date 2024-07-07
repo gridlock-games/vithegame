@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Vi.Utility;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(NetworkObject))]
+    [RequireComponent(typeof(NetworkTransform))]
     public class GameInteractiveActionVFX : ActionVFX
     {
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;

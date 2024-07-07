@@ -217,7 +217,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Red) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
@@ -244,7 +244,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Red; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return PlayerDataManager.Team.Red;
@@ -271,7 +271,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Blue) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
@@ -298,7 +298,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Blue; }
 
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return PlayerDataManager.Team.Blue;
