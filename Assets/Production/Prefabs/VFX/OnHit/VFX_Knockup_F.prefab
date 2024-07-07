@@ -176,33 +176,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &5195721301477246239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627271323598904033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 1, z: -1.5}
-  vfxRotationOffset: {x: 45, y: 0, z: 0}
-  vfxSpawnType: 0
-  transformType: 1
-  onActivateVFXSpawnNormalizedTime: 0.03
-  raycastOffset: {x: 0, y: 2, z: 3}
-  fartherRaycastOffset: {x: 0, y: 4, z: 5}
-  raycastMaxDistance: 5
-  lookRotationUpDirection: {x: 0, y: 1, z: 0}
-  weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
-  awakeAudioClipDelay: 0
-  audioClipToPlayOnDestroy: {fileID: 0}
-  VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
 --- !u!114 &4922210291207751576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,3 +207,29 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &5195721301477246239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627271323598904033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 1, z: -1.5}
+  vfxRotationOffset: {x: 45, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 1
+  onActivateVFXSpawnNormalizedTime: 0.03
+  raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
+  raycastMaxDistance: 5
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
