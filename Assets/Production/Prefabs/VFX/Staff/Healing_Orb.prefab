@@ -43598,7 +43598,10 @@ GameObject:
   - component: {fileID: 5870090169964646765}
   - component: {fileID: 7748934393057481797}
   - component: {fileID: 446577899068989341}
+  - component: {fileID: 2859012502586187462}
   - component: {fileID: 8993570455217462991}
+  - component: {fileID: 3445869951673666337}
+  - component: {fileID: 4712110016043068208}
   m_Layer: 6
   m_Name: Healing_Orb
   m_TagString: Untagged
@@ -48445,6 +48448,27 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2859012502586187462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2623934816169499568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2099385409
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &8993570455217462991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48463,15 +48487,19 @@ MonoBehaviour:
   transformType: 0
   onActivateVFXSpawnNormalizedTime: 0.5
   raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
-  crossProductDirection: {x: 1, y: 0, z: 0}
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy:
-  - {fileID: 1659498523229177339, guid: cdd5d1f3cb0e19342a70d68b4401e1b3, type: 3}
+  - {fileID: -8543850773922107856, guid: 0965f413807621140b57e9ee9a961b7a, type: 3}
+  pooledVFXToPlayOnDestroy:
+  - {fileID: -8543850773922107856, guid: 0965f413807621140b57e9ee9a961b7a, type: 3}
   followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 1
   shouldUseAttackerPositionForHitAngles: 0
   shouldOverrideMaxHits: 0
@@ -48479,6 +48507,49 @@ MonoBehaviour:
   scaleVFXBasedOnEdges: 0
   boundsPoint: {x: 0, y: 0, z: 2.5}
   boundsLocalAxis: {x: 0, y: -1, z: 0}
+--- !u!114 &3445869951673666337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2623934816169499568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &4712110016043068208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2623934816169499568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3352236052331106402
 GameObject:
   m_ObjectHideFlags: 0

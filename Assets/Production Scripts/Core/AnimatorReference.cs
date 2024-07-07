@@ -104,6 +104,7 @@ namespace Vi.Core
                     }
                 }
             }
+            SetArmorType();
         }
 
         public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
@@ -122,6 +123,7 @@ namespace Vi.Core
                     wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
                 }
             }
+            SetArmorType();
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -134,7 +136,9 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Boots
         };
 
-        public Weapon.ArmorType GetArmorType()
+        private Weapon.ArmorType armorType = Weapon.ArmorType.Flesh;
+
+        private void SetArmorType()
         {
             Dictionary<Weapon.ArmorType, int> armorTypeCounts = new Dictionary<Weapon.ArmorType, int>();
             foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
@@ -150,8 +154,18 @@ namespace Vi.Core
                     armorTypeCounts.Add(kvp.Value.armorType, 1);
                 }
             }
-            return armorTypeCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+
+            if (armorTypeCounts.Count == 0)
+            {
+                armorType = Weapon.ArmorType.Flesh;
+            }
+            else
+            {
+                armorType = armorTypeCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
         }
+
+        public Weapon.ArmorType GetArmorType() { return armorType; }
 
         [System.Serializable]
         private class MaterialReplacementDefintion

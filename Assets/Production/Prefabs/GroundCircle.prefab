@@ -4901,6 +4901,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4910361421448362997}
   - component: {fileID: 2050741956633788196}
+  - component: {fileID: -9076160948696418514}
   m_Layer: 5
   m_Name: GroundCircle
   m_TagString: Untagged
@@ -4936,3 +4937,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01e3f0d75e38a8d40be4d1668ff8fbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-9076160948696418514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4910361421448362994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 8
+  pooledObjectIndex: 3

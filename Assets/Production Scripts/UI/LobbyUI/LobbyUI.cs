@@ -219,7 +219,7 @@ namespace Vi.UI
             // Put the local team into the first index
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
                 int teamIndex = System.Array.IndexOf(possibleTeams, localTeam);
                 if (teamIndex != -1)
                 {
@@ -236,15 +236,6 @@ namespace Vi.UI
 
             leftTeamParent.joinTeamButton.onClick.RemoveAllListeners();
             rightTeamParent.joinTeamButton.onClick.RemoveAllListeners();
-
-            leftTeamParent.teamNameOverrideInputField.text = "";
-            leftTeamParent.teamPrefixOverrideInputField.text = "";
-
-            rightTeamParent.teamNameOverrideInputField.text = "";
-            rightTeamParent.teamPrefixOverrideInputField.text = "";
-
-            leftTeamParent.ApplyTeamNameOverride();
-            rightTeamParent.ApplyTeamNameOverride();
 
             for (int i = 0; i < possibleTeams.Length; i++)
             {
@@ -275,13 +266,33 @@ namespace Vi.UI
             leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
             rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
 
+            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            {
+                leftTeamParent.teamNameOverrideInputField.text = "";
+                leftTeamParent.teamPrefixOverrideInputField.text = "";
+
+                rightTeamParent.teamNameOverrideInputField.text = "";
+                rightTeamParent.teamPrefixOverrideInputField.text = "";
+
+                leftTeamParent.ApplyTeamNameOverride();
+                rightTeamParent.ApplyTeamNameOverride();
+            }
+            else
+            {
+                leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
+                leftTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(leftTeamParent.team));
+
+                rightTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team));
+                rightTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(rightTeamParent.team));
+            }
+
             // Maps
             RefreshMapOptions();
 
             // Teams
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team;
+                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
                 if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
             }
 
@@ -338,10 +349,17 @@ namespace Vi.UI
             primaryWeaponText.enabled = true;
             secondaryWeaponText.enabled = true;
 
-            foreach (Button button in loadoutPresetButtons)
+            // Initialze loadout presset buttons
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
             {
-                button.interactable = true;
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
             }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
+
             spectateButton.interactable = true;
             lockCharacterButton.interactable = true;
 
@@ -353,7 +371,14 @@ namespace Vi.UI
 
             RefreshPlayerCards();
 
-            if (!IsSpawned) { Destroy(gameObject); }
+            if (IsSpawned)
+            {
+                CreateCharacterPreview();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -361,27 +386,6 @@ namespace Vi.UI
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
-
-            if (IsClient)
-            {
-                StartCoroutine(UpdateCharacterPreview());
-                StartCoroutine(InitializeLoadoutButtons());
-            }
-        }
-
-        private IEnumerator InitializeLoadoutButtons()
-        {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
-
-            int activeLoadoutSlot = 0;
-            for (int i = 0; i < loadoutPresetButtons.Length; i++)
-            {
-                Button button = loadoutPresetButtons[i];
-                int var = i;
-                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
-                if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).character.IsSlotActive(i)) { activeLoadoutSlot = i; }
-            }
-            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
         public override void OnNetworkDespawn()
@@ -434,7 +438,7 @@ namespace Vi.UI
 
         public void SwitchToSpectate()
         {
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
             if (playerData.team == PlayerDataManager.Team.Spectator)
             {
                 playerData.team = PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0];
@@ -485,6 +489,18 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
+            if (PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame)
+            {
+                leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
+                leftTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(leftTeamParent.team));
+
+                rightTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team));
+                rightTeamParent.teamPrefixOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamPrefixRaw(rightTeamParent.team));
+
+                leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team);
+                rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team);
+            }
+
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
@@ -649,9 +665,6 @@ namespace Vi.UI
             leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
             
-            if (leftTeamParent.teamTitleText.gameObject.activeInHierarchy) { leftTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team); }
-            if (rightTeamParent.teamTitleText.gameObject.activeInHierarchy) { rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team); }
-
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
@@ -673,7 +686,7 @@ namespace Vi.UI
             {
                 if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
                 {
-                    if (PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId).team == PlayerDataManager.Team.Spectator)
+                    if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
                     {
                         spectateButton.GetComponentInChildren<Text>().text = "STOP SPECTATE";
                     }
@@ -696,11 +709,11 @@ namespace Vi.UI
         }
 
         private GameObject previewObject;
-        private IEnumerator UpdateCharacterPreview()
+        private void CreateCharacterPreview()
         {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId));
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.LocalClientId).character;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
             var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
             KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
@@ -801,7 +814,7 @@ namespace Vi.UI
             }
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
 
@@ -836,7 +849,7 @@ namespace Vi.UI
         {
             if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
             {
-                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.LocalClientId);
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
                 playerData.team = team;
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }

@@ -134,15 +134,39 @@ namespace Vi.UI
         private float lastWidthEvaluated;
         private void Update()
         {
-            for (int i = 0; i < tintMaterialInstances.Count; i++)
+            Color targetColor = Color.white;
+            if (IsNotRunning()) { targetColor.a = 0; }
+
+            if (lastTargetColor != targetColor)
             {
-                Color targetColor = Color.white;
-                if (IsNotRunning()) { targetColor.a = 0; }
-                if (lastTargetColor != targetColor) { tintMaterialInstances[i].color = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime); }
+                if (colorFadeCoroutine != null) { StopCoroutine(colorFadeCoroutine); }
+                colorFadeCoroutine = StartCoroutine(FadeKillFeedColor(targetColor));
+                lastTargetColor = targetColor;
             }
 
             float targetWidth = transformToCopyWidthFrom.sizeDelta.x;
-            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated)) { rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth); }
+            if (!Mathf.Approximately(targetWidth, lastWidthEvaluated))
+            {
+                rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
+                lastWidthEvaluated = targetWidth;
+            }
+        }
+
+        private Coroutine colorFadeCoroutine;
+        private IEnumerator FadeKillFeedColor(Color targetColor)
+        {
+            while (true)
+            {
+                List<Color> colorList = new List<Color>();
+                for (int i = 0; i < tintMaterialInstances.Count; i++)
+                {
+                    Color colorResult = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime);
+                    tintMaterialInstances[i].color = colorResult;
+                    colorList.Add(colorResult);
+                }
+                if (colorList.TrueForAll(item => item == targetColor)) { break; }
+                yield return null;
+            }
         }
     }
 }

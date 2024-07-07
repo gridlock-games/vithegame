@@ -79,8 +79,7 @@ namespace Vi.UI
         private PlayerDataManager.Team team;
         private void UpdateNameTextAndColors()
         {
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.CachedPlayerData.team) + attributes.CachedPlayerData.character.name.ToString();
 
             Color relativeTeamColor = attributes.GetRelativeTeamColor();
             nameDisplay.color = Color.white;
@@ -119,7 +118,7 @@ namespace Vi.UI
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
-            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateNameTextAndColors(); }
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame) { UpdateNameTextAndColors(); }
 
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }

@@ -37,6 +37,7 @@ namespace Vi.UI
         {
             RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
+            OnScoreListChanged();
             gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
             
             roundResultText.enabled = false;
@@ -129,7 +130,7 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
                     if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
                     {
-                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId);
+                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
                         if (playerData.team == PlayerDataManager.Team.Spectator)
                         {
                             PlayerDataManager.Singleton.GetLocalSpectatorObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();

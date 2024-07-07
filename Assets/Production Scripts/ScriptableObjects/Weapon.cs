@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
@@ -172,7 +173,7 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public GameObject hitVFXPrefab;
+        public PooledObject hitVFXPrefab;
 
         [System.Serializable]
         private class BlockSoundEffect
@@ -197,7 +198,7 @@ namespace Vi.ScriptableObjects
             return blockingHitSoundEffect.hitSounds[Random.Range(0, blockingHitSoundEffect.hitSounds.Length)];
         }
 
-        public GameObject blockVFXPrefab;
+        public PooledObject blockVFXPrefab;
 
         public enum WeaponBone
         {
