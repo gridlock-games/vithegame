@@ -160,7 +160,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
             yield return new WaitUntil(() => IsSpawned);
 
-            NetworkObject.NetworkShow(OwnerClientId);
+            if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
 
             PlayerDataManager.PlayerData thisPlayerData = PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId());
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())

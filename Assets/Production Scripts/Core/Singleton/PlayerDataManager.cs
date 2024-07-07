@@ -911,6 +911,11 @@ namespace Vi.Core
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
 
                         channelCounts[networkListEvent.Value.channel]++;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -927,6 +932,11 @@ namespace Vi.Core
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
 
                         channelCounts[networkListEvent.Value.channel]--;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
@@ -945,9 +955,9 @@ namespace Vi.Core
                             channelCounts[networkListEvent.PreviousValue.channel]--;
                             channelCounts[networkListEvent.Value.channel]++;
 
-                            if (localPlayers.ContainsKey(networkListEvent.Value.id))
+                            foreach (Attributes player in localPlayers.Values)
                             {
-                                localPlayers[networkListEvent.Value.id].UpdateNetworkVisiblity();
+                                if (player) { player.UpdateNetworkVisiblity(); }
                             }
                         }
                     }
@@ -1204,7 +1214,7 @@ namespace Vi.Core
 
         private const int defaultChannel = 0;
         private const int maxChannels = 5;
-        private const int maxPlayersInChannel = 3;
+        private const int maxPlayersInChannel = 2;
 
         public List<int> GetChannelCountList()
         {
