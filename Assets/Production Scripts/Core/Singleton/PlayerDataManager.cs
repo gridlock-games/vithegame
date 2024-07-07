@@ -936,11 +936,19 @@ namespace Vi.Core
                         loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
+                    }
 
+                    if (IsServer)
+                    {
                         if (networkListEvent.PreviousValue.channel != networkListEvent.Value.channel)
                         {
                             channelCounts[networkListEvent.PreviousValue.channel]--;
                             channelCounts[networkListEvent.Value.channel]++;
+
+                            if (localPlayers.ContainsKey(networkListEvent.Value.id))
+                            {
+                                localPlayers[networkListEvent.Value.id].UpdateNetworkVisiblity();
+                            }
                         }
                     }
                     break;

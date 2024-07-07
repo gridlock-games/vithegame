@@ -124,7 +124,7 @@ namespace Vi.Core
             if (IsServer)
             {
                 StartCoroutine(InitStats());
-                StartCoroutine(SetVisibilityAfterSpawn());
+                StartCoroutine(SetNetworkVisibilityAfterSpawn());
             }
 
             HP.OnValueChanged += OnHPChanged;
@@ -149,9 +149,15 @@ namespace Vi.Core
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
-        private IEnumerator SetVisibilityAfterSpawn()
+        public void UpdateNetworkVisiblity()
         {
-            if (!IsServer) { Debug.LogError("Attributes.SetVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            if (!IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            StartCoroutine(SetNetworkVisibilityAfterSpawn());
+        }
+
+        private IEnumerator SetNetworkVisibilityAfterSpawn()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
             yield return new WaitUntil(() => IsSpawned);
 
             NetworkObject.NetworkShow(OwnerClientId);
@@ -177,8 +183,6 @@ namespace Vi.Core
                         NetworkObject.NetworkHide(networkId);
                     }
                 }
-
-                
             }
         }
 
