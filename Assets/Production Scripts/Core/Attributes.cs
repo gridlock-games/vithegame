@@ -775,7 +775,7 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            if (isMeleeHit) { StartHitStop(attacker); }
+            StartHitStop(attacker, isMeleeHit);
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
@@ -825,7 +825,7 @@ namespace Vi.Core
             return true;
         }
 
-        private void StartHitStop(Attributes attacker)
+        private void StartHitStop(Attributes attacker, bool isMeleeHit)
         {
             if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
 
@@ -835,7 +835,14 @@ namespace Vi.Core
             hitFreezeStartTime = Time.time;
             attacker.hitFreezeStartTime = Time.time;
 
-            StartHitStopClientRpc(attacker.NetworkObjectId);
+            if (isMeleeHit)
+            {
+                StartHitStopClientRpc(attacker.NetworkObjectId);
+            }
+            else
+            {
+                StartHitStopClientRpc();
+            }
         }
 
         [Rpc(SendTo.NotServer)]
@@ -848,6 +855,13 @@ namespace Vi.Core
 
             hitFreezeStartTime = Time.time;
             attacker.hitFreezeStartTime = Time.time;
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void StartHitStopClientRpc()
+        {
+            shouldShake = true;
+            hitFreezeStartTime = Time.time;
         }
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();
