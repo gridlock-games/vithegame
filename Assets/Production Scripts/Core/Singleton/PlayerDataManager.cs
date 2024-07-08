@@ -889,6 +889,27 @@ namespace Vi.Core
             }
         }
 
+        private void UpdateIgnoreCollisionsMatrix()
+        {
+            foreach (Attributes player in localPlayers.Values)
+            {
+                if (!player) { continue; }
+
+                foreach (Attributes otherPlayer in localPlayers.Values)
+                {
+                    if (!otherPlayer) { continue; }
+
+                    foreach (Collider col in player.NetworkCollider.Colliders)
+                    {
+                        foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
+                        {
+                            Physics.IgnoreCollision(col, otherCol, player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                        }
+                    }
+                }
+            }
+        }
+
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
@@ -917,6 +938,8 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;
@@ -938,6 +961,8 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
@@ -961,6 +986,8 @@ namespace Vi.Core
                             }
                         }
                     }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
                     break;
