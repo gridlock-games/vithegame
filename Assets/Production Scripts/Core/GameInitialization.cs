@@ -87,11 +87,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0).ToString()); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("DPIScalingFactor"))
-            {
-                FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.5f : 1);
-                QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
-            }
+            if (!FasterPlayerPrefs.Singleton.HasKey("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.5f : 1); }
+            QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
 
             if (!FasterPlayerPrefs.Singleton.HasKey("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetString("IsDiscordVerified", false.ToString()); }
 
