@@ -181,6 +181,7 @@ namespace Vi.UI
         private void SetDPIScale()
         {
             QualitySettings.resolutionScalingFixedDPIFactor = dpiScaleSlider.value;
+            FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", dpiScaleSlider.value);
         }
 
         private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()

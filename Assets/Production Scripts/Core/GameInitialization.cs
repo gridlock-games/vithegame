@@ -87,6 +87,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0).ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", 1); }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetString("IsDiscordVerified", false.ToString()); }
 
