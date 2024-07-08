@@ -73,6 +73,26 @@ namespace Vi.UI
             }
         }
 
+        private void Update()
+        {
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
+            {
+                if (channelDropdown.gameObject.activeInHierarchy)
+                {
+                    channelDropdown.ClearOptions();
+                    List<string> channelOptions = new List<string>();
+                    List<int> channelCountList = PlayerDataManager.Singleton.GetChannelCountList();
+                    for (int i = 0; i < channelCountList.Count; i++)
+                    {
+                        channelOptions.Add("Channel " + (i + 1).ToString() + " - " + channelCountList[i].ToString() + " Players");
+                    }
+                    channelDropdown.AddOptions(channelOptions);
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.Singleton.LocalClientId);
+                    channelDropdown.SetValueWithoutNotify(playerData.channel);
+                }
+            }
+        }
+
         private void OnChannelDropdownChange()
         {
             var playerData = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.Singleton.LocalClientId);
