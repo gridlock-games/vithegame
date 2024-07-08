@@ -51,6 +51,7 @@ namespace Vi.UI
 
         public void Initialize(Attributes attributes)
         {
+            if ((attributes == this.attributes) & (attributes != null)) { return; }
             this.attributes = attributes;
             if (!canvas) { canvas = GetComponent<Canvas>(); }
             canvas.enabled = attributes != null;
