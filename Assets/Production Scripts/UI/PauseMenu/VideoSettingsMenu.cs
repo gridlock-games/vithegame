@@ -134,7 +134,7 @@ namespace Vi.UI
             fullscreenModeDropdown.value = fsModeIndex;
 
             dpiScaleSlider.value = QualitySettings.resolutionScalingFixedDPIFactor;
-            dpiScaleSlider.onValueChanged.AddListener(delegate { SetDPIScale(); });
+            dpiScaleSlider.GetComponent<SliderEndEditEvent>().EndDrag += SetDPIScale;
 
             // Graphics Quality dropdown
             graphicsPresetDropdown.AddOptions(QualitySettings.names.ToList());
@@ -178,10 +178,10 @@ namespace Vi.UI
             SetOriginalVariables();
         }
 
-        private void SetDPIScale()
+        private void SetDPIScale(float sliderValue)
         {
-            QualitySettings.resolutionScalingFixedDPIFactor = dpiScaleSlider.value;
-            FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", dpiScaleSlider.value);
+            QualitySettings.resolutionScalingFixedDPIFactor = sliderValue;
+            FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", sliderValue);
         }
 
         private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()

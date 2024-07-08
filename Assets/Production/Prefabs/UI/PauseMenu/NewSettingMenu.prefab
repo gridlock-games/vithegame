@@ -4586,7 +4586,7 @@ PrefabInstance:
     - target: {fileID: 4123113073282363091, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_Text
-      value: Resolution Scale
+      value: DPI/Resolution Scale
       objectReference: {fileID: 0}
     - target: {fileID: 4154547462845194283, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
@@ -4985,10 +4985,28 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 7812686011314136251}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4830153438491441899}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &4830153438491441899 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3414883548772114000, guid: f4765ff7f7167214f86b02cb1995750e,
+    type: 3}
+  m_PrefabInstance: {fileID: 7812686011314136251}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6974339845475075652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4830153438491441899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3438f9c0d703e9c4a895d6ac743f1d78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5201047888072580595 stripped
