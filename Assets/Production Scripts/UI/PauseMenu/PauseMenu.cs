@@ -89,7 +89,7 @@ namespace Vi.UI
                 List<int> channelCountList = PlayerDataManager.Singleton.GetChannelCountList();
                 for (int i = 0; i < channelCountList.Count; i++)
                 {
-                    channelOptions.Add("Channel " + (i + 1).ToString());
+                    channelOptions.Add("Channel " + (i + 1).ToString() + " - " + channelCountList[i].ToString() + " Players");
                 }
                 channelDropdown.AddOptions(channelOptions);
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData((int)NetworkManager.Singleton.LocalClientId);
