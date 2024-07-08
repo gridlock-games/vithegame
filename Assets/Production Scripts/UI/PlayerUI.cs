@@ -407,6 +407,20 @@ namespace Vi.UI
         private void OnEnable()
         {
             RefreshStatus();
+
+            List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+            foreach (StatusIcon statusIcon in statusIcons)
+            {
+                if (activeStatuses.Contains(statusIcon.Status))
+                {
+                    statusIcon.SetActive(true);
+                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                }
+                else
+                {
+                    statusIcon.SetActive(false);
+                }
+            }
         }
 
         List<Attributes> teammateAttributes = new List<Attributes>();
