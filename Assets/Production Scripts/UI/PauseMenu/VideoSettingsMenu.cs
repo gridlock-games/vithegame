@@ -18,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
+        [SerializeField] private Slider dpiScaleSlider;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
         [SerializeField] private Slider renderScaleSlider;
@@ -35,6 +36,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform displaySettingsGroup;
         [SerializeField] private GameObject fullScreenModeElement;
         [SerializeField] private GameObject resolutionElement;
+        [SerializeField] private GameObject dpiScalingElement;
 
         private UniversalRenderPipelineAsset pipeline;
         private FullScreenMode[] fsModes = new FullScreenMode[3];
@@ -52,7 +54,20 @@ namespace Vi.UI
 
         private void Awake()
         {
-            if (!platformsToAllowResolutionChangesOn.Contains(Application.platform))
+            if (platformsToAllowResolutionChangesOn.Contains(Application.platform))
+            {
+                dpiScalingElement.SetActive(false);
+
+                displaySettingsGroup.sizeDelta = new Vector2(displaySettingsGroup.sizeDelta.x, displaySettingsGroup.sizeDelta.y - 125);
+
+                foreach (Transform child in displaySettingsGroup.parent)
+                {
+                    RectTransform rt = (RectTransform)child;
+                    if (rt == displaySettingsGroup) { continue; }
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, rt.anchoredPosition.y + 125);
+                }
+            }
+            else
             {
                 fullScreenModeElement.SetActive(false);
                 resolutionElement.SetActive(false);
@@ -118,6 +133,9 @@ namespace Vi.UI
             int fsModeIndex = Array.IndexOf(fsModes, Screen.fullScreenMode);
             fullscreenModeDropdown.value = fsModeIndex;
 
+            dpiScaleSlider.value = QualitySettings.resolutionScalingFixedDPIFactor;
+            dpiScaleSlider.onValueChanged.AddListener(delegate { SetDPIScale(); });
+
             // Graphics Quality dropdown
             graphicsPresetDropdown.AddOptions(QualitySettings.names.ToList());
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
@@ -158,6 +176,11 @@ namespace Vi.UI
             postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
 
             SetOriginalVariables();
+        }
+
+        private void SetDPIScale()
+        {
+            QualitySettings.resolutionScalingFixedDPIFactor = dpiScaleSlider.value;
         }
 
         private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
