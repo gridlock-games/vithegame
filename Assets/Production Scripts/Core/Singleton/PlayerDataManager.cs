@@ -1229,14 +1229,17 @@ namespace Vi.Core
         public int GetBestChannel()
         {
             if (GetGameMode() != GameMode.None) { return defaultChannel; }
+
+            // Return first channel that has less than the max players in channel
+            List<int> channelCounts = GetChannelCountList();
             for (int channelIndex = 0; channelIndex < channelCounts.Count; channelIndex++)
             {
-                if (channelCounts[channelIndex] < maxPlayersInChannel)
-                {
-                    return channelIndex;
-                }
+                if (channelCounts[channelIndex] < maxPlayersInChannel) { return channelIndex; }
             }
-            return defaultChannel;
+
+            // Return channel with the lowest number of players in it
+            int lowestCountIndex = channelCounts.FindIndex(item => item == channelCounts.Min());
+            return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
         }
 
         private NetworkList<PlayerData> playerDataList;
