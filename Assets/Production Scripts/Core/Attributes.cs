@@ -121,7 +121,12 @@ namespace Vi.Core
         GameObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(InitStats()); }
+            if (IsServer)
+            {
+                StartCoroutine(InitStats());
+                StartCoroutine(SetNetworkVisibilityAfterSpawn());
+            }
+
             HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
@@ -139,6 +144,45 @@ namespace Vi.Core
             {
                 spawnedOnOwnerInstance.Value = true;
                 RefreshStatus();
+            }
+
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+        }
+
+        public void UpdateNetworkVisiblity()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            StartCoroutine(SetNetworkVisibilityAfterSpawn());
+        }
+
+        private IEnumerator SetNetworkVisibilityAfterSpawn()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            yield return new WaitUntil(() => IsSpawned);
+
+            if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
+
+            PlayerDataManager.PlayerData thisPlayerData = PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId());
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            {
+                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                if (networkId == 0) { continue; }
+                if (networkId == OwnerClientId) { continue; }
+
+                if (playerData.channel == thisPlayerData.channel)
+                {
+                    if (!NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        NetworkObject.NetworkShow(networkId);
+                    }
+                }
+                else
+                {
+                    if (NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        NetworkObject.NetworkHide(networkId);
+                    }
+                }
             }
         }
 
@@ -289,6 +333,8 @@ namespace Vi.Core
             movementHandler = GetComponent<MovementHandler>();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             RefreshStatus();
+
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         [SerializeField] private PooledObject teamIndicatorPrefab;
@@ -750,7 +796,7 @@ namespace Vi.Core
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            StartHitStop(attacker);
+            StartHitStop(attacker, isMeleeHit);
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
@@ -800,17 +846,27 @@ namespace Vi.Core
             return true;
         }
 
-        private void StartHitStop(Attributes attacker)
+        private void StartHitStop(Attributes attacker, bool isMeleeHit)
         {
             if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
 
-            shouldShake = true;
-            attacker.shouldShake = false;
+            if (isMeleeHit)
+            {
+                shouldShake = true;
+                attacker.shouldShake = false;
 
-            hitFreezeStartTime = Time.time;
-            attacker.hitFreezeStartTime = Time.time;
+                hitFreezeStartTime = Time.time;
+                attacker.hitFreezeStartTime = Time.time;
 
-            StartHitStopClientRpc(attacker.NetworkObjectId);
+                StartHitStopClientRpc(attacker.NetworkObjectId);
+            }
+            else
+            {
+                shouldShake = true;
+                hitFreezeStartTime = Time.time;
+
+                StartHitStopClientRpc();
+            }
         }
 
         [Rpc(SendTo.NotServer)]
@@ -823,6 +879,13 @@ namespace Vi.Core
 
             hitFreezeStartTime = Time.time;
             attacker.hitFreezeStartTime = Time.time;
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void StartHitStopClientRpc()
+        {
+            shouldShake = true;
+            hitFreezeStartTime = Time.time;
         }
 
         private NetworkVariable<int> pullAssailantDataId = new NetworkVariable<int>();

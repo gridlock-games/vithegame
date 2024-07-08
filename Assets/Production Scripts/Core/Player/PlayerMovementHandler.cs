@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Player
 {
@@ -255,14 +256,27 @@ namespace Vi.Player
             //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             if (wasPlayerHit)
             {
-                Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
-                float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                if (angle > 180) { angle -= 360; }
-
-                if (angle > -20 & angle < 20)
+                bool collidersIgnoreEachOther = false;
+                foreach (Collider c in attributes.NetworkCollider.Colliders)
                 {
-                    movement = Vector3.zero;
+                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
+                    {
+                        collidersIgnoreEachOther = true;
+                        break;
+                    }
+                }
+
+                if (!collidersIgnoreEachOther)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
+                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+
+                    if (angle > 180) { angle -= 360; }
+
+                    if (angle > -20 & angle < 20)
+                    {
+                        movement = Vector3.zero;
+                    }
                 }
             }
 
@@ -387,7 +401,9 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                                List<string> layers = layersToAccountForInMovement.ToList();
+                                layers.Add("NetworkPrediction");
+                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
                                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                                 foreach (RaycastHit hit in allHits)
                                 {
@@ -542,7 +558,9 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            List<string> layers = layersToAccountForInMovement.ToList();
+            layers.Add("NetworkPrediction");
+            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {

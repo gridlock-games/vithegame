@@ -155,7 +155,7 @@ namespace Vi.Core
 
             if (payload.type == 0)
             {
-                foreach (Server server in servers)
+                foreach (Server server in servers.ToList())
                 {
                     if (server.ip == payload.ip)
                     {
