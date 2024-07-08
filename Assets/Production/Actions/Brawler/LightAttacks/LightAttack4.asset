@@ -1406,7 +1406,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YAngleRotationOffset: 20
+  YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
@@ -1452,6 +1452,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []

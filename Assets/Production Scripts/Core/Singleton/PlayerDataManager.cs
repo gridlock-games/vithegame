@@ -521,6 +521,7 @@ namespace Vi.Core
                 if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
 
                 PlayerData botData = new PlayerData(botClientId,
+                    defaultChannel,
                     botCharacter,
                     team);
                 AddPlayerData(botData);
@@ -655,6 +656,14 @@ namespace Vi.Core
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
+
+            List<int> initialChannelCounts = new List<int>();
+            for (int i = 0; i < maxChannels; i++)
+            {
+                initialChannelCounts.Add(0);
+            }
+
+            channelCounts = new NetworkList<int>(initialChannelCounts);
         }
 
         private void OnEnable()
@@ -880,6 +889,27 @@ namespace Vi.Core
             }
         }
 
+        private void UpdateIgnoreCollisionsMatrix()
+        {
+            foreach (Attributes player in localPlayers.Values)
+            {
+                if (!player) { continue; }
+
+                foreach (Attributes otherPlayer in localPlayers.Values)
+                {
+                    if (!otherPlayer) { continue; }
+
+                    foreach (Collider col in player.NetworkCollider.Colliders)
+                    {
+                        foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
+                        {
+                            Physics.IgnoreCollision(col, otherCol, player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                        }
+                    }
+                }
+            }
+        }
+
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
@@ -900,7 +930,16 @@ namespace Vi.Core
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+
+                        channelCounts[networkListEvent.Value.channel]++;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;
@@ -914,7 +953,16 @@ namespace Vi.Core
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+
+                        channelCounts[networkListEvent.Value.channel]--;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
@@ -924,6 +972,22 @@ namespace Vi.Core
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
+
+                    if (IsServer)
+                    {
+                        if (networkListEvent.PreviousValue.channel != networkListEvent.Value.channel)
+                        {
+                            channelCounts[networkListEvent.PreviousValue.channel]--;
+                            channelCounts[networkListEvent.Value.channel]++;
+
+                            foreach (Attributes player in localPlayers.Values)
+                            {
+                                if (player) { player.UpdateNetworkVisiblity(); }
+                            }
+                        }
+                    }
+
+                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
                     break;
@@ -1173,34 +1237,62 @@ namespace Vi.Core
             return playerDatas;
         }
 
+        private NetworkList<int> channelCounts;
+
+        private const int defaultChannel = 0;
+        private const int maxChannels = 5;
+        private const int maxPlayersInChannel = 15;
+
+        public List<int> GetChannelCountList()
+        {
+            List<int> channelCountsList = new List<int>();
+            for (int i = 0; i < channelCounts.Count; i++)
+            {
+                channelCountsList.Add(channelCounts[i]);
+            }
+            return channelCountsList;
+        }
+
+        public int GetBestChannel()
+        {
+            if (GetGameMode() != GameMode.None) { return defaultChannel; }
+
+            // Return first channel that has less than the max players in channel
+            List<int> channelCounts = GetChannelCountList();
+            for (int channelIndex = 0; channelIndex < channelCounts.Count; channelIndex++)
+            {
+                if (channelCounts[channelIndex] < maxPlayersInChannel) { return channelIndex; }
+            }
+
+            // Return channel with the lowest number of players in it
+            int lowestCountIndex = channelCounts.FindIndex(item => item == channelCounts.Min());
+            return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
+        }
+
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 
-        [System.Serializable]
-        private struct TeamDefinition
-        {
-            public Team team;
-            public ulong clientId;
-        }
-
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
+            public int channel;
             public WebRequestManager.Character character;
             public Team team;
 
             public PlayerData(int id)
             {
                 this.id = id;
+                channel = defaultChannel;
                 character = new();
                 team = Team.Environment;
             }
 
-            public PlayerData(int id, WebRequestManager.Character character, Team team)
+            public PlayerData(int id, int channel, WebRequestManager.Character character, Team team)
             {
                 this.id = id;
+                this.channel = channel;
                 this.character = character;
                 this.team = team;
             }
@@ -1213,6 +1305,7 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
+                serializer.SerializeValue(ref channel);
                 serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
             }
