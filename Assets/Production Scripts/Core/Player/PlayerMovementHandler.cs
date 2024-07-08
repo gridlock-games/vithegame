@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Player
 {
@@ -400,7 +401,9 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                                List<string> layers = layersToAccountForInMovement.ToList();
+                                layers.Add("NetworkPrediction");
+                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
                                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                                 foreach (RaycastHit hit in allHits)
                                 {
@@ -555,7 +558,9 @@ namespace Vi.Player
 
         void OnInteract()
         {
-            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            List<string> layers = layersToAccountForInMovement.ToList();
+            layers.Add("NetworkPrediction");
+            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             foreach (RaycastHit hit in allHits)
             {

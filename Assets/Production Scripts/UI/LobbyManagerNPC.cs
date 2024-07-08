@@ -38,17 +38,17 @@ namespace Vi.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.transform.root.TryGetComponent(out Attributes attributes))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (attributes.IsLocalPlayer) { localPlayerInRange = true; }
+                if (networkCollider.Attributes.IsLocalPlayer) { localPlayerInRange = true; }
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.transform.root.TryGetComponent(out Attributes attributes))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (attributes.IsLocalPlayer) { localPlayerInRange = false; }
+                if (networkCollider.Attributes.IsLocalPlayer) { localPlayerInRange = false; }
             }
         }
 
