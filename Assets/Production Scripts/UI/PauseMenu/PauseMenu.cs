@@ -78,7 +78,9 @@ namespace Vi.UI
 
             applicationVersionText.text = "Version: " + Application.version;
 
-            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId)
+                & PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None
+                & !NetworkManager.Singleton.IsServer)
             {
                 channelDropdownParent.SetActive(true);
 

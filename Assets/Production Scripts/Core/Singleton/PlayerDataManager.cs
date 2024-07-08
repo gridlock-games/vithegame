@@ -1228,6 +1228,7 @@ namespace Vi.Core
 
         public int GetBestChannel()
         {
+            if (GetGameMode() != GameMode.None) { return defaultChannel; }
             for (int channelIndex = 0; channelIndex < channelCounts.Count; channelIndex++)
             {
                 if (channelCounts[channelIndex] < maxPlayersInChannel)
