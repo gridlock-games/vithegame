@@ -74,6 +74,7 @@ namespace Vi.UI
         }
 
         [SerializeField] private bool isRightSideCard;
+        private bool staminaAndSpiritAreDisabled;
         private void DisableStaminaAndSpiritDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
@@ -104,6 +105,8 @@ namespace Vi.UI
                 ((RectTransform)healthFillImage.transform).anchoredPosition = ((RectTransform)staminaFillImage.transform).anchoredPosition;
                 ((RectTransform)interimHealthFillImage.transform).anchoredPosition = ((RectTransform)interimStaminaFillImage.transform).anchoredPosition;
             }
+
+            staminaAndSpiritAreDisabled = true;
         }
 
         private static GameObject ragingPreviewInstance;
@@ -179,52 +182,61 @@ namespace Vi.UI
             if (!attributes) { canvas.enabled = false; return; }
 
             float HP = attributes.GetHP();
-            float stamina = attributes.GetStamina();
-            float spirit = attributes.GetSpirit();
             float rage = attributes.GetRage();
 
             float maxHP = attributes.GetMaxHP();
-            float maxStamina = attributes.GetMaxStamina();
-            float maxSpirit = attributes.GetMaxSpirit();
             float maxRage = attributes.GetMaxRage();
 
-            if (!Mathf.Approximately(lastHP, HP) | Mathf.Approximately(lastMaxHP, maxHP))
+            if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
                 healthText.text = "HP " + (HP < 10 & !Mathf.Approximately(0, HP) ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
                 healthFillImage.fillAmount = HP / maxHP;
             }
 
-            if (!Mathf.Approximately(lastStamina, stamina) | Mathf.Approximately(lastMaxStamina, maxStamina))
-            {
-                staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
-                staminaFillImage.fillAmount = stamina / maxStamina;
-            }
-
-            if (!Mathf.Approximately(lastSpirit, spirit) | Mathf.Approximately(lastMaxSpirit, maxSpirit))
-            {
-                spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
-                spiritFillImage.fillAmount = spirit / maxSpirit;
-            }
-
-            if (!Mathf.Approximately(lastRage, rage) | Mathf.Approximately(lastMaxRage, maxRage))
+            if (!Mathf.Approximately(lastRage, rage) | !Mathf.Approximately(lastMaxRage, maxRage))
             {
                 rageFillImage.fillAmount = rage / maxRage;
             }
 
             lastHP = HP;
-            lastStamina = stamina;
-            lastSpirit = spirit;
             lastRage = rage;
 
             lastMaxHP = maxHP;
-            lastMaxStamina = maxStamina;
-            lastMaxSpirit = maxSpirit;
             lastMaxRage = maxRage;
+
+            if (!staminaAndSpiritAreDisabled)
+            {
+                float stamina = attributes.GetStamina();
+                float spirit = attributes.GetSpirit();
+
+                float maxStamina = attributes.GetMaxStamina();
+                float maxSpirit = attributes.GetMaxSpirit();
+
+                if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
+                {
+                    staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+                    staminaFillImage.fillAmount = stamina / maxStamina;
+                }
+
+                if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
+                {
+                    spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+                    spiritFillImage.fillAmount = spirit / maxSpirit;
+                }
+
+                // Interim images - these update every frame
+                interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
+                interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
+
+                lastStamina = stamina;
+                lastSpirit = spirit;
+
+                lastMaxStamina = maxStamina;
+                lastMaxSpirit = maxSpirit;
+            }
 
             // Interim images - these update every frame
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
-            interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
-            interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, rage / maxRage, Time.deltaTime * fillSpeed);
 
             if (!playerUI)
