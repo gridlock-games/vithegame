@@ -104,9 +104,26 @@ namespace Vi.UI
             }
         }
 
+        private WeaponHandler localWeaponHandler;
+        private void FindLocalWeaponHandler()
+        {
+            if (localWeaponHandler) { return; }
+
+            if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+            {
+                KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                if (kvp.Value)
+                {
+                    localWeaponHandler = kvp.Value.GetComponent<WeaponHandler>();
+                }
+            }
+        }
+
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            FindLocalWeaponHandler();
         }
 
         private void LateUpdate()
@@ -167,10 +184,9 @@ namespace Vi.UI
 
             if (healthBarLocalScaleTarget == Vector3.zero)
             {
-                KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                if (localPlayerKvp.Value)
+                if (localWeaponHandler)
                 {
-                    if (localPlayerKvp.Value.GetComponent<WeaponHandler>().CanAim) { healthBarLocalScaleTarget = Vector3.one; }
+                    if (localWeaponHandler.CanAim) { healthBarLocalScaleTarget = Vector3.one; }
                 }
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
