@@ -84,12 +84,38 @@ namespace Vi.Core
                 servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
 
-            HubServers = servers.FindAll(item => item.type == 0).ToArray();
-            LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
-
+            if (Debug.isDebugBuild)
+            {
+                if (servers.Exists(item => item.ip == localhostIP))
+                {
+                    HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
+                    LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
+                }
+                else
+                {
+                    HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                    LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+                }
+            }
+            else
+            {
+                if (servers.Exists(item => item.ip == localhostIP))
+                {
+                    HubServers = servers.FindAll(item => item.type == 0 & item.ip != localhostIP).ToArray();
+                    LobbyServers = servers.FindAll(item => item.type == 1 & item.ip != localhostIP).ToArray();
+                }
+                else
+                {
+                    HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                    LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+                }
+            }
+            
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
+
+        private const string localhostIP = "127.0.0.1";
 
         public IEnumerator UpdateServerProgress(int progress)
         {
