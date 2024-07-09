@@ -8,7 +8,7 @@ namespace Vi.Player
     [RequireComponent(typeof(PlayerMovementHandler))]
     public class PlayerNetworkMovementPrediction : NetworkBehaviour
     {
-        public struct InputPayload : INetworkSerializable
+        public struct InputPayload
         {
             public int tick;
             public Vector2 inputVector;
@@ -19,13 +19,6 @@ namespace Vi.Player
                 this.tick = tick;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref inputVector);
-                serializer.SerializeValue(ref rotation);
             }
         }
 
@@ -124,6 +117,8 @@ namespace Vi.Player
 
         private void HandleServerTick()
         {
+            inputQueue.Enqueue(new InputPayload(currentOwnerTick.Value, inputVector.Value, inputRotation.Value));
+
             int bufferIndex = ProcessInputQueue();
 
             if (bufferIndex != -1)
@@ -136,6 +131,10 @@ namespace Vi.Player
 
         [Rpc(SendTo.NotServer)] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
 
+        private NetworkVariable<int> currentOwnerTick = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector2> inputVector = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Quaternion> inputRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private void HandleClientTick()
         {
             if (IsOwner)
@@ -147,9 +146,11 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
+                currentOwnerTick.Value = currentTick;
+                inputVector.Value = movementHandler.GetMoveInput();
+                inputRotation.Value = transform.rotation;
 
-                SendInputServerRpc(inputPayload);
+                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
 
                 if (!IsHost)
                 {
@@ -229,8 +230,6 @@ namespace Vi.Player
                 CurrentRotation = currentRotationCached;
             }
         }
-
-        [Rpc(SendTo.Server)] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {
