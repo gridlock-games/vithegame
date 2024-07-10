@@ -62,7 +62,6 @@ namespace Vi.Player
             movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
             overrideRotation = newRotation;
             applyOverrideRotation = true;
-            inputRotation.Value = newRotation;
         }
 
         public float playerObjectTeleportThreshold = 2;
