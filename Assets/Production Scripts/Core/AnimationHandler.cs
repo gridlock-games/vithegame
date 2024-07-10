@@ -533,7 +533,7 @@ namespace Vi.Core
                 }
 
                 if (successfulHits >= grabAttackClip.maxHitLimit) { break; }
-                yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits());
+                yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits(Animator.speed));
             }
         }
 

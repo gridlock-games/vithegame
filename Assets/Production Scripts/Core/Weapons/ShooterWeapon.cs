@@ -82,7 +82,7 @@ namespace Vi.Core
 
             if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)
             {
-                if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits())
+                if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
                 {
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position, projectileSpawnPoint.transform.rotation);
                     projectileInstance.GetComponent<NetworkObject>().Spawn();
