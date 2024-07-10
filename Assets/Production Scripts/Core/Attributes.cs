@@ -82,6 +82,19 @@ namespace Vi.Core
                 HP.Value += amount;
         }
 
+        private float AddHPWithoutApply(float amount)
+        {
+            if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
+            if (amount > 0) { amount *= healingMultiplier; }
+
+            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
+                return weaponHandler.GetWeapon().GetMaxHP();
+            else if (HP.Value + amount < 0)
+                return 0;
+            else
+                return HP.Value + amount;
+        }
+
         public void AddStamina(float amount, bool activateCooldown = true)
         {
             if (activateCooldown)
@@ -247,7 +260,7 @@ namespace Vi.Core
         private IEnumerator PlayHeartbeatSound()
         {
             heartbeatSoundIsPlaying = true;
-            AudioSource audioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+            AudioSource audioSource = AudioManager.Singleton.Play2DClip(gameObject, heartbeatSoundEffect, heartbeatVolume);
 
             while (true)
             {
@@ -752,10 +765,10 @@ namespace Vi.Core
 
             if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
 
-            if (HP.Value + HPDamage <= 0)
+            if (AddHPWithoutApply(HPDamage) <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
-                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
             }
 
             bool hitReactionWasPlayed = false;

@@ -356,6 +356,11 @@ namespace Vi.Core
             return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
+        public List<Attributes> GetActivePlayerObjectsInChannel(int channel)
+        {
+            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value.CachedPlayerData.channel == channel).Select(kvp => kvp.Value).ToList();
+        }
+
         public Attributes GetPlayerObjectById(int id)
         {
             if (!localPlayers.ContainsKey(id)) { Debug.LogError("No player object for Id: " + id); return null; }
@@ -1019,14 +1024,14 @@ namespace Vi.Core
 
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
             if (attributesToRespawn.GetTeam() != Team.Peaceful & attributesToRespawn.GetTeam() != Team.Spectator)
             {
                 float waitTime = 0;
                 while (!spawnPointFound)
                 {
                     attributesToRespawn.isWaitingForSpawnPoint = true;
-                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
                     yield return null;
                     waitTime += Time.deltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
@@ -1121,14 +1126,14 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
+                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                 if (playerData.team != Team.Peaceful & playerData.team != Team.Spectator)
                 {
                     float waitTime = 0;
                     while (!spawnPointFound)
                     {
                         isWaitingForSpawnPoint.Value = true;
-                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
+                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                         yield return null;
                         waitTime += Time.deltaTime;
                         if (waitTime > maxSpawnPointWaitTime) { break; }
