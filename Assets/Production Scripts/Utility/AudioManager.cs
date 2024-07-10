@@ -167,7 +167,7 @@ namespace Vi.Utility
 
         private const float audioSourceFadeOutSpeed = 1.5f;
 
-        public AudioSource Play2DClip(AudioClip audioClip, float volume)
+        public AudioSource Play2DClip(GameObject objectToDestroyWith, AudioClip audioClip, float volume)
         {
             AudioSource audioSource = ObjectPoolingManager.SpawnObject(audioSourcePrefab).GetComponent<AudioSource>();
             ResetAudioSourceProperties(audioSource);
@@ -176,8 +176,25 @@ namespace Vi.Utility
             audioSource.volume = volume;
             audioSource.clip = audioClip;
 
-            StartCoroutine(Play2DSoundPrefab(audioSource));
+            if (objectToDestroyWith)
+                StartCoroutine(Play2DSoundPrefabWithInvoker(objectToDestroyWith, audioSource));
+            else
+                StartCoroutine(Play2DSoundPrefab(audioSource));
+
             return audioSource;
+        }
+
+        private IEnumerator Play2DSoundPrefabWithInvoker(GameObject invoker, AudioSource audioSource)
+        {
+            audioSource.Play();
+            while (true)
+            {
+                if (!invoker) { break; }
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+            if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
         private IEnumerator Play2DSoundPrefab(AudioSource audioSource)

@@ -21,7 +21,7 @@ namespace Vi.UI
 
         public void Play2DAudio(int value)
         {
-            AudioManager.Singleton.Play2DClip(audioClip, volume);
+            AudioManager.Singleton.Play2DClip(null, audioClip, volume);
         }
     }
 }

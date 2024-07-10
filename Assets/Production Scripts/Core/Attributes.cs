@@ -247,7 +247,7 @@ namespace Vi.Core
         private IEnumerator PlayHeartbeatSound()
         {
             heartbeatSoundIsPlaying = true;
-            AudioSource audioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+            AudioSource audioSource = AudioManager.Singleton.Play2DClip(gameObject, heartbeatSoundEffect, heartbeatVolume);
 
             while (true)
             {
