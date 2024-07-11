@@ -1113,11 +1113,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (IsGrabbed())
-            {
-                Debug.Log(Time.time + " " + animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Actions.GrabReaction") + " " + name);
-            }
-
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!IsSpawned) { return; }
