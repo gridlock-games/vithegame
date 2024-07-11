@@ -26,12 +26,6 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
-        public override void OnIsGrabbedChange(bool prev, bool current)
-        {
-            SetImmovable(current);
-            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetImmovable(current);
-        }
-
         public override void SetImmovable(bool isKinematic)
         {
             movementPredictionRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
@@ -377,6 +371,15 @@ namespace Vi.Player
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             FindMainCamera();
+
+            if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+            {
+                SetImmovable(animationHandler.IsGrabAttacking());
+            }
+            else
+            {
+                SetImmovable(attributes.IsGrabbed());
+            }
 
             if (!IsSpawned) { return; }
 

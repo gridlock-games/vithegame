@@ -27,8 +27,6 @@ namespace Vi.Core
 
 		public virtual Vector3 GetPosition() { return transform.position; }
 
-		public virtual void OnIsGrabbedChange(bool prev, bool current) { }
-
         public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }

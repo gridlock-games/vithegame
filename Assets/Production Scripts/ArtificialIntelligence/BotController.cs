@@ -23,12 +23,6 @@ namespace Vi.ArtificialIntelligence
 
         public override Vector3 GetPosition() { return currentPosition.Value; }
 
-        public override void OnIsGrabbedChange(bool prev, bool current)
-        {
-            SetImmovable(current);
-            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetImmovable(current);
-        }
-
         public override void SetImmovable(bool isKinematic)
         {
             networkColliderRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
@@ -298,6 +292,15 @@ namespace Vi.ArtificialIntelligence
 
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
+            if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+            {
+                SetImmovable(animationHandler.IsGrabAttacking());
+            }
+            else
+            {
+                SetImmovable(attributes.IsGrabbed());
+            }
+            
             if (!CanMove()) { return; }
             if (!IsSpawned) { return; }
 
