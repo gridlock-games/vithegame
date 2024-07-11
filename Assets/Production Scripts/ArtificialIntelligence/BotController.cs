@@ -25,13 +25,13 @@ namespace Vi.ArtificialIntelligence
 
         public override void OnIsGrabbedChange(bool prev, bool current)
         {
-            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetIsKinematic(current);
-            SetIsKinematic(current);
+            SetImmovable(current);
+            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetImmovable(current);
         }
 
-        public override void SetIsKinematic(bool isKinematic)
+        public override void SetImmovable(bool isKinematic)
         {
-            networkColliderRigidbody.isKinematic = isKinematic;
+            networkColliderRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
         }
 
         private Vector3 lastMovement;

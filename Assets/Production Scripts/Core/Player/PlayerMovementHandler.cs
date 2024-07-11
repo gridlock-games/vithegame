@@ -28,13 +28,13 @@ namespace Vi.Player
 
         public override void OnIsGrabbedChange(bool prev, bool current)
         {
-            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetIsKinematic(current);
-            SetIsKinematic(current);
+            SetImmovable(current);
+            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetImmovable(current);
         }
 
-        public override void SetIsKinematic(bool isKinematic)
+        public override void SetImmovable(bool isKinematic)
         {
-            movementPredictionRigidbody.isKinematic = isKinematic;
+            movementPredictionRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
         }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
