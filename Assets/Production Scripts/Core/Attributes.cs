@@ -145,7 +145,6 @@ namespace Vi.Core
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
-            isGrabbed.OnValueChanged += OnIsGrabbedChanged;
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
@@ -219,7 +218,6 @@ namespace Vi.Core
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
-            isGrabbed.OnValueChanged -= OnIsGrabbedChanged;
             statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
@@ -519,8 +517,6 @@ namespace Vi.Core
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }
-
-        private void OnIsGrabbedChanged(bool prev, bool current) { movementHandler.OnIsGrabbedChange(prev, current); }
 
         public Attributes GetGrabAssailant()
         {
@@ -851,7 +847,7 @@ namespace Vi.Core
                 if (attack.shouldFlinch | IsRaging())
                 {
                     movementHandler.Flinch(attack.GetFlinchAmount());
-                    if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                    if (!hitReactionWasPlayed & !IsGrabbed()) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
                 }
             }
 
@@ -1320,8 +1316,7 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -1329,23 +1324,16 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            if (animationHandler.IsActionClipPlaying(hitReaction))
-            {
-                yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-            }
-
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isPulled.Value = false;
         }
 
         private Coroutine grabResetCoroutine;
         private IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
         {
+            if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isGrabbed.Value = false;
             grabAssailantDataId.Value = default;
             grabVictimDataId.Value = default;

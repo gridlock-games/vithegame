@@ -23,10 +23,9 @@ namespace Vi.ArtificialIntelligence
 
         public override Vector3 GetPosition() { return currentPosition.Value; }
 
-        private float originalMass;
-        public override void OnIsGrabbedChange(bool prev, bool current)
+        public override void SetImmovable(bool isKinematic)
         {
-            networkColliderRigidbody.mass = current ? Mathf.Infinity : originalMass;
+            networkColliderRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
         }
 
         private Vector3 lastMovement;
@@ -87,7 +86,6 @@ namespace Vi.ArtificialIntelligence
             navMeshAgent.updateRotation = false;
             navMeshAgent.updateUpAxis = false;
             RefreshStatus();
-            originalMass = networkColliderRigidbody.mass;
         }
 
         private void Start()
@@ -294,6 +292,15 @@ namespace Vi.ArtificialIntelligence
 
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
+            if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+            {
+                SetImmovable(animationHandler.IsGrabAttacking());
+            }
+            else
+            {
+                SetImmovable(attributes.IsGrabbed());
+            }
+            
             if (!CanMove()) { return; }
             if (!IsSpawned) { return; }
 
@@ -552,7 +559,21 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (animationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                    if (attributes.IsGrabbed())
+                    {
+                        Attributes grabAssailant = attributes.GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            if (grabAssailant.TryGetComponent(out AnimationHandler assailantAnimationHandler))
+                            {
+                                animationHandler.Animator.speed = assailantAnimationHandler.Animator.speed;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (animationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                    }
                 }
             }
 
