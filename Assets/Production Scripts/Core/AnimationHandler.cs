@@ -24,10 +24,16 @@ namespace Vi.Core
             }
         }
 
+        public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
+        {
+            return weaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
+        }
+
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
-            return Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName);
+            int layerIndex = actionClip.GetClipType() == ActionClip.ClipType.Flinch ? flinchLayerIndex : actionsLayerIndex;
+            return Animator.GetCurrentAnimatorStateInfo(layerIndex).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(layerIndex).IsName(animationStateName);
         }
 
         public bool IsActionClipPlayingInCurrentState(ActionClip actionClip)
@@ -41,6 +47,14 @@ namespace Vi.Core
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
             animationStateName = (actionClip.GetClipType() == ActionClip.ClipType.Flinch ? flinchLayerName : actionsLayerName) + "." + animationStateName;
+            return animationStateName;
+        }
+
+        private string GetActionClipAnimationStateNameWithoutLayer(ActionClip actionClip)
+        {
+            string animationStateName = actionClip.name;
+            if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
             return animationStateName;
         }
 
@@ -459,6 +473,7 @@ namespace Vi.Core
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
+            Debug.Log(animationStateName + " - " + name);
             if (actionClip.ailment != ActionClip.Ailment.Death)
             {
                 switch (actionClip.GetClipType())

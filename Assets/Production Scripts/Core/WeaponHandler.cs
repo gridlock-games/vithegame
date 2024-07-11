@@ -1184,6 +1184,10 @@ namespace Vi.Core
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
+            if (attributes.IsGrabbed()) { return null; }
+            if (attributes.IsPulled()) { return null; }
+            if (attributes.GetAilment() != ActionClip.Ailment.None) { return null; }
+
             if (animationHandler.WaitingForActionToPlay) { return null; }
             if (animationHandler.IsReloading()) { return null; }
 

@@ -1113,6 +1113,11 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (IsGrabbed())
+            {
+                Debug.Log(Time.time + " " + animationHandler.Animator.GetCurrentAnimatorStateInfo(animationHandler.Animator.GetLayerIndex("Actions")).IsName("Actions.GrabReaction") + " " + name);
+            }
+
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!IsSpawned) { return; }
@@ -1320,8 +1325,7 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -1329,23 +1333,16 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            if (animationHandler.IsActionClipPlaying(hitReaction))
-            {
-                yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-            }
-
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isPulled.Value = false;
         }
 
         private Coroutine grabResetCoroutine;
         private IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
         {
+            if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isGrabbed.Value = false;
             grabAssailantDataId.Value = default;
             grabVictimDataId.Value = default;
