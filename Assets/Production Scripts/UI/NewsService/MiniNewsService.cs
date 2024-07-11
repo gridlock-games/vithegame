@@ -28,6 +28,7 @@ namespace Vi.UI
     }
     private IEnumerator GetNewsData()
     {
+      Debug.Log("Run network check");
       UnityWebRequest getRequest = UnityWebRequest.Get(NewsAPIURL + "/game/getActiveNews");
       yield return getRequest.SendWebRequest();
 
@@ -43,6 +44,9 @@ namespace Vi.UI
       //Popup a connection error message
       else
       {
+        Debug.Log("Connection Problem");
+        NewsData nd = new NewsData() { newsTitle = "Cannot connect to server"};
+        newsData.Add(nd);
       }
 
       UpdateNewsContents();
@@ -62,13 +66,14 @@ namespace Vi.UI
 
       for (int i = 0; i < newsCounter; i++)
       {
+        Debug.Log("Printing News Data");
         var nldo = Instantiate(newsListDataObject.gameObject);
         nldo.GetComponent<NewsMiniWindowDataObject>().updateContent(newsData[i].newsTitle, Color.red);
 
         //Add content to list
         newsWindowObject.Add(nldo);
 
-        newsListObject.transform.parent = nldo.transform;
+        nldo.transform.parent = newsListObject.transform;
       }
       }
 
