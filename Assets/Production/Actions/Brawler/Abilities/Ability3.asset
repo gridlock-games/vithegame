@@ -284,7 +284,7 @@ MonoBehaviour:
   timeBetweenHits: 1
   isBlockable: 1
   isUninterruptable: 0
-  isInvincible: 0
+  isInvincible: 1
   canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 7
@@ -299,7 +299,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 7601e10f958babe478c3d5a5dadf41af, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 0
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
