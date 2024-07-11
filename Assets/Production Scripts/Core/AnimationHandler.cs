@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -26,7 +27,15 @@ namespace Vi.Core
 
         public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
         {
-            return weaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
+            try
+            {
+                return weaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
+            }
+            catch
+            {
+                Debug.LogError("Action clip " + actionClip.name + " is not present in the animator override controller! " + weaponHandler.AnimatorOverrideControllerInstance);
+                return 2;
+            }
         }
 
         public bool IsActionClipPlaying(ActionClip actionClip)

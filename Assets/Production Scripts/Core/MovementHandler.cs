@@ -38,6 +38,8 @@ namespace Vi.Core
 		protected const float bodyRadius = 0.5f;
 		public virtual void AddForce(Vector3 force) { }
 
+		public virtual void SetIsKinematic(bool isKinematic) { }
+
         protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
         protected void Awake()

@@ -26,10 +26,15 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
-        private float originalMass;
         public override void OnIsGrabbedChange(bool prev, bool current)
         {
-            movementPredictionRigidbody.mass = current ? Mathf.Infinity : originalMass;
+            attributes.GetGrabAssailant().GetComponent<MovementHandler>().SetIsKinematic(current);
+            SetIsKinematic(current);
+        }
+
+        public override void SetIsKinematic(bool isKinematic)
+        {
+            movementPredictionRigidbody.isKinematic = isKinematic;
         }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
@@ -340,7 +345,6 @@ namespace Vi.Player
         {
             base.Awake();
             RefreshStatus();
-            originalMass = movementPredictionRigidbody.mass;
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
