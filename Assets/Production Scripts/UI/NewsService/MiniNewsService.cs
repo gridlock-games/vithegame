@@ -8,7 +8,7 @@ namespace Vi.UI
   public class MiniNewsService : MonoBehaviour
   {
 
-    private string NewsAPIURL = "154.90.35.191/";
+    private string NewsAPIURL = "154.90.35.191";
     private List<NewsData> newsData = new List<NewsData>();
     public int latestNewsCount = 3;
 
