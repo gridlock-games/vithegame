@@ -796,11 +796,11 @@ namespace Vi.Core
         {
             if (isPressed)
             {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressed(); }
             }
             else
             {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
+                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleased(); }
             }
 
             if (canADS)

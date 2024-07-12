@@ -681,9 +681,18 @@ namespace Vi.Core
             }
         }
 
-        private bool heavyAttackReleased;
-        [Rpc(SendTo.Server)] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
-        [Rpc(SendTo.Server)] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
+        private NetworkVariable<bool> heavyAttackReleased = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public void HeavyAttackReleased()
+        {
+            if (!IsOwner) { Debug.LogError("AnimationHandler.HeavyAttackReleased should only be called on the owner instance!"); return; }
+            heavyAttackReleased.Value = true;
+        }
+
+        public void HeavyAttackPressed()
+        {
+            if (!IsOwner) { Debug.LogError("AnimationHandler.HeavyAttackPressed should only be called on the owner instance!"); return; }
+            heavyAttackReleased.Value = false;
+        }
 
         public float HeavyAttackChargeTime { get; private set; }
         private Coroutine heavyAttackCoroutine;
@@ -728,7 +737,7 @@ namespace Vi.Core
                         break;
                     }
 
-                    if (heavyAttackReleased)
+                    if (heavyAttackReleased.Value)
                     {
                         HeavyAttackChargeTime = chargeTime;
                         EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount);
