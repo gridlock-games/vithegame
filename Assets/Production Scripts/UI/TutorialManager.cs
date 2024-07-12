@@ -514,7 +514,7 @@ namespace Vi.UI
                 }
 
                 playerUI.GetHeavyAttackButton().gameObject.SetActive(true);
-                playerUI.GetOnScreenReloadButton().gameObject.SetActive(true);
+                playerUI.RefreshOnScreenReloadButtonInteractability();
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
 
                 playerUI.GetPauseMenuButton().gameObject.SetActive(true);
