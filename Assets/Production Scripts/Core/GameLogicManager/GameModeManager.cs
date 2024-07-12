@@ -384,7 +384,7 @@ namespace Vi.Core.GameModeManagers
 
             if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
             {
-                List<PlayerScore> highestKillPlayers = GetHighestKillPlayers();
+                List<PlayerScore> highestKillPlayers = GetHighestKillPlayersCumulative();
                 if (highestKillPlayers.Count > 1)
                 {
                     float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
@@ -604,7 +604,7 @@ namespace Vi.Core.GameModeManagers
         protected virtual void OnRoundTimerEnd()
         {
             List<int> highestKillIdList = new List<int>();
-            foreach (PlayerScore playerScore in GetHighestKillPlayers())
+            foreach (PlayerScore playerScore in GetHighestKillPlayersThisRound())
             {
                 highestKillIdList.Add(playerScore.id);
             }
@@ -675,7 +675,7 @@ namespace Vi.Core.GameModeManagers
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
-        protected List<PlayerScore> GetHighestKillPlayers()
+        protected List<PlayerScore> GetHighestKillPlayersThisRound()
         {
             List<PlayerScore> allPlayerScores = new List<PlayerScore>();
             for (int i = 0; i < scoreList.Count; i++)
@@ -710,6 +710,43 @@ namespace Vi.Core.GameModeManagers
             }
             return highestKillPlayerScores;
         }
+
+        private List<PlayerScore> GetHighestKillPlayersCumulative()
+        {
+            List<PlayerScore> allPlayerScores = new List<PlayerScore>();
+            for (int i = 0; i < scoreList.Count; i++)
+            {
+                allPlayerScores.Add(scoreList[i]);
+            }
+            for (int i = 0; i < disconnectedScoreList.Count; i++)
+            {
+                allPlayerScores.Add(disconnectedScoreList[i].playerScore);
+            }
+
+            List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
+            for (int i = 0; i < allPlayerScores.Count; i++)
+            {
+                PlayerScore playerScore = allPlayerScores[i];
+                if (highestKillPlayerScores.Count > 0)
+                {
+                    if (playerScore.cumulativeKills > highestKillPlayerScores[0].cumulativeKills)
+                    {
+                        highestKillPlayerScores.Clear();
+                        highestKillPlayerScores.Add(playerScore);
+                    }
+                    else if (playerScore.cumulativeKills == highestKillPlayerScores[0].cumulativeKills)
+                    {
+                        highestKillPlayerScores.Add(playerScore);
+                    }
+                }
+                else
+                {
+                    highestKillPlayerScores.Add(playerScore);
+                }
+            }
+            return highestKillPlayerScores;
+        }
+
 
         public virtual string GetLeftScoreString() { return string.Empty; }
 
