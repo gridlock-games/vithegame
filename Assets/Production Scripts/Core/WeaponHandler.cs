@@ -499,7 +499,33 @@ namespace Vi.Core
                         PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
                     Transform parent = netObj.transform.parent;
-                    netObj.Spawn(true);
+                    netObj.SpawnWithObservers = false;
+                    netObj.SpawnWithOwnership(OwnerClientId, true);
+
+                    // Set Observers
+                    if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
+                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+                    {
+                        ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                        if (networkId == 0) { continue; }
+                        if (networkId == OwnerClientId) { continue; }
+
+                        if (playerData.channel == attributes.CachedPlayerData.channel)
+                        {
+                            if (!netObj.IsNetworkVisibleTo(networkId))
+                            {
+                                netObj.NetworkShow(networkId);
+                            }
+                        }
+                        else
+                        {
+                            if (NetworkObject.IsNetworkVisibleTo(networkId))
+                            {
+                                netObj.NetworkHide(networkId);
+                            }
+                        }
+                    }
+
                     netObj.TrySetParent(parent);
                 }
             }
@@ -790,18 +816,9 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
-        private bool lastHeavyAttackPressedState;
-
         public void HeavyAttack(bool isPressed)
         {
-            if (isPressed)
-            {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressedServerRpc(); }
-            }
-            else
-            {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleasedServerRpc(); }
-            }
+            animationHandler.SetHeavyAttackPressedState(isPressed);
 
             if (canADS)
             {
@@ -834,8 +851,6 @@ namespace Vi.Core
                         animationHandler.PlayAction(actionClip);
                 }
             }
-
-            lastHeavyAttackPressedState = isPressed;
         }
 
         public void HeavyAttackHold(bool isPressed)

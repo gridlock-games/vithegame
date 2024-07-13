@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -14,7 +15,10 @@ namespace Vi.ArtificialIntelligence
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                StartCoroutine(SpawnBots());
+                if (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+                {
+                    StartCoroutine(SpawnBots());
+                }
             }
         }
 

@@ -528,8 +528,6 @@ namespace Vi.UI
 
             CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
 
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
             bool shouldCreateNewModel = selectedCharacter.model != character.model;
 
             if (shouldCreateNewModel)

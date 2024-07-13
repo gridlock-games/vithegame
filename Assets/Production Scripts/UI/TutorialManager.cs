@@ -514,7 +514,7 @@ namespace Vi.UI
                 }
 
                 playerUI.GetHeavyAttackButton().gameObject.SetActive(true);
-                playerUI.GetOnScreenReloadButton().gameObject.SetActive(true);
+                playerUI.RefreshOnScreenReloadButtonInteractability();
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(true);
 
                 playerUI.GetPauseMenuButton().gameObject.SetActive(true);
@@ -787,10 +787,6 @@ namespace Vi.UI
         {
             if (currentActionIndex == -1)
             {
-                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().ToArray())
-                {
-                    if (playerData.id < 0) { PlayerDataManager.Singleton.KickPlayer(playerData.id); }
-                }
                 return;
             }
             else if (currentActionIndex == 0) // Look

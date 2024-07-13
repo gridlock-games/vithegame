@@ -187,8 +187,8 @@ namespace Vi.Core
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
-            Animator.CrossFade("Empty", transitionTime, actionsLayerIndex);
-            Animator.CrossFade("Empty", transitionTime, flinchLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();
@@ -208,8 +208,8 @@ namespace Vi.Core
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
-            Animator.CrossFade("Empty", transitionTime, actionsLayerIndex);
-            Animator.CrossFade("Empty", transitionTime, flinchLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 
@@ -461,7 +461,7 @@ namespace Vi.Core
             if (heavyAttackCoroutine != null)
             {
                 StopCoroutine(heavyAttackCoroutine);
-                Animator.CrossFade("Empty", 0, actionsLayerIndex);
+                Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
             }
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
@@ -491,19 +491,19 @@ namespace Vi.Core
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.GrabAttack:
                     case ActionClip.ClipType.Lunge:
-                        Animator.CrossFade(animationStateName, transitionTime, actionsLayerIndex);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                         break;
                     case ActionClip.ClipType.HeavyAttack:
                         heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                         break;
                     case ActionClip.ClipType.HitReaction:
-                        Animator.CrossFade(animationStateName, transitionTime, actionsLayerIndex, 0);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
                         break;
                     case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFade(animationStateName, transitionTime, actionsLayerIndex, 0);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
                         break;
                     case ActionClip.ClipType.Flinch:
-                        Animator.CrossFade(animationStateName, transitionTime, flinchLayerIndex, 0);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
                         break;
                     default:
                         Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
@@ -681,15 +681,19 @@ namespace Vi.Core
             }
         }
 
-        private bool heavyAttackReleased;
-        [Rpc(SendTo.Server)] public void HeavyAttackReleasedServerRpc() { heavyAttackReleased = true; }
-        [Rpc(SendTo.Server)] public void HeavyAttackPressedServerRpc() { heavyAttackReleased = false; }
+
+        private NetworkVariable<bool> heavyAttackPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public void SetHeavyAttackPressedState(bool isPressed)
+        {
+            if (!IsOwner) { Debug.LogError("AnimationHandler.HeavyAttackPressed should only be called on the owner instance!"); return; }
+            heavyAttackPressed.Value = isPressed;
+        }
 
         public float HeavyAttackChargeTime { get; private set; }
         private Coroutine heavyAttackCoroutine;
         private IEnumerator PlayHeavyAttack(ActionClip actionClip)
         {
-            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayAdditionalStates() should only be called for heavy attack action clips!"); yield break; }
+            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayHeavyAttack() should only be called for heavy attack action clips!"); yield break; }
 
             Animator.ResetTrigger("CancelHeavyAttackState");
             Animator.ResetTrigger("ProgressHeavyAttackState");
@@ -698,12 +702,16 @@ namespace Vi.Core
             Animator.SetBool("PlayHeavyAttackEnd", actionClip.chargeAttackHasEndAnimation);
 
             string animationStateName = GetActionClipAnimationStateName(actionClip).Replace("_Attack", "");
-            Animator.CrossFade(animationStateName + "_Start", actionClip.transitionTime, actionsLayerIndex);
+            Animator.CrossFadeInFixedTime(animationStateName + "_Start", actionClip.transitionTime, actionsLayerIndex);
+
+            bool heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value;
 
             float chargeTime = 0;
             while (true)
             {
                 yield return null;
+
+                heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value | heavyAttackWasPressedInThisCoroutine;
 
                 if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Loop") | Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Enhance"))
                 {
@@ -728,7 +736,7 @@ namespace Vi.Core
                         break;
                     }
 
-                    if (heavyAttackReleased)
+                    if (!heavyAttackPressed.Value & heavyAttackWasPressedInThisCoroutine)
                     {
                         HeavyAttackChargeTime = chargeTime;
                         EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount);
@@ -771,6 +779,7 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
         {
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
             if (chargeTime > ActionClip.chargeAttackTime) // Attack
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
@@ -844,7 +853,10 @@ namespace Vi.Core
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
-            yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
+            if (weaponHandler.GetWeapon().name != weaponName)
+            {
+                yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
+            }
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
@@ -876,17 +888,17 @@ namespace Vi.Core
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.GrabAttack:
                     case ActionClip.ClipType.Lunge:
-                        Animator.CrossFade(animationStateName, transitionTime, actionsLayerIndex);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                         break;
                     case ActionClip.ClipType.HeavyAttack:
                         heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                         break;
                     case ActionClip.ClipType.HitReaction:
                     case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFade(animationStateName, transitionTime, actionsLayerIndex, 0);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
                         break;
                     case ActionClip.ClipType.Flinch:
-                        Animator.CrossFade(animationStateName, transitionTime, flinchLayerIndex, 0);
+                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
                         break;
                     default:
                         Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());

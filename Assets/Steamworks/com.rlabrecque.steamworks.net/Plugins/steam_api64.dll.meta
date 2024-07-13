@@ -22,7 +22,8 @@ PluginImporter:
         Exclude OSXUniversal: 0
         Exclude WebGL: 1
         Exclude Win: 0
-        Exclude Win64: 1
+        Exclude Win64: 0
+        Exclude WindowsStoreApps: 1
   - first:
       Android: Android
     second:
@@ -63,9 +64,19 @@ PluginImporter:
   - first:
       Standalone: Win64
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: x86_64
+  - first:
+      Windows Store Apps: WindowsStoreApps
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+        DontProcess: false
+        PlaceholderPath: 
+        SDK: AnySDK
+        ScriptingBackend: AnyScriptingBackend
   userData: 
   assetBundleName: 
   assetBundleVariant: 
