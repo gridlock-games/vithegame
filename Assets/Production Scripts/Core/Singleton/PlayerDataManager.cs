@@ -908,7 +908,7 @@ namespace Vi.Core
                     {
                         foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
                         {
-                            Physics.IgnoreCollision(col, otherCol, player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
                         }
                     }
                 }
