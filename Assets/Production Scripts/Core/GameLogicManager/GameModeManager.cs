@@ -846,7 +846,7 @@ namespace Vi.Core.GameModeManagers
         private IEnumerator PlayAnimation(AnimationHandler animationHandler, bool isVictor)
         {
             yield return new WaitUntil(() => animationHandler.IsAtRest());
-            animationHandler.Animator.CrossFade(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFadeInFixedTime(isVictor ? "Victory" : "Defeat", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
             yield return ResetAnimation(animationHandler);
         }
 
@@ -855,7 +855,7 @@ namespace Vi.Core.GameModeManagers
             yield return new WaitUntil(() => nextGameActionTimer.Value <= (nextGameActionDuration / 2));
             if (animationHandler)
             {
-                animationHandler.Animator.CrossFade("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+                animationHandler.Animator.CrossFadeInFixedTime("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
             }
         }
 
