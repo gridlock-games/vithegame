@@ -41,13 +41,27 @@ namespace Vi.Core
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
-            int layerIndex = actionClip.GetClipType() == ActionClip.ClipType.Flinch ? flinchLayerIndex : actionsLayerIndex;
-            return Animator.GetCurrentAnimatorStateInfo(layerIndex).IsName(animationStateName) | Animator.GetNextAnimatorStateInfo(layerIndex).IsName(animationStateName);
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch)
+            {
+                return animatorReference.CurrentFlinchAnimatorStateInfo.IsName(animationStateName) | animatorReference.NextFlinchAnimatorStateInfo.IsName(animationStateName);
+            }
+            else
+            {
+                return animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName) | animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName);
+            }
         }
 
         public bool IsActionClipPlayingInCurrentState(ActionClip actionClip)
         {
-            return Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(GetActionClipAnimationStateName(actionClip));
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch)
+            {
+                return animatorReference.CurrentFlinchAnimatorStateInfo.IsName(animationStateName);
+            }
+            else
+            {
+                return animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName);
+            }
         }
 
         private string GetActionClipAnimationStateName(ActionClip actionClip)
@@ -71,13 +85,13 @@ namespace Vi.Core
         {
             string stateName = GetActionClipAnimationStateName(actionClip);
             float normalizedTime = 0;
-            if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(stateName))
+            if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(stateName))
             {
-                normalizedTime = Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).normalizedTime;
+                normalizedTime = animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime;
             }
-            else if (Animator.GetNextAnimatorStateInfo(actionsLayerIndex).IsName(stateName))
+            else if (animatorReference.NextActionsAnimatorStateInfo.IsName(stateName))
             {
-                normalizedTime = Animator.GetNextAnimatorStateInfo(actionsLayerIndex).normalizedTime;
+                normalizedTime = animatorReference.NextActionsAnimatorStateInfo.normalizedTime;
             }
 
             float floor = Mathf.FloorToInt(normalizedTime);
@@ -143,7 +157,7 @@ namespace Vi.Core
         public const float flinchingMovementSpeedMultiplier = 0.8f;
         public bool IsFlinching()
         {
-            return !Animator.GetCurrentAnimatorStateInfo(flinchLayerIndex).IsName("Empty");
+            return !animatorReference.CurrentFlinchAnimatorStateInfo.IsName("Empty");
         }
 
         public bool IsGrabAttacking()
@@ -157,9 +171,10 @@ namespace Vi.Core
         {
             if (!lastClipPlayed) { return false; }
             if (lastClipPlayed.GetClipType() != ActionClip.ClipType.HeavyAttack) { return false; }
-            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex);
             string stateName = GetActionClipAnimationStateName(lastClipPlayed);
-            return currentStateInfo.IsName(stateName + "_Loop") | currentStateInfo.IsName(stateName + "_Enhance") | currentStateInfo.IsName(stateName + "_Start");
+            return animatorReference.CurrentActionsAnimatorStateInfo.IsName(stateName + "_Loop")
+                | animatorReference.CurrentActionsAnimatorStateInfo.IsName(stateName + "_Enhance")
+                | animatorReference.CurrentActionsAnimatorStateInfo.IsName(stateName + "_Start");
         }
 
         public void OnDeath()
@@ -300,18 +315,16 @@ namespace Vi.Core
                 if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
             }
 
-            AnimatorStateInfo currentStateInfo = Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex);
-            AnimatorStateInfo nextStateInfo = Animator.GetNextAnimatorStateInfo(actionsLayerIndex);
             // If we are transitioning to the same state as this actionclip
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (nextStateInfo.IsName(animationStateName)) { return; }
+                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
             }
 
             bool isInTransition = Animator.IsInTransition(actionsLayerIndex);
             bool shouldUseDodgeCancelTransitionTime = false;
             // If we are not at rest
-            if (!currentStateInfo.IsName("Empty") | isInTransition)
+            if (!animatorReference.CurrentActionsAnimatorStateInfo.IsName("Empty") | isInTransition)
             {
                 string lastClipPlayedAnimationStateName = GetActionClipAnimationStateName(lastClipPlayed);
 
@@ -320,7 +333,7 @@ namespace Vi.Core
                 {
                     case ActionClip.ClipType.Dodge:
                         // If the clip we are trying to play is a dodge, and we cannot dodge out of the current state, don't play this
-                        if (currentStateInfo.IsName(lastClipPlayedAnimationStateName))
+                        if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             // Dodge lock checks
                             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
@@ -335,12 +348,12 @@ namespace Vi.Core
                                 }
                             }
                         }
-                        else if (currentStateInfo.IsTag("CanDodge") | nextStateInfo.IsTag("CanDodge"))
+                        else if (animatorReference.CurrentActionsAnimatorStateInfo.IsTag("CanDodge") | animatorReference.NextActionsAnimatorStateInfo.IsTag("CanDodge"))
                         {
-                            if (currentStateInfo.IsTag("CanDodge"))
+                            if (animatorReference.CurrentActionsAnimatorStateInfo.IsTag("CanDodge"))
                             {
                                 // If we are in transition and not returning to the empty state
-                                if (isInTransition & !nextStateInfo.IsName("Empty")) { return; }
+                                if (isInTransition & !animatorReference.NextActionsAnimatorStateInfo.IsName("Empty")) { return; }
                             }
 
                             shouldEvaluatePreviousState = false;
@@ -354,19 +367,19 @@ namespace Vi.Core
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.FlashAttack:
-                        if (currentStateInfo.IsName(lastClipPlayedAnimationStateName))
+                        if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             if (IsDodging())
                             {
                                 // Check the dodge time threshold, this allows dodges to be interrupted faster by attacks
-                                if (currentStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
+                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
                                 shouldUseDodgeCancelTransitionTime = true;
                                 shouldEvaluatePreviousState = false;
                             }
                             else if (IsPlayingBlockingHitReaction())
                             {
                                 // Check the blocking hit reaction time threshold, this allows us to counter from blocking
-                                if (currentStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return; }
+                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return; }
                                 shouldEvaluatePreviousState = false;
                             }
                             else if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)
@@ -397,7 +410,7 @@ namespace Vi.Core
 
                 if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
-                    if (currentStateInfo.IsName(animationStateName)) { return; }
+                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
                     if (!actionClip.canCancelLightAttacks)
                     {
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
@@ -413,7 +426,7 @@ namespace Vi.Core
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
-                    if (currentStateInfo.IsName(animationStateName)) { return; }
+                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
@@ -431,7 +444,7 @@ namespace Vi.Core
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (nextStateInfo.IsName(animationStateName)) { return; }
+                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
             }
 
             if (!AreActionClipRequirementsMet(actionClip)) { return; }
@@ -668,13 +681,13 @@ namespace Vi.Core
                 if (i == 0)
                 {
                     yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip));
-                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
                 else
                 {
                     yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(actionClip.followUpActionClipsToPlay[i - 1].actionClip));
-                    yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
+                    yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= actionClip.followUpActionClipsToPlay[i].normalizedTimeToPlayClip);
                     yield return new WaitForFixedUpdate();
                 }
                 PlayAction(actionClip.followUpActionClipsToPlay[i].actionClip, true);
@@ -713,7 +726,7 @@ namespace Vi.Core
 
                 heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value | heavyAttackWasPressedInThisCoroutine;
 
-                if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Loop") | Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Enhance"))
+                if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Loop") | animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Enhance"))
                 {
                     chargeTime += Time.deltaTime;
                     //if (Application.isEditor) { Debug.Log(chargeTime); }
@@ -745,15 +758,15 @@ namespace Vi.Core
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
 
-                            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Attack"));
+                            yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Attack"));
 
                             while (true)
                             {
                                 yield return null;
 
-                                if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Attack"))
+                                if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Attack"))
                                 {
-                                    if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                                    if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                                     {
                                         Animator.SetTrigger("ProgressHeavyAttackState");
                                         break;
@@ -800,15 +813,15 @@ namespace Vi.Core
 
         private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount)
         {
-            yield return new WaitUntil(() => Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(actionStateName + "_Attack"));
+            yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.IsName(actionStateName + "_Attack"));
 
             while (true)
             {
                 yield return null;
 
-                if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(actionStateName + "_Attack"))
+                if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(actionStateName + "_Attack"))
                 {
-                    if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
+                    if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
                         break;

@@ -201,6 +201,12 @@ namespace Vi.Core
             return _;
         }
 
+        private const string actionsLayerName = "Actions";
+        private const string flinchLayerName = "Flinch";
+
+        private int actionsLayerIndex;
+        private int flinchLayerIndex;
+
         Animator animator;
         WeaponHandler weaponHandler;
         Attributes attributes;
@@ -219,6 +225,9 @@ namespace Vi.Core
             movementHandler = weaponHandler.GetComponent<MovementHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
+
+            actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
+            flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
         }
 
         private void Start()
@@ -244,11 +253,11 @@ namespace Vi.Core
         {
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
-                return animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+                return NextActionsAnimatorStateInfo.IsName("Empty");
             }
             else
             {
-                return animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+                return CurrentActionsAnimatorStateInfo.IsName("Empty");
             }
         }
 
@@ -258,9 +267,19 @@ namespace Vi.Core
             return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
         }
 
+        public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo NextActionsAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo CurrentFlinchAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo NextFlinchAnimatorStateInfo { get; private set; }
+
         private void Update()
         {
             limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
+
+            CurrentActionsAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(actionsLayerIndex);
+            NextActionsAnimatorStateInfo = animator.GetNextAnimatorStateInfo(actionsLayerIndex);
+            CurrentFlinchAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(flinchLayerIndex);
+            NextFlinchAnimatorStateInfo = animator.GetNextAnimatorStateInfo(flinchLayerIndex);
         }
 
         private void OnAnimatorMove()
