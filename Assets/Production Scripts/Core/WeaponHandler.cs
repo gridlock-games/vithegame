@@ -1076,6 +1076,8 @@ namespace Vi.Core
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
+            if (!animationHandler.Animator) { return; }
+
             animationHandler.Animator.SetBool("Blocking", IsBlocking);
 
             if (IsServer)
