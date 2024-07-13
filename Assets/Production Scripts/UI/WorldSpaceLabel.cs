@@ -37,27 +37,57 @@ namespace Vi.UI
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private CanvasGroup[] canvasGroups;
 
-        private void Start()
+        private void Awake()
         {
-            canvas = GetComponent<Canvas>();
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            RefreshStatus();
-
-            attributes = GetComponentInParent<Attributes>();
-
-            transform.SetParent(null, true);
-
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
                 statusIcon.InitializeStatusIcon(status);
                 statusIcons.Add(statusIcon);
             }
+        }
 
-            transform.localScale = Vector3.zero;
-            healthBarParent.localScale = Vector3.zero;
+        private void OnEnable()
+        {
+            if (!attributes)
+            {
+                attributes = GetComponentInParent<Attributes>();
 
-            UpdateNameTextAndColors();
+                transform.SetParent(null, true);
+
+                transform.localScale = Vector3.zero;
+                healthBarParent.localScale = Vector3.zero;
+
+                rendererToFollow = null;
+            }
+
+            if (attributes)
+            {
+                RefreshRendererToFollow();
+
+                UpdateNameTextAndColors();
+
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
+                }
+            }
+        }
+
+        private void Start()
+        {
+            canvas = GetComponent<Canvas>();
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            RefreshStatus();
         }
 
         private void RefreshStatus()
