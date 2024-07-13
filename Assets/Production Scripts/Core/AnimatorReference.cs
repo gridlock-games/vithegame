@@ -267,23 +267,24 @@ namespace Vi.Core
             return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
         }
 
+        private void Update()
+        {
+            limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
+
+        }
+
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
         public AnimatorStateInfo NextActionsAnimatorStateInfo { get; private set; }
         public AnimatorStateInfo CurrentFlinchAnimatorStateInfo { get; private set; }
         public AnimatorStateInfo NextFlinchAnimatorStateInfo { get; private set; }
 
-        private void Update()
+        private void OnAnimatorMove()
         {
-            limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
-
             CurrentActionsAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(actionsLayerIndex);
             NextActionsAnimatorStateInfo = animator.GetNextAnimatorStateInfo(actionsLayerIndex);
             CurrentFlinchAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(flinchLayerIndex);
             NextFlinchAnimatorStateInfo = animator.GetNextAnimatorStateInfo(flinchLayerIndex);
-        }
 
-        private void OnAnimatorMove()
-        {
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
