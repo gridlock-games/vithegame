@@ -503,7 +503,7 @@ namespace Vi.Core
                     netObj.SpawnWithOwnership(OwnerClientId, true);
 
                     // Set Observers
-                    if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
+                    if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
                     foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
                     {
                         ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
@@ -512,16 +512,16 @@ namespace Vi.Core
 
                         if (playerData.channel == attributes.CachedPlayerData.channel)
                         {
-                            if (!NetworkObject.IsNetworkVisibleTo(networkId))
+                            if (!netObj.IsNetworkVisibleTo(networkId))
                             {
-                                NetworkObject.NetworkShow(networkId);
+                                netObj.NetworkShow(networkId);
                             }
                         }
                         else
                         {
                             if (NetworkObject.IsNetworkVisibleTo(networkId))
                             {
-                                NetworkObject.NetworkHide(networkId);
+                                netObj.NetworkHide(networkId);
                             }
                         }
                     }
