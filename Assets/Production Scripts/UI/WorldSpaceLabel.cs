@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using UnityEngine.SceneManagement;
 
 namespace Vi.UI
 {
@@ -59,6 +60,8 @@ namespace Vi.UI
                 healthBarParent.localScale = Vector3.zero;
 
                 rendererToFollow = null;
+
+                SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
             }
 
             if (attributes)
