@@ -681,24 +681,19 @@ namespace Vi.Core
             }
         }
 
-        private NetworkVariable<bool> heavyAttackReleased = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        public void HeavyAttackReleased()
-        {
-            if (!IsOwner) { Debug.LogError("AnimationHandler.HeavyAttackReleased should only be called on the owner instance!"); return; }
-            heavyAttackReleased.Value = true;
-        }
 
-        public void HeavyAttackPressed()
+        private NetworkVariable<bool> heavyAttackPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        public void SetHeavyAttackPressedState(bool isPressed)
         {
             if (!IsOwner) { Debug.LogError("AnimationHandler.HeavyAttackPressed should only be called on the owner instance!"); return; }
-            heavyAttackReleased.Value = false;
+            heavyAttackPressed.Value = isPressed;
         }
 
         public float HeavyAttackChargeTime { get; private set; }
         private Coroutine heavyAttackCoroutine;
         private IEnumerator PlayHeavyAttack(ActionClip actionClip)
         {
-            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayAdditionalStates() should only be called for heavy attack action clips!"); yield break; }
+            if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayHeavyAttack() should only be called for heavy attack action clips!"); yield break; }
 
             Animator.ResetTrigger("CancelHeavyAttackState");
             Animator.ResetTrigger("ProgressHeavyAttackState");
@@ -709,10 +704,14 @@ namespace Vi.Core
             string animationStateName = GetActionClipAnimationStateName(actionClip).Replace("_Attack", "");
             Animator.CrossFade(animationStateName + "_Start", actionClip.transitionTime, actionsLayerIndex);
 
+            bool heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value;
+
             float chargeTime = 0;
             while (true)
             {
                 yield return null;
+
+                heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value | heavyAttackWasPressedInThisCoroutine;
 
                 if (Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Loop") | Animator.GetCurrentAnimatorStateInfo(actionsLayerIndex).IsName(animationStateName + "_Enhance"))
                 {
@@ -737,7 +736,7 @@ namespace Vi.Core
                         break;
                     }
 
-                    if (heavyAttackReleased.Value)
+                    if (!heavyAttackPressed.Value & heavyAttackWasPressedInThisCoroutine)
                     {
                         HeavyAttackChargeTime = chargeTime;
                         EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount);
@@ -780,6 +779,7 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
         {
+            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
             if (chargeTime > ActionClip.chargeAttackTime) // Attack
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
@@ -853,7 +853,10 @@ namespace Vi.Core
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
-            yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
+            if (weaponHandler.GetWeapon().name != weaponName)
+            {
+                yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
+            }
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);

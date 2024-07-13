@@ -790,18 +790,9 @@ namespace Vi.Core
             HeavyAttack(value.isPressed);
         }
 
-        private bool lastHeavyAttackPressedState;
-
         public void HeavyAttack(bool isPressed)
         {
-            if (isPressed)
-            {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackPressed(); }
-            }
-            else
-            {
-                if (isPressed != lastHeavyAttackPressedState) { animationHandler.HeavyAttackReleased(); }
-            }
+            animationHandler.SetHeavyAttackPressedState(isPressed);
 
             if (canADS)
             {
@@ -834,8 +825,6 @@ namespace Vi.Core
                         animationHandler.PlayAction(actionClip);
                 }
             }
-
-            lastHeavyAttackPressedState = isPressed;
         }
 
         public void HeavyAttackHold(bool isPressed)
