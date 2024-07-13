@@ -499,7 +499,33 @@ namespace Vi.Core
                         PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
                     Transform parent = netObj.transform.parent;
-                    netObj.Spawn(true);
+                    netObj.SpawnWithObservers = false;
+                    netObj.SpawnWithOwnership(OwnerClientId, true);
+
+                    // Set Observers
+                    if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
+                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+                    {
+                        ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                        if (networkId == 0) { continue; }
+                        if (networkId == OwnerClientId) { continue; }
+
+                        if (playerData.channel == attributes.CachedPlayerData.channel)
+                        {
+                            if (!NetworkObject.IsNetworkVisibleTo(networkId))
+                            {
+                                NetworkObject.NetworkShow(networkId);
+                            }
+                        }
+                        else
+                        {
+                            if (NetworkObject.IsNetworkVisibleTo(networkId))
+                            {
+                                NetworkObject.NetworkHide(networkId);
+                            }
+                        }
+                    }
+
                     netObj.TrySetParent(parent);
                 }
             }
