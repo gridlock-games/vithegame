@@ -170,6 +170,7 @@ namespace Vi.Core
         private IEnumerator SetNetworkVisibilityAfterSpawn()
         {
             if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            yield return null;
             if (!IsSpawned) { yield return new WaitUntil(() => IsSpawned); }
 
             if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
