@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Leaves
+    second: {fileID: 2100000, guid: 3944721dc9a83c54ea0b76794563617e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Medium2_Leaves_Batch.001
     second: {fileID: 2100000, guid: 3944721dc9a83c54ea0b76794563617e, type: 2}
   - first:
@@ -14,6 +19,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Tree_sentinel
     second: {fileID: 2100000, guid: 9546f64f84cac7b47b9eb3b954adfc30, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Trunk
+    second: {fileID: 2100000, guid: 6538e49424fee004c98dbf417f11f8be, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -44,7 +54,9 @@ ModelImporter:
     clipAnimations: []
     isReadable: 0
   meshes:
-    lODScreenPercentages: []
+    lODScreenPercentages:
+    - 0.25
+    - 0.01
     globalScale: 1
     meshCompression: 0
     addColliders: 0

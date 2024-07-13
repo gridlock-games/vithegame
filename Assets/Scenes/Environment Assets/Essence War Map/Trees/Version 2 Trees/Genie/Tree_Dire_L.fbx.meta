@@ -13,7 +13,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Trunk
-    second: {fileID: 2100000, guid: 62f479944f7ca8640941315961a3c124, type: 2}
+    second: {fileID: 2100000, guid: c799921b867ffcf4281f81e92bf7fb92, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -44,7 +44,9 @@ ModelImporter:
     clipAnimations: []
     isReadable: 0
   meshes:
-    lODScreenPercentages: []
+    lODScreenPercentages:
+    - 0.25
+    - 0.01
     globalScale: 1
     meshCompression: 0
     addColliders: 0
