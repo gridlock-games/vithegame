@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
@@ -53,12 +55,12 @@ namespace Vi.Core
             {
                 if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType])
                 {
-                    Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].gameObject);
+                    ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponent<PooledObject>());
                 }
 
                 if (model)
                 {
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform).GetComponent<WearableEquipment>();
+                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>();
                     SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                     foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
                     {
@@ -70,7 +72,7 @@ namespace Vi.Core
             }
             else if (model)
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform).GetComponent<WearableEquipment>());
+                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>());
                 SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                 foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
                 {
@@ -111,7 +113,7 @@ namespace Vi.Core
         {
             if (wearableEquipmentInstances.ContainsKey(equipmentType))
             {
-                Destroy(wearableEquipmentInstances[equipmentType].gameObject);
+                ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[equipmentType].GetComponent<PooledObject>());
                 wearableEquipmentInstances.Remove(equipmentType);
             }
 
@@ -124,6 +126,19 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
+        }
+
+        private void OnDestroy()
+        {
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
+            {
+                kvp.Value.transform.SetParent(null, true);
+                SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
+                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+            }
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()

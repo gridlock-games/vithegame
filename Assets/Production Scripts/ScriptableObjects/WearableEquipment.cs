@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
+    [RequireComponent(typeof(PooledObject))]
     [DisallowMultipleComponent]
     public class WearableEquipment : MonoBehaviour
     {
@@ -15,9 +16,17 @@ namespace Vi.ScriptableObjects
 
         private const bool shouldDebugWarnings = false;
 
-        private void Start()
+        [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
+
+        private void OnValidate()
+        {
+            renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
+        }
+
+        private void OnEnable()
         {
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
+            if (!networkObject) { return; }
 
             Animator animator = GetComponentInParent<Animator>();
             Transform target = animator.transform;
@@ -25,7 +34,6 @@ namespace Vi.ScriptableObjects
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
-            SkinnedMeshRenderer[] renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
 
             //nothing to map
             if (renderList.Length == 0)
