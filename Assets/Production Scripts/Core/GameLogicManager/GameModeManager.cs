@@ -384,7 +384,7 @@ namespace Vi.Core.GameModeManagers
 
             if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
             {
-                List<PlayerScore> highestKillPlayers = GetHighestKillPlayersCumulative();
+                List<PlayerScore> highestKillPlayers = GetHighestKillPlayersCumulative(winningPlayersDataIds);
                 if (highestKillPlayers.Count > 1)
                 {
                     float highestDamage = highestKillPlayers.Max(item => item.cumulativeDamageDealt);
@@ -711,16 +711,16 @@ namespace Vi.Core.GameModeManagers
             return highestKillPlayerScores;
         }
 
-        private List<PlayerScore> GetHighestKillPlayersCumulative()
+        private List<PlayerScore> GetHighestKillPlayersCumulative(int[] scoreIdsToPickFrom)
         {
             List<PlayerScore> allPlayerScores = new List<PlayerScore>();
             for (int i = 0; i < scoreList.Count; i++)
             {
-                allPlayerScores.Add(scoreList[i]);
+                if (scoreIdsToPickFrom.Contains(scoreList[i].id)) { allPlayerScores.Add(scoreList[i]); }
             }
             for (int i = 0; i < disconnectedScoreList.Count; i++)
             {
-                allPlayerScores.Add(disconnectedScoreList[i].playerScore);
+                if (scoreIdsToPickFrom.Contains(scoreList[i].id)) { allPlayerScores.Add(disconnectedScoreList[i].playerScore); }
             }
 
             List<PlayerScore> highestKillPlayerScores = new List<PlayerScore>();
