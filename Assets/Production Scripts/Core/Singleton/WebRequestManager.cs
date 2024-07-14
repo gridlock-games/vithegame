@@ -1501,11 +1501,8 @@ namespace Vi.Core
 
                 CharacterJson element = new CharacterJson();
                 element.loadOuts = new List<LoadoutJson>();
-                List<int> indicesAlreadyEvaluated = new List<int>();
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
-                    if (indicesAlreadyEvaluated.Contains(i)) { continue; }
-
                     switch (splitStrings[i])
                     {
                         case "_id":
@@ -1518,7 +1515,6 @@ namespace Vi.Core
                                     Debug.LogError("_id can't find a : in between the value!");
                                 }
                                 element._id = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1533,7 +1529,6 @@ namespace Vi.Core
                                     Debug.LogError("userId can't find a : in between the value!");
                                 }
                                 element.userId = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1551,7 +1546,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing slot property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1566,7 +1560,6 @@ namespace Vi.Core
                                     Debug.LogError("name can't find a : in between the value!");
                                 }
                                 element.name = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1581,7 +1574,6 @@ namespace Vi.Core
                                     Debug.LogError("model can't find a : in between the value!");
                                 }
                                 element.model = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1599,7 +1591,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing experience property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1614,7 +1605,6 @@ namespace Vi.Core
                                     Debug.LogError("bodyColor can't find a : in between the value!");
                                 }
                                 element.bodyColor = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1629,7 +1619,6 @@ namespace Vi.Core
                                     Debug.LogError("eyeColor can't find a : in between the value!");
                                 }
                                 element.eyeColor = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1644,7 +1633,6 @@ namespace Vi.Core
                                     Debug.LogError("beard can't find a : in between the value!");
                                 }
                                 element.beard = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1659,7 +1647,6 @@ namespace Vi.Core
                                     Debug.LogError("brows can't find a : in between the value!");
                                 }
                                 element.brows = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1674,7 +1661,6 @@ namespace Vi.Core
                                     Debug.LogError("hair can't find a : in between the value!");
                                 }
                                 element.hair = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1689,7 +1675,6 @@ namespace Vi.Core
                                     Debug.LogError("gender can't find a : in between the value!");
                                 }
                                 element.gender = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1704,7 +1689,6 @@ namespace Vi.Core
                                     Debug.LogError("race can't find a : in between the value!");
                                 }
                                 element.race = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1719,7 +1703,6 @@ namespace Vi.Core
                                     Debug.LogError("dateCreated can't find a : in between the value!");
                                 }
                                 element.dateCreated = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1727,28 +1710,22 @@ namespace Vi.Core
                             }
                             break;
                         case "attributes":
-                            List<int> indicesToAdd = new List<int>();
                             List<string> splitAttributesStrings = new List<string>();
                             for (int j = i; j < splitStrings.Count; j++)
                             {
-                                indicesToAdd.Add(j);
                                 splitAttributesStrings.Add(splitStrings[j]);
                                 if (splitStrings[j].Contains("},")) { break; }
                             }
                             element.attributes = CharacterAttributes.FromCharacterJsonExtract(splitAttributesStrings);
-                            indicesAlreadyEvaluated.AddRange(indicesToAdd);
                             break;
                         case "loadoutSlot":
-                            indicesToAdd = new List<int>();
                             List<string> splitLoadoutStrings = new List<string>();
                             for (int j = i; j < splitStrings.Count; j++)
                             {
-                                indicesToAdd.Add(j);
                                 splitLoadoutStrings.Add(splitStrings[j]);
                                 if (splitStrings[j].Contains("}")) { break; }
                             }
                             element.loadOuts.Add(LoadoutJson.FromCharacterJsonExtract(splitLoadoutStrings));
-                            indicesAlreadyEvaluated.AddRange(indicesToAdd);
                             break;
                         case "level":
                             if (i + 1 < splitStrings.Count)
@@ -1761,7 +1738,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing level property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1779,7 +1755,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing attack property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1797,7 +1772,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing defense property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1815,7 +1789,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1833,7 +1806,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1851,7 +1823,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing critChance property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1869,7 +1840,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing crit property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -1885,7 +1855,6 @@ namespace Vi.Core
                                     Debug.LogError("id can't find a : in between the value!");
                                 }
                                 element.id = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1949,12 +1918,9 @@ namespace Vi.Core
 
             public static LoadoutJson FromCharacterJsonExtract(List<string> splitStrings)
             {
-                List<int> indicesAlreadyEvaluated = new List<int>();
                 LoadoutJson loadoutJson = new LoadoutJson();
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
-                    if (indicesAlreadyEvaluated.Contains(i)) { continue; }
-
                     string split = splitStrings[i].Replace("},", ",");
 
                     switch (split)
@@ -1967,7 +1933,6 @@ namespace Vi.Core
                                     Debug.LogError("loadoutSlot can't find a : in between the value!");
                                 }
                                 loadoutJson.loadoutSlot = splitStrings[i + 2];
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                             }
                             else
                             {
@@ -1980,7 +1945,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.helmGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -1989,7 +1953,6 @@ namespace Vi.Core
                                         Debug.LogError("helmGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.helmGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2003,7 +1966,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.chestArmorGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2012,7 +1974,6 @@ namespace Vi.Core
                                         Debug.LogError("chestArmorGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.chestArmorGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2026,7 +1987,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.shouldersGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2035,7 +1995,6 @@ namespace Vi.Core
                                         Debug.LogError("shouldersGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.shouldersGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2049,7 +2008,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.bootsGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2058,7 +2016,6 @@ namespace Vi.Core
                                         Debug.LogError("bootsGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.bootsGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2072,7 +2029,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.pantsGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2081,7 +2037,6 @@ namespace Vi.Core
                                         Debug.LogError("pantsGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.pantsGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2095,7 +2050,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.beltGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2104,7 +2058,6 @@ namespace Vi.Core
                                         Debug.LogError("beltGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.beltGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2118,7 +2071,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.glovesGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2127,7 +2079,6 @@ namespace Vi.Core
                                         Debug.LogError("glovesGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.glovesGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2141,7 +2092,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.capeGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2150,7 +2100,6 @@ namespace Vi.Core
                                         Debug.LogError("capeGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.capeGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2164,7 +2113,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.robeGearItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1});
                                 }
                                 else
                                 {
@@ -2173,7 +2121,6 @@ namespace Vi.Core
                                         Debug.LogError("robeGearItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.robeGearItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2187,7 +2134,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.weapon1ItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2196,7 +2142,6 @@ namespace Vi.Core
                                         Debug.LogError("weapon1ItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.weapon1ItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2210,7 +2155,6 @@ namespace Vi.Core
                                 if (splitStrings[i + 1].Contains("null"))
                                 {
                                     loadoutJson.weapon2ItemId = null;
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                                 }
                                 else
                                 {
@@ -2219,7 +2163,6 @@ namespace Vi.Core
                                         Debug.LogError("weapon2ItemId can't find a : in between the value!");
                                     }
                                     loadoutJson.weapon2ItemId = splitStrings[i + 2];
-                                    indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1, i + 2 });
                                 }
                             }
                             else
@@ -2238,7 +2181,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing " + splitStrings[i + 1 ][1..^3]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -2268,12 +2210,9 @@ namespace Vi.Core
 
             public static CharacterAttributes FromCharacterJsonExtract(List<string> splitStrings)
             {
-                List<int> indicesAlreadyEvaluated = new List<int>();
                 CharacterAttributes attributes = new CharacterAttributes();
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
-                    if (indicesAlreadyEvaluated.Contains(i)) { continue; }
-
                     string split = splitStrings[i].Replace("},", ",");
 
                     switch (split)
@@ -2289,7 +2228,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing strength property! " + splitStrings[i + 1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -2307,7 +2245,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing vitality property! " + splitStrings[i + 1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -2325,7 +2262,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing agility property! " + splitStrings[i + 1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -2343,7 +2279,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing dexterity property! " + splitStrings[i + 1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
@@ -2361,7 +2296,6 @@ namespace Vi.Core
                                 {
                                     Debug.LogError("Error while parsing intelligence property! " + splitStrings[i + 1][1..^1]);
                                 }
-                                indicesAlreadyEvaluated.AddRange(new int[] { i, i + 1 });
                             }
                             else
                             {
