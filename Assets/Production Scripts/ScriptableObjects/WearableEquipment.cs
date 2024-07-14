@@ -17,10 +17,19 @@ namespace Vi.ScriptableObjects
         private const bool shouldDebugWarnings = false;
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
+        private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
         private void OnValidate()
         {
             renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
+        }
+
+        private void Awake()
+        {
+            foreach (SkinnedMeshRenderer srenderer in renderList)
+            {
+                originalRenderData.Add((srenderer.rootBone, srenderer.bones));
+            }
         }
 
         private void OnEnable()
@@ -79,6 +88,17 @@ namespace Vi.ScriptableObjects
                     srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
                 }
             }
+        }
+
+        private void OnDisable()
+        {
+            for (int i = 0; i < renderList.Length; i++)
+            {
+                (Transform originalRootBone, Transform[] originalBones) = originalRenderData[i];
+                renderList[i].rootBone = originalRootBone;
+                renderList[i].bones = originalBones;
+            }
+            boneMapToFollow.Clear();
         }
 
         private void FindRootBone(ref Transform target, Transform start)
