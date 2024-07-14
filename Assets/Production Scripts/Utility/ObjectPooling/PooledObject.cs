@@ -15,11 +15,10 @@ namespace Vi.Utility
 
         public void SetPooledObjectIndex(int index)
         {
+            #if UNITY_EDITOR
+            if (index != pooledObjectIndex) { UnityEditor.EditorUtility.SetDirty(this); }
+            #endif
             pooledObjectIndex = index;
-
-#if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(this);
-#endif
         }
     }
 }
