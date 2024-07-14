@@ -134,6 +134,8 @@ namespace Vi.Core
         PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+
             if (IsServer)
             {
                 StartCoroutine(InitStats());
@@ -157,8 +159,6 @@ namespace Vi.Core
                 spawnedOnOwnerInstance.Value = true;
                 RefreshStatus();
             }
-
-            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         public void UpdateNetworkVisiblity()
