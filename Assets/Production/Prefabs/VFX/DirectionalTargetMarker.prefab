@@ -4929,12 +4929,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed4699a204b27d4c9af9f9bad1b60b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0.3, y: 1, z: 0.2}
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 1
-  onActivateVFXSpawnNormalizedTime: 0.15
-  raycastOffset: {x: 0, y: 2, z: 3}
+  transformType: 3
+  onActivateVFXSpawnNormalizedTime: 0.45
+  raycastOffset: {x: 0, y: 2, z: 0}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
