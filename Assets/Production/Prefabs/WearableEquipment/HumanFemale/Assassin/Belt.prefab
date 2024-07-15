@@ -439,12 +439,32 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e10247a67e64dc44ab692d9090468b71, type: 3}
+--- !u!137 &2491759210741204362 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5239612906116457895, guid: e10247a67e64dc44ab692d9090468b71,
+    type: 3}
+  m_PrefabInstance: {fileID: 7647773943143997485}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7413822395768315260 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e10247a67e64dc44ab692d9090468b71,
     type: 3}
   m_PrefabInstance: {fileID: 7647773943143997485}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3682379377941994020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7413822395768315260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 10
+  pooledObjectIndex: 18
 --- !u!114 &7830744759515969986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -460,3 +480,5 @@ MonoBehaviour:
   equipmentType: 0
   armorType: 0
   shouldDisableCharSkinRenderer: 0
+  renderList:
+  - {fileID: 2491759210741204362}

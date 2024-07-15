@@ -13,6 +13,12 @@ namespace Vi.Utility
         [SerializeField] private int pooledObjectIndex = -1;
         public int GetPooledObjectIndex() { return pooledObjectIndex; }
 
-        public void SetPooledObjectIndex(int index) { pooledObjectIndex = index; }
+        public void SetPooledObjectIndex(int index)
+        {
+            #if UNITY_EDITOR
+            if (index != pooledObjectIndex) { UnityEditor.EditorUtility.SetDirty(this); }
+            #endif
+            pooledObjectIndex = index;
+        }
     }
 }

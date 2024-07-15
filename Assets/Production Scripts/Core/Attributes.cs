@@ -12,7 +12,7 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
-        [SerializeField] private GameObject worldSpaceLabelPrefab;
+        [SerializeField] private PooledObject worldSpaceLabelPrefab;
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
@@ -131,9 +131,11 @@ namespace Vi.Core
                 rage.Value += amount;
         }
 
-        GameObject worldSpaceLabelInstance;
+        PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+
             if (IsServer)
             {
                 StartCoroutine(InitStats());
@@ -149,7 +151,7 @@ namespace Vi.Core
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner)
@@ -157,8 +159,6 @@ namespace Vi.Core
                 spawnedOnOwnerInstance.Value = true;
                 RefreshStatus();
             }
-
-            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         public void UpdateNetworkVisiblity()
@@ -170,7 +170,8 @@ namespace Vi.Core
         private IEnumerator SetNetworkVisibilityAfterSpawn()
         {
             if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
-            yield return new WaitUntil(() => IsSpawned);
+            yield return null;
+            if (!IsSpawned) { yield return new WaitUntil(() => IsSpawned); }
 
             if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
 
@@ -196,6 +197,7 @@ namespace Vi.Core
                     }
                 }
             }
+            PlayerDataManager.Singleton.UpdateIgnoreCollisionsMatrix();
         }
 
         private IEnumerator InitStats()
@@ -222,7 +224,7 @@ namespace Vi.Core
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -357,12 +359,12 @@ namespace Vi.Core
 
         private void OnEnable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
         }
 
         private void OnDisable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
         public bool IsInvincible() { return isInvincible.Value; }
@@ -1257,14 +1259,14 @@ namespace Vi.Core
                 weaponHandler.OnDeath();
                 animationHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 isRaging.Value = false;
                 animationHandler.Animator.enabled = true;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
         }

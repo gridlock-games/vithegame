@@ -501,32 +501,10 @@ namespace Vi.Core
                     Transform parent = netObj.transform.parent;
                     netObj.SpawnWithObservers = false;
                     netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.TrySetParent(parent);
 
                     // Set Observers
-                    if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
-                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
-                    {
-                        ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
-                        if (networkId == 0) { continue; }
-                        if (networkId == OwnerClientId) { continue; }
-
-                        if (playerData.channel == attributes.CachedPlayerData.channel)
-                        {
-                            if (!netObj.IsNetworkVisibleTo(networkId))
-                            {
-                                netObj.NetworkShow(networkId);
-                            }
-                        }
-                        else
-                        {
-                            if (NetworkObject.IsNetworkVisibleTo(networkId))
-                            {
-                                netObj.NetworkHide(networkId);
-                            }
-                        }
-                    }
-
-                    netObj.TrySetParent(parent);
+                    StartCoroutine(SetVFXNetworkVisibility(netObj));
                 }
             }
             else if (!isPreviewVFX & actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
@@ -537,6 +515,33 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
+        }
+
+        private IEnumerator SetVFXNetworkVisibility(NetworkObject netObj)
+        {
+            yield return new WaitUntil(() => netObj.IsSpawned);
+            if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            {
+                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                if (networkId == 0) { continue; }
+                if (networkId == OwnerClientId) { continue; }
+
+                if (playerData.channel == attributes.CachedPlayerData.channel)
+                {
+                    if (!netObj.IsNetworkVisibleTo(networkId))
+                    {
+                        netObj.NetworkShow(networkId);
+                    }
+                }
+                else
+                {
+                    if (NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        netObj.NetworkHide(networkId);
+                    }
+                }
+            }
         }
 
         public static IEnumerator DespawnVFXAfterPlaying(NetworkObject vfxInstance)
@@ -1070,6 +1075,8 @@ namespace Vi.Core
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
+            if (!animationHandler.Animator) { return; }
 
             animationHandler.Animator.SetBool("Blocking", IsBlocking);
 

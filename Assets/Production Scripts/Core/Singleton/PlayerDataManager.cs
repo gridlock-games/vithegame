@@ -230,6 +230,7 @@ namespace Vi.Core
         public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
+            if (!IsServer) { teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString()); }
             TeamNameOverridesUpdatedThisFrame = true;
             if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
             teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
@@ -244,7 +245,6 @@ namespace Vi.Core
 
         public string GetTeamText(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
@@ -264,7 +264,6 @@ namespace Vi.Core
 
         public string GetTeamPrefix(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team))
@@ -280,7 +279,6 @@ namespace Vi.Core
 
         public string GetTeamPrefixRaw(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix; }
@@ -319,6 +317,7 @@ namespace Vi.Core
             localPlayers.Add(clientId, playerObject);
             LocalPlayersWasUpdatedThisFrame = true;
 
+            UpdateIgnoreCollisionsMatrix();
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
 
@@ -329,6 +328,7 @@ namespace Vi.Core
         {
             localPlayers.Remove(clientId);
             LocalPlayersWasUpdatedThisFrame = true;
+            UpdateIgnoreCollisionsMatrix();
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
@@ -381,10 +381,7 @@ namespace Vi.Core
 
         public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
 
-        public bool ContainsId(int clientId)
-        {
-            return cachedPlayerDataList.Contains(new PlayerData(clientId));
-        }
+        public bool ContainsId(int clientId) { return cachedIdList.Contains(clientId); }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
         {
@@ -875,8 +872,10 @@ namespace Vi.Core
         private void SyncCachedPlayerDataList()
         {
             cachedPlayerDataList.Clear();
+            cachedIdList.Clear();
             foreach (PlayerData playerData in playerDataList)
             {
+                cachedIdList.Add(playerData.id);
                 cachedPlayerDataList.Add(playerData);
             }
         }
@@ -894,7 +893,7 @@ namespace Vi.Core
             }
         }
 
-        private void UpdateIgnoreCollisionsMatrix()
+        public void UpdateIgnoreCollisionsMatrix()
         {
             foreach (Attributes player in localPlayers.Values)
             {
@@ -903,12 +902,13 @@ namespace Vi.Core
                 foreach (Attributes otherPlayer in localPlayers.Values)
                 {
                     if (!otherPlayer) { continue; }
+                    if (otherPlayer == player) { continue; }
 
                     foreach (Collider col in player.NetworkCollider.Colliders)
                     {
                         foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
                         {
-                            Physics.IgnoreCollision(col, otherCol, player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
                         }
                     }
                 }
@@ -943,8 +943,6 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;
@@ -966,8 +964,6 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
@@ -991,14 +987,14 @@ namespace Vi.Core
                             }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
+
+            UpdateIgnoreCollisionsMatrix();
 
             DataListWasUpdatedThisFrame = true;
 
@@ -1276,6 +1272,7 @@ namespace Vi.Core
 
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
+        private List<int> cachedIdList = new List<int>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 

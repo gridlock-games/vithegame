@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
@@ -25,6 +26,7 @@ namespace Vi.UI
 
         [HideInInspector] public int playerDataId;
         private bool initialized;
+        private Attributes player;
 
         public void Initialize(int playerDataId)
         {
@@ -32,6 +34,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
             UpdateUI();
             initialized = true;
+            player = PlayerDataManager.Singleton.GetPlayerObjectById(playerDataId);
         }
 
         public void HideRoundWinsColumn()
@@ -72,6 +75,14 @@ namespace Vi.UI
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
                     backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                    if (player)
+                    {
+                        if (player.GetAilment() == ActionClip.Ailment.Death)
+                        {
+                            backgroundImagesToColor[i].color += Color.black;
+                            backgroundImagesToColor[i].color /= 2;
+                        }
+                    }
                 }
                 playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
                 roundWinsText.text = playerScore.roundWins.ToString();
