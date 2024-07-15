@@ -170,10 +170,10 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
             {
-                kvp.Value.transform.SetParent(null, true);
-                SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
                 if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
                 {
+                    kvp.Value.transform.SetParent(null, true);
+                    SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                 }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
