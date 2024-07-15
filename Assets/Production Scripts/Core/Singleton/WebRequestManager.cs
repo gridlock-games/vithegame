@@ -104,12 +104,20 @@ namespace Vi.Core
                         LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
                     }
                 }
-                else
+                else // Not development build
                 {
                     if (servers.Exists(item => item.ip == localhostIP))
                     {
-                        HubServers = servers.FindAll(item => item.type == 0 & item.ip != localhostIP).ToArray();
-                        LobbyServers = servers.FindAll(item => item.type == 1 & item.ip != localhostIP).ToArray();
+                        if (servers.Exists(item => item.ip != localhostIP))
+                        {
+                            HubServers = servers.FindAll(item => item.type == 0 & item.ip != localhostIP).ToArray();
+                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip != localhostIP).ToArray();
+                        }
+                        else
+                        {
+                            HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
+                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
+                        }
                     }
                     else
                     {
