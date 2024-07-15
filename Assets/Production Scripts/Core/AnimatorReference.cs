@@ -59,12 +59,28 @@ namespace Vi.Core
                     {
                         glowRenderer.UnregisterRenderer(smr);
                     }
-                    ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponent<PooledObject>());
+
+                    if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType].TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].gameObject);
+                    }
                 }
 
                 if (model)
                 {
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>();
+                    if (model.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = ObjectPoolingManager.SpawnObject(pooledObject, transform).GetComponent<WearableEquipment>();
+                    }
+                    else
+                    {
+                        wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>();
+                    }
+
                     foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                     {
                         glowRenderer.RegisterNewRenderer(smr);
@@ -75,7 +91,15 @@ namespace Vi.Core
             }
             else if (model)
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>());
+                if (model.TryGetComponent(out PooledObject pooledObject))
+                {
+                    wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, ObjectPoolingManager.SpawnObject(pooledObject, transform).GetComponent<WearableEquipment>());
+                }
+                else
+                {
+                    wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>());
+                }
+
                 foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                 {
                     glowRenderer.RegisterNewRenderer(smr);
@@ -118,7 +142,12 @@ namespace Vi.Core
                 {
                     glowRenderer.UnregisterRenderer(smr);
                 }
-                ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[equipmentType].GetComponent<PooledObject>());
+
+                if (wearableEquipmentInstances[equipmentType].TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                
                 wearableEquipmentInstances.Remove(equipmentType);
             }
 

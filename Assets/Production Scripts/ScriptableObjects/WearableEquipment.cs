@@ -6,7 +6,6 @@ using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
-    [RequireComponent(typeof(PooledObject))]
     [DisallowMultipleComponent]
     public class WearableEquipment : MonoBehaviour
     {
