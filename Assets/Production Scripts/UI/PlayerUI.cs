@@ -33,6 +33,8 @@ namespace Vi.UI
 
         public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
+        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim); }
+
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
         public Button GetLoadoutMenuButton() { return loadoutMenuButton; }

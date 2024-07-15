@@ -95,8 +95,12 @@ namespace Vi.Player
             cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
         }
 
-        Vector3 targetPosition;
-        Quaternion targetRotation;
+        private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
+        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
+
+        private float followCamAngleOffset;
+        private Vector3 targetPosition;
+        private Quaternion targetRotation;
         private void LateUpdate()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -116,7 +120,6 @@ namespace Vi.Player
                 targetRotationX += lookInput.y;
                 targetRotationY += lookInput.x;
             }
-            movementHandler.ResetLookInput();
 
             targetRotationX %= 360f;
             targetRotationY %= 360f;
@@ -127,11 +130,13 @@ namespace Vi.Player
             {
                 if (movementHandler.CameraFollowTarget)
                 {
-                    Vector3 targetPosition = movementHandler.CameraFollowTarget.transform.position + movementHandler.CameraFollowTarget.transform.rotation * new Vector3(0, 3, -3);
-                    Quaternion targetRotation = Quaternion.LookRotation(movementHandler.CameraFollowTarget.transform.position - transform.position);
+                    Vector3 targetPosition = movementHandler.CameraFollowTarget.transform.position + movementHandler.CameraFollowTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
+                    Quaternion targetRotation = Quaternion.LookRotation(movementHandler.CameraFollowTarget.transform.position + followTargetLookAtPositionOffset - transform.position);
 
                     transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 8);
                     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8);
+
+                    followCamAngleOffset += movementHandler.GetLookInput().x;
                 }
                 else
                 {
@@ -196,6 +201,7 @@ namespace Vi.Player
                     }
                 }
             }
+            movementHandler.ResetLookInput();
         }
 
         public bool IsAnimating { get; private set; }

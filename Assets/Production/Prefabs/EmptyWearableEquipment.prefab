@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7733493481715264713}
   - component: {fileID: 4940541453049098453}
+  - component: {fileID: 1581520295757356021}
   m_Layer: 7
   m_Name: EmptyWearableEquipment
   m_TagString: Untagged
@@ -47,3 +48,18 @@ MonoBehaviour:
   equipmentType: 0
   armorType: 2
   shouldDisableCharSkinRenderer: 0
+  renderList: []
+--- !u!114 &1581520295757356021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5249298516552041871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 63

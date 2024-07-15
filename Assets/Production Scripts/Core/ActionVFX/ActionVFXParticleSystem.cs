@@ -146,7 +146,7 @@ namespace Vi.Core
                             if (hitCounter.ContainsKey(networkCollider.Attributes))
                             {
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                             }
 
                             if (canHit)
@@ -186,7 +186,7 @@ namespace Vi.Core
                                 if (hitCounter.ContainsKey(networkCollider.Attributes))
                                 {
                                     if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                    if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits()) { canHit = false; }
+                                    if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                                 }
 
                                 if (canHit)

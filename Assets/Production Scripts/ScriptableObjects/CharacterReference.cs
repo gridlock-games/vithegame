@@ -217,6 +217,26 @@ namespace Vi.ScriptableObjects
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
 
+        private Dictionary<string, WeaponOption> cachedWeaponDictionary;
+
+        private void RefreshCachedWeaponDictionary()
+        {
+            cachedWeaponDictionary = new Dictionary<string, WeaponOption>();
+            foreach (WeaponOption weaponOption in weaponOptions)
+            {
+                cachedWeaponDictionary.Add(weaponOption.itemWebId, weaponOption);
+            }
+        }
+
+        public Dictionary<string, WeaponOption> GetWeaponOptionsDictionary() 
+        {
+            if (cachedWeaponDictionary == null)
+            {
+                RefreshCachedWeaponDictionary();
+            }
+            return cachedWeaponDictionary;
+        }
+
         public List<WearableEquipmentOption> GetArmorEquipmentOptions(RaceAndGender raceAndGender) { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType) & item.GetModel(raceAndGender, null) != null); }
 
         public List<WearableEquipmentOption> GetAllArmorEquipmentOptions() { return equipmentOptions.FindAll(item => !equipmentTypesThatAreForCharacterCustomization.Contains(item.equipmentType)); }

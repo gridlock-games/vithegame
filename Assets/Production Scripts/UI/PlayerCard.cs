@@ -189,7 +189,7 @@ namespace Vi.UI
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
-                healthText.text = "HP " + (HP < 10 & !Mathf.Approximately(0, HP) ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+                healthText.text = "HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
                 healthFillImage.fillAmount = HP / maxHP;
             }
 
@@ -214,13 +214,13 @@ namespace Vi.UI
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
-                    staminaText.text = "ST " + (stamina < 10 & !Mathf.Approximately(0, stamina) ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+                    staminaText.text = "ST " + (stamina < 10 & stamina > 0 ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
                     staminaFillImage.fillAmount = stamina / maxStamina;
                 }
 
                 if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
                 {
-                    spiritText.text = "SP " + (spirit < 10 & !Mathf.Approximately(0, spirit) ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+                    spiritText.text = "SP " + (spirit < 10 & spirit > 0 ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
                     spiritFillImage.fillAmount = spirit / maxSpirit;
                 }
 

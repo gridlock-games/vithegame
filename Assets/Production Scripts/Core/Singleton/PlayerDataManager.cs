@@ -230,6 +230,7 @@ namespace Vi.Core
         public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
+            if (!IsServer) { teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString()); }
             TeamNameOverridesUpdatedThisFrame = true;
             if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
             teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
@@ -244,7 +245,6 @@ namespace Vi.Core
 
         public string GetTeamText(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
@@ -264,7 +264,6 @@ namespace Vi.Core
 
         public string GetTeamPrefix(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team))
@@ -280,7 +279,6 @@ namespace Vi.Core
 
         public string GetTeamPrefixRaw(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix; }
@@ -319,6 +317,7 @@ namespace Vi.Core
             localPlayers.Add(clientId, playerObject);
             LocalPlayersWasUpdatedThisFrame = true;
 
+            UpdateIgnoreCollisionsMatrix();
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
 
@@ -329,6 +328,7 @@ namespace Vi.Core
         {
             localPlayers.Remove(clientId);
             LocalPlayersWasUpdatedThisFrame = true;
+            UpdateIgnoreCollisionsMatrix();
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
@@ -356,6 +356,11 @@ namespace Vi.Core
             return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
+        public List<Attributes> GetActivePlayerObjectsInChannel(int channel)
+        {
+            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value.CachedPlayerData.channel == channel).Select(kvp => kvp.Value).ToList();
+        }
+
         public Attributes GetPlayerObjectById(int id)
         {
             if (!localPlayers.ContainsKey(id)) { Debug.LogError("No player object for Id: " + id); return null; }
@@ -376,10 +381,7 @@ namespace Vi.Core
 
         public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
 
-        public bool ContainsId(int clientId)
-        {
-            return cachedPlayerDataList.Contains(new PlayerData(clientId));
-        }
+        public bool ContainsId(int clientId) { return cachedIdList.Contains(clientId); }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
         {
@@ -870,8 +872,10 @@ namespace Vi.Core
         private void SyncCachedPlayerDataList()
         {
             cachedPlayerDataList.Clear();
+            cachedIdList.Clear();
             foreach (PlayerData playerData in playerDataList)
             {
+                cachedIdList.Add(playerData.id);
                 cachedPlayerDataList.Add(playerData);
             }
         }
@@ -889,7 +893,7 @@ namespace Vi.Core
             }
         }
 
-        private void UpdateIgnoreCollisionsMatrix()
+        public void UpdateIgnoreCollisionsMatrix()
         {
             foreach (Attributes player in localPlayers.Values)
             {
@@ -898,12 +902,13 @@ namespace Vi.Core
                 foreach (Attributes otherPlayer in localPlayers.Values)
                 {
                     if (!otherPlayer) { continue; }
+                    if (otherPlayer == player) { continue; }
 
                     foreach (Collider col in player.NetworkCollider.Colliders)
                     {
                         foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
                         {
-                            Physics.IgnoreCollision(col, otherCol, player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
                         }
                     }
                 }
@@ -938,8 +943,6 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;
@@ -961,8 +964,6 @@ namespace Vi.Core
                             if (player) { player.UpdateNetworkVisiblity(); }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
@@ -986,14 +987,14 @@ namespace Vi.Core
                             }
                         }
                     }
-
-                    UpdateIgnoreCollisionsMatrix();
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
+
+            UpdateIgnoreCollisionsMatrix();
 
             DataListWasUpdatedThisFrame = true;
 
@@ -1019,14 +1020,14 @@ namespace Vi.Core
 
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
             if (attributesToRespawn.GetTeam() != Team.Peaceful & attributesToRespawn.GetTeam() != Team.Spectator)
             {
                 float waitTime = 0;
                 while (!spawnPointFound)
                 {
                     attributesToRespawn.isWaitingForSpawnPoint = true;
-                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
                     yield return null;
                     waitTime += Time.deltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
@@ -1121,14 +1122,14 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
+                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                 if (playerData.team != Team.Peaceful & playerData.team != Team.Spectator)
                 {
                     float waitTime = 0;
                     while (!spawnPointFound)
                     {
                         isWaitingForSpawnPoint.Value = true;
-                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
+                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                         yield return null;
                         waitTime += Time.deltaTime;
                         if (waitTime > maxSpawnPointWaitTime) { break; }
@@ -1271,6 +1272,7 @@ namespace Vi.Core
 
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
+        private List<int> cachedIdList = new List<int>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -48,7 +49,7 @@ namespace Vi.Core
             this.canFlashAttack = canFlashAttack;
         }
 
-        private List<Material> glowMaterialInstances = new List<Material>();
+        private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();
 
         private void Start()
         {
@@ -86,9 +87,31 @@ namespace Vi.Core
             {
                 if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
                 {
-                    glowMaterialInstances.Add(m);
+                    if (glowMaterialInstances.ContainsKey(renderer))
+                    {
+                        glowMaterialInstances[renderer].Add(m);
+                    }
+                    else
+                    {
+                        glowMaterialInstances.Add(renderer, new List<Material>() { m });
+                    }
                 }
             }
+        }
+
+        public void UnregisterRenderer(Renderer renderer)
+        {
+            if (!glowMaterialInstances.ContainsKey(renderer)) { Debug.LogError("Trying to unregister a renderer but it isn't present in the dictionary!"); return; }
+            
+            List<Material> newMatList = renderer.materials.ToList();
+            foreach (Material glowMaterialInstance in glowMaterialInstances[renderer])
+            {
+                newMatList.Remove(glowMaterialInstance);
+                Destroy(glowMaterialInstance);
+            }
+            renderer.materials = newMatList.ToArray();
+
+            glowMaterialInstances.Remove(renderer);
         }
 
         private readonly Color invincibleColor = new Color(1, 1, 0);
@@ -139,10 +162,13 @@ namespace Vi.Core
             }
             
             currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
-            foreach (Material glowMaterialInstance in glowMaterialInstances)
+            foreach (KeyValuePair<Renderer, List<Material>> kvp in glowMaterialInstances)
             {
-                glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
-                glowMaterialInstance.SetColor(_Color, colorTarget);
+                foreach (Material glowMaterialInstance in kvp.Value)
+                {
+                    glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
+                    glowMaterialInstance.SetColor(_Color, colorTarget);
+                }
             }
         }
 

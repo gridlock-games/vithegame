@@ -12,7 +12,7 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : NetworkBehaviour
     {
-        [SerializeField] private GameObject worldSpaceLabelPrefab;
+        [SerializeField] private PooledObject worldSpaceLabelPrefab;
 
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
@@ -82,6 +82,19 @@ namespace Vi.Core
                 HP.Value += amount;
         }
 
+        private float AddHPWithoutApply(float amount)
+        {
+            if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
+            if (amount > 0) { amount *= healingMultiplier; }
+
+            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
+                return weaponHandler.GetWeapon().GetMaxHP();
+            else if (HP.Value + amount < 0)
+                return 0;
+            else
+                return HP.Value + amount;
+        }
+
         public void AddStamina(float amount, bool activateCooldown = true)
         {
             if (activateCooldown)
@@ -118,9 +131,11 @@ namespace Vi.Core
                 rage.Value += amount;
         }
 
-        GameObject worldSpaceLabelInstance;
+        PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+
             if (IsServer)
             {
                 StartCoroutine(InitStats());
@@ -132,12 +147,11 @@ namespace Vi.Core
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             ailment.OnValueChanged += OnAilmentChanged;
-            isGrabbed.OnValueChanged += OnIsGrabbedChanged;
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = Instantiate(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner)
@@ -145,8 +159,6 @@ namespace Vi.Core
                 spawnedOnOwnerInstance.Value = true;
                 RefreshStatus();
             }
-
-            SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
         public void UpdateNetworkVisiblity()
@@ -158,7 +170,8 @@ namespace Vi.Core
         private IEnumerator SetNetworkVisibilityAfterSpawn()
         {
             if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
-            yield return new WaitUntil(() => IsSpawned);
+            yield return null;
+            if (!IsSpawned) { yield return new WaitUntil(() => IsSpawned); }
 
             if (!NetworkObject.IsNetworkVisibleTo(OwnerClientId)) { NetworkObject.NetworkShow(OwnerClientId); }
 
@@ -184,6 +197,7 @@ namespace Vi.Core
                     }
                 }
             }
+            PlayerDataManager.Singleton.UpdateIgnoreCollisionsMatrix();
         }
 
         private IEnumerator InitStats()
@@ -206,12 +220,11 @@ namespace Vi.Core
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
             ailment.OnValueChanged -= OnAilmentChanged;
-            isGrabbed.OnValueChanged -= OnIsGrabbedChanged;
             statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { Destroy(worldSpaceLabelInstance); }
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -247,7 +260,7 @@ namespace Vi.Core
         private IEnumerator PlayHeartbeatSound()
         {
             heartbeatSoundIsPlaying = true;
-            AudioSource audioSource = AudioManager.Singleton.Play2DClip(heartbeatSoundEffect, heartbeatVolume);
+            AudioSource audioSource = AudioManager.Singleton.Play2DClip(gameObject, heartbeatSoundEffect, heartbeatVolume);
 
             while (true)
             {
@@ -346,12 +359,12 @@ namespace Vi.Core
 
         private void OnEnable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
         }
 
         private void OnDisable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
         public bool IsInvincible() { return isInvincible.Value; }
@@ -506,8 +519,6 @@ namespace Vi.Core
         private NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
 
         public bool IsGrabbed() { return isGrabbed.Value; }
-
-        private void OnIsGrabbedChanged(bool prev, bool current) { movementHandler.OnIsGrabbedChange(prev, current); }
 
         public Attributes GetGrabAssailant()
         {
@@ -752,10 +763,10 @@ namespace Vi.Core
 
             if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
 
-            if (HP.Value + HPDamage <= 0)
+            if (AddHPWithoutApply(HPDamage) <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
-                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
+                hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
             }
 
             bool hitReactionWasPlayed = false;
@@ -838,7 +849,7 @@ namespace Vi.Core
                 if (attack.shouldFlinch | IsRaging())
                 {
                     movementHandler.Flinch(attack.GetFlinchAmount());
-                    if (!hitReactionWasPlayed) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                    if (!hitReactionWasPlayed & !IsGrabbed()) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
                 }
             }
 
@@ -1248,14 +1259,14 @@ namespace Vi.Core
                 weaponHandler.OnDeath();
                 animationHandler.OnDeath();
                 animationHandler.Animator.enabled = false;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(false); }
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 isRaging.Value = false;
                 animationHandler.Animator.enabled = true;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.SetActive(true); }
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
         }
@@ -1307,8 +1318,7 @@ namespace Vi.Core
 
         private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
         {
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -1316,23 +1326,16 @@ namespace Vi.Core
         private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
         {
             if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            if (animationHandler.IsActionClipPlaying(hitReaction))
-            {
-                yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-            }
-
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
-
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isPulled.Value = false;
         }
 
         private Coroutine grabResetCoroutine;
         private IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
         {
+            if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            yield return new WaitUntil(() => animationHandler.IsActionClipPlaying(hitReaction));
-            yield return new WaitUntil(() => !animationHandler.IsActionClipPlaying(hitReaction));
+            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
             isGrabbed.Value = false;
             grabAssailantDataId.Value = default;
             grabVictimDataId.Value = default;

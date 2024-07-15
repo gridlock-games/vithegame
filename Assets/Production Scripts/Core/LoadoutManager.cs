@@ -130,15 +130,41 @@ namespace Vi.Core
         {
             if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            //CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
             if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId); }
-            if (PrimaryWeaponOption == null) { PrimaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon1ItemId.ToString()); }
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId))
+            {
+                if (weaponOptions.TryGetValue(WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId, out CharacterReference.WeaponOption weaponOption))
+                {
+                    PrimaryWeaponOption = weaponOption;
+                }
+            }
+            if (PrimaryWeaponOption == null)
+            {
+                if (weaponOptions.TryGetValue(loadout.weapon1ItemId.ToString(), out CharacterReference.WeaponOption weaponOption))
+                {
+                    PrimaryWeaponOption = weaponOption;
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon2ItemId.ToString()).itemId); }
-            if (SecondaryWeaponOption == null) { SecondaryWeaponOption = System.Array.Find(weaponOptions, item => item.itemWebId == loadout.weapon2ItemId.ToString()); }
+            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId))
+            {
+                if (weaponOptions.TryGetValue(WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon2ItemId.ToString()).itemId, out CharacterReference.WeaponOption weaponOption))
+                {
+                    SecondaryWeaponOption = weaponOption;
+                }
+            }
+            if (SecondaryWeaponOption == null)
+            {
+                if (weaponOptions.TryGetValue(loadout.weapon2ItemId.ToString(), out CharacterReference.WeaponOption weaponOption))
+                {
+                    SecondaryWeaponOption = weaponOption;
+                }
+            }
 
             primaryWeaponInstance = Instantiate(PrimaryWeaponOption.weapon);
             secondaryWeaponInstance = Instantiate(SecondaryWeaponOption.weapon);

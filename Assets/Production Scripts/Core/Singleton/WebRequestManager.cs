@@ -84,12 +84,54 @@ namespace Vi.Core
                 servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
             }
 
-            HubServers = servers.FindAll(item => item.type == 0).ToArray();
-            LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+            if (NetworkManager.Singleton.IsServer)
+            {
+                HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+            }
+            else // Not the server
+            {
+                if (Debug.isDebugBuild)
+                {
+                    if (servers.Exists(item => item.ip == localhostIP))
+                    {
+                        HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
+                        LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
+                    }
+                    else
+                    {
+                        HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                        LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+                    }
+                }
+                else // Not development build
+                {
+                    if (servers.Exists(item => item.ip == localhostIP))
+                    {
+                        if (servers.Exists(item => item.ip != localhostIP))
+                        {
+                            HubServers = servers.FindAll(item => item.type == 0 & item.ip != localhostIP).ToArray();
+                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip != localhostIP).ToArray();
+                        }
+                        else
+                        {
+                            HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
+                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
+                        }
+                    }
+                    else
+                    {
+                        HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                        LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+                    }
+                }
+            }
 
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
+
+        private const string localhostIP = "127.0.0.1";
 
         public IEnumerator UpdateServerProgress(int progress)
         {
@@ -623,10 +665,22 @@ namespace Vi.Core
             string json = getRequest.downloadHandler.text;
             try
             {
-                foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                try
                 {
-                    Characters.Add(jsonStruct.ToCharacter());
+                    foreach (CharacterJson jsonStruct in CharacterJson.DeserializeJsonList(json))
+                    {
+                        Characters.Add(jsonStruct.ToCharacter());
+                    }
                 }
+                catch (System.Exception e)
+                {
+                    Debug.LogError(e);
+                    foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                    {
+                        Characters.Add(jsonStruct.ToCharacter());
+                    }
+                }
+                
             }
             catch (System.Exception e)
             {
@@ -690,6 +744,8 @@ namespace Vi.Core
             try
             {
                 CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
+
+                CharacterJson.DeserializeJson(json);
             }
             catch
             {
@@ -1400,12 +1456,423 @@ namespace Vi.Core
             public string userId;
             public int level;
             public double attack;
-            public int defense;
+            public double defense;
             public double hp;
-            public int stamina;
+            public double stamina;
             public double critChance;
             public double crit;
             public string id;
+
+            public static CharacterJson DeserializeJson(string json)
+            {
+                List<CharacterJson> list = DeserializeJsonList('[' + json + ']');
+                if (list.Count == 0)
+                {
+                    Debug.LogError("Unable to deserialize json body " + json);
+                    return new CharacterJson();
+                }
+                else
+                {
+                    if (list.Count > 1) { Debug.LogError("There should only be one character in this body! " + json); }
+                    return list[0];
+                }
+            }
+
+            public static List<CharacterJson> DeserializeJsonList(string json)
+            {
+                List<CharacterJson> parsedElements = new List<CharacterJson>();
+
+                List<string> splitStrings = new List<string>();
+                string splitToAppend = "";
+                char charToSplitOn = '"';
+                for (int i = 0; i < json.Length; i++)
+                {
+                    if (json[i] == charToSplitOn)
+                    {
+                        if (splitToAppend.Length > 0)
+                        {
+                            if (splitToAppend[^1] == '\\')
+                            {
+                                splitToAppend = splitToAppend[0..^1] + json[i];
+                                continue;
+                            }
+                        }
+
+                        splitStrings.Add(splitToAppend);
+                        splitToAppend = "";
+                    }
+                    else
+                    {
+                        splitToAppend += json[i];
+                    }
+                }
+
+                CharacterJson element = new CharacterJson();
+                element.loadOuts = new List<LoadoutJson>();
+                for (int i = 0; i < splitStrings.Count; i++)
+                {
+                    switch (splitStrings[i])
+                    {
+                        case "_id":
+                            element = new CharacterJson();
+                            element.loadOuts = new List<LoadoutJson>();
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("_id can't find a : in between the value!");
+                                }
+                                element._id = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property _id!");
+                            }
+                            break;
+                        case "userId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("userId can't find a : in between the value!");
+                                }
+                                element.userId = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property userId!");
+                            }
+                            break;
+                        case "slot":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    element.slot = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing slot property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property _id!");
+                            }
+                            break;
+                        case "name":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("name can't find a : in between the value!");
+                                }
+                                element.name = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property name!");
+                            }
+                            break;
+                        case "model":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("model can't find a : in between the value!");
+                                }
+                                element.model = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property model!");
+                            }
+                            break;
+                        case "experience":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    element.experience = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing experience property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property experience!");
+                            }
+                            break;
+                        case "bodyColor":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("bodyColor can't find a : in between the value!");
+                                }
+                                element.bodyColor = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property bodyColor!");
+                            }
+                            break;
+                        case "eyeColor":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("eyeColor can't find a : in between the value!");
+                                }
+                                element.eyeColor = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property eyeColor!");
+                            }
+                            break;
+                        case "beard":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("beard can't find a : in between the value!");
+                                }
+                                element.beard = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property beard!");
+                            }
+                            break;
+                        case "brows":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("brows can't find a : in between the value!");
+                                }
+                                element.brows = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property brows!");
+                            }
+                            break;
+                        case "hair":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("hair can't find a : in between the value!");
+                                }
+                                element.hair = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property hair!");
+                            }
+                            break;
+                        case "gender":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("gender can't find a : in between the value!");
+                                }
+                                element.gender = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property gender!");
+                            }
+                            break;
+                        case "race":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("race can't find a : in between the value!");
+                                }
+                                element.race = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property race!");
+                            }
+                            break;
+                        case "dateCreated":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("dateCreated can't find a : in between the value!");
+                                }
+                                element.dateCreated = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property dateCreated!");
+                            }
+                            break;
+                        case "attributes":
+                            List<string> splitAttributesStrings = new List<string>();
+                            for (int j = i; j < splitStrings.Count; j++)
+                            {
+                                splitAttributesStrings.Add(splitStrings[j]);
+                                if (splitStrings[j].Contains("},")) { break; }
+                            }
+                            element.attributes = CharacterAttributes.FromCharacterJsonExtract(splitAttributesStrings);
+                            break;
+                        case "loadoutSlot":
+                            List<string> splitLoadoutStrings = new List<string>();
+                            for (int j = i; j < splitStrings.Count; j++)
+                            {
+                                splitLoadoutStrings.Add(splitStrings[j]);
+                                if (splitStrings[j].Contains("}")) { break; }
+                            }
+                            element.loadOuts.Add(LoadoutJson.FromCharacterJsonExtract(splitLoadoutStrings));
+                            break;
+                        case "level":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    element.level = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing level property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property level!");
+                            }
+                            break;
+                        case "attack":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.attack = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing attack property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property attack!");
+                            }
+                            break;
+                        case "defense":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.defense = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing defense property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property defense!");
+                            }
+                            break;
+                        case "hp":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.hp = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property hp!");
+                            }
+                            break;
+                        case "stamina":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.stamina = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property hp!");
+                            }
+                            break;
+                        case "critChance":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.critChance = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing critChance property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property critChance!");
+                            }
+                            break;
+                        case "crit":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
+                                {
+                                    element.crit = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing crit property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property crit!");
+                            }
+                            break;
+                        case "id":
+                            parsedElements.Add(element);
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("id can't find a : in between the value!");
+                                }
+                                element.id = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property id!");
+                            }
+                            break;
+                    }
+                }
+                return parsedElements;
+            }
 
             public Character ToCharacter()
             {
@@ -1457,6 +1924,282 @@ namespace Vi.Core
                 this.active = active;
             }
 
+            public static LoadoutJson FromCharacterJsonExtract(List<string> splitStrings)
+            {
+                LoadoutJson loadoutJson = new LoadoutJson();
+                for (int i = 0; i < splitStrings.Count; i++)
+                {
+                    string split = splitStrings[i].Replace("},", ",");
+
+                    switch (split)
+                    {
+                        case "loadoutSlot":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1] != ":")
+                                {
+                                    Debug.LogError("loadoutSlot can't find a : in between the value!");
+                                }
+                                loadoutJson.loadoutSlot = splitStrings[i + 2];
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property loadoutSlot!");
+                            }
+                            break;
+                        case "helmGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.helmGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("helmGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.helmGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property helmGearItemId!");
+                            }
+                            break;
+                        case "chestArmorGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.chestArmorGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("chestArmorGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.chestArmorGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property chestArmorGearItemId!");
+                            }
+                            break;
+                        case "shouldersGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.shouldersGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("shouldersGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.shouldersGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property shouldersGearItemId!");
+                            }
+                            break;
+                        case "bootsGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.bootsGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("bootsGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.bootsGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property bootsGearItemId!");
+                            }
+                            break;
+                        case "pantsGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.pantsGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("pantsGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.pantsGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property pantsGearItemId!");
+                            }
+                            break;
+                        case "beltGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.beltGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("beltGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.beltGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property beltGearItemId!");
+                            }
+                            break;
+                        case "glovesGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.glovesGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("glovesGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.glovesGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property glovesGearItemId!");
+                            }
+                            break;
+                        case "capeGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.capeGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("capeGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.capeGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property capeGearItemId!");
+                            }
+                            break;
+                        case "robeGearItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.robeGearItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("robeGearItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.robeGearItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property robeGearItemId!");
+                            }
+                            break;
+                        case "weapon1ItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.weapon1ItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("weapon1ItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.weapon1ItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property weapon1ItemId!");
+                            }
+                            break;
+                        case "weapon2ItemId":
+                            if (i + 2 < splitStrings.Count)
+                            {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    loadoutJson.weapon2ItemId = null;
+                                }
+                                else
+                                {
+                                    if (splitStrings[i + 1] != ":")
+                                    {
+                                        Debug.LogError("weapon2ItemId can't find a : in between the value!");
+                                    }
+                                    loadoutJson.weapon2ItemId = splitStrings[i + 2];
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property weapon2ItemId!");
+                            }
+                            break;
+                        case "active":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (bool.TryParse(splitStrings[i + 1][1..^3], out bool result))
+                                {
+                                    loadoutJson.active = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing " + splitStrings[i + 1 ][1..^3]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property weapon2ItemId!");
+                            }
+                            break;
+                    }
+                }
+                return loadoutJson;
+            }
+
             public Loadout ToLoadout()
             {
                 return new Loadout(loadoutSlot, helmGearItemId ?? "", chestArmorGearItemId ?? "", shouldersGearItemId ?? "", bootsGearItemId ?? "",
@@ -1472,6 +2215,105 @@ namespace Vi.Core
             public int agility;
             public int dexterity;
             public int intelligence;
+
+            public static CharacterAttributes FromCharacterJsonExtract(List<string> splitStrings)
+            {
+                CharacterAttributes attributes = new CharacterAttributes();
+                for (int i = 0; i < splitStrings.Count; i++)
+                {
+                    string split = splitStrings[i].Replace("},", ",");
+
+                    switch (split)
+                    {
+                        case "strength":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    attributes.strength = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing strength property! " + splitStrings[i + 1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property strength!");
+                            }
+                            break;
+                        case "vitality":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    attributes.vitality = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing vitality property! " + splitStrings[i + 1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property vitality!");
+                            }
+                            break;
+                        case "agility":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    attributes.agility = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing agility property! " + splitStrings[i + 1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property agility!");
+                            }
+                            break;
+                        case "dexterity":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
+                                {
+                                    attributes.strength = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing dexterity property! " + splitStrings[i + 1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property dexterity!");
+                            }
+                            break;
+                        case "intelligence":
+                            if (i + 1 < splitStrings.Count)
+                            {
+                                if (int.TryParse(splitStrings[i + 1][1..^2], out int result))
+                                {
+                                    attributes.intelligence = result;
+                                }
+                                else
+                                {
+                                    Debug.LogError("Error while parsing intelligence property! " + splitStrings[i + 1][1..^1]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Could not find value for property intelligence!");
+                            }
+                            break;
+                    }
+                }
+                return attributes;
+            }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
