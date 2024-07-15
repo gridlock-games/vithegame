@@ -19,6 +19,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
         private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
+        public SkinnedMeshRenderer[] GetRenderList() { return renderList; }
+
         private void OnValidate()
         {
             renderList = GetComponentsInChildren<SkinnedMeshRenderer>();

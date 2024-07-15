@@ -55,14 +55,17 @@ namespace Vi.Core
             {
                 if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType])
                 {
+                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                    {
+                        glowRenderer.UnregisterRenderer(smr);
+                    }
                     ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponent<PooledObject>());
                 }
 
                 if (model)
                 {
                     wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>();
-                    SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                    foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                     {
                         glowRenderer.RegisterNewRenderer(smr);
                     }
@@ -73,8 +76,7 @@ namespace Vi.Core
             else if (model)
             {
                 wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, ObjectPoolingManager.SpawnObject(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).GetComponent<PooledObject>(), transform).GetComponent<WearableEquipment>());
-                SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                 {
                     glowRenderer.RegisterNewRenderer(smr);
                 }
@@ -89,7 +91,6 @@ namespace Vi.Core
                     {
                         if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                         {
-                            SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
                         }
                         else
@@ -113,6 +114,10 @@ namespace Vi.Core
         {
             if (wearableEquipmentInstances.ContainsKey(equipmentType))
             {
+                foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[equipmentType].GetRenderList())
+                {
+                    glowRenderer.UnregisterRenderer(smr);
+                }
                 ObjectPoolingManager.ReturnObjectToPool(wearableEquipmentInstances[equipmentType].GetComponent<PooledObject>());
                 wearableEquipmentInstances.Remove(equipmentType);
             }
@@ -137,6 +142,10 @@ namespace Vi.Core
                 if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
                 {
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                {
+                    glowRenderer.UnregisterRenderer(smr);
                 }
             }
         }
