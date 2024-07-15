@@ -147,6 +147,10 @@ namespace Vi.Core
                 {
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                 }
+                else
+                {
+                    Destroy(wearableEquipmentInstances[equipmentType].gameObject);
+                }
                 
                 wearableEquipmentInstances.Remove(equipmentType);
             }
