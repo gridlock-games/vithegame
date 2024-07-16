@@ -60,7 +60,7 @@ namespace Vi.UI
         private const int minimumLobbyServersRequired = 1;
 
         // The minimum number of EMPTY lobby instances we want to run at one time
-        private const int emptyLobbyServersRequired = 4;
+        private const int emptyLobbyServersRequired = 1;
 #else
         // The minimum number of lobby instances we want to run at one time
         private const int minimumLobbyServersRequired = 1;
