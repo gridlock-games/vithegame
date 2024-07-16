@@ -1279,10 +1279,10 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.3
+  recoveryNormalizedTime: 0.85
   isAffectedByRage: 1
-  damage: 5
+  damage: 4
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
@@ -1318,7 +1318,7 @@ MonoBehaviour:
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
   maximumTargetingRotationAngle: 60
-  canLunge: 0
+  canLunge: 1
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0

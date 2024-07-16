@@ -260,7 +260,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1.15
-  agentStaminaCost: 25
+  agentStaminaCost: 30
   agentRageCost: 0
   effectedWeaponBones: 12000000
   weaponBonesToHide: 
@@ -281,7 +281,7 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 4
-  timeBetweenHits: 0.15
+  timeBetweenHits: 0.05
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
@@ -300,11 +300,13 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 3c7ccecc924911c4984c92e07104862c, type: 3}
   abilityCooldownTime: 25
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate:
   - status: 2
     value: 2
     duration: 5
     delay: 0
+    associatedWithCurrentWeapon: 0
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
