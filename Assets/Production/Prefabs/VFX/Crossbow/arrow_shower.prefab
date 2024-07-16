@@ -34448,7 +34448,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 4
-  onActivateVFXSpawnNormalizedTime: 0.5
+  onActivateVFXSpawnNormalizedTime: 0.45
   raycastOffset: {x: 0, y: 6, z: 8}
   fartherRaycastOffset: {x: 0, y: 6, z: 8}
   raycastMaxDistance: 50
@@ -34459,7 +34459,6 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0

@@ -59,7 +59,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundTimerEnd()
         {
             List<int> highestKillIdList = new List<int>();
-            foreach (PlayerScore playerScore in GetHighestKillPlayers())
+            foreach (PlayerScore playerScore in GetHighestKillPlayersThisRound())
             {
                 highestKillIdList.Add(playerScore.id);
             }

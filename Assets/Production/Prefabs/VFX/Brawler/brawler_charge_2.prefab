@@ -132,7 +132,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
+  onActivateVFXSpawnNormalizedTime: 0.03
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5
@@ -143,7 +143,6 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
 --- !u!114 &669004292584078758
 MonoBehaviour:
   m_ObjectHideFlags: 0

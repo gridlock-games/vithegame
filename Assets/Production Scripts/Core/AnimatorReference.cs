@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Utility;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
@@ -53,14 +55,33 @@ namespace Vi.Core
             {
                 if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType])
                 {
-                    Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].gameObject);
+                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                    {
+                        glowRenderer.UnregisterRenderer(smr);
+                    }
+
+                    if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType].TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].gameObject);
+                    }
                 }
 
                 if (model)
                 {
-                    wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform).GetComponent<WearableEquipment>();
-                    SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                    foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                    if (model.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = ObjectPoolingManager.SpawnObject(pooledObject, transform).GetComponent<WearableEquipment>();
+                    }
+                    else
+                    {
+                        wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>();
+                    }
+
+                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                     {
                         glowRenderer.RegisterNewRenderer(smr);
                     }
@@ -70,9 +91,16 @@ namespace Vi.Core
             }
             else if (model)
             {
-                wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).gameObject, transform).GetComponent<WearableEquipment>());
-                SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
-                foreach (SkinnedMeshRenderer smr in equipmentSkinnedMeshRenderers)
+                if (model.TryGetComponent(out PooledObject pooledObject))
+                {
+                    wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, ObjectPoolingManager.SpawnObject(pooledObject, transform).GetComponent<WearableEquipment>());
+                }
+                else
+                {
+                    wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>());
+                }
+
+                foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                 {
                     glowRenderer.RegisterNewRenderer(smr);
                 }
@@ -87,7 +115,6 @@ namespace Vi.Core
                     {
                         if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                         {
-                            SkinnedMeshRenderer[] equipmentSkinnedMeshRenderers = wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetComponentsInChildren<SkinnedMeshRenderer>();
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
                         }
                         else
@@ -111,7 +138,20 @@ namespace Vi.Core
         {
             if (wearableEquipmentInstances.ContainsKey(equipmentType))
             {
-                Destroy(wearableEquipmentInstances[equipmentType].gameObject);
+                foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[equipmentType].GetRenderList())
+                {
+                    glowRenderer.UnregisterRenderer(smr);
+                }
+
+                if (wearableEquipmentInstances[equipmentType].TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(wearableEquipmentInstances[equipmentType].gameObject);
+                }
+                
                 wearableEquipmentInstances.Remove(equipmentType);
             }
 
@@ -124,6 +164,23 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
+        }
+
+        private void OnDestroy()
+        {
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
+            {
+                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                {
+                    kvp.Value.transform.SetParent(null, true);
+                    SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                {
+                    glowRenderer.UnregisterRenderer(smr);
+                }
+            }
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -201,6 +258,12 @@ namespace Vi.Core
             return _;
         }
 
+        private const string actionsLayerName = "Actions";
+        private const string flinchLayerName = "Flinch";
+
+        private int actionsLayerIndex;
+        private int flinchLayerIndex;
+
         Animator animator;
         WeaponHandler weaponHandler;
         Attributes attributes;
@@ -219,6 +282,9 @@ namespace Vi.Core
             movementHandler = weaponHandler.GetComponent<MovementHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
+
+            actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
+            flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
         }
 
         private void Start()
@@ -244,11 +310,11 @@ namespace Vi.Core
         {
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
-                return animator.GetNextAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+                return NextActionsAnimatorStateInfo.IsName("Empty");
             }
             else
             {
-                return animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Actions")).IsName("Empty");
+                return CurrentActionsAnimatorStateInfo.IsName("Empty");
             }
         }
 
@@ -261,10 +327,21 @@ namespace Vi.Core
         private void Update()
         {
             limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
+
         }
+
+        public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo NextActionsAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo CurrentFlinchAnimatorStateInfo { get; private set; }
+        public AnimatorStateInfo NextFlinchAnimatorStateInfo { get; private set; }
 
         private void OnAnimatorMove()
         {
+            CurrentActionsAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(actionsLayerIndex);
+            NextActionsAnimatorStateInfo = animator.GetNextAnimatorStateInfo(actionsLayerIndex);
+            CurrentFlinchAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(flinchLayerIndex);
+            NextFlinchAnimatorStateInfo = animator.GetNextAnimatorStateInfo(flinchLayerIndex);
+
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
@@ -291,11 +368,9 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (attributes.IsGrabbed() & animationHandler.IsActionClipPlayingInCurrentState(weaponHandler.CurrentActionClip))
+                if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
                 {
-                    Transform grabAssailant = attributes.GetGrabAssailant().transform;
-                    //movementHandler.AddForce(Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude));
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(grabAssailant.position + (grabAssailant.forward * 1.2f) - transform.root.position, worldSpaceRootMotion.magnitude);
+                    curveAdjustedLocalRootMotion = Vector3.zero;
                 }
                 else if (attributes.IsPulled())
                 {

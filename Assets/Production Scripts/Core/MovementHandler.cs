@@ -27,8 +27,6 @@ namespace Vi.Core
 
 		public virtual Vector3 GetPosition() { return transform.position; }
 
-		public virtual void OnIsGrabbedChange(bool prev, bool current) { }
-
         public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
         public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
@@ -37,6 +35,8 @@ namespace Vi.Core
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
 		public virtual void AddForce(Vector3 force) { }
+
+		public virtual void SetImmovable(bool isImmovable) { }
 
         protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;

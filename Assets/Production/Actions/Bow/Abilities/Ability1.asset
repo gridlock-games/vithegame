@@ -1711,8 +1711,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.45
-  recoveryNormalizedTime: 1
+  attackingNormalizedTime: 0.28
+  recoveryNormalizedTime: 0.65
   isAffectedByRage: 1
   damage: 5
   healAmount: 0
@@ -1740,6 +1740,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: ddaf850384c166f46a44d1388d87be8f, type: 3}
   abilityCooldownTime: 1
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -1747,8 +1748,8 @@ MonoBehaviour:
   - {fileID: -5220340233243105456, guid: a179a32d8977f7a468af39122f7f4f04, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 10
   canLunge: 0
   minLungeDistance: 2.5

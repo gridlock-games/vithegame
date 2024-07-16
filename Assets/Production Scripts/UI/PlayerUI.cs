@@ -33,6 +33,8 @@ namespace Vi.UI
 
         public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
+        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim); }
+
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
         public Button GetLoadoutMenuButton() { return loadoutMenuButton; }
@@ -407,6 +409,20 @@ namespace Vi.UI
         private void OnEnable()
         {
             RefreshStatus();
+
+            List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+            foreach (StatusIcon statusIcon in statusIcons)
+            {
+                if (activeStatuses.Contains(statusIcon.Status))
+                {
+                    statusIcon.SetActive(true);
+                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                }
+                else
+                {
+                    statusIcon.SetActive(false);
+                }
+            }
         }
 
         List<Attributes> teammateAttributes = new List<Attributes>();

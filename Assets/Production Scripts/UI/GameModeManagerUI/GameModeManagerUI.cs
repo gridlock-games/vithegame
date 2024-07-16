@@ -182,7 +182,7 @@ namespace Vi.UI
 
             yield return new WaitUntil(() => animationHandler.Animator);
 
-            animationHandler.Animator.CrossFade("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private GameObject MVPPreviewObject;

@@ -485,6 +485,7 @@ namespace Vi.UI
         }
 
         private string lastPlayersString;
+        private string lastDataString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
@@ -666,21 +667,24 @@ namespace Vi.UI
             rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
             
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
+            string dataString = "";
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
                 playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
+                dataString += data.id.ToString() + data.character._id.ToString();
             }
 
             if (lastPlayersString != playersString)
             {
                 RefreshPlayerCards();
-                if (IsServer)
+                if (IsServer & dataString != lastDataString)
                 {
                     characterLockTimer.Value = characterLockTime;
                     startGameTimer.Value = startGameTime;
                 }
             }
             lastPlayersString = playersString;
+            lastDataString = dataString;
 
             if (IsClient)
             {

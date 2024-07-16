@@ -230,6 +230,7 @@ namespace Vi.Core
         public bool TeamNameOverridesUpdatedThisFrame { get; private set; }
         private void OnTeamNameOverridesJsonChange(FixedString512Bytes prev, FixedString512Bytes current)
         {
+            if (!IsServer) { teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString()); }
             TeamNameOverridesUpdatedThisFrame = true;
             if (teamNameOverridesWasUpdatedThisFrameCoroutine != null) { StopCoroutine(teamNameOverridesWasUpdatedThisFrameCoroutine); }
             teamNameOverridesWasUpdatedThisFrameCoroutine = StartCoroutine(ResetTeamNameOverridesUpdatedBool());
@@ -244,7 +245,6 @@ namespace Vi.Core
 
         public string GetTeamText(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].teamName; }
@@ -264,7 +264,6 @@ namespace Vi.Core
 
         public string GetTeamPrefix(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team))
@@ -280,7 +279,6 @@ namespace Vi.Core
 
         public string GetTeamPrefixRaw(Team team)
         {
-            Dictionary<Team, TeamNameOverride> teamNameOverrides = JsonConvert.DeserializeObject<Dictionary<Team, TeamNameOverride>>(teamNameOverridesJson.Value.ToString());
             if (teamNameOverrides != null)
             {
                 if (teamNameOverrides.ContainsKey(team)) { return teamNameOverrides[team].prefix; }
@@ -319,6 +317,7 @@ namespace Vi.Core
             localPlayers.Add(clientId, playerObject);
             LocalPlayersWasUpdatedThisFrame = true;
 
+            UpdateIgnoreCollisionsMatrix();
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
 
@@ -329,6 +328,7 @@ namespace Vi.Core
         {
             localPlayers.Remove(clientId);
             LocalPlayersWasUpdatedThisFrame = true;
+            UpdateIgnoreCollisionsMatrix();
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
@@ -356,6 +356,11 @@ namespace Vi.Core
             return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
         }
 
+        public List<Attributes> GetActivePlayerObjectsInChannel(int channel)
+        {
+            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value.CachedPlayerData.channel == channel).Select(kvp => kvp.Value).ToList();
+        }
+
         public Attributes GetPlayerObjectById(int id)
         {
             if (!localPlayers.ContainsKey(id)) { Debug.LogError("No player object for Id: " + id); return null; }
@@ -376,10 +381,7 @@ namespace Vi.Core
 
         public bool IdHasLocalPlayer(int clientId) { return localPlayers.ContainsKey(clientId); }
 
-        public bool ContainsId(int clientId)
-        {
-            return cachedPlayerDataList.Contains(new PlayerData(clientId));
-        }
+        public bool ContainsId(int clientId) { return cachedIdList.Contains(clientId); }
 
         public bool ContainsDisconnectedPlayerData(int clientId)
         {
@@ -521,6 +523,7 @@ namespace Vi.Core
                 if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
 
                 PlayerData botData = new PlayerData(botClientId,
+                    defaultChannel,
                     botCharacter,
                     team);
                 AddPlayerData(botData);
@@ -655,6 +658,14 @@ namespace Vi.Core
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
+
+            List<int> initialChannelCounts = new List<int>();
+            for (int i = 0; i < maxChannels; i++)
+            {
+                initialChannelCounts.Add(0);
+            }
+
+            channelCounts = new NetworkList<int>(initialChannelCounts);
         }
 
         private void OnEnable()
@@ -861,8 +872,10 @@ namespace Vi.Core
         private void SyncCachedPlayerDataList()
         {
             cachedPlayerDataList.Clear();
+            cachedIdList.Clear();
             foreach (PlayerData playerData in playerDataList)
             {
+                cachedIdList.Add(playerData.id);
                 cachedPlayerDataList.Add(playerData);
             }
         }
@@ -877,6 +890,28 @@ namespace Vi.Core
             if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold & spawnPlayerRunning)
             {
                 EndSpawnPlayerCoroutine();
+            }
+        }
+
+        public void UpdateIgnoreCollisionsMatrix()
+        {
+            foreach (Attributes player in localPlayers.Values)
+            {
+                if (!player) { continue; }
+
+                foreach (Attributes otherPlayer in localPlayers.Values)
+                {
+                    if (!otherPlayer) { continue; }
+                    if (otherPlayer == player) { continue; }
+
+                    foreach (Collider col in player.NetworkCollider.Colliders)
+                    {
+                        foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
+                        {
+                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+                        }
+                    }
+                }
             }
         }
 
@@ -900,6 +935,13 @@ namespace Vi.Core
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+
+                        channelCounts[networkListEvent.Value.channel]++;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -914,6 +956,13 @@ namespace Vi.Core
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+
+                        channelCounts[networkListEvent.Value.channel]--;
+
+                        foreach (Attributes player in localPlayers.Values)
+                        {
+                            if (player) { player.UpdateNetworkVisiblity(); }
+                        }
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Value:
@@ -924,12 +973,28 @@ namespace Vi.Core
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
+
+                    if (IsServer)
+                    {
+                        if (networkListEvent.PreviousValue.channel != networkListEvent.Value.channel)
+                        {
+                            channelCounts[networkListEvent.PreviousValue.channel]--;
+                            channelCounts[networkListEvent.Value.channel]++;
+
+                            foreach (Attributes player in localPlayers.Values)
+                            {
+                                if (player) { player.UpdateNetworkVisiblity(); }
+                            }
+                        }
+                    }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Clear:
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
+
+            UpdateIgnoreCollisionsMatrix();
 
             DataListWasUpdatedThisFrame = true;
 
@@ -955,17 +1020,20 @@ namespace Vi.Core
 
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
-            float waitTime = 0;
-            while (!spawnPointFound)
+            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+            if (attributesToRespawn.GetTeam() != Team.Peaceful & attributesToRespawn.GetTeam() != Team.Spectator)
             {
-                attributesToRespawn.isWaitingForSpawnPoint = true;
-                (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
-                yield return null;
-                waitTime += Time.deltaTime;
-                if (waitTime > maxSpawnPointWaitTime) { break; }
+                float waitTime = 0;
+                while (!spawnPointFound)
+                {
+                    attributesToRespawn.isWaitingForSpawnPoint = true;
+                    (spawnPointFound, transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+                    yield return null;
+                    waitTime += Time.deltaTime;
+                    if (waitTime > maxSpawnPointWaitTime) { break; }
+                }
             }
-
+            
             attributesToRespawn.isWaitingForSpawnPoint = false;
 
             Vector3 spawnPosition = transformData.position;
@@ -1054,18 +1122,20 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
-                float waitTime = 0;
-                while (!spawnPointFound)
+                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
+                if (playerData.team != Team.Peaceful & playerData.team != Team.Spectator)
                 {
-                    isWaitingForSpawnPoint.Value = true;
-                    (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, null);
-                    yield return null;
-                    waitTime += Time.deltaTime;
-                    if (waitTime > maxSpawnPointWaitTime) { break; }
+                    float waitTime = 0;
+                    while (!spawnPointFound)
+                    {
+                        isWaitingForSpawnPoint.Value = true;
+                        (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
+                        yield return null;
+                        waitTime += Time.deltaTime;
+                        if (waitTime > maxSpawnPointWaitTime) { break; }
+                    }
+                    isWaitingForSpawnPoint.Value = false;
                 }
-                isWaitingForSpawnPoint.Value = false;
-
                 spawnPosition = transformData.position;
                 spawnRotation = transformData.rotation;
             }
@@ -1084,7 +1154,7 @@ namespace Vi.Core
                 yield break;
             }
 
-            bool isSpectator = GetPlayerData(playerData.id).team == Team.Spectator;
+            bool isSpectator = playerData.team == Team.Spectator;
             if (isSpectator)
             {
                 playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
@@ -1168,34 +1238,63 @@ namespace Vi.Core
             return playerDatas;
         }
 
+        private NetworkList<int> channelCounts;
+
+        private const int defaultChannel = 0;
+        private const int maxChannels = 5;
+        private const int maxPlayersInChannel = 15;
+
+        public List<int> GetChannelCountList()
+        {
+            List<int> channelCountsList = new List<int>();
+            for (int i = 0; i < channelCounts.Count; i++)
+            {
+                channelCountsList.Add(channelCounts[i]);
+            }
+            return channelCountsList;
+        }
+
+        public int GetBestChannel()
+        {
+            if (GetGameMode() != GameMode.None) { return defaultChannel; }
+
+            // Return first channel that has less than the max players in channel
+            List<int> channelCounts = GetChannelCountList();
+            for (int channelIndex = 0; channelIndex < channelCounts.Count; channelIndex++)
+            {
+                if (channelCounts[channelIndex] < maxPlayersInChannel) { return channelIndex; }
+            }
+
+            // Return channel with the lowest number of players in it
+            int lowestCountIndex = channelCounts.FindIndex(item => item == channelCounts.Min());
+            return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
+        }
+
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
+        private List<int> cachedIdList = new List<int>();
 
         private NetworkList<DisconnectedPlayerData> disconnectedPlayerDataList;
-
-        [System.Serializable]
-        private struct TeamDefinition
-        {
-            public Team team;
-            public ulong clientId;
-        }
 
         public struct PlayerData : INetworkSerializable, System.IEquatable<PlayerData>
         {
             public int id;
+            public int channel;
             public WebRequestManager.Character character;
             public Team team;
 
             public PlayerData(int id)
             {
                 this.id = id;
+                channel = defaultChannel;
                 character = new();
                 team = Team.Environment;
             }
 
-            public PlayerData(int id, WebRequestManager.Character character, Team team)
+            public PlayerData(int id, int channel, WebRequestManager.Character character, Team team)
             {
                 this.id = id;
+                this.channel = channel;
                 this.character = character;
                 this.team = team;
             }
@@ -1208,6 +1307,7 @@ namespace Vi.Core
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref id);
+                serializer.SerializeValue(ref channel);
                 serializer.SerializeNetworkSerializable(ref character);
                 serializer.SerializeValue(ref team);
             }

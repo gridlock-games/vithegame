@@ -213,9 +213,9 @@ namespace Vi.ScriptableObjects
         public bool[] ailmentHitDefinition = new bool[0];
 
         public const float HitStopEffectDuration = 0.1f;
-        public float GetTimeBetweenHits()
+        public float GetTimeBetweenHits(float animatorSpeed)
         {
-            return timeBetweenHits + HitStopEffectDuration;
+            return animatorSpeed > 0 ? (timeBetweenHits + HitStopEffectDuration) / animatorSpeed : timeBetweenHits + HitStopEffectDuration;
         }
 
         public enum DodgeLock

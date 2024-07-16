@@ -78,7 +78,7 @@ namespace Vi.Core
             if (hitCounter.ContainsKey(attributes))
             {
                 if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
-                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits()) { return false; }
+                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed)) { return false; }
             }
             return true;
         }
@@ -89,6 +89,7 @@ namespace Vi.Core
 
         protected Attributes parentAttributes;
         protected WeaponHandler parentWeaponHandler;
+        protected AnimationHandler parentAnimationHandler;
 
         private Collider[] colliders;
         private Renderer[] renderers;
@@ -99,6 +100,7 @@ namespace Vi.Core
         {
             parentAttributes = transform.root.GetComponent<Attributes>();
             parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
+            parentAnimationHandler = transform.root.GetComponent<AnimationHandler>();
 
             colliders = GetComponentsInChildren<Collider>(true);
             renderers = GetComponentsInChildren<Renderer>(true);

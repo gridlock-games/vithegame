@@ -53,9 +53,65 @@ namespace Vi.Core
             }
         }
 
-        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, Attributes attributesToExcludeInLogic)
+        private const float spawnPointFoundDistanceThreshold = 5;
+
+        public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, int channel)
         {
-            (bool sortByDistanceFirst, List<(int, TransformData)> possibleSpawnPoints) = GetPossibleSpawnOrientations(gameMode, team);
+            (bool findMostClearSpawnPoint, List<(int, TransformData)> possibleSpawnPoints) = GetPossibleSpawnOrientations(gameMode, team);
+            if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
+
+            List<(float, TransformData, int)> verifiedSpawnPoints = new List<(float, TransformData, int)>();
+            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjectsInChannel(channel);
+            foreach ((int spawnPriority, TransformData transformData) in possibleSpawnPoints)
+            {
+                float minDistance = Mathf.Infinity;
+                foreach (Attributes attributes in activePlayerObjects)
+                {
+                    float distance = Vector3.Distance(attributes.GetComponent<MovementHandler>().GetPosition(), transformData.position);
+                    if (distance < minDistance) { minDistance = distance; }
+                }
+                verifiedSpawnPoints.Add((minDistance, transformData, spawnPriority));
+            }
+
+            if (findMostClearSpawnPoint)
+            {
+                // Get the spawn points where we have the largest minimum distance to another player object
+                float maxDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == maxDistanceInList).ToList();
+
+                // Take the highest spawn priority from that list
+                int maxSpawnPriority = verifiedSpawnPoints.Max(item => item.Item3);
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item3 == maxSpawnPriority).ToList();
+            }
+            else // Don't find most clear spawn point
+            {
+                // Get list of spawn points where 
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 > spawnPointFoundDistanceThreshold).ToList();
+
+                // Take the highest spawn priority from that list
+                int maxSpawnPriority = verifiedSpawnPoints.Max(item => item.Item3);
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item3 == maxSpawnPriority).ToList();
+            }
+
+            float distanceOfSelectedPoint = Mathf.Infinity;
+            TransformData spawnPoint = new TransformData();
+            if (verifiedSpawnPoints.Count > 0)
+            {
+                int randomIndex = Random.Range(0, verifiedSpawnPoints.Count);
+                (distanceOfSelectedPoint, spawnPoint, _) = verifiedSpawnPoints[randomIndex];
+            }
+            else
+            {
+                int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
+                (distanceOfSelectedPoint, spawnPoint) = possibleSpawnPoints[randomIndex];
+                distanceOfSelectedPoint = 0;
+            }
+            return (distanceOfSelectedPoint > spawnPointFoundDistanceThreshold, spawnPoint);
+        }
+
+        public (bool, TransformData) GetRespawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, Attributes attributesToExcludeInLogic)
+        {
+            (bool findMostClearSpawnPoint, List<(int, TransformData)> possibleSpawnPoints) = GetPossibleSpawnOrientations(gameMode, team);
             if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
 
             List<(float, TransformData, int)> verifiedSpawnPoints = new List<(float, TransformData, int)>();
@@ -71,23 +127,26 @@ namespace Vi.Core
                 verifiedSpawnPoints.Add((minDistance, transformData, spawnPriority));
             }
 
-            if (sortByDistanceFirst)
+            if (findMostClearSpawnPoint)
             {
                 // Get the spawn points where we have the largest minimum distance to another player object
                 float maxDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
                 verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == maxDistanceInList).ToList();
+
+                // Take the highest spawn priority from that list
+                int maxSpawnPriority = verifiedSpawnPoints.Max(item => item.Item3);
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item3 == maxSpawnPriority).ToList();
+            }
+            else // Don't find most clear spawn point
+            {
+                // Get list of spawn points where 
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 > spawnPointFoundDistanceThreshold).ToList();
+
+                // Take the highest spawn priority from that list
+                int maxSpawnPriority = verifiedSpawnPoints.Max(item => item.Item3);
+                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item3 == maxSpawnPriority).ToList();
             }
             
-            int maxSpawnPriority = verifiedSpawnPoints.Max(item => item.Item3);
-            verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item3 == maxSpawnPriority).ToList();
-
-            if (!sortByDistanceFirst)
-            {
-                // Get the spawn points where we have the largest minimum distance to another player object
-                float maxDistanceInList = verifiedSpawnPoints.Max(item => item.Item1);
-                verifiedSpawnPoints = verifiedSpawnPoints.Where(item => item.Item1 == maxDistanceInList).ToList();
-            }
-
             float distanceOfSelectedPoint = Mathf.Infinity;
             TransformData spawnPoint = new TransformData();
             if (verifiedSpawnPoints.Count > 0)
@@ -95,21 +154,24 @@ namespace Vi.Core
                 int randomIndex = Random.Range(0, verifiedSpawnPoints.Count);
                 (distanceOfSelectedPoint, spawnPoint, _) = verifiedSpawnPoints[randomIndex];
             }
-
-            return (distanceOfSelectedPoint > spawnDistanceThreshold, spawnPoint);
+            else
+            {
+                int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
+                (distanceOfSelectedPoint, spawnPoint) = possibleSpawnPoints[randomIndex];
+                distanceOfSelectedPoint = 0;
+            }
+            return (distanceOfSelectedPoint > spawnPointFoundDistanceThreshold, spawnPoint);
         }
-
-        private const float spawnDistanceThreshold = 5;
 
         private (bool, List<(int, TransformData)>) GetPossibleSpawnOrientations(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
-            bool sortByDistanceFirst = true;
+            bool findMostClearSpawnPoint = true;
             List<(int, TransformData)> returnedSpawnPoints = new List<(int, TransformData)>();
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)
             {
                 if (spawnPoint.gameModes.Contains(gameMode) & spawnPoint.teams.Contains(team))
                 {
-                    sortByDistanceFirst = spawnPoint.sortByDistanceFirst;
+                    findMostClearSpawnPoint = spawnPoint.findMostClearSpawnPoint;
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         if (i < spawnPoint.spawnPriorities.Length)
@@ -119,7 +181,7 @@ namespace Vi.Core
                     }
                 }
             }
-            return (sortByDistanceFirst, returnedSpawnPoints);
+            return (findMostClearSpawnPoint, returnedSpawnPoints);
         }
 
         [Header("Gizmos")]
@@ -191,7 +253,7 @@ namespace Vi.Core
         {
             public PlayerDataManager.GameMode[] gameModes;
             public PlayerDataManager.Team[] teams;
-            public bool sortByDistanceFirst = true;
+            public bool findMostClearSpawnPoint = true;
             public Vector3[] spawnPositions = new Vector3[0];
             public Vector3[] spawnRotations = new Vector3[0];
             public int[] spawnPriorities = new int[0];

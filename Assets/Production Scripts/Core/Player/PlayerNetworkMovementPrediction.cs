@@ -8,7 +8,7 @@ namespace Vi.Player
     [RequireComponent(typeof(PlayerMovementHandler))]
     public class PlayerNetworkMovementPrediction : NetworkBehaviour
     {
-        public struct InputPayload : INetworkSerializable
+        public struct InputPayload
         {
             public int tick;
             public Vector2 inputVector;
@@ -19,13 +19,6 @@ namespace Vi.Player
                 this.tick = tick;
                 this.inputVector = inputVector;
                 this.rotation = rotation;
-            }
-
-            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-            {
-                serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref inputVector);
-                serializer.SerializeValue(ref rotation);
             }
         }
 
@@ -78,7 +71,7 @@ namespace Vi.Player
         private int currentTick;
         private StatePayload[] stateBuffer;
         private InputPayload[] inputBuffer;
-        private StatePayload latestServerState;
+        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
 
@@ -103,15 +96,18 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
-            latestServerState = new StatePayload(0, CurrentPosition, CurrentRotation);
+            if (IsServer)
+            {
+                latestServerState.Value = new StatePayload(0, CurrentPosition, CurrentRotation);
+                NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
+            }
+            if (IsClient)
+            {
+                NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
+            }
 
             CurrentPosition = transform.position;
             CurrentRotation = transform.rotation;
-
-            if (IsServer)
-                NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
-            if (IsClient)
-                NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
         }
 
         public override void OnNetworkDespawn()
@@ -124,17 +120,21 @@ namespace Vi.Player
 
         private void HandleServerTick()
         {
+            inputQueue.Enqueue(new InputPayload(currentOwnerTick.Value, inputVector.Value, inputRotation.Value));
+
             int bufferIndex = ProcessInputQueue();
 
             if (bufferIndex != -1)
             {
-                SendStateToClientRpc(stateBuffer[bufferIndex]);
+                latestServerState.Value = stateBuffer[bufferIndex];
             }
 
             currentTick++;
         }
 
-        [Rpc(SendTo.NotServer)] private void SendStateToClientRpc(StatePayload statePayload) { latestServerState = statePayload; }
+        private NetworkVariable<int> currentOwnerTick = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector2> inputVector = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Quaternion> inputRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void HandleClientTick()
         {
@@ -147,9 +147,11 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
+                currentOwnerTick.Value = currentTick;
+                inputVector.Value = movementHandler.GetMoveInput();
+                inputRotation.Value = transform.rotation;
 
-                SendInputServerRpc(inputPayload);
+                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
 
                 if (!IsHost)
                 {
@@ -159,8 +161,8 @@ namespace Vi.Player
             }
             else // If we are not the owner of this object
             {
-                CurrentPosition = latestServerState.position;
-                CurrentRotation = latestServerState.rotation;
+                CurrentPosition = latestServerState.Value.position;
+                CurrentRotation = latestServerState.Value.rotation;
             }
 
             // If we are the host, this is also called in the HandleServerTick() method
@@ -190,26 +192,26 @@ namespace Vi.Player
 
         private void HandleServerReconciliation()
         {
-            lastProcessedState = latestServerState;
+            lastProcessedState = latestServerState.Value;
 
-            int serverStateBufferIndex = latestServerState.tick % BUFFER_SIZE;
-            float positionError = Vector3.Distance(latestServerState.position, stateBuffer[serverStateBufferIndex].position);
+            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
+            float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
             if (positionError > 0.001f)
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
-                CurrentPosition = latestServerState.position;
-                CurrentRotation = latestServerState.rotation;
+                CurrentPosition = latestServerState.Value.position;
+                CurrentRotation = latestServerState.Value.rotation;
 
                 // Update buffer at index of latest server state
-                stateBuffer[serverStateBufferIndex] = latestServerState;
+                stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
-                int tickToProcess = latestServerState.tick + 1;
+                int tickToProcess = latestServerState.Value.tick + 1;
 
-                Vector3 currentPositionCached = latestServerState.position;
-                Quaternion currentRotationCached = latestServerState.rotation;
+                Vector3 currentPositionCached = latestServerState.Value.position;
+                Quaternion currentRotationCached = latestServerState.Value.rotation;
                 while (tickToProcess < currentTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
@@ -229,8 +231,6 @@ namespace Vi.Player
                 CurrentRotation = currentRotationCached;
             }
         }
-
-        [Rpc(SendTo.Server)] private void SendInputServerRpc(InputPayload inputPayload) { inputQueue.Enqueue(inputPayload); }
 
         private StatePayload ProcessInput(InputPayload input)
         {
