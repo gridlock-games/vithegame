@@ -500,7 +500,7 @@ namespace Vi.Core
                     }
                     Transform parent = netObj.transform.parent;
                     netObj.SpawnWithObservers = false;
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     netObj.TrySetParent(parent);
 
                     // Set Observers
@@ -579,7 +579,14 @@ namespace Vi.Core
                 }
             }
 
-            vfxInstance.Despawn(true);
+            if (vfxInstance.IsSpawned)
+            {
+                vfxInstance.Despawn(true);
+            }
+            else
+            {
+                Destroy(vfxInstance);
+            }
         }
 
         public bool IsInAnticipation { get; private set; }
