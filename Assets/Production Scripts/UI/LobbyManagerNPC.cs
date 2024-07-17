@@ -95,16 +95,7 @@ namespace Vi.UI
 
             if (IsServer)
             {
-                if (!creatingNewLobby)
-                {
-                    WebRequestManager.Server[] emptyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address & item.population == 0);
-                    if (emptyServers.Length < emptyLobbyServersRequired)
-                    {
-                        StartCoroutine(CreateNewLobby());
-                    }
-                }
-
-                /*if (!creatingNewLobby & !WebRequestManager.Singleton.IsDeletingServer)
+                if (!creatingNewLobby & !WebRequestManager.Singleton.IsDeletingServer)
                 {
                     WebRequestManager.Server[] emptyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address & item.population == 0);
 
@@ -117,7 +108,7 @@ namespace Vi.UI
                     {
                         StartCoroutine(CreateNewLobby());
                     }
-                }*/
+                }
             }
         }
 
