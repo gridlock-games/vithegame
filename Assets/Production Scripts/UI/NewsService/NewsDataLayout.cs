@@ -14,8 +14,9 @@ namespace Vi.UI
 
     public void UpdateArticleUI(string articleData, string articleTitle)
     {
-      newsTitleTMP.text = articleTitle;
-      newsArticleTMP.text = articleData;
+      Debug.Log("Updating article" + articleTitle + articleData);
+      newsTitleTMP.text = articleTitle.ToString();
+      newsArticleTMP.text = articleData.ToString();
     }
 
     public void UpdateImageUI(Texture2D texture)

@@ -8,6 +8,7 @@ using jomarcentermjm.ExternalFileHandler;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using Unity.Netcode;
+using TMPro;
 
 
 namespace Vi.UI
@@ -29,13 +30,18 @@ namespace Vi.UI
 
     [SerializeField] List<NewsButtonSelection> newsButtonSelections = new List<NewsButtonSelection>();
 
+    //NewsArticle
+    [SerializeField] TextMeshProUGUI newsArticleTMP;
+    [SerializeField] TextMeshProUGUI newsTitleTMP;
+    [SerializeField] Image newsArticleImage;
+
     void CloseUI()
     {
       Destroy(gameObject);
     }
     void OnEnable()
     {
-      StartCoroutine(GetNewsData());
+      StartCoroutine("GetNewsData");
     }
 
     private IEnumerator GetNewsData()
@@ -50,7 +56,7 @@ namespace Vi.UI
         newsData = JsonConvert.DeserializeObject<List<NewsData>>(rawData);
 
         UpdateListUI();
-        UpdateNewsUI(0);
+        //UpdateNewsUI(0);
       }
 
       //Start Updating the UI
@@ -81,18 +87,23 @@ namespace Vi.UI
         recreatedNewsBtnNb.updateContents(newsData[i].newsTitle, newsButtonSelections[0].typeIcon);
 
         recreatedNewsBtn.transform.parent = newsBtnListLayout.transform;
+
+        newsButtonList.Add(recreatedNewsBtn.GetComponent<Button>());
       }
+
+      UpdateNewsUI(0);
     }
 
 
     private void UpdateNewsUI(int newsSelectionID)
     {
       Debug.Log(newsSelectionID);
-      newsInfoLayout.UpdateImageUI(defaultLoadingImage);
+      //newsInfoLayout.UpdateImageUI(defaultLoadingImage);
 
       if (ExternalFileLoaderWeb.Singleton)
       {
-        StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(newsImageServerLocation + newsData[newsSelectionID].newsBody.bannerImg, networkedImage));
+        Debug.Log("Loading Image"); 
+        //StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(newsImageServerLocation + newsData[newsSelectionID].newsBody.bannerImg, networkedImage));
       }
       else
       {
@@ -100,13 +111,15 @@ namespace Vi.UI
       }
 
       //Change text
-      newsInfoLayout.UpdateArticleUI(newsData[newsSelectionID].newsBody.newsContent, newsData[newsSelectionID].newsTitle);
+      newsArticleTMP.text = newsData[newsSelectionID].newsBody.newsContent;
+      newsTitleTMP.text = newsData[newsSelectionID].newsTitle;
     }
 
 
     private void networkedImage(Texture2D networkFile)
     {
-      newsInfoLayout.UpdateImageUI(networkFile);
+      Sprite toConvert = Sprite.Create(networkFile, new Rect(0, 0, networkFile.width, networkFile.height), new Vector2(networkFile.width / 2, networkFile.height / 2));
+      newsArticleImage.sprite = toConvert;
     }
 
   }

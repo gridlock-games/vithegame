@@ -207,7 +207,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1114696973}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999897
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -648,6 +648,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &467583937 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1233578864, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &569648328
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,11 +833,26 @@ MonoBehaviour:
   newsButton: {fileID: 7708169384868758784, guid: ec8cc1187646dfe45a45763285f43f0c,
     type: 3}
   newsBtnListLayout: {fileID: 1395972980}
-  newsInfoLayout: {fileID: 92895559, guid: db2b10bb0444f244bb4ae138bf8d2108, type: 3}
+  newsInfoLayout: {fileID: 0}
   homeLayout: {fileID: 0}
   newsButtonSelections:
   - typeName: normalNews
     typeIcon: {fileID: 21300000, guid: f7d1ca34ceca595448a18c7307f203a9, type: 3}
+  newsArticleTMP: {fileID: 630099882}
+  newsTitleTMP: {fileID: 467583937}
+  newsArticleImage: {fileID: 881922591}
+--- !u!114 &630099882 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3167979607230566035, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &638297001
 GameObject:
   m_ObjectHideFlags: 0
@@ -999,6 +1026,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 6464451820563279755}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &881922591 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3167979608201149077, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &966742543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1557,7 +1596,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0005902184}
+  m_AnchoredPosition: {x: 0, y: 0.00080712046}
   m_SizeDelta: {x: 0, y: 840.39}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1395972982
@@ -2284,6 +2323,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1680572185}
     m_Modifications:
+    - target: {fileID: 1233578864, guid: db2b10bb0444f244bb4ae138bf8d2108, type: 3}
+      propertyPath: m_text
+      value: TEST NEWS TITLE
+      objectReference: {fileID: 0}
     - target: {fileID: 3167979607208640377, guid: db2b10bb0444f244bb4ae138bf8d2108,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2297,8 +2340,7 @@ PrefabInstance:
     - target: {fileID: 3167979607230566035, guid: db2b10bb0444f244bb4ae138bf8d2108,
         type: 3}
       propertyPath: m_text
-      value: '<color=red> NOTICE: THIS IS A TEST UPDATE ARTICLE </color> <br> The
-        Vi Team is conducting a maintenance on nocktober 17'
+      value: Test news Data update
       objectReference: {fileID: 0}
     - target: {fileID: 3167979607230566044, guid: db2b10bb0444f244bb4ae138bf8d2108,
         type: 3}
@@ -2345,6 +2387,12 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3167979608201149077, guid: db2b10bb0444f244bb4ae138bf8d2108,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c4124d21ce859e94cbe4e4949ed99053,
+        type: 3}
     - target: {fileID: 3167979608343928697, guid: db2b10bb0444f244bb4ae138bf8d2108,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2495,7 +2543,8 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 92895559, guid: db2b10bb0444f244bb4ae138bf8d2108, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: db2b10bb0444f244bb4ae138bf8d2108, type: 3}
 --- !u!1001 &6464451820563279755
 PrefabInstance:
