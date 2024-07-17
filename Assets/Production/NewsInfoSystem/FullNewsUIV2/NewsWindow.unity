@@ -250,12 +250,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 24995735}
   m_CullTransparentMesh: 1
+--- !u!1 &92895555 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3167979608579245320, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &92895556 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3167979608579245327, guid: db2b10bb0444f244bb4ae138bf8d2108,
     type: 3}
   m_PrefabInstance: {fileID: 3167979608637537355}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &92895559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92895555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca672c43b44c5494e982540678210963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  newsArticleTMP: {fileID: 1412281048}
+  newsArticleImage: {fileID: 503826142}
 --- !u!1 &103045498
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,6 +668,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &503826142 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3167979608201149077, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &569648328
 GameObject:
   m_ObjectHideFlags: 0
@@ -816,6 +848,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5160a48e40f659047a9cc1cc09b60545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  newsImageServerLocation: https://vi-assets.com/imagestorage/News/
+  mainMenuGameObject: {fileID: 0}
+  defaultLoadingImage: {fileID: 0}
+  newsBtnListLayout: {fileID: 0}
+  newsInfoLayout: {fileID: 0}
+  homeLayout: {fileID: 0}
 --- !u!1 &638297001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1576,6 +1614,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1412281048 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3167979607230566035, guid: db2b10bb0444f244bb4ae138bf8d2108,
+    type: 3}
+  m_PrefabInstance: {fileID: 3167979608637537355}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1426676101
 GameObject:
   m_ObjectHideFlags: 0
