@@ -17,7 +17,7 @@ namespace Vi.UI
     [SerializeField] private string newsImageServerLocation = "https://vi-assets.com/imagestorage/News/";
     [SerializeField] private Texture2D defaultLoadingImage;
 
-    private string NewsAPIURL = "154.90.35.191/";
+    private string NewsAPIURL = "154.90.35.191";
     private List<NewsData> newsData = new List<NewsData>();
     private List<Button> newsButtonList = new List<Button>();
 
@@ -35,7 +35,7 @@ namespace Vi.UI
     }
     void OnEnable()
     {
-      StartCoroutine("GetNewsData");
+      StartCoroutine(GetNewsData());
     }
 
     private IEnumerator GetNewsData()
@@ -58,6 +58,7 @@ namespace Vi.UI
       //Popup a connection error message
       else
       {
+        Debug.Log("Can't load server");
       }
 
       getRequest.Dispose();
@@ -78,6 +79,8 @@ namespace Vi.UI
         GameObject recreatedNewsBtn = Instantiate(newsButton.gameObject);
         NewsButtonUI recreatedNewsBtnNb = recreatedNewsBtn.GetComponent<NewsButtonUI>();
         recreatedNewsBtnNb.updateContents(newsData[i].newsTitle, newsButtonSelections[0].typeIcon);
+
+        recreatedNewsBtn.transform.parent = newsBtnListLayout.transform;
       }
     }
 
@@ -125,6 +128,7 @@ namespace Vi.UI
     public string id { get; set; }
   }
 
+  [Serializable]
   public class NewsButtonSelection
   {
     public string typeName = "normal";
