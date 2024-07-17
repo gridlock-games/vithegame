@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6464451820289695366}
   - component: {fileID: 6464451820289695367}
   m_Layer: 5
-  m_Name: Text (Legacy)
+  m_Name: NewxText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 6464451820427166995}
   - component: {fileID: 6464451820427167004}
   m_Layer: 5
-  m_Name: Image
+  m_Name: NewsIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -168,6 +168,7 @@ GameObject:
   - component: {fileID: 6464451821302173373}
   - component: {fileID: 6464451821302173374}
   - component: {fileID: 6464451821302173375}
+  - component: {fileID: 7708169384868758784}
   m_Layer: 5
   m_Name: Newsinfo_Btn
   m_TagString: Untagged
@@ -182,7 +183,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6464451821302173369}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -279,3 +280,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7708169384868758784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6464451821302173369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01c304267bbb2ae499c345c9194d6009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  newsArticleID: 0
+  newsTitleText: {fileID: 6464451820289695367}
+  newArticleIcon: {fileID: 6464451820427167004}

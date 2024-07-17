@@ -704,6 +704,7 @@ GameObject:
   - component: {fileID: 3167979608579245327}
   - component: {fileID: 3167979608579245325}
   - component: {fileID: 3167979608579245326}
+  - component: {fileID: 92895559}
   m_Layer: 5
   m_Name: NewsArticle
   m_TagString: Untagged
@@ -771,6 +772,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &92895559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167979608579245320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca672c43b44c5494e982540678210963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  newsArticleTMP: {fileID: 3167979607230566035}
+  newsTitleTMP: {fileID: 0}
+  newsArticleImage: {fileID: 3167979608201149077}
 --- !u!1 &3167979608870113392
 GameObject:
   m_ObjectHideFlags: 0
