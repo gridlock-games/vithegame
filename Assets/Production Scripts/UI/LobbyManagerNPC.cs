@@ -56,15 +56,9 @@ namespace Vi.UI
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
 
 #if UNITY_SERVER
-        // The minimum number of lobby instances we want to run at one time
-        private const int minimumLobbyServersRequired = 1;
-
         // The minimum number of EMPTY lobby instances we want to run at one time
-        private const int emptyLobbyServersRequired = 4;
+        private const int emptyLobbyServersRequired = 2;
 #else
-        // The minimum number of lobby instances we want to run at one time
-        private const int minimumLobbyServersRequired = 1;
-
         // The minimum number of EMPTY lobby instances we want to run at one time
         private const int emptyLobbyServersRequired = 1;
 #endif
@@ -101,29 +95,18 @@ namespace Vi.UI
 
             if (IsServer)
             {
-                List<WebRequestManager.Server> emptyServerList = new List<WebRequestManager.Server>();
-                WebRequestManager.Server[] lobbyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address);
-                foreach (WebRequestManager.Server server in lobbyServers)
+                if (!creatingNewLobby & !WebRequestManager.Singleton.IsDeletingServer)
                 {
-                    if (server.ip != networkTransport.ConnectionData.Address) { continue; }
+                    WebRequestManager.Server[] emptyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address & item.population == 0);
 
-                    if (server.population == 0)
-                        emptyServerList.Add(server);
-                }
-
-                if (emptyServerList.Count < emptyLobbyServersRequired | lobbyServers.Length < minimumLobbyServersRequired)
-                {
-                    if (!creatingNewLobby)
+                    if (emptyServers.Length > emptyLobbyServersRequired)
+                    {
+                        Debug.Log("Deleting server with id " + emptyServers[0]._id.ToString());
+                        WebRequestManager.Singleton.DeleteServer(emptyServers[0]._id.ToString());
+                    }
+                    else if (emptyServers.Length < emptyLobbyServersRequired)
                     {
                         StartCoroutine(CreateNewLobby());
-                    }
-                }
-                else if (emptyServerList.Count > emptyLobbyServersRequired & lobbyServers.Length > minimumLobbyServersRequired)
-                {
-                    if (emptyServerList.Count > 0 & !WebRequestManager.Singleton.IsDeletingServer)
-                    {
-                        Debug.Log("Deleting server with id " + emptyServerList[0]._id.ToString());
-                        WebRequestManager.Singleton.DeleteServer(emptyServerList[0]._id.ToString());
                     }
                 }
             }
