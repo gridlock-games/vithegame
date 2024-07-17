@@ -247,39 +247,39 @@ namespace Vi.Core
             thisServerCreated = true;
         }
 
-        public bool IsDeletingServer { get; private set; }
-        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
-        private IEnumerator DeleteServerCoroutine(string serverId)
-        {
-            if (IsDeletingServer) { yield break; }
-            IsDeletingServer = true;
-            ServerDeletePayload payload = new ServerDeletePayload(serverId);
+        //public bool IsDeletingServer { get; private set; }
+        //public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
+        //private IEnumerator DeleteServerCoroutine(string serverId)
+        //{
+        //    if (IsDeletingServer) { yield break; }
+        //    IsDeletingServer = true;
+        //    ServerDeletePayload payload = new ServerDeletePayload(serverId);
 
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+        //    string json = JsonUtility.ToJson(payload);
+        //    byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
-            deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
-            deleteRequest.SetRequestHeader("Content-Type", "application/json");
-            deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
-            yield return deleteRequest.SendWebRequest();
+        //    UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
+        //    deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+        //    deleteRequest.SetRequestHeader("Content-Type", "application/json");
+        //    deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+        //    yield return deleteRequest.SendWebRequest();
 
-            if (deleteRequest.result != UnityWebRequest.Result.Success)
-            {
-                deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
-                deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
-                deleteRequest.SetRequestHeader("Content-Type", "application/json");
-                deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
-                yield return deleteRequest.SendWebRequest();
-            }
+        //    if (deleteRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
+        //        deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
+        //        deleteRequest.SetRequestHeader("Content-Type", "application/json");
+        //        deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
+        //        yield return deleteRequest.SendWebRequest();
+        //    }
 
-            if (deleteRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
-            }
-            deleteRequest.Dispose();
-            IsDeletingServer = false;
-        }
+        //    if (deleteRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
+        //    }
+        //    deleteRequest.Dispose();
+        //    IsDeletingServer = false;
+        //}
 
         public struct Server
         {
