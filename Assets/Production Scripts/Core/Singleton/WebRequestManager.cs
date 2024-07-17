@@ -2448,6 +2448,7 @@ namespace Vi.Core
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
             CheckGameVersion();
+            NetworkManager.Singleton.NetworkConfig.SpawnTimeout = 10;
         }
 
         private void Update()
