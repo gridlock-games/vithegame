@@ -519,7 +519,9 @@ namespace Vi.Core
 
         private IEnumerator SetVFXNetworkVisibility(NetworkObject netObj)
         {
-            yield return new WaitUntil(() => netObj.IsSpawned);
+            yield return null;
+            if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
+
             if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
             {
