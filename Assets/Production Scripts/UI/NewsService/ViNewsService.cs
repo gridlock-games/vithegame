@@ -30,14 +30,24 @@ namespace Vi.UI
 
     [SerializeField] List<NewsButtonSelection> newsButtonSelections = new List<NewsButtonSelection>();
 
+    [Header("Date time localization")]
+    [SerializeField] string dateTimeMessage;
+    [SerializeField] Text dateTimeText;
+
+    [Header("Article Window")]
     //NewsArticle
     [SerializeField] TextMeshProUGUI newsArticleTMP;
     [SerializeField] TextMeshProUGUI newsTitleTMP;
     [SerializeField] Image newsArticleImage;
 
-    void CloseUI()
+    public void CloseUI()
     {
       Destroy(gameObject);
+    }
+
+    private void Update()
+    {
+      dateTimeText.text = $"{dateTimeMessage} {System.DateTime.Now.ToString("MM/dd/yyyy")} {System.DateTime.Now.ToString("hh:mm:ss")}";
     }
     void OnEnable()
     {
@@ -87,6 +97,8 @@ namespace Vi.UI
         recreatedNewsBtnNb.updateContents(newsData[i].newsTitle, newsButtonSelections[0].typeIcon);
 
         recreatedNewsBtn.transform.parent = newsBtnListLayout.transform;
+        int countValue = i;
+        recreatedNewsBtn.GetComponent<Button>().onClick.AddListener(() => UpdateNewsUI(countValue));
 
         newsButtonList.Add(recreatedNewsBtn.GetComponent<Button>());
       }
@@ -95,15 +107,16 @@ namespace Vi.UI
     }
 
 
-    private void UpdateNewsUI(int newsSelectionID)
+    public void UpdateNewsUI(int newsSelectionID)
     {
       Debug.Log(newsSelectionID);
-      //newsInfoLayout.UpdateImageUI(defaultLoadingImage);
+      Sprite toConvert = Sprite.Create(defaultLoadingImage, new Rect(0, 0, defaultLoadingImage.width, defaultLoadingImage.height), new Vector2(defaultLoadingImage.width / 2, defaultLoadingImage.height / 2));
+      newsArticleImage.sprite = toConvert;
 
       if (ExternalFileLoaderWeb.Singleton)
       {
         Debug.Log("Loading Image"); 
-        //StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(newsImageServerLocation + newsData[newsSelectionID].newsBody.bannerImg, networkedImage));
+        StartCoroutine(ExternalFileLoaderWeb.Singleton.DoImageWebRequest(newsImageServerLocation + newsData[newsSelectionID].newsBody.bannerImg, networkedImage));
       }
       else
       {
