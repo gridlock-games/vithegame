@@ -85,7 +85,8 @@ namespace Vi.Core
                 if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
                 {
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position, projectileSpawnPoint.transform.rotation);
-                    projectileInstance.GetComponent<NetworkObject>().Spawn();
+                    NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
+                    netObj.Spawn();
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo)
@@ -99,6 +100,36 @@ namespace Vi.Core
                     else
                     {
                         projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce, 1);
+                    }
+                    StartCoroutine(SetProjectileNetworkVisibility(netObj));
+                }
+            }
+        }
+
+        private IEnumerator SetProjectileNetworkVisibility(NetworkObject netObj)
+        {
+            yield return null;
+            if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
+
+            if (!netObj.IsNetworkVisibleTo(parentWeaponHandler.OwnerClientId)) { netObj.NetworkShow(parentWeaponHandler.OwnerClientId); }
+            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            {
+                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+                if (networkId == 0) { continue; }
+                if (networkId == parentWeaponHandler.OwnerClientId) { continue; }
+
+                if (playerData.channel == parentAttributes.CachedPlayerData.channel)
+                {
+                    if (!netObj.IsNetworkVisibleTo(networkId))
+                    {
+                        netObj.NetworkShow(networkId);
+                    }
+                }
+                else
+                {
+                    if (parentWeaponHandler.NetworkObject.IsNetworkVisibleTo(networkId))
+                    {
+                        netObj.NetworkHide(networkId);
                     }
                 }
             }

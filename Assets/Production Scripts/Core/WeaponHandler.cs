@@ -485,6 +485,9 @@ namespace Vi.Core
                 {
                     if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
+                    Transform parent = netObj.transform.parent;
+                    netObj.Spawn(true);
+                    netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                     {
                         actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
@@ -498,11 +501,6 @@ namespace Vi.Core
                     {
                         PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
-                    Transform parent = netObj.transform.parent;
-                    netObj.SpawnWithObservers = false;
-                    netObj.Spawn(true);
-                    netObj.TrySetParent(parent);
-
                     // Set Observers
                     StartCoroutine(SetVFXNetworkVisibility(netObj));
                 }

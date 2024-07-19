@@ -214,7 +214,7 @@ MonoBehaviour:
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
+  SpawnWithObservers: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &5575609125080847161
@@ -243,7 +243,6 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
 --- !u!114 &6466239402159247775
 MonoBehaviour:
   m_ObjectHideFlags: 0

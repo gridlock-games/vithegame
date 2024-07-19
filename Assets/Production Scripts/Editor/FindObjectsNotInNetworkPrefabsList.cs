@@ -61,5 +61,23 @@ namespace Vi.Editor
                 }
             }
         }
+
+        [MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
+        static void SetNotSpawnWithObservers()
+        {
+            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
+            if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
+
+            foreach (NetworkPrefab networkPrefab in networkPrefabsList.PrefabList)
+            {
+                if (networkPrefab.Prefab.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (!networkPrefab.Prefab.GetComponent<ActionVFX>() & !networkPrefab.Prefab.GetComponent<Projectile>()) { continue; }
+                    networkObject.SpawnWithObservers = false;
+                    EditorUtility.SetDirty(networkObject);
+                    Debug.Log(networkObject);
+                }
+            }
+        }
     }
 }
