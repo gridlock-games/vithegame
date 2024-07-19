@@ -102,6 +102,8 @@ namespace Vi.UI
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
                     backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                    backgroundImagesToColor[i].color += Color.black;
+                    backgroundImagesToColor[i].color /= 2;
                 }
                 playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
                 roundWinsText.text = playerScore.roundWins.ToString();
