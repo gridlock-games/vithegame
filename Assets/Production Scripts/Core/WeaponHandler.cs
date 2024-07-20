@@ -486,23 +486,16 @@ namespace Vi.Core
                     if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
                     Transform parent = netObj.transform.parent;
-                    netObj.Spawn(true);
+                    netObj.SpawnWithOwnership(OwnerClientId, true);
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                     {
                         actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                        PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
                     }
                     else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
                     {
                         actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
                     }
-                    else
-                    {
-                        PersistentLocalObjects.Singleton.StartCoroutine(DespawnVFXAfterPlaying(netObj));
-                    }
-                    // Set Observers
-                    StartCoroutine(SetVFXNetworkVisibility(netObj));
                 }
             }
             else if (!isPreviewVFX & actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
@@ -513,80 +506,6 @@ namespace Vi.Core
             if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate & !isPreviewVFX) { actionVFXTracker.Add(actionVFXPrefab); }
 
             return vfxInstance;
-        }
-
-        private IEnumerator SetVFXNetworkVisibility(NetworkObject netObj)
-        {
-            yield return null;
-            if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
-
-            if (!netObj.IsNetworkVisibleTo(OwnerClientId)) { netObj.NetworkShow(OwnerClientId); }
-            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
-            {
-                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
-                if (networkId == 0) { continue; }
-                if (networkId == OwnerClientId) { continue; }
-
-                if (playerData.channel == attributes.CachedPlayerData.channel)
-                {
-                    if (!netObj.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkShow(networkId);
-                    }
-                }
-                else
-                {
-                    if (NetworkObject.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkHide(networkId);
-                    }
-                }
-            }
-        }
-
-        public static IEnumerator DespawnVFXAfterPlaying(NetworkObject vfxInstance)
-        {
-            ParticleSystem particleSystem = vfxInstance.GetComponentInChildren<ParticleSystem>();
-            if (particleSystem)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!particleSystem.isPlaying) { break; }
-                }
-            }
-
-            AudioSource audioSource = vfxInstance.GetComponentInChildren<AudioSource>();
-            if (audioSource)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!audioSource.isPlaying) { break; }
-                }
-            }
-
-            VisualEffect visualEffect = vfxInstance.GetComponentInChildren<VisualEffect>();
-            if (visualEffect)
-            {
-                while (true)
-                {
-                    yield return null;
-                    if (!vfxInstance) { yield break; }
-                    if (!visualEffect.HasAnySystemAwake()) { break; }
-                }
-            }
-
-            if (vfxInstance.IsSpawned)
-            {
-                vfxInstance.Despawn(true);
-            }
-            else
-            {
-                Destroy(vfxInstance);
-            }
         }
 
         public bool IsInAnticipation { get; private set; }
@@ -1364,6 +1283,5 @@ namespace Vi.Core
             if (selectedAttack == null) { return null; }
             return selectedAttack.attackClip;
         }
-
     }
 }
