@@ -70,13 +70,15 @@ namespace Vi.ScriptableObjects
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
         }
 
-        private void Start()
+        public override void OnNetworkSpawn()
         {
             StartCoroutine(DespawnVFXAfterPlaying());
         }
 
         protected IEnumerator DespawnVFXAfterPlaying()
         {
+            yield return null;
+
             ParticleSystem particleSystem = GetComponentInChildren<ParticleSystem>();
             if (particleSystem)
             {

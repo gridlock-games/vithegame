@@ -73,7 +73,7 @@ namespace Vi.Editor
                 if (networkPrefab.Prefab.TryGetComponent(out NetworkObject networkObject))
                 {
                     if (!networkPrefab.Prefab.GetComponent<ActionVFX>() & !networkPrefab.Prefab.GetComponent<Projectile>()) { continue; }
-                    networkObject.SpawnWithObservers = false;
+                    networkObject.SpawnWithObservers = true;
                     EditorUtility.SetDirty(networkObject);
                     Debug.Log(networkObject);
                 }
