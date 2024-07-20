@@ -31,20 +31,29 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0.3662508
       value: 1.5
-      inSlope: 0.025776317
-      outSlope: 0.025776317
+      inSlope: 0.006540895
+      outSlope: 0.006540895
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.10144202
+      outWeight: 1
+    - serializedVersion: 3
+      time: 0.49712867
+      value: 1.1400769
+      inSlope: -0.9270432
+      outSlope: -0.9270432
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.075344376
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.038036857
+      outSlope: -0.038036857
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.123287424
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -265,10 +274,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0
+  transitionTime: 0.1
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 2
+  animationSpeed: 0.9
+  recoveryAnimationSpeed: 1.5
   agentStaminaCost: 20
   agentRageCost: 50
   effectedWeaponBones: 12000000
@@ -280,7 +289,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.2
+  attackingNormalizedTime: 0.15
   recoveryNormalizedTime: 0.3
   isAffectedByRage: 1
   damage: 9
@@ -309,6 +318,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -318,7 +328,7 @@ MonoBehaviour:
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
   maximumTargetingRotationAngle: 60
-  canLunge: 1
+  canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
   aimDuringAnticipation: 0
