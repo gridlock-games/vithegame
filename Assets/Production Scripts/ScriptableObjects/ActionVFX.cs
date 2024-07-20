@@ -72,10 +72,10 @@ namespace Vi.ScriptableObjects
 
         public override void OnNetworkSpawn()
         {
-            StartCoroutine(DespawnVFXAfterPlaying());
+            if (IsServer) { StartCoroutine(DespawnVFXAfterPlaying()); }
         }
 
-        protected IEnumerator DespawnVFXAfterPlaying()
+        private IEnumerator DespawnVFXAfterPlaying()
         {
             yield return null;
 

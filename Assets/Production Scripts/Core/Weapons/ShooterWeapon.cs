@@ -86,7 +86,7 @@ namespace Vi.Core
                 {
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position, projectileSpawnPoint.transform.rotation);
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
-                    netObj.Spawn(true);
+                    netObj.SpawnWithOwnership(parentAttributes.OwnerClientId, true);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo)
