@@ -90,8 +90,8 @@ namespace Vi.UI
             objectiveCompleteImage.color = new Color(1, 1, 1, 0);
 
             backgroundImage.enabled = false;
-            HandlePlatformAPI();
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
+            HandlePlatformAPI();
         }
 
         private IEnumerator DisplayNextActionAfterPlayerInputFound()
@@ -359,7 +359,7 @@ namespace Vi.UI
                     var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
                     currentOverlaySprites = result.releasedSprites;
                 }
-                
+
                 currentOverlayMessage = "Block An Attack.";
                 FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
                 foreach (InputAction action in playerInput.actions)
@@ -889,11 +889,11 @@ namespace Vi.UI
         }
 
         void HandlePlatformAPI()
-    {
-      if (PlatformRichPresence.instance != null)
-      {
-        PlatformRichPresence.instance.UpdatePlatformStatus("Learning the ropes", "Playing tutorial");
-      }
-    }
+        {
+            if (PlatformRichPresence.instance != null)
+            {
+                PlatformRichPresence.instance.UpdatePlatformStatus("Learning the ropes", "Playing tutorial");
+            }
+        }
     }
 }
