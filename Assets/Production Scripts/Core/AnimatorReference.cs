@@ -184,6 +184,7 @@ namespace Vi.Core
                     kvp.Value.transform.SetParent(null, true);
                     SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    kvp.Value.enabled = true;
                 }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {
