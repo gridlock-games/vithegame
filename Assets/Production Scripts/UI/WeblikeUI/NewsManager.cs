@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using jomarcentermjm.ExternalFileHandler;
-
+//Legacy stuff
 namespace Vi.UI
 {
   public class NewsManager : MonoBehaviour
@@ -115,20 +115,4 @@ namespace Vi.UI
     }
   }
 
-  [Serializable]
-  public class NewsBody
-  {
-    public string bannerImg { get; set; }
-    public string newsContent { get; set; }
-  }
-
-  [Serializable]
-  public class NewsData
-  {
-    public string newsTitle { get; set; }
-    public NewsBody newsBody { get; set; }
-    public string dateCreated { get; set; }
-    public bool isActive { get; set; }
-    public string id { get; set; }
-  }
 }
