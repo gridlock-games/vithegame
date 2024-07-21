@@ -28,6 +28,10 @@ namespace Vi.Player
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 playerInput.SwitchCurrentActionMap("UI");
+
+                if (scoreboardInstance) { Destroy(scoreboardInstance); }
+                if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
+                if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
             }
             else
             {
@@ -36,12 +40,6 @@ namespace Vi.Player
                     playerUIInstance.SetActive(true);
                 playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
             }
-        }
-
-        private LoadoutManager loadoutManager;
-        private void Awake()
-        {
-            loadoutManager = GetComponent<LoadoutManager>();
         }
 
         private void OnEnable()
@@ -84,7 +82,6 @@ namespace Vi.Player
         {
             if (ExternalUI) { return; }
             if (!GameModeManager.Singleton) { return; }
-            if (minimapInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
 
@@ -119,7 +116,6 @@ namespace Vi.Player
                 ExternalUI.SendMessage("OnPause");
                 return;
             }
-            if (minimapInstance) { return; }
             if (scoreboardInstance) { return; }
             if (inventoryInstance) { return; }
 
@@ -152,7 +148,6 @@ namespace Vi.Player
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
-            if (minimapInstance) { return; }
 
             if (inventoryInstance)
             {
@@ -175,25 +170,5 @@ namespace Vi.Player
                 playerInput.SwitchCurrentActionMap("UI");
             }
         }
-
-        [SerializeField] private GameObject minimapPrefab;
-        GameObject minimapInstance;
-        //void OnMinimap(InputValue value)
-        //{
-        //    if (ExternalUI) { return; }
-        //    if (scoreboardInstance) { return; }
-        //    if (pauseInstance) { return; }
-        //    if (inventoryInstance) { return; }
-
-        //    if (value.isPressed)
-        //    {
-        //        minimapInstance = Instantiate(minimapPrefab);
-        //    }
-        //    else
-        //    {
-        //        Cursor.lockState = CursorLockMode.Locked;
-        //        Destroy(minimapInstance);
-        //    }
-        //}
     }
 }
