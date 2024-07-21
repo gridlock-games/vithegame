@@ -313,7 +313,7 @@ namespace Vi.UI
             // Show game mode info UI
             if (roomSettingsParent.activeSelf)
             {
-                if (PlayerDataManager.Singleton.IsLobbyLeader())
+                if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
                 {
                     string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
                     if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
@@ -790,7 +790,7 @@ namespace Vi.UI
             lobbyUIParent.SetActive(false);
 
             // Show game mode info UI
-            if (PlayerDataManager.Singleton.IsLobbyLeader())
+            if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
             {
                 string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
                 if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
