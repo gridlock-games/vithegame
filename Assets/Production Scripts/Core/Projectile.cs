@@ -152,9 +152,8 @@ namespace Vi.Core
                 if (prefab.GetComponent<FollowUpVFX>())
                 {
                     NetworkObject netObj = Instantiate(prefab, transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.Spawn();
+                    netObj.SpawnWithOwnership(OwnerClientId, true);
                     netObj.GetComponent<FollowUpVFX>().Initialize(attacker, attack);
-                    PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
                 }
                 else
                 {

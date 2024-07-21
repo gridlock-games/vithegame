@@ -28,7 +28,7 @@ namespace Vi.Core.GameModeManagers
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
             damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
-            damageCircleInstance.NetworkObject.Spawn();
+            damageCircleInstance.NetworkObject.Spawn(true);
         }
 
         public override void OnEnvironmentKill(Attributes victim)
