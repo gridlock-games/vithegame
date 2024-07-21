@@ -79,5 +79,42 @@ namespace Vi.Editor
                 }
             }
         }
+
+        [MenuItem("Tools/Set Texture Overrides for Android Platform")]
+        static void SetTextureOverridesForAndroidPlatform()
+        {
+            foreach (string guid in AssetDatabase.FindAssets("t:Texture"))
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (assetPath.Length == 0) { Debug.LogError(guid + " not found"); continue; }
+
+                Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
+                if (texture)
+                {
+                    try
+                    {
+                        TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
+                        TextureImporterPlatformSettings existingSettings = importer.GetPlatformTextureSettings("Android");
+                        if (!existingSettings.overridden)
+                        {
+                            TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
+                            androidSettings.name = "Android";
+                            androidSettings.overridden = true;
+                            androidSettings.maxTextureSize = 256;
+                            importer.SetPlatformTextureSettings(androidSettings);
+                            importer.SaveAndReimport();
+                        }
+                    }
+                    catch // This happens on shit like font textures
+                    {
+
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Error loading texture at path " + assetPath);
+                }
+            }
+        }
     }
 }
