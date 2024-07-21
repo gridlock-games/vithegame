@@ -132,6 +132,15 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
+
+            if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
+            {
+                if (!wearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled)
+                {
+                    Debug.LogError(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].name + " isn't enabled");
+                }
+                wearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled = true;
+            }
         }
 
         public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
