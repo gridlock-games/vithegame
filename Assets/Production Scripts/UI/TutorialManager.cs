@@ -91,6 +91,10 @@ namespace Vi.UI
 
             backgroundImage.enabled = false;
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
+        }
+
+        private void Start()
+        {
             HandlePlatformAPI();
         }
 
