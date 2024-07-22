@@ -34,7 +34,7 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam Code
-        if (SteamManager.Initialized)
+        if (SteamManager.Initialized && gameObject.GetComponent<SteamManager>() != null)
         {
           //Call in the achievement as completed
           Steamworks.SteamUserStats.GetAchievement(achivement.steamAchievementID, out bool isCompleted);
