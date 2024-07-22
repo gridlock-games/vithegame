@@ -471,12 +471,15 @@ namespace Vi.Core
                 SetInvincibleStatusOnDodge(actionClipName);
             }
 
-            if (heavyAttackCoroutine != null)
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                StopCoroutine(heavyAttackCoroutine);
-                Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                if (heavyAttackCoroutine != null)
+                {
+                    StopCoroutine(heavyAttackCoroutine);
+                    Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                }
             }
-
+            
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
@@ -873,7 +876,14 @@ namespace Vi.Core
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
-            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
+            {
+                if (heavyAttackCoroutine != null)
+                {
+                    StopCoroutine(heavyAttackCoroutine);
+                    Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                }
+            }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
