@@ -4,14 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using UnityEngine;
-using static Vi.UI.SimpleGoogleSignIn.GoogleAuth;
+
 
 namespace Vi.UI.FBAuthentication
 {
   public static partial class FacebookAuth
   {
     private const string AuthorizationEndpoint = "https://www.facebook.com/v20.0/dialog/oauth";
-    private const string AccessScope = "openid email profile";
+    private const string AccessScope = "public_profile,email,openid";
 
     private static string _clientId;
     private static string _clientSecret;
@@ -37,7 +37,7 @@ namespace Vi.UI.FBAuthentication
       //This can be ignored
       _redirectUriLocalhost = $"http://localhost:7750/";
 
-
+      Auth();
 
       //Not needed for mobile version/used on windows version
       if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
@@ -79,8 +79,8 @@ namespace Vi.UI.FBAuthentication
       _codeVerifier = Guid.NewGuid().ToString();
 
       var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);
-      var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
-
+      //var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
+      var authorizationRequest = $"{AuthorizationEndpoint}?client_id={_clientId}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&{AccessScope}&state={_state}";
       //Debug.Log("authorizationRequest=" + authorizationRequest);
       Application.OpenURL(authorizationRequest);
     }
@@ -140,7 +140,7 @@ namespace Vi.UI.FBAuthentication
       RestClient.Request(new RequestHelper
       {
         Method = "POST",
-        Uri = "https://oauth2.googleapis.com/token",
+        Uri = "https://graph.facebook.com/oauth/access_token",
         Params = new Dictionary<string, string>
             {
                 {"client_id", _clientId},
