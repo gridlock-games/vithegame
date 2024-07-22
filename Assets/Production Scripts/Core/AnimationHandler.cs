@@ -275,7 +275,7 @@ namespace Vi.Core
                 lungeClip.isInvincible = actionClip.isInvincible;
                 lungeClip.isUninterruptable = actionClip.isUninterruptable;
 
-                if (AreActionClipRequirementsMet(lungeClip))
+                if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                 {
                     // Lunge mechanic
                     ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
