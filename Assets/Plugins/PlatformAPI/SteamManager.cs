@@ -27,6 +27,7 @@ namespace jomarcentermjm.PlatformAPI
 		protected static bool s_EverInitialized = false;
 
 		protected static SteamManager s_instance;
+
 		protected static SteamManager Instance
 		{
 			get
@@ -101,31 +102,31 @@ namespace jomarcentermjm.PlatformAPI
 				Debug.LogError("[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version.", this);
 			}
 
-			//try
-			//{
-			//	// If Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the
-			//	// Steam client and also launches this game again if the User owns it. This can act as a rudimentary form of DRM.
-			//	// Note that this will run which ever version you have installed in steam. Which may not be the precise executable
-			//	// we were currently running.
+			try
+			{
+				// If Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the
+				// Steam client and also launches this game again if the User owns it. This can act as a rudimentary form of DRM.
+				// Note that this will run which ever version you have installed in steam. Which may not be the precise executable
+				// we were currently running.
 
-			//	// Once you get a Steam AppID assigned by Valve, you need to replace AppId_t.Invalid with it and
-			//	// remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
-			//	// See the Valve documentation for more information: https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
-			//	//if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
-			//	//{
-			//	//	Debug.Log("[Steamworks.NET] Shutting down because RestartAppIfNecessary returned true. Steam will restart the application.");
-
-			//	//	//Application.Quit();
-			//	//	return;
-			//	//}
-			//}
-			//catch (System.DllNotFoundException e)
-			//{ // We catch this exception here, as it will be the first occurrence of it.
-			//	Debug.LogError("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.\n" + e, this);
-
-			//	//Application.Quit();
-			//	return;
-			//}
+				// Once you get a Steam AppID assigned by Valve, you need to replace AppId_t.Invalid with it and
+				// remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
+				// See the Valve documentation for more information: https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
+				if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
+				{
+					Debug.Log("[Steamworks.NET] Shutting down because RestartAppIfNecessary returned true. Steam will restart the application.");
+					Destroy(this);
+					//Application.Quit();
+					return;
+				}
+			}
+			catch (System.DllNotFoundException e)
+			{ // We catch this exception here, as it will be the first occurrence of it.
+				Debug.LogError("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.\n" + e, this);
+        Destroy(this);
+        //Application.Quit();
+        return;
+			}
 
 			// Initializes the Steamworks API.
 			// If this returns false then this indicates one of the following conditions:

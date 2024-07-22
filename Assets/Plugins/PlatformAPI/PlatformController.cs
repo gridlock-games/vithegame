@@ -60,7 +60,7 @@ namespace jomarcentermjm.PlatformAPI
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
-            return false;
+      return false;
     }
 
     bool AttemptDiscord()
