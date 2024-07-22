@@ -195,18 +195,18 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server post request from a server!"); yield break; }
 
-            //if (payload.type == 0)
-            //{
-            //    foreach (Server server in servers.ToList())
-            //    {
-            //        if (server.ip == payload.ip)
-            //        {
-            //            yield return new WaitUntil(() => !IsDeletingServer);
-            //            DeleteServer(server._id);
-            //            yield return new WaitUntil(() => !IsDeletingServer);
-            //        }
-            //    }
-            //}
+            if (payload.type == 0)
+            {
+                foreach (Server server in servers.ToList())
+                {
+                    if (server.ip == payload.ip)
+                    {
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                        DeleteServer(server._id);
+                        yield return new WaitUntil(() => !IsDeletingServer);
+                    }
+                }
+            }
 
             yield return ServerGetRequest();
 

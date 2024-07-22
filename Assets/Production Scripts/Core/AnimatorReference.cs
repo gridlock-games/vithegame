@@ -132,6 +132,15 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
+
+            if (wearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
+            {
+                if (!wearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled)
+                {
+                    Debug.LogError(wearableEquipmentInstances[wearableEquipmentOption.equipmentType].name + " isn't enabled");
+                }
+                wearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled = true;
+            }
         }
 
         public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
@@ -175,6 +184,7 @@ namespace Vi.Core
                     kvp.Value.transform.SetParent(null, true);
                     SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    kvp.Value.enabled = true;
                 }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {

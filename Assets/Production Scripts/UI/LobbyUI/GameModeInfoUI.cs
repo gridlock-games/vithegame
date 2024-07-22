@@ -31,14 +31,26 @@ namespace Vi.UI
                 gameModeInfoUICard.Initialize(data.gameModeSprites[i], data.cardHeaders[i], data.gameModeMessages[i]);
             }
 
+            okButtonText = okButton.GetComponentInChildren<Text>();
             okButton.interactable = false;
-            PersistentLocalObjects.Singleton.StartCoroutine(ActivateOKButton());
+            if (okButtonCoroutine != null) { StopCoroutine(okButtonCoroutine); }
+            okButtonCoroutine = PersistentLocalObjects.Singleton.StartCoroutine(ActivateOKButton());
         }
 
+        private Coroutine okButtonCoroutine;
+        private Text okButtonText;
         private IEnumerator ActivateOKButton()
         {
-            yield return new WaitForSeconds(5);
+            float elapsedTime = 0;
+            while (elapsedTime < 5)
+            {
+                okButtonText.text = "Okay " + Mathf.CeilToInt(5 - elapsedTime).ToString();
+                yield return null;
+                elapsedTime += Time.deltaTime;
+            }
+
             okButton.interactable = true;
+            okButtonText.text = "Okay";
         }
 
         [System.Serializable]

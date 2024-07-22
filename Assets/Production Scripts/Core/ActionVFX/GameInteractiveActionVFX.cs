@@ -28,9 +28,8 @@ namespace Vi.Core
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
                     NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.Spawn();
+                    netObj.SpawnWithOwnership(OwnerClientId, true);
                     if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
-                    PersistentLocalObjects.Singleton.StartCoroutine(WeaponHandler.DespawnVFXAfterPlaying(netObj));
                 }
             }
         }

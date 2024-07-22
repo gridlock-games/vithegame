@@ -275,7 +275,7 @@ namespace Vi.Core
                 lungeClip.isInvincible = actionClip.isInvincible;
                 lungeClip.isUninterruptable = actionClip.isUninterruptable;
 
-                if (AreActionClipRequirementsMet(lungeClip))
+                if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                 {
                     // Lunge mechanic
                     ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
@@ -728,8 +728,7 @@ namespace Vi.Core
 
                 if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Loop") | animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Enhance"))
                 {
-                    chargeTime += Time.deltaTime;
-                    //if (Application.isEditor) { Debug.Log(chargeTime); }
+                    chargeTime += Time.deltaTime * Animator.speed;
                 }
 
                 if (actionClip.canEnhance)
