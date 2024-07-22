@@ -311,14 +311,17 @@ namespace Vi.UI
             }
 
             // Show game mode info UI
-            if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
+            if (roomSettingsParent.activeSelf)
             {
-                string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
-                if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
                 {
-                    FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
-                    gameModeInfoUI.gameObject.SetActive(true);
-                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                    string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
+                    if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                    {
+                        FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
+                        gameModeInfoUI.gameObject.SetActive(true);
+                        gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                    }
                 }
             }
         }
