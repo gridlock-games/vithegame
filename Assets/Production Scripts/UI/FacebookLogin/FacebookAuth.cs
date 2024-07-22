@@ -1,10 +1,12 @@
+using Proyecto26;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using UnityEngine;
 using static Vi.UI.SimpleGoogleSignIn.GoogleAuth;
 
-namespace Vi.UI
+namespace Vi.UI.FBAuthentication
 {
   public static partial class FacebookAuth
   {
@@ -35,13 +37,14 @@ namespace Vi.UI
       //This can be ignored
       _redirectUriLocalhost = $"http://localhost:7750/";
 
-      Auth();
+
 
       //Not needed for mobile version/used on windows version
       if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { Listen(); }
 
     }
+
 
 
     [Serializable]
@@ -53,6 +56,106 @@ namespace Vi.UI
       public string refresh_token;
       public string scope;
       public string token_type;
+    }
+    private static void Listen()
+    {
+      var httpListener = new System.Net.HttpListener();
+
+      httpListener.Prefixes.Add(_redirectUriLocalhost);
+      httpListener.Start();
+
+      httpListener1 = httpListener;
+
+      var context = System.Threading.SynchronizationContext.Current;
+      var asyncResult = httpListener.BeginGetContext(result => context.Send(HandleHttpListenerCallback, result), httpListener);
+
+      // Block the thread when background mode is not supported to serve HTTP response while the application is not in focus.
+      if (!Application.runInBackground) asyncResult.AsyncWaitHandle.WaitOne();
+    }
+
+    private static void Auth()
+    {
+      _state = Guid.NewGuid().ToString();
+      _codeVerifier = Guid.NewGuid().ToString();
+
+      var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);
+      var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
+
+      //Debug.Log("authorizationRequest=" + authorizationRequest);
+      Application.OpenURL(authorizationRequest);
+    }
+
+    private static void HandleHttpListenerCallback(object state)
+    {
+      var result = (IAsyncResult)state;
+      var httpListener = (System.Net.HttpListener)result.AsyncState;
+      var context = httpListener.EndGetContext(result);
+
+      // Send an HTTP response to the browser to notify the user to close the browser.
+      var response = context.Response;
+
+      var buffer = System.Text.Encoding.UTF8.GetBytes(webpageHTML());
+
+      response.ContentLength64 = buffer.Length;
+
+      var output = response.OutputStream;
+      output1 = output;
+      output.Write(buffer, 0, buffer.Length);
+      output.Close();
+      httpListener.Close();
+      HandleAuthResponse(context.Request.QueryString);
+    }
+
+    private static void HandleAuthResponse(NameValueCollection parameters)
+    {
+      Debug.Log("Handle AUTH REESPONSE");
+      var error = parameters.Get("error");
+      Debug.Log(error);
+      if (error != null)
+      {
+        Debug.Log("Handle AUTH REESPONSE - ERROR");
+        _callback?.Invoke(false, error, null);
+        return;
+      }
+
+      var state = parameters.Get("state");
+      var code = parameters.Get("code");
+      var scope = parameters.Get("scope");
+      Debug.Log(state + " " + code + " " + scope);
+
+      if (state == null || code == null || scope == null) return;
+
+      if (state == _state)
+      {
+        PerformCodeExchange(code, _codeVerifier);
+      }
+      else
+      {
+        Debug.Log("Unexpected response.");
+      }
+    }
+
+    private static void PerformCodeExchange(string code, string codeVerifier)
+    {
+      RestClient.Request(new RequestHelper
+      {
+        Method = "POST",
+        Uri = "https://oauth2.googleapis.com/token",
+        Params = new Dictionary<string, string>
+            {
+                {"client_id", _clientId},
+                {"client_secret", _clientSecret},
+                {"code", code},
+                {"code_verifier", codeVerifier},
+                {"grant_type","authorization_code"},
+                {"redirect_uri", _redirectUri}
+            }
+      }).Then(
+      response =>
+      {
+        FacebookIdTokenResponse data = JsonUtility.FromJson<FacebookIdTokenResponse>(response.Text);
+        _callback(true, null, data);
+      }).Catch(Debug.LogError);
     }
 
     private static string webpageHTML()
