@@ -728,8 +728,7 @@ namespace Vi.Core
 
                 if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Loop") | animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Enhance"))
                 {
-                    chargeTime += Time.deltaTime;
-                    //if (Application.isEditor) { Debug.Log(chargeTime); }
+                    chargeTime += Time.deltaTime * Animator.speed;
                 }
 
                 if (actionClip.canEnhance)
