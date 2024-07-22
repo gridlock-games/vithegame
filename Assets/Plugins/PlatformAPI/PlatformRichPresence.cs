@@ -36,7 +36,7 @@ namespace jomarcentermjm.PlatformAPI
       //Debug.Log("Updating Platform Status");
       //Steam
 
-      if (SteamManager.Initialized && gameObject.GetComponent<SteamManager>() != null)
+      if (gameObject.GetComponent<SteamManager>() != null)
             {
                 //Debug.Log("Successful reporting on steam");
                 string RecreatedValue = description + linethree;
