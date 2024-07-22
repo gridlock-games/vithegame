@@ -59,7 +59,7 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam
-        if (SteamManager.Initialized)
+        if (SteamManager.Initialized && gameObject.GetComponent<SteamManager>() != null)
         {
           SteamUserStats.SetStat(stats.steamStatisticsID, value);
           SteamUserStats.StoreStats();
@@ -81,7 +81,7 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam
-        if (SteamManager.Initialized && platform == GamePlatform.Steam)
+        if (SteamManager.Initialized && platform == GamePlatform.Steam &&gameObject.GetComponent<SteamManager>() != null)
         {
           SteamUserStats.GetStat(stats.steamStatisticsID, out output);
         }
