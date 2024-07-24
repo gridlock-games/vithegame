@@ -102,7 +102,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static void Auth()
     {
-      _state = Guid.NewGuid().ToString();
+      _state = $"st={Guid.NewGuid().ToString()}$pl=Google";
       _codeVerifier = Guid.NewGuid().ToString();
 
       var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);

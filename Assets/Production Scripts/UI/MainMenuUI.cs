@@ -366,7 +366,7 @@ namespace Vi.UI
     public void LoginWithFacebook()
     {
       Debug.Log("Logging in with Facebook");
-      dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
+      dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.facebook);
       openDialogue("Facebook");
       FacebookAuth.Auth(facebookSignInClientId, facebookSignInSecretId, (success, error, tokenData) =>
       {
@@ -389,10 +389,38 @@ namespace Vi.UI
 
       yield return new WaitUntil(() => task.IsCompleted);
 
-      FacebookAuth.Auth(facebookSignInClientId, facebookSignInSecretId, (success, error, tokenData) =>
+      if (task.IsCanceled)
       {
-        Debug.Log("test");
-      });
+        loginErrorText.text = "Login with Facebook was cancelled.";
+        oAuthParent.SetActive(false);
+        yield break;
+      }
+
+      if (task.IsFaulted)
+      {
+        loginErrorText.text = "Login with Facebook encountered an error.";
+        oAuthParent.SetActive(false);
+        yield break;
+      }
+
+      AuthResult authResult = task.Result;
+      oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+
+      if (WebRequestManager.Singleton.IsLoggedIn)
+      {
+        initialParent.SetActive(false);
+        oAuthParent.SetActive(false);
+        welcomeUserText.text = authResult.User.DisplayName;
+        FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Facebook");
+        FasterPlayerPrefs.Singleton.SetString("FacebookIdTokenResponse", JsonUtility.ToJson(tokenData));
+      }
+      else
+      {
+        oAuthParent.SetActive(false);
+        initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+      }
+
       }
 
 

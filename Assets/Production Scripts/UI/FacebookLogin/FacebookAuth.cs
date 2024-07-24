@@ -3,6 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net.Http;
+using System.Net.Sockets;
+using System.Web;
 using UnityEngine;
 
 
@@ -73,14 +76,22 @@ namespace Vi.UI.FBAuthentication
       if (!Application.runInBackground) asyncResult.AsyncWaitHandle.WaitOne();
     }
 
+    //Handles deeplink listener request - MJM
+    public static void deeplinkListener(string content)
+    {
+      Debug.Log("Start verification");
+      NameValueCollection dlquery = HttpUtility.ParseQueryString(content);
+      HandleAuthResponse(dlquery);
+    }
+
     private static void Auth()
     {
-      _state = Guid.NewGuid().ToString();
+      _state = $"st={Guid.NewGuid().ToString()}$plt=Facebook";
       _codeVerifier = Guid.NewGuid().ToString();
 
       var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);
       //var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
-      var authorizationRequest = $"{AuthorizationEndpoint}?client_id={_clientId}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&{AccessScope}&state={_state}";
+      var authorizationRequest = $"{AuthorizationEndpoint}?client_id={_clientId}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&{AccessScope}&state={_state}&scope={AccessScope}";
       //Debug.Log("authorizationRequest=" + authorizationRequest);
       Application.OpenURL(authorizationRequest);
     }
@@ -103,6 +114,8 @@ namespace Vi.UI.FBAuthentication
       output.Write(buffer, 0, buffer.Length);
       output.Close();
       httpListener.Close();
+
+      Debug.Log(context);
       HandleAuthResponse(context.Request.QueryString);
     }
 
@@ -120,10 +133,9 @@ namespace Vi.UI.FBAuthentication
 
       var state = parameters.Get("state");
       var code = parameters.Get("code");
-      var scope = parameters.Get("scope");
-      Debug.Log(state + " " + code + " " + scope);
+      Debug.Log(state + " " + code  );
 
-      if (state == null || code == null || scope == null) return;
+      if (state == null || code == null) return;
 
       if (state == _state)
       {
@@ -137,23 +149,25 @@ namespace Vi.UI.FBAuthentication
 
     private static void PerformCodeExchange(string code, string codeVerifier)
     {
+
       RestClient.Request(new RequestHelper
       {
         Method = "POST",
-        Uri = "https://graph.facebook.com/oauth/access_token",
+        Uri = $"https://graph.facebook.com/v20.0/oauth/access_token",
         Params = new Dictionary<string, string>
             {
                 {"client_id", _clientId},
+                {"redirect_uri", _redirectUri + "/"}, //Figuring out how to get this working.
                 {"client_secret", _clientSecret},
-                {"code", code},
-                {"code_verifier", codeVerifier},
-                {"grant_type","authorization_code"},
-                {"redirect_uri", _redirectUri}
+                {"code", code}
+
             }
       }).Then(
       response =>
       {
+        Debug.Log(response.Text);
         FacebookIdTokenResponse data = JsonUtility.FromJson<FacebookIdTokenResponse>(response.Text);
+        Debug.Log(data);
         _callback(true, null, data);
       }).Catch(Debug.LogError);
     }
