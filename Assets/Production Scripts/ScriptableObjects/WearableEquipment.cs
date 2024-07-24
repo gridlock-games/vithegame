@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.Utility;
+using UnityEngine.Assertions;
 
 namespace Vi.ScriptableObjects
 {
@@ -44,10 +45,6 @@ namespace Vi.ScriptableObjects
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
-
-            //nothing to map
-            if (renderList.Length == 0)
-                return;
 
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {
