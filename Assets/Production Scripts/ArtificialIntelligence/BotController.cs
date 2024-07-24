@@ -301,7 +301,6 @@ namespace Vi.ArtificialIntelligence
                 SetImmovable(attributes.IsGrabbed());
             }
             
-            if (!CanMove()) { return; }
             if (!IsSpawned) { return; }
 
             if (attributes.GetAilment() == ActionClip.Ailment.Death)

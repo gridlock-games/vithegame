@@ -184,10 +184,9 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", sliderValue);
         }
 
-        private Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
+        private readonly Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
         {
-            { "Disabled", 0 },
-            { "1x", 1 },
+            { "Disabled", 1 },
             { "2x", 2 },
             { "4x", 4 },
             { "8x", 8 }

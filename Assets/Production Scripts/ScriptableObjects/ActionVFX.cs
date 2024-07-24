@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using UnityEngine.VFX;
 
 namespace Vi.ScriptableObjects
 {
@@ -67,6 +68,55 @@ namespace Vi.ScriptableObjects
             }
 
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsServer) { StartCoroutine(DespawnVFXAfterPlaying()); }
+        }
+
+        private IEnumerator DespawnVFXAfterPlaying()
+        {
+            yield return null;
+
+            ParticleSystem particleSystem = GetComponentInChildren<ParticleSystem>();
+            if (particleSystem)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!particleSystem.isPlaying) { break; }
+                }
+            }
+
+            AudioSource audioSource = GetComponentInChildren<AudioSource>();
+            if (audioSource)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!audioSource.isPlaying) { break; }
+                }
+            }
+
+            VisualEffect visualEffect = GetComponentInChildren<VisualEffect>();
+            if (visualEffect)
+            {
+                while (true)
+                {
+                    yield return null;
+                    if (!visualEffect.HasAnySystemAwake()) { break; }
+                }
+            }
+
+            if (IsSpawned)
+            {
+                NetworkObject.Despawn(true);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         private const float actionVFXSoundEffectVolume = 0.7f;
