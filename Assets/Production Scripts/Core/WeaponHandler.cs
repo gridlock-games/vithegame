@@ -702,17 +702,37 @@ namespace Vi.Core
             }
         }
 
+        private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private Coroutine lightAttackHoldCoroutine;
         public void LightAttackHold(bool isPressed)
         {
-            if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
-            if (isPressed) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
-            else { LightAttack(false); }
+            lightAttackIsPressed.Value = isPressed;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
         }
 
         void OnLightAttackHold(InputValue value)
         {
-            LightAttackHold(value.isPressed);
+            lightAttackIsPressed.Value = value.isPressed;
+        }
+
+        private void OnLightAttackHoldChange(bool prev, bool current)
+        {
+            if (IsServer)
+            {
+                if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
+                if (current) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
+                else { LightAttack(false); }
+            }
         }
 
         private IEnumerator LightAttackHold()
