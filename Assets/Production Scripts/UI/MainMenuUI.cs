@@ -328,7 +328,7 @@ namespace Vi.UI
         {
             Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
             System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
-
+      
             yield return new WaitUntil(() => task.IsCompleted);
 
             if (task.IsCanceled)
@@ -346,7 +346,9 @@ namespace Vi.UI
             }
 
             AuthResult authResult = task.Result;
-            oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      Debug.Log(authResult.User.Email);
+      Debug.Log(authResult.User.UserId);
+      oAuthMessageText.text = $"Waiting for Firebase Authentication";
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
@@ -385,7 +387,11 @@ namespace Vi.UI
 
         private IEnumerator WaitForFacebookAuth(FacebookAuth.FacebookIdTokenResponse tokenData)
         {
-            Credential credential = FacebookAuthProvider.GetCredential(tokenData.access_token);
+      Debug.Log(tokenData.access_token);
+      Debug.Log(tokenData.id_token);
+      Debug.Log(tokenData.token_type);
+      Debug.Log(tokenData.scope);
+      Credential credential = FacebookAuthProvider.GetCredential(tokenData.access_token);
             System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
 
             yield return new WaitUntil(() => task.IsCompleted);
@@ -406,6 +412,8 @@ namespace Vi.UI
 
             AuthResult authResult = task.Result;
             oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      Debug.Log(authResult.User.Email);
+      Debug.Log(authResult.User.UserId);
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
