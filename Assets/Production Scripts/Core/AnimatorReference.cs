@@ -141,7 +141,7 @@ namespace Vi.Core
                 }
                 wearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled = true;
             }
-            SetRendererStatusForCharacterCosmetics();
+            StartCoroutine(SetRendererStatusForCharacterCosmetics());
         }
 
         public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
@@ -174,18 +174,19 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
-            SetRendererStatusForCharacterCosmetics();
+            StartCoroutine(SetRendererStatusForCharacterCosmetics());
         }
 
-        private void SetRendererStatusForCharacterCosmetics()
+        private IEnumerator SetRendererStatusForCharacterCosmetics()
         {
+            yield return null;
             // Disable hair if we're wearing a helmet
             if (wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair))
             {
-                bool shouldRenderHair = wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Helm);
+                bool shouldRenderHair = !wearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Helm);
                 foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[CharacterReference.EquipmentType.Hair].GetRenderList())
                 {
-                    smr.forceRenderingOff = shouldRenderHair;
+                    smr.forceRenderingOff = !shouldRenderHair;
                 }
             }
         }
