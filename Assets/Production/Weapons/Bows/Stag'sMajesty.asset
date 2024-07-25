@@ -102,8 +102,6 @@ MonoBehaviour:
     - {fileID: 8300000, guid: cb1cf390a5c5f4fec94acda121b5e90f, type: 3}
   hitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
-  pooledHitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
-    type: 3}
   blockingHitSoundEffects:
   - attackingWeaponMaterial: 0
     hitSounds:
@@ -182,8 +180,12 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 5c34718ee73304d6f869941b8789a77e, type: 3}
   blockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
     type: 3}
-  pooledBlockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
-    type: 3}
+  reloadSoundEffects:
+  - {fileID: 8300000, guid: 05b354e5be31e4de68ed0febd5be6c29, type: 3}
+  - {fileID: 8300000, guid: 8deafc3a5168e448c9762d52f4259c1e, type: 3}
+  - {fileID: 8300000, guid: a6494a2be6f4143e6b80da96c7512d3c, type: 3}
+  - {fileID: 8300000, guid: 1b6c0fc644ac14396bc3596db28b56fb, type: 3}
+  - {fileID: 8300000, guid: a06d4c10032604dfd820e70417cf98c8, type: 3}
   weaponModelData:
   - skinPrefab: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df,
       type: 3}

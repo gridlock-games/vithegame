@@ -200,6 +200,11 @@ namespace Vi.ScriptableObjects
 
         public PooledObject blockVFXPrefab;
 
+        [SerializeField] private List<AudioClip> reloadSoundEffects = new List<AudioClip>();
+
+        public const float reloadSoundEffectVolume = 0.1f;
+        public AudioClip GetReloadSoundEffect() { return reloadSoundEffects[Random.Range(0, reloadSoundEffects.Count)]; }
+
         public enum WeaponBone
         {
             Root = -1,
