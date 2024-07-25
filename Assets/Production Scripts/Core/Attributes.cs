@@ -1346,7 +1346,6 @@ namespace Vi.Core
                     Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
                     if (Vector3.Distance(victimNewPosition, movementHandler.GetPosition()) > 1)
                     {
-                        Debug.Log(Time.time + " calling set orientation");
                         movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
                     }
                 }
