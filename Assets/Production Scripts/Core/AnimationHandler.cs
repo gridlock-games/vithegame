@@ -14,6 +14,8 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
+            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name, isFollowUpClip);
@@ -605,10 +607,7 @@ namespace Vi.Core
             ActionClip.ClipType.Lunge
         };
 
-        private bool ShouldApplyStaminaCost(ActionClip actionClip)
-        {
-            return staminaCostActionClipTypes.Contains(actionClip.GetClipType());
-        }
+        private bool ShouldApplyStaminaCost(ActionClip actionClip) { return staminaCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
         private float GetStaminaCostOfClip(ActionClip actionClip)
         {
@@ -640,10 +639,7 @@ namespace Vi.Core
             ActionClip.ClipType.Lunge
         };
 
-        private bool ShouldApplyRageCost(ActionClip actionClip)
-        {
-            return rageCostActionClipTypes.Contains(actionClip.GetClipType());
-        }
+        private bool ShouldApplyRageCost(ActionClip actionClip) { return rageCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
         private float GetRageCostOfClip(ActionClip actionClip)
         {
