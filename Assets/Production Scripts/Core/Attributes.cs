@@ -1335,7 +1335,28 @@ namespace Vi.Core
         {
             if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
+
+            float durationLeft = animationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
+            Attributes attacker = GetGrabAssailant();
+            while (true)
+            {
+                durationLeft -= Time.deltaTime;
+                if (attacker)
+                {
+                    Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    if (Vector3.Distance(victimNewPosition, movementHandler.GetPosition()) > 1)
+                    {
+                        Debug.Log(Time.time + " calling set orientation");
+                        movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    }
+                }
+                else
+                {
+                    attacker = GetGrabAssailant();
+                }
+                yield return null;
+                if (durationLeft <= 0) { break; }
+            }
             isGrabbed.Value = false;
             grabAssailantDataId.Value = default;
             grabVictimDataId.Value = default;
