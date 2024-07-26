@@ -611,7 +611,11 @@ namespace Vi.Core
             // Don't let grab attack hit players that aren't grabbed
             if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
 
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            if (PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                if (Mathf.Approximately(attack.damage, 0)) { return false; }
+            }
+            else
             {
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
