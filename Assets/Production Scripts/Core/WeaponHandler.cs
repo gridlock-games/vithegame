@@ -713,11 +713,13 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
+            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterChange;
         }
 
         public override void OnNetworkDespawn()
         {
             lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
+            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterChange;
         }
 
         void OnLightAttackHold(InputValue value)
@@ -741,6 +743,27 @@ namespace Vi.Core
             {
                 yield return null;
                 LightAttack(true);
+            }
+        }
+
+        private void OnReloadAnimParameterChange(bool prev, bool current)
+        {
+            if (current)
+            {
+                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
+                if (reloadSoundEffect) { StartCoroutine(PlayReloadSoundEffect(reloadSoundEffect)); }
+            }
+        }
+
+        private IEnumerator PlayReloadSoundEffect(AudioClip reloadSoundEffect)
+        {
+            AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(gameObject, reloadSoundEffect, transform.position, Weapon.reloadSoundEffectVolume);
+            while (true)
+            {
+                if (!reloadingAnimParameterValue.Value) { break; }
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
             }
         }
 

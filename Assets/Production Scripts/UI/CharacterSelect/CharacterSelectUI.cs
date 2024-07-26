@@ -643,7 +643,7 @@ namespace Vi.UI
 
             UpdateSelectionBarPositions();
 
-            gameVersionText.text = WebRequestManager.Singleton.GameIsUpToDate ? "" : "GAME IS OUT OF DATE";
+            gameVersionText.text = WebRequestManager.Singleton.GameVersionErrorMessage;
 
             if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
             lastClientState = NetworkManager.Singleton.IsClient;
