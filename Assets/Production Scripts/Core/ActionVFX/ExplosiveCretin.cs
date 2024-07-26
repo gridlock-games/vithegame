@@ -16,6 +16,8 @@ namespace Vi.Core
             rb = GetComponent<Rigidbody>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
+
+            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
         }
 
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
@@ -44,14 +46,12 @@ namespace Vi.Core
 
         private const float radius = 10;
 
-        private NetworkCollider target;
         private Collider[] colliders = new Collider[20];
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
-            target = null;
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
@@ -65,11 +65,16 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        target = networkCollider;
                         navMeshAgent.destination = networkCollider.MovementHandler.GetPosition();
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < navMeshAgent.stoppingDistance)
                         {
-                            NetworkObject.Despawn(true);
+                            bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
+                                attack, networkCollider.Attributes.transform.position, transform.position);
+
+                            if (hitSuccess)
+                            {
+                                NetworkObject.Despawn(true);
+                            }
                         }
                         break;
                     }
