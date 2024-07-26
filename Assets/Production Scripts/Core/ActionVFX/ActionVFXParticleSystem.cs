@@ -11,6 +11,13 @@ namespace Vi.Core
     [RequireComponent(typeof(NetworkRigidbody))]
     public class ActionVFXParticleSystem : GameInteractiveActionVFX
     {
+        private enum ParticleSystemType
+        {
+            ParticleCollisions,
+            GenericCollisions
+        }
+
+        [SerializeField] private ParticleSystemType particleSystemType = ParticleSystemType.ParticleCollisions;
         [SerializeField] private bool shouldUseAttackerPositionForHitAngles;
         [SerializeField] private bool shouldOverrideMaxHits;
         [SerializeField] private int maxHitOverride = 1;
@@ -29,12 +36,15 @@ namespace Vi.Core
         {
             GetComponent<Rigidbody>().useGravity = false;
 
-            particleSystems = GetComponentsInChildren<ParticleSystem>();
-            foreach (ParticleSystem ps in particleSystems)
+            if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
-                if (ps.trigger.enabled)
+                particleSystems = GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem ps in particleSystems)
                 {
-                    ps.gameObject.AddComponent<ActionVFXChildTriggerParticleSystem>();
+                    if (ps.trigger.enabled)
+                    {
+                        ps.gameObject.AddComponent<ActionVFXChildTriggerParticleSystem>();
+                    }
                 }
             }
 
@@ -87,23 +97,90 @@ namespace Vi.Core
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
-                foreach (ParticleSystem ps in particleSystems)
+                if (other.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    bool skip = false;
-                    for (int i = 0; i < ps.trigger.colliderCount; i++)
+                    foreach (ParticleSystem ps in particleSystems)
                     {
-                        if (ps.trigger.GetCollider(i) == other)
+                        bool skip = false;
+                        for (int i = 0; i < ps.trigger.colliderCount; i++)
                         {
-                            skip = true;
-                            break;
+                            if (ps.trigger.GetCollider(i) == other)
+                            {
+                                skip = true;
+                                break;
+                            }
+                        }
+
+                        if (!skip)
+                        {
+                            ps.trigger.AddCollider(other);
                         }
                     }
-
-                    if (!skip)
+                }
+            }
+            else if (particleSystemType == ParticleSystemType.GenericCollisions)
+            {
+                if (other.TryGetComponent(out NetworkCollider networkCollider))
+                {
+                    if (networkCollider.Attributes)
                     {
-                        ps.trigger.AddCollider(other);
+                        bool canHit = true;
+                        if (hitCounter.ContainsKey(networkCollider.Attributes))
+                        {
+                            if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                            if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                        }
+
+                        if (canHit)
+                        {
+                            if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                            {
+                                if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                {
+                                    hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                }
+                                else
+                                {
+                                    hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (particleSystemType == ParticleSystemType.GenericCollisions)
+            {
+                if (other.TryGetComponent(out NetworkCollider networkCollider))
+                {
+                    if (networkCollider.Attributes)
+                    {
+                        bool canHit = true;
+                        if (hitCounter.ContainsKey(networkCollider.Attributes))
+                        {
+                            if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                            if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                        }
+
+                        if (canHit)
+                        {
+                            if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                            {
+                                if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                {
+                                    hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                }
+                                else
+                                {
+                                    hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                }
+                            }
+                        }
                     }
                 }
             }

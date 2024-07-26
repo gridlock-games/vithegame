@@ -1740,15 +1740,17 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: ddaf850384c166f46a44d1388d87be8f, type: 3}
   abilityCooldownTime: 1
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 8993570455217462991, guid: 5434a5bc0ccc71845a5e564a0dc42f65, type: 3}
-  previewActionVFX: {fileID: 0}
-  previewActionVFXScale: {x: 1, y: 1, z: 1}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  previewActionVFX: {fileID: 2951280832426361480, guid: 5018b3ee257acd84fb55f47bf0955508,
+    type: 3}
+  previewActionVFXScale: {x: 0.9, y: 0.9, z: 0.9}
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 10
   canLunge: 0
   minLungeDistance: 2.5
