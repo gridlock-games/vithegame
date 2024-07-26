@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.UI.SimpleGoogleSignIn;
+using Vi.UI.FBAuthentication;
 using Vi.Utility;
 
 namespace Vi.UI
@@ -42,6 +43,7 @@ namespace Vi.UI
 
         [Header("OAuth")]
         [SerializeField] private GameObject oAuthParent;
+
         [SerializeField] private Text oAuthMessageText;
 
         [Header("Play Menu")]
@@ -164,6 +166,7 @@ namespace Vi.UI
             if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             initialParent.SetActive(false);
+            initialErrorText.text = "";
 
             emailInput.gameObject.SetActive(false);
             loginButton.GetComponentInChildren<Text>().text = "LOGIN";
@@ -296,6 +299,12 @@ namespace Vi.UI
         private const string googleSignInClientId = "583444002427-p8hrsdv9p38migp7db30mch3qeluodda.apps.googleusercontent.com";
         private const string googleSignInSecretId = "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";
 
+        //private const string facebookSignInClientId = "582767463749884";
+        //private const string facebookSignInSecretId = "d5bd937c38b1b7843431cbfacd0ceeef";
+
+        private const string facebookSignInClientId = "461749126721789";
+        private const string facebookSignInSecretId = "ad176d80170673cff90d3e0afec14cc7";
+
         public void LoginWithGoogle()
         {
             Debug.Log("Logging in with Google");
@@ -319,25 +328,27 @@ namespace Vi.UI
         {
             Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
             System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
-
+      
             yield return new WaitUntil(() => task.IsCompleted);
 
             if (task.IsCanceled)
             {
-                loginErrorText.text = "Login with google was cancelled.";
+                initialErrorText.text = "Login with google was cancelled.";
                 oAuthParent.SetActive(false);
                 yield break;
             }
 
             if (task.IsFaulted)
             {
-                loginErrorText.text = "Login with google encountered an error.";
+                initialErrorText.text = "Login with google encountered an error.";
                 oAuthParent.SetActive(false);
                 yield break;
             }
 
             AuthResult authResult = task.Result;
-            oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      Debug.Log(authResult.User.Email);
+      Debug.Log(authResult.User.UserId);
+      oAuthMessageText.text = $"Waiting for Firebase Authentication";
             yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
             if (WebRequestManager.Singleton.IsLoggedIn)
@@ -357,8 +368,70 @@ namespace Vi.UI
 
         public void LoginWithFacebook()
         {
-            initialErrorText.text = "Facebook sign in not implemented yet";
+            Debug.Log("Logging in with Facebook");
+            dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.facebook);
+            openDialogue("Facebook");
+            FacebookAuth.Auth(facebookSignInClientId, facebookSignInSecretId, (success, error, tokenData) =>
+            {
+                if (success)
+                {
+                    StartCoroutine(WaitForFacebookAuth(tokenData));
+                }
+                else
+                {
+                    Debug.LogError("Facebook sign in error - " + error);
+                    oAuthParent.SetActive(false);
+                }
+            });
         }
+
+        private IEnumerator WaitForFacebookAuth(FacebookAuth.FacebookIdTokenResponse tokenData)
+        {
+      Debug.Log(tokenData.access_token);
+      Debug.Log(tokenData.id_token);
+      Debug.Log(tokenData.token_type);
+      Debug.Log(tokenData.scope);
+      Credential credential = FacebookAuthProvider.GetCredential(tokenData.access_token);
+            System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
+
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.IsCanceled)
+            {
+                initialErrorText.text = "Login with Facebook was cancelled.";
+                oAuthParent.SetActive(false);
+                yield break;
+            }
+
+            if (task.IsFaulted)
+            {
+                initialErrorText.text = "Login with Facebook encountered an error.";
+                oAuthParent.SetActive(false);
+                yield break;
+            }
+
+            AuthResult authResult = task.Result;
+            oAuthMessageText.text = $"Waiting for Firebase Authentication";
+      Debug.Log(authResult.User.Email);
+      Debug.Log(authResult.User.UserId);
+            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+
+            if (WebRequestManager.Singleton.IsLoggedIn)
+            {
+                initialParent.SetActive(false);
+                oAuthParent.SetActive(false);
+                welcomeUserText.text = authResult.User.DisplayName;
+                FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Facebook");
+                FasterPlayerPrefs.Singleton.SetString("FacebookIdTokenResponse", JsonUtility.ToJson(tokenData));
+            }
+            else
+            {
+                oAuthParent.SetActive(false);
+                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+            }
+
+        }
+
 
         public void LoginWithApple()
         {
@@ -369,6 +442,10 @@ namespace Vi.UI
         {
             WebRequestManager.Singleton.Logout();
             initialParent.SetActive(true);
+            FasterPlayerPrefs.Singleton.DeleteKey("LastSignInType");
+            FasterPlayerPrefs.Singleton.DeleteKey("username");
+            FasterPlayerPrefs.Singleton.DeleteKey("password");
+            FasterPlayerPrefs.Singleton.DeleteKey("GoogleIdTokenResponse");
         }
 
         public void ForgotPassword()
@@ -393,9 +470,6 @@ namespace Vi.UI
                 StartCoroutine(AutomaticallyAttemptLogin());
                 HandlePlatformAPI();
             }
-
-
-
         }
 
         private IEnumerator AutomaticallyAttemptLogin()
@@ -418,12 +492,11 @@ namespace Vi.UI
                             initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
                         }
                         break;
-
                     case "Google":
                         yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("GoogleIdTokenResponse")));
-
                         break;
-
+                    case "Facebook":
+                        break;
                     default:
                         Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
                         break;
@@ -501,9 +574,9 @@ namespace Vi.UI
             viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
             loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
         }
+
         public void HandlePlatformAPI()
         {
-
             //Rich presence
             if (PlatformRichPresence.instance != null)
             {
