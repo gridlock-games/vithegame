@@ -78,7 +78,7 @@ namespace Vi.Core
                 HP.Value = weaponHandler.GetWeapon().GetMaxHP();
             else if (HP.Value + amount < 0)
                 HP.Value = 0;
-            else
+            else if (HP.Value + amount <= weaponHandler.GetWeapon().GetMaxHP())
                 HP.Value += amount;
         }
 
@@ -91,8 +91,10 @@ namespace Vi.Core
                 return weaponHandler.GetWeapon().GetMaxHP();
             else if (HP.Value + amount < 0)
                 return 0;
-            else
+            else if (HP.Value + amount <= weaponHandler.GetWeapon().GetMaxHP())
                 return HP.Value + amount;
+
+            return HP.Value;
         }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -104,7 +106,7 @@ namespace Vi.Core
                 stamina.Value = weaponHandler.GetWeapon().GetMaxStamina();
             else if (stamina.Value + amount < 0)
                 stamina.Value = 0;
-            else
+            else if (stamina.Value + amount <= weaponHandler.GetWeapon().GetMaxStamina())
                 stamina.Value += amount;
         }
 
@@ -117,7 +119,7 @@ namespace Vi.Core
                 spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
             else if (spirit.Value + amount < 0)
                 spirit.Value = 0;
-            else
+            else if (spirit.Value + amount <= weaponHandler.GetWeapon().GetMaxSpirit())
                 spirit.Value += amount;
         }
 
@@ -127,7 +129,7 @@ namespace Vi.Core
                 rage.Value = weaponHandler.GetWeapon().GetMaxRage();
             else if (rage.Value + amount < 0)
                 rage.Value = 0;
-            else
+            else if (rage.Value + amount <= weaponHandler.GetWeapon().GetMaxRage())
                 rage.Value += amount;
         }
 

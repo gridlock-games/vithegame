@@ -16,6 +16,7 @@ namespace Vi.Core
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy;
         [SerializeField] private AudioClip[] soundToPlayOnSpawn = new AudioClip[0];
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
+        [SerializeField] private AudioClip[] soundToPlayOnDespawn = new AudioClip[0];
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -160,6 +161,12 @@ namespace Vi.Core
                     PooledObject obj = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                     PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(obj));
                 }
+            }
+
+            if (soundToPlayOnDespawn.Length > 0)
+            {
+                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnDespawn[Random.Range(0, soundToPlayOnDespawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
+                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
             }
         }
 

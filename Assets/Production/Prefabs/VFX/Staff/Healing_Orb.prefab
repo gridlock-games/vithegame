@@ -48460,7 +48460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2099385409
+  GlobalObjectIdHash: 3909088034
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -48491,12 +48491,12 @@ MonoBehaviour:
   raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnAwake: {fileID: 8300000, guid: a75426219019846d0bbb6f094f4d4ef9,
+    type: 3}
   awakeAudioClipDelay: 0
-  audioClipToPlayOnDestroy: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 8300000, guid: d449323f536dc491bb3912ea114564dc,
+    type: 3}
   VFXToPlayOnDestroy:
-  - {fileID: -8543850773922107856, guid: 0965f413807621140b57e9ee9a961b7a, type: 3}
-  pooledVFXToPlayOnDestroy:
   - {fileID: -8543850773922107856, guid: 0965f413807621140b57e9ee9a961b7a, type: 3}
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
