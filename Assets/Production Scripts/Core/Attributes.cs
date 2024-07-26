@@ -1475,6 +1475,7 @@ namespace Vi.Core
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
         public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
         public bool IsFeared() { return activeStatuses.Contains((int)ActionClip.Status.fear); }
+        public bool IsImmuneToGroundSpells() { return activeStatuses.Contains((int)ActionClip.Status.immuneToGroundSpells); }
 
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
@@ -1735,6 +1736,20 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
+                    TryRemoveStatus(statusPayload);
+                    break;
+                case ActionClip.Status.immuneToGroundSpells:
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
                     TryRemoveStatus(statusPayload);
                     break;
                 default:

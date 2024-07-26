@@ -11,6 +11,14 @@ namespace Vi.Core
     [RequireComponent(typeof(NetworkTransform))]
     public class GameInteractiveActionVFX : ActionVFX
     {
+        public enum SpellType
+        {
+            NotASpell,
+            GroundSpell,
+            AerialSpell
+        }
+
+        [SerializeField] protected SpellType spellType = SpellType.NotASpell;
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
         [SerializeField] private bool shouldBlockProjectiles;
         [SerializeField] private bool shouldDestroyOnEnemyHit;

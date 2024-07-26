@@ -10,13 +10,17 @@ namespace Vi.Editor
     [CanEditMultipleObjects]
     public class GameInteractiveActionVFXEditor : ActionVFXEditor
     {
+        private SerializedProperty spSpellType;
         private SerializedProperty spFollowUpVFXToPlayOnDestroy;
+        private SerializedProperty spShouldBlockProjectiles;
         private SerializedProperty spShouldDestroyOnEnemyHit;
 
         protected new void OnEnable()
         {
             base.OnEnable();
+            spSpellType = serializedObject.FindProperty("spellType");
             spFollowUpVFXToPlayOnDestroy = serializedObject.FindProperty("followUpVFXToPlayOnDestroy");
+            spShouldBlockProjectiles = serializedObject.FindProperty("shouldBlockProjectiles");
             spShouldDestroyOnEnemyHit = serializedObject.FindProperty("shouldDestroyOnEnemyHit");
         }
 
@@ -24,7 +28,9 @@ namespace Vi.Editor
         {
             base.OnInspectorGUI();
             EditorGUILayout.LabelField("Game Interactive Action VFX", EditorStyles.whiteLargeLabel);
+            EditorGUILayout.PropertyField(spSpellType);
             EditorGUILayout.PropertyField(spFollowUpVFXToPlayOnDestroy);
+            EditorGUILayout.PropertyField(spShouldBlockProjectiles);
             EditorGUILayout.PropertyField(spShouldDestroyOnEnemyHit);
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();

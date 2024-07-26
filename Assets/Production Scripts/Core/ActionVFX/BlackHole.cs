@@ -58,6 +58,11 @@ namespace Vi.Core
                         if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
 
+                    if (spellType == SpellType.GroundSpell)
+                    {
+                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                    }
+
                     if (shouldAffect)
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
