@@ -10,14 +10,5 @@ namespace Vi.Core
         public bool shouldAffectSelf;
         public bool shouldAffectTeammates;
         public bool shouldAffectEnemies;
-
-        public Attributes Attacker { get; private set; }
-        public ActionClip ActionClip { get; private set; }
-
-        public void Initialize(Attributes attacker, ActionClip actionClip)
-        {
-            Attacker = attacker;
-            ActionClip = actionClip;
-        }
     }
 }

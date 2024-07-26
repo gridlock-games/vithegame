@@ -28,6 +28,15 @@ namespace Vi.Core
         protected Attributes attacker;
         protected ActionClip attack;
 
+        public Attributes GetAttacker() { return attacker; }
+        public ActionClip GetAttack() { return attack; }
+
+        public virtual void InitializeVFX(Attributes attacker, ActionClip attack)
+        {
+            this.attacker = attacker;
+            this.attack = attack;
+        }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -37,7 +46,7 @@ namespace Vi.Core
                 {
                     NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
                     netObj.SpawnWithOwnership(OwnerClientId, true);
-                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }
             }
         }

@@ -19,7 +19,7 @@ namespace Vi.Core
 
         private bool initialized;
 
-        public void InitializeVFX(Attributes attacker, ActionClip attack)
+        public override void InitializeVFX(Attributes attacker, ActionClip attack)
         {
             ClearInitialization();
 
@@ -66,6 +66,7 @@ namespace Vi.Core
         private IEnumerator ActivateGravityCoroutine()
         {
             rb.useGravity = false;
+            if (timeToActivateGravity < 0) { yield break; }
             yield return new WaitForSeconds(timeToActivateGravity);
             rb.useGravity = true;
         }

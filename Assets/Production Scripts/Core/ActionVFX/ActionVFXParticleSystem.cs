@@ -25,12 +25,6 @@ namespace Vi.Core
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
-        public void InitializeVFX(Attributes attacker, ActionClip attack)
-        {
-            this.attacker = attacker;
-            this.attack = attack;
-        }
-
         private ParticleSystem[] particleSystems;
         private void Awake()
         {
