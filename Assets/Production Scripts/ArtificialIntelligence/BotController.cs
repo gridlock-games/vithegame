@@ -401,7 +401,7 @@ namespace Vi.ArtificialIntelligence
         private const float weaponSwapDuration = 20;
         private float lastWeaponSwapTime;
 
-        private const float abilityWaitDuration = 3;
+        private const float abilityWaitDuration = 0.1f;
         private float lastAbilityTime;
 
         private void EvaluteAction()
