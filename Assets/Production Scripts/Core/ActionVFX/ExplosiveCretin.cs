@@ -65,7 +65,8 @@ namespace Vi.Core
 
                     if (shouldAffect)
                     {
-                        navMeshAgent.destination = networkCollider.MovementHandler.GetPosition();
+                        Vector3 targetPosition = networkCollider.MovementHandler.GetPosition();
+                        if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { navMeshAgent.destination = networkCollider.MovementHandler.GetPosition(); }
                         if (Vector3.Distance(navMeshAgent.destination, transform.position) < navMeshAgent.stoppingDistance)
                         {
                             bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
