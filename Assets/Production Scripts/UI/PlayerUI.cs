@@ -446,25 +446,25 @@ namespace Vi.UI
             dodgeCooldownImage.enabled = dodgeIsOnCooldown;
             mobileDodgeCooldownImage.enabled = dodgeIsOnCooldown;
 
-            if (attributes.GetAilment() != ActionClip.Ailment.Death)
+            if (attributes.ActiveStatusesWasUpdatedThisFrame)
             {
-                if (attributes.ActiveStatusesWasUpdatedThisFrame)
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-                    foreach (StatusIcon statusIcon in statusIcons)
+                    if (activeStatuses.Contains(statusIcon.Status))
                     {
-                        if (activeStatuses.Contains(statusIcon.Status))
-                        {
-                            statusIcon.SetActive(true);
-                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                        }
-                        else
-                        {
-                            statusIcon.SetActive(false);
-                        }
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
                     }
                 }
+            }
 
+            if (attributes.GetAilment() != ActionClip.Ailment.Death)
+            {
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
