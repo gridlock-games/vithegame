@@ -18,14 +18,26 @@ namespace Vi.Core
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
         }
 
+        private float serverSpawnTime;
+        private const float cretinDuration = 5;
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (IsServer) { serverSpawnTime = Time.time; }
+        }
+
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
 
         private const float runAnimationTransitionSpeed = 5;
 
+        private bool despawnCalled;
+
         private void Update()
         {
+            if (despawnCalled) { return; }
             if (IsServer)
             {
+                if (Time.time - serverSpawnTime > cretinDuration) { despawnCalled = true; NetworkObject.Despawn(true); }
                 Vector3 inputDir;
                 if (Vector3.Distance(navMeshAgent.destination, transform.position) < navMeshAgent.stoppingDistance)
                 {
@@ -48,6 +60,7 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (despawnCalled) { return; }
 
             Collider[] colliders = Physics.OverlapSphere(transform.position, radius, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
@@ -72,10 +85,10 @@ namespace Vi.Core
 
                             if (hitSuccess)
                             {
+                                despawnCalled = true;
                                 NetworkObject.Despawn(true);
                             }
                         }
-                        break;
                     }
                 }
             }

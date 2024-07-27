@@ -33,7 +33,7 @@ namespace Vi.UI
 
         public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
-        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim); }
+        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS); }
 
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
@@ -358,7 +358,7 @@ namespace Vi.UI
                 loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon,
                 loadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
 
-            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim);
+            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS);
         }
 
         private void UpdateActiveUIElements()
@@ -446,25 +446,25 @@ namespace Vi.UI
             dodgeCooldownImage.enabled = dodgeIsOnCooldown;
             mobileDodgeCooldownImage.enabled = dodgeIsOnCooldown;
 
-            if (attributes.GetAilment() != ActionClip.Ailment.Death)
+            if (attributes.ActiveStatusesWasUpdatedThisFrame)
             {
-                if (attributes.ActiveStatusesWasUpdatedThisFrame)
+                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
                 {
-                    List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
-                    foreach (StatusIcon statusIcon in statusIcons)
+                    if (activeStatuses.Contains(statusIcon.Status))
                     {
-                        if (activeStatuses.Contains(statusIcon.Status))
-                        {
-                            statusIcon.SetActive(true);
-                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                        }
-                        else
-                        {
-                            statusIcon.SetActive(false);
-                        }
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
                     }
                 }
+            }
 
+            if (attributes.GetAilment() != ActionClip.Ailment.Death)
+            {
                 if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
@@ -563,7 +563,7 @@ namespace Vi.UI
 
             lastControlScheme = playerInput.currentControlScheme;
 
-            heavyAttackButton.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
+            heavyAttackButton.sprite = weaponHandler.CanADS ? aimIcon : heavyAttackIcon;
         }
     }
 }

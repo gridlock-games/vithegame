@@ -113,7 +113,7 @@ namespace Vi.Core
             shooterWeapons.Clear();
 
             CanAim = false;
-            canADS = false;
+            CanADS = false;
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -154,7 +154,7 @@ namespace Vi.Core
                         {
                             shooterWeapons.Add(shooterWeapon);
                             CanAim = true;
-                            canADS = shooterWeapon.CanADS() | canADS;
+                            CanADS = shooterWeapon.CanADS() | CanADS;
                         }
                     }
                     broken = true;
@@ -764,7 +764,7 @@ namespace Vi.Core
         }
 
         public bool CanAim { get; private set; }
-        private bool canADS;
+        public bool CanADS { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -790,7 +790,7 @@ namespace Vi.Core
         {
             animationHandler.SetHeavyAttackPressedState(isPressed);
 
-            if (canADS)
+            if (CanADS)
             {
                 if (NetworkObject.IsPlayerObject)
                 {
