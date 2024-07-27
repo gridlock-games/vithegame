@@ -48430,7 +48430,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 3
+  m_Radius: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &446577899068989341
 Rigidbody:
@@ -48460,7 +48460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3909088034
+  GlobalObjectIdHash: 2099385409
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -48481,7 +48481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 1, z: 3}
+  vfxPositionOffset: {x: 0, y: 1, z: 2}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
@@ -48498,9 +48498,11 @@ MonoBehaviour:
     type: 3}
   VFXToPlayOnDestroy:
   - {fileID: -8543850773922107856, guid: 0965f413807621140b57e9ee9a961b7a, type: 3}
+  spellType: 0
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 1
+  particleSystemType: 1
   shouldUseAttackerPositionForHitAngles: 0
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
@@ -82403,7 +82405,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8489593623352105603
 Transform:
   m_ObjectHideFlags: 0
