@@ -46,14 +46,14 @@ namespace Vi.Core
 
         private const float radius = 10;
 
-        private Collider[] colliders = new Collider[20];
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
-            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
-            for (int i = 0; i < count; i++)
+            Collider[] colliders = Physics.OverlapSphere(transform.position, radius, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
+            System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+            for (int i = 0; i < colliders.Length; i++)
             {
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
