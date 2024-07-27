@@ -77,6 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a96115ad39cb2d45b04ca28e86fbb19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
   canADS: 0
   projectileSpawnPoint: {fileID: 6049529673539774852}
   projectile: {fileID: 747944658870220374, guid: 8003eff23bb7beb4396ce0ed2691b05c,
@@ -96,7 +97,7 @@ MonoBehaviour:
     aimHandIKOffset: {x: 9.8, y: 49.18, z: -6.1}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 1
-    aimHandIKOffset: {x: 0, y: 0.24, z: 0.64}
+    aimHandIKOffset: {x: 9.8, y: 49.18, z: -6.1}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 2
     aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
