@@ -74,12 +74,17 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
-                HP.Value = weaponHandler.GetWeapon().GetMaxHP();
-            else if (HP.Value + amount < 0)
-                HP.Value = 0;
-            else if (HP.Value + amount <= weaponHandler.GetWeapon().GetMaxHP())
-                HP.Value += amount;
+            if (amount > 0)
+            {
+                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+            }
         }
 
         private float AddHPWithoutApply(float amount)
@@ -87,13 +92,17 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
-                return weaponHandler.GetWeapon().GetMaxHP();
-            else if (HP.Value + amount < 0)
-                return 0;
-            else if (HP.Value + amount <= weaponHandler.GetWeapon().GetMaxHP())
-                return HP.Value + amount;
-
+            if (amount > 0)
+            {
+                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+            }
             return HP.Value;
         }
 
@@ -102,12 +111,17 @@ namespace Vi.Core
             if (activateCooldown)
                 staminaDelayCooldown = weaponHandler.GetWeapon().GetStaminaDelay();
 
-            if (stamina.Value + amount > weaponHandler.GetWeapon().GetMaxStamina() & stamina.Value <= weaponHandler.GetWeapon().GetMaxStamina())
-                stamina.Value = weaponHandler.GetWeapon().GetMaxStamina();
-            else if (stamina.Value + amount < 0)
-                stamina.Value = 0;
-            else if (stamina.Value + amount <= weaponHandler.GetWeapon().GetMaxStamina())
-                stamina.Value += amount;
+            if (amount > 0)
+            {
+                if (stamina.Value < weaponHandler.GetWeapon().GetMaxStamina())
+                {
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+            }
         }
 
         public void AddSpirit(float amount)
@@ -115,22 +129,32 @@ namespace Vi.Core
             if (amount < 0) { amount *= spiritReductionMultiplier; }
             if (amount > 0) { amount *= spiritIncreaseMultiplier; }
 
-            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit() & spirit.Value <= weaponHandler.GetWeapon().GetMaxSpirit())
-                spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
-            else if (spirit.Value + amount < 0)
-                spirit.Value = 0;
-            else if (spirit.Value + amount <= weaponHandler.GetWeapon().GetMaxSpirit())
-                spirit.Value += amount;
+            if (amount > 0)
+            {
+                if (spirit.Value < weaponHandler.GetWeapon().GetMaxSpirit())
+                {
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+            }
         }
 
         public void AddRage(float amount)
         {
-            if (rage.Value + amount > weaponHandler.GetWeapon().GetMaxRage() & rage.Value <= weaponHandler.GetWeapon().GetMaxRage())
-                rage.Value = weaponHandler.GetWeapon().GetMaxRage();
-            else if (rage.Value + amount < 0)
-                rage.Value = 0;
-            else if (rage.Value + amount <= weaponHandler.GetWeapon().GetMaxRage())
-                rage.Value += amount;
+            if (amount > 0)
+            {
+                if (rage.Value < weaponHandler.GetWeapon().GetMaxRage())
+                {
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+            }
         }
 
         PooledObject worldSpaceLabelInstance;
