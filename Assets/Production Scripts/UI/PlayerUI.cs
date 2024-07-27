@@ -33,7 +33,7 @@ namespace Vi.UI
 
         public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
-        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim); }
+        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS); }
 
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
@@ -358,7 +358,7 @@ namespace Vi.UI
                 loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon,
                 loadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
 
-            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanAim);
+            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS);
         }
 
         private void UpdateActiveUIElements()
@@ -563,7 +563,7 @@ namespace Vi.UI
 
             lastControlScheme = playerInput.currentControlScheme;
 
-            heavyAttackButton.sprite = weaponHandler.CanAim ? aimIcon : heavyAttackIcon;
+            heavyAttackButton.sprite = weaponHandler.CanADS ? aimIcon : heavyAttackIcon;
         }
     }
 }
