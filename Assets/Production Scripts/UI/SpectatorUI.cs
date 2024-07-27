@@ -20,6 +20,7 @@ namespace Vi.UI
         private void Awake()
         {
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+            spectator = GetComponentInParent<Spectator>();
         }
 
         private void OnEnable()
@@ -30,8 +31,6 @@ namespace Vi.UI
 
         private void Start()
         {
-            spectator = GetComponentInParent<Spectator>();
-
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
             List<PlayerCard> rightPlayerCardsTemp = rightPlayerCards.ToList();
 
