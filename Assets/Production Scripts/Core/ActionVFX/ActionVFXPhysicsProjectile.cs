@@ -19,7 +19,7 @@ namespace Vi.Core
 
         private bool initialized;
 
-        public void InitializeVFX(Attributes attacker, ActionClip attack)
+        public override void InitializeVFX(Attributes attacker, ActionClip attack)
         {
             ClearInitialization();
 
@@ -66,6 +66,7 @@ namespace Vi.Core
         private IEnumerator ActivateGravityCoroutine()
         {
             rb.useGravity = false;
+            if (timeToActivateGravity < 0) { yield break; }
             yield return new WaitForSeconds(timeToActivateGravity);
             rb.useGravity = true;
         }
@@ -95,8 +96,18 @@ namespace Vi.Core
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
-                if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+
+                bool canHit = true;
+                if (spellType == SpellType.GroundSpell)
+                {
+                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                }
+
+                if (canHit)
+                {
+                    bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {

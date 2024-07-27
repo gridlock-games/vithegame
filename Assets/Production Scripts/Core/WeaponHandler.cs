@@ -488,13 +488,9 @@ namespace Vi.Core
                     Transform parent = netObj.transform.parent;
                     netObj.SpawnWithOwnership(OwnerClientId, true);
                     netObj.TrySetParent(parent);
-                    if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                    if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {
-                        actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    }
-                    else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
-                    {
-                        actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
+                        gameInteractiveActionVFX.InitializeVFX(attributes, CurrentActionClip);
                     }
                 }
             }

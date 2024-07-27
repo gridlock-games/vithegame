@@ -79,9 +79,12 @@ namespace Vi.ScriptableObjects
         {
             yield return null;
 
+            bool componentFound = false;
+
             ParticleSystem particleSystem = GetComponentInChildren<ParticleSystem>();
             if (particleSystem)
             {
+                componentFound = true;
                 while (true)
                 {
                     yield return null;
@@ -92,6 +95,7 @@ namespace Vi.ScriptableObjects
             AudioSource audioSource = GetComponentInChildren<AudioSource>();
             if (audioSource)
             {
+                componentFound = true;
                 while (true)
                 {
                     yield return null;
@@ -102,12 +106,15 @@ namespace Vi.ScriptableObjects
             VisualEffect visualEffect = GetComponentInChildren<VisualEffect>();
             if (visualEffect)
             {
+                componentFound = true;
                 while (true)
                 {
                     yield return null;
                     if (!visualEffect.HasAnySystemAwake()) { break; }
                 }
             }
+
+            if (!componentFound) { yield break; }
 
             if (IsSpawned)
             {
@@ -119,7 +126,7 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        private const float actionVFXSoundEffectVolume = 0.7f;
+        protected const float actionVFXSoundEffectVolume = 0.7f;
 
         private IEnumerator PlayAwakeAudioClip()
         {

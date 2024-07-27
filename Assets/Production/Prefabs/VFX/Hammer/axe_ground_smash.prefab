@@ -5018,8 +5018,8 @@ GameObject:
   - component: {fileID: 8669111835701529754}
   - component: {fileID: 8669111835701529755}
   - component: {fileID: 8669111835701529732}
-  - component: {fileID: 82199973914113988}
   - component: {fileID: 7249162916143604617}
+  - component: {fileID: 82199973914113988}
   - component: {fileID: 3730964296283589503}
   - component: {fileID: 4398858583647616671}
   - component: {fileID: 2555935206191910977}
@@ -9901,6 +9901,27 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7249162916143604617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8669111835701529733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 960463799
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &82199973914113988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9928,36 +9949,17 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
+  spellType: 1
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  particleSystemType: 0
   shouldUseAttackerPositionForHitAngles: 1
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
   scaleVFXBasedOnEdges: 0
   boundsPoint: {x: 0, y: 0, z: 2.5}
   boundsLocalAxis: {x: 0, y: -1, z: 0}
---- !u!114 &7249162916143604617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8669111835701529733}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 960463799
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!54 &3730964296283589503
 Rigidbody:
   m_ObjectHideFlags: 0
