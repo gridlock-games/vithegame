@@ -8,12 +8,10 @@ namespace Vi.Core
 {
     public class ExplosiveCretin : GameInteractiveActionVFX
     {
-        private Rigidbody rb;
         private NavMeshAgent navMeshAgent;
         private Animator animator;
         private void Awake()
         {
-            rb = GetComponent<Rigidbody>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
 

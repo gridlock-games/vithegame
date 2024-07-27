@@ -126,7 +126,7 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        private const float actionVFXSoundEffectVolume = 0.7f;
+        protected const float actionVFXSoundEffectVolume = 0.7f;
 
         private IEnumerator PlayAwakeAudioClip()
         {

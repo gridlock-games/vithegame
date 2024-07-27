@@ -18,6 +18,8 @@ namespace Vi.Core
             AerialSpell
         }
 
+        public SpellType GetSpellType() { return spellType; }
+
         [SerializeField] protected SpellType spellType = SpellType.NotASpell;
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
         [SerializeField] private bool shouldBlockProjectiles;
