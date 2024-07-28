@@ -254,7 +254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldProcessWeapons: 0
+  shouldProcessWeapons: 1
   archivedWeaponsToGenerate:
   - weapon: {fileID: 11400000, guid: 34ca3ff156bce574e9623ae5181055dd, type: 2}
     transformDatas:
@@ -352,8 +352,12 @@ MonoBehaviour:
     transformDatas:
     - position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0}
-  weaponsToGenerate: []
-  shouldProcessEquipmentOptions: 1
+  weaponsToGenerate:
+  - weapon: {fileID: 11400000, guid: 9efd2fb72ea3c4d40a75f6fa13cf2a53, type: 2}
+    transformDatas: []
+  - weapon: {fileID: 11400000, guid: d35a5f0318b4a4144af8d1214217a2ce, type: 2}
+    transformDatas: []
+  shouldProcessEquipmentOptions: 0
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:
