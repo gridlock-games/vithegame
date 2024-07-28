@@ -83,7 +83,14 @@ namespace Vi.Core
             }
             else // Delta is less than or equal to zero
             {
-                HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    HP.Value += amount;
+                }
+                else
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
             }
         }
 
@@ -101,7 +108,14 @@ namespace Vi.Core
             }
             else // Delta is less than or equal to zero
             {
-                return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    return HP.Value + amount;
+                }
+                else
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
             }
             return HP.Value;
         }
@@ -120,7 +134,14 @@ namespace Vi.Core
             }
             else // Delta is less than or equal to zero
             {
-                stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                if (stamina.Value > weaponHandler.GetWeapon().GetMaxStamina())
+                {
+                    stamina.Value += amount;
+                }
+                else
+                {
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                }
             }
         }
 
@@ -138,7 +159,14 @@ namespace Vi.Core
             }
             else // Delta is less than or equal to zero
             {
-                spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                if (spirit.Value > weaponHandler.GetWeapon().GetMaxSpirit())
+                {
+                    spirit.Value += amount;
+                }
+                else
+                {
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                }
             }
         }
 
@@ -153,7 +181,14 @@ namespace Vi.Core
             }
             else // Delta is less than or equal to zero
             {
-                rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                if (rage.Value > weaponHandler.GetWeapon().GetMaxRage())
+                {
+                    rage.Value += amount;
+                }
+                else
+                {
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                }
             }
         }
 
