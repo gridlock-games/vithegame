@@ -24,6 +24,7 @@ namespace Vi.Core
         private ActionClip attack;
         private Vector3 projectileForce;
         private float damageMultiplier;
+        private Quaternion originalRotation;
         private bool initialized;
 
         public void Initialize(Attributes attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce, float damageMultiplier)
@@ -36,9 +37,16 @@ namespace Vi.Core
             this.attack = attack;
             this.projectileForce = projectileForce;
             this.damageMultiplier = damageMultiplier;
+            originalRotation = transform.rotation;
             initialized = true;
 
-            GetComponent<Rigidbody>().AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
+            rb.AddForce(transform.rotation * projectileForce, ForceMode.VelocityChange);
+        }
+
+        private Rigidbody rb;
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
         }
 
         private Vector3 startPosition;
@@ -109,6 +117,13 @@ namespace Vi.Core
                     Destroy(gameObject);
                 }
             }
+        }
+
+        private void FixedUpdate()
+        {
+            if (!initialized) { return; }
+            if (!IsServer) { return; }
+            transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
         }
 
         private void OnTriggerEnter(Collider other)
