@@ -2512,7 +2512,15 @@ MonoBehaviour:
     m_Active: 1
   - m_Rig: {fileID: 2099876545416834566}
     m_Active: 1
-  m_Effectors: []
+  m_Effectors:
+  - m_Transform: {fileID: 5635548144609208355}
+    m_Style:
+      shape: {fileID: 4300000, guid: e050c2b16fe384bd994474655a4b4968, type: 2}
+      color: {r: 1, g: 0, b: 1, a: 0.5}
+      size: 0.5
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+    m_Visible: 1
 --- !u!114 &6790715044151899370
 MonoBehaviour:
   m_ObjectHideFlags: 0
