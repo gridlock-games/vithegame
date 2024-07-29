@@ -34,8 +34,6 @@ namespace Vi.Core
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
-
-            NetworkManager.Singleton.NetworkConfig.SpawnTimeout = 10;
         }
 
         private void CreatePlayerDataManager(bool forceRefresh)
