@@ -254,8 +254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f669a714520ccf448a7b6979e70ee259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shouldProcessWeapons: 0
-  weaponsToGenerate:
+  shouldProcessWeapons: 1
+  archivedWeaponsToGenerate:
   - weapon: {fileID: 11400000, guid: 34ca3ff156bce574e9623ae5181055dd, type: 2}
     transformDatas:
     - position: {x: -0.42, y: 0, z: -0.21}
@@ -271,11 +271,11 @@ MonoBehaviour:
   - weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
     transformDatas:
     - position: {x: -0.54, y: 0, z: -0.058}
-      rotation: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
     transformDatas:
     - position: {x: -0.5, y: -0.15, z: 0}
-      rotation: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: ac028e91a77bd1540a0f8cbfd4342dbd, type: 2}
     transformDatas:
     - position: {x: -0.58, y: -0.04, z: 0}
@@ -291,9 +291,9 @@ MonoBehaviour:
   - weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
     transformDatas:
     - position: {x: -0.9, y: 0, z: -0.15}
-      rotation: {x: -0, y: 180, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
     - position: {x: -0.9, y: 0, z: 0.15}
-      rotation: {x: -0, y: 180, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
   - weapon: {fileID: 11400000, guid: 730971d05a0eefb46890429729ae874e, type: 2}
     transformDatas:
     - position: {x: -0.9, y: -0.1, z: -0.15}
@@ -315,9 +315,9 @@ MonoBehaviour:
   - weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
     transformDatas:
     - position: {x: -0.504, y: 0.146, z: -0.453}
-      rotation: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
     - position: {x: -0.489, y: 0.036, z: 0}
-      rotation: {x: -0, y: 180, z: 0}
+      rotation: {x: 0, y: 180, z: 0}
   - weapon: {fileID: 11400000, guid: a7404c483eb8721438c7e2d4a8a9a6cb, type: 2}
     transformDatas:
     - position: {x: -0.55, y: -0.05, z: -0.39}
@@ -339,16 +339,25 @@ MonoBehaviour:
   - weapon: {fileID: 11400000, guid: 48af974a8cfde574bbd3000d7d7a3cb1, type: 2}
     transformDatas:
     - position: {x: -0.279, y: 0, z: -0.153}
-      rotation: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
     transformDatas:
     - position: {x: -0.279, y: 0, z: -0.153}
-      rotation: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
   - weapon: {fileID: 11400000, guid: 4351ea1e1d73d2c408305f763bec31ec, type: 2}
     transformDatas:
     - position: {x: -0.279, y: 0, z: -0.153}
-      rotation: {x: -0, y: 0, z: 0}
-  shouldProcessEquipmentOptions: 1
+      rotation: {x: 0, y: 0, z: 0}
+  - weapon: {fileID: 11400000, guid: b8c854e692e561149a91a8872f3229a7, type: 2}
+    transformDatas:
+    - position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+  weaponsToGenerate:
+  - weapon: {fileID: 11400000, guid: 9efd2fb72ea3c4d40a75f6fa13cf2a53, type: 2}
+    transformDatas: []
+  - weapon: {fileID: 11400000, guid: d35a5f0318b4a4144af8d1214217a2ce, type: 2}
+    transformDatas: []
+  shouldProcessEquipmentOptions: 0
   characterReference: {fileID: 11400000, guid: 9ad061509b57a4848a6318a1e9067133, type: 2}
 --- !u!1 &1206360724
 GameObject:

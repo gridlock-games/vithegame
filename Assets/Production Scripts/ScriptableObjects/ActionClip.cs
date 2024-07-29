@@ -62,7 +62,8 @@ namespace Vi.ScriptableObjects
             rooted,
             silenced,
             fear,
-            healing
+            healing,
+            immuneToGroundSpells
         }
 
         [System.Serializable]

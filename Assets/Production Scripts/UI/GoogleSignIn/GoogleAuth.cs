@@ -45,26 +45,6 @@ namespace Vi.UI.SimpleGoogleSignIn
       if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { Listen(); }
 
-      //if (Application.platform == RuntimePlatform.Android)
-      //{
-      //    clientSecret = "google.auth";
-
-      //    _clientId = clientId;
-      //    _callback = callback;
-      //    _redirectUri = $"{clientSecret}:/oauth2callback";
-
-      //    Auth();
-      //}
-      //else
-      //{
-      //    _clientId = clientId;
-      //    _clientSecret = clientSecret;
-      //    _callback = callback;
-      //    _redirectUri = $"http://localhost:{Utils.GetRandomUnusedPort()}/";
-
-      //    Auth();
-      //    Listen();
-      //}
     }
 
     //Not needed for mobile version
@@ -122,7 +102,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static void Auth()
     {
-      _state = Guid.NewGuid().ToString();
+      _state = $"st={Guid.NewGuid().ToString()}$pl=Google";
       _codeVerifier = Guid.NewGuid().ToString();
 
       var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);

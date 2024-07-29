@@ -47,15 +47,20 @@ namespace Vi.Core
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == vfx.Attacker)
+                    if (networkCollider.Attributes == vfx.GetAttacker())
                     {
                         if (vfx.shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.Attacker);
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.GetAttacker());
                         if (vfx.shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
+                    }
+
+                    if (spellType == SpellType.GroundSpell)
+                    {
+                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
                     }
 
                     if (shouldAffect)
@@ -80,13 +85,13 @@ namespace Vi.Core
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == vfx.Attacker)
+                    if (networkCollider.Attributes == vfx.GetAttacker())
                     {
                         if (vfx.shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.Attacker);
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.GetAttacker());
                         if (vfx.shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
@@ -96,13 +101,13 @@ namespace Vi.Core
                         MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
 
-                        ActionClip copy = Instantiate(vfx.ActionClip);
-                        copy.name = vfx.ActionClip.name;
+                        ActionClip copy = Instantiate(vfx.GetAttack());
+                        copy.name = vfx.GetAttack().name;
                         copy.ailment = ailmentToTriggerOnEnd;
 
                         if (NetworkManager.Singleton.IsServer)
                         {
-                            networkCollider.Attributes.ProcessProjectileHit(vfx.Attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
+                            networkCollider.Attributes.ProcessProjectileHit(vfx.GetAttacker(), null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
                                 copy, networkCollider.Attributes.transform.position, transform.position);
                         }
                     }

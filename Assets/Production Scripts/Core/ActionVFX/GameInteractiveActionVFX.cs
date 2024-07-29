@@ -11,6 +11,16 @@ namespace Vi.Core
     [RequireComponent(typeof(NetworkTransform))]
     public class GameInteractiveActionVFX : ActionVFX
     {
+        public enum SpellType
+        {
+            NotASpell,
+            GroundSpell,
+            AerialSpell
+        }
+
+        public SpellType GetSpellType() { return spellType; }
+
+        [SerializeField] protected SpellType spellType = SpellType.NotASpell;
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
         [SerializeField] private bool shouldBlockProjectiles;
         [SerializeField] private bool shouldDestroyOnEnemyHit;
@@ -19,6 +29,15 @@ namespace Vi.Core
 
         protected Attributes attacker;
         protected ActionClip attack;
+
+        public Attributes GetAttacker() { return attacker; }
+        public ActionClip GetAttack() { return attack; }
+
+        public virtual void InitializeVFX(Attributes attacker, ActionClip attack)
+        {
+            this.attacker = attacker;
+            this.attack = attack;
+        }
 
         public override void OnNetworkDespawn()
         {
@@ -29,7 +48,7 @@ namespace Vi.Core
                 {
                     NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
                     netObj.SpawnWithOwnership(OwnerClientId, true);
-                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.Initialize(attacker, attack); }
+                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }
             }
         }

@@ -51,7 +51,12 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", false.ToString()); }
             FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate")) { FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", Screen.currentResolution.refreshRate + 60); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate"))
+            {
+                int targetFrameRate = Screen.currentResolution.refreshRate + 60;
+                if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 120; }
+                FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
+            }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetString("InvertMouse", false.ToString()); }
             if (!FasterPlayerPrefs.Singleton.HasKey("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }

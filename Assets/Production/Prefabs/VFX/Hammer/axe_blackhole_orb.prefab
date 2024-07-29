@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 761906137
+  GlobalObjectIdHash: 559323971
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -96,6 +96,41 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &2654175274349702557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494871026038834521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccfb7ebf44a80f8408efada6ad352880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 0
+  onActivateVFXSpawnNormalizedTime: 0
+  raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
+  raycastMaxDistance: 5
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 0}
+  awakeAudioClipDelay: 0
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy:
+  - {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff, type: 3}
+  spellType: 1
+  followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
+  shouldDestroyOnEnemyHit: 0
+  duration: 3
+  radius: 2
+  forceMultiplier: 5
+  ailmentToTriggerOnEnd: 1
 --- !u!114 &-5467905512432266006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,46 +159,13 @@ MonoBehaviour:
   audioClipToPlayOnDestroy: {fileID: 8300000, guid: 5b0a3f85c9474433c86f969773917bfa,
     type: 3}
   VFXToPlayOnDestroy: []
+  spellType: 0
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
---- !u!114 &2654175274349702557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1494871026038834521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccfb7ebf44a80f8408efada6ad352880, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 0}
-  vfxRotationOffset: {x: 0, y: 0, z: 0}
-  vfxSpawnType: 0
-  transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
-  raycastOffset: {x: 0, y: 2, z: 3}
-  fartherRaycastOffset: {x: 0, y: 4, z: 5}
-  raycastMaxDistance: 5
-  lookRotationUpDirection: {x: 0, y: 1, z: 0}
-  weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
-  awakeAudioClipDelay: 0
-  audioClipToPlayOnDestroy: {fileID: 0}
-  VFXToPlayOnDestroy:
-  - {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff, type: 3}
-  followUpVFXToPlayOnDestroy: []
-  shouldBlockProjectiles: 0
-  shouldDestroyOnEnemyHit: 0
-  duration: 3
-  radius: 2
-  forceMultiplier: 5
-  ailmentToTriggerOnEnd: 1
 --- !u!114 &4468287924467602658
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -74,12 +74,24 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
-                HP.Value = weaponHandler.GetWeapon().GetMaxHP();
-            else if (HP.Value + amount < 0)
-                HP.Value = 0;
-            else
-                HP.Value += amount;
+            if (amount > 0)
+            {
+                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    HP.Value += amount;
+                }
+                else
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
         }
 
         private float AddHPWithoutApply(float amount)
@@ -87,12 +99,25 @@ namespace Vi.Core
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }
 
-            if (HP.Value + amount > weaponHandler.GetWeapon().GetMaxHP() & HP.Value <= weaponHandler.GetWeapon().GetMaxHP())
-                return weaponHandler.GetWeapon().GetMaxHP();
-            else if (HP.Value + amount < 0)
-                return 0;
-            else
-                return HP.Value + amount;
+            if (amount > 0)
+            {
+                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
+                {
+                    return HP.Value + amount;
+                }
+                else
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
+                }
+            }
+            return HP.Value;
         }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -100,12 +125,24 @@ namespace Vi.Core
             if (activateCooldown)
                 staminaDelayCooldown = weaponHandler.GetWeapon().GetStaminaDelay();
 
-            if (stamina.Value + amount > weaponHandler.GetWeapon().GetMaxStamina() & stamina.Value <= weaponHandler.GetWeapon().GetMaxStamina())
-                stamina.Value = weaponHandler.GetWeapon().GetMaxStamina();
-            else if (stamina.Value + amount < 0)
-                stamina.Value = 0;
-            else
-                stamina.Value += amount;
+            if (amount > 0)
+            {
+                if (stamina.Value < weaponHandler.GetWeapon().GetMaxStamina())
+                {
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (stamina.Value > weaponHandler.GetWeapon().GetMaxStamina())
+                {
+                    stamina.Value += amount;
+                }
+                else
+                {
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                }
+            }
         }
 
         public void AddSpirit(float amount)
@@ -113,22 +150,46 @@ namespace Vi.Core
             if (amount < 0) { amount *= spiritReductionMultiplier; }
             if (amount > 0) { amount *= spiritIncreaseMultiplier; }
 
-            if (spirit.Value + amount > weaponHandler.GetWeapon().GetMaxSpirit() & spirit.Value <= weaponHandler.GetWeapon().GetMaxSpirit())
-                spirit.Value = weaponHandler.GetWeapon().GetMaxSpirit();
-            else if (spirit.Value + amount < 0)
-                spirit.Value = 0;
-            else
-                spirit.Value += amount;
+            if (amount > 0)
+            {
+                if (spirit.Value < weaponHandler.GetWeapon().GetMaxSpirit())
+                {
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (spirit.Value > weaponHandler.GetWeapon().GetMaxSpirit())
+                {
+                    spirit.Value += amount;
+                }
+                else
+                {
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                }
+            }
         }
 
         public void AddRage(float amount)
         {
-            if (rage.Value + amount > weaponHandler.GetWeapon().GetMaxRage() & rage.Value <= weaponHandler.GetWeapon().GetMaxRage())
-                rage.Value = weaponHandler.GetWeapon().GetMaxRage();
-            else if (rage.Value + amount < 0)
-                rage.Value = 0;
-            else
-                rage.Value += amount;
+            if (amount > 0)
+            {
+                if (rage.Value < weaponHandler.GetWeapon().GetMaxRage())
+                {
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (rage.Value > weaponHandler.GetWeapon().GetMaxRage())
+                {
+                    rage.Value += amount;
+                }
+                else
+                {
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                }
+            }
         }
 
         PooledObject worldSpaceLabelInstance;
@@ -609,7 +670,11 @@ namespace Vi.Core
             // Don't let grab attack hit players that aren't grabbed
             if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
 
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            if (PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                if (Mathf.Approximately(attack.damage, 0)) { return false; }
+            }
+            else
             {
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
@@ -1335,7 +1400,27 @@ namespace Vi.Core
         {
             if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
-            yield return new WaitForSeconds(animationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
+
+            float durationLeft = animationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
+            Attributes attacker = GetGrabAssailant();
+            while (true)
+            {
+                durationLeft -= Time.deltaTime;
+                if (attacker)
+                {
+                    Vector3 victimNewPosition = attacker.movementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    if (Vector3.Distance(victimNewPosition, movementHandler.GetPosition()) > 1)
+                    {
+                        movementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.movementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    }
+                }
+                else
+                {
+                    attacker = GetGrabAssailant();
+                }
+                yield return null;
+                if (durationLeft <= 0) { break; }
+            }
             isGrabbed.Value = false;
             grabAssailantDataId.Value = default;
             grabVictimDataId.Value = default;
@@ -1449,6 +1534,7 @@ namespace Vi.Core
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
         public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
         public bool IsFeared() { return activeStatuses.Contains((int)ActionClip.Status.fear); }
+        public bool IsImmuneToGroundSpells() { return activeStatuses.Contains((int)ActionClip.Status.immuneToGroundSpells); }
 
         private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
         {
@@ -1709,6 +1795,20 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
+                    TryRemoveStatus(statusPayload);
+                    break;
+                case ActionClip.Status.immuneToGroundSpells:
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
                     TryRemoveStatus(statusPayload);
                     break;
                 default:

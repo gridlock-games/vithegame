@@ -14,6 +14,8 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
+            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name, isFollowUpClip);
@@ -471,12 +473,15 @@ namespace Vi.Core
                 SetInvincibleStatusOnDodge(actionClipName);
             }
 
-            if (heavyAttackCoroutine != null)
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                StopCoroutine(heavyAttackCoroutine);
-                Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                if (heavyAttackCoroutine != null)
+                {
+                    StopCoroutine(heavyAttackCoroutine);
+                    Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                }
             }
-
+            
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
@@ -602,10 +607,7 @@ namespace Vi.Core
             ActionClip.ClipType.Lunge
         };
 
-        private bool ShouldApplyStaminaCost(ActionClip actionClip)
-        {
-            return staminaCostActionClipTypes.Contains(actionClip.GetClipType());
-        }
+        private bool ShouldApplyStaminaCost(ActionClip actionClip) { return staminaCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
         private float GetStaminaCostOfClip(ActionClip actionClip)
         {
@@ -637,10 +639,7 @@ namespace Vi.Core
             ActionClip.ClipType.Lunge
         };
 
-        private bool ShouldApplyRageCost(ActionClip actionClip)
-        {
-            return rageCostActionClipTypes.Contains(actionClip.GetClipType());
-        }
+        private bool ShouldApplyRageCost(ActionClip actionClip) { return rageCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
         private float GetRageCostOfClip(ActionClip actionClip)
         {
@@ -873,7 +872,14 @@ namespace Vi.Core
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
-            if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
+            {
+                if (heavyAttackCoroutine != null)
+                {
+                    StopCoroutine(heavyAttackCoroutine);
+                    Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                }
+            }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 

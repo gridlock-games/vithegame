@@ -16,6 +16,7 @@ namespace Vi.Core
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy;
         [SerializeField] private AudioClip[] soundToPlayOnSpawn = new AudioClip[0];
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
+        [SerializeField] private AudioClip[] soundToPlayOnDespawn = new AudioClip[0];
 
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
@@ -85,7 +86,7 @@ namespace Vi.Core
                         {
                             if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
                             {
-                                AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, soundToPlayOnSpawn.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, whooshNearbySound.Length)], false, Weapon.projectileNearbyWhooshVolume);
                                 audioSource.maxDistance = 20;
                                 nearbyWhooshPlayed = true;
                             }
@@ -153,13 +154,19 @@ namespace Vi.Core
                 {
                     NetworkObject netObj = Instantiate(prefab, transform.position, transform.rotation).GetComponent<NetworkObject>();
                     netObj.SpawnWithOwnership(OwnerClientId, true);
-                    netObj.GetComponent<FollowUpVFX>().Initialize(attacker, attack);
+                    netObj.GetComponent<FollowUpVFX>().InitializeVFX(attacker, attack);
                 }
                 else
                 {
                     PooledObject obj = ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation);
                     PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(obj));
                 }
+            }
+
+            if (soundToPlayOnDespawn.Length > 0)
+            {
+                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnDespawn[Random.Range(0, soundToPlayOnDespawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
+                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
             }
         }
 

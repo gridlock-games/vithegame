@@ -780,8 +780,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  animationSpeed: 2
+  recoveryAnimationSpeed: 2
   agentStaminaCost: 20
   agentRageCost: 50
   effectedWeaponBones: 11000000
@@ -822,6 +822,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []

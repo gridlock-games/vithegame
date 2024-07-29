@@ -113,7 +113,7 @@ namespace Vi.Core
             shooterWeapons.Clear();
 
             CanAim = false;
-            canADS = false;
+            CanADS = false;
 
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
@@ -154,7 +154,7 @@ namespace Vi.Core
                         {
                             shooterWeapons.Add(shooterWeapon);
                             CanAim = true;
-                            canADS = shooterWeapon.CanADS() | canADS;
+                            CanADS = shooterWeapon.CanADS() | CanADS;
                         }
                     }
                     broken = true;
@@ -488,13 +488,9 @@ namespace Vi.Core
                     Transform parent = netObj.transform.parent;
                     netObj.SpawnWithOwnership(OwnerClientId, true);
                     netObj.TrySetParent(parent);
-                    if (vfxInstance.TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                    if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {
-                        actionVFXParticleSystem.InitializeVFX(attributes, CurrentActionClip);
-                    }
-                    else if (vfxInstance.TryGetComponent(out ActionVFXPhysicsProjectile actionVFXPhysicsProjectile))
-                    {
-                        actionVFXPhysicsProjectile.InitializeVFX(attributes, CurrentActionClip);
+                        gameInteractiveActionVFX.InitializeVFX(attributes, CurrentActionClip);
                     }
                 }
             }
@@ -702,17 +698,39 @@ namespace Vi.Core
             }
         }
 
+        private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private Coroutine lightAttackHoldCoroutine;
         public void LightAttackHold(bool isPressed)
         {
-            if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
-            if (isPressed) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
-            else { LightAttack(false); }
+            lightAttackIsPressed.Value = isPressed;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
+            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterChange;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
+            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterChange;
         }
 
         void OnLightAttackHold(InputValue value)
         {
-            LightAttackHold(value.isPressed);
+            lightAttackIsPressed.Value = value.isPressed;
+        }
+
+        private void OnLightAttackHoldChange(bool prev, bool current)
+        {
+            if (IsServer)
+            {
+                if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
+                if (current) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
+                else { LightAttack(false); }
+            }
         }
 
         private IEnumerator LightAttackHold()
@@ -724,8 +742,29 @@ namespace Vi.Core
             }
         }
 
+        private void OnReloadAnimParameterChange(bool prev, bool current)
+        {
+            if (current)
+            {
+                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
+                if (reloadSoundEffect) { StartCoroutine(PlayReloadSoundEffect(reloadSoundEffect)); }
+            }
+        }
+
+        private IEnumerator PlayReloadSoundEffect(AudioClip reloadSoundEffect)
+        {
+            AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(gameObject, reloadSoundEffect, transform.position, Weapon.reloadSoundEffectVolume);
+            while (true)
+            {
+                if (!reloadingAnimParameterValue.Value) { break; }
+                if (!audioSource) { break; }
+                if (!audioSource.isPlaying) { break; }
+                yield return null;
+            }
+        }
+
         public bool CanAim { get; private set; }
-        private bool canADS;
+        public bool CanADS { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -751,7 +790,7 @@ namespace Vi.Core
         {
             animationHandler.SetHeavyAttackPressedState(isPressed);
 
-            if (canADS)
+            if (CanADS)
             {
                 if (NetworkObject.IsPlayerObject)
                 {

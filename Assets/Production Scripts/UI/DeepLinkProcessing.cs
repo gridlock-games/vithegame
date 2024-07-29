@@ -1,4 +1,5 @@
 using UnityEngine;
+using Vi.UI.FBAuthentication;
 using Vi.UI.SimpleGoogleSignIn;
 
 namespace Vi.UI
@@ -89,7 +90,6 @@ namespace Vi.UI
       string loginData = deeplinkURL.Split('?')[1];
       Debug.Log(loginData);
       string fullLoginData = "?" + loginData;
-
       //Temp Setup
       //lss = loginSiteSource.google;
 
@@ -108,6 +108,7 @@ namespace Vi.UI
           break;
 
         case loginSiteSource.facebook:
+          FacebookAuth.deeplinkListener(fullLoginData);
           break;
 
         case loginSiteSource.elonMistake:

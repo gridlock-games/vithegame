@@ -11,6 +11,7 @@ namespace Vi.Editor
     public class GeneratePreviewIcons : MonoBehaviour
     {
         [SerializeField] private bool shouldProcessWeapons;
+        [SerializeField] private WeaponPositioningData[] archivedWeaponsToGenerate;
         [SerializeField] private WeaponPositioningData[] weaponsToGenerate;
         [SerializeField] private bool shouldProcessEquipmentOptions;
         [SerializeField] private CharacterReference characterReference;

@@ -2735,6 +2735,7 @@ namespace Vi.Core
         }
 
         public bool GameIsUpToDate { get; private set; }
+        public string GameVersionErrorMessage { get; private set; } = "";
 
         public string GetGameVersion() { return gameVersion.Version; }
 
@@ -2752,6 +2753,14 @@ namespace Vi.Core
             {
                 Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "game/version");
                 getRequest.Dispose();
+                if (Application.internetReachability == NetworkReachability.NotReachable)
+                {
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
+                }
+                else
+                {
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, restart your game.";
+                }
                 yield break;
             }
 
@@ -2761,9 +2770,23 @@ namespace Vi.Core
             getRequest.Dispose();
 
             GameIsUpToDate = Application.version == gameVersion.Version;
-            if (!GameIsUpToDate & SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null) { Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update."; }
+            GameVersionErrorMessage = "";
 
             IsCheckingGameVersion = false;
+
+            if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+            {
+                if (float.Parse(Application.version) > float.Parse(gameVersion.Version))
+                {
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Servers not updated yet, online play is unavailable.";
+                    GameVersionErrorMessage = "SERVERS NOT UPDATED YET";
+                }
+                else if (float.Parse(Application.version) < float.Parse(gameVersion.Version))
+                {
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update.";
+                    GameVersionErrorMessage = "GAME IS OUT OF DATE";
+                }
+            }
         }
 
         private class GameVersion
