@@ -64,10 +64,14 @@ namespace Vi.Core.VFX.Staff
 
             Collider[] colliders = Physics.OverlapSphere(transform.position, radius, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+            int networkColliderCount = 0;
             for (int i = 0; i < colliders.Length; i++)
             {
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
+                    if (networkCollider.Attributes == attacker) { continue; }
+
+                    networkColliderCount++;
                     bool shouldAffect = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker);
                     if (spellType == SpellType.GroundSpell)
                     {
@@ -76,9 +80,13 @@ namespace Vi.Core.VFX.Staff
 
                     if (shouldAffect)
                     {
-                        Vector3 targetPosition = networkCollider.MovementHandler.GetPosition();
-                        if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { navMeshAgent.destination = networkCollider.MovementHandler.GetPosition(); }
-                        if (Vector3.Distance(navMeshAgent.destination, transform.position) < navMeshAgent.stoppingDistance)
+                        if (networkColliderCount == 1)
+                        {
+                            Vector3 targetPosition = networkCollider.MovementHandler.GetPosition();
+                            if (new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { navMeshAgent.destination = networkCollider.MovementHandler.GetPosition(); }
+                        }
+
+                        if (Vector3.Distance(networkCollider.transform.position, transform.position) <= navMeshAgent.stoppingDistance + 0.5f)
                         {
                             bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
                                 attack, networkCollider.Attributes.transform.position, transform.position);
