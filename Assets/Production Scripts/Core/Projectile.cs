@@ -5,6 +5,7 @@ using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Vi.Core.VFX;
 
 namespace Vi.Core
 {

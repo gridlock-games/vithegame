@@ -5,7 +5,7 @@ using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 
-namespace Vi.Core
+namespace Vi.Core.VFX
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NetworkRigidbody))]

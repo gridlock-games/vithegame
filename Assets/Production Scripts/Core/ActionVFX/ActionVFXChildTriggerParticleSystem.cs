@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.Core
+namespace Vi.Core.VFX
 {
     [RequireComponent(typeof(ParticleSystem))]
     public class ActionVFXChildTriggerParticleSystem : MonoBehaviour

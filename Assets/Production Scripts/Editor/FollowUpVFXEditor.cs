@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Vi.Core;
+using Vi.Core.VFX;
 
 namespace Vi.Editor
 {

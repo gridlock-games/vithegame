@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
 
-namespace Vi.Core
+namespace Vi.Core.VFX.Staff
 {
     public class LandProtector : GameInteractiveActionVFX
     {

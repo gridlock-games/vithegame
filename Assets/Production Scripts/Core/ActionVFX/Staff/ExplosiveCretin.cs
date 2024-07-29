@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
 
-namespace Vi.Core
+namespace Vi.Core.VFX.Staff
 {
     public class ExplosiveCretin : GameInteractiveActionVFX
     {

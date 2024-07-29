@@ -5,8 +5,8 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.InputSystem;
-using UnityEngine.VFX;
 using Vi.Utility;
+using Vi.Core.VFX;
 
 namespace Vi.Core
 {
