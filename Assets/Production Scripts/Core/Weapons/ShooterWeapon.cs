@@ -84,7 +84,12 @@ namespace Vi.Core
             {
                 if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
                 {
-                    GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position, projectileSpawnPoint.transform.rotation);
+                    bool bHit = Physics.Raycast(parentAnimationHandler.GetCameraPivotPoint(), parentAnimationHandler.GetCameraForwardDirection(), out RaycastHit hit, 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    Vector3 targetPoint = bHit ? hit.point : parentAnimationHandler.GetAimPoint();
+
+                    GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,
+                        Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
+                    
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
                     netObj.SpawnWithOwnership(parentAttributes.OwnerClientId, true);
                     lastProjectileSpawnTime = Time.time;
