@@ -89,9 +89,13 @@ namespace Vi.Core
                     foreach (RaycastHit hit in allHits)
                     {
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
+                        if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                        {
+                            if (networkCollider.Attributes == parentAttributes) { continue; }
+                        }
                         targetPoint = hit.point;
                     }
-                    
+
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,
                         Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
                     
