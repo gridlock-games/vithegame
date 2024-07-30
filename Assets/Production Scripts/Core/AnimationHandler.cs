@@ -1044,6 +1044,12 @@ namespace Vi.Core
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public Vector3 GetCameraPivotPoint() { return cameraPivotPoint.Value; }
+        public Vector3 GetCameraForwardDirection() { return cameraForwardDir.Value; }
+        private NetworkVariable<Vector3> cameraPivotPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector3> cameraForwardDir = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         [SerializeField] private Transform cameraPivot;
 
@@ -1069,11 +1075,15 @@ namespace Vi.Core
                 {
                     aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                     meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
+                    cameraPivotPoint.Value = cameraPivot.transform.position;
+                    cameraForwardDir.Value = mainCamera.transform.forward;
                 }
                 else
                 {
                     aimPoint.Value = transform.position + transform.up * 0.5f + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                     meleeVerticalAimConstraintOffset.Value = 0;
+                    cameraPivotPoint.Value = transform.position + transform.up * 0.5f;
+                    cameraForwardDir.Value = transform.forward;
                 }
             }
 

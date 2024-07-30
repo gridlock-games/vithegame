@@ -5,7 +5,7 @@ using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
 
-namespace Vi.Core
+namespace Vi.Core.VFX.Axe
 {
     [RequireComponent(typeof(FollowUpVFX))]
     public class BlackHole : GameInteractiveActionVFX

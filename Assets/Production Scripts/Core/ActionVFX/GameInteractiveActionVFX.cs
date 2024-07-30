@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Unity.Netcode.Components;
 
-namespace Vi.Core
+namespace Vi.Core.VFX
 {
     [RequireComponent(typeof(NetworkObject))]
     [RequireComponent(typeof(NetworkTransform))]
