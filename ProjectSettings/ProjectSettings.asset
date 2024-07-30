@@ -142,7 +142,8 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleVersion: 0.73
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: 94a1cf4e328026542a584be1c363a837, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -169,7 +170,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 82
+  AndroidBundleVersionCode: 83
   AndroidMinSdkVersion: 24
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
