@@ -827,7 +827,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    canProceed = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | canProceed;
+                    canProceed = botAttributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Knockdown | attributes.GetComboCounter() >= 3 | canProceed;
                 }
             }
             else if (currentActionIndex == 4) // Ability
