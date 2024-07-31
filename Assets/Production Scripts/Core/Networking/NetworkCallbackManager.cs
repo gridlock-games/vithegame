@@ -116,7 +116,9 @@ namespace Vi.Core
                     {
                         clientTeam = PlayerDataManager.Team.Peaceful;
                     }
-                    else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby")
+                        | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room")
+                        | NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
                     {
                         PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
                         List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();

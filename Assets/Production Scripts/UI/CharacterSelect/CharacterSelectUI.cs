@@ -32,6 +32,7 @@ namespace Vi.UI
         [SerializeField] private Image selectionBarGlowImage;
         [SerializeField] private RectTransform selectionBarUnselectedImage;
         [SerializeField] private Button deleteCharacterButton;
+        [SerializeField] private Button tutorialButton;
         [SerializeField] private GameObject statsAndGearParent;
 
         [Header("Stats Section")]
@@ -627,8 +628,12 @@ namespace Vi.UI
             {
                 equipmentImageValues[i].gameObject.SetActive(false);
             }
-            HandlePlatformAPI(false);
             PlayerDataManager.Singleton.SetGameModeSettings("");
+
+            tutorialButton.gameObject.SetActive(bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")));
+            tutorialButton.onClick.AddListener(() => GoToTutorial());
+
+            HandlePlatformAPI(false);
         }
 
         private List<ServerListElement> serverListElementList = new List<ServerListElement>();
@@ -859,12 +864,34 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             if (NetworkManager.Singleton.StartHost())
             {
-                NetSceneManager.Singleton.LoadScene("Training Room");
-                NetSceneManager.Singleton.LoadScene(bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")) ? "Eclipse Grove" : "Tutorial Map");
+                if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")))
+                {
+                    NetSceneManager.Singleton.LoadScene("Training Room");
+                    NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+                }
+                else
+                {
+                    NetSceneManager.Singleton.LoadScene("Tutorial Room");
+                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
+                }
             }
             else
             {
                 Debug.LogError("Error trying to start host to go to training room");
+            }
+        }
+
+        private void GoToTutorial()
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
+            if (NetworkManager.Singleton.StartHost())
+            {
+                NetSceneManager.Singleton.LoadScene("Tutorial Room");
+                NetSceneManager.Singleton.LoadScene("Tutorial Map");
+            }
+            else
+            {
+                Debug.LogError("Error trying to start host to go to tutorial");
             }
         }
 
