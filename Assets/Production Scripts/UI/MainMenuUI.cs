@@ -335,7 +335,7 @@ namespace Vi.UI
         RestClient.Request(new RequestHelper
         {
           Method = "POST",
-          Uri = "https://oauth2.googleapis.com/token?",
+          Uri = "https://oauth2.googleapis.com/token",
           Params = new Dictionary<string, string>
             {
                 {"client_id", googleSignInClientId},
