@@ -1,13 +1,9 @@
 using Proyecto26;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Net.Http;
-using System.Net.Sockets;
 using System.Web;
 using UnityEngine;
-
 
 namespace Vi.UI.FBAuthentication
 {
@@ -45,10 +41,7 @@ namespace Vi.UI.FBAuthentication
       //Not needed for mobile version/used on windows version
       if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { Listen(); }
-
     }
-
-
 
     [Serializable]
     public class FacebookIdTokenResponse
@@ -60,6 +53,7 @@ namespace Vi.UI.FBAuthentication
       public string scope;
       public string token_type;
     }
+
     private static void Listen()
     {
       var httpListener = new System.Net.HttpListener();
@@ -133,7 +127,7 @@ namespace Vi.UI.FBAuthentication
 
       var state = parameters.Get("state");
       var code = parameters.Get("code");
-      Debug.Log(state + " " + code  );
+      Debug.Log(state + " " + code);
 
       if (state == null || code == null) return;
 
@@ -149,7 +143,6 @@ namespace Vi.UI.FBAuthentication
 
     private static void PerformCodeExchange(string code, string codeVerifier)
     {
-
       RestClient.Request(new RequestHelper
       {
         Method = "POST",
@@ -157,19 +150,38 @@ namespace Vi.UI.FBAuthentication
         Params = new Dictionary<string, string>
             {
                 {"client_id", _clientId},
-                {"redirect_uri", _redirectUri + "/"}, //Figuring out how to get this working.
+                {"redirect_uri", _redirectUri + "/"},
                 {"client_secret", _clientSecret},
                 {"code", code}
-
             }
       }).Then(
       response =>
       {
+        //getting long code
         Debug.Log(response.Text);
         FacebookIdTokenResponse data = JsonUtility.FromJson<FacebookIdTokenResponse>(response.Text);
-        Debug.Log(data);
-        _callback(true, null, data);
+        RestClient.Request(new RequestHelper
+        {
+          Method = "POST",
+          Uri = $"https://graph.facebook.com/v20.0/oauth/access_token",
+          Params = new Dictionary<string, string>
+            {
+                {"grant_type", "fb_exchange_token"},
+                {"client_id", _clientId},
+                {"client_secret", _clientSecret},
+                {"fb_exchange_token", data.access_token}
+            }
+        }).Then(
+            response =>
+            {
+              Debug.Log(response.Text);
+              FacebookIdTokenResponse longCodeData = JsonUtility.FromJson<FacebookIdTokenResponse>(response.Text);
+              Debug.Log(longCodeData);
+              _callback(true, null, longCodeData);
+            });
       }).Catch(Debug.LogError);
+
+      // getting long_code
     }
 
     private static string webpageHTML()
