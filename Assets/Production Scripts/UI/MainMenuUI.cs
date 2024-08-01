@@ -339,13 +339,14 @@ namespace Vi.UI
           Params = new Dictionary<string, string>
             {
                 {"client_id", googleSignInClientId},
+                {"client_secret", googleSignInSecretId},
                 {"refresh_token", tokenData.refresh_token},
                 {"grant_type","refresh_token"}
             }
         }).Then(
 response =>
 {
-
+  Debug.Log("Oauth 2 Called");
   GoogleAuth.GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(response.Text);
   Debug.Log(data.id_token);
   tokenData = data;
