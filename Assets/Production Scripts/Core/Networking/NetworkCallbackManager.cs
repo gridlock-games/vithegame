@@ -34,8 +34,6 @@ namespace Vi.Core
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
-
-            NetworkManager.Singleton.NetworkConfig.SpawnTimeout = 10;
         }
 
         private void CreatePlayerDataManager(bool forceRefresh)
@@ -118,7 +116,9 @@ namespace Vi.Core
                     {
                         clientTeam = PlayerDataManager.Team.Peaceful;
                     }
-                    else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby")
+                        | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room")
+                        | NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
                     {
                         PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
                         List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();

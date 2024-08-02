@@ -7,7 +7,7 @@ using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode.Components;
 
-namespace Vi.Core
+namespace Vi.Core.VFX
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NetworkRigidbody))]

@@ -5,8 +5,8 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using System.Linq;
 using UnityEngine.InputSystem;
-using UnityEngine.VFX;
 using Vi.Utility;
+using Vi.Core.VFX;
 
 namespace Vi.Core
 {
@@ -486,6 +486,7 @@ namespace Vi.Core
                     if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
                     Transform parent = netObj.transform.parent;
+                    netObj.transform.parent = null;
                     netObj.SpawnWithOwnership(OwnerClientId, true);
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))

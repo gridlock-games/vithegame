@@ -69,7 +69,7 @@ namespace Vi.Core
                 rage.Value = 0;
         }
 
-        private void AddHP(float amount)
+        public void AddHP(float amount)
         {
             if (amount < 0) { amount *= damageReceivedMultiplier / damageReductionMultiplier; }
             if (amount > 0) { amount *= healingMultiplier; }

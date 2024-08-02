@@ -1044,10 +1044,12 @@ namespace Vi.Core
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<float> meleeVerticalAimConstraintOffset = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        [SerializeField] private Transform cameraPivot;
 
-        private const float aimPointYAxisLerpSpeed = 24;
+        public Vector3 GetCameraPivotPoint() { return NetworkObject.IsPlayerObject ? transform.position + cameraPivotLocalPosition : transform.position + transform.up * 0.5f; }
+        public Vector3 GetCameraForwardDirection() { return NetworkObject.IsPlayerObject ? cameraForwardDir.Value : transform.forward; }
+        private NetworkVariable<Vector3> cameraForwardDir = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        private readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
 
         private Camera mainCamera;
         private void FindMainCamera()
@@ -1068,16 +1070,15 @@ namespace Vi.Core
                 if (NetworkObject.IsPlayerObject)
                 {
                     aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                    meleeVerticalAimConstraintOffset.Value = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (cameraPivot.position.y - aimPoint.Value.y) * 6 : 0;
+                    cameraForwardDir.Value = mainCamera.transform.forward;
                 }
                 else
                 {
-                    aimPoint.Value = transform.position + transform.up * 0.5f + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
-                    meleeVerticalAimConstraintOffset.Value = 0;
+                    aimPoint.Value = GetCameraPivotPoint() + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                 }
             }
 
-            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? meleeVerticalAimConstraintOffset.Value : 0);
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }
