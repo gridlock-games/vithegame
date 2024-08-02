@@ -25,7 +25,7 @@ namespace Vi.Core.VFX.Staff
             {
                 if (!PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker))
                 {
-                    networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP());
+                    networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP() * 0.05f);
                     NetworkObject.Despawn();
                 }
             }
