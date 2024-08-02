@@ -102,8 +102,6 @@ namespace Vi.Core
             }
         }
 
-        public const int maxActivePlayersInLobby = 8;
-
         private Queue<PlayerDataInput> playerDataQueue = new Queue<PlayerDataInput>();
         private void Update()
         {
@@ -120,14 +118,14 @@ namespace Vi.Core
                         | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room")
                         | NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
                     {
-                        PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
                         List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
-                        if (playerDataListWithoutSpectators.Count >= maxActivePlayersInLobby)
+                        if (playerDataListWithoutSpectators.Count >= PlayerDataManager.Singleton.GetMaxPlayersForMap())
                         {
                             clientTeam = PlayerDataManager.Team.Spectator;
                         }
                         else // The lobby isn't full yet
                         {
+                            PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
                             Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
                             foreach (PlayerDataManager.Team possibleTeam in gameModeInfo.possibleTeams)
                             {

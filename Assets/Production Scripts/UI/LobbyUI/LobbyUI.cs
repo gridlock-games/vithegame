@@ -575,11 +575,11 @@ namespace Vi.UI
                     Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());
                     break;
             }
-
-            if (playerDataListWithoutSpectators.Count > NetworkCallbackManager.maxActivePlayersInLobby)
+            int maxPlayersForMap = PlayerDataManager.Singleton.GetMaxPlayersForMap();
+            if (playerDataListWithoutSpectators.Count > maxPlayersForMap)
             {
                 canCountDown = false;
-                cannotCountDownMessage = "Cannot play a match with more than 8 players";
+                cannotCountDownMessage = "Cannot play a match on " + PlayerDataManager.Singleton.GetMapName() + " with more than " + maxPlayersForMap.ToString() + " players";
             }
 
             bool roomSettingsParsedProperly = true;
@@ -663,8 +663,8 @@ namespace Vi.UI
             leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
             rightTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
 
-            leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
-            rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < NetworkCallbackManager.maxActivePlayersInLobby;
+            leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
+            rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
 
             leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
@@ -810,7 +810,7 @@ namespace Vi.UI
 
         public void AddBot(PlayerDataManager.Team team)
         {
-            PlayerDataManager.Singleton.AddBotData(team, false, team == PlayerDataManager.Team.Competitor ? NetworkCallbackManager.maxActivePlayersInLobby : 4);
+            PlayerDataManager.Singleton.AddBotData(team, false, PlayerDataManager.Singleton.GetMaxPlayersForMap() / PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length);
         }
 
         private void ChooseLoadoutPreset(Button button, int loadoutSlot)

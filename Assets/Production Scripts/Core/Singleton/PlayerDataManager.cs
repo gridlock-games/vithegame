@@ -28,6 +28,7 @@ namespace Vi.Core
             public Sprite gameModeIcon;
             public Team[] possibleTeams;
             public string[] possibleMapSceneGroupNames;
+            public int[] maxPlayersOnMap;
         }
 
         public CharacterReference GetCharacterReference() { return characterReference; }
@@ -68,6 +69,18 @@ namespace Vi.Core
         public string GetMapName()
         {
             return GetGameModeInfo().possibleMapSceneGroupNames[mapIndex.Value];
+        }
+
+        public int GetMaxPlayersForMap()
+        {
+            try
+            {
+                return GetGameModeInfo().maxPlayersOnMap[mapIndex.Value];
+            }
+            catch
+            {
+                return 8;
+            }
         }
 
         public void SetMap(string map)
