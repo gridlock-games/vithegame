@@ -11,6 +11,9 @@ using Vi.UI.SimpleGoogleSignIn;
 using Vi.UI.FBAuthentication;
 using Vi.Utility;
 using Proyecto26;
+using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace Vi.UI
 {
@@ -327,35 +330,26 @@ namespace Vi.UI
 
     private IEnumerator WaitForGoogleAuth(GoogleAuth.GoogleIdTokenResponse tokenData, bool refresh = false)
     {
+      GoogleAuth.GoogleIdTokenResponse refreshedTokenData;
+      Task<GoogleAuth.GoogleIdTokenResponse> refreshedTokenDataTask;
       Debug.Log(tokenData.id_token);
       Debug.Log(tokenData.refresh_token);
+      Credential credential = new Credential();
       if (refresh)
       {
-        //Start obtaining new token data
-        RestClient.Request(new RequestHelper
-        {
-          Method = "POST",
-          Uri = "https://oauth2.googleapis.com/token",
-          Params = new Dictionary<string, string>
-            {
-                {"client_id", googleSignInClientId},
-                {"client_secret", googleSignInSecretId},
-                {"refresh_token", tokenData.refresh_token},
-                {"grant_type","refresh_token"}
-            }
-        }).Then(
-response =>
-{
-  Debug.Log("Oauth 2 Called");
-  GoogleAuth.GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(response.Text);
-  Debug.Log(data.id_token);
-  tokenData = data;
-}).Catch(Debug.LogError);
-        //Replace token data with new data
-        
+        refreshedTokenDataTask = GenerateNewGoogleToken(tokenData);
+        yield return new WaitUntil(() => refreshedTokenDataTask.IsCompleted);
+        refreshedTokenData = refreshedTokenDataTask.Result;
+        credential = GoogleAuthProvider.GetCredential(refreshedTokenData.id_token, refreshedTokenData.access_token);
+       
       }
       Debug.Log(tokenData.id_token);
-      Credential credential = GoogleAuthProvider.GetCredential(tokenData.id_token, null);
+      
+      if (!refresh)
+      {
+        credential = GoogleAuthProvider.GetCredential(tokenData.id_token, tokenData.access_token);
+      }
+
       System.Threading.Tasks.Task<AuthResult> task = auth.SignInAndRetrieveDataWithCredentialAsync(credential);
 
       yield return new WaitUntil(() => task.IsCompleted);
@@ -393,6 +387,25 @@ response =>
         oAuthParent.SetActive(false);
         initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
       }
+    }
+
+    private async Task<GoogleAuth.GoogleIdTokenResponse> GenerateNewGoogleToken(GoogleAuth.GoogleIdTokenResponse tokenData)
+    {
+
+      var baseUri = "https://oauth2.googleapis.com/token";
+      var httpClient = new HttpClient();
+      var parameters = new Dictionary<string, string>();
+      parameters["client_id"] = googleSignInClientId;
+      parameters["client_secret"] = googleSignInSecretId;
+      parameters["refresh_token"] = tokenData.refresh_token;
+      parameters["grant_type"] = "refresh_token";
+
+      var response = await httpClient.PostAsync(baseUri, new FormUrlEncodedContent(parameters));
+      var contents = response.Content.ReadAsStringAsync();
+      Debug.Log(contents);
+      GoogleAuth.GoogleIdTokenResponse converting = JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(contents.Result);
+      Debug.Log(converting);
+      return converting;
     }
 
     public void LoginWithFacebook()
