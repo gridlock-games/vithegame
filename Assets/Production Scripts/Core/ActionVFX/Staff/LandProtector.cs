@@ -11,7 +11,7 @@ namespace Vi.Core.VFX.Staff
         [SerializeField] private AudioClip[] soundToPlayOnSpellCancel;
         [SerializeField] private PooledObject[] VFXToPlayOnSpellCancel;
 
-        private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.GroundSpell };
+        private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.NotASpell, SpellType.GroundSpell, SpellType.AerialSpell };
 
         public override void OnNetworkSpawn()
         {
@@ -46,6 +46,15 @@ namespace Vi.Core.VFX.Staff
                         PlayEffects(gameInteractiveActionVFX.transform.position);
                         gameInteractiveActionVFX.NetworkObject.Despawn(true);
                     }
+                }
+            }
+            else if (other.TryGetComponent(out Projectile projectile))
+            {
+                if (!projectile.IsSpawned) { return; }
+                if (PlayerDataManager.Singleton.CanHit(attacker, projectile.GetAttacker()))
+                {
+                    PlayEffects(projectile.transform.position);
+                    projectile.NetworkObject.Despawn(true);
                 }
             }
         }
