@@ -60,6 +60,41 @@ namespace Vi.Editor
                     Debug.LogError("Could not load prefab at path: " + prefabFilePath);
                 }
             }
+
+            string packagedPrefabsFolder = @"Assets\PackagedPrefabs";
+            foreach (string prefabFilePath in Directory.GetFiles(packagedPrefabsFolder, "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out ActionVFX actionVFX))
+                    {
+                        bool vfxReferencedInActionClip = false;
+                        foreach (ActionClip actionClip in actionClips)
+                        {
+                            if (actionClip.actionVFXList.Contains(actionVFX))
+                            {
+                                vfxReferencedInActionClip = true;
+                                break;
+                            }
+                        }
+
+                        if (vfxReferencedInActionClip)
+                        {
+                            if (!networkPrefabsList.Contains(prefab))
+                            {
+                                // Add object here
+                                Debug.Log(prefab.name + " referenced in action clip, but not in the selected network prefabs list");
+                                Debug.Log(prefabFilePath);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Could not load prefab at path: " + prefabFilePath);
+                }
+            }
         }
 
         [MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
