@@ -398,7 +398,7 @@ namespace Vi.ArtificialIntelligence
                                 destination = hit.position;
                             }
                         }
-                        //EvaluteAction();
+                        EvaluteAction();
                     }
                 }
                 else if (disableBots)
