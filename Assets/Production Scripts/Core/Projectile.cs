@@ -19,6 +19,8 @@ namespace Vi.Core
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
         [SerializeField] private AudioClip[] soundToPlayOnDespawn = new AudioClip[0];
 
+        public Attributes GetAttacker() { return attacker; }
+
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
         private ActionClip attack;
