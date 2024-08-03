@@ -290,8 +290,8 @@ namespace Vi.Core
 
         public GameObject SpawnPreviewVFX(ActionClip actionClip, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
-            actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset;
-            actionPreviewVFXPrefab.vfxRotationOffset = actionClip.actionVFXList[0].vfxRotationOffset;
+            actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset + actionClip.previewActionVFXPositionOffset;
+            actionPreviewVFXPrefab.vfxRotationOffset = (Quaternion.Euler(actionClip.actionVFXList[0].vfxRotationOffset) * Quaternion.Euler(actionClip.previewActionVFXRotationOffset)).eulerAngles;
             actionPreviewVFXPrefab.vfxSpawnType = actionClip.actionVFXList[0].vfxSpawnType;
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
