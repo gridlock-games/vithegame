@@ -854,6 +854,33 @@ namespace Vi.Core
             }
         }
 
+        public void ClearActionVFXInstances()
+        {
+            if (ability1PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance.GetComponent<PooledObject>());
+                ability1PreviewInstance = null;
+            }
+
+            if (ability2PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance.GetComponent<PooledObject>());
+                ability2PreviewInstance = null;
+            }
+
+            if (ability3PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance.GetComponent<PooledObject>());
+                ability3PreviewInstance = null;
+            }
+
+            if (ability4PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance.GetComponent<PooledObject>());
+                ability4PreviewInstance = null;
+            }
+        }
+
         void OnAbility1(InputValue value)
         {
             Ability1(value.isPressed);
