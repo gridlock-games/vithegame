@@ -51,6 +51,12 @@ namespace Vi.ScriptableObjects
         [SerializeField] protected float awakeAudioClipDelay;
         [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
+        public static readonly string[] layersToAccountForInRaycasting = new string[]
+        {
+            "Default",
+            "ProjectileCollider"
+        };
+
         protected void OnEnable()
         {
             if (Application.isEditor)

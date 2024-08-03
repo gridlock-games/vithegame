@@ -6690,6 +6690,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 311f42101bcd67e4d81d0cf3a36bcc47, type: 3}
   abilityCooldownTime: 15
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -6697,6 +6698,8 @@ MonoBehaviour:
   - {fileID: 2095710391150502652, guid: 66047c3e08b413148ba4224121f2184b, type: 3}
   previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
     type: 3}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 0.3, y: 0.3, z: 0.3}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 0

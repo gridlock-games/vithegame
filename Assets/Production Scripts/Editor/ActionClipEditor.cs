@@ -98,6 +98,8 @@ namespace Vi.Editor
 
         private SerializedProperty spActionVFXList;
         private SerializedProperty spPreviewActionVFX;
+        private SerializedProperty spPreviewActionVFXPositionOffset;
+        private SerializedProperty spPreviewActionVFXRotationOffset;
         private SerializedProperty spPreviewActionVFXScale;
 
         private SerializedProperty spUseRotationalTargetingSystem;
@@ -199,6 +201,8 @@ namespace Vi.Editor
 
             spActionVFXList = serializedObject.FindProperty("actionVFXList");
             spPreviewActionVFX = serializedObject.FindProperty("previewActionVFX");
+            spPreviewActionVFXPositionOffset = serializedObject.FindProperty("previewActionVFXPositionOffset");
+            spPreviewActionVFXRotationOffset = serializedObject.FindProperty("previewActionVFXRotationOffset");
             spPreviewActionVFXScale = serializedObject.FindProperty("previewActionVFXScale");
 
             spUseRotationalTargetingSystem = serializedObject.FindProperty("useRotationalTargetingSystem");
@@ -727,6 +731,8 @@ namespace Vi.Editor
             if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Ability)
             {
                 EditorGUILayout.PropertyField(spPreviewActionVFX);
+                EditorGUILayout.PropertyField(spPreviewActionVFXPositionOffset);
+                EditorGUILayout.PropertyField(spPreviewActionVFXRotationOffset);
                 EditorGUILayout.PropertyField(spPreviewActionVFXScale);
             }
 

@@ -287,6 +287,8 @@ namespace Vi.ScriptableObjects
 
         public List<ActionVFX> actionVFXList = new List<ActionVFX>();
         public ActionVFX previewActionVFX;
+        public Vector3 previewActionVFXPositionOffset = new Vector3(0, 0, 0);
+        public Vector3 previewActionVFXRotationOffset = new Vector3(0, 0, 0);
         public Vector3 previewActionVFXScale = new Vector3(1, 1, 1);
 
         public bool useRotationalTargetingSystem = true;

@@ -86,7 +86,7 @@ namespace Vi.Core.VFX
 
         private const string layersToHit = "NetworkPrediction";
 
-        private void OnTriggerEnter(Collider other)
+        protected void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
@@ -125,7 +125,11 @@ namespace Vi.Core.VFX
                         {
                             if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                             if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                            if (spellType == SpellType.GroundSpell)
+                        }
+
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
                                 if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                             }
@@ -150,7 +154,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        private void OnTriggerStay(Collider other)
+        protected void OnTriggerStay(Collider other)
         {
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
@@ -163,7 +167,11 @@ namespace Vi.Core.VFX
                         {
                             if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                             if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                            if (spellType == SpellType.GroundSpell)
+                        }
+
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
                                 if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                             }
@@ -190,14 +198,14 @@ namespace Vi.Core.VFX
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        private new void OnDisable()
+        protected new void OnDisable()
         {
             base.OnDisable();
             hitCounter.Clear();
         }
 
         private bool particleEnterCalledThisFrame;
-        private void LateUpdate()
+        protected void LateUpdate()
         {
             particleEnterCalledThisFrame = false;
         }
@@ -226,7 +234,11 @@ namespace Vi.Core.VFX
                             {
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                 if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                                if (spellType == SpellType.GroundSpell)
+                            }
+
+                            if (spellType == SpellType.GroundSpell)
+                            {
+                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                 {
                                     if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                                 }
@@ -270,7 +282,11 @@ namespace Vi.Core.VFX
                                 {
                                     if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                     if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                                    if (spellType == SpellType.GroundSpell)
+                                }
+
+                                if (spellType == SpellType.GroundSpell)
+                                {
+                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                     {
                                         if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                                     }

@@ -73,11 +73,19 @@ namespace Vi.Core.VFX.Staff
 
                     networkColliderCount++;
                     bool shouldAffect = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker);
-                    if (spellType == SpellType.GroundSpell)
+                    if (shouldAffect)
                     {
-                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (networkCollider.Attributes.IsImmuneToGroundSpells())
+                            {
+                                shouldAffect = false;
+                                despawnCalled = true;
+                                NetworkObject.Despawn(true);
+                            }
+                        }
                     }
-
+                    
                     if (shouldAffect)
                     {
                         if (networkColliderCount == 1)
