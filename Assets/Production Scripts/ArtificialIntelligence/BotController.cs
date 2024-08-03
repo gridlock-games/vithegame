@@ -450,7 +450,7 @@ namespace Vi.ArtificialIntelligence
             {
                 if (Vector3.Distance(destination, transform.position) < lightAttackDistance)
                 {
-                    if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
+                    if (weaponHandler.CanADS) { weaponHandler.HeavyAttack(true); }
                     else { weaponHandler.HeavyAttack(false); }
 
                     weaponHandler.LightAttack(true);
@@ -459,10 +459,10 @@ namespace Vi.ArtificialIntelligence
                 }
                 else if (Vector3.Distance(destination, transform.position) < heavyAttackDistance)
                 {
-                    if (weaponHandler.CanAim) { weaponHandler.LightAttack(true); }
-                    else { weaponHandler.LightAttack(false); }
-
                     if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
+
+                    if (weaponHandler.CanADS) { weaponHandler.LightAttack(true); }
+                    else { weaponHandler.LightAttack(false); }
 
                     EvaluateAbility();
                 }

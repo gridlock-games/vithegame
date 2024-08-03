@@ -86,7 +86,7 @@ namespace Vi.Core.VFX
 
         private const string layersToHit = "NetworkPrediction";
 
-        private void OnTriggerEnter(Collider other)
+        protected void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
@@ -150,7 +150,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        private void OnTriggerStay(Collider other)
+        protected void OnTriggerStay(Collider other)
         {
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
@@ -190,14 +190,14 @@ namespace Vi.Core.VFX
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        private new void OnDisable()
+        protected new void OnDisable()
         {
             base.OnDisable();
             hitCounter.Clear();
         }
 
         private bool particleEnterCalledThisFrame;
-        private void LateUpdate()
+        protected void LateUpdate()
         {
             particleEnterCalledThisFrame = false;
         }
