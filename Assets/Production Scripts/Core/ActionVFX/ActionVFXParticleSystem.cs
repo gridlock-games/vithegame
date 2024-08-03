@@ -129,7 +129,10 @@ namespace Vi.Core.VFX
 
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                            {
+                                if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                            }
                         }
 
                         if (canHit)
@@ -168,7 +171,10 @@ namespace Vi.Core.VFX
 
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                            {
+                                if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                            }
                         }
 
                         if (canHit)
@@ -229,10 +235,13 @@ namespace Vi.Core.VFX
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                 if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                             }
-                            
+
                             if (spellType == SpellType.GroundSpell)
                             {
-                                if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                                {
+                                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                }
                             }
 
                             if (canHit)
@@ -277,7 +286,10 @@ namespace Vi.Core.VFX
 
                                 if (spellType == SpellType.GroundSpell)
                                 {
-                                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                                    {
+                                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                    }
                                 }
 
                                 if (canHit)

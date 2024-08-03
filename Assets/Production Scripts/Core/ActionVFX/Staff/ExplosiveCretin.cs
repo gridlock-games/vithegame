@@ -20,18 +20,10 @@ namespace Vi.Core.VFX.Staff
 
         private float serverSpawnTime;
         private const float cretinDuration = 5;
-        private bool isSpawned;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             if (IsServer) { serverSpawnTime = Time.time; }
-            StartCoroutine(SetIsSpawned());
-        }
-
-        private IEnumerator SetIsSpawned()
-        {
-            yield return null;
-            isSpawned = true;
         }
 
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
@@ -67,7 +59,6 @@ namespace Vi.Core.VFX.Staff
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
-            if (!isSpawned) { return; }
             if (!IsServer) { return; }
             if (despawnCalled) { return; }
 
