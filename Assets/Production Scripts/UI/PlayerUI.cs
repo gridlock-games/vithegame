@@ -416,7 +416,7 @@ namespace Vi.UI
                 if (activeStatuses.Contains(statusIcon.Status))
                 {
                     statusIcon.SetActive(true);
-                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 4);
                 }
                 else
                 {
@@ -454,7 +454,7 @@ namespace Vi.UI
                     if (activeStatuses.Contains(statusIcon.Status))
                     {
                         statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 4);
                     }
                     else
                     {
