@@ -4616,7 +4616,7 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 2
   recoveryAnimationSpeed: 2
-  agentStaminaCost: 8
+  agentStaminaCost: 15
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -4655,7 +4655,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 10dc53326b2f7fd4bab2c0c3b94f3bdc, type: 3}
-  abilityCooldownTime: 1
+  abilityCooldownTime: 10
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
