@@ -62,8 +62,8 @@ namespace Vi.Core.VFX
                 {
                     if (fartherAllHits[i].distance > minDistance & minDistanceInitialized) { continue; }
 
-                    bHit = true;
-                    floorHit = fartherAllHits[i];
+                    fartherBHit = true;
+                    fartherFloorHit = fartherAllHits[i];
 
                     minDistance = fartherAllHits[i].distance;
                     minDistanceInitialized = true;
@@ -87,8 +87,10 @@ namespace Vi.Core.VFX
                 {
                     transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
                     transform.rotation = transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+
+                    CanCast = false;
                 }
-                ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
+                ChangeParticleColor(CanCast ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
             }
             else
             {
