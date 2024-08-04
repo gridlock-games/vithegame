@@ -795,7 +795,7 @@ namespace Vi.Core
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
             {
-                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
@@ -809,7 +809,7 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
                     foreach (Attributes attributes in GetActivePlayerObjects())
                     {
@@ -940,7 +940,7 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Add:
                     if (IsServer)
                     {
-                        if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayer)
                         {
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }

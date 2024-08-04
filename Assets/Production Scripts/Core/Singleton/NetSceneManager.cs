@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.Events;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -295,18 +295,42 @@ namespace Vi.Core
             activeSceneGroupIndicies = new NetworkList<int>();
         }
 
-        public bool ShouldSpawnPlayer()
+        private void OnEnable()
+        {
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnDisable()
+        {
+            EventDelegateManager.sceneLoaded += OnSceneLoad;
+            EventDelegateManager.sceneUnloaded += OnSceneUnload;
+        }
+
+        private void OnSceneLoad(Scene scene)
+        {
+            SetShouldSpawnPlayer();
+        }
+
+        private void OnSceneUnload()
+        {
+            SetShouldSpawnPlayer();
+        }
+
+        public bool ShouldSpawnPlayer { get; private set; }
+
+        private void SetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
-            foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
+            foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Where(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
             {
                 foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
-                    if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }
+                    if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { ShouldSpawnPlayer = false; return; }
                 }
                 if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
-            return gameplaySceneIsLoaded;
+            ShouldSpawnPlayer = gameplaySceneIsLoaded;
         }
 
         public bool IsBusyLoadingScenes()
@@ -343,12 +367,12 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
         }
 
