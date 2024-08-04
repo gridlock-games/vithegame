@@ -44,25 +44,29 @@ namespace Vi.Core.VFX
                 RaycastHit fartherFloorHit = new RaycastHit();
 
                 float minDistance = 0;
+                bool minDistanceInitialized = false;
                 for (int i = 0; i < allHitsCount; i++)
                 {
-                    if (allHits[i].distance > minDistance) { continue; }
+                    if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
 
                     bHit = true;
                     floorHit = allHits[i];
 
                     minDistance = allHits[i].distance;
+                    minDistanceInitialized = true;
                 }
 
                 minDistance = 0;
+                minDistanceInitialized = false;
                 for (int i = 0; i < fartherAllHitsCount; i++)
                 {
-                    if (fartherAllHits[i].distance > minDistance) { continue; }
+                    if (fartherAllHits[i].distance > minDistance & minDistanceInitialized) { continue; }
 
                     bHit = true;
                     floorHit = fartherAllHits[i];
 
                     minDistance = fartherAllHits[i].distance;
+                    minDistanceInitialized = true;
                 }
 
                 # if UNITY_EDITOR

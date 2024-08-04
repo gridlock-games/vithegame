@@ -90,9 +90,10 @@ namespace Vi.Core
                     
                     Vector3 targetPoint = parentAnimationHandler.GetAimPoint();
                     float minDistance = 0;
+                    bool minDistanceInitialized = false;
                     for (int i = 0; i < hitCount; i++)
                     {
-                        if (projectileRotationRaycastingResults[i].distance > minDistance) { continue; }
+                        if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
                         RaycastHit hit = projectileRotationRaycastingResults[i];
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
                         if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
@@ -105,6 +106,7 @@ namespace Vi.Core
                         }
                         if (hit.distance > 1.5f) { targetPoint = hit.point; }
                         minDistance = hit.distance;
+                        minDistanceInitialized = true;
                     }
 
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,

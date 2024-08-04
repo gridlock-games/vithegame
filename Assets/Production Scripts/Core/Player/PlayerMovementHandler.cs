@@ -129,12 +129,14 @@ namespace Vi.Player
 
             bool bHit = false;
             float minDistance = 0;
+            bool minDistanceInitialized = false;
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allHitsCount; i++)
             {
-                if (allGravityHits[i].distance > minDistance) { continue; }
+                if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
                 minDistance = allGravityHits[i].distance;
+                minDistanceInitialized = true;
             }
             gravity += amountToAddToGravity;
 
@@ -426,12 +428,14 @@ namespace Vi.Player
                                     interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
 
                                 float minDistance = 0;
+                                bool minDistanceInitialized = false;
                                 NetworkInteractable networkInteractable = null;
                                 for (int i = 0; i < interactableHitCount; i++)
                                 {
-                                    if (interactableHits[i].distance > minDistance) { continue; }
+                                    if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                                     networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
                                     minDistance = interactableHits[i].distance;
+                                    minDistanceInitialized = true;
                                 }
                                 if (networkInteractable) { networkInteractable.Interact(gameObject); }
                             }

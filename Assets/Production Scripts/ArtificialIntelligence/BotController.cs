@@ -176,12 +176,14 @@ namespace Vi.ArtificialIntelligence
 
             bool bHit = false;
             float minDistance = 0;
+            bool minDistanceInitialized = false;
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allHitsCount; i++)
             {
-                if (allHits[i].distance > minDistance) { continue; }
+                if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
                 minDistance = allHits[i].distance;
+                minDistanceInitialized = true;
             }
             gravity += amountToAddToGravity;
 
