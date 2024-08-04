@@ -65,6 +65,7 @@ namespace Vi.Core
         private float lastProjectileSpawnTime = Mathf.NegativeInfinity;
         private int projectileSpawnCount;
 
+        private RaycastHit[] projectileRotationRaycastingResults = new RaycastHit[10];
         private void LateUpdate()
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
@@ -84,18 +85,26 @@ namespace Vi.Core
             {
                 if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
                 {
-                    RaycastHit[] allHits = Physics.RaycastAll(parentAnimationHandler.GetCameraPivotPoint(), parentAnimationHandler.GetCameraForwardDirection(), 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    int hitCount = Physics.RaycastNonAlloc(parentAnimationHandler.GetCameraPivotPoint(), parentAnimationHandler.GetCameraForwardDirection().normalized,
+                        projectileRotationRaycastingResults, 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    
                     Vector3 targetPoint = parentAnimationHandler.GetAimPoint();
-                    foreach (RaycastHit hit in allHits)
+                    float minDistance = 0;
+                    for (int i = 0; i < hitCount; i++)
                     {
+                        if (projectileRotationRaycastingResults[i].distance > minDistance) { continue; }
+                        RaycastHit hit = projectileRotationRaycastingResults[i];
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
                         if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (networkCollider.Attributes == parentAttributes) { continue; }
                         }
+                        else // No Network Collider
+                        {
+                            continue;
+                        }
                         if (hit.distance > 1.5f) { targetPoint = hit.point; }
-                        break;
+                        minDistance = hit.distance;
                     }
 
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,

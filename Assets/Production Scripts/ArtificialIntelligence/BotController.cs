@@ -110,6 +110,9 @@ namespace Vi.ArtificialIntelligence
         private NavMeshPath path;
         private Vector3 nextPosition;
         private const float stoppingDistance = 2;
+
+        RaycastHit[] allHits = new RaycastHit[10];
+
         private void ProcessMovementTick()
         {
             // This method is only called on the server
@@ -167,17 +170,20 @@ namespace Vi.ArtificialIntelligence
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            RaycastHit[] allHits = Physics.SphereCastAll(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            int allHitsCount = Physics.SphereCastNonAlloc(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity.normalized, allHits, gravitySphereCastPositionOffset.magnitude,
+                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+
             bool bHit = false;
-            foreach (RaycastHit gravityHit in allHits)
+            float minDistance = 0;
+            Vector3 amountToAddToGravity = Vector3.zero;
+            for (int i = 0; i < allHitsCount; i++)
             {
-                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
-                bHit = true;
-                break;
+                if (allHits[i].distance > minDistance) { continue; }
+                amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
+                minDistance = allHits[i].distance;
             }
+            gravity += amountToAddToGravity;
 
             if (bHit)
             {
