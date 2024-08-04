@@ -182,6 +182,7 @@ namespace Vi.ArtificialIntelligence
             {
                 if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
+                bHit = true;
                 minDistance = allHits[i].distance;
                 minDistanceInitialized = true;
             }

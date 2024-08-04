@@ -123,7 +123,7 @@ namespace Vi.Player
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            int allHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
                 LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
@@ -131,9 +131,10 @@ namespace Vi.Player
             float minDistance = 0;
             bool minDistanceInitialized = false;
             Vector3 amountToAddToGravity = Vector3.zero;
-            for (int i = 0; i < allHitsCount; i++)
+            for (int i = 0; i < allGravityHitsCount; i++)
             {
                 if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                bHit = true;
                 amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
                 minDistance = allGravityHits[i].distance;
                 minDistanceInitialized = true;
