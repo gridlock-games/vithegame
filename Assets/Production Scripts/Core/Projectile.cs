@@ -19,6 +19,8 @@ namespace Vi.Core
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
         [SerializeField] private AudioClip[] soundToPlayOnDespawn = new AudioClip[0];
 
+        public Attributes GetAttacker() { return attacker; }
+
         private Attributes attacker;
         private ShooterWeapon shooterWeapon;
         private ActionClip attack;
@@ -126,17 +128,20 @@ namespace Vi.Core
             transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
         }
 
+        [HideInInspector] public bool canHitPlayers = true;
+
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (!canHitPlayers) { return; }
 
             bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.Attributes == attacker) { return; }
-                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce, damageMultiplier);
+                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
                 if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))

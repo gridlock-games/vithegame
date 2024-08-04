@@ -32,9 +32,9 @@ namespace Vi.Core.VFX
             else if (transformType == TransformType.ConformToGround)
             {
                 Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
-                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
                 Vector3 fartherStartPos = transform.parent.position + transform.parent.rotation * fartherRaycastOffset;
-                RaycastHit[] fartherAllHits = Physics.RaycastAll(fartherStartPos, Vector3.down, raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                RaycastHit[] fartherAllHits = Physics.RaycastAll(fartherStartPos, Vector3.down, raycastMaxDistance * 2, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
                 System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                 System.Array.Sort(fartherAllHits, (x, y) => x.distance.CompareTo(y.distance));
 

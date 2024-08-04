@@ -28,6 +28,7 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static System.Net.HttpListener httpListener1 = null;
     private static System.IO.Stream output1 = null;
+
     public static void Auth(string clientId, string clientSecret, Action<bool, string, GoogleIdTokenResponse> callback)
     {
       _clientId = clientId;
@@ -44,7 +45,6 @@ namespace Vi.UI.SimpleGoogleSignIn
       //Not needed for mobile version/used on windows version
       if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
       { Listen(); }
-
     }
 
     //Not needed for mobile version
@@ -76,7 +76,7 @@ namespace Vi.UI.SimpleGoogleSignIn
       var buffer = System.Text.Encoding.UTF8.GetBytes(webpageHTML());
 
       response.ContentLength64 = buffer.Length;
-      
+
       var output = response.OutputStream;
       output1 = output;
       output.Write(buffer, 0, buffer.Length);
@@ -106,7 +106,7 @@ namespace Vi.UI.SimpleGoogleSignIn
       _codeVerifier = Guid.NewGuid().ToString();
 
       var codeChallenge = Utils.CreateCodeChallenge(_codeVerifier);
-      var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256";
+      var authorizationRequest = $"{AuthorizationEndpoint}?response_type=code&scope={Uri.EscapeDataString(AccessScope)}&prompt=consent&redirect_uri={Uri.EscapeDataString(_redirectUri)}&client_id={_clientId}&state={_state}&code_challenge={codeChallenge}&code_challenge_method=S256&access_type=offline";
 
       //Debug.Log("authorizationRequest=" + authorizationRequest);
       Application.OpenURL(authorizationRequest);
@@ -127,7 +127,7 @@ namespace Vi.UI.SimpleGoogleSignIn
       var state = parameters.Get("state");
       var code = parameters.Get("code");
       var scope = parameters.Get("scope");
-      Debug.Log(state +" " + code + " " + scope);
+      Debug.Log(state + " " + code + " " + scope);
 
       if (state == null || code == null || scope == null) return;
 
@@ -149,9 +149,9 @@ namespace Vi.UI.SimpleGoogleSignIn
         Uri = "https://oauth2.googleapis.com/token",
         Params = new Dictionary<string, string>
             {
-                {"client_id", _clientId},
-                {"client_secret", _clientSecret},
                 {"code", code},
+                {"client_id", _clientId },
+                {"client_secret", _clientSecret},
                 {"code_verifier", codeVerifier},
                 {"grant_type","authorization_code"},
                 {"redirect_uri", _redirectUri}
@@ -159,7 +159,9 @@ namespace Vi.UI.SimpleGoogleSignIn
       }).Then(
       response =>
       {
+        Debug.Log($"{response.Text}");
         GoogleIdTokenResponse data = JsonUtility.FromJson<GoogleIdTokenResponse>(response.Text);
+
         _callback(true, null, data);
       }).Catch(Debug.LogError);
     }

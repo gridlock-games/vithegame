@@ -6,12 +6,12 @@ using Unity.Netcode;
 
 namespace Vi.Core.VFX.Staff
 {
-    public class LandProtector : GameInteractiveActionVFX
+    public class LandProtector : ActionVFXParticleSystem
     {
         [SerializeField] private AudioClip[] soundToPlayOnSpellCancel;
         [SerializeField] private PooledObject[] VFXToPlayOnSpellCancel;
 
-        private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.GroundSpell };
+        private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.NotASpell, SpellType.GroundSpell, SpellType.AerialSpell };
 
         public override void OnNetworkSpawn()
         {
@@ -20,19 +20,11 @@ namespace Vi.Core.VFX.Staff
             {
                 col.enabled = IsServer;
             }
-
-            if (IsServer)
-            {
-                Collider[] cols = Physics.OverlapBox(new Vector3(transform.position.x, transform.position.y + 0.8f, transform.position.z), new Vector3(5.6f, 2, 5.6f) / 2, transform.rotation);
-                foreach (Collider col in cols)
-                {
-                    OnTriggerEnter(col);
-                }
-            }
         }
 
-        private void OnTriggerEnter(Collider other)
+        private new void OnTriggerEnter(Collider other)
         {
+            base.OnTriggerEnter(other);
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -46,6 +38,16 @@ namespace Vi.Core.VFX.Staff
                         PlayEffects(gameInteractiveActionVFX.transform.position);
                         gameInteractiveActionVFX.NetworkObject.Despawn(true);
                     }
+                }
+            }
+            else if (other.TryGetComponent(out Projectile projectile))
+            {
+                if (!projectile.IsSpawned) { return; }
+                if (PlayerDataManager.Singleton.CanHit(attacker, projectile.GetAttacker()))
+                {
+                    PlayEffects(projectile.transform.position);
+                    projectile.canHitPlayers = false;
+                    projectile.NetworkObject.Despawn(true);
                 }
             }
         }

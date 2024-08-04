@@ -72,9 +72,6 @@ namespace Vi.Player
             CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             CameraPositionClone.transform.LookAt(cameraInterp.transform);
 
-            targetPosition = CameraPositionClone.transform.position;
-            targetRotation = CameraPositionClone.transform.rotation;
-
             transform.position = CameraPositionClone.transform.position;
             transform.rotation = CameraPositionClone.transform.rotation;
 
@@ -99,8 +96,6 @@ namespace Vi.Player
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
 
         private float followCamAngleOffset;
-        private Vector3 targetPosition;
-        private Quaternion targetRotation;
         private void LateUpdate()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -156,7 +151,7 @@ namespace Vi.Player
             {
                 Quaternion targetCameraInterpRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
 
-                if (weaponHandler.IsAiming())
+                if (weaponHandler.IsAiming() | IsAnimating)
                 {
                     cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
                     cameraInterp.transform.rotation = targetCameraInterpRotation;
@@ -180,18 +175,15 @@ namespace Vi.Player
                 CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
                 CameraPositionClone.transform.LookAt(cameraInterp.transform);
 
-                targetPosition = CameraPositionClone.transform.position;
-                targetRotation = CameraPositionClone.transform.rotation;
-
                 if (IsAnimating)
                 {
-                    transform.position = targetPosition + animationPositionOffset;
-                    transform.rotation = targetRotation * animationRotationOffset;
+                    transform.position = CameraPositionClone.transform.position + animationPositionOffset;
+                    transform.rotation = CameraPositionClone.transform.rotation * animationRotationOffset;
                 }
                 else
                 {
-                    transform.position = targetPosition;
-                    transform.rotation = targetRotation;
+                    transform.position = CameraPositionClone.transform.position;
+                    transform.rotation = CameraPositionClone.transform.rotation;
 
                     // Move camera if there is a wall in the way
                     if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }

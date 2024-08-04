@@ -177,10 +177,20 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3205846158461354809, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3205846158758083503, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3205846158758083503, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3205846159074075455, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
@@ -201,6 +211,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3205846159889718374, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3920667750946730408, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
@@ -317,6 +332,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 7183537951617099631, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7325620320651569025, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
       propertyPath: m_Layer
@@ -326,6 +346,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7331303929435548962, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7350443133687444733, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
@@ -469,7 +494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1918433063
+  GlobalObjectIdHash: 3860352162
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -506,7 +531,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
+  onActivateVFXSpawnNormalizedTime: 0.45
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
   raycastMaxDistance: 5

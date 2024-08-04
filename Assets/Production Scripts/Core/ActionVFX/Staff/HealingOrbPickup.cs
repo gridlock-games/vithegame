@@ -7,6 +7,8 @@ namespace Vi.Core.VFX.Staff
 {
     public class HealingOrbPickup : GameInteractiveActionVFX
     {
+        private float serverSpawnTime;
+        private const float healingOrbDuration = 3;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -14,6 +16,7 @@ namespace Vi.Core.VFX.Staff
             {
                 col.enabled = IsServer;
             }
+            if (IsServer) { serverSpawnTime = Time.time; }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -25,9 +28,17 @@ namespace Vi.Core.VFX.Staff
             {
                 if (!PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker))
                 {
-                    networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP());
+                    networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP() * 0.05f);
                     NetworkObject.Despawn();
                 }
+            }
+        }
+
+        private void Update()
+        {
+            if (IsServer)
+            {
+                if (Time.time - serverSpawnTime > healingOrbDuration) { NetworkObject.Despawn(true); }
             }
         }
     }

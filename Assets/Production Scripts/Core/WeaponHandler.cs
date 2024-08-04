@@ -290,8 +290,8 @@ namespace Vi.Core
 
         public GameObject SpawnPreviewVFX(ActionClip actionClip, ActionVFXPreview actionPreviewVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
-            actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset;
-            actionPreviewVFXPrefab.vfxRotationOffset = actionClip.actionVFXList[0].vfxRotationOffset;
+            actionPreviewVFXPrefab.vfxPositionOffset = actionClip.actionVFXList[0].vfxPositionOffset + actionClip.previewActionVFXPositionOffset;
+            actionPreviewVFXPrefab.vfxRotationOffset = (Quaternion.Euler(actionClip.actionVFXList[0].vfxRotationOffset) * Quaternion.Euler(actionClip.previewActionVFXRotationOffset)).eulerAngles;
             actionPreviewVFXPrefab.vfxSpawnType = actionClip.actionVFXList[0].vfxSpawnType;
             actionPreviewVFXPrefab.transformType = actionClip.actionVFXList[0].transformType;
             actionPreviewVFXPrefab.onActivateVFXSpawnNormalizedTime = actionClip.actionVFXList[0].onActivateVFXSpawnNormalizedTime;
@@ -371,8 +371,8 @@ namespace Vi.Core
                 case ActionVFX.TransformType.ConformToGround:
                     Vector3 startPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.raycastOffset;
                     Vector3 fartherStartPos = attackerTransform.position + attackerTransform.rotation * actionVFXPrefab.fartherRaycastOffset;
-                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    bool fartherBHit = Physics.Raycast(fartherStartPos, Vector3.down, out RaycastHit fartherHit, actionVFXPrefab.raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                    bool bHit = Physics.Raycast(startPos, Vector3.down, out RaycastHit hit, actionVFXPrefab.raycastMaxDistance, LayerMask.GetMask(ActionVFX.layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
+                    bool fartherBHit = Physics.Raycast(fartherStartPos, Vector3.down, out RaycastHit fartherHit, actionVFXPrefab.raycastMaxDistance * 2, LayerMask.GetMask(ActionVFX.layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
 
                     if (Application.isEditor)
                     {
@@ -851,6 +851,33 @@ namespace Vi.Core
             {
                 yield return null;
                 HeavyAttack(true);
+            }
+        }
+
+        public void ClearActionVFXInstances()
+        {
+            if (ability1PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance.GetComponent<PooledObject>());
+                ability1PreviewInstance = null;
+            }
+
+            if (ability2PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance.GetComponent<PooledObject>());
+                ability2PreviewInstance = null;
+            }
+
+            if (ability3PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance.GetComponent<PooledObject>());
+                ability3PreviewInstance = null;
+            }
+
+            if (ability4PreviewInstance)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance.GetComponent<PooledObject>());
+                ability4PreviewInstance = null;
             }
         }
 

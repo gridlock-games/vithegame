@@ -94,6 +94,15 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
       sceneName: Training Room
+  - name: Tutorial Room
+    sceneType: 2
+    scenePreviewIcon: {fileID: 0}
+    sceneReferences:
+    - m_AssetGUID: cbf5d4a04f52a4a4da9816d655fa6ce4
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: Tutorial Room
   - name: Player Hub
     sceneType: 2
     scenePreviewIcon: {fileID: 0}
@@ -168,7 +177,7 @@ MonoBehaviour:
       sceneName: TeamDeathmatch
   - name: Tutorial Map
     sceneType: 3
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIcon: {fileID: 21300000, guid: 724704bce32a47346b3c4008ca841391, type: 3}
     sceneReferences:
     - m_AssetGUID: e8640f6257262a94eba1432fd83fd8b3
       m_SubObjectName: 

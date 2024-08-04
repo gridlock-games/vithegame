@@ -73,11 +73,19 @@ namespace Vi.Core.VFX.Staff
 
                     networkColliderCount++;
                     bool shouldAffect = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker);
-                    if (spellType == SpellType.GroundSpell)
+                    if (shouldAffect)
                     {
-                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (networkCollider.Attributes.IsImmuneToGroundSpells())
+                            {
+                                shouldAffect = false;
+                                despawnCalled = true;
+                                NetworkObject.Despawn(true);
+                            }
+                        }
                     }
-
+                    
                     if (shouldAffect)
                     {
                         if (networkColliderCount == 1)
@@ -91,11 +99,8 @@ namespace Vi.Core.VFX.Staff
                             bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
                                 attack, networkCollider.Attributes.transform.position, transform.position);
 
-                            if (hitSuccess)
-                            {
-                                despawnCalled = true;
-                                NetworkObject.Despawn(true);
-                            }
+                            despawnCalled = true;
+                            NetworkObject.Despawn(true);
                         }
                     }
                 }

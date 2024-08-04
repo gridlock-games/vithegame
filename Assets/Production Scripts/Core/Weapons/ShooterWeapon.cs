@@ -85,6 +85,7 @@ namespace Vi.Core
                 if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
                 {
                     RaycastHit[] allHits = Physics.RaycastAll(parentAnimationHandler.GetCameraPivotPoint(), parentAnimationHandler.GetCameraForwardDirection(), 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
                     Vector3 targetPoint = parentAnimationHandler.GetAimPoint();
                     foreach (RaycastHit hit in allHits)
                     {
@@ -93,7 +94,8 @@ namespace Vi.Core
                         {
                             if (networkCollider.Attributes == parentAttributes) { continue; }
                         }
-                        targetPoint = hit.point;
+                        if (hit.distance > 1.5f) { targetPoint = hit.point; }
+                        break;
                     }
 
                     GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,
