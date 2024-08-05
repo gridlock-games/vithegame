@@ -56,11 +56,6 @@ namespace Vi.Core
             }
         }
 
-        public void CheckStatus()
-        {
-            Debug.Log(IsServer + " " + NetworkManager.IsServer + " " + NetworkManager.Singleton.IsServer);
-        }
-
         public Sprite GetSceneGroupIcon(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
@@ -173,12 +168,15 @@ namespace Vi.Core
                 }
             }
 
+            ShouldSpawnPlayer = SetShouldSpawnPlayer();
+
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
         }
 
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
+            ShouldSpawnPlayer = SetShouldSpawnPlayer();
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
@@ -295,42 +293,20 @@ namespace Vi.Core
             activeSceneGroupIndicies = new NetworkList<int>();
         }
 
-        private void OnEnable()
-        {
-            EventDelegateManager.sceneLoaded += OnSceneLoad;
-            EventDelegateManager.sceneUnloaded += OnSceneUnload;
-        }
-
-        private void OnDisable()
-        {
-            EventDelegateManager.sceneLoaded += OnSceneLoad;
-            EventDelegateManager.sceneUnloaded += OnSceneUnload;
-        }
-
-        private void OnSceneLoad(Scene scene)
-        {
-            SetShouldSpawnPlayer();
-        }
-
-        private void OnSceneUnload()
-        {
-            SetShouldSpawnPlayer();
-        }
-
         public bool ShouldSpawnPlayer { get; private set; }
 
-        private void SetShouldSpawnPlayer()
+        private bool SetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
             {
                 foreach (SceneReference scene in scenePayload.sceneReferences)
                 {
-                    if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { ShouldSpawnPlayer = false; return; }
+                    if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }
                 }
                 if (scenePayload.sceneType == SceneType.Gameplay) { gameplaySceneIsLoaded = true; }
             }
-            ShouldSpawnPlayer = gameplaySceneIsLoaded;
+            return gameplaySceneIsLoaded;
         }
 
         public bool IsBusyLoadingScenes()
