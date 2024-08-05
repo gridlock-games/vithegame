@@ -6,6 +6,7 @@ using UnityEngine;
 using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -1303,7 +1304,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == ailment.Value))
                 {
                     if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {

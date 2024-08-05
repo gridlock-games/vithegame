@@ -186,7 +186,7 @@ namespace Vi.Core.GameModeManagers
             Dictionary<PlayerDataManager.Team, int> deathCountByTeam = new Dictionary<PlayerDataManager.Team, int>();
             foreach (PlayerDataManager.Team team in uniqueTeamList)
             {
-                deathCountByTeam.Add(team, PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).FindAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death).Count);
+                deathCountByTeam.Add(team, PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Count(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death));
             }
 
             int highestDeaths = deathCountByTeam.Max(item => item.Value);

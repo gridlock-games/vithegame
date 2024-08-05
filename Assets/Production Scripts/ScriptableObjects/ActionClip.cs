@@ -267,11 +267,12 @@ namespace Vi.ScriptableObjects
         {
             List<ActionClipSoundEffect> filteredEffects = actionClipSoundEffects.FindAll(item => item.raceAndGenders.Contains(raceAndGender));
             List<ActionSoundEffect> returnList = new List<ActionSoundEffect>();
-            for (int i = 0; i < filteredEffects.Count; i++)
+            int i = -1;
+            foreach (ActionClipSoundEffect actionClipSoundEffect in actionClipSoundEffects.Where(item => item.raceAndGenders.Contains(raceAndGender)))
             {
+                i++;
                 if (idsToExclude.Contains(i)) { continue; }
 
-                ActionClipSoundEffect actionClipSoundEffect = filteredEffects[i];
                 returnList.Add(new ActionSoundEffect(i,
                     actionClipSoundEffect.audioClips[Random.Range(0, actionClipSoundEffect.audioClips.Length)],
                     actionClipSoundEffect.normalizedPlayTime));

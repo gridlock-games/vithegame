@@ -154,14 +154,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.8.1",
+      "version": "https://github.com/Unity-Technologies/com.unity.netcode.gameobjects.git?path=com.unity.netcode.gameobjects#fix/fixedstring-byte-writing-and-comparing",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.10.1",
         "com.unity.transport": "1.4.0"
       },
-      "url": "https://packages.unity.com"
+      "hash": "b39bc3a1359535589611eaa70b3ec10423c02d84"
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",

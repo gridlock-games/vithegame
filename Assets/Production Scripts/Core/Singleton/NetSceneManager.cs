@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.Events;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -54,11 +54,6 @@ namespace Vi.Core
                     Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
                     break;
             }
-        }
-
-        public void CheckStatus()
-        {
-            Debug.Log(IsServer + " " + NetworkManager.IsServer + " " + NetworkManager.Singleton.IsServer);
         }
 
         public Sprite GetSceneGroupIcon(string sceneGroupName)
@@ -173,12 +168,15 @@ namespace Vi.Core
                 }
             }
 
+            ShouldSpawnPlayer = SetShouldSpawnPlayer();
+
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
         }
 
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
+            ShouldSpawnPlayer = SetShouldSpawnPlayer();
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
@@ -295,7 +293,9 @@ namespace Vi.Core
             activeSceneGroupIndicies = new NetworkList<int>();
         }
 
-        public bool ShouldSpawnPlayer()
+        public bool ShouldSpawnPlayer { get; private set; }
+
+        private bool SetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
@@ -335,7 +335,7 @@ namespace Vi.Core
 
         public bool IsEnvironmentLoaded()
         {
-            return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Environment).Count > 0;
+            return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Count(item => item.sceneType == SceneType.Environment) > 0;
         }
 
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)
@@ -343,12 +343,12 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer() ? 0 : 1)); }
+                if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
         }
 

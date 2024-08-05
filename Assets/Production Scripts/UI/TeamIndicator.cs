@@ -16,38 +16,43 @@ namespace Vi.UI
             attributes = GetComponentInParent<Attributes>();
             renderers = GetComponentsInChildren<Renderer>();
 
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                List<Material> materials = new List<Material>();
+                renderers[i].GetMaterials(materials);
+                materials = materials.FindAll(item => item.HasProperty(_Glow));
+                rendererMaterialCache.Add(i, materials);
+            }
+
             Update();
         }
 
         private readonly int _Glow = Shader.PropertyToID("_Glow");
         private readonly int _Transparency = Shader.PropertyToID("_Transparency");
 
+        Dictionary<int, List<Material>> rendererMaterialCache = new Dictionary<int, List<Material>>();
         private void Update()
         {
-            foreach (Renderer r in renderers)
+            for (int i = 0; i < renderers.Length; i++)
             {
-                r.enabled = attributes.IsSpawned;
-                if (!r.enabled) { continue; }
+                renderers[i].enabled = attributes.IsSpawned;
+                if (!renderers[i].enabled) { continue; }
 
-                foreach (Material mat in r.materials)
+                foreach (Material mat in rendererMaterialCache[i])
                 {
-                    if (mat.HasProperty(_Glow))
+                    if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
                     {
-                        if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
-                        {
-                            mat.color = attributes.GetRelativeTeamColor();
-                            mat.SetFloat(_Transparency, attributes.GetTeam() == PlayerDataManager.Team.Competitor | attributes.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
-                        }
-                        else
-                        {
-                            mat.color = Color.black;
-                            mat.SetFloat(_Transparency, 0);
-                        }
-
-                        mat.SetFloat(_Glow, glowAmount);
+                        mat.color = attributes.GetRelativeTeamColor();
+                        mat.SetFloat(_Transparency, attributes.GetTeam() == PlayerDataManager.Team.Competitor | attributes.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
                     }
+                    else
+                    {
+                        mat.color = Color.black;
+                        mat.SetFloat(_Transparency, 0);
+                    }
+                    mat.SetFloat(_Glow, glowAmount);
                 }
-                r.enabled = attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
+                renderers[i].enabled = attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
             }
         }
     }

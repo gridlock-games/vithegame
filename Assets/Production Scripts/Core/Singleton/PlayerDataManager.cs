@@ -795,7 +795,7 @@ namespace Vi.Core
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
             {
-                if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                if (NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
@@ -809,7 +809,7 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                if (!NetSceneManager.Singleton.ShouldSpawnPlayer())
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
                     foreach (Attributes attributes in GetActivePlayerObjects())
                     {
@@ -940,13 +940,13 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Add:
                     if (IsServer)
                     {
-                        if (NetSceneManager.Singleton.ShouldSpawnPlayer())
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayer)
                         {
                             playersToSpawnQueue.Enqueue(networkListEvent.Value);
                         }
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
 
                         channelCounts[networkListEvent.Value.channel]++;
@@ -964,7 +964,7 @@ namespace Vi.Core
                     if (IsServer)
                     {
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().FindAll(item => item.id >= 0).Count,
+                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
                             kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
 
                         // If there is a local player for this id, despawn it

@@ -57,6 +57,7 @@ namespace Vi.Core.VFX
             return newBounds / originalBounds;
         }
 
+        RaycastHit[] allHits = new RaycastHit[10];
         private void Start()
         {
             if (scaleVFXBasedOnEdges)
@@ -64,12 +65,16 @@ namespace Vi.Core.VFX
                 Vector3 endBoundsPoint = boundsPoint;
                 while (endBoundsPoint != Vector3.zero)
                 {
-                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    if (Application.isEditor) { Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3); }
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    int allHitsCount = Physics.RaycastNonAlloc(transform.position + (transform.rotation * endBoundsPoint),
+                        (transform.rotation * boundsLocalAxis).normalized, allHits, 1,
+                        LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+
+                    # if UNITY_EDITOR
+                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    #endif
 
                     bool bHit = false;
-                    foreach (RaycastHit hit in allHits)
+                    for (int i = 0; i < allHitsCount; i++)
                     {
                         bHit = true;
                         break;

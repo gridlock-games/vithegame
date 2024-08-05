@@ -86,6 +86,8 @@ namespace Vi.Player
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private bool isGrounded = true;
+        RaycastHit[] allGravityHits = new RaycastHit[10];
+        RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
@@ -121,17 +123,23 @@ namespace Vi.Player
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            RaycastHit[] allHits = Physics.SphereCastAll(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
-                gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
+                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+
             bool bHit = false;
-            foreach (RaycastHit gravityHit in allHits)
+            float minDistance = 0;
+            bool minDistanceInitialized = false;
+            Vector3 amountToAddToGravity = Vector3.zero;
+            for (int i = 0; i < allGravityHitsCount; i++)
             {
-                gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(gravityHit.distance) * Physics.gravity;
+                if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 bHit = true;
-                break;
+                amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
+                minDistance = allGravityHits[i].distance;
+                minDistanceInitialized = true;
             }
+            gravity += amountToAddToGravity;
 
             if (bHit)
             {
@@ -168,19 +176,27 @@ namespace Vi.Player
                 else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | animationHandler.IsLunging())
                 {
                     movement = rootMotion;
+
+                    # if UNITY_EDITOR
                     ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
-                    allHits = Physics.BoxCastAll(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    # endif
+
+                    int rootMotionHitCount = Physics.BoxCastNonAlloc(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset,
+                        ActionClip.boxCastHalfExtents, (movementPrediction.CurrentRotation * Vector3.forward).normalized, rootMotionHits,
+                        movementPrediction.CurrentRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                    foreach (RaycastHit hit in allHits)
+
+                    for (int i = 0; i < rootMotionHitCount; i++)
                     {
-                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        if (rootMotionHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
                                 angleList.Add((networkCollider,
                                     Mathf.Abs(targetRot.eulerAngles.y - movementPrediction.CurrentRotation.eulerAngles.y),
-                                    hit));
+                                    rootMotionHits[i]));
                             }
                         }
                     }
@@ -365,6 +381,7 @@ namespace Vi.Player
         }
 
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
+        RaycastHit[] interactableHits = new RaycastHit[10];
         private new void Update()
         {
             base.Update();
@@ -408,18 +425,20 @@ namespace Vi.Player
                         {
                             if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                             {
-                                List<string> layers = layersToAccountForInMovement.ToList();
-                                layers.Add("NetworkPrediction");
-                                RaycastHit[] allHits = Physics.RaycastAll(mainCamera.ScreenPointToRay(touch.screenPosition), 10, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
-                                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-                                foreach (RaycastHit hit in allHits)
+                                int interactableHitCount = Physics.RaycastNonAlloc(mainCamera.ScreenPointToRay(touch.screenPosition),
+                                    interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
+
+                                float minDistance = 0;
+                                bool minDistanceInitialized = false;
+                                NetworkInteractable networkInteractable = null;
+                                for (int i = 0; i < interactableHitCount; i++)
                                 {
-                                    if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
-                                    {
-                                        networkInteractable.Interact(gameObject);
-                                        break;
-                                    }
+                                    if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                                    networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
+                                    minDistance = interactableHits[i].distance;
+                                    minDistanceInitialized = true;
                                 }
+                                if (networkInteractable) { networkInteractable.Interact(gameObject); }
                             }
                         }
                         
@@ -474,6 +493,7 @@ namespace Vi.Player
         }
 
         private bool autoAim;
+        RaycastHit[] cameraHits = new RaycastHit[10];
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
@@ -533,22 +553,26 @@ namespace Vi.Player
                     if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | animationHandler.IsLunging())
                     {
                         ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
-                        RaycastHit[] allHits = Physics.BoxCastAll(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        int cameraHitsCount = Physics.BoxCastNonAlloc(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset,
+                            ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward.normalized, cameraHits,
+                            cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance,
+                            LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        
                         List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                        foreach (RaycastHit hit in allHits)
+                        for (int i = 0; i < cameraHitsCount; i++)
                         {
-                            if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                            if (cameraHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                             {
                                 if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                                 {
                                     Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
                                     angleList.Add((networkCollider,
                                         Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
-                                        hit));
+                                        cameraHits[i]));
                                 }
                             }
                         }
-
+                        
                         angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
                         foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
                         {
@@ -577,15 +601,22 @@ namespace Vi.Player
             animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
 
+        private string[] interactableRaycastLayers = new string[]
+        {
+            "Default",
+            "NetworkPrediction",
+            "Projectile",
+            "ProjectileCollider"
+        };
+
         void OnInteract()
         {
-            List<string> layers = layersToAccountForInMovement.ToList();
-            layers.Add("NetworkPrediction");
-            RaycastHit[] allHits = Physics.RaycastAll(mainCamera.transform.position, mainCamera.transform.forward, 15, LayerMask.GetMask(layers.ToArray()), QueryTriggerInteraction.Ignore);
-            System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-            foreach (RaycastHit hit in allHits)
+            int interactableHitsCount = Physics.RaycastNonAlloc(mainCamera.transform.position, mainCamera.transform.forward.normalized,
+                interactableHits, 15, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
+
+            for (int i = 0; i < interactableHitsCount; i++)
             {
-                if (hit.transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
+                if (interactableHits[i].transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
                 {
                     networkInteractable.Interact(gameObject);
                     break;
