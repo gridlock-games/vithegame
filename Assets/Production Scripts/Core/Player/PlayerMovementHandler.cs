@@ -367,7 +367,7 @@ namespace Vi.Player
             attributes = GetComponent<Attributes>();
             animationHandler = GetComponent<AnimationHandler>();
 
-            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Map"))
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
             {
                 cameraController.PlayAnimation("TutorialIntro");
             }
