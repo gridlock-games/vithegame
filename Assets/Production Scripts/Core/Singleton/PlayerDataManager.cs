@@ -62,7 +62,10 @@ namespace Vi.Core
 
         private void OnGameModeChange(GameMode prev, GameMode current)
         {
-            mapIndex.Value = 0;
+            if (IsServer)
+            {
+                mapIndex.Value = 0;
+            }
         }
 
         private NetworkVariable<int> mapIndex = new NetworkVariable<int>();
