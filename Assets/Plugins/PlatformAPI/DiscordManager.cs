@@ -98,11 +98,13 @@ namespace jomarcentermjm.PlatformAPI
       catch (ResultException e)
       {
           Debug.Log("Discord API have recieved an error and will be shutdown");
+        Debug.LogWarning(e);
           Destroy(this);
       }
       catch ( Exception e)
       {
         Debug.Log("Discord API have recieved an error and will be shutdown");
+        Debug.LogWarning(e);
         Destroy(this);
       }
     }
