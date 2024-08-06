@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Player;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -60,7 +61,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            spectatorCountText.text = "Spectator Count: " + PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().FindAll(item => item.team == PlayerDataManager.Team.Spectator).Count.ToString();
+            spectatorCountText.text = "Spectator Count: " + PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().Count(item => item.team == PlayerDataManager.Team.Spectator).ToString();
         }
 
         private void PopulateScoreboardWith2Columns(PlayerDataManager.Team[] teams)

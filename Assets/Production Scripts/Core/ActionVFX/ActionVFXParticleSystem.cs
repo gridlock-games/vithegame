@@ -57,6 +57,7 @@ namespace Vi.Core.VFX
             return newBounds / originalBounds;
         }
 
+        RaycastHit[] allHits = new RaycastHit[10];
         private void Start()
         {
             if (scaleVFXBasedOnEdges)
@@ -64,12 +65,16 @@ namespace Vi.Core.VFX
                 Vector3 endBoundsPoint = boundsPoint;
                 while (endBoundsPoint != Vector3.zero)
                 {
-                    RaycastHit[] allHits = Physics.RaycastAll(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                    if (Application.isEditor) { Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3); }
-                    System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
+                    int allHitsCount = Physics.RaycastNonAlloc(transform.position + (transform.rotation * endBoundsPoint),
+                        (transform.rotation * boundsLocalAxis).normalized, allHits, 1,
+                        LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+
+                    # if UNITY_EDITOR
+                    Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
+                    #endif
 
                     bool bHit = false;
-                    foreach (RaycastHit hit in allHits)
+                    for (int i = 0; i < allHitsCount; i++)
                     {
                         bHit = true;
                         break;
@@ -86,7 +91,7 @@ namespace Vi.Core.VFX
 
         private const string layersToHit = "NetworkPrediction";
 
-        private void OnTriggerEnter(Collider other)
+        protected void OnTriggerEnter(Collider other)
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
@@ -125,7 +130,11 @@ namespace Vi.Core.VFX
                         {
                             if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                             if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                            if (spellType == SpellType.GroundSpell)
+                        }
+
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
                                 if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                             }
@@ -150,7 +159,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        private void OnTriggerStay(Collider other)
+        protected void OnTriggerStay(Collider other)
         {
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
@@ -163,7 +172,11 @@ namespace Vi.Core.VFX
                         {
                             if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                             if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                            if (spellType == SpellType.GroundSpell)
+                        }
+
+                        if (spellType == SpellType.GroundSpell)
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
                                 if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                             }
@@ -190,14 +203,14 @@ namespace Vi.Core.VFX
 
         private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
 
-        private new void OnDisable()
+        protected new void OnDisable()
         {
             base.OnDisable();
             hitCounter.Clear();
         }
 
         private bool particleEnterCalledThisFrame;
-        private void LateUpdate()
+        protected void LateUpdate()
         {
             particleEnterCalledThisFrame = false;
         }
@@ -226,7 +239,11 @@ namespace Vi.Core.VFX
                             {
                                 if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                 if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                                if (spellType == SpellType.GroundSpell)
+                            }
+
+                            if (spellType == SpellType.GroundSpell)
+                            {
+                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                 {
                                     if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                                 }
@@ -270,7 +287,11 @@ namespace Vi.Core.VFX
                                 {
                                     if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
                                     if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                                    if (spellType == SpellType.GroundSpell)
+                                }
+
+                                if (spellType == SpellType.GroundSpell)
+                                {
+                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                     {
                                         if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
                                     }

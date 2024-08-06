@@ -6,6 +6,7 @@ using UnityEngine;
 using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -670,11 +671,7 @@ namespace Vi.Core
             // Don't let grab attack hit players that aren't grabbed
             if (!IsGrabbed() & attacker.animationHandler.IsGrabAttacking()) { return false; }
 
-            if (PlayerDataManager.Singleton.CanHit(attacker, this))
-            {
-                if (Mathf.Approximately(attack.damage, 0)) { return false; }
-            }
-            else
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
@@ -1307,7 +1304,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.FindAll(item => item.ailment == ailment.Value))
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == ailment.Value))
                 {
                     if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {

@@ -7,6 +7,8 @@ using Vi.Core;
 using Vi.Utility;
 using Vi.Player;
 using Unity.Netcode;
+using UnityEngine.Profiling;
+using System.IO;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -36,6 +38,22 @@ public class DebugOverlay : MonoBehaviour
         InvokeRepeating(nameof(RefreshPing), 0, 0.1f);
 
         StartCoroutine(RefreshStatusAfter1Frame());
+
+        # if PLATFORM_ANDROID
+        if (!Application.isEditor)
+        {
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log(Path.Join(Application.persistentDataPath, "myLog.raw"));
+                Profiler.logFile = Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+                Profiler.enableBinaryLog = true;
+                Profiler.enabled = true;
+
+                // Optional, if more memory is needed for the buffer
+                //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+            }
+        }
+        # endif
     }
 
     private IEnumerator RefreshStatusAfter1Frame()

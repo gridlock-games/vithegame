@@ -6950,12 +6950,19 @@ MonoBehaviour:
     duration: 1
     delay: 1
     associatedWithCurrentWeapon: 0
-  statusesToApplyToTeammateOnHit: []
+  statusesToApplyToTeammateOnHit:
+  - status: 15
+    value: 0
+    duration: 0.1
+    delay: 0
+    associatedWithCurrentWeapon: 0
   actionVFXList:
   - {fileID: 7695901101582375111, guid: f1ab6d20d810285409e0072107dd94fe, type: 3}
   previewActionVFX: {fileID: 2951280832426361480, guid: 5018b3ee257acd84fb55f47bf0955508,
     type: 3}
-  previewActionVFXScale: {x: 0, y: 0.5, z: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXScale: {x: 0.5, y: 0.5, z: 0.5}
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 50

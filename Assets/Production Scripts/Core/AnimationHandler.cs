@@ -242,6 +242,8 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
+        RaycastHit[] allHits = new RaycastHit[10];
+
         // This method plays the action on the server
         private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
@@ -280,19 +282,24 @@ namespace Vi.Core
                 if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                 {
                     // Lunge mechanic
+                    # if UNITY_EDITOR
                     ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
-                    RaycastHit[] allHits = Physics.BoxCastAll(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                    # endif
+                    int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
+                        ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
+                        ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                    foreach (RaycastHit hit in allHits)
+                    for (int i = 0; i < allHitsCount; i++)
                     {
-                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                                 angleList.Add((networkCollider,
                                     Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
-                                    hit));
+                                    allHits[i]));
                             }
                         }
                     }

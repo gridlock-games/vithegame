@@ -18,6 +18,7 @@ namespace Vi.Player
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
         private PlayerInput playerInput;
+        private WeaponHandler weaponHandler;
 
         public void SetExternalUI(MonoBehaviour externalUI)
         {
@@ -32,6 +33,8 @@ namespace Vi.Player
                 if (scoreboardInstance) { Destroy(scoreboardInstance); }
                 if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
                 if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
+
+                if (weaponHandler) { weaponHandler.ClearActionVFXInstances(); }
             }
             else
             {
@@ -40,6 +43,11 @@ namespace Vi.Player
                     playerUIInstance.SetActive(true);
                 playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
             }
+        }
+
+        private void Awake()
+        {
+            weaponHandler = GetComponent<WeaponHandler>();
         }
 
         private void OnEnable()

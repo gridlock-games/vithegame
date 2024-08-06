@@ -22,6 +22,8 @@ namespace Vi.Core.VFX
             noVFXWillBeSpawnedColor.a = originalParticleSystemColor.a;
         }
 
+        RaycastHit[] allHits = new RaycastHit[10];
+        RaycastHit[] fartherAllHits = new RaycastHit[10];
         private void LateUpdate()
         {
             if (transformType == TransformType.Projectile)
@@ -32,36 +34,45 @@ namespace Vi.Core.VFX
             else if (transformType == TransformType.ConformToGround)
             {
                 Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
-                RaycastHit[] allHits = Physics.RaycastAll(startPos, Vector3.down, raycastMaxDistance, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                int allHitsCount = Physics.RaycastNonAlloc(startPos, Vector3.down.normalized, allHits, raycastMaxDistance, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
                 Vector3 fartherStartPos = transform.parent.position + transform.parent.rotation * fartherRaycastOffset;
-                RaycastHit[] fartherAllHits = Physics.RaycastAll(fartherStartPos, Vector3.down, raycastMaxDistance * 2, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-                System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
-                System.Array.Sort(fartherAllHits, (x, y) => x.distance.CompareTo(y.distance));
+                int fartherAllHitsCount = Physics.RaycastNonAlloc(fartherStartPos, Vector3.down.normalized, fartherAllHits, raycastMaxDistance * 2, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
 
                 bool bHit = false;
                 bool fartherBHit = false;
                 RaycastHit floorHit = new RaycastHit();
                 RaycastHit fartherFloorHit = new RaycastHit();
 
-                foreach (RaycastHit hit in allHits)
+                float minDistance = 0;
+                bool minDistanceInitialized = false;
+                for (int i = 0; i < allHitsCount; i++)
                 {
+                    if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+
                     bHit = true;
-                    floorHit = hit;
-                    break;
+                    floorHit = allHits[i];
+
+                    minDistance = allHits[i].distance;
+                    minDistanceInitialized = true;
                 }
 
-                foreach (RaycastHit hit in fartherAllHits)
+                minDistance = 0;
+                minDistanceInitialized = false;
+                for (int i = 0; i < fartherAllHitsCount; i++)
                 {
+                    if (fartherAllHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+
                     fartherBHit = true;
-                    fartherFloorHit = hit;
-                    break;
+                    fartherFloorHit = fartherAllHits[i];
+
+                    minDistance = fartherAllHits[i].distance;
+                    minDistanceInitialized = true;
                 }
 
-                if (Application.isEditor)
-                {
-                    if (bHit) { Debug.DrawLine(startPos, floorHit.point, Color.red, Time.deltaTime); }
-                    if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherFloorHit.point, Color.magenta, Time.deltaTime); }
-                }
+                # if UNITY_EDITOR
+                if (bHit) { Debug.DrawLine(startPos, floorHit.point, Color.red, Time.deltaTime); }
+                if (fartherBHit) { Debug.DrawLine(fartherStartPos, fartherFloorHit.point, Color.magenta, Time.deltaTime); }
+                # endif
 
                 if (bHit & fartherBHit)
                 {
@@ -76,8 +87,10 @@ namespace Vi.Core.VFX
                 {
                     transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
                     transform.rotation = transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+
+                    CanCast = false;
                 }
-                ChangeParticleColor(bHit ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
+                ChangeParticleColor(CanCast ? originalParticleSystemColor : noVFXWillBeSpawnedColor);
             }
             else
             {

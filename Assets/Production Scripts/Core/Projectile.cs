@@ -128,11 +128,14 @@ namespace Vi.Core
             transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
         }
 
+        [HideInInspector] public bool canHitPlayers = true;
+
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (!canHitPlayers) { return; }
 
             bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))

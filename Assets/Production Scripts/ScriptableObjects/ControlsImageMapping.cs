@@ -16,7 +16,7 @@ namespace Vi.ScriptableObjects
         public List<Sprite> GetControlSchemeActionImages(InputControlScheme controlScheme, InputAction action)
         {
             List<Sprite> spriteList = new List<Sprite>();
-            foreach (ControlSchemeActionImage controlSchemeActionImage in controlSchemeActionImages.FindAll(item => item.controlSchemeName == controlScheme.name & item.actionName == action.name))
+            foreach (ControlSchemeActionImage controlSchemeActionImage in controlSchemeActionImages.Where(item => item.controlSchemeName == controlScheme.name & item.actionName == action.name))
             {
                 spriteList.Add(controlSchemeActionImage.sprite);
             }
