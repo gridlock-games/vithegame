@@ -91,22 +91,15 @@ namespace jomarcentermjm.PlatformAPI
     // Update is called once per frame
     private void LateUpdate()
     {
-      try
+
+
+      var callbackResult = discord.RunCallbacks();
+      if (callbackResult != Result.Ok)
       {
-        discord.RunCallbacks();
-      }
-      catch (ResultException e)
-      {
-          Debug.Log("Discord API have recieved an error and will be shutdown");
-        Debug.LogWarning(e);
-          Destroy(this);
-      }
-      catch ( Exception e)
-      {
-        Debug.Log("Discord API have recieved an error and will be shutdown");
-        Debug.LogWarning(e);
+        Debug.LogError($"Discord API have recieved an error and will be shutdown - error: {callbackResult}");
         Destroy(this);
       }
+
     }
 
 #endif
