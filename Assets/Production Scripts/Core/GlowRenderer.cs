@@ -162,9 +162,9 @@ namespace Vi.Core
             }
             
             currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
-            foreach (KeyValuePair<Renderer, List<Material>> kvp in glowMaterialInstances)
+            foreach (List<Material> materialList in glowMaterialInstances.Values)
             {
-                foreach (Material glowMaterialInstance in kvp.Value)
+                foreach (Material glowMaterialInstance in materialList)
                 {
                     glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
                     glowMaterialInstance.SetColor(_Color, colorTarget);
