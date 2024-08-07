@@ -14,6 +14,7 @@ using Proyecto26;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Vi.UI
 {
@@ -67,19 +68,46 @@ namespace Vi.UI
         private bool startServerCalled;
         private const int hubPort = 7777;
 
-        public void StartHubServer()
+        public IEnumerator StartHubServer()
         {
-            if (startServerCalled) { return; }
+            if (startServerCalled) { yield break; }
             startServerCalled = true;
             AudioListener.volume = 0;
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
-
-            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+            string serverIP = null;
+            if (File.Exists(Path.Join(Application.dataPath, "ServerConfig.txt")))
             {
-                networkTransport.ConnectionData.Address = "127.0.0.1";
+                string[] lines = File.ReadAllLines(Path.Join(Application.dataPath, "ServerConfig.txt"));
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        serverIP = lines[i];
+                    }
+                    else if (i == 1)
+                    {
+                        WebRequestManager.Singleton.SetAPIURL(lines[i]);
+                    }
+                }
             }
+            else
+            {
+                if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+                {
+                    serverIP = "127.0.0.1";
+                }
+                else
+                {
+                    serverIP = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+                }
+            }
+
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
+            WebRequestManager.Singleton.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = serverIP;
 
             networkTransport.ConnectionData.Port = hubPort;
 
@@ -90,19 +118,46 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
-        public void StartLobbyServer()
+        public IEnumerator StartLobbyServer()
         {
-            if (startServerCalled) { return; }
+            if (startServerCalled) { yield break; }
             startServerCalled = true;
             AudioListener.volume = 0;
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
-
-            if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+            string serverIP = null;
+            if (File.Exists(Path.Join(Application.dataPath, "ServerConfig.txt")))
             {
-                networkTransport.ConnectionData.Address = "127.0.0.1";
+                string[] lines = File.ReadAllLines(Path.Join(Application.dataPath, "ServerConfig.txt"));
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        serverIP = lines[i];
+                    }
+                    else if (i == 1)
+                    {
+                        WebRequestManager.Singleton.SetAPIURL(lines[i]);
+                    }
+                }
             }
+            else
+            {
+                if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
+                {
+                    serverIP = "127.0.0.1";
+                }
+                else
+                {
+                    serverIP = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+                }
+            }
+
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
+            WebRequestManager.Singleton.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.ConnectionData.Address = serverIP;
 
             List<int> portList = new List<int>();
             foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
@@ -240,6 +295,7 @@ namespace Vi.UI
 
         public void GoToCharacterSelect()
         {
+            WebRequestManager.Singleton.RefreshServers();
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
@@ -517,13 +573,11 @@ namespace Vi.UI
         private void Start()
         {
             initialParent.SetActive(true);
-            WebRequestManager.Singleton.RefreshServers();
             startHubServerButton.gameObject.SetActive(Application.isEditor);
             startLobbyServerButton.gameObject.SetActive(Application.isEditor);
             startAutoClientButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
-            Debug.Log(WebRequestManager.Singleton.GetAPIURL());
             APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL();
 
             if (!WebRequestManager.IsServerBuild())
@@ -602,20 +656,17 @@ namespace Vi.UI
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
 
-            if (!WebRequestManager.Singleton.IsRefreshingServers)
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {
-                if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
-                {
-                    StartHubServer();
-                }
-                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
-                {
-                    StartLobbyServer();
-                }
-                else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
-                {
-                    StartAutomatedClient();
-                }
+                StartCoroutine(StartHubServer());
+            }
+            else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-lobby-server") != -1)
+            {
+                StartCoroutine(StartLobbyServer());
+            }
+            else if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1)
+            {
+                StartAutomatedClient();
             }
 
             loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
