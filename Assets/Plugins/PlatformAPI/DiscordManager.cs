@@ -91,8 +91,6 @@ namespace jomarcentermjm.PlatformAPI
     // Update is called once per frame
     private void LateUpdate()
     {
-
-
       var callbackResult = discord.RunCallbacks();
       if (callbackResult != Result.Ok)
       {
