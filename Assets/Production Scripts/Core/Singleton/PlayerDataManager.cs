@@ -309,7 +309,8 @@ namespace Vi.Core
             TeamElimination,
             EssenceWar,
             OutpostRush,
-            TeamDeathmatch
+            TeamDeathmatch,
+            HordeMode
         }
 
         public enum Team
