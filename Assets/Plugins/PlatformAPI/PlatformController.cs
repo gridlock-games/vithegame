@@ -56,11 +56,12 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttmptSteam()
     {
+      Debug.Log("Running Steam check");
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
-            return false;
+      return false;
     }
 
     bool AttemptDiscord()

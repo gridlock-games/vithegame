@@ -34,14 +34,17 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam Code
-        if (SteamManager.Initialized)
+        if (gameObject.GetComponent<SteamManager>() != null)
         {
-          //Call in the achievement as completed
-          Steamworks.SteamUserStats.GetAchievement(achivement.steamAchievementID, out bool isCompleted);
-          if (!isCompleted)
+          if (!SteamManager.Initialized)
           {
-            SteamUserStats.SetAchievement(achivement.steamAchievementID);
-            SteamUserStats.StoreStats();
+            //Call in the achievement as completed
+            Steamworks.SteamUserStats.GetAchievement(achivement.steamAchievementID, out bool isCompleted);
+            if (!isCompleted)
+            {
+              SteamUserStats.SetAchievement(achivement.steamAchievementID);
+              SteamUserStats.StoreStats();
+            }
           }
         }
 #endif
@@ -59,10 +62,13 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam
-        if (SteamManager.Initialized)
+        if (gameObject.GetComponent<SteamManager>() != null)
         {
-          SteamUserStats.SetStat(stats.steamStatisticsID, value);
-          SteamUserStats.StoreStats();
+          if (!SteamManager.Initialized)
+          {
+            SteamUserStats.SetStat(stats.steamStatisticsID, value);
+            SteamUserStats.StoreStats();
+          }
         }
 #endif
       }
@@ -81,8 +87,9 @@ namespace jomarcentermjm.PlatformAPI
       {
 #if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
         //Steam
-        if (SteamManager.Initialized && platform == GamePlatform.Steam)
+        if (platform == GamePlatform.Steam &&gameObject.GetComponent<SteamManager>() != null)
         {
+          if (SteamManager.Initialized)
           SteamUserStats.GetStat(stats.steamStatisticsID, out output);
         }
 #endif
