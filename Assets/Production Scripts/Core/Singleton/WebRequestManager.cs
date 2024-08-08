@@ -967,7 +967,7 @@ namespace Vi.Core
             }
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
+            
             Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender, true);
             Loadout loadout2 = GetRandomizedLoadout(character.raceAndGender);
             Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
