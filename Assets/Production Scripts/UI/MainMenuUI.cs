@@ -68,16 +68,25 @@ namespace Vi.UI
         private bool startServerCalled;
         private const int hubPort = 7777;
 
+
         public IEnumerator StartHubServer()
         {
             if (startServerCalled) { yield break; }
+
+            var serverConfig = Path.Join(Application.dataPath, "ServerConfig.txt");
+
+            #if UNITY_STANDALONE_OSX
+                Debug.Log("Will Use OSX Option");
+                serverConfig =  @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/ServerConfig.txt";
+            #endif
+
             startServerCalled = true;
             AudioListener.volume = 0;
 
             string serverIP = null;
-            if (File.Exists(Path.Join(Application.dataPath, "ServerConfig.txt")))
+            if (File.Exists(serverConfig))
             {
-                string[] lines = File.ReadAllLines(Path.Join(Application.dataPath, "ServerConfig.txt"));
+                string[] lines = File.ReadAllLines(serverConfig);
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 0)
@@ -124,10 +133,19 @@ namespace Vi.UI
             startServerCalled = true;
             AudioListener.volume = 0;
 
+            var serverConfig = Path.Join(Application.dataPath, "ServerConfig.txt");
+
+            #if UNITY_STANDALONE_OSX
+                Debug.Log("MACOSX");
+                serverConfig = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/ServerConfig.txt";
+            #endif
+
+            Debug.Log(serverConfig);
+
             string serverIP = null;
-            if (File.Exists(Path.Join(Application.dataPath, "ServerConfig.txt")))
+            if (File.Exists(serverConfig))
             {
-                string[] lines = File.ReadAllLines(Path.Join(Application.dataPath, "ServerConfig.txt"));
+                string[] lines = File.ReadAllLines(serverConfig);
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 0)
