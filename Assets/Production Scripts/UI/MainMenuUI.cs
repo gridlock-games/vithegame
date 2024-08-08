@@ -400,7 +400,7 @@ namespace Vi.UI
         //private const string facebookSignInSecretId = "d5bd937c38b1b7843431cbfacd0ceeef";
 
         private const string facebookSignInClientId = "461749126721789";
-        private const string facebookSignInSecretId = "ad176d80170673cff90d3e0afec14cc7";
+        private const string facebookSignInSecretId = "c59261b57e535726b45dad280071d34d";
 
         public void LoginWithGoogle()
         {
