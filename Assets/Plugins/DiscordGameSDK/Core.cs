@@ -1103,14 +1103,15 @@ namespace Discord
                setLogHook.Value.Free();
             }
         }
-
-        public void RunCallbacks()
+        //Modify
+        public Result RunCallbacks()
         {
             var res = Methods.RunCallbacks(MethodsPtr);
-            if (res != Result.Ok)
-            {
-                throw new ResultException(res);
-            }
+            return res;
+            //if (res != Result.Ok)
+            //{
+            //    throw new ResultException(res);
+            //}
         }
 
         [MonoPInvokeCallback]
