@@ -82,6 +82,8 @@ namespace Vi.UI
 
         protected void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { OnScoreListChanged(); }
+
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!gameModeManager.IsSpawned) { return; }

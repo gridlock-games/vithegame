@@ -2780,7 +2780,6 @@ namespace Vi.Core
             }
 
             Version version = JsonConvert.DeserializeObject<Version>(getRequest.downloadHandler.text);
-            Debug.Log("REEQUEST COMPLETED " + version.gameversion);
             gameVersion = version.gameversion;
 
             getRequest.Dispose();
