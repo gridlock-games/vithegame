@@ -78,7 +78,6 @@ namespace Vi.ScriptableObjects
             }
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
-
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }

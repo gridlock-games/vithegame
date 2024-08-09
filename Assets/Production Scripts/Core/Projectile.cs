@@ -55,14 +55,6 @@ namespace Vi.Core
         private Vector3 startPosition;
         private void Start()
         {
-            startPosition = transform.position;
-
-            if (soundToPlayOnSpawn.Length > 0)
-            {
-                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
-                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
-            }
-            
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -71,6 +63,22 @@ namespace Vi.Core
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+        }
+
+        private PooledObject pooledObject;
+        private void OnEnable()
+        {
+            startPosition = transform.position;
+
+            if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
+            Debug.Log(pooledObject.IsPrewarmObject());
+            if (pooledObject.IsPrewarmObject()) { return; }
+
+            if (soundToPlayOnSpawn.Length > 0)
+            {
+                AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
+                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -178,6 +186,10 @@ namespace Vi.Core
             initialized = false;
 
             rb.velocity = Vector3.zero;
+
+            nearbyWhooshPlayed = false;
+
+            if (pooledObject.IsPrewarmObject()) { return; }
 
             foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
