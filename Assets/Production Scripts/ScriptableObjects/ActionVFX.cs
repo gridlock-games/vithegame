@@ -9,6 +9,7 @@ using UnityEngine.VFX;
 namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(PooledObject))]
     public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType

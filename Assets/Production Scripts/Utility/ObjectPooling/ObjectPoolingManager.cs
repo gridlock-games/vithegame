@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.VFX;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -36,6 +37,37 @@ namespace Vi.Utility
             for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
             {
                 objectPools.Add(new List<PooledObject>());
+            }
+        }
+
+        private void Start()
+        {
+            foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
+            {
+                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                {
+                    NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
+                }
+            }
+        }
+
+        private class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
+        {
+            PooledObject m_Prefab;
+
+            public PooledPrefabInstanceHandler(PooledObject prefab)
+            {
+                m_Prefab = prefab;
+            }
+
+            NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
+            {
+                return SpawnObject(m_Prefab.GetComponent<PooledObject>(), position, rotation).GetComponent<NetworkObject>();
+            }
+
+            void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
+            {
+                ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
             }
         }
 
