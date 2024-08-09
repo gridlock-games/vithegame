@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
 
 using Discord;
 
@@ -13,7 +13,7 @@ namespace jomarcentermjm.PlatformAPI
 {
   public class DiscordManager : MonoBehaviour
   {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
     public Discord.Discord discord;
     public ActivityManager activityManager;
 #endif
@@ -21,7 +21,7 @@ namespace jomarcentermjm.PlatformAPI
     // Use this for initialization
     private void Start()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
       discord = new Discord.Discord(1181075969558183996, (System.UInt64)Discord.CreateFlags.NoRequireDiscord);
       activityManager = discord.GetActivityManager();
       var activity = new Discord.Activity
@@ -46,7 +46,7 @@ namespace jomarcentermjm.PlatformAPI
     public void ChangeActivityMessage(string state, string details, string largeimg, string largetext, string smallimage, string smalltext)
     {
       clearActivity();
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
       var activity = new Discord.Activity
       {
         State = state,
@@ -70,7 +70,7 @@ namespace jomarcentermjm.PlatformAPI
 
     public void clearActivity()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
       activityManager = discord.GetActivityManager();
       activityManager.ClearActivity((result) =>
       {
@@ -86,7 +86,7 @@ namespace jomarcentermjm.PlatformAPI
 #endif
     }
 
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
 
     // Update is called once per frame
     private void LateUpdate()
