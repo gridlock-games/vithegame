@@ -71,11 +71,14 @@ namespace Vi.UI
             if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
 
-            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
+            if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
+            {
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
 
-            playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
-            PlayerDataManager.Singleton.SetPlayerData(playerData);
-
+                playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+            
             for (int i = 0; i < abilityImages.Length; i++)
             {
                 abilityImages[i].sprite = weaponOption.weapon.GetAbilities()[i].abilityImageIcon;

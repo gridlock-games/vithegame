@@ -11,8 +11,7 @@ namespace Vi.UI
     {
         [Header("Loadout Editor Menu")]
         [SerializeField] private Button[] loadoutButtons;
-        [SerializeField] private Camera characterPreviewCameraPrefab;
-        [SerializeField] private Vector3 characterPreviewCameraOffset;
+        [SerializeField] private Camera characterPreviewCamera;
 
         [Header("Weapon Select Menu")]
         [SerializeField] private WeaponSelectMenu weaponSelectMenu;
@@ -40,32 +39,42 @@ namespace Vi.UI
         [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
-        private GameObject camInstance;
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
-
-            camInstance = Instantiate(characterPreviewCameraPrefab.gameObject, transform.parent);
-            camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
-            camInstance.transform.LookAt(transform.root);
-            camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
         }
 
-        private void Update()
+        private GameObject previewObject;
+        private void CreatePreview()
         {
-            camInstance.transform.position = transform.root.position + transform.root.rotation * new Vector3(characterPreviewCameraOffset.x, 0, characterPreviewCameraOffset.z);
-            camInstance.transform.LookAt(transform.root);
-            camInstance.transform.position += new Vector3(0, characterPreviewCameraOffset.y, 0);
-        }
+            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
-        private void OnDestroy()
-        {
-            Destroy(camInstance);
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            if (!previewObject)
+            {
+                // Instantiate the player model
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation),
+                    transform);
+
+                AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
+                animationHandler.ChangeCharacter(character);
+
+                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
+            }
+
+            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
         }
 
         private void OnEnable()
         {
-            camInstance.SetActive(true);
+            CreatePreview();
             int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
@@ -79,6 +88,19 @@ namespace Vi.UI
             loadoutButtons[activeLoadoutSlot].onClick.Invoke();
         }
 
+        private void OnDisable()
+        {
+            if (previewObject) { Destroy(previewObject); }
+        }
+
+        private void Update()
+        {
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
+            {
+                CreatePreview();
+            }
+        }
+
         private void OpenLoadout(Button button, int loadoutSlot)
         {
             foreach (Button b in loadoutButtons)
@@ -89,11 +111,13 @@ namespace Vi.UI
             PlayerDataManager.PlayerData playerData = attributes.CachedPlayerData;
             WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
-            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot+1).ToString()));
-
-            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
-            PlayerDataManager.Singleton.SetPlayerData(playerData);
-
+            if (!playerData.character.GetActiveLoadout().Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
+            {
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
+                playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
+            
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
             CharacterReference.WeaponOption weaponOption1 = weaponOptions[WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId];
             CharacterReference.WeaponOption weaponOption2 = weaponOptions[WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId];
@@ -169,7 +193,6 @@ namespace Vi.UI
             menu.SetLastMenu(gameObject);
             menu.Initialize(weaponOption, otherOption, weaponType, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _weaponSelect;
-            camInstance.SetActive(false);
             gameObject.SetActive(false);
         }
 
@@ -180,7 +203,6 @@ namespace Vi.UI
             menu.SetLastMenu(gameObject);
             menu.Initialize(equipmentType, loadoutSlot, attributes.GetPlayerDataId());
             childMenu = _armorSelect;
-            camInstance.SetActive(true);
             gameObject.SetActive(false);
         }
     }

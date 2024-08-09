@@ -1360,7 +1360,7 @@ namespace Vi.Core
             }
         }
 
-        public struct Loadout : INetworkSerializable
+        public struct Loadout : INetworkSerializable, System.IEquatable<Loadout>
         {
             public FixedString64Bytes loadoutSlot;
             public FixedString64Bytes helmGearItemId;
@@ -1442,6 +1442,14 @@ namespace Vi.Core
                 serializer.SerializeValue(ref weapon1ItemId);
                 serializer.SerializeValue(ref weapon2ItemId);
                 serializer.SerializeValue(ref active);
+            }
+
+            public bool Equals(Loadout other)
+            {
+                return loadoutSlot == other.loadoutSlot & helmGearItemId == other.helmGearItemId & chestArmorGearItemId == other.chestArmorGearItemId
+                    & shouldersGearItemId == other.shouldersGearItemId & bootsGearItemId == other.bootsGearItemId & pantsGearItemId == other.pantsGearItemId
+                    & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
+                    & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
             }
         }
 
