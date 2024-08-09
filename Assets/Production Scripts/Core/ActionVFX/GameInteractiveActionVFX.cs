@@ -39,6 +39,13 @@ namespace Vi.Core.VFX
             this.attack = attack;
         }
 
+        protected new void OnDisable()
+        {
+            base.OnDisable();
+            attacker = null;
+            attack = null;
+        }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();

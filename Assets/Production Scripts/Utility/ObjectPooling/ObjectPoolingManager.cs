@@ -110,7 +110,10 @@ namespace Vi.Utility
 
             PooledObject spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
             if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
+            
             spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
+
+            spawnableObj.SetIsPrewarmStatus(true);
 
             ReturnObjectToPool(spawnableObj);
         }
@@ -140,6 +143,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -168,6 +172,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -206,6 +211,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -244,6 +250,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 

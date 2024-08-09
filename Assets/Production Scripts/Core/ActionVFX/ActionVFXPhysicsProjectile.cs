@@ -36,9 +36,11 @@ namespace Vi.Core.VFX
         }
 
         private Rigidbody rb;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             rb = GetComponent<Rigidbody>();
+            rb.useGravity = false;
             Collider[] colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
@@ -47,7 +49,11 @@ namespace Vi.Core.VFX
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+        }
 
+        private new void OnEnable()
+        {
+            base.OnEnable();
             StartCoroutine(ActivateGravityCoroutine());
         }
 

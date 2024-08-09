@@ -14717,6 +14717,7 @@ GameObject:
   - component: {fileID: 2675767828975425365}
   - component: {fileID: 5396091262161005482}
   - component: {fileID: 267943891494453289}
+  - component: {fileID: 2688625960480699311}
   m_Layer: 0
   m_Name: axe_fissure
   m_TagString: Untagged
@@ -19766,6 +19767,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2688625960480699311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744258597443500299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 92
 --- !u!1 &744258597897249285
 GameObject:
   m_ObjectHideFlags: 0

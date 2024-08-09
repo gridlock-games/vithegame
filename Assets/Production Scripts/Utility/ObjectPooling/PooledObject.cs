@@ -20,5 +20,14 @@ namespace Vi.Utility
             #endif
             pooledObjectIndex = index;
         }
+
+        private bool isPrewarmObject;
+
+        public void SetIsPrewarmStatus(bool isPrewarmObject)
+        {
+            this.isPrewarmObject = isPrewarmObject;
+        }
+
+        public bool IsPrewarmObject() { return isPrewarmObject; }
     }
 }

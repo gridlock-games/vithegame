@@ -9,6 +9,7 @@ using Vi.Core.VFX;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(PooledObject))]
     [RequireComponent(typeof(Rigidbody))]
     public class Projectile : NetworkBehaviour
     {
