@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if !UNITY_SERVER
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
 
 using Steamworks;
 
@@ -32,7 +32,7 @@ namespace jomarcentermjm.PlatformAPI
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);
       if (achivement != null)
       {
-#if !UNITY_SERVER
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
         //Steam Code
         if (gameObject.GetComponent<SteamManager>() != null)
         {
@@ -60,7 +60,7 @@ namespace jomarcentermjm.PlatformAPI
       StatisticsScriptableObject stats = StatisticsList.Find(x => x.StatisticsID == ID);
       if (stats != null)
       {
-#if !UNITY_SERVER
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
         //Steam
         if (gameObject.GetComponent<SteamManager>() != null)
         {
@@ -85,7 +85,7 @@ namespace jomarcentermjm.PlatformAPI
       int output = 0;
       if (stats != null)
       {
-#if !UNITY_SERVER
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
         //Steam
         if (platform == GamePlatform.Steam &&gameObject.GetComponent<SteamManager>() != null)
         {

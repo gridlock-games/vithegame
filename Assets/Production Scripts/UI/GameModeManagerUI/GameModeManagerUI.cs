@@ -51,14 +51,6 @@ namespace Vi.UI
             rightScoreTeamColorImage.enabled = false;
 
             MVPPresentationCamera.enabled = false;
-            StartCoroutine(SetCameraOrientation());
-        }
-
-        private IEnumerator SetCameraOrientation()
-        {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
-            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
-            MVPPresentationCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
         }
 
         private void OnDestroy()
@@ -180,6 +172,8 @@ namespace Vi.UI
             animationHandler.ChangeCharacter(character);
             MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
+            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
             MVPPresentationCamera.enabled = true;
 
             yield return new WaitUntil(() => animationHandler.Animator);

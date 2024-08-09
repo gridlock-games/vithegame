@@ -6,7 +6,6 @@ using Vi.Utility;
 
 namespace Vi.Core.VFX
 {
-    [RequireComponent(typeof(PooledObject))]
     public class ActionVFXPreview : ActionVFX
     {
         public bool CanCast { get; private set; }

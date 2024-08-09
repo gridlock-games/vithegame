@@ -853,9 +853,12 @@ namespace Vi.Core
 
         private void Update()
         {
-            if (playerSpawnPoints == null & NetSceneManager.Singleton.IsEnvironmentLoaded())
+            if (!playerSpawnPoints)
             {
-                playerSpawnPoints = FindObjectOfType<PlayerSpawnPoints>();
+                if (NetSceneManager.Singleton.IsEnvironmentLoaded())
+                {
+                    playerSpawnPoints = FindFirstObjectByType<PlayerSpawnPoints>();
+                }
             }
         }
 

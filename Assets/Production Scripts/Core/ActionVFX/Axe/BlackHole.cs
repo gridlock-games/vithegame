@@ -69,9 +69,12 @@ namespace Vi.Core.VFX.Axe
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
                     }
                 }
-                else if (colliders[i].TryGetComponent(out Rigidbody rb))
+                else if (colliders[i].GetComponent<Projectile>())
                 {
-                    rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
+                    if (colliders[i].TryGetComponent(out Rigidbody rb))
+                    {
+                        rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
+                    }
                 }
             }
         }
