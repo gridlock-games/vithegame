@@ -32,6 +32,15 @@ namespace Vi.UI
                 new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.PlayerWithAssist),
                 new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Environment)
             };
+
+            if (GameModeManager.Singleton)
+            {
+                List<GameModeManager.KillHistoryElement> cachedKillHistory = GameModeManager.Singleton.GetKillHistory();
+                for (int i = 0; i < cachedKillHistory.Count; i++)
+                {
+                    displayedKillHistoryIndices.Add(i);
+                }
+            }
         }
 
         private void Update()
