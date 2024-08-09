@@ -75,16 +75,28 @@ namespace Vi.UI
                     if (killElementsToDisplay.Count >= killFeedElementInstances.Length) { break; }
                 }
 
-                for (int i = 0; i < killFeedElementInstances.Length; i++)
+                for (int i = 0; i < killElementsToDisplay.Count; i++)
                 {
-                    if (killElementsToDisplay.Count == 0) { break; }
-                    if (!killFeedElementInstances[i].IsNotRunning()) { continue; }
-
+                    KillFeedElement killFeedElement = GetFirstAvailableKillFeedElement();
                     (int index, GameModeManager.KillHistoryElement killHistoryElement) = killElementsToDisplay.Dequeue();
-                    killFeedElementInstances[i].Initialize(killHistoryElement);
+                    killFeedElement.Initialize(killHistoryElement);
                     displayedKillHistoryIndices.Add(index);
                 }
             }
+        }
+
+        private KillFeedElement GetFirstAvailableKillFeedElement()
+        {
+            Dictionary<int, KillFeedElement> childIndexMapping = new Dictionary<int, KillFeedElement>();
+            foreach (KillFeedElement killFeedElement in killFeedElementInstances)
+            {
+                childIndexMapping.Add(killFeedElement.transform.GetSiblingIndex(), killFeedElement);
+
+                if (!killFeedElement.IsNotRunning()) { continue; }
+
+                return killFeedElement;
+            }
+            return childIndexMapping[childIndexMapping.Max(kvp => kvp.Key)];
         }
     }
 }

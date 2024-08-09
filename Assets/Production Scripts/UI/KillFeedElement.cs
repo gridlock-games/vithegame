@@ -52,6 +52,8 @@ namespace Vi.UI
                     break;
             }
 
+            transform.SetAsFirstSibling();
+
             // Evaluate colors
             KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             if (localPlayerKvp.Value)
