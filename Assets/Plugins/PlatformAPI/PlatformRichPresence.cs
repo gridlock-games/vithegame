@@ -32,11 +32,11 @@ namespace jomarcentermjm.PlatformAPI
 
         public void UpdatePlatformStatus(string title, string description = "", string linethree = "", string richpresenceKey = "#StatusGeneral", string mainImageID = null, string mainImageDesc = "", string subImageID = null, string subImageDesc = "")
         {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
-      //Debug.Log("Updating Platform Status");
-      //Steam
+#if !UNITY_SERVER
+            //Debug.Log("Updating Platform Status");
+            //Steam
 
-      if (gameObject.GetComponent<SteamManager>() != null)
+            if (gameObject.GetComponent<SteamManager>() != null)
             {
                 //Debug.Log("Successful reporting on steam");
                 string RecreatedValue = description + linethree;
