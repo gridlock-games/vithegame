@@ -10,8 +10,9 @@ namespace Vi.Core.VFX.Staff
     {
         private NavMeshAgent navMeshAgent;
         private Animator animator;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
 

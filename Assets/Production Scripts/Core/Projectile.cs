@@ -167,9 +167,18 @@ namespace Vi.Core
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
         }
 
-        private new void OnDestroy()
+        private void OnDisable()
         {
-            base.OnDestroy();
+            attacker = null;
+            shooterWeapon = null;
+            attack = null;
+            projectileForce = default;
+            damageMultiplier = default;
+            originalRotation = default;
+            initialized = false;
+
+            rb.velocity = Vector3.zero;
+
             foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 if (prefab.GetComponent<FollowUpVFX>())

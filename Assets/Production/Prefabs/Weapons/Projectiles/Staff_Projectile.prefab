@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1007868211
+  GlobalObjectIdHash: 2637866534
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -314,6 +314,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 0e89152d783714ee5afe4dba78a5b4a0, type: 3}
   - {fileID: 8300000, guid: 27d5161a64e96412ea8b9eba93099b1d, type: 3}
   - {fileID: 8300000, guid: 55604f00d7979432783ed6db990b7f79, type: 3}
+  canHitPlayers: 1
 --- !u!114 &3107967498327579398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,3 +358,17 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &3956492729147984457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5711215190253179507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 116

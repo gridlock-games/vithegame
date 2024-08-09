@@ -18,8 +18,9 @@ namespace Vi.Core.VFX.Axe
         private float startTime;
         private ParticleSystem ps;
         private FollowUpVFX vfx;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             vfx = GetComponent<FollowUpVFX>();
             ps = GetComponent<ParticleSystem>();
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -109,7 +110,7 @@ namespace Vi.Core
                         minDistanceInitialized = true;
                     }
 
-                    GameObject projectileInstance = Instantiate(projectile.gameObject, projectileSpawnPoint.transform.position,
+                    PooledObject projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
                         Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
                     
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
