@@ -75,7 +75,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1678338494779658425}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-5467905512432266006
+--- !u!114 &5796537484098628570
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -84,32 +84,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1494871026038834521}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eabb63d96fe6ba842bb323f0e0078468, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 0}
-  vfxRotationOffset: {x: 0, y: 0, z: 0}
-  vfxSpawnType: 0
-  transformType: 0
-  onActivateVFXSpawnNormalizedTime: 0
-  raycastOffset: {x: 0, y: 2, z: 3}
-  fartherRaycastOffset: {x: 0, y: 4, z: 5}
-  raycastMaxDistance: 5
-  lookRotationUpDirection: {x: 0, y: 1, z: 0}
-  weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 8300000, guid: 658f9ceda2fe24045ba49f5cb1d6df07,
-    type: 3}
-  awakeAudioClipDelay: 0
-  audioClipToPlayOnDestroy: {fileID: 8300000, guid: 5b0a3f85c9474433c86f969773917bfa,
-    type: 3}
-  VFXToPlayOnDestroy: []
-  spellType: 0
-  followUpVFXToPlayOnDestroy: []
-  shouldBlockProjectiles: 0
-  shouldDestroyOnEnemyHit: 0
-  shouldAffectSelf: 0
-  shouldAffectTeammates: 0
-  shouldAffectEnemies: 1
+  GlobalObjectIdHash: 559323971
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &2654175274349702557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,15 +118,20 @@ MonoBehaviour:
   raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnAwake: {fileID: 8300000, guid: 658f9ceda2fe24045ba49f5cb1d6df07,
+    type: 3}
   awakeAudioClipDelay: 0
-  audioClipToPlayOnDestroy: {fileID: 0}
+  audioClipToPlayOnDestroy: {fileID: 8300000, guid: 5b0a3f85c9474433c86f969773917bfa,
+    type: 3}
   VFXToPlayOnDestroy:
   - {fileID: 4650068748651550459, guid: 1c20100a0584bbc468da5ab78daf22ff, type: 3}
   spellType: 1
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  shouldAffectSelf: 0
+  shouldAffectTeammates: 0
+  shouldAffectEnemies: 1
   duration: 3
   radius: 2
   forceMultiplier: 5
@@ -176,27 +167,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &5796537484098628570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1494871026038834521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 761906137
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &5297874276818744795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,3 +181,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 88
+  isPrewarmObject: 0

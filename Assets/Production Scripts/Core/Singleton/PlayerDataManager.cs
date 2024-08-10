@@ -166,8 +166,8 @@ namespace Vi.Core
 
         public bool CanHit(Attributes attacker, Attributes victim)
         {
-            if (!attacker) { return false; }
-            if (!victim) { return false; }
+            if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
+            if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }
             return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team) & attacker != victim;
         }
 

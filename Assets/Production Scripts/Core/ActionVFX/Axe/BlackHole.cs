@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
-using Vi.Utility;
 
 namespace Vi.Core.VFX.Axe
 {
-    [RequireComponent(typeof(FollowUpVFX))]
-    public class BlackHole : GameInteractiveActionVFX
+    public class BlackHole : FollowUpVFX
     {
         [SerializeField] private float duration = 3;
         [SerializeField] private float radius = 2;
@@ -17,11 +15,9 @@ namespace Vi.Core.VFX.Axe
 
         private float startTime;
         private ParticleSystem ps;
-        private FollowUpVFX vfx;
         private new void Awake()
         {
             base.Awake();
-            vfx = GetComponent<FollowUpVFX>();
             ps = GetComponent<ParticleSystem>();
         }
 
@@ -48,15 +44,15 @@ namespace Vi.Core.VFX.Axe
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == vfx.GetAttacker())
+                    if (networkCollider.Attributes == GetAttacker())
                     {
-                        if (vfx.shouldAffectSelf) { shouldAffect = true; }
+                        if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.GetAttacker());
-                        if (vfx.shouldAffectEnemies & canHit) { shouldAffect = true; }
-                        if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        if (shouldAffectEnemies & canHit) { shouldAffect = true; }
+                        if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
 
                     if (spellType == SpellType.GroundSpell)
@@ -82,22 +78,21 @@ namespace Vi.Core.VFX.Axe
 
         private new void OnDisable()
         {
-            base.OnDisable();
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == vfx.GetAttacker())
+                    if (networkCollider.Attributes == GetAttacker())
                     {
-                        if (vfx.shouldAffectSelf) { shouldAffect = true; }
+                        if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, vfx.GetAttacker());
-                        if (vfx.shouldAffectEnemies & canHit) { shouldAffect = true; }
-                        if (vfx.shouldAffectTeammates & !canHit) { shouldAffect = true; }
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        if (shouldAffectEnemies & canHit) { shouldAffect = true; }
+                        if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
 
                     if (shouldAffect)
@@ -105,13 +100,13 @@ namespace Vi.Core.VFX.Axe
                         MovementHandler movementHandler = networkCollider.MovementHandler;
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
 
-                        ActionClip copy = Instantiate(vfx.GetAttack());
-                        copy.name = vfx.GetAttack().name;
+                        ActionClip copy = Instantiate(GetAttack());
+                        copy.name = GetAttack().name;
                         copy.ailment = ailmentToTriggerOnEnd;
 
                         if (NetworkManager.Singleton.IsServer)
                         {
-                            networkCollider.Attributes.ProcessProjectileHit(vfx.GetAttacker(), null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
+                            networkCollider.Attributes.ProcessProjectileHit(GetAttacker(), null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
                                 copy, networkCollider.Attributes.transform.position, transform.position);
                         }
                     }
@@ -121,6 +116,7 @@ namespace Vi.Core.VFX.Axe
                     rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
                 }
             }
+            base.OnDisable();
         }
 
         private void OnDrawGizmos()

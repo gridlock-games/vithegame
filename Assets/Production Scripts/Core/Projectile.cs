@@ -71,7 +71,7 @@ namespace Vi.Core
             startPosition = transform.position;
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
-            Debug.Log(pooledObject.IsPrewarmObject());
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (soundToPlayOnSpawn.Length > 0)

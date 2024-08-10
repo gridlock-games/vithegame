@@ -21,7 +21,7 @@ namespace Vi.Utility
             pooledObjectIndex = index;
         }
 
-        private bool isPrewarmObject;
+        [SerializeField] private bool isPrewarmObject;
 
         public void SetIsPrewarmStatus(bool isPrewarmObject)
         {

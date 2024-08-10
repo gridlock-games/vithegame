@@ -108,12 +108,11 @@ namespace Vi.Utility
         {
             if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return; }
 
+            objectToSpawn.SetIsPrewarmStatus(true);
             PooledObject spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
             if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
             
             spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
-
-            spawnableObj.SetIsPrewarmStatus(true);
 
             ReturnObjectToPool(spawnableObj);
         }
@@ -128,6 +127,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
@@ -135,6 +135,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.SetIsPrewarmStatus(false);
                 spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
@@ -143,7 +144,6 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
-            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -157,6 +157,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
@@ -164,6 +165,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.SetIsPrewarmStatus(false);
                 spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
@@ -172,7 +174,6 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
-            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -186,6 +187,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
@@ -198,6 +200,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.SetIsPrewarmStatus(false);
                 spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
                 spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
@@ -211,7 +214,6 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
-            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
@@ -225,6 +227,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
@@ -237,6 +240,7 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
+                spawnableObj.SetIsPrewarmStatus(false);
                 spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
@@ -250,7 +254,6 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
-            spawnableObj.SetIsPrewarmStatus(false);
             return spawnableObj;
         }
 
