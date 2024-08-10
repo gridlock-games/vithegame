@@ -75,8 +75,9 @@ namespace Vi.Core.VFX
 
                 if (bHit & fartherBHit)
                 {
-                    transform.position = floorHit.point + transform.parent.rotation * vfxPositionOffset;
-                    Vector3 rel = fartherFloorHit.point - transform.position;
+                    Vector3 offset = transform.parent.rotation * vfxPositionOffset;
+                    transform.position = floorHit.point + offset;
+                    Vector3 rel = fartherFloorHit.point + offset - transform.position;
                     Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, lookRotationUpDirection);
                     transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
 

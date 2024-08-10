@@ -382,14 +382,15 @@ namespace Vi.Core
 
                     if (bHit & fartherBHit)
                     {
-                        Vector3 spawnPosition = hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset;
-                        Vector3 rel = fartherHit.point - spawnPosition;
+                        Vector3 offset = attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset;
+                        Vector3 spawnPosition = hit.point + offset;
+                        Vector3 rel = fartherHit.point + offset - spawnPosition;
                         Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, actionVFXPrefab.lookRotationUpDirection);
 
                         if (actionVFXPrefab.TryGetComponent(out pooledObject))
                         {
                             vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject,
-                                hit.point + attackerTransform.rotation * actionVFXPrefab.vfxPositionOffset,
+                                hit.point + offset,
                                 groundRotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset),
                                 isPreviewVFX ? attackerTransform : null
                             ).gameObject;
