@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
 
 using Steamworks;
 
@@ -32,16 +32,19 @@ namespace jomarcentermjm.PlatformAPI
       AchivementScriptableObject achivement = achievementsList.Find(x => x.achievementID == ID);
       if (achivement != null)
       {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
         //Steam Code
-        if (SteamManager.Initialized)
+        if (gameObject.GetComponent<SteamManager>() != null)
         {
-          //Call in the achievement as completed
-          Steamworks.SteamUserStats.GetAchievement(achivement.steamAchievementID, out bool isCompleted);
-          if (!isCompleted)
+          if (!SteamManager.Initialized)
           {
-            SteamUserStats.SetAchievement(achivement.steamAchievementID);
-            SteamUserStats.StoreStats();
+            //Call in the achievement as completed
+            Steamworks.SteamUserStats.GetAchievement(achivement.steamAchievementID, out bool isCompleted);
+            if (!isCompleted)
+            {
+              SteamUserStats.SetAchievement(achivement.steamAchievementID);
+              SteamUserStats.StoreStats();
+            }
           }
         }
 #endif
@@ -57,12 +60,15 @@ namespace jomarcentermjm.PlatformAPI
       StatisticsScriptableObject stats = StatisticsList.Find(x => x.StatisticsID == ID);
       if (stats != null)
       {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
         //Steam
-        if (SteamManager.Initialized)
+        if (gameObject.GetComponent<SteamManager>() != null)
         {
-          SteamUserStats.SetStat(stats.steamStatisticsID, value);
-          SteamUserStats.StoreStats();
+          if (!SteamManager.Initialized)
+          {
+            SteamUserStats.SetStat(stats.steamStatisticsID, value);
+            SteamUserStats.StoreStats();
+          }
         }
 #endif
       }
@@ -79,10 +85,11 @@ namespace jomarcentermjm.PlatformAPI
       int output = 0;
       if (stats != null)
       {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER
         //Steam
-        if (SteamManager.Initialized && platform == GamePlatform.Steam)
+        if (platform == GamePlatform.Steam &&gameObject.GetComponent<SteamManager>() != null)
         {
+          if (SteamManager.Initialized)
           SteamUserStats.GetStat(stats.steamStatisticsID, out output);
         }
 #endif

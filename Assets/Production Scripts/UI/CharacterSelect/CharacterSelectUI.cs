@@ -935,7 +935,7 @@ namespace Vi.UI
             selectCharacterButton.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
-            WebRequestManager.Singleton.CheckGameVersion();
+            WebRequestManager.Singleton.CheckGameVersion(false);
 
             if (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("IsDiscordVerified")))
             {
