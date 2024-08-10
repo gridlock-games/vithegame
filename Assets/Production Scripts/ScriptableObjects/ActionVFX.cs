@@ -85,7 +85,14 @@ namespace Vi.ScriptableObjects
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(DespawnVFXAfterPlaying()); }
+            if (IsServer)
+            {
+                StartCoroutine(DespawnVFXAfterPlaying());
+                foreach (Collider col in GetComponentsInChildren<Collider>())
+                {
+                    col.enabled = IsServer;
+                }
+            }
         }
 
         private IEnumerator DespawnVFXAfterPlaying()

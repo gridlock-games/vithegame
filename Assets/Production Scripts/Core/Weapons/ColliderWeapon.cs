@@ -13,14 +13,6 @@ namespace Vi.Core
     {
         private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
 
-        private void Awake()
-        {
-            foreach (Collider col in GetComponentsInChildren<Collider>())
-            {
-                col.enabled = NetworkManager.Singleton.IsServer;
-            }
-        }
-
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;

@@ -49,16 +49,15 @@ namespace Vi.Core.VFX
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
-                col.enabled = false;
             }
         }
 
-        private new void OnEnable()
+        public override void OnNetworkSpawn()
         {
-            base.OnEnable();
+            base.OnNetworkSpawn();
             foreach (Collider col in colliders)
             {
-                col.enabled = NetworkManager.Singleton.IsServer;
+                col.enabled = IsServer;
             }
         }
 

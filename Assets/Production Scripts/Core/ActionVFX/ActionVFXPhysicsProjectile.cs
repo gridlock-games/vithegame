@@ -41,14 +41,6 @@ namespace Vi.Core.VFX
             base.Awake();
             rb = GetComponent<Rigidbody>();
             rb.useGravity = false;
-            Collider[] colliders = GetComponentsInChildren<Collider>();
-            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
-            foreach (Collider col in colliders)
-            {
-                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
-            }
-
-            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
         private new void OnEnable()
@@ -61,6 +53,16 @@ namespace Vi.Core.VFX
         {
             base.OnNetworkSpawn();
             StartCoroutine(AddForceAfter1Frame());
+
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
+            foreach (Collider col in colliders)
+            {
+                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
+                col.enabled = IsServer;
+            }
+
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
         private IEnumerator AddForceAfter1Frame()
