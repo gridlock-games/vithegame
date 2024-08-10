@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3a772ab81df79484ca1fcda7dfe1c278
+guid: de893f0df0f7e8f41818b02bcd2eae4c
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: T_Mod_ArcPillars_C
-    second: {fileID: 2100000, guid: 62848ee6e2b264e498f455fc91bf5531, type: 2}
+      name: T_ArenaTrims
+    second: {fileID: 2100000, guid: af59382111ded974baf8162eef53d3d9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -52,7 +52,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
@@ -74,9 +74,9 @@ ModelImporter:
     useFileScale: 1
     strictVertexDataChecks: 0
   tangentSpace:
-    normalSmoothAngle: 60
+    normalSmoothAngle: 90
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 0
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
