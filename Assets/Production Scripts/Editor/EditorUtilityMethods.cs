@@ -12,7 +12,7 @@ namespace Vi.Editor
     public class EditorUtilityMethods : UnityEditor.Editor
     {
         [MenuItem("Tools/Find Objects Not In Network Prefabs List")]
-        static void SelectGameObjectsInLayer()
+        static void FindObjectsNotInNetworkPrefabsList()
         {
             NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
             if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
@@ -97,24 +97,6 @@ namespace Vi.Editor
             }
         }
 
-        //[MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
-        //static void SetNotSpawnWithObservers()
-        //{
-        //    NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
-        //    if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
-
-        //    foreach (NetworkPrefab networkPrefab in networkPrefabsList.PrefabList)
-        //    {
-        //        if (networkPrefab.Prefab.TryGetComponent(out NetworkObject networkObject))
-        //        {
-        //            if (!networkPrefab.Prefab.GetComponent<ActionVFX>() & !networkPrefab.Prefab.GetComponent<Projectile>()) { continue; }
-        //            networkObject.SpawnWithObservers = true;
-        //            EditorUtility.SetDirty(networkObject);
-        //            Debug.Log(networkObject);
-        //        }
-        //    }
-        //}
-
         [MenuItem("Tools/Set Texture Overrides for Android Platform")]
         static void SetTextureOverridesForAndroidPlatform()
         {
@@ -151,5 +133,61 @@ namespace Vi.Editor
                 }
             }
         }
+
+        //[MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
+        //static void SetNotSpawnWithObservers()
+        //{
+        //    NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
+        //    if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
+
+        //    foreach (NetworkPrefab networkPrefab in networkPrefabsList.PrefabList)
+        //    {
+        //        if (networkPrefab.Prefab.TryGetComponent(out NetworkObject networkObject))
+        //        {
+        //            if (!networkPrefab.Prefab.GetComponent<ActionVFX>() & !networkPrefab.Prefab.GetComponent<Projectile>()) { continue; }
+        //            networkObject.SpawnWithObservers = true;
+        //            EditorUtility.SetDirty(networkObject);
+        //            Debug.Log(networkObject);
+        //        }
+        //    }
+        //}
+
+        //[MenuItem("Tools/Convert Projectile Layers To Colliders")]
+        //static void SelectGameObjectsInLayer()
+        //{
+        //    foreach (GameObject g in FindGameObjectsInLayer(LayerMask.NameToLayer("Projectile")))
+        //    {
+        //        Debug.Log(g);
+        //        g.layer = LayerMask.NameToLayer("ProjectileCollider");
+        //        EditorUtility.SetDirty(g);
+        //    }
+        //}
+
+        //private static GameObject[] FindGameObjectsInLayer(int layer)
+        //{
+        //    var goArray = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        //    var goList = new List<GameObject>();
+        //    for (int i = 0; i < goArray.Length; i++)
+        //    {
+        //        if (goArray[i].layer == layer)
+        //        {
+        //            goList.Add(goArray[i]);
+        //        }
+        //    }
+        //    if (goList.Count == 0)
+        //    {
+        //        return null;
+        //    }
+        //    return goList.ToArray();
+        //}
+
+        //[MenuItem("Tools/Find Item By GUID")]
+        //static void FindItemByGUIDMethod()
+        //{
+        //    string guid = "56f1fae43c882434d94c645713a29ec6";
+        //    string p = AssetDatabase.GUIDToAssetPath(guid);
+        //    if (p.Length == 0) p = "not found";
+        //    Debug.Log(p);
+        //}
     }
 }
