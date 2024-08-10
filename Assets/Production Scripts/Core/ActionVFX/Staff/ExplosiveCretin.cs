@@ -73,7 +73,7 @@ namespace Vi.Core.VFX.Staff
                     if (networkCollider.Attributes == attacker) { continue; }
 
                     networkColliderCount++;
-                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker);
+                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes);
                     if (shouldAffect)
                     {
                         if (spellType == SpellType.GroundSpell)

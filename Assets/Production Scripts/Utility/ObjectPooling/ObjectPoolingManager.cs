@@ -136,7 +136,10 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                spawnableObj.transform.SetParent(null);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
+                else
+                    spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -166,7 +169,10 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                spawnableObj.transform.SetParent(null);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
+                else
+                    spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -201,7 +207,10 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                spawnableObj.transform.SetParent(parentTransform);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
+                else
+                    spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
                 spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
                 if (parentTransform)
@@ -241,7 +250,10 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                spawnableObj.transform.SetParent(parentTransform);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
+                else
+                    spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 if (parentTransform)
@@ -255,6 +267,13 @@ namespace Vi.Utility
             }
 
             return spawnableObj;
+        }
+
+        private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
+        {
+            if (networkObject.transform.parent == parent) { yield break; }
+            yield return new WaitUntil(() => networkObject.IsSpawned);
+            if (!networkObject.TrySetParent(parent)) { Debug.LogError("Error while setting parent for networ object " + networkObject + " to parent " + parent); }
         }
 
         public static void ReturnObjectToPool(PooledObject obj)
