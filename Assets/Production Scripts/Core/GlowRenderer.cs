@@ -117,6 +117,9 @@ namespace Vi.Core
         private const float defaultFresnelPower = 5;
 
         private float currentFresnelPower;
+        private float lastFresnelPower;
+
+        private Color lastColor;
         private void Update()
         {
             Color colorTarget = defaultColor;
@@ -153,15 +156,24 @@ namespace Vi.Core
                 fresnelPowerTarget = fresnelPower;
             }
             
-            currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
-            foreach (List<Material> materialList in glowMaterialInstances.Values)
+            currentFresnelPower = Mathf.MoveTowards(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
+            if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower) | lastColor != colorTarget)
             {
-                foreach (Material glowMaterialInstance in materialList)
+                foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
-                    glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
-                    glowMaterialInstance.SetColor(_Color, colorTarget);
+                    foreach (Material glowMaterialInstance in materialList)
+                    {
+                        if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower))
+                            glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
+
+                        if (lastColor != colorTarget)
+                            glowMaterialInstance.SetColor(_Color, colorTarget);
+                    }
                 }
             }
+            
+            lastFresnelPower = currentFresnelPower;
+            lastColor = colorTarget;
         }
 
         private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");
