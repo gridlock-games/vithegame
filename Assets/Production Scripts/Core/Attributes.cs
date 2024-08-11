@@ -13,8 +13,6 @@ namespace Vi.Core
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : CombatAgent
     {
-        [SerializeField] private PooledObject worldSpaceLabelPrefab;
-
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
@@ -142,9 +140,9 @@ namespace Vi.Core
             }
         }
 
-        PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
 
             if (IsServer)
@@ -160,7 +158,6 @@ namespace Vi.Core
             ailment.OnValueChanged += OnAilmentChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner)
@@ -224,6 +221,7 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
+            base.OnNetworkDespawn();
             HP.OnValueChanged -= OnHPChanged;
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
@@ -231,7 +229,6 @@ namespace Vi.Core
             ailment.OnValueChanged -= OnAilmentChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
-            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
         }
 
@@ -357,16 +354,6 @@ namespace Vi.Core
         private void Start()
         {
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
-        }
-
-        private void OnEnable()
-        {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
-        }
-
-        private void OnDisable()
-        {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
         public override bool IsInvincible() { return isInvincible.Value; }

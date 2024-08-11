@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -70,6 +71,28 @@ namespace Vi.Core
         protected void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
+        }
+
+        [SerializeField] private PooledObject worldSpaceLabelPrefab;
+        protected PooledObject worldSpaceLabelInstance;
+        public override void OnNetworkSpawn()
+        {
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
+        }
+
+        protected void OnEnable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+        }
+
+        protected void OnDisable()
+        {
+            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
         public abstract string GetName();

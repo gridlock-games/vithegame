@@ -20,23 +20,13 @@ namespace Vi.Core
 
         public override float GetMaxHP() { return maxHP; }
 
-        [SerializeField] private PooledObject worldSpaceLabelPrefab;
-
-        PooledObject worldSpaceLabelInstance;
-
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsServer)
             {
                 HP.Value = maxHP;
             }
-
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
         }
 
         public override PlayerDataManager.Team GetTeam() { return team.Value; }
