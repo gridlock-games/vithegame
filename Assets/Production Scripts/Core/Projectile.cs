@@ -9,6 +9,7 @@ using Vi.Core.VFX;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(PooledObject))]
     [RequireComponent(typeof(Rigidbody))]
     public class Projectile : NetworkBehaviour
     {
@@ -52,24 +53,20 @@ namespace Vi.Core
         }
 
         private Vector3 startPosition;
-        private void Start()
+        private PooledObject pooledObject;
+        private void OnEnable()
         {
             startPosition = transform.position;
+
+            if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
+
+            if (pooledObject.IsPrewarmObject()) { return; }
 
             if (soundToPlayOnSpawn.Length > 0)
             {
                 AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
                 audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
             }
-            
-            Collider[] colliders = GetComponentsInChildren<Collider>();
-            if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
-            foreach (Collider col in colliders)
-            {
-                if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
-            }
-
-            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
         public override void OnNetworkSpawn()
@@ -81,6 +78,8 @@ namespace Vi.Core
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on projectiles are triggers! " + this); }
                 col.enabled = IsServer;
             }
+
+            if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
         }
 
         private bool nearbyWhooshPlayed;
@@ -166,9 +165,22 @@ namespace Vi.Core
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
         }
 
-        private new void OnDestroy()
+        private void OnDisable()
         {
-            base.OnDestroy();
+            attacker = null;
+            shooterWeapon = null;
+            attack = null;
+            projectileForce = default;
+            damageMultiplier = default;
+            originalRotation = default;
+            initialized = false;
+
+            rb.velocity = Vector3.zero;
+
+            nearbyWhooshPlayed = false;
+
+            if (pooledObject.IsPrewarmObject()) { return; }
+
             foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 if (prefab.GetComponent<FollowUpVFX>())

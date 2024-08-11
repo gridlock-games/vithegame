@@ -124,12 +124,20 @@ namespace Vi.UI
             if (Application.isEditor)
             {
                 path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\VitheGame.exe";
+
+                #if UNITY_STANDALONE_OSX
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/VitheGame";
+                #endif
             }
             else
             {
                 path = Application.dataPath;
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
+
+                #if UNITY_STANDALONE_OSX
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/VitheGame";
+                #endif
             }
 
             System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");

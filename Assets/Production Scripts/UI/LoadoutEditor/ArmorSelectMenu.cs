@@ -11,6 +11,40 @@ namespace Vi.UI
     {
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
+        [SerializeField] private Camera characterPreviewCamera;
+
+        private void Start()
+        {
+            CreatePreview();
+        }
+
+        private GameObject previewObject;
+        private void CreatePreview()
+        {
+            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+
+            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
+            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
+            int characterIndex = kvp.Key;
+            int skinIndex = kvp.Value;
+
+            if (!previewObject)
+            {
+                // Instantiate the player model
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation),
+                    transform);
+
+                AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
+                animationHandler.ChangeCharacter(character);
+
+                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
+            }
+            
+            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+        }
 
         private List<Button> buttonList = new List<Button>();
         private int playerDataId;
@@ -89,6 +123,14 @@ namespace Vi.UI
             invokeThis.onClick.Invoke();
         }
 
+        private void Update()
+        {
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
+            {
+                CreatePreview();
+            }
+        }
+
         private void ChangeArmor(Button button, CharacterReference.EquipmentType equipmentType, CharacterReference.WearableEquipmentOption wearableEquipmentOption, int loadoutSlot)
         {
             foreach (Button b in buttonList)
@@ -131,19 +173,13 @@ namespace Vi.UI
                     break;
             }
 
-            //if (armorPreviewObject) { Destroy(armorPreviewObject); }
-            //if (wearableEquipmentOption.armorPreviewPrefab) { armorPreviewObject = Instantiate(wearableEquipmentOption.armorPreviewPrefab); }
+            if (!newLoadout.Equals(playerData.character.GetActiveLoadout()))
+            {
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
 
-            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
-
-            playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
-            PlayerDataManager.Singleton.SetPlayerData(playerData);
+                playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
         }
-
-        //private GameObject armorPreviewObject;
-        //private void OnDestroy()
-        //{
-        //    Destroy(armorPreviewObject);
-        //}
     }
 }

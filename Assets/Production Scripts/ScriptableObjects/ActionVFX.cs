@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine.VFX;
 
 namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(PooledObject))]
     public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType
@@ -57,28 +57,42 @@ namespace Vi.ScriptableObjects
             "ProjectileCollider"
         };
 
+        protected void Awake()
+        {
+            
+        }
+
+        private PooledObject pooledObject;
         protected void OnEnable()
         {
-            if (Application.isEditor)
+#if UNITY_EDITOR
+            foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
             {
-                foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
-                {
-                    Debug.LogError("Action VFX " + name + " should not have an audio source component!");
-                }
+                Debug.LogError("Action VFX " + name + " should not have an audio source component!");
             }
-
+#endif
             foreach (ParticleSystem ps in GetComponentsInChildren<ParticleSystem>())
             {
                 ParticleSystem.MainModule main = ps.main;
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
 
+            if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
+            if (pooledObject.IsPrewarmObject()) { return; }
+
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
         }
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer) { StartCoroutine(DespawnVFXAfterPlaying()); }
+            if (IsServer)
+            {
+                StartCoroutine(DespawnVFXAfterPlaying());
+                foreach (Collider col in GetComponentsInChildren<Collider>())
+                {
+                    col.enabled = IsServer;
+                }
+            }
         }
 
         private IEnumerator DespawnVFXAfterPlaying()
@@ -144,6 +158,8 @@ namespace Vi.ScriptableObjects
 
         protected void OnDisable()
         {
+            if (pooledObject.IsPrewarmObject()) { return; }
+
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }
             
             foreach (PooledObject prefab in VFXToPlayOnDestroy)

@@ -81,9 +81,12 @@ namespace Vi.Core
                         wearableEquipmentInstances[wearableEquipmentOption.equipmentType] = Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>();
                     }
 
-                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                    if (wearableEquipmentOption.equipmentType != CharacterReference.EquipmentType.Cape)
                     {
-                        glowRenderer.RegisterNewRenderer(smr);
+                        foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                        {
+                            glowRenderer.RegisterNewRenderer(smr);
+                        }
                     }
                 }
                 else
@@ -100,9 +103,12 @@ namespace Vi.Core
                     wearableEquipmentInstances.Add(wearableEquipmentOption.equipmentType, Instantiate(model.gameObject, transform).GetComponent<WearableEquipment>());
                 }
 
-                foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                if (wearableEquipmentOption.equipmentType != CharacterReference.EquipmentType.Cape)
                 {
-                    glowRenderer.RegisterNewRenderer(smr);
+                    foreach (SkinnedMeshRenderer smr in wearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
+                    {
+                        glowRenderer.RegisterNewRenderer(smr);
+                    }
                 }
             }
 

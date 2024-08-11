@@ -10,8 +10,9 @@ namespace Vi.Core.VFX.Staff
     {
         private NavMeshAgent navMeshAgent;
         private Animator animator;
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
 
@@ -72,7 +73,7 @@ namespace Vi.Core.VFX.Staff
                     if (networkCollider.Attributes == attacker) { continue; }
 
                     networkColliderCount++;
-                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker);
+                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes);
                     if (shouldAffect)
                     {
                         if (spellType == SpellType.GroundSpell)

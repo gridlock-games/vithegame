@@ -37,7 +37,17 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        private const string APIURL = "154.90.35.191/";
+        //private string APIURL = "154.90.35.191/";
+        private string APIURL = "154.90.35.191/";
+
+        public string GetAPIURL() { return APIURL[0..^1]; }
+
+        public void SetAPIURL(string newAPIURL)
+        {
+            APIURL = newAPIURL + "/";
+
+            CheckGameVersion(true);
+        }
 
         public bool IsRefreshingServers { get; private set; }
         public Server[] LobbyServers { get; private set; } = new Server[0];
@@ -957,7 +967,7 @@ namespace Vi.Core
             }
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
+            
             Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender, true);
             Loadout loadout2 = GetRandomizedLoadout(character.raceAndGender);
             Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
@@ -1350,7 +1360,7 @@ namespace Vi.Core
             }
         }
 
-        public struct Loadout : INetworkSerializable
+        public struct Loadout : INetworkSerializable, System.IEquatable<Loadout>
         {
             public FixedString64Bytes loadoutSlot;
             public FixedString64Bytes helmGearItemId;
@@ -1432,6 +1442,14 @@ namespace Vi.Core
                 serializer.SerializeValue(ref weapon1ItemId);
                 serializer.SerializeValue(ref weapon2ItemId);
                 serializer.SerializeValue(ref active);
+            }
+
+            public bool Equals(Loadout other)
+            {
+                return loadoutSlot == other.loadoutSlot & helmGearItemId == other.helmGearItemId & chestArmorGearItemId == other.chestArmorGearItemId
+                    & shouldersGearItemId == other.shouldersGearItemId & bootsGearItemId == other.bootsGearItemId & pantsGearItemId == other.pantsGearItemId
+                    & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
+                    & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
             }
         }
 
@@ -2447,7 +2465,7 @@ namespace Vi.Core
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
-            CheckGameVersion();
+            CheckGameVersion(false);
         }
 
         private void Update()
@@ -2728,10 +2746,14 @@ namespace Vi.Core
             }
         }
 
-        public void CheckGameVersion()
+        public void CheckGameVersion(bool force)
         {
-            if (IsCheckingGameVersion) { return; }
-            StartCoroutine(CheckGameVersionRequest());
+            if (!force)
+            {
+                if (IsCheckingGameVersion) { return; }
+            }
+            if (gameVersionCheckCoroutine != null) { StopCoroutine(gameVersionCheckCoroutine); }
+            gameVersionCheckCoroutine = StartCoroutine(CheckGameVersionRequest());
         }
 
         public bool GameIsUpToDate { get; private set; }
@@ -2742,6 +2764,7 @@ namespace Vi.Core
         [SerializeField] private GameObject alertBoxPrefab;
         public bool IsCheckingGameVersion { get; private set; }
         private GameVersion gameVersion;
+        private Coroutine gameVersionCheckCoroutine;
         private IEnumerator CheckGameVersionRequest()
         {
             IsCheckingGameVersion = true;

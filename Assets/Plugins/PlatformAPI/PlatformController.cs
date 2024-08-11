@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
 using Steamworks;
 #endif
 namespace jomarcentermjm.PlatformAPI
@@ -56,16 +56,17 @@ namespace jomarcentermjm.PlatformAPI
 
     bool AttmptSteam()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+      Debug.Log("Running Steam check");
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
       this.gameObject.AddComponent<SteamManager>();
       return SteamManager.Initialized;
 #endif
-            return false;
+      return false;
     }
 
     bool AttemptDiscord()
     {
-#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
       this.gameObject.AddComponent<DiscordManager>();
       return true;
 #endif

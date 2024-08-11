@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.IO;
 using UnityEditor;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -26,13 +27,25 @@ namespace Vi.Utility
         [ContextMenu("Find Unregistered Pooled Objects")]
         private void FindUnregisteredPooledObjects()
         {
+            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
+
             foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
             {
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (!prefab) { continue; }
                 if (prefab.TryGetComponent(out PooledObject pooledObject))
                 {
-                    if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                        }
+                    }
+                    else
+                    {
+                        if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                    }
                 }
             }
 
@@ -42,7 +55,79 @@ namespace Vi.Utility
                 if (!prefab) { continue; }
                 if (prefab.TryGetComponent(out PooledObject pooledObject))
                 {
-                    if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                        }
+                    }
+                    else
+                    {
+                        if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                    }
+                }
+            }
+        }
+
+        [ContextMenu("Add Unregistered Pooled Objects")]
+        private void AddUnregisteredPooledObjects()
+        {
+            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
+
+            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (!prefab) { continue; }
+                if (prefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject))
+                            {
+                                Debug.Log(prefabFilePath);
+                                pooledObjects.Add(pooledObject);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!pooledObjects.Contains(pooledObject))
+                        {
+                            Debug.Log(prefabFilePath);
+                            pooledObjects.Add(pooledObject);
+                        }
+                    }
+                }
+            }
+
+            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (!prefab) { continue; }
+                if (prefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject))
+                            {
+                                Debug.Log(prefabFilePath);
+                                pooledObjects.Add(pooledObject);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!pooledObjects.Contains(pooledObject))
+                        {
+                            Debug.Log(prefabFilePath);
+                            pooledObjects.Add(pooledObject);
+                        }
+                    }
                 }
             }
         }

@@ -89,41 +89,47 @@ namespace Vi.UI
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
+        private InputAction pauseMenuAction;
         public void OpenPauseMenu()
         {
-            if (!playerInput.actions.FindAction("Pause").enabled) { return; }
+            if (!pauseMenuAction.enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnPause();
         }
 
+        private InputAction inventoryAction;
         public void OpenInventoryMenu()
         {
-            if (!playerInput.actions.FindAction("Inventory").enabled) { return; }
+            if (!inventoryAction.enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OnInventory();
         }
 
+        private InputAction scoreboardAction;
         public void OpenScoreboard()
         {
-            if (!playerInput.actions.FindAction("Scoreboard").enabled) { return; }
+            if (!scoreboardAction.enabled) { return; }
             attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
         }
 
+        private InputAction switchWeaponAction;
         public void SwitchWeapon()
         {
-            if (!playerInput.actions.FindAction("SwitchWeapon").enabled) { return; }
+            if (!switchWeaponAction.enabled) { return; }
             loadoutManager.SwitchWeapon();
         }
 
+        private InputAction lightAttackAction;
         public void StartLightAttack()
         {
-            if (!playerInput.actions.FindAction("LightAttack").enabled) { return; }
+            if (!lightAttackAction.enabled) { return; }
             weaponHandler.LightAttackHold(true);
         }
 
         public void StopLightAttack() { weaponHandler.LightAttackHold(false); }
 
+        private InputAction heavyAttackAction;
         public void StartHeavyAttack()
         {
-            if (!playerInput.actions.FindAction("HeavyAttack").enabled) { return; }
+            if (!heavyAttackAction.enabled) { return; }
             weaponHandler.HeavyAttackHold(true);
         }
 
@@ -132,39 +138,45 @@ namespace Vi.UI
             weaponHandler.HeavyAttackHold(false);
         }
 
+        private InputAction ability1Action;
         public void Ability1(bool isPressed)
         {
-            if (!playerInput.actions.FindAction("Ability1").enabled) { isPressed = false; }
+            if (!ability1Action.enabled) { isPressed = false; }
             weaponHandler.Ability1(isPressed);
         }
 
+        private InputAction ability2Action;
         public void Ability2(bool isPressed)
         {
-            if (!playerInput.actions.FindAction("Ability2").enabled) { isPressed = false; }
+            if (!ability2Action.enabled) { isPressed = false; }
             weaponHandler.Ability2(isPressed);
         }
 
+        private InputAction ability3Action;
         public void Ability3(bool isPressed)
         {
-            if (!playerInput.actions.FindAction("Ability3").enabled) { isPressed = false; }
+            if (!ability3Action.enabled) { isPressed = false; }
             weaponHandler.Ability3(isPressed);
         }
 
+        private InputAction ability4Action;
         public void Ability4(bool isPressed)
         {
-            if (!playerInput.actions.FindAction("Ability4").enabled) { isPressed = false; }
+            if (!ability4Action.enabled) { isPressed = false; }
             weaponHandler.Ability4(isPressed);
         }
 
+        private InputAction reloadAction;
         public void Reload()
         {
-            if (!playerInput.actions.FindAction("Reload").enabled) { return; }
+            if (!reloadAction.enabled) { return; }
             weaponHandler.Reload();
         }
 
+        private InputAction dodgeAction;
         public void Dodge()
         {
-            if (!playerInput.actions.FindAction("Dodge").enabled) { return; }
+            if (!dodgeAction.enabled) { return; }
             playerMovementHandler.OnDodge();
         }
 
@@ -189,7 +201,21 @@ namespace Vi.UI
         {
             weaponHandler = GetComponentInParent<WeaponHandler>();
             attributes = weaponHandler.GetComponent<Attributes>();
+            
             playerInput = weaponHandler.GetComponent<PlayerInput>();
+            pauseMenuAction = playerInput.actions.FindAction("Pause");
+            inventoryAction = playerInput.actions.FindAction("Inventory");
+            scoreboardAction = playerInput.actions.FindAction("Scoreboard");
+            switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
+            lightAttackAction = playerInput.actions.FindAction("LightAttack");
+            heavyAttackAction = playerInput.actions.FindAction("HeavyAttack");
+            ability1Action = playerInput.actions.FindAction("Ability1");
+            ability2Action = playerInput.actions.FindAction("Ability2");
+            ability3Action = playerInput.actions.FindAction("Ability3");
+            ability4Action = playerInput.actions.FindAction("Ability4");
+            reloadAction = playerInput.actions.FindAction("Reload");
+            dodgeAction = playerInput.actions.FindAction("Dodge");
+
             loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
             playerMovementHandler = weaponHandler.GetComponent<PlayerMovementHandler>();
 

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2116712592617969172}
   - component: {fileID: 6544803431402953921}
   - component: {fileID: 8366476032307975780}
+  - component: {fileID: 2980443407920427474}
   m_Layer: 10
   m_Name: FX_Shoot_Arrow_projectile
   m_TagString: Untagged
@@ -4971,6 +4972,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 802eebc6f5fc249c9a33a5d52194574d, type: 3}
   - {fileID: 8300000, guid: de4ff1588c19a45bd8d7802aaa5e2d08, type: 3}
   - {fileID: 8300000, guid: 283ce388b16e44ab08b1d0ae5104fee6, type: 3}
+  soundToPlayOnDespawn: []
+  canHitPlayers: 1
 --- !u!114 &6544803431402953921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5014,6 +5017,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2980443407920427474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548044759800512191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 8
+  pooledObjectIndex: 115
 --- !u!1 &6806690838749617874
 GameObject:
   m_ObjectHideFlags: 0

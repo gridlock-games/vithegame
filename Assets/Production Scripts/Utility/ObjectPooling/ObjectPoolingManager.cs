@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.VFX;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -36,6 +37,37 @@ namespace Vi.Utility
             for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
             {
                 objectPools.Add(new List<PooledObject>());
+            }
+        }
+
+        private void Start()
+        {
+            foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
+            {
+                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                {
+                    NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
+                }
+            }
+        }
+
+        private class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
+        {
+            PooledObject m_Prefab;
+
+            public PooledPrefabInstanceHandler(PooledObject prefab)
+            {
+                m_Prefab = prefab;
+            }
+
+            NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
+            {
+                return SpawnObject(m_Prefab.GetComponent<PooledObject>(), position, rotation).GetComponent<NetworkObject>();
+            }
+
+            void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
+            {
+                ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
             }
         }
 
@@ -76,8 +108,10 @@ namespace Vi.Utility
         {
             if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return; }
 
+            objectToSpawn.SetIsPrewarmStatus(true);
             PooledObject spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
             if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
+            
             spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
 
             ReturnObjectToPool(spawnableObj);
@@ -93,6 +127,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
@@ -100,7 +135,11 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
-                spawnableObj.transform.SetParent(null);
+                spawnableObj.SetIsPrewarmStatus(false);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
+                else
+                    spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -121,6 +160,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
                 spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
@@ -128,7 +168,11 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
-                spawnableObj.transform.SetParent(null);
+                spawnableObj.SetIsPrewarmStatus(false);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
+                else
+                    spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -149,6 +193,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
@@ -161,7 +206,11 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
-                spawnableObj.transform.SetParent(parentTransform);
+                spawnableObj.SetIsPrewarmStatus(false);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
+                else
+                    spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
                 spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
                 if (parentTransform)
@@ -187,6 +236,7 @@ namespace Vi.Utility
             if (spawnableObj == null)
             {
                 // If there are no inactive objects, create a new one
+                objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation, parentTransform).GetComponent<PooledObject>();
                 if (parentTransform)
                 {
@@ -199,7 +249,11 @@ namespace Vi.Utility
             else
             {
                 // If there is an inactive object, reactivate it
-                spawnableObj.transform.SetParent(parentTransform);
+                spawnableObj.SetIsPrewarmStatus(false);
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
+                else
+                    spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 if (parentTransform)
@@ -213,6 +267,13 @@ namespace Vi.Utility
             }
 
             return spawnableObj;
+        }
+
+        private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
+        {
+            if (networkObject.transform.parent == parent) { yield break; }
+            yield return new WaitUntil(() => networkObject.IsSpawned);
+            if (!networkObject.TrySetParent(parent)) { Debug.LogError("Error while setting parent for networ object " + networkObject + " to parent " + parent); }
         }
 
         public static void ReturnObjectToPool(PooledObject obj)

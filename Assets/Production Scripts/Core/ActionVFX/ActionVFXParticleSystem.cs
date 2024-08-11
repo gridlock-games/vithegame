@@ -26,8 +26,10 @@ namespace Vi.Core.VFX
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
         private ParticleSystem[] particleSystems;
-        private void Awake()
+        private Collider[] colliders;
+        private new void Awake()
         {
+            base.Awake();
             GetComponent<Rigidbody>().useGravity = false;
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
@@ -42,15 +44,23 @@ namespace Vi.Core.VFX
                 }
             }
 
-            Collider[] colliders = GetComponentsInChildren<Collider>();
+            colliders = GetComponentsInChildren<Collider>();
             if (colliders.Length == 0) { Debug.LogError("No collider attached to: " + this); }
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
-                col.enabled = NetworkManager.Singleton.IsServer;
             }
         }
-        
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            foreach (Collider col in colliders)
+            {
+                col.enabled = IsServer;
+            }
+        }
+
         private float DivideBounds(float originalBounds, float newBounds)
         {
             if (Mathf.Approximately(originalBounds, 0)) { return 1; }
@@ -161,6 +171,9 @@ namespace Vi.Core.VFX
 
         protected void OnTriggerStay(Collider other)
         {
+            if (!NetworkManager.Singleton.IsServer) { return; }
+            if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
+
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
                 if (other.TryGetComponent(out NetworkCollider networkCollider))
