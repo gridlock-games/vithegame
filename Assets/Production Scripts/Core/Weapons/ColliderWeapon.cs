@@ -47,7 +47,7 @@ namespace Vi.Core
             // Don't evaluate grab attacks here, it's evaluated in the animation handler script
             if (parentWeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
 
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (parentAttributes == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }

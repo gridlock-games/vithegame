@@ -40,7 +40,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public override void OnHit(Attributes attacker)
+        public override void OnHit(CombatAgent attacker)
         {
             if (!IsServer) { Debug.LogError("TeamEliminationViEssence.OnHit() should only be called on the server!"); return; }
             if (!IsSpawned) { return; }

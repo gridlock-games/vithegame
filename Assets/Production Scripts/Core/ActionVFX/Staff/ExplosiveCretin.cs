@@ -68,7 +68,7 @@ namespace Vi.Core.VFX.Staff
             int networkColliderCount = 0;
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent == attacker) { continue; }
 

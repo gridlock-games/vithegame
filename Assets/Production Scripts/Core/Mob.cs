@@ -36,7 +36,6 @@ namespace Vi.Core
         public override Color GetRelativeTeamColor()
         {
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
-
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
                 return PlayerDataManager.GetTeamColor(GetTeam());
@@ -47,14 +46,16 @@ namespace Vi.Core
             }
         }
 
-        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
-            throw new System.NotImplementedException();
+            Debug.LogError("Mob.ProcessMeleeHit() has not been implemented yet!");
+            return false;
+        }
+
+        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        {
+            Debug.LogError("Mob.ProcessProjectileHit() has not been implemented yet!");
+            return false;
         }
     }
 }

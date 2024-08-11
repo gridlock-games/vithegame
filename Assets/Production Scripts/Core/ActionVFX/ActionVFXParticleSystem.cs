@@ -108,7 +108,7 @@ namespace Vi.Core.VFX
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
-                if (other.TryGetComponent(out NetworkCollider networkCollider))
+                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     foreach (ParticleSystem ps in particleSystems)
                     {
@@ -131,7 +131,7 @@ namespace Vi.Core.VFX
             }
             else if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
-                if (other.TryGetComponent(out NetworkCollider networkCollider))
+                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent)
                     {
@@ -176,7 +176,7 @@ namespace Vi.Core.VFX
 
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
-                if (other.TryGetComponent(out NetworkCollider networkCollider))
+                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent)
                     {
@@ -243,7 +243,7 @@ namespace Vi.Core.VFX
                 for (int colliderIndex = 0; colliderIndex < enterColliderData.GetColliderCount(particleIndex); colliderIndex++)
                 {
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
-                    if (col.TryGetComponent(out NetworkCollider networkCollider))
+                    if (col.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                     {
                         if (networkCollider.CombatAgent)
                         {
@@ -291,7 +291,7 @@ namespace Vi.Core.VFX
                     try
                     {
                         Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
-                        if (col.TryGetComponent(out NetworkCollider networkCollider))
+                        if (col.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (networkCollider.CombatAgent)
                             {

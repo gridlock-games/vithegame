@@ -45,14 +45,15 @@ namespace Vi.Core
             MovementHandler.ReceiveOnCollisionExitMessage(collision);
         }
 
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.green;
-            if (Application.isPlaying) { Gizmos.color = CombatAgent.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death ? Color.red : Color.green; }
+        //private void OnDrawGizmos()
+        //{
+        //    Gizmos.color = Color.green;
+        //    if (Application.isPlaying) { Gizmos.color = CombatAgent.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death ? Color.red : Color.green; }
 
-            ExtDebug.DrawWireCapsule(transform.position + GetComponent<CapsuleCollider>().center - new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),
-                transform.position + GetComponent<CapsuleCollider>().center + new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),
-                GetComponent<CapsuleCollider>().radius);
-        }
+        //    CapsuleCollider capsuleCollider = GetComponentInChildren<CapsuleCollider>();
+        //    ExtDebug.DrawWireCapsule(capsuleCollider.transform.position + capsuleCollider.transform.TransformPoint(capsuleCollider.center) - capsuleCollider.transform.up * (capsuleCollider.height / 2),
+        //        capsuleCollider.transform.position + capsuleCollider.transform.TransformPoint(capsuleCollider.center) + capsuleCollider.transform.up * (capsuleCollider.height / 2),
+        //        capsuleCollider.radius);
+        //}
     }
 }

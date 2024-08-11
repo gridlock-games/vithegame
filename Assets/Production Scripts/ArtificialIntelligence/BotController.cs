@@ -355,6 +355,7 @@ namespace Vi.ArtificialIntelligence
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.magenta;
+            if (!Application.isPlaying) { return; }
             for (int i = 0; i < path.corners.Length; i++)
             {
                 Gizmos.DrawSphere(path.corners[i], 0.5f);

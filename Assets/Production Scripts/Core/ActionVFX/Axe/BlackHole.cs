@@ -41,7 +41,7 @@ namespace Vi.Core.VFX.Axe
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
                     if (networkCollider.CombatAgent == GetAttacker())
@@ -66,7 +66,7 @@ namespace Vi.Core.VFX.Axe
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
                     }
                 }
-                else if (colliders[i].GetComponent<Projectile>())
+                else if (colliders[i].transform.root.GetComponent<Projectile>())
                 {
                     if (colliders[i].TryGetComponent(out Rigidbody rb))
                     {
@@ -81,7 +81,7 @@ namespace Vi.Core.VFX.Axe
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
                     if (networkCollider.CombatAgent == GetAttacker())
@@ -111,7 +111,7 @@ namespace Vi.Core.VFX.Axe
                         }
                     }
                 }
-                else if (colliders[i].TryGetComponent(out Rigidbody rb))
+                else if (colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
                 {
                     rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
                 }

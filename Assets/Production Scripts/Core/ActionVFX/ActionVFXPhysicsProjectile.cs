@@ -19,7 +19,7 @@ namespace Vi.Core.VFX
 
         private bool initialized;
 
-        public override void InitializeVFX(Attributes attacker, ActionClip attack)
+        public override void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             ClearInitialization();
 
@@ -101,7 +101,7 @@ namespace Vi.Core.VFX
             if (!IsServer) { return; }
 
             bool shouldDestroy = false;
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.CombatAgent == attacker) { return; }
 

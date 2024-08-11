@@ -97,7 +97,7 @@ namespace Vi.Core
                         if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
                         RaycastHit hit = projectileRotationRaycastingResults[i];
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
-                        if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
                             if (networkCollider.CombatAgent == parentAttributes) { continue; }
                         }
