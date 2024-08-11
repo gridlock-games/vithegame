@@ -7,6 +7,6 @@ namespace Vi.UI
 {
     public class HordeModeManagerUI : GameModeManagerUI
     {
-
+        
     }
 }

@@ -1260,7 +1260,7 @@ namespace Vi.Core
 
         private NetworkList<int> channelCounts;
 
-        private const int defaultChannel = 0;
+        public const int defaultChannel = 0;
         private const int maxChannels = 5;
         private const int maxPlayersInChannel = 15;
 
