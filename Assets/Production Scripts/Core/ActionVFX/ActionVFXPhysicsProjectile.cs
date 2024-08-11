@@ -108,7 +108,7 @@ namespace Vi.Core.VFX
                 bool canHit = true;
                 if (spellType == SpellType.GroundSpell)
                 {
-                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                    if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                 }
 
                 if (canHit)

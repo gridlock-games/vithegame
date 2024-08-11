@@ -245,9 +245,9 @@ namespace Vi.UI
 
             if (!playerUI)
             {
-                if (attributes.ActiveStatusesWasUpdatedThisFrame)
+                if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
                 {
-                    List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                    List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
                     foreach (StatusIcon statusIcon in statusIcons)
                     {
                         if (activeStatuses.Contains(statusIcon.Status))

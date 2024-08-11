@@ -57,7 +57,7 @@ namespace Vi.Core.VFX.Axe
 
                     if (spellType == SpellType.GroundSpell)
                     {
-                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                        if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
                     }
 
                     if (shouldAffect)

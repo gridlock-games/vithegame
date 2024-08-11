@@ -70,7 +70,7 @@ namespace Vi.UI
 
                 UpdateNameTextAndColors();
 
-                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     if (activeStatuses.Contains(statusIcon.Status))
@@ -227,9 +227,9 @@ namespace Vi.UI
             healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
             
-            if (attributes.ActiveStatusesWasUpdatedThisFrame)
+            if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
-                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     if (activeStatuses.Contains(statusIcon.Status))

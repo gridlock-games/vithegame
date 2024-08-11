@@ -190,7 +190,7 @@ namespace Vi.Core
             Animator.Play("Empty", flinchLayerIndex);
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
-            if (IsServer) { attributes.RemoveAllStatuses(); }
+            if (IsServer) { attributes.StatusAgent.RemoveAllStatuses(); }
         }
 
         public void CancelAllActions(float transitionTime)
@@ -209,7 +209,7 @@ namespace Vi.Core
             attributes.SetInviniciblity(0);
             attributes.SetUninterruptable(0);
             attributes.ResetAilment();
-            attributes.RemoveAllStatuses();
+            attributes.StatusAgent.RemoveAllStatuses();
             weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
 
             CancelAllActionsClientRpc(transitionTime);
@@ -253,9 +253,9 @@ namespace Vi.Core
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (!movementHandler.CanMove()) { return; }
-            if ((attributes.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
+            if ((attributes.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
             if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
-            if (attributes.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
+            if (attributes.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {

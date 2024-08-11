@@ -78,7 +78,7 @@ namespace Vi.Core.VFX.Staff
                     {
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (networkCollider.Attributes.IsImmuneToGroundSpells())
+                            if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells())
                             {
                                 shouldAffect = false;
                                 despawnCalled = true;

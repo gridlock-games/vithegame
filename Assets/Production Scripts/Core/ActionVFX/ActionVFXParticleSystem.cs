@@ -146,7 +146,7 @@ namespace Vi.Core.VFX
                         {
                             if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
-                                if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                             }
                         }
 
@@ -191,7 +191,7 @@ namespace Vi.Core.VFX
                         {
                             if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                             {
-                                if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                             }
                         }
 
@@ -258,7 +258,7 @@ namespace Vi.Core.VFX
                             {
                                 if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                 {
-                                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                    if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                                 }
                             }
 
@@ -306,7 +306,7 @@ namespace Vi.Core.VFX
                                 {
                                     if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
                                     {
-                                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                                        if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                                     }
                                 }
 

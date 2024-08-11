@@ -283,7 +283,7 @@ namespace Vi.Core
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
-                    attributes.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
+                    attributes.StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
                 }
             }
         }

@@ -25,7 +25,9 @@ namespace Vi.ArtificialIntelligence
             foreach (MobDefinition mobDefinition in mobDefinitions)
             {
                 (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetSpawnOrientation(PlayerDataManager.Singleton.GetGameMode(), mobDefinition.team, PlayerDataManager.defaultChannel);
-                Instantiate(mobDefinition.mobPrefab.gameObject, transformData.position, transformData.rotation).GetComponent<NetworkObject>().Spawn();
+                GameObject g = Instantiate(mobDefinition.mobPrefab.gameObject, transformData.position, transformData.rotation);
+                g.GetComponent<NetworkObject>().Spawn();
+                g.GetComponent<Mob>().SetTeam(mobDefinition.team);
             }
         }
 
