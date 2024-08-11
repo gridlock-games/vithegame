@@ -12,7 +12,7 @@ namespace Vi.Core
 {
     [RequireComponent(typeof(WeaponHandler))]
     [RequireComponent(typeof(StatusAgent))]
-    public class Attributes : NetworkBehaviour
+    public class Attributes : CombatAgent
     {
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
 

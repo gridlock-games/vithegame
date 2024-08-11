@@ -38,7 +38,7 @@ namespace Vi.ArtificialIntelligence
                     navMeshAgent.destination = hit.position;
                 }
 
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(navMeshAgent.velocity.normalized), rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, navMeshAgent.velocity == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(navMeshAgent.velocity.normalized), rotationSpeed * Time.deltaTime);
 
                 Vector3 animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(navMeshAgent.velocity, 1));
                 moveForwardTarget.Value = animDir.z;

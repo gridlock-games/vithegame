@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 namespace Vi.Core
 {
-    public class Mob : NetworkBehaviour
+    public class Mob : CombatAgent
     {
         private NetworkVariable<PlayerDataManager.Team> team = new NetworkVariable<PlayerDataManager.Team>();
 
