@@ -112,5 +112,12 @@ namespace Vi.Core
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
 
         public virtual bool IsInvincible() { return false; }
+
+        protected bool wasStaggeredThisFrame;
+        protected IEnumerator ResetStaggerBool()
+        {
+            yield return null;
+            wasStaggeredThisFrame = false;
+        }
     }
 }
