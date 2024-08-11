@@ -98,9 +98,9 @@ namespace Vi.Core
 
         protected void Start()
         {
-            parentAttributes = transform.root.GetComponent<Attributes>();
-            parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
-            parentAnimationHandler = transform.root.GetComponent<AnimationHandler>();
+            parentAttributes = GetComponentInParent<Attributes>();
+            parentWeaponHandler = GetComponentInParent<WeaponHandler>();
+            parentAnimationHandler = GetComponentInParent<AnimationHandler>();
 
             colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)

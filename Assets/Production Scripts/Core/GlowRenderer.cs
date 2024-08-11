@@ -51,14 +51,6 @@ namespace Vi.Core
 
         private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();
 
-        private void Start()
-        {
-            foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
-            {
-                RegisterNewRenderer(renderer);
-            }
-        }
-
         public void RegisterNewRenderer(Renderer renderer)
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
@@ -101,7 +93,7 @@ namespace Vi.Core
 
         public void UnregisterRenderer(Renderer renderer)
         {
-            if (!glowMaterialInstances.ContainsKey(renderer)) { Debug.LogError("Trying to unregister a renderer but it isn't present in the dictionary!"); return; }
+            if (!glowMaterialInstances.ContainsKey(renderer)) { return; }
             
             List<Material> newMatList = renderer.materials.ToList();
             foreach (Material glowMaterialInstance in glowMaterialInstances[renderer])
