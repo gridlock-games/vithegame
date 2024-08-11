@@ -598,6 +598,11 @@ namespace Vi.UI
 
             APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL();
 
+            foreach (Button button in authenticationButtons)
+            {
+                button.interactable = false;
+            }
+
             if (!WebRequestManager.IsServerBuild())
             {
                 auth = FirebaseAuth.DefaultInstance;
@@ -668,7 +673,7 @@ namespace Vi.UI
 
         private void Update()
         {
-            loginMethodText.text = WebRequestManager.Singleton.IsLoggingIn ? "Logging in..." : "Please Select Login Method";
+            loginMethodText.text = WebRequestManager.Singleton.IsCheckingGameVersion ? "Checking Game Version..." : WebRequestManager.Singleton.IsLoggingIn ? "Logging In..." : "Please Select Login Method";
 
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
@@ -694,7 +699,7 @@ namespace Vi.UI
             forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
-                button.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion;
             }
 
             if (!initialParent.activeSelf)
