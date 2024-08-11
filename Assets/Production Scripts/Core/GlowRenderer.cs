@@ -51,14 +51,6 @@ namespace Vi.Core
 
         private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();
 
-        private void Start()
-        {
-            foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
-            {
-                RegisterNewRenderer(renderer);
-            }
-        }
-
         public void RegisterNewRenderer(Renderer renderer)
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
@@ -101,7 +93,7 @@ namespace Vi.Core
 
         public void UnregisterRenderer(Renderer renderer)
         {
-            if (!glowMaterialInstances.ContainsKey(renderer)) { Debug.LogError("Trying to unregister a renderer but it isn't present in the dictionary!"); return; }
+            if (!glowMaterialInstances.ContainsKey(renderer)) { return; }
             
             List<Material> newMatList = renderer.materials.ToList();
             foreach (Material glowMaterialInstance in glowMaterialInstances[renderer])
@@ -125,6 +117,9 @@ namespace Vi.Core
         private const float defaultFresnelPower = 5;
 
         private float currentFresnelPower;
+        private float lastFresnelPower;
+
+        private Color lastColor;
         private void Update()
         {
             Color colorTarget = defaultColor;
@@ -161,15 +156,24 @@ namespace Vi.Core
                 fresnelPowerTarget = fresnelPower;
             }
             
-            currentFresnelPower = Mathf.Lerp(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
-            foreach (List<Material> materialList in glowMaterialInstances.Values)
+            currentFresnelPower = Mathf.MoveTowards(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
+            if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower) | lastColor != colorTarget)
             {
-                foreach (Material glowMaterialInstance in materialList)
+                foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
-                    glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
-                    glowMaterialInstance.SetColor(_Color, colorTarget);
+                    foreach (Material glowMaterialInstance in materialList)
+                    {
+                        if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower))
+                            glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
+
+                        if (lastColor != colorTarget)
+                            glowMaterialInstance.SetColor(_Color, colorTarget);
+                    }
                 }
             }
+            
+            lastFresnelPower = currentFresnelPower;
+            lastColor = colorTarget;
         }
 
         private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");

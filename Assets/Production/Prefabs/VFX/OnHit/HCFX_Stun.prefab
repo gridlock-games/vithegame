@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3620578655205301015}
   - component: {fileID: 3922548515315126405}
   - component: {fileID: 3274325476200027930}
+  - component: {fileID: 9200914873657226559}
   m_Layer: 0
   m_Name: HCFX_Stun
   m_TagString: Untagged
@@ -4924,6 +4925,20 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &9200914873657226559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5663927605720312730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 105
 --- !u!1 &6403355468392384476
 GameObject:
   m_ObjectHideFlags: 0

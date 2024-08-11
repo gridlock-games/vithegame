@@ -84,7 +84,7 @@ namespace Vi.Core.GameModeManagers
             else
                 Debug.LogError("Possible spawn point count is 0! Game item - " + gameItemPrefab);
 
-            GameItem gameItemInstance = Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
+            GameItem gameItemInstance = ObjectPoolingManager.SpawnObject(gameItemPrefab.GetComponent<PooledObject>(), spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
             gameItemInstance.NetworkObject.Spawn(true);
             return gameItemInstance;
         }
@@ -93,7 +93,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
 
-            GameItem gameItemInstance = Instantiate(gameItemPrefab.gameObject, spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
+            GameItem gameItemInstance = ObjectPoolingManager.SpawnObject(gameItemPrefab.GetComponent<PooledObject>(), spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
             gameItemInstance.NetworkObject.Spawn(true);
             return gameItemInstance;
         }

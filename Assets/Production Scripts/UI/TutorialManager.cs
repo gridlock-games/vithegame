@@ -369,6 +369,7 @@ namespace Vi.UI
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Block") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())

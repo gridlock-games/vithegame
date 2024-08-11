@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8710131711197057661}
   - component: {fileID: -5220340233243105456}
   - component: {fileID: 2081301059026572207}
+  - component: {fileID: 6206390981590542398}
   m_Layer: 0
   m_Name: arrow_charge_dust
   m_TagString: Untagged
@@ -4963,3 +4964,17 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &6206390981590542398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2341394265047737295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 76

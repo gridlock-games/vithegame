@@ -150,6 +150,21 @@ CapsuleCollider:
   m_Height: 4
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &240094662305103642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712926932317761439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 111
+  isPrewarmObject: 1
 --- !u!114 &1199684895839949329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,14 +229,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 0}
+  vfxPositionOffset: {x: 0, y: 0.1, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 4
   onActivateVFXSpawnNormalizedTime: 0.4
-  raycastOffset: {x: 0, y: 1, z: 2}
-  fartherRaycastOffset: {x: 0, y: 2, z: 3}
-  raycastMaxDistance: 5
+  raycastOffset: {x: 0, y: 3, z: 2}
+  fartherRaycastOffset: {x: 0, y: 4, z: 3}
+  raycastMaxDistance: 20
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 966e0cf25c9b84da9b6d1c667869261c,

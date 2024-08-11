@@ -203,6 +203,27 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 5.6, y: 2, z: 5.6}
   m_Center: {x: 0, y: 0.8, z: 0}
+--- !u!114 &6219262824514682719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6567381037492270064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3074050522
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &2161287549521949941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,27 +267,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6219262824514682719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6567381037492270064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3074050522
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &7695901101582375111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,14 +279,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6dadea52722e9643bb826f9d57c42f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: -3}
+  vfxPositionOffset: {x: 0, y: 0, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 4
   onActivateVFXSpawnNormalizedTime: 0.5
-  raycastOffset: {x: 0, y: 3, z: 3}
-  fartherRaycastOffset: {x: 0, y: 3, z: 4}
-  raycastMaxDistance: 8
+  raycastOffset: {x: 0, y: 3, z: 0}
+  fartherRaycastOffset: {x: 0, y: 4, z: 1}
+  raycastMaxDistance: 20
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 8300000, guid: d97aaaf2da209442491c821519b0c310,
@@ -318,3 +318,18 @@ MonoBehaviour:
   - {fileID: 7112875677876922127, guid: 8baa55e4dcf576f4dafe5d379ffaccd4, type: 3}
   - {fileID: -3826752291375207837, guid: 98f5d6b409dcb2648b16436e63fca7ff, type: 3}
   - {fileID: -1543584885252910358, guid: f0ab520c06ce15846ab4c46b4c9f79cf, type: 3}
+--- !u!114 &7704198759919875140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6567381037492270064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 110
+  isPrewarmObject: 1

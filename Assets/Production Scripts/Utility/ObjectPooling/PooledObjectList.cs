@@ -37,7 +37,10 @@ namespace Vi.Utility
                 {
                     if (prefab.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (networkPrefabsList.Contains(prefab)) { Debug.Log(prefabFilePath); }
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                        }
                     }
                     else
                     {
@@ -54,7 +57,10 @@ namespace Vi.Utility
                 {
                     if (prefab.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (networkPrefabsList.Contains(prefab)) { Debug.Log(prefabFilePath); }
+                        if (networkPrefabsList.Contains(prefab))
+                        {
+                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                        }
                     }
                     else
                     {
@@ -79,8 +85,11 @@ namespace Vi.Utility
                     {
                         if (networkPrefabsList.Contains(prefab))
                         {
-                            Debug.Log(prefabFilePath);
-                            pooledObjects.Add(pooledObject);
+                            if (!pooledObjects.Contains(pooledObject))
+                            {
+                                Debug.Log(prefabFilePath);
+                                pooledObjects.Add(pooledObject);
+                            }
                         }
                     }
                     else
@@ -104,8 +113,11 @@ namespace Vi.Utility
                     {
                         if (networkPrefabsList.Contains(prefab))
                         {
-                            Debug.Log(prefabFilePath);
-                            pooledObjects.Add(pooledObject);
+                            if (!pooledObjects.Contains(pooledObject))
+                            {
+                                Debug.Log(prefabFilePath);
+                                pooledObjects.Add(pooledObject);
+                            }
                         }
                     }
                     else

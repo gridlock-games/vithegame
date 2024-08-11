@@ -91,19 +91,31 @@ namespace Vi.Core
         protected WeaponHandler parentWeaponHandler;
         protected AnimationHandler parentAnimationHandler;
 
-        private Collider[] colliders;
+        protected Collider[] colliders;
         private Renderer[] renderers;
 
         public Vector3 GetClosetPointFromAttributes(Attributes victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
         protected void Start()
         {
-            parentAttributes = transform.root.GetComponent<Attributes>();
-            parentWeaponHandler = transform.root.GetComponent<WeaponHandler>();
-            parentAnimationHandler = transform.root.GetComponent<AnimationHandler>();
+            parentAttributes = GetComponentInParent<Attributes>();
+            parentWeaponHandler = GetComponentInParent<WeaponHandler>();
+            parentAnimationHandler = GetComponentInParent<AnimationHandler>();
 
             colliders = GetComponentsInChildren<Collider>(true);
+            foreach (Collider col in colliders)
+            {
+                col.enabled = parentAttributes.IsServer;
+            }
+
             renderers = GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer is SkinnedMeshRenderer smr)
+                {
+                    smr.updateWhenOffscreen = parentAttributes.IsServer;
+                }
+            }
         }
 
         private bool lastIsActiveCall = true;

@@ -182,6 +182,8 @@ namespace Vi.UI
             if (!attributes) { canvas.enabled = false; return; }
 
             float HP = attributes.GetHP();
+            if (HP < 0.1f & HP > 0) { HP = 0.1f; }
+
             float rage = attributes.GetRage();
 
             float maxHP = attributes.GetMaxHP();
@@ -207,7 +209,9 @@ namespace Vi.UI
             if (!staminaAndSpiritAreDisabled)
             {
                 float stamina = attributes.GetStamina();
+                if (stamina < 0.1f & stamina > 0) { stamina = 0.1f; }
                 float spirit = attributes.GetSpirit();
+                if (spirit < 0.1f & spirit > 0) { spirit = 0.1f; }
 
                 float maxStamina = attributes.GetMaxStamina();
                 float maxSpirit = attributes.GetMaxSpirit();

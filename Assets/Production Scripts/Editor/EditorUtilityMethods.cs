@@ -12,7 +12,7 @@ namespace Vi.Editor
     public class EditorUtilityMethods : UnityEditor.Editor
     {
         [MenuItem("Tools/Find Objects Not In Network Prefabs List")]
-        static void SelectGameObjectsInLayer()
+        static void FindObjectsNotInNetworkPrefabsList()
         {
             NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
             if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
@@ -97,6 +97,41 @@ namespace Vi.Editor
             }
         }
 
+        [MenuItem("Tools/Set Texture Overrides for Android Platform")]
+        static void SetTextureOverridesForAndroidPlatform()
+        {
+            string[] textures = AssetDatabase.FindAssets("t:Texture");
+            for (int i = 0; i < textures.Length; i++)
+            {
+                EditorUtility.DisplayProgressBar("Overriding Textures For Android",
+                    i.ToString() + " out of " + textures.Length.ToString() + " textures completed",
+                    i / textures.Length);
+
+                string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
+                if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
+
+                try
+                {
+                    TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
+                    TextureImporterPlatformSettings existingSettings = importer.GetPlatformTextureSettings("Android");
+                    if (!existingSettings.overridden)
+                    {
+                        TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
+                        androidSettings.name = "Android";
+                        androidSettings.overridden = true;
+                        androidSettings.maxTextureSize = 256;
+                        importer.SetPlatformTextureSettings(androidSettings);
+                        importer.SaveAndReimport();
+                    }
+                }
+                catch // This happens on shit like font textures
+                {
+
+                }
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
         //[MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
         //static void SetNotSpawnWithObservers()
         //{
@@ -115,41 +150,42 @@ namespace Vi.Editor
         //    }
         //}
 
-        [MenuItem("Tools/Set Texture Overrides for Android Platform")]
-        static void SetTextureOverridesForAndroidPlatform()
-        {
-            foreach (string guid in AssetDatabase.FindAssets("t:Texture"))
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                if (assetPath.Length == 0) { Debug.LogError(guid + " not found"); continue; }
+        //[MenuItem("Tools/Convert Projectile Layers To Colliders")]
+        //static void SelectGameObjectsInLayer()
+        //{
+        //    foreach (GameObject g in FindGameObjectsInLayer(LayerMask.NameToLayer("Projectile")))
+        //    {
+        //        Debug.Log(g);
+        //        g.layer = LayerMask.NameToLayer("ProjectileCollider");
+        //        EditorUtility.SetDirty(g);
+        //    }
+        //}
 
-                Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
-                if (texture)
-                {
-                    try
-                    {
-                        TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
-                        TextureImporterPlatformSettings existingSettings = importer.GetPlatformTextureSettings("Android");
-                        if (!existingSettings.overridden)
-                        {
-                            TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
-                            androidSettings.name = "Android";
-                            androidSettings.overridden = true;
-                            androidSettings.maxTextureSize = 256;
-                            importer.SetPlatformTextureSettings(androidSettings);
-                            importer.SaveAndReimport();
-                        }
-                    }
-                    catch // This happens on shit like font textures
-                    {
+        //private static GameObject[] FindGameObjectsInLayer(int layer)
+        //{
+        //    var goArray = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        //    var goList = new List<GameObject>();
+        //    for (int i = 0; i < goArray.Length; i++)
+        //    {
+        //        if (goArray[i].layer == layer)
+        //        {
+        //            goList.Add(goArray[i]);
+        //        }
+        //    }
+        //    if (goList.Count == 0)
+        //    {
+        //        return null;
+        //    }
+        //    return goList.ToArray();
+        //}
 
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Error loading texture at path " + assetPath);
-                }
-            }
-        }
+        //[MenuItem("Tools/Find Item By GUID")]
+        //static void FindItemByGUIDMethod()
+        //{
+        //    string guid = "56f1fae43c882434d94c645713a29ec6";
+        //    string p = AssetDatabase.GUIDToAssetPath(guid);
+        //    if (p.Length == 0) p = "not found";
+        //    Debug.Log(p);
+        //}
     }
 }

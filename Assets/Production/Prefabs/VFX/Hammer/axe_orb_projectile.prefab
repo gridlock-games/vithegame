@@ -40,7 +40,7 @@ PrefabInstance:
     - target: {fileID: 2439428452925413717, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2670817242
+      value: 1260409227
       objectReference: {fileID: 0}
     - target: {fileID: 2439428452925413717, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
@@ -61,6 +61,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3395505952454275661, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
+      propertyPath: isPrewarmObject
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3395505952454275661, guid: 9d94a3a70b41f3244b3209af5df04e4a,
+        type: 3}
+      propertyPath: pooledObjectIndex
+      value: 95
       objectReference: {fileID: 0}
     - target: {fileID: 3490261705381356768, guid: 9d94a3a70b41f3244b3209af5df04e4a,
         type: 3}
@@ -295,7 +305,7 @@ PrefabInstance:
         type: 3}
       propertyPath: followUpVFXToPlayOnDestroy.Array.data[0]
       value: 
-      objectReference: {fileID: -5467905512432266006, guid: 1bf608eaa8ac3b144974fd6af172ca17,
+      objectReference: {fileID: 2654175274349702557, guid: 1bf608eaa8ac3b144974fd6af172ca17,
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d94a3a70b41f3244b3209af5df04e4a, type: 3}

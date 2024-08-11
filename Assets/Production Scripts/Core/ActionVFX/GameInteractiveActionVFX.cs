@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Unity.Netcode.Components;
+using Vi.Utility;
 
 namespace Vi.Core.VFX
 {
@@ -39,6 +40,13 @@ namespace Vi.Core.VFX
             this.attack = attack;
         }
 
+        protected new void OnDisable()
+        {
+            base.OnDisable();
+            attacker = null;
+            attack = null;
+        }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -46,7 +54,7 @@ namespace Vi.Core.VFX
             {
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
-                    NetworkObject netObj = Instantiate(prefab.gameObject, transform.position, transform.rotation).GetComponent<NetworkObject>();
+                    NetworkObject netObj = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation).GetComponent<NetworkObject>();
                     netObj.SpawnWithOwnership(OwnerClientId, true);
                     if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }

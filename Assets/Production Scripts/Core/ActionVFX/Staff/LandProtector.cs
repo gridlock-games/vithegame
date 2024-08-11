@@ -13,15 +13,6 @@ namespace Vi.Core.VFX.Staff
 
         private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.NotASpell, SpellType.GroundSpell, SpellType.AerialSpell };
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            foreach (Collider col in GetComponentsInChildren<Collider>())
-            {
-                col.enabled = IsServer;
-            }
-        }
-
         private new void OnTriggerEnter(Collider other)
         {
             base.OnTriggerEnter(other);

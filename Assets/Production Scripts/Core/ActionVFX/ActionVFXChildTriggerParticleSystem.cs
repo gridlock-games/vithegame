@@ -19,8 +19,6 @@ namespace Vi.Core.VFX
             triggerModule.exit = ParticleSystemOverlapAction.Ignore;
             triggerModule.inside = ParticleSystemOverlapAction.Callback;
             triggerModule.outside = ParticleSystemOverlapAction.Ignore;
-            ParticleSystem.MainModule mainModule = ps.main;
-            mainModule.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
         }
 
         private void OnParticleTrigger()

@@ -12,10 +12,6 @@ namespace Vi.Core.VFX.Staff
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            foreach (Collider col in GetComponentsInChildren<Collider>())
-            {
-                col.enabled = IsServer;
-            }
             if (IsServer) { serverSpawnTime = Time.time; }
         }
 
@@ -28,8 +24,11 @@ namespace Vi.Core.VFX.Staff
             {
                 if (!PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker))
                 {
-                    networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP() * 0.05f);
-                    NetworkObject.Despawn();
+                    if (!Mathf.Approximately(networkCollider.Attributes.GetHP(), networkCollider.Attributes.GetMaxHP()))
+                    {
+                        networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP() * 0.05f);
+                        NetworkObject.Despawn();
+                    }
                 }
             }
         }
