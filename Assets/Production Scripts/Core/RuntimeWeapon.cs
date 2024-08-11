@@ -30,14 +30,14 @@ namespace Vi.Core
             }
         }
 
-        protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
+        protected Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
 
-        public Dictionary<Attributes, HitCounterData> GetHitCounter()
+        public Dictionary<CombatAgent, HitCounterData> GetHitCounter()
         {
-            Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
+            Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
             foreach (RuntimeWeapon runtimeWeapon in associatedRuntimeWeapons)
             {
-                foreach (KeyValuePair<Attributes, HitCounterData> kvp in runtimeWeapon.hitCounter)
+                foreach (KeyValuePair<CombatAgent, HitCounterData> kvp in runtimeWeapon.hitCounter)
                 {
                     if (hitCounter.ContainsKey(kvp.Key))
                     {
@@ -72,9 +72,9 @@ namespace Vi.Core
             hitCounter.Clear();
         }
         
-        public bool CanHit(Attributes attributes)
+        public bool CanHit(CombatAgent attributes)
         {
-            Dictionary<Attributes, HitCounterData> hitCounter = GetHitCounter();
+            Dictionary<CombatAgent, HitCounterData> hitCounter = GetHitCounter();
             if (hitCounter.ContainsKey(attributes))
             {
                 if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }

@@ -44,20 +44,20 @@ namespace Vi.Core.VFX.Axe
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == GetAttacker())
+                    if (networkCollider.CombatAgent == GetAttacker())
                     {
                         if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
                         if (shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
 
                     if (spellType == SpellType.GroundSpell)
                     {
-                        if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                        if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
                     }
 
                     if (shouldAffect)
@@ -84,13 +84,13 @@ namespace Vi.Core.VFX.Axe
                 if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == GetAttacker())
+                    if (networkCollider.CombatAgent == GetAttacker())
                     {
                         if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
                         if (shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
@@ -106,8 +106,8 @@ namespace Vi.Core.VFX.Axe
 
                         if (NetworkManager.Singleton.IsServer)
                         {
-                            networkCollider.Attributes.ProcessProjectileHit(GetAttacker(), null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
-                                copy, networkCollider.Attributes.transform.position, transform.position);
+                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                                copy, networkCollider.CombatAgent.transform.position, transform.position);
                         }
                     }
                 }

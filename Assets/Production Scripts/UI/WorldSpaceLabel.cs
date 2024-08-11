@@ -33,7 +33,7 @@ namespace Vi.UI
         [SerializeField] private StatusIcon statusImagePrefab;
 
         private Canvas canvas;
-        private Attributes attributes;
+        private CombatAgent combatAgent;
         private Renderer rendererToFollow;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private CanvasGroup[] canvasGroups;
@@ -50,9 +50,9 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (!attributes)
+            if (!combatAgent)
             {
-                attributes = GetComponentInParent<Attributes>();
+                combatAgent = GetComponentInParent<CombatAgent>();
 
                 transform.SetParent(null, true);
 
@@ -64,13 +64,13 @@ namespace Vi.UI
                 SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
             }
 
-            if (attributes)
+            if (combatAgent)
             {
                 RefreshRendererToFollow();
 
                 UpdateNameTextAndColors();
 
-                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
+                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     if (activeStatuses.Contains(statusIcon.Status))
@@ -112,17 +112,17 @@ namespace Vi.UI
         private PlayerDataManager.Team team;
         private void UpdateNameTextAndColors()
         {
-            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.CachedPlayerData.team) + attributes.CachedPlayerData.character.name.ToString();
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(combatAgent.GetTeam()) + combatAgent.GetName();
 
-            Color relativeTeamColor = attributes.GetRelativeTeamColor();
+            Color relativeTeamColor = combatAgent.GetRelativeTeamColor();
             nameDisplay.color = Color.white;
-            team = attributes.GetTeam();
+            team = combatAgent.GetTeam();
             healthFillImage.color = relativeTeamColor == Color.black | team == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
         }
 
         private void RefreshRendererToFollow()
         {
-            Renderer[] renderers = attributes.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = combatAgent.GetComponentsInChildren<Renderer>();
             if (renderers.Length == 0) { return; }
             Vector3 highestPoint = renderers[0].bounds.center;
             rendererToFollow = renderers[0];
@@ -165,8 +165,6 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
-
-            if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
 
             if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame) { UpdateNameTextAndColors(); }
 
@@ -224,12 +222,12 @@ namespace Vi.UI
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
 
-            healthFillImage.fillAmount = attributes.GetHP() / attributes.GetMaxHP();
-            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, attributes.GetHP() / attributes.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
+            healthFillImage.fillAmount = combatAgent.GetHP() / combatAgent.GetMaxHP();
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, combatAgent.GetHP() / combatAgent.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
             
-            if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
+            if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
-                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
+                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     if (activeStatuses.Contains(statusIcon.Status))

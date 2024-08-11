@@ -99,7 +99,7 @@ namespace Vi.Core
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
                         if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (networkCollider.Attributes == parentAttributes) { continue; }
+                            if (networkCollider.CombatAgent == parentAttributes) { continue; }
                         }
                         else // No Network Collider
                         {

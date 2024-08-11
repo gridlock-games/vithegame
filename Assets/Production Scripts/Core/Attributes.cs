@@ -11,7 +11,6 @@ using System.Linq;
 namespace Vi.Core
 {
     [RequireComponent(typeof(WeaponHandler))]
-    [RequireComponent(typeof(StatusAgent))]
     public class Attributes : CombatAgent
     {
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
@@ -19,14 +18,16 @@ namespace Vi.Core
         private NetworkVariable<int> playerDataId = new NetworkVariable<int>();
         public int GetPlayerDataId() { return playerDataId.Value; }
         public void SetPlayerDataId(int id) { playerDataId.Value = id; name = PlayerDataManager.Singleton.GetPlayerData(id).character.name.ToString(); }
-        public PlayerDataManager.Team GetTeam() { return CachedPlayerData.team; }
+        public override PlayerDataManager.Team GetTeam() { return CachedPlayerData.team; }
+
+        public override string GetName() { return CachedPlayerData.character.name.ToString(); }
 
         public CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
-        public Color GetRelativeTeamColor()
+        public override Color GetRelativeTeamColor()
         {
             if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
 
@@ -46,17 +47,15 @@ namespace Vi.Core
             CachedPlayerData = playerData;
         }
 
-        public float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
+        public override float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
         public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
         public float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
         public float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
 
-        private NetworkVariable<float> HP = new NetworkVariable<float>();
         private NetworkVariable<float> stamina = new NetworkVariable<float>();
         private NetworkVariable<float> spirit = new NetworkVariable<float>();
         private NetworkVariable<float> rage = new NetworkVariable<float>();
 
-        public float GetHP() { return HP.Value; }
         public float GetStamina() { return stamina.Value; }
         public float GetSpirit() { return spirit.Value; }
         public float GetRage() { return rage.Value; }
@@ -69,57 +68,6 @@ namespace Vi.Core
             stamina.Value = 0;
             if (resetRage)
                 rage.Value = 0;
-        }
-
-        public void AddHP(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
-                {
-                    HP.Value += amount;
-                }
-                else
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
-                }
-            }
-        }
-
-        private float AddHPWithoutApply(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < weaponHandler.GetWeapon().GetMaxHP())
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > weaponHandler.GetWeapon().GetMaxHP())
-                {
-                    return HP.Value + amount;
-                }
-                else
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, weaponHandler.GetWeapon().GetMaxHP());
-                }
-            }
-            return HP.Value;
         }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -385,21 +333,16 @@ namespace Vi.Core
         public GlowRenderer GlowRenderer { get; private set; }
         private void OnTransformChildrenChanged()
         {
-            GlowRenderer = GetComponentInChildren<GlowRenderer>();
+            if (!GlowRenderer) { GlowRenderer = GetComponentInChildren<GlowRenderer>(); }
         }
 
-        public NetworkCollider NetworkCollider { get; private set; }
-
-        public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
-
-        public StatusAgent StatusAgent { get; private set; }
         private WeaponHandler weaponHandler;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
-        private void Awake()
+        private new void Awake()
         {
-            StatusAgent = GetComponent<StatusAgent>();
+            base.Awake();
             animationHandler = GetComponent<AnimationHandler>();
             weaponHandler = GetComponent<WeaponHandler>();
             movementHandler = GetComponent<MovementHandler>();
@@ -426,7 +369,7 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
-        public bool IsInvincible() { return isInvincible.Value; }
+        public override bool IsInvincible() { return isInvincible.Value; }
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
@@ -437,7 +380,7 @@ namespace Vi.Core
         public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         private bool wasStaggeredThisFrame;
-        public bool ProcessMeleeHit(Attributes attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
 
@@ -450,7 +393,7 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        public bool ProcessProjectileHit(Attributes attacker, RuntimeWeapon runtimeWeapon, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
 
@@ -652,8 +595,10 @@ namespace Vi.Core
             }
         }
 
-        private bool ProcessHit(bool isMeleeHit, Attributes attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
+        private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            Attributes attacker = (Attributes)attackerCombatAgent;
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -1291,7 +1236,6 @@ namespace Vi.Core
             ActivateRage();
         }
 
-        private NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
         private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
@@ -1360,7 +1304,6 @@ namespace Vi.Core
         }
 
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
-        public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 

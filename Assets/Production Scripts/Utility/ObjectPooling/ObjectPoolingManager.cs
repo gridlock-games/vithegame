@@ -136,7 +136,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
                 else
                     spawnableObj.transform.SetParent(null);
@@ -169,7 +169,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
                 else
                     spawnableObj.transform.SetParent(null);
@@ -207,7 +207,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
                 else
                     spawnableObj.transform.SetParent(parentTransform);
@@ -250,7 +250,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
                 else
                     spawnableObj.transform.SetParent(parentTransform);

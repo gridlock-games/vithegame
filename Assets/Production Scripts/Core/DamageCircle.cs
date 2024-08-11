@@ -84,10 +84,10 @@ namespace Vi.Core
             Vector3 top = new Vector3(capsuleCollider.center.x, capsuleCollider.center.y + (capsuleCollider.height * transform.localScale.y / 2), capsuleCollider.center.z);
             Collider[] collidersInside = Physics.OverlapCapsule(bottom, top, capsuleCollider.radius * transform.localScale.x, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
 
-            List<Attributes> attributesInside = new List<Attributes>();
+            List<CombatAgent> attributesInside = new List<CombatAgent>();
             foreach (Collider col in collidersInside)
             {
-                if (col.TryGetComponent(out NetworkCollider networkCollider)) { attributesInside.Add(networkCollider.Attributes); }
+                if (col.TryGetComponent(out NetworkCollider networkCollider)) { attributesInside.Add(networkCollider.CombatAgent); }
             }
 
             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())

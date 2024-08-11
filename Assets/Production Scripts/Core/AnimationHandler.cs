@@ -294,7 +294,7 @@ namespace Vi.Core
                     {
                         if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.Attributes) & !networkCollider.Attributes.IsInvincible())
+                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                                 angleList.Add((networkCollider,

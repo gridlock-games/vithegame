@@ -326,7 +326,7 @@ PrefabInstance:
     - target: {fileID: 8074822472132885952, guid: a25419db5e9becb4abb8edc5d77f0428,
         type: 3}
       propertyPath: m_Name
-      value: Cavecrasher_Bl Variant
+      value: Cave Crasher
       objectReference: {fileID: 0}
     - target: {fileID: 8074822472132885952, guid: a25419db5e9becb4abb8edc5d77f0428,
         type: 3}
@@ -452,18 +452,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &3115624215988016511
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5154451350289567119}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15e4601c5acc5b14dac14ba210ed1605, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4202932918317016219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -476,7 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2393450009
+  GlobalObjectIdHash: 3337472517
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -485,6 +473,33 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1290086314784349669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3115624215988016511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15e4601c5acc5b14dac14ba210ed1605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
+    type: 3}
 --- !u!114 &4164857717923467686
 MonoBehaviour:
   m_ObjectHideFlags: 0

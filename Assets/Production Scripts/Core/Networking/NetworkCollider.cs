@@ -7,15 +7,15 @@ namespace Vi.Core
 {
     public class NetworkCollider : MonoBehaviour
     {
-        public Attributes Attributes { get; private set; }
+        public CombatAgent CombatAgent { get; private set; }
         public MovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
 
         private void Awake()
         {
             MovementHandler = GetComponentInParent<MovementHandler>();
-            Attributes = GetComponentInParent<Attributes>();
-            Attributes.SetNetworkCollider(this);
+            CombatAgent = GetComponentInParent<CombatAgent>();
+            CombatAgent.SetNetworkCollider(this);
             Colliders = GetComponentsInChildren<Collider>();
         }
 
@@ -23,7 +23,7 @@ namespace Vi.Core
         {
             foreach (Collider c in Colliders)
             {
-                c.enabled = Attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
+                c.enabled = CombatAgent.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
             }
         }
 
@@ -48,7 +48,7 @@ namespace Vi.Core
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.green;
-            if (Application.isPlaying) { Gizmos.color = Attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death ? Color.red : Color.green; }
+            if (Application.isPlaying) { Gizmos.color = CombatAgent.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death ? Color.red : Color.green; }
 
             ExtDebug.DrawWireCapsule(transform.position + GetComponent<CapsuleCollider>().center - new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),
                 transform.position + GetComponent<CapsuleCollider>().center + new Vector3(0, GetComponent<CapsuleCollider>().height / 8, 0),

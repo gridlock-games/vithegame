@@ -133,34 +133,34 @@ namespace Vi.Core.VFX
             {
                 if (other.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (networkCollider.Attributes)
+                    if (networkCollider.CombatAgent)
                     {
                         bool canHit = true;
-                        if (hitCounter.ContainsKey(networkCollider.Attributes))
+                        if (hitCounter.ContainsKey(networkCollider.CombatAgent))
                         {
-                            if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                            if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                            if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                            if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                         }
 
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
                             {
-                                if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                                if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                             }
                         }
 
                         if (canHit)
                         {
-                            if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                            if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                             {
-                                if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
                                 {
-                                    hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                    hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
                                 }
                                 else
                                 {
-                                    hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                    hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
                                 }
                             }
                         }
@@ -178,34 +178,34 @@ namespace Vi.Core.VFX
             {
                 if (other.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (networkCollider.Attributes)
+                    if (networkCollider.CombatAgent)
                     {
                         bool canHit = true;
-                        if (hitCounter.ContainsKey(networkCollider.Attributes))
+                        if (hitCounter.ContainsKey(networkCollider.CombatAgent))
                         {
-                            if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                            if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                            if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                            if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                         }
 
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
                             {
-                                if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                                if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                             }
                         }
 
                         if (canHit)
                         {
-                            if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                            if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                             {
-                                if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
                                 {
-                                    hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                    hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
                                 }
                                 else
                                 {
-                                    hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                    hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
                                 }
                             }
                         }
@@ -214,7 +214,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        private Dictionary<Attributes, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<Attributes, RuntimeWeapon.HitCounterData>();
+        private Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>();
 
         protected new void OnDisable()
         {
@@ -245,34 +245,34 @@ namespace Vi.Core.VFX
                     Collider col = (Collider)enterColliderData.GetCollider(particleIndex, colliderIndex);
                     if (col.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        if (networkCollider.Attributes)
+                        if (networkCollider.CombatAgent)
                         {
                             bool canHit = true;
-                            if (hitCounter.ContainsKey(networkCollider.Attributes))
+                            if (hitCounter.ContainsKey(networkCollider.CombatAgent))
                             {
-                                if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                                if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                                if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                             }
 
                             if (spellType == SpellType.GroundSpell)
                             {
-                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
                                 {
-                                    if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                                    if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                                 }
                             }
 
                             if (canHit)
                             {
-                                if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                                if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                 {
-                                    if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                    if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
                                     {
-                                        hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                        hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
                                     }
                                     else
                                     {
-                                        hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                        hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
                                     }
                                 }
                             }
@@ -293,34 +293,34 @@ namespace Vi.Core.VFX
                         Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
                         if (col.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (networkCollider.Attributes)
+                            if (networkCollider.CombatAgent)
                             {
                                 bool canHit = true;
-                                if (hitCounter.ContainsKey(networkCollider.Attributes))
+                                if (hitCounter.ContainsKey(networkCollider.CombatAgent))
                                 {
-                                    if (hitCounter[networkCollider.Attributes].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                    if (Time.time - hitCounter[networkCollider.Attributes].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                                    if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                                    if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
                                 }
 
                                 if (spellType == SpellType.GroundSpell)
                                 {
-                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes))
+                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
                                     {
-                                        if (networkCollider.Attributes.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                                        if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                                     }
                                 }
 
                                 if (canHit)
                                 {
-                                    if (networkCollider.Attributes.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+                                    if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
                                     {
-                                        if (!hitCounter.ContainsKey(networkCollider.Attributes))
+                                        if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
                                         {
-                                            hitCounter.Add(networkCollider.Attributes, new(1, Time.time));
+                                            hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
                                         }
                                         else
                                         {
-                                            hitCounter[networkCollider.Attributes] = new(hitCounter[networkCollider.Attributes].hitNumber + 1, Time.time);
+                                            hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
                                         }
                                     }
                                 }

@@ -139,9 +139,9 @@ namespace Vi.Core
             bool shouldDestroy = false;
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.Attributes == attacker) { return; }
-                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
-                if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                if (networkCollider.CombatAgent == attacker) { return; }
+                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {

@@ -164,11 +164,11 @@ namespace Vi.Core
             return true;
         }
 
-        public bool CanHit(Attributes attacker, Attributes victim)
+        public bool CanHit(CombatAgent attacker, CombatAgent victim)
         {
             if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
             if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }
-            return CanHit(GetPlayerData(attacker.GetPlayerDataId()).team, GetPlayerData(victim.GetPlayerDataId()).team) & attacker != victim;
+            return CanHit(attacker.GetTeam(), victim.GetTeam()) & attacker != victim;
         }
 
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()

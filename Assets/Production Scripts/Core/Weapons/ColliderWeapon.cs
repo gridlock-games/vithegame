@@ -11,7 +11,7 @@ namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
+        private List<CombatAgent> hitsOnThisPhysicsUpdate = new List<CombatAgent>();
 
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
@@ -49,12 +49,12 @@ namespace Vi.Core
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (parentAttributes == networkCollider.Attributes) { return; }
-                if (!CanHit(networkCollider.Attributes)) { return; }
+                if (parentAttributes == networkCollider.CombatAgent) { return; }
+                if (!CanHit(networkCollider.CombatAgent)) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.Attributes)) { return; }
+                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
 
-                bool bHit = networkCollider.Attributes.ProcessMeleeHit(parentAttributes,
+                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentAttributes,
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
@@ -63,7 +63,7 @@ namespace Vi.Core
 
                 if (bHit)
                 {
-                    hitsOnThisPhysicsUpdate.Add(networkCollider.Attributes);
+                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
                     parentWeaponHandler.lastMeleeHitTime = Time.time;
                 }
             }

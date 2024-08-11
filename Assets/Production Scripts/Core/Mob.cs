@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Utility;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -14,34 +16,13 @@ namespace Vi.Core
             this.team.Value = team;
         }
 
-        [SerializeField] private float maxHP;
-        private NetworkVariable<float> HP = new NetworkVariable<float>();
+        [SerializeField] private float maxHP = 100;
 
-        public float GetHP() { return HP.Value; }
+        public override float GetMaxHP() { return maxHP; }
 
-        public float GetMaxHP() { return maxHP; }
+        [SerializeField] private PooledObject worldSpaceLabelPrefab;
 
-        private void AddHP(float amount)
-        {
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    HP.Value += amount;
-                }
-                else
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-        }
+        PooledObject worldSpaceLabelInstance;
 
         public override void OnNetworkSpawn()
         {
@@ -49,6 +30,41 @@ namespace Vi.Core
             {
                 HP.Value = maxHP;
             }
+
+            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
+        }
+
+        public override PlayerDataManager.Team GetTeam() { return team.Value; }
+
+        public override string GetName() { return name.Replace("(Clone)", ""); }
+
+        public override Color GetRelativeTeamColor()
+        {
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
+
+            if (localTeam == PlayerDataManager.Team.Spectator)
+            {
+                return PlayerDataManager.GetTeamColor(GetTeam());
+            }
+            else
+            {
+                return localTeam == GetTeam() ? Color.cyan : Color.red;
+            }
+        }
+
+        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
