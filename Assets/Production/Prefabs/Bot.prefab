@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1564116883212529235}
   - component: {fileID: 1564116883212529237}
   - component: {fileID: -8539089533449040199}
+  - component: {fileID: 1300232046518436515}
   m_Layer: 0
   m_Name: Bot
   m_TagString: Untagged
@@ -105,6 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
+  wasStaggeredThisFrame: 0
   heartbeatSoundEffect: {fileID: 0}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
@@ -129,7 +131,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1564116883212529240}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67de6cd9a17e8da4f97c178631788a81, type: 3}
+  m_Script: {fileID: 11500000, guid: 55547efd7c30b224f909ea85d162ae65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &-8539089533449040199
@@ -142,6 +144,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e02eeb6ad314904db188a3fa6204532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1300232046518436515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564116883212529240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3322520477404608314

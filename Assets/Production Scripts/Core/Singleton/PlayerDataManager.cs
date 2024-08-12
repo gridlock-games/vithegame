@@ -700,8 +700,11 @@ namespace Vi.Core
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
             EventDelegateManager.sceneUnloaded -= OnSceneUnload;
 
-            NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
-            NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+            if (NetworkManager)
+            {
+                NetworkManager.OnClientConnectedCallback -= OnClientConnectCallback;
+                NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+            }
         }
 
         public SpawnPoints.TransformData[] GetEnvironmentViewPoints()
