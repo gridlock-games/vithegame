@@ -71,6 +71,13 @@ namespace Vi.Core
         protected void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
+            GlowRenderer = GetComponent<GlowRenderer>();
+        }
+
+        public GlowRenderer GlowRenderer { get; private set; }
+        protected void OnTransformChildrenChanged()
+        {
+            if (!GlowRenderer) { GlowRenderer = GetComponentInChildren<GlowRenderer>(); }
         }
 
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
@@ -112,12 +119,188 @@ namespace Vi.Core
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
 
         public virtual bool IsInvincible() { return false; }
+        public virtual bool IsUninterruptable() { return false; }
 
-        protected bool wasStaggeredThisFrame;
+        [HideInInspector] public bool wasStaggeredThisFrame;
         protected IEnumerator ResetStaggerBool()
         {
             yield return null;
             wasStaggeredThisFrame = false;
+        }
+
+        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter)
+        {
+            // Combination ailment logic here
+            bool applyAilmentRegardless = false;
+            ActionClip.Ailment attackAilment;
+            // These hit numbers are BEFORE the hit has been added to the weapon
+            if (hitCounter.ContainsKey(this))
+            {
+                if (attack.ailmentHitDefinition.Length > hitCounter[this].hitNumber)
+                {
+                    if (attack.ailmentHitDefinition[hitCounter[this].hitNumber]) // If we are in the ailment hit definition and it is true
+                    {
+                        attackAilment = attack.ailment;
+                    }
+                    else // If we are in the ailment hit definition, but it is false
+                    {
+                        attackAilment = ActionClip.Ailment.None;
+                    }
+                }
+                else // If we are out of the range of the ailment hit array
+                {
+                    attackAilment = attack.ailment;
+                }
+            }
+            else // First hit
+            {
+                if (attack.ailmentHitDefinition.Length > 0)
+                {
+                    if (attack.ailmentHitDefinition[0]) // If we are in the ailment hit definition and it is true
+                    {
+                        attackAilment = attack.ailment;
+                    }
+                    else // If we are in the ailment hit definition, but it is false
+                    {
+                        attackAilment = ActionClip.Ailment.None;
+                    }
+                }
+                else // If the ailment hit definition array is empty
+                {
+                    attackAilment = attack.ailment;
+                }
+            }
+
+            if (ailment.Value == ActionClip.Ailment.Stun & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Stagger; }
+            if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Stun & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockup; }
+
+            if (ailment.Value == ActionClip.Ailment.Stagger & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
+
+            if (ailment.Value == ActionClip.Ailment.Knockup & attackAilment == ActionClip.Ailment.Stun) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attackAilment == ActionClip.Ailment.Stagger) { attackAilment = ActionClip.Ailment.Knockdown; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attack.GetClipType() == ActionClip.ClipType.FlashAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
+            if (ailment.Value == ActionClip.Ailment.Knockup & attack.isFollowUpAttack) { attackAilment = ActionClip.Ailment.Knockup; applyAilmentRegardless = true; }
+
+            return (applyAilmentRegardless, attackAilment);
+        }
+
+        public bool ShouldPlayHitStop()
+        {
+            return Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration;
+        }
+
+        public bool ShouldShake()
+        {
+            return (Time.time - hitFreezeStartTime < ActionClip.HitStopEffectDuration) & shouldShake;
+        }
+
+        public const float ShakeAmount = 10;
+
+        private bool shouldShake;
+        private float hitFreezeStartTime = Mathf.NegativeInfinity;
+        protected void StartHitStop(CombatAgent attacker, bool isMeleeHit)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
+
+            if (isMeleeHit)
+            {
+                shouldShake = true;
+                attacker.shouldShake = false;
+
+                hitFreezeStartTime = Time.time;
+                attacker.hitFreezeStartTime = Time.time;
+
+                StartHitStopClientRpc(attacker.NetworkObjectId);
+            }
+            else
+            {
+                shouldShake = true;
+                hitFreezeStartTime = Time.time;
+
+                StartHitStopClientRpc();
+            }
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void StartHitStopClientRpc(ulong attackerNetObjId)
+        {
+            Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
+
+            shouldShake = true;
+            attacker.shouldShake = false;
+
+            hitFreezeStartTime = Time.time;
+            attacker.hitFreezeStartTime = Time.time;
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void StartHitStopClientRpc()
+        {
+            shouldShake = true;
+            hitFreezeStartTime = Time.time;
+        }
+
+        protected abstract PooledObject GetHitVFXPrefab();
+        protected abstract PooledObject GetBlockVFXPrefab();
+        protected abstract AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment);
+        protected abstract AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial);
+
+        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
+
+            GlowRenderer.RenderHit();
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>().GetHitSoundEffect(armorType, weaponBone, ailment),
+                impactPosition, Weapon.hitSoundEffectVolume);
+
+            RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        {
+            GlowRenderer.RenderHit();
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>().GetHitSoundEffect(armorType, weaponBone, ailment),
+                impactPosition, Weapon.hitSoundEffectVolume);
+        }
+
+        protected void RenderHitGlowOnly()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
+
+            GlowRenderer.RenderHit();
+
+            RenderHitGlowOnlyClientRpc();
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void RenderHitGlowOnlyClientRpc()
+        {
+            GlowRenderer.RenderHit();
+        }
+
+        protected void RenderBlock(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
+
+            GlowRenderer.RenderBlock();
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
+
+            RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
+        {
+            GlowRenderer.RenderBlock();
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject, GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
         }
     }
 }

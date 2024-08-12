@@ -49,6 +49,17 @@ namespace Vi.Core
             this.canFlashAttack = canFlashAttack;
         }
 
+        private void Start()
+        {
+            if (transform.root == transform)
+            {
+                foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
+                {
+                    RegisterNewRenderer(renderer);
+                }
+            }
+        }
+
         private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();
 
         public void RegisterNewRenderer(Renderer renderer)
