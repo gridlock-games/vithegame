@@ -19,6 +19,9 @@ namespace Vi.Core.CombatAgents
         [SerializeField] private float maxHP = 100;
 
         public override float GetMaxHP() { return maxHP; }
+        public override float GetMaxStamina() { return 100; }
+        public override float GetMaxSpirit() { return 100; }
+        public override float GetMaxRage() { return 100; }
 
         public override void OnNetworkSpawn()
         {

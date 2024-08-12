@@ -6,7 +6,7 @@ using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
-    public class PlayerSpawnPoints : MonoBehaviour
+    public class SpawnPoints : MonoBehaviour
     {
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];

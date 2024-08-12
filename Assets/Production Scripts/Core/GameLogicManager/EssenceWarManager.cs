@@ -37,7 +37,7 @@ namespace Vi.Core.GameModeManagers
         private IEnumerator SpawnAncients()
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
-            PlayerSpawnPoints playerSpawnPoints = PlayerDataManager.Singleton.GetPlayerSpawnPoints();
+            SpawnPoints playerSpawnPoints = PlayerDataManager.Singleton.GetPlayerSpawnPoints();
             Instantiate(ancientBossCorruptPrefab, playerSpawnPoints.ancientBossCorruptSpawnPoint.position, playerSpawnPoints.ancientBossCorruptSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
             Instantiate(ancientBossLightPrefab, playerSpawnPoints.ancientBossLightSpawnPoint.position, playerSpawnPoints.ancientBossLightSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
             Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);

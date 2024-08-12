@@ -11,10 +11,19 @@ namespace Vi.Core
     public abstract class CombatAgent : NetworkBehaviour
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
+        protected NetworkVariable<float> stamina = new NetworkVariable<float>();
+        protected NetworkVariable<float> spirit = new NetworkVariable<float>();
+        protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetHP() { return HP.Value; }
+        public float GetStamina() { return stamina.Value; }
+        public float GetSpirit() { return spirit.Value; }
+        public float GetRage() { return rage.Value; }
 
         public abstract float GetMaxHP();
+        public abstract float GetMaxStamina();
+        public abstract float GetMaxSpirit();
+        public abstract float GetMaxRage();
 
         public void AddHP(float amount)
         {

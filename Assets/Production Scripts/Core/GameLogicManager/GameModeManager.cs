@@ -49,7 +49,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
 
-            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            List<SpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
 
             bool shouldResetSpawnTracker = false;
             foreach (int index in gameItemSpawnIndexTracker)
@@ -78,7 +78,7 @@ namespace Vi.Core.GameModeManagers
 
             int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
             gameItemSpawnIndexTracker.Add(randomIndex);
-            PlayerSpawnPoints.TransformData spawnPoint = new PlayerSpawnPoints.TransformData();
+            SpawnPoints.TransformData spawnPoint = new SpawnPoints.TransformData();
             if (possibleSpawnPoints.Count != 0)
                 spawnPoint = possibleSpawnPoints[randomIndex];
             else
@@ -89,7 +89,7 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        protected GameItem SpawnGameItem(GameItem gameItemPrefab, PlayerSpawnPoints.TransformData spawnPoint)
+        protected GameItem SpawnGameItem(GameItem gameItemPrefab, SpawnPoints.TransformData spawnPoint)
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
 
@@ -98,11 +98,11 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        protected List<PlayerSpawnPoints.TransformData> GetGameItemSpawnPoints()
+        protected List<SpawnPoints.TransformData> GetGameItemSpawnPoints()
         {
             if (!IsServer) { Debug.LogError("GameModeManager.GetGameItemSpawnPoints() should only be called from the server!"); return null; }
 
-            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            List<SpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
 
             bool shouldResetSpawnTracker = false;
             foreach (int index in gameItemSpawnIndexTracker)

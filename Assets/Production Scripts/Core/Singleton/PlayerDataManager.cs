@@ -704,7 +704,7 @@ namespace Vi.Core
             NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
         }
 
-        public PlayerSpawnPoints.TransformData[] GetEnvironmentViewPoints()
+        public SpawnPoints.TransformData[] GetEnvironmentViewPoints()
         {
             if (playerSpawnPoints)
             {
@@ -713,18 +713,18 @@ namespace Vi.Core
             else
             {
                 Debug.LogWarning("Trying to access environment view points when there is no player spawn points object");
-                return new PlayerSpawnPoints.TransformData[0];
+                return new SpawnPoints.TransformData[0];
             }
         }
 
-        public PlayerSpawnPoints.TransformData[] GetGameItemSpawnPoints()
+        public SpawnPoints.TransformData[] GetGameItemSpawnPoints()
         {
             if (playerSpawnPoints)
             {
                 float distanceThreshold = 8;
-                List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = new List<PlayerSpawnPoints.TransformData>();
+                List<SpawnPoints.TransformData> possibleSpawnPoints = new List<SpawnPoints.TransformData>();
                 List<Attributes> localPlayerList = localPlayers.Values.ToList();
-                foreach (PlayerSpawnPoints.TransformData transformData in playerSpawnPoints.GetGameItemSpawnPoints())
+                foreach (SpawnPoints.TransformData transformData in playerSpawnPoints.GetGameItemSpawnPoints())
                 {
                     if (localPlayerList.TrueForAll(item => Vector3.Distance(item.transform.position, transformData.position) > distanceThreshold))
                     {
@@ -736,7 +736,7 @@ namespace Vi.Core
             else
             {
                 Debug.LogWarning("Trying to access game item spawn points when there is no player spawn points object");
-                return new PlayerSpawnPoints.TransformData[0];
+                return new SpawnPoints.TransformData[0];
             }
         }
 
@@ -745,7 +745,7 @@ namespace Vi.Core
             return playerSpawnPoints;
         }
 
-        public PlayerSpawnPoints GetPlayerSpawnPoints()
+        public SpawnPoints GetPlayerSpawnPoints()
         {
             return playerSpawnPoints;
         }
@@ -789,7 +789,7 @@ namespace Vi.Core
             }
         }
 
-        private PlayerSpawnPoints playerSpawnPoints;
+        private SpawnPoints playerSpawnPoints;
         void OnSceneLoad(Scene scene)
         {
             foreach (GameObject g in scene.GetRootGameObjects())
@@ -859,7 +859,7 @@ namespace Vi.Core
             {
                 if (NetSceneManager.Singleton.IsEnvironmentLoaded())
                 {
-                    playerSpawnPoints = FindFirstObjectByType<PlayerSpawnPoints>();
+                    playerSpawnPoints = FindFirstObjectByType<SpawnPoints>();
                 }
             }
         }
@@ -1041,7 +1041,7 @@ namespace Vi.Core
 
         public IEnumerator RespawnPlayer(Attributes attributesToRespawn)
         {
-            (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
+            (bool spawnPointFound, SpawnPoints.TransformData transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
             if (attributesToRespawn.GetTeam() != Team.Peaceful & attributesToRespawn.GetTeam() != Team.Spectator)
             {
                 float waitTime = 0;
@@ -1143,7 +1143,7 @@ namespace Vi.Core
 
             if (playerSpawnPoints)
             {
-                (bool spawnPointFound, PlayerSpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
+                (bool spawnPointFound, SpawnPoints.TransformData transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                 if (playerData.team != Team.Peaceful & playerData.team != Team.Spectator)
                 {
                     float waitTime = 0;

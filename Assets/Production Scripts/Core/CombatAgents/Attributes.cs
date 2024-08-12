@@ -46,17 +46,9 @@ namespace Vi.Core.CombatAgents
         }
 
         public override float GetMaxHP() { return weaponHandler.GetWeapon().GetMaxHP(); }
-        public float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
-        public float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
-        public float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
-
-        private NetworkVariable<float> stamina = new NetworkVariable<float>();
-        private NetworkVariable<float> spirit = new NetworkVariable<float>();
-        private NetworkVariable<float> rage = new NetworkVariable<float>();
-
-        public float GetStamina() { return stamina.Value; }
-        public float GetSpirit() { return spirit.Value; }
-        public float GetRage() { return rage.Value; }
+        public override float GetMaxStamina() { return weaponHandler.GetWeapon().GetMaxStamina(); }
+        public override float GetMaxSpirit() { return weaponHandler.GetWeapon().GetMaxSpirit(); }
+        public override float GetMaxRage() { return weaponHandler.GetWeapon().GetMaxRage(); }
 
         public void ResetStats(float hpPercentage, bool resetRage)
         {
@@ -75,20 +67,20 @@ namespace Vi.Core.CombatAgents
 
             if (amount > 0)
             {
-                if (stamina.Value < weaponHandler.GetWeapon().GetMaxStamina())
+                if (stamina.Value < GetMaxStamina())
                 {
-                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, GetMaxStamina());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (stamina.Value > weaponHandler.GetWeapon().GetMaxStamina())
+                if (stamina.Value > GetMaxStamina())
                 {
                     stamina.Value += amount;
                 }
                 else
                 {
-                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, weaponHandler.GetWeapon().GetMaxStamina());
+                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, GetMaxStamina());
                 }
             }
         }
@@ -100,20 +92,20 @@ namespace Vi.Core.CombatAgents
 
             if (amount > 0)
             {
-                if (spirit.Value < weaponHandler.GetWeapon().GetMaxSpirit())
+                if (spirit.Value < GetMaxSpirit())
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (spirit.Value > weaponHandler.GetWeapon().GetMaxSpirit())
+                if (spirit.Value > GetMaxSpirit())
                 {
                     spirit.Value += amount;
                 }
                 else
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, weaponHandler.GetWeapon().GetMaxSpirit());
+                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
                 }
             }
         }
@@ -122,20 +114,20 @@ namespace Vi.Core.CombatAgents
         {
             if (amount > 0)
             {
-                if (rage.Value < weaponHandler.GetWeapon().GetMaxRage())
+                if (rage.Value < GetMaxRage())
                 {
-                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (rage.Value > weaponHandler.GetWeapon().GetMaxRage())
+                if (rage.Value > GetMaxRage())
                 {
                     rage.Value += amount;
                 }
                 else
                 {
-                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, weaponHandler.GetWeapon().GetMaxRage());
+                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
                 }
             }
         }
