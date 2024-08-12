@@ -572,6 +572,19 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &340561407328105711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
 --- !u!114 &4202932918317016219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,6 +636,7 @@ MonoBehaviour:
   maxHP: 100
   hitVFXPrefab: {fileID: 0}
   blockVFXPrefab: {fileID: 0}
+  armorType: 0
 --- !u!114 &3235619416877000350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -712,19 +726,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73652a80d66e98a4da2e59bcef55b1ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &340561407328105711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5154451350289567119}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
 --- !u!1 &6037723977910187870 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7227590791192463121, guid: a25419db5e9becb4abb8edc5d77f0428,

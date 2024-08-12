@@ -62,7 +62,6 @@ namespace Vi.Core
         private CombatAgent lastAttackingCombatAgent;
         private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
-            Debug.Log("Processing hit " + attackerCombatAgent);
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -160,7 +159,6 @@ namespace Vi.Core
 
             StartHitStop(attackerCombatAgent, isMeleeHit);
 
-            AddHP(HPDamage);
             //if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             //{
             //    RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
@@ -212,6 +210,8 @@ namespace Vi.Core
 
         protected override PooledObject GetHitVFXPrefab() { return hitVFXPrefab; }
         protected override PooledObject GetBlockVFXPrefab() { return blockVFXPrefab; }
+
+        [SerializeField] private Weapon.ArmorType armorType;
 
         protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return null; }
         protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return null; }
