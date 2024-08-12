@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class GlowRenderer : MonoBehaviour
     {
         [SerializeField] private Material glowMaterial;

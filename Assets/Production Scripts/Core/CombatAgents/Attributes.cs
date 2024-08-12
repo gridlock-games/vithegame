@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace Vi.Core.CombatAgents
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : CombatAgent
     {
@@ -110,7 +111,7 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        public void AddRage(float amount)
+        public override void AddRage(float amount)
         {
             if (amount > 0)
             {

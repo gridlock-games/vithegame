@@ -10,6 +10,7 @@ using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(LimbReferences))]
     [RequireComponent(typeof(GlowRenderer))]

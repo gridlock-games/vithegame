@@ -585,6 +585,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
+--- !u!114 &606028978212446418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  materialReplacementDefintions: []
+  wearableEquipmentRendererDefinitions: []
 --- !u!114 &4202932918317016219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -618,6 +632,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1517308568555588994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aimTargetIKSolver: {fileID: 0}
+  rightHandAimRig: {fileID: 0}
+  rightHandAimBodyConstraint: {fileID: 0}
+  rightHandAimBodyInvertedConstraint: {fileID: 0}
+  rightHandAimConstraint: {fileID: 0}
+  leftHandAimRig: {fileID: 0}
+  leftHandAimBodyConstraint: {fileID: 0}
+  leftHandAimBodyInvertedConstraint: {fileID: 0}
+  leftHandAimConstraint: {fileID: 0}
+  rightHandReachRig: {fileID: 0}
+  leftHandReachRig: {fileID: 0}
+  meleeVerticalAimRig: {fileID: 0}
+  meleeVerticalAimConstraint: {fileID: 0}
+  rotationOffsetConstraint: {fileID: 0}
+  rotationOffsetAxis: 2
+  stowedWeaponParent: {fileID: 0}
 --- !u!114 &3115624215988016511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -634,8 +676,10 @@ MonoBehaviour:
     type: 3}
   wasStaggeredThisFrame: 0
   maxHP: 100
-  hitVFXPrefab: {fileID: 0}
-  blockVFXPrefab: {fileID: 0}
+  hitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
+    type: 3}
+  blockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
+    type: 3}
   armorType: 0
 --- !u!114 &3235619416877000350
 MonoBehaviour:
@@ -738,7 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55547efd7c30b224f909ea85d162ae65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1517308568555588994
+--- !u!114 &439555570492053616
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -747,39 +791,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5154451350289567119}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2d52d5621cc66643a517060a1c0db16, type: 3}
+  m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimTargetIKSolver: {fileID: 0}
-  rightHandAimRig: {fileID: 0}
-  rightHandAimBodyConstraint: {fileID: 0}
-  rightHandAimBodyInvertedConstraint: {fileID: 0}
-  rightHandAimConstraint: {fileID: 0}
-  leftHandAimRig: {fileID: 0}
-  leftHandAimBodyConstraint: {fileID: 0}
-  leftHandAimBodyInvertedConstraint: {fileID: 0}
-  leftHandAimConstraint: {fileID: 0}
-  rightHandReachRig: {fileID: 0}
-  leftHandReachRig: {fileID: 0}
-  meleeVerticalAimRig: {fileID: 0}
-  meleeVerticalAimConstraint: {fileID: 0}
-  rotationOffsetConstraint: {fileID: 0}
-  rotationOffsetAxis: 2
-  stowedWeaponParent: {fileID: 0}
---- !u!114 &606028978212446418
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5154451350289567119}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f5c2cc18f774dd4f8133860fc24c125, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  materialReplacementDefintions: []
-  wearableEquipmentRendererDefinitions: []
+  lastMeleeHitTime: -Infinity
 --- !u!1 &6037723977910187870 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7227590791192463121, guid: a25419db5e9becb4abb8edc5d77f0428,

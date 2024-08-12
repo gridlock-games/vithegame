@@ -8,6 +8,7 @@ using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
         public bool WaitingForActionToPlay { get; private set; }

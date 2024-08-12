@@ -7,6 +7,7 @@ using Vi.Utility;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(StatusAgent))]
     public abstract class CombatAgent : NetworkBehaviour
     {

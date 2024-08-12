@@ -6,6 +6,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class LimbReferences : MonoBehaviour
     {
         public enum Hand

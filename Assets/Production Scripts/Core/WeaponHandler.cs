@@ -11,6 +11,7 @@ using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class WeaponHandler : NetworkBehaviour
     {
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
@@ -21,7 +22,7 @@ namespace Vi.Core
         public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
 
         private Weapon weaponInstance;
-        private Attributes attributes;
+        private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
         private MovementHandler movementHandler;
         private LoadoutManager loadoutManager;
@@ -29,7 +30,7 @@ namespace Vi.Core
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
-            attributes = GetComponent<Attributes>();
+            combatAgent = GetComponent<CombatAgent>();
             movementHandler = GetComponent<MovementHandler>();
             loadoutManager = GetComponent<LoadoutManager>();
             weaponInstance = ScriptableObject.CreateInstance<Weapon>();
@@ -234,12 +235,26 @@ namespace Vi.Core
             actionSoundEffectIdTracker.Clear();
 
             // Action sound effect logic here for normalized time of 0
-            foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+            if (combatAgent is Attributes attributes)
             {
-                if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                    actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                    {
+                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                    }
+                }
+            }
+            else
+            {
+                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(CharacterReference.RaceAndGender.Universal, actionSoundEffectIdTracker))
+                {
+                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                    {
+                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                    }
                 }
             }
 
@@ -284,7 +299,7 @@ namespace Vi.Core
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
-                    attributes.StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
+                    combatAgent.StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
                 }
             }
         }
@@ -493,7 +508,7 @@ namespace Vi.Core
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {
-                        gameInteractiveActionVFX.InitializeVFX(attributes, CurrentActionClip);
+                        gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
                     }
                 }
             }
@@ -519,7 +534,7 @@ namespace Vi.Core
 
             if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = attributes.GetSpirit() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
+                IsBlocking = combatAgent.GetSpirit() > 0 | combatAgent.GetStamina() / combatAgent.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {
@@ -541,14 +556,28 @@ namespace Vi.Core
                         }
                     }
                 }
-                
+
                 // Action sound effect logic here
-                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+                if (combatAgent is Attributes attributes)
                 {
-                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
+                    foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
                     {
-                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                        if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
+                        {
+                            AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                            actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(CharacterReference.RaceAndGender.Universal, actionSoundEffectIdTracker))
+                    {
+                        if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
+                        {
+                            AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                            actionSoundEffectIdTracker.Add(actionSoundEffect.id);
+                        }
                     }
                 }
             }
@@ -632,9 +661,9 @@ namespace Vi.Core
 
                         if (!wasThereAHit)
                         {
-                            attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
-                            attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
-                            attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
+                            combatAgent.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
+                            combatAgent.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
+                            combatAgent.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
                 }
@@ -1049,7 +1078,8 @@ namespace Vi.Core
             animationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                CharacterReference.RaceAndGender raceAndGender = attributes.CachedPlayerData.character.raceAndGender;
+                CharacterReference.RaceAndGender raceAndGender = CharacterReference.RaceAndGender.Universal;
+                if (combatAgent is Attributes attributes) { raceAndGender = attributes.CachedPlayerData.character.raceAndGender; }
                 animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
