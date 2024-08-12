@@ -67,6 +67,22 @@ namespace Vi.Core
             return HP.Value;
         }
 
+        protected virtual void OnHPChanged(float prev, float current)
+        {
+            if (current < prev)
+            {
+                if (current <= 0)
+                {
+                    // Death
+                    //ailment.Value = ActionClip.Ailment.Death;
+                }
+            }
+            else if (current > prev)
+            {
+                GlowRenderer.RenderHeal();
+            }
+        }
+
         public StatusAgent StatusAgent { get; private set; }
         protected void Awake()
         {
@@ -84,11 +100,17 @@ namespace Vi.Core
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            ailment.OnValueChanged += OnAilmentChanged;
+            HP.OnValueChanged += OnHPChanged;
+
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
         }
 
         public override void OnNetworkDespawn()
         {
+            ailment.OnValueChanged -= OnAilmentChanged;
+            HP.OnValueChanged -= OnHPChanged;
+
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
         }
 
@@ -117,6 +139,8 @@ namespace Vi.Core
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
+
+        protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current) { }
 
         public virtual bool IsInvincible() { return false; }
         public virtual bool IsUninterruptable() { return false; }

@@ -62,6 +62,7 @@ namespace Vi.Core
         private CombatAgent lastAttackingCombatAgent;
         private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            Debug.Log("Processing hit " + attackerCombatAgent);
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -158,7 +159,8 @@ namespace Vi.Core
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
             StartHitStop(attackerCombatAgent, isMeleeHit);
-            
+
+            AddHP(HPDamage);
             //if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             //{
             //    RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);

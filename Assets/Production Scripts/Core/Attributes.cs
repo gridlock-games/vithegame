@@ -151,11 +151,9 @@ namespace Vi.Core
                 StartCoroutine(SetNetworkVisibilityAfterSpawn());
             }
 
-            HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
-            ailment.OnValueChanged += OnAilmentChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
@@ -222,11 +220,9 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            HP.OnValueChanged -= OnHPChanged;
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
             isRaging.OnValueChanged -= OnIsRagingChanged;
-            ailment.OnValueChanged -= OnAilmentChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
@@ -236,21 +232,9 @@ namespace Vi.Core
         private const float heartbeatVolume = 1;
         private const float heartbeatHPPercentageThreshold = 0.1f;
 
-        private void OnHPChanged(float prev, float current)
+        protected override void OnHPChanged(float prev, float current)
         {
-            if (current < prev)
-            {
-                if (current <= 0)
-                {
-                    // Death
-                    //ailment.Value = ActionClip.Ailment.Death;
-                }
-            }
-            else if (current > prev)
-            {
-                GlowRenderer.RenderHeal();
-            }
-
+            base.OnHPChanged(prev, current);
             if (IsLocalPlayer)
             {
                 if (current / GetMaxHP() < heartbeatHPPercentageThreshold)
@@ -1065,7 +1049,7 @@ namespace Vi.Core
 
         private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
-        private void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             animationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
