@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Unity.Collections;
 
 namespace Vi.Core
 {
@@ -98,10 +99,16 @@ namespace Vi.Core
         }
 
         public StatusAgent StatusAgent { get; private set; }
+        public AnimationHandler AnimationHandler { get; private set; }
+        public MovementHandler MovementHandler { get; private set; }
+        public WeaponHandler WeaponHandler { get; private set; }
         protected void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
+            AnimationHandler = GetComponent<AnimationHandler>();
             GlowRenderer = GetComponent<GlowRenderer>();
+            MovementHandler = GetComponent<MovementHandler>();
+            WeaponHandler = GetComponent<WeaponHandler>();
         }
 
         public GlowRenderer GlowRenderer { get; private set; }
@@ -147,10 +154,188 @@ namespace Vi.Core
 
         public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
 
-        public abstract void SetInviniciblity(float duration);
+        public virtual bool IsInvincible() { return isInvincible.Value; }
 
-        public abstract void SetUninterruptable(float duration);
+        private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
+        private float invincibilityEndTime;
+        public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
+        public bool IsUninterruptable() { return isUninterruptable.Value; }
+
+        private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
+        private float uninterruptableEndTime;
+        public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
+
+        protected NetworkVariable<ulong> grabAssailantDataId = new NetworkVariable<ulong>();
+        protected NetworkVariable<ulong> grabVictimDataId = new NetworkVariable<ulong>();
+        protected NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
+        protected NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
+
+        public void SetGrabVictim(ulong grabVictimNetworkObjectId) { grabVictimDataId.Value = grabVictimNetworkObjectId; }
+
+        public bool IsGrabbed() { return isGrabbed.Value; }
+
+        public CombatAgent GetGrabAssailant()
+        {
+            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(grabAssailantDataId.Value, out NetworkObject networkObject);
+            if (!networkObject) { return null; }
+            return networkObject.GetComponent<CombatAgent>();
+        }
+
+        public CombatAgent GetGrabVictim()
+        {
+            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(grabVictimDataId.Value, out NetworkObject networkObject);
+            if (!networkObject) { return null; }
+            return networkObject.GetComponent<CombatAgent>();
+        }
+
+        public AnimationClip GetGrabReactionClip()
+        {
+            CombatAgent grabAssailant = GetGrabAssailant();
+            if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
+
+            ActionClip grabAttackClip = grabAssailant.WeaponHandler.GetWeapon().GetActionClipByName(grabAttackClipName.Value.ToString());
+
+            if (!grabAttackClip.grabVictimClip) { Debug.LogError("Couldn't find grab reaction clip!"); }
+            return grabAttackClip.grabVictimClip;
+        }
+
+        public void CancelGrab()
+        {
+            if (IsGrabbed())
+            {
+                if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
+                isGrabbed.Value = false;
+                grabAssailantDataId.Value = default;
+                grabVictimDataId.Value = default;
+            }
+
+            if (AnimationHandler.IsGrabAttacking())
+            {
+                AnimationHandler.CancelAllActions(0.15f);
+            }
+        }
+
+        protected Coroutine grabResetCoroutine;
+        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
+        {
+            if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
+            if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
+
+            float durationLeft = AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
+            CombatAgent attacker = GetGrabAssailant();
+            while (true)
+            {
+                durationLeft -= Time.deltaTime;
+                if (attacker)
+                {
+                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    if (Vector3.Distance(victimNewPosition, MovementHandler.GetPosition()) > 1)
+                    {
+                        MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    }
+                }
+                else
+                {
+                    attacker = GetGrabAssailant();
+                }
+                yield return null;
+                if (durationLeft <= 0) { break; }
+            }
+            isGrabbed.Value = false;
+            grabAssailantDataId.Value = default;
+            grabVictimDataId.Value = default;
+        }
+
+        protected virtual void Update()
+        {
+            bool isInvincibleThisFrame = IsInvincible();
+            if (!isInvincibleThisFrame)
+            {
+                if (!IsLocalPlayer)
+                {
+                    if (AnimationHandler.IsGrabAttacking())
+                    {
+                        isInvincibleThisFrame = true;
+                    }
+                    else if (IsGrabbed())
+                    {
+                        CombatAgent grabAssailant = GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            if (!grabAssailant.IsLocalPlayer) { isInvincibleThisFrame = true; }
+                        }
+                    }
+                }
+            }
+
+            GlowRenderer.RenderInvincible(isInvincibleThisFrame);
+            GlowRenderer.RenderUninterruptable(IsUninterruptable());
+
+            bool evaluateInvinicibility = true;
+            bool evaluateUninterruptability = true;
+            if (AnimationHandler.IsActionClipPlaying(WeaponHandler.CurrentActionClip))
+            {
+                if (WeaponHandler.CurrentActionClip.isUninterruptable) { isUninterruptable.Value = true; evaluateUninterruptability = false; }
+                if (WeaponHandler.CurrentActionClip.isInvincible) { isInvincible.Value = true; evaluateInvinicibility = false; }
+            }
+
+            if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
+            if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
+        }
+
+        public void OnActivateRage()
+        {
+            if (!CanActivateRage()) { return; }
+            ActivateRage();
+        }
+
+        public bool IsRaging() { return isRaging.Value; }
+        protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
+        private void ActivateRage()
+        {
+            if (!IsSpawned) { Debug.LogError("Calling Attributes.ActivateRage() before this object is spawned!"); return; }
+
+            if (IsServer)
+            {
+                if (!CanActivateRage()) { return; }
+                isRaging.Value = true;
+            }
+            else
+            {
+                ActivateRageServerRpc();
+            }
+        }
+
+        public bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
+
+        [Rpc(SendTo.Server)] private void ActivateRageServerRpc() { ActivateRage(); }
+
+        public void ResetStats(float hpPercentage, bool resetRage)
+        {
+            damageMappingThisLife.Clear();
+            HP.Value = GetMaxHP() * hpPercentage;
+            spirit.Value = GetMaxSpirit();
+            stamina.Value = 0;
+            if (resetRage)
+                rage.Value = 0;
+        }
+
+        protected Dictionary<CombatAgent, float> damageMappingThisLife = new Dictionary<CombatAgent, float>();
+
+        public Dictionary<CombatAgent, float> GetDamageMappingThisLife() { return damageMappingThisLife; }
+
+        protected void AddDamageToMapping(CombatAgent attacker, float damage)
+        {
+            if (damageMappingThisLife.ContainsKey(attacker))
+            {
+                damageMappingThisLife[attacker] += damage;
+            }
+            else
+            {
+                damageMappingThisLife.Add(attacker, damage);
+            }
+        }
 
         protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
@@ -165,9 +350,6 @@ namespace Vi.Core
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current) { }
-
-        public virtual bool IsInvincible() { return false; }
-        public virtual bool IsUninterruptable() { return false; }
 
         [HideInInspector] public bool wasStaggeredThisFrame;
         protected IEnumerator ResetStaggerBool()

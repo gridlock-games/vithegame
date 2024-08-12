@@ -298,50 +298,64 @@ namespace Vi.Core.GameModeManagers
             return killHistoryList;
         }
 
-        public virtual void OnDamageOccuring(Attributes attacker, Attributes victim, float HPDamage)
+        public virtual void OnDamageOccuring(CombatAgent attacker, CombatAgent victim, float HPDamage)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int attackerIndex = scoreList.IndexOf(new PlayerScore(attacker.GetPlayerDataId()));
-                PlayerScore attackerScore = scoreList[attackerIndex];
-                attackerScore.cumulativeDamageDealt += HPDamage;
-                attackerScore.damageDealtThisRound += HPDamage;
-                scoreList[attackerIndex] = attackerScore;
-
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDamageRecieved += HPDamage;
-                victimScore.damageRecievedThisRound += HPDamage;
-                scoreList[victimIndex] = victimScore;
+                if (attacker is Attributes attackerAttributes)
+                {
+                    int attackerIndex = scoreList.IndexOf(new PlayerScore(attackerAttributes.GetPlayerDataId()));
+                    PlayerScore attackerScore = scoreList[attackerIndex];
+                    attackerScore.cumulativeDamageDealt += HPDamage;
+                    attackerScore.damageDealtThisRound += HPDamage;
+                    scoreList[attackerIndex] = attackerScore;
+                }
+                
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDamageRecieved += HPDamage;
+                    victimScore.damageRecievedThisRound += HPDamage;
+                    scoreList[victimIndex] = victimScore;
+                }
             }
         }
 
-        public virtual void OnPlayerKill(Attributes killer, Attributes victim)
+        public virtual void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-                PlayerScore killerScore = scoreList[killerIndex];
-                killerScore.cumulativeKills += 1;
-                killerScore.killsThisRound += 1;
-                scoreList[killerIndex] = killerScore;
+                if (killer is Attributes killerAttributes)
+                {
+                    int killerIndex = scoreList.IndexOf(new PlayerScore(killerAttributes.GetPlayerDataId()));
+                    PlayerScore killerScore = scoreList[killerIndex];
+                    killerScore.cumulativeKills += 1;
+                    killerScore.killsThisRound += 1;
+                    scoreList[killerIndex] = killerScore;
+                }
 
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDeaths += 1;
-                victimScore.deathsThisRound += 1;
-                scoreList[victimIndex] = victimScore;
-
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDeaths += 1;
+                    victimScore.deathsThisRound += 1;
+                    scoreList[victimIndex] = victimScore;
+                }
+                
                 // Damage is in negative numbers
-                Attributes assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
+                CombatAgent assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
                 if (assist)
                 {
-                    int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
-                    PlayerScore assistScore = scoreList[assistIndex];
-                    assistScore.cumulativeAssists += 1;
-                    assistScore.assistsThisRound += 1;
-                    scoreList[assistIndex] = assistScore;
-
+                    if (assist is Attributes assistAttributes)
+                    {
+                        int assistIndex = scoreList.IndexOf(new PlayerScore(assistAttributes.GetPlayerDataId()));
+                        PlayerScore assistScore = scoreList[assistIndex];
+                        assistScore.cumulativeAssists += 1;
+                        assistScore.assistsThisRound += 1;
+                        scoreList[assistIndex] = assistScore;
+                    }
                     killHistory.Add(new KillHistoryElement(killer, assist, victim));
                 }
                 else

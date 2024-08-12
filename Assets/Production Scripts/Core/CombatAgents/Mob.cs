@@ -98,7 +98,7 @@ namespace Vi.Core.CombatAgents
             {
                 attackAilment = ActionClip.Ailment.Death;
                 ailment.Value = ActionClip.Ailment.Death;
-                //animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
 
                 if (lastAttackingCombatAgent)
                 {
@@ -113,11 +113,11 @@ namespace Vi.Core.CombatAgents
             }
             else
             {
-                //ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
-                //animationHandler.PlayAction(hitReaction);
+                ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
+                AnimationHandler.PlayAction(hitReaction);
             }
 
-            //RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, animationHandler.GetArmorType(), Weapon.WeaponBone.Root, attackAilment);
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, armorType, Weapon.WeaponBone.Root, attackAilment);
             AddHP(damage);
             return true;
         }
@@ -160,9 +160,9 @@ namespace Vi.Core.CombatAgents
 
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
-            //float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
-            //ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, weaponHandler.IsBlocking, attackAilment, ailment.Value);
-            //hitReaction.SetHitReactionRootMotionMultipliers(attack);
+            float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
+            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
+            hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
             float HPDamage = -attack.damage;
             HPDamage *= attackerCombatAgent.StatusAgent.DamageMultiplier;
@@ -171,16 +171,16 @@ namespace Vi.Core.CombatAgents
             bool shouldPlayHitReaction = false;
             if (attackerCombatAgent is Attributes attacker)
             {
-                //if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
-                //{
-                //    HPDamage *= attacker.animationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                //    if (attack.canEnhance & attacker.animationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
-                //    {
-                //        HPDamage *= attack.enhancedChargeDamageMultiplier;
-                //    }
-                //}
+                if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                {
+                    HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                    if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
+                    {
+                        HPDamage *= attack.enhancedChargeDamageMultiplier;
+                    }
+                }
 
-                //if (attacker.animationHandler.IsCharging()) { shouldPlayHitReaction = true; }
+                if (attacker.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
 
                 attacker.AddHitToComboCounter();
             }
@@ -199,49 +199,49 @@ namespace Vi.Core.CombatAgents
                 //hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
             }
 
-            //bool hitReactionWasPlayed = false;
-            //if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
-            //{
-            //    if (hitReaction.ailment != ActionClip.Ailment.None)
-            //    {
-            //        if (attack.shouldPlayHitReaction
-            //            | ailment.Value != ActionClip.Ailment.None
-            //            | shouldPlayHitReaction)
-            //        {
-            //            if (hitReaction.ailment != ActionClip.Ailment.None)
-            //            {
-            //                //animationHandler.PlayAction(hitReaction);
-            //                hitReactionWasPlayed = true;
-            //            }
-            //        }
-            //    }
-            //}
+            bool hitReactionWasPlayed = false;
+            if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
+            {
+                if (hitReaction.ailment != ActionClip.Ailment.None)
+                {
+                    if (attack.shouldPlayHitReaction
+                        | ailment.Value != ActionClip.Ailment.None
+                        | shouldPlayHitReaction)
+                    {
+                        if (hitReaction.ailment != ActionClip.Ailment.None)
+                        {
+                            //animationHandler.PlayAction(hitReaction);
+                            hitReactionWasPlayed = true;
+                        }
+                    }
+                }
+            }
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
             StartHitStop(attackerCombatAgent, isMeleeHit);
 
-            //if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
-            //{
-            //    RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
-            //    float prevHP = GetHP();
-            //    AddHP(HPDamage);
-            //    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-            //    AddDamageToMapping(attacker, prevHP - GetHP());
-            //}
-            //else // Not blocking
-            //{
-            //    if (!Mathf.Approximately(HPDamage, 0))
-            //    {
-            //        RenderHit(attacker.NetworkObjectId, impactPosition, animationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
-            //        float prevHP = GetHP();
-            //        AddHP(HPDamage);
-            //        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-            //        AddDamageToMapping(attacker, prevHP - GetHP());
-            //    }
+            if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            {
+                RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+                float prevHP = GetHP();
+                AddHP(HPDamage);
+                //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                //AddDamageToMapping(attacker, prevHP - GetHP());
+            }
+            else // Not blocking
+            {
+                if (!Mathf.Approximately(HPDamage, 0))
+                {
+                    RenderHit(attackerCombatAgent.NetworkObjectId, impactPosition, armorType, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
+                    float prevHP = GetHP();
+                    AddHP(HPDamage);
+                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                    //AddDamageToMapping(attacker, prevHP - GetHP());
+                }
 
-            //    EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
-            //}
+                //EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
+            }
 
             if (IsServer)
             {
@@ -249,7 +249,7 @@ namespace Vi.Core.CombatAgents
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        //weaponHandler.SpawnActionVFX(weaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                        WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, actionVFX, attackerCombatAgent.transform, transform);
                     }
                 }
             }
@@ -277,15 +277,5 @@ namespace Vi.Core.CombatAgents
 
         protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return null; }
         protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return null; }
-
-        public override void SetInviniciblity(float duration)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void SetUninterruptable(float duration)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

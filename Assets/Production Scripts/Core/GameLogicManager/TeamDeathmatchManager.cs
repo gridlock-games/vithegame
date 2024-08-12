@@ -19,7 +19,7 @@ namespace Vi.Core.GameModeManagers
             if (IsServer) { roundResultMessage.Value = "Team deathmatch starting! "; }
         }
 
-        public override void OnPlayerKill(Attributes killer, Attributes victim)
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
 

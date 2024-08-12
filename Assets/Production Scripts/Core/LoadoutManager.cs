@@ -74,12 +74,12 @@ namespace Vi.Core
         }
 
         private WeaponHandler weaponHandler;
-        private Attributes attributes;
+        private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
-            attributes = GetComponent<Attributes>();
+            combatAgent = GetComponent<Attributes>();
             weaponHandler = GetComponent<WeaponHandler>();
 
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
@@ -92,8 +92,19 @@ namespace Vi.Core
         {
             currentEquippedWeapon.OnValueChanged += OnCurrentEquippedWeaponChange;
 
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
+            if (combatAgent is Attributes attributes)
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
+            }
+            else if (combatAgent is Mob mob)
+            {
+                // Equip weapon here
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle combat agent sub class! " + combatAgent);
+            }
         }
 
         private Coroutine applyLoadoutCoroutine;
@@ -226,12 +237,12 @@ namespace Vi.Core
                 case 1:
                     weaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(secondaryWeaponInstance);
-                    if (IsServer) { attributes.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
                     weaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     weaponHandler.SetStowedWeapon(primaryWeaponInstance);
-                    if (IsServer) { attributes.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");
@@ -242,7 +253,7 @@ namespace Vi.Core
 
         public bool CanSwapWeapons()
         {
-            if (attributes.GetAilment() != ActionClip.Ailment.None) { return false; }
+            if (combatAgent.GetAilment() != ActionClip.Ailment.None) { return false; }
             if (!animationHandler.IsAtRest()) { return false; }
             if (animationHandler.IsReloading()) { return false; }
             return true;
@@ -339,7 +350,7 @@ namespace Vi.Core
                         canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
-                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                combatAgent.GlowRenderer.RenderFlashAttack(canFlashAttack);
                 WeaponNameThatCanFlashAttack = canFlashAttack ? SecondaryWeaponOption.weapon.name : string.Empty;
             }
             else if (currentEquippedWeapon.Value == 2)
@@ -353,7 +364,7 @@ namespace Vi.Core
                         canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
-                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                combatAgent.GlowRenderer.RenderFlashAttack(canFlashAttack);
                 WeaponNameThatCanFlashAttack = canFlashAttack ? PrimaryWeaponOption.weapon.name : string.Empty;
             }
             else

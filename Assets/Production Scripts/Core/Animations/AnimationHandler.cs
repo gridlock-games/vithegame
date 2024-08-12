@@ -565,41 +565,34 @@ namespace Vi.Core
             yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(grabAttackClip));
 
             // Wait for a grab victim to be assigned
-            if (combatAgent is Attributes attributes)
+            yield return new WaitUntil(() => combatAgent.GetGrabVictim());
+            int successfulHits = 0;
+            CombatAgent grabVictim = combatAgent.GetGrabVictim();
+            int weaponBoneIndex = -1;
+            while (true)
             {
-                yield return new WaitUntil(() => attributes.GetGrabVictim());
-                int successfulHits = 0;
-                Attributes grabVictim = attributes.GetGrabVictim();
-                int weaponBoneIndex = -1;
-                while (true)
+                // If the grab attack is done playing, stop evaluating hits
+                if (!IsActionClipPlaying(grabAttackClip)) { break; }
+                // If the grab victim disconnects, stop evaluating hits
+                if (!grabVictim) { break; }
+
+                // If we are attacking, evaluate a hit
+                if (weaponHandler.IsAttacking)
                 {
-                    // If the grab attack is done playing, stop evaluating hits
-                    if (!IsActionClipPlaying(grabAttackClip)) { break; }
-                    // If the grab victim disconnects, stop evaluating hits
-                    if (!grabVictim) { break; }
+                    weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
+                    RuntimeWeapon runtimeWeapon = weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
 
-                    // If we are attacking, evaluate a hit
-                    if (weaponHandler.IsAttacking)
+                    bool hitSucesss = grabVictim.ProcessMeleeHit(combatAgent, grabAttackClip, runtimeWeapon,
+                        runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);
+
+                    if (hitSucesss)
                     {
-                        weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
-                        RuntimeWeapon runtimeWeapon = weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
-
-                        bool hitSucesss = grabVictim.ProcessMeleeHit(combatAgent, grabAttackClip, runtimeWeapon,
-                            runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);
-
-                        if (hitSucesss)
-                        {
-                            successfulHits++;
-                        }
+                        successfulHits++;
                     }
-
-                    if (successfulHits >= grabAttackClip.maxHitLimit) { break; }
-                    yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits(Animator.speed));
                 }
-            }
-            else
-            {
-                Debug.LogError("Trying to evaluate grab attack hits on a victim that isn't a player!");
+
+                if (successfulHits >= grabAttackClip.maxHitLimit) { break; }
+                yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits(Animator.speed));
             }
         }
 

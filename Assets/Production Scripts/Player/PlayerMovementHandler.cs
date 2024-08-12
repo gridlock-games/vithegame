@@ -523,12 +523,12 @@ namespace Vi.Player
                 {
                     if (attributes.IsGrabbed())
                     {
-                        Attributes grabAssailant = attributes.GetGrabAssailant();
+                        CombatAgent grabAssailant = attributes.GetGrabAssailant();
                         if (grabAssailant)
                         {
-                            if (grabAssailant.TryGetComponent(out AnimationHandler assailantAnimationHandler))
+                            if (grabAssailant.AnimationHandler)
                             {
-                                animationHandler.Animator.speed = assailantAnimationHandler.Animator.speed;
+                                animationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
                             }
                         }
                     }
