@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {

@@ -87,25 +87,25 @@ namespace Vi.Core
 
         public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
 
-        protected Attributes parentAttributes;
+        protected CombatAgent parentCombatAgent;
         protected WeaponHandler parentWeaponHandler;
         protected AnimationHandler parentAnimationHandler;
 
         protected Collider[] colliders;
         private Renderer[] renderers;
 
-        public Vector3 GetClosetPointFromAttributes(Attributes victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
+        public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
         protected void Start()
         {
-            parentAttributes = GetComponentInParent<Attributes>();
+            parentCombatAgent = GetComponentInParent<CombatAgent>();
             parentWeaponHandler = GetComponentInParent<WeaponHandler>();
             parentAnimationHandler = GetComponentInParent<AnimationHandler>();
 
             colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)
             {
-                col.enabled = parentAttributes.IsServer;
+                col.enabled = parentCombatAgent.IsServer;
             }
 
             renderers = GetComponentsInChildren<Renderer>(true);
@@ -113,7 +113,7 @@ namespace Vi.Core
             {
                 if (renderer is SkinnedMeshRenderer smr)
                 {
-                    smr.updateWhenOffscreen = parentAttributes.IsServer;
+                    smr.updateWhenOffscreen = parentCombatAgent.IsServer;
                 }
             }
         }

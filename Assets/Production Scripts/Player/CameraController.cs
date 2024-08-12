@@ -6,6 +6,7 @@ using UnityEngine.Rendering.Universal;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Player
 {

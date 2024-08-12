@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
 using UnityEngine.AddressableAssets;
+using Vi.Player;
 
 namespace Vi.UI
 {

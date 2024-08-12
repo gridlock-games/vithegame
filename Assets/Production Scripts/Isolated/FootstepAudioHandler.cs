@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core;
 
-namespace Vi.Core
+namespace Vi.Isolated
 {
     public class FootstepAudioHandler : MonoBehaviour
     {
         [SerializeField] private AudioClip[] footStepSounds;
         private const float volume = 0.05f;
 
-        Attributes attributes;
+        CombatAgent combatAgent;
         private void Awake()
         {
-            attributes = GetComponentInParent<Attributes>();
+            combatAgent = GetComponentInParent<CombatAgent>();
         }
 
         private bool footRaised;
         private const float footRaisedDistanceThreshold = 0.2f;
         private void LateUpdate()
         {
-            if (!attributes.IsSpawned) { return; }
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { return; }
+            if (!combatAgent.IsSpawned) { return; }
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {

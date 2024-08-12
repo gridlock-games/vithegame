@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.VFX;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {

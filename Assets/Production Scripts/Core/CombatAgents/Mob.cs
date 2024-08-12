@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.ScriptableObjects;
 
-namespace Vi.Core
+namespace Vi.Core.CombatAgents
 {
     public class Mob : CombatAgent
     {
@@ -59,7 +59,66 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
         }
 
-        private CombatAgent lastAttackingCombatAgent;
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
+            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            {
+                ailment.Value = ActionClip.Ailment.Death;
+                //animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (lastAttackingCombatAgent)
+                {
+                    //SetKiller((Attributes)lastAttackingCombatAgent);
+                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
+                }
+                else
+                {
+                    //killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                }
+            }
+            RenderHitGlowOnly();
+            AddHP(damage);
+            return true;
+        }
+
+        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Mob.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
+            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
+            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            {
+                attackAilment = ActionClip.Ailment.Death;
+                ailment.Value = ActionClip.Ailment.Death;
+                //animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+
+                if (lastAttackingCombatAgent)
+                {
+                    //SetKiller((Attributes)lastAttackingCombatAgent);
+                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
+                }
+                else
+                {
+                    //killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                }
+            }
+            else
+            {
+                //ActionClip hitReaction = weaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
+                //animationHandler.PlayAction(hitReaction);
+            }
+
+            //RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, animationHandler.GetArmorType(), Weapon.WeaponBone.Root, attackAilment);
+            AddHP(damage);
+            return true;
+        }
+
         private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)

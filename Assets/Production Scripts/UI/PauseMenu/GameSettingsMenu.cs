@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.Utility;
 using TMPro;
 using Unity.Netcode;
+using Vi.Player;
 
 namespace Vi.UI
 {

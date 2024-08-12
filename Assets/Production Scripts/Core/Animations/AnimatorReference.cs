@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
 using UnityEngine.SceneManagement;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {

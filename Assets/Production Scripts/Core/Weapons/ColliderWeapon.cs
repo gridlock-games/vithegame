@@ -49,16 +49,16 @@ namespace Vi.Core
 
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (parentAttributes == networkCollider.CombatAgent) { return; }
+                if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 
                 if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
 
-                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentAttributes,
+                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent,
                     parentWeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
-                    parentAttributes.transform.position
+                    parentCombatAgent.transform.position
                 );
 
                 if (bHit)
@@ -69,11 +69,11 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                actionVFX.OnHit(parentAttributes);
+                actionVFX.OnHit(parentCombatAgent);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
             {
-                gameItem.OnHit(parentAttributes);
+                gameItem.OnHit(parentCombatAgent);
             }
         }
 

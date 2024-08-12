@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Vi.Core
+namespace Vi.Player
 {
     public class UIDeadZoneElement : MonoBehaviour
     {

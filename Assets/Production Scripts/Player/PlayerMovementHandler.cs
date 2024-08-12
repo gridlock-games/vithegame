@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
-using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Player
 {

@@ -4,6 +4,8 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Vi.ScriptableObjects;
+using Vi.Core.CombatAgents;
+using Vi.Player;
 
 namespace Vi.UI
 {

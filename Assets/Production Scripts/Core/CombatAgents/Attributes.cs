@@ -8,7 +8,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using System.Linq;
 
-namespace Vi.Core
+namespace Vi.Core.CombatAgents
 {
     [RequireComponent(typeof(WeaponHandler))]
     public class Attributes : CombatAgent
@@ -356,8 +356,7 @@ namespace Vi.Core
             return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
         }
 
-        private CombatAgent lastAttackingCombatAgent;
-        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
@@ -383,7 +382,7 @@ namespace Vi.Core
             return true;
         }
 
-        public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
+        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }

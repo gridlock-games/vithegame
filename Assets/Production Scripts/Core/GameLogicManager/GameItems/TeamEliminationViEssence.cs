@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
+using Vi.Core.DynamicEnvironmentElements;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -28,14 +30,17 @@ namespace Vi.Core.GameModeManagers
         {
             if (!IsServer) { return; }
 
-            if (other.transform.root.TryGetComponent(out Attributes attributes))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
-                if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 0)
+                if (networkCollider.CombatAgent is Attributes attributes)
                 {
-                    PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
-                    teamEliminationManager.OnViEssenceActivation();
-                    NetworkObject.Despawn(true);
+                    List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
+                    if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 0)
+                    {
+                        PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
+                        teamEliminationManager.OnViEssenceActivation();
+                        NetworkObject.Despawn(true);
+                    }
                 }
             }
         }

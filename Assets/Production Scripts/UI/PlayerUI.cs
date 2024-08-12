@@ -10,6 +10,7 @@ using Unity.Netcode;
 using Vi.Player;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {

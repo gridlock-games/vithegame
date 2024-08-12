@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
+using Vi.Core.CombatAgents;
+using Vi.Core;
 
-namespace Vi.Core
+namespace Vi.Isolated
 {
     public class PartialSceneLoadAnchor : MonoBehaviour
     {

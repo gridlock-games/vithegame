@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {

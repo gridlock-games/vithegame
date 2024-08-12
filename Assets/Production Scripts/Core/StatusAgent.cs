@@ -8,12 +8,12 @@ namespace Vi.Core
 {
     public class StatusAgent : NetworkBehaviour
     {
-        private Attributes attributes;
+        private CombatAgent attributes;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
             activeStatuses = new NetworkList<int>();
-            attributes = GetComponent<Attributes>();
+            attributes = GetComponent<CombatAgent>();
         }
 
         public override void OnNetworkSpawn()

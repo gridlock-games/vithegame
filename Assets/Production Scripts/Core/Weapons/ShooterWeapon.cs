@@ -99,7 +99,7 @@ namespace Vi.Core
                         if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
                         if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (networkCollider.CombatAgent == parentAttributes) { continue; }
+                            if (networkCollider.CombatAgent == parentCombatAgent) { continue; }
                         }
                         else // No Network Collider
                         {
@@ -114,54 +114,54 @@ namespace Vi.Core
                         Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
                     
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(parentAttributes.OwnerClientId, true);
+                    netObj.SpawnWithOwnership(parentCombatAgent.OwnerClientId, true);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo)
                     {
                         int damageMultiplerIndex = parentWeaponHandler.GetMaxAmmoCount() - parentWeaponHandler.GetAmmoCount();
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce,
+                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentWeaponHandler.CurrentActionClip, projectileForce,
                             ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1);
 
                         parentWeaponHandler.UseAmmo();
                     }
                     else
                     {
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce, 1);
+                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentWeaponHandler.CurrentActionClip, projectileForce, 1);
                     }
-                    StartCoroutine(SetProjectileNetworkVisibility(netObj));
+                    //StartCoroutine(SetProjectileNetworkVisibility(netObj));
                 }
             }
         }
 
-        private IEnumerator SetProjectileNetworkVisibility(NetworkObject netObj)
-        {
-            yield return null;
-            if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
+        //private IEnumerator SetProjectileNetworkVisibility(NetworkObject netObj)
+        //{
+        //    yield return null;
+        //    if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
 
-            if (!netObj.IsNetworkVisibleTo(parentWeaponHandler.OwnerClientId)) { netObj.NetworkShow(parentWeaponHandler.OwnerClientId); }
-            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
-            {
-                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
-                if (networkId == 0) { continue; }
-                if (networkId == parentWeaponHandler.OwnerClientId) { continue; }
+        //    if (!netObj.IsNetworkVisibleTo(parentWeaponHandler.OwnerClientId)) { netObj.NetworkShow(parentWeaponHandler.OwnerClientId); }
+        //    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+        //    {
+        //        ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+        //        if (networkId == 0) { continue; }
+        //        if (networkId == parentWeaponHandler.OwnerClientId) { continue; }
 
-                if (playerData.channel == parentAttributes.CachedPlayerData.channel)
-                {
-                    if (!netObj.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkShow(networkId);
-                    }
-                }
-                else
-                {
-                    if (parentWeaponHandler.NetworkObject.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkHide(networkId);
-                    }
-                }
-            }
-        }
+        //        if (playerData.channel == parentCombatAgent.CachedPlayerData.channel)
+        //        {
+        //            if (!netObj.IsNetworkVisibleTo(networkId))
+        //            {
+        //                netObj.NetworkShow(networkId);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (parentWeaponHandler.NetworkObject.IsNetworkVisibleTo(networkId))
+        //            {
+        //                netObj.NetworkHide(networkId);
+        //            }
+        //        }
+        //    }
+        //}
 
         public float GetNextDamageMultiplier()
         {

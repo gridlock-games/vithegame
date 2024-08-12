@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.Core.GameModeManagers;
+using Vi.Core.CombatAgents;
 
-namespace Vi.Core
+namespace Vi.Core.DynamicEnvironmentElements
 {
     public class DamageCircle : NetworkBehaviour
     {

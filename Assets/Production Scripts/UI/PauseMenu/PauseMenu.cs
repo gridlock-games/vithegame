@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Player;
 
 namespace Vi.UI
 {

@@ -9,6 +9,7 @@ using Vi.Player;
 using Unity.Netcode;
 using UnityEngine.Profiling;
 using System.IO;
+using Vi.Core.CombatAgents;
 
 public class DebugOverlay : MonoBehaviour
 {

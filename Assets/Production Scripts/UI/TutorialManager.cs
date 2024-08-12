@@ -8,6 +8,7 @@ using Vi.Utility;
 using UnityEngine.UI;
 using Unity.Netcode;
 using jomarcentermjm.PlatformAPI;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {

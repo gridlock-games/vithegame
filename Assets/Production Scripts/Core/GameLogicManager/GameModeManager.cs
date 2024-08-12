@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Linq;
 using Vi.Utility;
 using Unity.Collections;
-using jomarcentermjm.PlatformAPI;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -150,48 +150,43 @@ namespace Vi.Core.GameModeManagers
             public FixedString64Bytes weaponName;
             public KillType killType;
 
-            public KillHistoryElement(Attributes killer, Attributes victim)
+            public KillHistoryElement(CombatAgent killer, CombatAgent victim)
             {
-                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
-                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
-                killerTeam = killerData.team;
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killer.GetTeam()) + killer.GetName();
+                killerTeam = killer.GetTeam();
                 killerNetObjId = killer.NetworkObjectId;
 
                 assistName = "";
                 assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = victimData.team;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
             }
 
-            public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
+            public KillHistoryElement(CombatAgent killer, CombatAgent assist, CombatAgent victim)
             {
-                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
-                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
-                killerTeam = killerData.team;
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killer.GetTeam()) + killer.GetName();
+                killerTeam = killer.GetTeam();
                 killerNetObjId = killer.NetworkObjectId;
 
-                PlayerDataManager.PlayerData assistData = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId());
-                assistName = PlayerDataManager.Singleton.GetTeamPrefix(assistData.team) + assistData.character.name;
-                assistTeam = assistData.team;
+                assistName = PlayerDataManager.Singleton.GetTeamPrefix(assist.GetTeam()) + assist.GetName();
+                assistTeam = assist.GetTeam();
                 assistNetObjId = assist.NetworkObjectId;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = victimData.team;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.PlayerWithAssist;
             }
 
-            public KillHistoryElement(Attributes victim)
+            public KillHistoryElement(CombatAgent victim)
             {
                 killerName = "";
                 killerTeam = PlayerDataManager.Team.Environment;
@@ -201,9 +196,8 @@ namespace Vi.Core.GameModeManagers
                 assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = PlayerDataManager.Team.Environment;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = "Environment";

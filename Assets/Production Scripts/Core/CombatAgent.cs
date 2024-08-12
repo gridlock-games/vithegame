@@ -133,9 +133,14 @@ namespace Vi.Core
 
         public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
 
+        protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
 
         public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
+
+        public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
+
+        public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
@@ -249,7 +254,7 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
-            Attributes attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<Attributes>();
+            CombatAgent attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
 
             shouldShake = true;
             attacker.shouldShake = false;

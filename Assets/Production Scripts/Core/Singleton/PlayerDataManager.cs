@@ -10,6 +10,7 @@ using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Utility;
 using Newtonsoft.Json;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {

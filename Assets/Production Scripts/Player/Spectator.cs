@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Player
 {

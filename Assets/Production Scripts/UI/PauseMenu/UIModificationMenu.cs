@@ -6,6 +6,7 @@ using Vi.Core;
 using System.Linq;
 using Vi.Utility;
 using Newtonsoft.Json;
+using Vi.Player;
 
 namespace Vi.UI
 {

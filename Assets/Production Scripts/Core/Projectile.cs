@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.VFX;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {

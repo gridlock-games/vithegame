@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {

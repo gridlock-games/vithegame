@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
