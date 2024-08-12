@@ -29,14 +29,19 @@ namespace Vi.ArtificialIntelligence
             base.Update();
             if (IsServer)
             {
-                if (Vector3.Distance(transform.position, navMeshAgent.destination) <= navMeshAgent.stoppingDistance - 0.5f)
+                if (NetworkManager.LocalClient.PlayerObject)
                 {
-                    float walkRadius = 500;
-                    Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                    randomDirection += transform.position;
-                    NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                    navMeshAgent.destination = hit.position;
+                    navMeshAgent.destination = NetworkManager.LocalClient.PlayerObject.transform.position;
                 }
+                
+                //if (Vector3.Distance(transform.position, navMeshAgent.destination) <= navMeshAgent.stoppingDistance - 0.5f)
+                //{
+                //    float walkRadius = 500;
+                //    Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                //    randomDirection += transform.position;
+                //    NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                //    navMeshAgent.destination = hit.position;
+                //}
 
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, navMeshAgent.velocity == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(navMeshAgent.velocity.normalized), rotationSpeed * Time.deltaTime);
 
