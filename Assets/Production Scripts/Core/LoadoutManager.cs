@@ -78,7 +78,7 @@ namespace Vi.Core
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
-            combatAgent = GetComponent<Attributes>();
+            combatAgent = GetComponent<CombatAgent>();
 
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
             {
@@ -98,6 +98,9 @@ namespace Vi.Core
             else if (combatAgent is Mob mob)
             {
                 // Equip weapon here
+                PrimaryWeaponOption = mob.GetWeaponOption();
+                SecondaryWeaponOption = mob.GetWeaponOption();
+                combatAgent.WeaponHandler.SetNewWeapon(mob.GetWeaponOption().weapon, mob.GetWeaponOption().animationController);
             }
             else
             {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
-using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {

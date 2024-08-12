@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using UnityEngine.SceneManagement;
 using Vi.Core.CombatAgents;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {

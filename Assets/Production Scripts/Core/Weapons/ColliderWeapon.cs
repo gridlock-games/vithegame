@@ -86,7 +86,7 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
-            if (!parentCombatAgent.WeaponHandler) { return; }
+            if (!parentCombatAgent) { return; }
 
             if (TryGetComponent(out BoxCollider boxCollider))
             {

@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Utility;
 using Vi.ScriptableObjects;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core.CombatAgents
 {
@@ -17,6 +18,9 @@ namespace Vi.Core.CombatAgents
         }
 
         [SerializeField] private float maxHP = 100;
+        [SerializeField] private CharacterReference.WeaponOption weaponOption;
+
+        public CharacterReference.WeaponOption GetWeaponOption() { return weaponOption; }
 
         public override float GetMaxHP() { return maxHP; }
         public override float GetMaxStamina() { return 100; }
@@ -196,7 +200,7 @@ namespace Vi.Core.CombatAgents
             if (AddHPWithoutApply(HPDamage) <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
-                //hitReaction = weaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
+                hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
             }
 
             bool hitReactionWasPlayed = false;
@@ -210,7 +214,7 @@ namespace Vi.Core.CombatAgents
                     {
                         if (hitReaction.ailment != ActionClip.Ailment.None)
                         {
-                            //animationHandler.PlayAction(hitReaction);
+                            AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;
                         }
                     }
@@ -226,8 +230,8 @@ namespace Vi.Core.CombatAgents
                 RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
                 float prevHP = GetHP();
                 AddHP(HPDamage);
-                //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                //AddDamageToMapping(attacker, prevHP - GetHP());
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attackerCombatAgent, this, prevHP - GetHP()); }
+                AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
             }
             else // Not blocking
             {
@@ -236,8 +240,8 @@ namespace Vi.Core.CombatAgents
                     RenderHit(attackerCombatAgent.NetworkObjectId, impactPosition, armorType, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
-                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    //AddDamageToMapping(attacker, prevHP - GetHP());
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attackerCombatAgent, this, prevHP - GetHP()); }
+                    AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
                 }
 
                 //EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
@@ -254,14 +258,14 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            //if (!IsUninterruptable())
-            //{
-            //    if (attack.shouldFlinch | IsRaging())
-            //    {
-            //        movementHandler.Flinch(attack.GetFlinchAmount());
-            //        if (!hitReactionWasPlayed & !IsGrabbed()) { animationHandler.PlayAction(weaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
-            //    }
-            //}
+            if (!IsUninterruptable())
+            {
+                if (attack.shouldFlinch | IsRaging())
+                {
+                    MovementHandler.Flinch(attack.GetFlinchAmount());
+                    if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                }
+            }
 
             lastAttackingCombatAgent = attackerCombatAgent;
             return true;

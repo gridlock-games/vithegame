@@ -450,6 +450,12 @@ CapsuleCollider:
   m_Height: 0.7744143
   m_Direction: 1
   m_Center: {x: 0.000000053061196, y: 0.289732, z: 9.056191e-11}
+--- !u!4 &1454056026632167658 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2569895333365911717, guid: a25419db5e9becb4abb8edc5d77f0428,
+    type: 3}
+  m_PrefabInstance: {fileID: 4001380580265078863}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3221038781553519369 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1960384997375974214, guid: a25419db5e9becb4abb8edc5d77f0428,
@@ -673,6 +679,10 @@ MonoBehaviour:
   rotationOffsetConstraint: {fileID: 0}
   rotationOffsetAxis: 2
   stowedWeaponParent: {fileID: 0}
+  keys: 1200000011000000
+  values:
+  - {fileID: 1454056026632167658}
+  - {fileID: 7319752541851652088}
 --- !u!114 &3115624215988016511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -689,6 +699,15 @@ MonoBehaviour:
     type: 3}
   wasStaggeredThisFrame: 0
   maxHP: 100
+  weaponOption:
+    name: Cave Crasher
+    weaponIcon: {fileID: 0}
+    killFeedIcon: {fileID: 0}
+    animationController: {fileID: 22100000, guid: 03b70aa871e6a284ea85b4392b989f9f,
+      type: 2}
+    weapon: {fileID: 11400000, guid: 028d93a5a99b5c94fba3664d6f155d14, type: 2}
+    weaponPreviewPrefab: {fileID: 0}
+    itemWebId: 
   hitVFXPrefab: {fileID: 1895856908668378941, guid: 42c427f9d12527f4b86f4e770b4ce034,
     type: 3}
   blockVFXPrefab: {fileID: 1148619535615574292, guid: ed0c022a338d3384d9ee622d354a94e2,
@@ -867,6 +886,12 @@ CapsuleCollider:
   m_Height: 0.94143695
   m_Direction: 0
   m_Center: {x: -0.3926021, y: -0.09346669, z: 0.0000001173841}
+--- !u!4 &7319752541851652088 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5914139282088148919, guid: a25419db5e9becb4abb8edc5d77f0428,
+    type: 3}
+  m_PrefabInstance: {fileID: 4001380580265078863}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7580468762752680429 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6824359011749015970, guid: a25419db5e9becb4abb8edc5d77f0428,

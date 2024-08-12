@@ -5,6 +5,7 @@ using Unity.Netcode;
 using System.Linq;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {

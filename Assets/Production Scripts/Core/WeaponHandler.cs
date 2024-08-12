@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {
@@ -141,7 +142,14 @@ namespace Vi.Core
                                 bone = transform;
                                 break;
                             default:
-                                bone = combatAgent.AnimationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
+                                if (combatAgent.AnimationHandler.Animator.avatar.isHuman)
+                                {
+                                    bone = combatAgent.AnimationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
+                                }
+                                else
+                                {
+                                    bone = combatAgent.AnimationHandler.LimbReferences.GetBoneTransform(modelData.weaponBone);
+                                }
                                 break;
                         }
 

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ProceduralAnimations;
 using UnityEngine.Animations.Rigging;
+using Vi.ScriptableObjects;
 
-namespace Vi.Core
+namespace Vi.ProceduralAnimations
 {
     [DisallowMultipleComponent]
     public class LimbReferences : MonoBehaviour
@@ -160,7 +161,19 @@ namespace Vi.Core
             if (rightHandReachRig) rightHandReachRig.weight = 0;
             if (leftHandReachRig) leftHandReachRig.weight = 0;
             if (meleeVerticalAimRig) meleeVerticalAimRig.weight = 0;
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (weaponBoneMapping.ContainsKey(keys[i]))
+                {
+                    Debug.LogError("Duplciate key found " + keys[i] + " " + name);
+                    continue;
+                }
+                weaponBoneMapping.Add(keys[i], values[i]);
+            }
         }
+
+        private Dictionary<Weapon.WeaponBone, Transform> weaponBoneMapping = new Dictionary<Weapon.WeaponBone, Transform>();
 
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
@@ -196,6 +209,7 @@ namespace Vi.Core
 
         public void SetMeleeVerticalAimEnabled(bool isEnabled)
         {
+            if (!meleeVerticalAimRig) { return; }
             meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
         }
 
@@ -233,6 +247,28 @@ namespace Vi.Core
             X,
             Y,
             Z
+        }
+
+        [Header("For Generic Rigs")]
+        [SerializeField] private Weapon.WeaponBone[] keys = new Weapon.WeaponBone[0];
+        [SerializeField] private Transform[] values = new Transform[0];
+
+        private void OnValidate()
+        {
+            if (keys.Length != values.Length) { Debug.LogError("Keys and Values must be the same length!"); }
+        }
+
+        public Transform GetBoneTransform(Weapon.WeaponBone weaponBone)
+        {
+            if (weaponBoneMapping.ContainsKey(weaponBone))
+            {
+                return weaponBoneMapping[weaponBone];
+            }
+            else
+            {
+                Debug.LogError("Weapon bone not present in mapping! " + weaponBone + " " + name);
+            }
+            return null;
         }
     }
 }
