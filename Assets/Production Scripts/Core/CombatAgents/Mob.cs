@@ -277,5 +277,15 @@ namespace Vi.Core.CombatAgents
 
         protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return null; }
         protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return null; }
+
+        public override void SetInviniciblity(float duration)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void SetUninterruptable(float duration)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

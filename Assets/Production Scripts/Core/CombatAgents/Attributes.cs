@@ -60,7 +60,7 @@ namespace Vi.Core.CombatAgents
                 rage.Value = 0;
         }
 
-        public void AddStamina(float amount, bool activateCooldown = true)
+        public override void AddStamina(float amount, bool activateCooldown = true)
         {
             if (activateCooldown)
                 staminaDelayCooldown = weaponHandler.GetWeapon().GetStaminaDelay();
@@ -85,7 +85,7 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        public void AddSpirit(float amount)
+        private void AddSpirit(float amount)
         {
             if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
             if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
@@ -329,12 +329,12 @@ namespace Vi.Core.CombatAgents
         public override bool IsInvincible() { return isInvincible.Value; }
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
-        public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
+        public override void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
         public override bool IsUninterruptable() { return isUninterruptable.Value; }
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
-        public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
+        public override void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
@@ -1105,7 +1105,6 @@ namespace Vi.Core.CombatAgents
             IsRespawning = false;
         }
 
-        public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 

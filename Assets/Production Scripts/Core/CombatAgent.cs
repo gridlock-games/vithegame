@@ -76,6 +76,10 @@ namespace Vi.Core
             return HP.Value;
         }
 
+        public virtual void AddStamina(float amount, bool activateCooldown = true) { }
+
+        public virtual void AddRage(float amount) { }
+
         protected virtual void OnHPChanged(float prev, float current)
         {
             if (current < prev)
@@ -142,6 +146,11 @@ namespace Vi.Core
 
         public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
 
+        public abstract void SetInviniciblity(float duration);
+
+        public abstract void SetUninterruptable(float duration);
+
+
         protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
 
@@ -153,7 +162,7 @@ namespace Vi.Core
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-
+        public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current) { }
 
         public virtual bool IsInvincible() { return false; }

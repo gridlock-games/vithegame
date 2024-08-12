@@ -150,15 +150,15 @@ namespace Vi.Core
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
 
-            rightHandAimRig.weight = 0;
-            rightHandAimBodyConstraint.weight = 0;
-            rightHandAimBodyInvertedConstraint.weight = 0;
-            leftHandAimRig.weight = 0;
-            leftHandAimBodyConstraint.weight = 0;
-            leftHandAimBodyInvertedConstraint.weight = 0;
-            rightHandReachRig.weight = 0;
-            leftHandReachRig.weight = 0;
-            meleeVerticalAimRig.weight = 0;
+            if (rightHandAimRig) rightHandAimRig.weight = 0;
+            if (rightHandAimBodyConstraint) rightHandAimBodyConstraint.weight = 0;
+            if (rightHandAimBodyInvertedConstraint) rightHandAimBodyInvertedConstraint.weight = 0;
+            if (leftHandAimRig) leftHandAimRig.weight = 0;
+            if (leftHandAimBodyConstraint) leftHandAimBodyConstraint.weight = 0;
+            if (leftHandAimBodyInvertedConstraint) leftHandAimBodyInvertedConstraint.weight = 0;
+            if (rightHandReachRig) rightHandReachRig.weight = 0;
+            if (leftHandReachRig) leftHandReachRig.weight = 0;
+            if (meleeVerticalAimRig) meleeVerticalAimRig.weight = 0;
         }
 
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
@@ -200,6 +200,7 @@ namespace Vi.Core
 
         public void SetRotationOffset(float angle)
         {
+            if (!rotationOffsetConstraint) { return; }
             Vector3 targetOffset = Vector3.zero;
             switch (rotationOffsetAxis)
             {

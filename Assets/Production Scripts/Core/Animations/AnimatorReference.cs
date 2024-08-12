@@ -299,8 +299,7 @@ namespace Vi.Core
 
         Animator animator;
         WeaponHandler weaponHandler;
-        Attributes attributes;
-        MovementHandler movementHandler;
+        CombatAgent combatAgent;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
         AnimationHandler animationHandler;
@@ -309,10 +308,10 @@ namespace Vi.Core
         {
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
-            weaponHandler = GetComponentInParent<WeaponHandler>();
-            animationHandler = weaponHandler.GetComponent<AnimationHandler>();
-            attributes = weaponHandler.GetComponent<Attributes>();
-            movementHandler = weaponHandler.GetComponent<MovementHandler>();
+
+            combatAgent = GetComponentInParent<CombatAgent>();
+            weaponHandler = combatAgent.GetComponent<WeaponHandler>();
+            animationHandler = combatAgent.GetComponent<AnimationHandler>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
 
@@ -353,6 +352,7 @@ namespace Vi.Core
 
         public bool ShouldApplyRootMotion()
         {
+            if (!weaponHandler) { return false; }
             if (!weaponHandler.CurrentActionClip) { return false; }
             return weaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
         }
@@ -360,7 +360,6 @@ namespace Vi.Core
         private void Update()
         {
             limbReferences.SetRotationOffset(IsAtRest() ? 0 : weaponHandler.CurrentActionClip.YAngleRotationOffset);
-
         }
 
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
@@ -401,14 +400,21 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
+                if (combatAgent is Attributes attributes)
                 {
-                    curveAdjustedLocalRootMotion = Vector3.zero;
-                }
-                else if (attributes.IsPulled())
-                {
-                    //movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                    if (attributes.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
+                    {
+                        curveAdjustedLocalRootMotion = Vector3.zero;
+                    }
+                    else if (attributes.IsPulled())
+                    {
+                        //movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
+                        curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
+                    }
+                    else
+                    {
+                        curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+                    }
                 }
                 else
                 {
