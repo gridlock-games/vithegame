@@ -109,7 +109,7 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     newRotation = attributes.GetAilmentRotation();
-                else if (animationHandler.IsGrabAttacking())
+                else if (attributes.AnimationHandler.IsGrabAttacking())
                     newRotation = inputPayload.rotation;
                 else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
@@ -161,19 +161,19 @@ namespace Vi.Player
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
             }
-            else if (animationHandler.ShouldApplyRootMotion())
+            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
             {
                 if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
                 {
                     movement = Vector3.zero;
                 }
-                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | animationHandler.IsLunging())
+                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
                 {
                     movement = rootMotion;
 
@@ -222,11 +222,11 @@ namespace Vi.Player
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount() : 0;
-                movement = attributes.StatusAgent.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
-            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
             float yOffset = 0.2f;
@@ -359,13 +359,11 @@ namespace Vi.Player
 
         private PlayerNetworkMovementPrediction movementPrediction;
         private Attributes attributes;
-        private AnimationHandler animationHandler;
         private void Start()
         {
             movementPredictionRigidbody.transform.SetParent(null, true);
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             attributes = GetComponent<Attributes>();
-            animationHandler = GetComponent<AnimationHandler>();
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
             {
@@ -391,7 +389,7 @@ namespace Vi.Player
 
             if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
             {
-                SetImmovable(animationHandler.IsGrabAttacking());
+                SetImmovable(attributes.AnimationHandler.IsGrabAttacking());
             }
             else
             {
@@ -453,9 +451,9 @@ namespace Vi.Player
 #endif
 
             UpdateLocomotion();
-            animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            animationHandler.Animator.SetBool("IsGrounded", isGrounded);
+            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded);
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
@@ -463,7 +461,7 @@ namespace Vi.Player
         Vector3 forceAccumulated;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !animationHandler.IsGrabAttacking()) { forceAccumulated += force * Time.fixedDeltaTime; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += force * Time.fixedDeltaTime; }
         }
 
         private float positionStrength = 1;
@@ -517,7 +515,7 @@ namespace Vi.Player
             {
                 if (attributes.ShouldPlayHitStop())
                 {
-                    animationHandler.Animator.speed = 0;
+                    attributes.AnimationHandler.Animator.speed = 0;
                 }
                 else
                 {
@@ -528,13 +526,13 @@ namespace Vi.Player
                         {
                             if (grabAssailant.AnimationHandler)
                             {
-                                animationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
+                                attributes.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
                             }
                         }
                     }
                     else
                     {
-                        animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (animationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                        attributes.AnimationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
                     }
                 }
             }
@@ -550,7 +548,7 @@ namespace Vi.Player
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
-                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | animationHandler.IsLunging())
+                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | attributes.AnimationHandler.IsLunging())
                     {
                         ExtDebug.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
                         int cameraHitsCount = Physics.BoxCastNonAlloc(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset,
@@ -596,9 +594,9 @@ namespace Vi.Player
 
         public void OnDodge()
         {
-            if (animationHandler.IsReloading()) { return; }
+            if (attributes.AnimationHandler.IsReloading()) { return; }
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
-            animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+            attributes.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
 
         private string[] interactableRaycastLayers = new string[]

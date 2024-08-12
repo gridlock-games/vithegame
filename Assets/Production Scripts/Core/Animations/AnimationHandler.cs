@@ -33,11 +33,11 @@ namespace Vi.Core
         {
             try
             {
-                return weaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
+                return combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
             }
             catch
             {
-                Debug.LogError("Action clip " + actionClip.name + " is not present in the animator override controller! " + weaponHandler.AnimatorOverrideControllerInstance);
+                Debug.LogError("Action clip " + actionClip.name + " is not present in the animator override controller! " + combatAgent.WeaponHandler.AnimatorOverrideControllerInstance);
                 return 2;
             }
         }
@@ -212,7 +212,7 @@ namespace Vi.Core
             combatAgent.SetUninterruptable(0);
             combatAgent.ResetAilment();
             combatAgent.StatusAgent.RemoveAllStatuses();
-            weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
 
             CancelAllActionsClientRpc(transitionTime);
         }
@@ -229,7 +229,7 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
-            weaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
         }
 
         // Stores the type of the last action clip played
@@ -251,21 +251,21 @@ namespace Vi.Core
         {
             WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
-            if (!movementHandler.CanMove()) { return; }
+            if (!combatAgent.MovementHandler.CanMove()) { return; }
             if ((combatAgent.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
-            if (actionClip.mustBeAiming & !weaponHandler.IsAiming()) { return; }
+            if (actionClip.mustBeAiming & !combatAgent.WeaponHandler.IsAiming()) { return; }
             if (combatAgent.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (weaponHandler.GetWeapon().IsDodgeOnCooldown()) { return; }
+                if (combatAgent.WeaponHandler.GetWeapon().IsDodgeOnCooldown()) { return; }
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
-                if (weaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
+                if (combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
             }
 
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
@@ -279,7 +279,7 @@ namespace Vi.Core
             
             if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
             {
-                ActionClip lungeClip = Instantiate(weaponHandler.GetWeapon().GetLungeClip());
+                ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
                 lungeClip.name = lungeClip.name.Replace("(Clone)", "");
                 lungeClip.isInvincible = actionClip.isInvincible;
                 lungeClip.isUninterruptable = actionClip.isUninterruptable;
@@ -358,7 +358,7 @@ namespace Vi.Core
                                 }
                                 else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
                                 {
-                                    if (weaponHandler.IsInRecovery) { return; }
+                                    if (combatAgent.WeaponHandler.IsInRecovery) { return; }
                                 }
                             }
                         }
@@ -444,7 +444,7 @@ namespace Vi.Core
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
-                if (clipTypesToCheckForCancellation.Contains(actionClip.GetClipType()) & !weaponHandler.IsInRecovery & clipTypesToCheckForCancellation.Contains(lastClipPlayed.GetClipType()))
+                if (clipTypesToCheckForCancellation.Contains(actionClip.GetClipType()) & !combatAgent.WeaponHandler.IsInRecovery & clipTypesToCheckForCancellation.Contains(lastClipPlayed.GetClipType()))
                 {
                     if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
                     & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
@@ -477,7 +477,7 @@ namespace Vi.Core
 
             // At this point we are going to play the action clip
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
+            combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
@@ -502,11 +502,11 @@ namespace Vi.Core
                 {
                     if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                     {
-                        weaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attr.GetGrabReactionClip();
+                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attr.GetGrabReactionClip();
                     }
                     else
                     {
-                        weaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
+                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                     }
                 }
             }
@@ -550,7 +550,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, weaponHandler.GetWeapon().name, transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name, transitionTime);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
         }
@@ -561,7 +561,7 @@ namespace Vi.Core
             if (grabAttackClip.GetClipType() != ActionClip.ClipType.GrabAttack) { Debug.LogError("AnimationHandler.EvaluateGrabAttackHits() should only be called with a grab attack action clip!"); yield break; }
 
             // Wait until grab attack is playing fully
-            yield return new WaitUntil(() => weaponHandler.CurrentActionClip == grabAttackClip);
+            yield return new WaitUntil(() => combatAgent.WeaponHandler.CurrentActionClip == grabAttackClip);
             yield return new WaitUntil(() => IsActionClipPlayingInCurrentState(grabAttackClip));
 
             // Wait for a grab victim to be assigned
@@ -577,10 +577,10 @@ namespace Vi.Core
                 if (!grabVictim) { break; }
 
                 // If we are attacking, evaluate a hit
-                if (weaponHandler.IsAttacking)
+                if (combatAgent.WeaponHandler.IsAttacking)
                 {
                     weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
-                    RuntimeWeapon runtimeWeapon = weaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
+                    RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
 
                     bool hitSucesss = grabVictim.ProcessMeleeHit(combatAgent, grabAttackClip, runtimeWeapon,
                         runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);
@@ -631,7 +631,7 @@ namespace Vi.Core
                 switch (actionClip.GetClipType())
                 {
                     case ActionClip.ClipType.Dodge:
-                        return attributes.IsRaging() & actionClip.isAffectedByRage ? weaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : weaponHandler.GetWeapon().dodgeStaminaCost;
+                        return attributes.IsRaging() & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
                     case ActionClip.ClipType.LightAttack:
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
@@ -652,7 +652,7 @@ namespace Vi.Core
                 switch (actionClip.GetClipType())
                 {
                     case ActionClip.ClipType.Dodge:
-                        return weaponHandler.GetWeapon().dodgeStaminaCost;
+                        return combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
                     case ActionClip.ClipType.LightAttack:
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
@@ -903,13 +903,13 @@ namespace Vi.Core
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
-            if (weaponHandler.GetWeapon().name != weaponName)
+            if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
             {
-                yield return new WaitUntil(() => weaponHandler.GetWeapon().name == weaponName);
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name == weaponName);
             }
 
             // Retrieve the ActionClip based on the actionStateName
-            ActionClip actionClip = weaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
@@ -929,11 +929,11 @@ namespace Vi.Core
                     if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                     {
                         yield return new WaitUntil(() => attributes.GetGrabAssailant());
-                        weaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attributes.GetGrabReactionClip();
+                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attributes.GetGrabReactionClip();
                     }
                     else
                     {
-                        weaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
+                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                     }
                 }
             }
@@ -967,7 +967,7 @@ namespace Vi.Core
             }
 
             // Set the current action clip for the weapon handler
-            weaponHandler.SetActionClip(actionClip, weaponHandler.GetWeapon().name);
+            combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             lastClipPlayed = actionClip;
@@ -978,7 +978,7 @@ namespace Vi.Core
         // Coroutine for setting invincibility status during a dodge
         private void SetInvincibleStatusOnDodge(string actionStateName)
         {
-            combatAgent.SetInviniciblity(weaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
+            combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
@@ -1077,13 +1077,9 @@ namespace Vi.Core
         private int flinchLayerIndex;
 
         CombatAgent combatAgent;
-        WeaponHandler weaponHandler;
-        MovementHandler movementHandler;
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
-            weaponHandler = GetComponent<WeaponHandler>();
-            movementHandler = GetComponent<MovementHandler>();
 
             if (combatAgent is not Attributes)
             {
@@ -1129,7 +1125,7 @@ namespace Vi.Core
                 }
             }
 
-            LimbReferences.SetMeleeVerticalAimConstraintOffset(weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
+            LimbReferences.SetMeleeVerticalAimConstraintOffset(combatAgent.WeaponHandler.IsInAnticipation | combatAgent.WeaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
         }
     }

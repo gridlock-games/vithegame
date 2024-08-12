@@ -148,7 +148,7 @@ namespace Vi.UI
                 KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
                 if (kvp.Value)
                 {
-                    localWeaponHandler = kvp.Value.GetComponent<WeaponHandler>();
+                    localWeaponHandler = kvp.Value.WeaponHandler;
                 }
             }
         }

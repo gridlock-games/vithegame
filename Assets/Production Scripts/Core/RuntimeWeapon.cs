@@ -77,8 +77,8 @@ namespace Vi.Core
             Dictionary<CombatAgent, HitCounterData> hitCounter = GetHitCounter();
             if (hitCounter.ContainsKey(attributes))
             {
-                if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
-                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed)) { return false; }
+                if (hitCounter[attributes].hitNumber >= parentCombatAgent.WeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
+                if (Time.time - hitCounter[attributes].timeOfHit < parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed)) { return false; }
             }
             return true;
         }
@@ -88,8 +88,6 @@ namespace Vi.Core
         public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
 
         protected CombatAgent parentCombatAgent;
-        protected WeaponHandler parentWeaponHandler;
-        protected AnimationHandler parentAnimationHandler;
 
         protected Collider[] colliders;
         private Renderer[] renderers;
@@ -99,8 +97,6 @@ namespace Vi.Core
         protected void Start()
         {
             parentCombatAgent = GetComponentInParent<CombatAgent>();
-            parentWeaponHandler = GetComponentInParent<WeaponHandler>();
-            parentAnimationHandler = GetComponentInParent<AnimationHandler>();
 
             colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)

@@ -164,7 +164,7 @@ namespace Vi.Core.GameModeManagers
                 victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
-                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                weaponName = killer.WeaponHandler.GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
             }
 
@@ -182,7 +182,7 @@ namespace Vi.Core.GameModeManagers
                 victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
-                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                weaponName = killer.WeaponHandler.GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.PlayerWithAssist;
             }
 
@@ -844,7 +844,7 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
 
-                    if (attributes.TryGetComponent(out AnimationHandler animationHandler)) { StartCoroutine(PlayAnimation(animationHandler, isVictor)); }
+                    StartCoroutine(PlayAnimation(attributes.AnimationHandler, isVictor));
                 }
             }
             scoresToEvaluate.Clear();
