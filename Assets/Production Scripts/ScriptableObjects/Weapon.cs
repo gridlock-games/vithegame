@@ -586,9 +586,10 @@ namespace Vi.ScriptableObjects
         public ActionClip GetLungeClip() { return lunge; }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
-
+        private bool awakeCalled = false;
         private void Awake()
         {
+            awakeCalled = true;
             if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
             if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
             if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
@@ -640,7 +641,11 @@ namespace Vi.ScriptableObjects
             }
             else
             {
-                if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
+                if (Application.isPlaying)
+                {
+                    Debug.LogError("Action clip Not Found: " + clipName);
+                    Debug.LogError("Awake called: " + awakeCalled + " Action Clip Lookup Dictionary Count: " + actionClipLookup.Count);
+                }
                 return null;
             }
         }

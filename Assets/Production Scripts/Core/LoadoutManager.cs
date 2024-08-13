@@ -98,26 +98,14 @@ namespace Vi.Core
             else if (combatAgent is Mob mob)
             {
                 // Equip weapon here
-                StartCoroutine(EquipWeaponAfterStartCalled(mob.GetWeaponOption()));
+                PrimaryWeaponOption = mob.GetWeaponOption();
+                SecondaryWeaponOption = mob.GetWeaponOption();
+                combatAgent.WeaponHandler.SetNewWeapon(mob.GetWeaponOption().weapon, mob.GetWeaponOption().animationController);
             }
             else
             {
                 Debug.LogError("Unsure how to handle combat agent sub class! " + combatAgent);
             }
-        }
-
-        private bool startCalled;
-        private void Start()
-        {
-            startCalled = true;
-        }
-
-        private IEnumerator EquipWeaponAfterStartCalled(CharacterReference.WeaponOption weaponOption)
-        {
-            yield return new WaitUntil(() => startCalled);
-            PrimaryWeaponOption = weaponOption;
-            SecondaryWeaponOption = weaponOption;
-            combatAgent.WeaponHandler.SetNewWeapon(weaponOption.weapon, weaponOption.animationController);
         }
 
         private Coroutine applyLoadoutCoroutine;
