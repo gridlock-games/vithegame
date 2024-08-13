@@ -28,13 +28,13 @@ namespace Vi.Core.VFX
 
         public bool ShouldBlockProjectiles() { return shouldBlockProjectiles; }
 
-        protected Attributes attacker;
+        protected CombatAgent attacker;
         protected ActionClip attack;
 
-        public Attributes GetAttacker() { return attacker; }
+        public CombatAgent GetAttacker() { return attacker; }
         public ActionClip GetAttack() { return attack; }
 
-        public virtual void InitializeVFX(Attributes attacker, ActionClip attack)
+        public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             this.attacker = attacker;
             this.attack = attack;
@@ -61,7 +61,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        public virtual void OnHit(Attributes attacker)
+        public virtual void OnHit(CombatAgent attacker)
         {
             if (!IsSpawned) { return; }
             if (shouldDestroyOnEnemyHit)

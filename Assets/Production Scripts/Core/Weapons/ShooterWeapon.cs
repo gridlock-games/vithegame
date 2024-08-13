@@ -5,6 +5,7 @@ using Unity.Netcode;
 using System.Linq;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {
@@ -71,35 +72,35 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
-            if (!parentWeaponHandler) { return; }
-            if (!parentWeaponHandler.IsAiming(aimHand)) { return; }
-            if (!parentWeaponHandler.IsAttacking) { return; }
-            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
+            if (!parentCombatAgent) { return; }
+            if (!parentCombatAgent.WeaponHandler.IsAiming(aimHand)) { return; }
+            if (!parentCombatAgent.WeaponHandler.IsAttacking) { return; }
+            if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
-            bool shouldUseAmmo = parentWeaponHandler.ShouldUseAmmo();
+            bool shouldUseAmmo = parentCombatAgent.WeaponHandler.ShouldUseAmmo();
             if (shouldUseAmmo)
             {
-                if (parentWeaponHandler.GetAmmoCount() <= 0 | !parentWeaponHandler.CurrentActionClip.requireAmmo) { return; }
+                if (parentCombatAgent.WeaponHandler.GetAmmoCount() <= 0 | !parentCombatAgent.WeaponHandler.CurrentActionClip.requireAmmo) { return; }
             }
 
-            if (projectileSpawnCount < parentWeaponHandler.CurrentActionClip.maxHitLimit)
+            if (projectileSpawnCount < parentCombatAgent.WeaponHandler.CurrentActionClip.maxHitLimit)
             {
-                if (Time.time - lastProjectileSpawnTime > parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed))
+                if (Time.time - lastProjectileSpawnTime > parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed))
                 {
-                    int hitCount = Physics.RaycastNonAlloc(parentAnimationHandler.GetCameraPivotPoint(), parentAnimationHandler.GetCameraForwardDirection().normalized,
+                    int hitCount = Physics.RaycastNonAlloc(parentCombatAgent.AnimationHandler.GetCameraPivotPoint(), parentCombatAgent.AnimationHandler.GetCameraForwardDirection().normalized,
                         projectileRotationRaycastingResults, 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     
-                    Vector3 targetPoint = parentAnimationHandler.GetAimPoint();
+                    Vector3 targetPoint = parentCombatAgent.AnimationHandler.GetAimPoint();
                     float minDistance = 0;
                     bool minDistanceInitialized = false;
                     for (int i = 0; i < hitCount; i++)
                     {
                         if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
                         RaycastHit hit = projectileRotationRaycastingResults[i];
-                        if (hit.transform.root == parentWeaponHandler.transform.root) { continue; }
-                        if (hit.transform.TryGetComponent(out NetworkCollider networkCollider))
+                        if (hit.transform.root == parentCombatAgent.WeaponHandler.transform.root) { continue; }
+                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (networkCollider.Attributes == parentAttributes) { continue; }
+                            if (networkCollider.CombatAgent == parentCombatAgent) { continue; }
                         }
                         else // No Network Collider
                         {
@@ -114,77 +115,77 @@ namespace Vi.Core
                         Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
                     
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(parentAttributes.OwnerClientId, true);
+                    netObj.SpawnWithOwnership(parentCombatAgent.OwnerClientId, true);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo)
                     {
-                        int damageMultiplerIndex = parentWeaponHandler.GetMaxAmmoCount() - parentWeaponHandler.GetAmmoCount();
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce,
+                        int damageMultiplerIndex = parentCombatAgent.WeaponHandler.GetMaxAmmoCount() - parentCombatAgent.WeaponHandler.GetAmmoCount();
+                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce,
                             ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1);
 
-                        parentWeaponHandler.UseAmmo();
+                        parentCombatAgent.WeaponHandler.UseAmmo();
                     }
                     else
                     {
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentAttributes, this, parentWeaponHandler.CurrentActionClip, projectileForce, 1);
+                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce, 1);
                     }
-                    StartCoroutine(SetProjectileNetworkVisibility(netObj));
+                    //StartCoroutine(SetProjectileNetworkVisibility(netObj));
                 }
             }
         }
 
-        private IEnumerator SetProjectileNetworkVisibility(NetworkObject netObj)
-        {
-            yield return null;
-            if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
+        //private IEnumerator SetProjectileNetworkVisibility(NetworkObject netObj)
+        //{
+        //    yield return null;
+        //    if (!netObj.IsSpawned) { yield return new WaitUntil(() => netObj.IsSpawned); }
 
-            if (!netObj.IsNetworkVisibleTo(parentWeaponHandler.OwnerClientId)) { netObj.NetworkShow(parentWeaponHandler.OwnerClientId); }
-            foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
-            {
-                ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
-                if (networkId == 0) { continue; }
-                if (networkId == parentWeaponHandler.OwnerClientId) { continue; }
+        //    if (!netObj.IsNetworkVisibleTo(parentCombatAgent.WeaponHandler.OwnerClientId)) { netObj.NetworkShow(parentCombatAgent.WeaponHandler.OwnerClientId); }
+        //    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+        //    {
+        //        ulong networkId = playerData.id >= 0 ? (ulong)playerData.id : 0;
+        //        if (networkId == 0) { continue; }
+        //        if (networkId == parentCombatAgent.WeaponHandler.OwnerClientId) { continue; }
 
-                if (playerData.channel == parentAttributes.CachedPlayerData.channel)
-                {
-                    if (!netObj.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkShow(networkId);
-                    }
-                }
-                else
-                {
-                    if (parentWeaponHandler.NetworkObject.IsNetworkVisibleTo(networkId))
-                    {
-                        netObj.NetworkHide(networkId);
-                    }
-                }
-            }
-        }
+        //        if (playerData.channel == parentCombatAgent.CachedPlayerData.channel)
+        //        {
+        //            if (!netObj.IsNetworkVisibleTo(networkId))
+        //            {
+        //                netObj.NetworkShow(networkId);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (parentCombatAgent.WeaponHandler.NetworkObject.IsNetworkVisibleTo(networkId))
+        //            {
+        //                netObj.NetworkHide(networkId);
+        //            }
+        //        }
+        //    }
+        //}
 
         public float GetNextDamageMultiplier()
         {
-            if (!parentWeaponHandler) { return 1; }
-            int damageMultiplerIndex = parentWeaponHandler.GetMaxAmmoCount() - parentWeaponHandler.GetAmmoCount();
+            if (!parentCombatAgent) { return 1; }
+            int damageMultiplerIndex = parentCombatAgent.WeaponHandler.GetMaxAmmoCount() - parentCombatAgent.WeaponHandler.GetAmmoCount();
             return ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1;
         }
 
         private void OnDrawGizmos()
         {
-            if (!parentWeaponHandler) { return; }
+            if (!parentCombatAgent) { return; }
 
-            if (parentWeaponHandler.CurrentActionClip)
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip)
             {
-                if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                    if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                     {
-                        if (parentWeaponHandler.IsInAnticipation)
+                        if (parentCombatAgent.WeaponHandler.IsInAnticipation)
                             Gizmos.color = Color.yellow;
-                        else if (parentWeaponHandler.IsAttacking)
+                        else if (parentCombatAgent.WeaponHandler.IsAttacking)
                             Gizmos.color = Color.red;
-                        else if (parentWeaponHandler.IsInRecovery)
+                        else if (parentCombatAgent.WeaponHandler.IsInRecovery)
                             Gizmos.color = Color.magenta;
                         else
                             Gizmos.color = Color.white;

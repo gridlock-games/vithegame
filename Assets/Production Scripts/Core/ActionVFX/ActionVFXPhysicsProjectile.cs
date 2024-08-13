@@ -19,7 +19,7 @@ namespace Vi.Core.VFX
 
         private bool initialized;
 
-        public override void InitializeVFX(Attributes attacker, ActionClip attack)
+        public override void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             ClearInitialization();
 
@@ -101,20 +101,20 @@ namespace Vi.Core.VFX
             if (!IsServer) { return; }
 
             bool shouldDestroy = false;
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.Attributes == attacker) { return; }
+                if (networkCollider.CombatAgent == attacker) { return; }
 
                 bool canHit = true;
                 if (spellType == SpellType.GroundSpell)
                 {
-                    if (networkCollider.Attributes.IsImmuneToGroundSpells()) { canHit = false; }
+                    if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                 }
 
                 if (canHit)
                 {
-                    bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
-                    if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
                 }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))

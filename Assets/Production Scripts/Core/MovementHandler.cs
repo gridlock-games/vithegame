@@ -8,7 +8,7 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
-    public class MovementHandler : NetworkBehaviour
+    public abstract class MovementHandler : NetworkBehaviour
     {
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
 

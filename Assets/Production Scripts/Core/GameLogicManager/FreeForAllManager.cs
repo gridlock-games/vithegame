@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -19,13 +20,16 @@ namespace Vi.Core.GameModeManagers
             if (IsServer) { roundResultMessage.Value = "Free for All Starting! "; }
         }
 
-        public override void OnPlayerKill(Attributes killer, Attributes victim)
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
-            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-            if (scoreList[killerIndex].killsThisRound >= killsToWinRound)
+            if (killer is Attributes killerAttributes)
             {
-                OnRoundEnd(new int[] { killer.GetPlayerDataId() });
+                int killerIndex = scoreList.IndexOf(new PlayerScore(killerAttributes.GetPlayerDataId()));
+                if (scoreList[killerIndex].killsThisRound >= killsToWinRound)
+                {
+                    OnRoundEnd(new int[] { killerAttributes.GetPlayerDataId() });
+                }
             }
         }
 

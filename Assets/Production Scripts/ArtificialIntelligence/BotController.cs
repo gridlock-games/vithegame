@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using UnityEngine.AI;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -72,12 +73,10 @@ namespace Vi.ArtificialIntelligence
 
         private Attributes attributes;
         private LoadoutManager loadoutManager;
-        private AnimationHandler animationHandler;
         private new void Awake()
         {
             base.Awake();
             path = new NavMeshPath();
-            animationHandler = GetComponent<AnimationHandler>();
             attributes = GetComponent<Attributes>();
             loadoutManager = GetComponent<LoadoutManager>();
             RefreshStatus();
@@ -161,7 +160,7 @@ namespace Vi.ArtificialIntelligence
             Quaternion newRotation = currentRotation.Value;
             if (attributes.ShouldApplyAilmentRotation())
                 newRotation = attributes.GetAilmentRotation();
-            else if (animationHandler.IsGrabAttacking())
+            else if (attributes.AnimationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
                 newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
@@ -208,15 +207,15 @@ namespace Vi.ArtificialIntelligence
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = animationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.GetMovementSpeedDecreaseAmount() + attributes.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
             }
-            else if (animationHandler.ShouldApplyRootMotion())
+            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
             {
-                if (attributes.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
                 {
                     movement = Vector3.zero;
                 }
@@ -228,14 +227,14 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 //Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
-                Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.IsFeared() ? -1 : 1));
+                Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount() : 0;
-                movement = attributes.IsRooted() | animationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount() : 0;
+                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
-            if (animationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
             float yOffset = 0.2f;
@@ -321,7 +320,7 @@ namespace Vi.ArtificialIntelligence
 
             if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
             {
-                SetImmovable(animationHandler.IsGrabAttacking());
+                SetImmovable(attributes.AnimationHandler.IsGrabAttacking());
             }
             else
             {
@@ -337,9 +336,9 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 UpdateLocomotion();
-                animationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-                animationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(animationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-                animationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
+                attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+                attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+                attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
             }
         }
         
@@ -355,6 +354,7 @@ namespace Vi.ArtificialIntelligence
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.magenta;
+            if (!Application.isPlaying) { return; }
             for (int i = 0; i < path.corners.Length; i++)
             {
                 Gizmos.DrawSphere(path.corners[i], 0.5f);
@@ -585,24 +585,24 @@ namespace Vi.ArtificialIntelligence
             {
                 if (attributes.ShouldPlayHitStop())
                 {
-                    animationHandler.Animator.speed = 0;
+                    attributes.AnimationHandler.Animator.speed = 0;
                 }
                 else
                 {
                     if (attributes.IsGrabbed())
                     {
-                        Attributes grabAssailant = attributes.GetGrabAssailant();
+                        CombatAgent grabAssailant = attributes.GetGrabAssailant();
                         if (grabAssailant)
                         {
-                            if (grabAssailant.TryGetComponent(out AnimationHandler assailantAnimationHandler))
+                            if (grabAssailant.AnimationHandler)
                             {
-                                animationHandler.Animator.speed = assailantAnimationHandler.Animator.speed;
+                                attributes.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
                             }
                         }
                     }
                     else
                     {
-                        animationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.GetMovementSpeedDecreaseAmount()) + attributes.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (animationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                        attributes.AnimationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
                     }
                 }
             }
@@ -618,8 +618,8 @@ namespace Vi.ArtificialIntelligence
         void OnDodge()
         {
             Vector3 moveInput = transform.InverseTransformDirection(nextPosition - currentPosition.Value).normalized;
-            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z) * (attributes.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
-            animationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z) * (attributes.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
+            attributes.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
 }

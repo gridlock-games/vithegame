@@ -22,11 +22,11 @@ namespace Vi.Core.VFX.Staff
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (!PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, attacker))
+                if (!PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, attacker))
                 {
-                    if (!Mathf.Approximately(networkCollider.Attributes.GetHP(), networkCollider.Attributes.GetMaxHP()))
+                    if (!Mathf.Approximately(networkCollider.CombatAgent.GetHP(), networkCollider.CombatAgent.GetMaxHP()))
                     {
-                        networkCollider.Attributes.AddHP(networkCollider.Attributes.GetMaxHP() * 0.05f);
+                        networkCollider.CombatAgent.AddHP(networkCollider.CombatAgent.GetMaxHP() * 0.05f);
                         NetworkObject.Despawn();
                     }
                 }

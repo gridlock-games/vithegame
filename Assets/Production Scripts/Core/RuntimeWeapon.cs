@@ -30,14 +30,14 @@ namespace Vi.Core
             }
         }
 
-        protected Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
+        protected Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
 
-        public Dictionary<Attributes, HitCounterData> GetHitCounter()
+        public Dictionary<CombatAgent, HitCounterData> GetHitCounter()
         {
-            Dictionary<Attributes, HitCounterData> hitCounter = new Dictionary<Attributes, HitCounterData>();
+            Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
             foreach (RuntimeWeapon runtimeWeapon in associatedRuntimeWeapons)
             {
-                foreach (KeyValuePair<Attributes, HitCounterData> kvp in runtimeWeapon.hitCounter)
+                foreach (KeyValuePair<CombatAgent, HitCounterData> kvp in runtimeWeapon.hitCounter)
                 {
                     if (hitCounter.ContainsKey(kvp.Key))
                     {
@@ -55,15 +55,15 @@ namespace Vi.Core
             return hitCounter;
         }
 
-        public void AddHit(Attributes attributes)
+        public void AddHit(CombatAgent combatAgent)
         {
-            if (!hitCounter.ContainsKey(attributes))
+            if (!hitCounter.ContainsKey(combatAgent))
             {
-                hitCounter.Add(attributes, new HitCounterData(1, Time.time));
+                hitCounter.Add(combatAgent, new HitCounterData(1, Time.time));
             }
             else
             {
-                hitCounter[attributes] = new HitCounterData(hitCounter[attributes].hitNumber+1, Time.time);
+                hitCounter[combatAgent] = new HitCounterData(hitCounter[combatAgent].hitNumber+1, Time.time);
             }
         }
 
@@ -72,13 +72,13 @@ namespace Vi.Core
             hitCounter.Clear();
         }
         
-        public bool CanHit(Attributes attributes)
+        public bool CanHit(CombatAgent attributes)
         {
-            Dictionary<Attributes, HitCounterData> hitCounter = GetHitCounter();
+            Dictionary<CombatAgent, HitCounterData> hitCounter = GetHitCounter();
             if (hitCounter.ContainsKey(attributes))
             {
-                if (hitCounter[attributes].hitNumber >= parentWeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
-                if (Time.time - hitCounter[attributes].timeOfHit < parentWeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentAnimationHandler.Animator.speed)) { return false; }
+                if (hitCounter[attributes].hitNumber >= parentCombatAgent.WeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
+                if (Time.time - hitCounter[attributes].timeOfHit < parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed)) { return false; }
             }
             return true;
         }
@@ -87,25 +87,21 @@ namespace Vi.Core
 
         public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
 
-        protected Attributes parentAttributes;
-        protected WeaponHandler parentWeaponHandler;
-        protected AnimationHandler parentAnimationHandler;
+        protected CombatAgent parentCombatAgent;
 
         protected Collider[] colliders;
         private Renderer[] renderers;
 
-        public Vector3 GetClosetPointFromAttributes(Attributes victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
+        public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
         protected void Start()
         {
-            parentAttributes = GetComponentInParent<Attributes>();
-            parentWeaponHandler = GetComponentInParent<WeaponHandler>();
-            parentAnimationHandler = GetComponentInParent<AnimationHandler>();
+            parentCombatAgent = GetComponentInParent<CombatAgent>();
 
             colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)
             {
-                col.enabled = parentAttributes.IsServer;
+                col.enabled = parentCombatAgent.IsServer;
             }
 
             renderers = GetComponentsInChildren<Renderer>(true);
@@ -113,7 +109,7 @@ namespace Vi.Core
             {
                 if (renderer is SkinnedMeshRenderer smr)
                 {
-                    smr.updateWhenOffscreen = parentAttributes.IsServer;
+                    smr.updateWhenOffscreen = parentCombatAgent.IsServer;
                 }
             }
         }

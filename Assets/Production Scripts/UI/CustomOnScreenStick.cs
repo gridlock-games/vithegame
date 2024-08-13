@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Vi.Core;
 using Vi.Utility;
+using Vi.Player;
 
 namespace Vi.UI
 {

@@ -68,17 +68,17 @@ namespace Vi.Core.VFX.Staff
             int networkColliderCount = 0;
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (networkCollider.Attributes == attacker) { continue; }
+                    if (networkCollider.CombatAgent == attacker) { continue; }
 
                     networkColliderCount++;
-                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(attacker, networkCollider.Attributes);
+                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent);
                     if (shouldAffect)
                     {
                         if (spellType == SpellType.GroundSpell)
                         {
-                            if (networkCollider.Attributes.IsImmuneToGroundSpells())
+                            if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells())
                             {
                                 shouldAffect = false;
                                 despawnCalled = true;
@@ -97,8 +97,8 @@ namespace Vi.Core.VFX.Staff
 
                         if (Vector3.Distance(networkCollider.transform.position, transform.position) <= navMeshAgent.stoppingDistance + 0.5f)
                         {
-                            bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
-                                attack, networkCollider.Attributes.transform.position, transform.position);
+                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                                attack, networkCollider.CombatAgent.transform.position, transform.position);
 
                             despawnCalled = true;
                             NetworkObject.Despawn(true);

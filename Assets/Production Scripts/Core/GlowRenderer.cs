@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class GlowRenderer : MonoBehaviour
     {
         [SerializeField] private Material glowMaterial;
@@ -47,6 +48,17 @@ namespace Vi.Core
         public void RenderFlashAttack(bool canFlashAttack)
         {
             this.canFlashAttack = canFlashAttack;
+        }
+
+        private void Start()
+        {
+            if (transform.root == transform)
+            {
+                foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
+                {
+                    RegisterNewRenderer(renderer);
+                }
+            }
         }
 
         private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();

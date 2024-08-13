@@ -165,15 +165,15 @@ namespace Vi.UI
             if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
             // Instantiate the player model
             MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
-                Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation));
+                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                Quaternion.Euler(SpawnPoints.previewCharacterRotation));
 
             AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
             animationHandler.ChangeCharacter(character);
             MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
-            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
-            MVPPresentationCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
+            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             MVPPresentationCamera.enabled = true;
 
             yield return new WaitUntil(() => animationHandler.Animator);

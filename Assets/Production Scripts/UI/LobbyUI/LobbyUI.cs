@@ -113,7 +113,8 @@ namespace Vi.UI
         private readonly static List<PlayerDataManager.GameMode> whitelistedGameModes = new List<PlayerDataManager.GameMode>()
         {
             PlayerDataManager.GameMode.FreeForAll,
-            PlayerDataManager.GameMode.TeamElimination
+            PlayerDataManager.GameMode.TeamElimination,
+            PlayerDataManager.GameMode.HordeMode
         };
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;

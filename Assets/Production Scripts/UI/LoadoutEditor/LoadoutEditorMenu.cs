@@ -4,6 +4,8 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Vi.ScriptableObjects;
+using Vi.Core.CombatAgents;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -58,15 +60,15 @@ namespace Vi.UI
             {
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(PlayerSpawnPoints.previewCharacterRotation),
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation),
                     transform);
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
 
-                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + PlayerSpawnPoints.cameraPreviewCharacterPositionOffset;
-                characterPreviewCamera.transform.rotation = Quaternion.Euler(PlayerSpawnPoints.cameraPreviewCharacterRotation);
+                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             }
 
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());

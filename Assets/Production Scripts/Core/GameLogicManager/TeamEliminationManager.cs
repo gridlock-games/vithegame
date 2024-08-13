@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core.CombatAgents;
+using Vi.Core.DynamicEnvironmentElements;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -31,7 +33,7 @@ namespace Vi.Core.GameModeManagers
             damageCircleInstance.NetworkObject.Spawn(true);
         }
 
-        public override void OnEnvironmentKill(Attributes victim)
+        public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
 
@@ -76,11 +78,9 @@ namespace Vi.Core.GameModeManagers
         }
 
         private NetworkVariable<ulong> viEssenceNetObjId = new NetworkVariable<ulong>();
-        public override void OnPlayerKill(Attributes killer, Attributes victim)
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
-            int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-
             List<Attributes> killerTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
             List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))

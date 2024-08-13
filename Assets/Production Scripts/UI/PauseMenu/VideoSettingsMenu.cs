@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.Rendering.Universal;
 using System.Text.RegularExpressions;
 using Vi.Utility;
+using Vi.Player;
 
 namespace Vi.UI
 {

@@ -8,6 +8,7 @@ using Vi.Core;
 using UnityEngine.InputSystem.OnScreen;
 using Newtonsoft.Json;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {
