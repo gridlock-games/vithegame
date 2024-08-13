@@ -181,29 +181,18 @@ namespace Vi.Core.CombatAgents
             HPDamage *= damageMultiplier;
 
             bool shouldPlayHitReaction = false;
-            if (attackerCombatAgent is Attributes attacker)
+            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
-                if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                HPDamage *= attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                if (attack.canEnhance & attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
                 {
-                    HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                    if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
-                    {
-                        HPDamage *= attack.enhancedChargeDamageMultiplier;
-                    }
+                    HPDamage *= attack.enhancedChargeDamageMultiplier;
                 }
-
-                if (attacker.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
-
-                attacker.AddHitToComboCounter();
             }
-            else if (attackerCombatAgent is Mob mob)
-            {
 
-            }
-            else
-            {
-                Debug.LogError("Unsure how to handle subclass type of combat agent! " + attackerCombatAgent);
-            }
+            if (attackerCombatAgent.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
+
+            if (attackerCombatAgent is Attributes attacker) { attacker.AddHitToComboCounter(); }
 
             if (AddHPWithoutApply(HPDamage) <= 0)
             {
@@ -252,7 +241,7 @@ namespace Vi.Core.CombatAgents
                     AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
                 }
 
-                //EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attackerCombatAgent, attack, hitReaction);
             }
 
             if (IsServer)
