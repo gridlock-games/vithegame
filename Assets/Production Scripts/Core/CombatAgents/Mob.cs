@@ -293,6 +293,8 @@ namespace Vi.Core.CombatAgents
             {
                 StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
             }
+
+            ailment.Value = attackAilment;
         }
 
         [SerializeField] private Weapon.ArmorType armorType;

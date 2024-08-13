@@ -867,9 +867,7 @@ namespace Vi.Core.CombatAgents
 
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
-            AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-
+            base.OnAilmentChanged(prev, current);
             if (IsServer)
             {
                 foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == ailment.Value))
@@ -884,28 +882,13 @@ namespace Vi.Core.CombatAgents
 
             if (current == ActionClip.Ailment.Death)
             {
-                StartCoroutine(ClearDamageMappingAfter1Frame());
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
-                WeaponHandler.OnDeath();
-                AnimationHandler.OnDeath();
-                AnimationHandler.Animator.enabled = false;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 respawnCoroutine = StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                isRaging.Value = false;
-                AnimationHandler.Animator.enabled = true;
-                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
             }
-        }
-
-        private IEnumerator ClearDamageMappingAfter1Frame()
-        {
-            yield return null;
-            damageMappingThisLife.Clear();
-            lastAttackingCombatAgent = null;
         }
 
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
@@ -934,7 +917,6 @@ namespace Vi.Core.CombatAgents
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
-        private Coroutine ailmentResetCoroutine;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }

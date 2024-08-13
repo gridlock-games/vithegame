@@ -347,7 +347,35 @@ namespace Vi.Core
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
-        protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current) { }
+
+        protected Coroutine ailmentResetCoroutine;
+        protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        {
+            AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+
+            if (current == ActionClip.Ailment.Death)
+            {
+                StartCoroutine(ClearDamageMappingAfter1Frame());
+                WeaponHandler.OnDeath();
+                AnimationHandler.OnDeath();
+                AnimationHandler.Animator.enabled = false;
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+            }
+            else if (prev == ActionClip.Ailment.Death)
+            {
+                isRaging.Value = false;
+                AnimationHandler.Animator.enabled = true;
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+            }
+        }
+
+        private IEnumerator ClearDamageMappingAfter1Frame()
+        {
+            yield return null;
+            damageMappingThisLife.Clear();
+            lastAttackingCombatAgent = null;
+        }
 
         [HideInInspector] public bool wasStaggeredThisFrame;
         protected IEnumerator ResetStaggerBool()

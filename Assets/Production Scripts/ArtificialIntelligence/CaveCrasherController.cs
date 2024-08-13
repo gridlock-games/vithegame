@@ -69,19 +69,21 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private const float lightAttackDistance = 2;
+        private const float lightAttackDistance = 3;
 
+        private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
 
         private void EvaluteAction()
         {
             if (targetAttributes)
             {
-                if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
+                float dist = Vector3.Distance(Destination, transform.position);
+                if (dist < lightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (Vector3.Distance(Destination, transform.position) < ability1Distance)
+                else if (dist < ability1Distance & dist > ability1DistanceMin)
                 {
                     weaponHandler.Ability1(true);
                 }
