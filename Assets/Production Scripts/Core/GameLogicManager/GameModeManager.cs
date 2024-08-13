@@ -367,16 +367,19 @@ namespace Vi.Core.GameModeManagers
 
         private const float minAssistDamage = 30;
 
-        public virtual void OnEnvironmentKill(Attributes victim)
+        public virtual void OnEnvironmentKill(CombatAgent victim)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDeaths += 1;
-                victimScore.deathsThisRound += 1;
-                scoreList[victimIndex] = victimScore;
-
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDeaths += 1;
+                    victimScore.deathsThisRound += 1;
+                    scoreList[victimIndex] = victimScore;
+                }
+                
                 killHistory.Add(new KillHistoryElement(victim));
             }
         }

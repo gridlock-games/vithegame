@@ -33,7 +33,7 @@ namespace Vi.Core.GameModeManagers
             damageCircleInstance.NetworkObject.Spawn(true);
         }
 
-        public override void OnEnvironmentKill(Attributes victim)
+        public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
 

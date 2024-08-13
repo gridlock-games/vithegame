@@ -335,8 +335,8 @@ namespace Vi.Core.CombatAgents
 
                 if (lastAttackingCombatAgent)
                 {
-                    SetKiller((Attributes)lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
+                    SetKiller(lastAttackingCombatAgent);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
                 }
                 else
                 {
@@ -363,8 +363,8 @@ namespace Vi.Core.CombatAgents
 
                 if (lastAttackingCombatAgent)
                 {
-                    SetKiller((Attributes)lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
+                    SetKiller(lastAttackingCombatAgent);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
                 }
                 else
                 {

@@ -19,6 +19,7 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;
+        [SerializeField] private List<ActionClip.Ailment> whitelistedAilments;
 
         public CharacterReference.WeaponOption GetWeaponOption() { return weaponOption; }
 
@@ -74,17 +75,18 @@ namespace Vi.Core.CombatAgents
             if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
-                //animationHandler.PlayAction(weaponHandler.GetWeapon().GetDeathReaction());
+                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
 
-                if (lastAttackingCombatAgent)
+                if (GameModeManager.Singleton)
                 {
-                    //SetKiller((Attributes)lastAttackingCombatAgent);
-                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    //killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
-                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    if (lastAttackingCombatAgent)
+                    {
+                        GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this);
+                    }
+                    else
+                    {
+                        GameModeManager.Singleton.OnEnvironmentKill(this);
+                    }
                 }
             }
             RenderHitGlowOnly();
@@ -104,15 +106,16 @@ namespace Vi.Core.CombatAgents
                 ailment.Value = ActionClip.Ailment.Death;
                 AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
 
-                if (lastAttackingCombatAgent)
+                if (GameModeManager.Singleton)
                 {
-                    //SetKiller((Attributes)lastAttackingCombatAgent);
-                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill((Attributes)lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    //killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
-                    //if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    if (lastAttackingCombatAgent)
+                    {
+                        GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this);
+                    }
+                    else
+                    {
+                        GameModeManager.Singleton.OnEnvironmentKill(this);
+                    }
                 }
             }
             else
@@ -161,6 +164,7 @@ namespace Vi.Core.CombatAgents
             }
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
+            if (!whitelistedAilments.Contains(attack.ailment)) { attackAilment = ActionClip.Ailment.None; }
 
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 

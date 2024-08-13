@@ -1084,6 +1084,8 @@ namespace Vi.Core
             if (combatAgent is not Attributes)
             {
                 Animator = GetComponent<Animator>();
+                actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
+                flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
                 LimbReferences = GetComponent<LimbReferences>();
                 animatorReference = GetComponent<AnimatorReference>();
             }
