@@ -203,13 +203,32 @@ namespace Vi.Core.CombatAgents
             bool hitReactionWasPlayed = false;
             if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
-                if (hitReaction.ailment != ActionClip.Ailment.None)
+                if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
+                {
+                    GetGrabAssailant().CancelGrab();
+                    CancelGrab();
+                }
+
+                if (hitReaction.ailment == ActionClip.Ailment.Grab)
+                {
+                    grabAttackClipName.Value = attack.name;
+                    grabAssailantDataId.Value = attackerCombatAgent.NetworkObjectId;
+                    attackerCombatAgent.SetGrabVictim(NetworkObjectId);
+                    isGrabbed.Value = true;
+
+                    Vector3 victimNewPosition = attackerCombatAgent.MovementHandler.GetPosition() + (attackerCombatAgent.transform.forward * 1.2f);
+                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attackerCombatAgent.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    attackerCombatAgent.AnimationHandler.PlayAction(attackerCombatAgent.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                }
+
+                if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
                 {
                     if (attack.shouldPlayHitReaction
                         | ailment.Value != ActionClip.Ailment.None
+                        | AnimationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        if (hitReaction.ailment != ActionClip.Ailment.None)
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None))
                         {
                             AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;
