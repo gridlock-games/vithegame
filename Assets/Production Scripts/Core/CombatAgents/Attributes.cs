@@ -645,11 +645,6 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        protected override PooledObject GetHitVFXPrefab() { return WeaponHandler.GetWeapon().hitVFXPrefab; }
-        protected override PooledObject GetBlockVFXPrefab() { return WeaponHandler.GetWeapon().blockVFXPrefab; }
-        protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
-        protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return WeaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial); }
-
         private NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
         private NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
 
@@ -662,7 +657,7 @@ namespace Vi.Core.CombatAgents
             return networkObject.GetComponent<CombatAgent>();
         }
 
-        private void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
+        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
         {
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {

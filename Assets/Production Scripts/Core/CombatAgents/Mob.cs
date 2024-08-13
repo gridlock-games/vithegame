@@ -279,15 +279,17 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        [SerializeField] private PooledObject hitVFXPrefab;
-        [SerializeField] private PooledObject blockVFXPrefab;
-
-        protected override PooledObject GetHitVFXPrefab() { return hitVFXPrefab; }
-        protected override PooledObject GetBlockVFXPrefab() { return blockVFXPrefab; }
+        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
+        {
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+            }
+        }
 
         [SerializeField] private Weapon.ArmorType armorType;
 
-        protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return null; }
-        protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return null; }
+        [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
+        public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
     }
 }
