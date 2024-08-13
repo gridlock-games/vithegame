@@ -617,7 +617,6 @@ namespace Vi.ScriptableObjects
             {
                 if (!flinchReaction.reactionClip) { continue; }
                 actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
-                Debug.Log(flinchReaction.reactionClip);
             }
 
             foreach (Attack attack in attackList)
