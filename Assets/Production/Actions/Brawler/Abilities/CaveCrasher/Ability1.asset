@@ -1559,14 +1559,14 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 674b0afeb4b9de743930aa2b08cde859, type: 3}
-  abilityCooldownTime: 5
+  abilityCooldownTime: 10
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 11
-    value: 1
+    value: 10
     duration: 1
-    delay: 0.75
+    delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
