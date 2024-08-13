@@ -19,7 +19,11 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;
-        [SerializeField] private List<ActionClip.Ailment> whitelistedAilments;
+        [SerializeField] private List<ActionClip.Ailment> whitelistedAilments = new List<ActionClip.Ailment>()
+        {
+            ActionClip.Ailment.None,
+            ActionClip.Ailment.Death
+        };
 
         public CharacterReference.WeaponOption GetWeaponOption() { return weaponOption; }
 

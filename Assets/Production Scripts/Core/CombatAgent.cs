@@ -147,8 +147,8 @@ namespace Vi.Core
 
         public abstract string GetName();
         public abstract PlayerDataManager.Team GetTeam();
-
         public abstract Color GetRelativeTeamColor();
+        public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
 
         public NetworkCollider NetworkCollider { get; private set; }
 

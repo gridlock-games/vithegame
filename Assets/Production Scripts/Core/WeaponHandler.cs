@@ -241,26 +241,12 @@ namespace Vi.Core
             actionSoundEffectIdTracker.Clear();
 
             // Action sound effect logic here for normalized time of 0
-            if (combatAgent is Attributes attributes)
+            foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
             {
-                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+                if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
                 {
-                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
-                    {
-                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
-                    }
-                }
-            }
-            else
-            {
-                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(CharacterReference.RaceAndGender.Universal, actionSoundEffectIdTracker))
-                {
-                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
-                    {
-                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
-                    }
+                    AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                    actionSoundEffectIdTracker.Add(actionSoundEffect.id);
                 }
             }
 
@@ -564,26 +550,12 @@ namespace Vi.Core
                 }
 
                 // Action sound effect logic here
-                if (combatAgent is Attributes attributes)
+                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
                     {
-                        if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
-                        {
-                            AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                            actionSoundEffectIdTracker.Add(actionSoundEffect.id);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(CharacterReference.RaceAndGender.Universal, actionSoundEffectIdTracker))
-                    {
-                        if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
-                        {
-                            AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
-                            actionSoundEffectIdTracker.Add(actionSoundEffect.id);
-                        }
+                        AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
+                        actionSoundEffectIdTracker.Add(actionSoundEffect.id);
                     }
                 }
             }
@@ -1084,8 +1056,7 @@ namespace Vi.Core
             combatAgent.AnimationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                CharacterReference.RaceAndGender raceAndGender = CharacterReference.RaceAndGender.Universal;
-                if (combatAgent is Attributes attributes) { raceAndGender = attributes.CachedPlayerData.character.raceAndGender; }
+                CharacterReference.RaceAndGender raceAndGender = combatAgent.GetRaceAndGender();
                 combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 combatAgent.AnimationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (combatAgent.AnimationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !combatAgent.AnimationHandler.IsReloading());
