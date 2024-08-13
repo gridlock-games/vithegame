@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Vi.Core.CombatAgents;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -17,6 +18,68 @@ namespace Vi.ArtificialIntelligence
             base.Awake();
             animator = GetComponent<Animator>();
             combatAgent = GetComponent<CombatAgent>();
+        }
+
+        private void Start()
+        {
+            UpdateActivePlayersList();
+            StartCoroutine(EvaluateBotLogic());
+        }
+
+        private List<Attributes> activePlayers = new List<Attributes>();
+        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(); }
+
+        CombatAgent targetAttributes;
+        private IEnumerator EvaluateBotLogic()
+        {
+            while (true)
+            {
+                if (IsOwner)
+                {
+                    activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+
+                    targetAttributes = null;
+                    foreach (Attributes player in activePlayers)
+                    {
+                        if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
+                        targetAttributes = player;
+                        break;
+                    }
+
+                    if (targetAttributes)
+                    {
+                        SetDestination(targetAttributes.transform.position);
+                    }
+                    else
+                    {
+                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
+                        {
+                            float walkRadius = 500;
+                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                            randomDirection += transform.position;
+                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                            SetDestination(hit.position);
+                        }
+                    }
+                    EvaluteAction();
+                }
+
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        private const float lightAttackDistance = 3;
+
+        private void EvaluteAction()
+        {
+            if (targetAttributes)
+            {
+                if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
+                {
+                    weaponHandler.LightAttack(true);
+                }
+            }
         }
 
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
@@ -129,6 +192,7 @@ namespace Vi.ArtificialIntelligence
         private new void Update()
         {
             base.Update();
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
             ProcessMovement();
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));

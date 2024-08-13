@@ -276,12 +276,8 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
-        [SerializeField] private List<Attributes> activePlayers = new List<Attributes>();
-
-        private void UpdateActivePlayersList()
-        {
-            activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes);
-        }
+        private List<Attributes> activePlayers = new List<Attributes>();
+        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes); }
 
         private Attributes targetAttributes;
 
