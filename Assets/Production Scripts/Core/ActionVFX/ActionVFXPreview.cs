@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace Vi.Core.VFX
 {
@@ -13,7 +15,7 @@ namespace Vi.Core.VFX
         private ParticleSystem ps;
         private Color originalParticleSystemColor;
         private Color noVFXWillBeSpawnedColor = Color.red;
-        
+
         private void Start()
         {
             ps = GetComponentInChildren<ParticleSystem>();

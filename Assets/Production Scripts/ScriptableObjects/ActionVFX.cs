@@ -4,11 +4,14 @@ using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
 using UnityEngine.VFX;
+using Unity.Netcode.Components;
 
 namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PooledObject))]
+    //[RequireComponent(typeof(NetworkObject))]
+    //[RequireComponent(typeof(NetworkTransform))]
     public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType

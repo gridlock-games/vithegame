@@ -77,7 +77,8 @@ namespace Vi.ArtificialIntelligence
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
                 {
-                    weaponHandler.LightAttack(true);
+                    weaponHandler.Ability1(true);
+                    //weaponHandler.LightAttack(true);
                 }
             }
         }
@@ -103,11 +104,10 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            Transform target = null;
-            if (NetworkManager.LocalClient.PlayerObject)
+            Transform target = targetAttributes.transform;
+            if (target)
             {
-                target = NetworkManager.LocalClient.PlayerObject.transform;
-                SetDestination(NetworkManager.LocalClient.PlayerObject.transform.position);
+                SetDestination(target.position);
                 CalculatePath(transform.position, NavMesh.AllAreas);
             }
 

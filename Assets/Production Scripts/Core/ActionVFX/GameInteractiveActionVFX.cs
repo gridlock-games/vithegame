@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Unity.Netcode.Components;
 using Vi.Utility;
 
 namespace Vi.Core.VFX
 {
-    [RequireComponent(typeof(NetworkObject))]
-    [RequireComponent(typeof(NetworkTransform))]
     public class GameInteractiveActionVFX : ActionVFX
     {
         public enum SpellType
