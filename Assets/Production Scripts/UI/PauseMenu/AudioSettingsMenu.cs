@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.Core;
+using Vi.Player;
 using UnityEngine.UI;
 using TMPro;
 using Vi.Utility;

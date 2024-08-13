@@ -8,6 +8,7 @@ using Vi.Utility;
 using UnityEngine.UI;
 using Unity.Netcode;
 using jomarcentermjm.PlatformAPI;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {
@@ -41,8 +42,8 @@ namespace Vi.UI
                 playerInput = localPlayer.GetComponent<PlayerInput>();
                 playerMovementHandler = localPlayer.GetComponent<PlayerMovementHandler>();
                 attributes = localPlayer;
-                weaponHandler = localPlayer.GetComponent<WeaponHandler>();
-                animationHandler = localPlayer.GetComponent<AnimationHandler>();
+                weaponHandler = localPlayer.WeaponHandler;
+                animationHandler = localPlayer.AnimationHandler;
                 loadoutManager = localPlayer.GetComponent<LoadoutManager>();
                 playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
 
@@ -845,7 +846,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
+                    WeaponHandler weaponHandler = botAttributes.WeaponHandler;
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = attributes.BlockedRecently() | canProceed;
@@ -854,7 +855,7 @@ namespace Vi.UI
             {
                 if (botAttributes)
                 {
-                    WeaponHandler weaponHandler = botAttributes.GetComponent<WeaponHandler>();
+                    WeaponHandler weaponHandler = botAttributes.WeaponHandler;
                     Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;

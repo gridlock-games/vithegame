@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.VFX;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -20,9 +21,9 @@ namespace Vi.Core
         [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
         [SerializeField] private AudioClip[] soundToPlayOnDespawn = new AudioClip[0];
 
-        public Attributes GetAttacker() { return attacker; }
+        public CombatAgent GetAttacker() { return attacker; }
 
-        private Attributes attacker;
+        private CombatAgent attacker;
         private ShooterWeapon shooterWeapon;
         private ActionClip attack;
         private Vector3 projectileForce;
@@ -30,7 +31,7 @@ namespace Vi.Core
         private Quaternion originalRotation;
         private bool initialized;
 
-        public void Initialize(Attributes attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce, float damageMultiplier)
+        public void Initialize(CombatAgent attacker, ShooterWeapon shooterWeapon, ActionClip attack, Vector3 projectileForce, float damageMultiplier)
         {
             if (!IsServer) { Debug.LogError("Projectile.Initialize() should only be called on the server!"); return; }
             if (initialized) { Debug.LogError("Projectile.Initialize() already called, why are you calling it again idiot?"); return; }
@@ -137,11 +138,11 @@ namespace Vi.Core
             if (!canHitPlayers) { return; }
 
             bool shouldDestroy = false;
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.Attributes == attacker) { return; }
-                bool hitSuccess = networkCollider.Attributes.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
-                if (!hitSuccess & networkCollider.Attributes.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                if (networkCollider.CombatAgent == attacker) { return; }
+                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {

@@ -10,6 +10,7 @@ using Unity.Netcode;
 using Vi.Player;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {
@@ -436,7 +437,7 @@ namespace Vi.UI
         {
             RefreshStatus();
 
-            List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+            List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
             foreach (StatusIcon statusIcon in statusIcons)
             {
                 if (activeStatuses.Contains(statusIcon.Status))
@@ -461,7 +462,7 @@ namespace Vi.UI
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
             if (!weaponHandler.WeaponInitialized) { return; }
 
-            scoreboardButton.gameObject.SetActive(Core.GameModeManagers.GameModeManager.Singleton);
+            scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
             float dodgeCooldownProgress = weaponHandler.GetWeapon().GetDodgeCooldownProgress();
             mobileDodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
@@ -472,9 +473,9 @@ namespace Vi.UI
             dodgeCooldownImage.enabled = dodgeIsOnCooldown;
             mobileDodgeCooldownImage.enabled = dodgeIsOnCooldown;
 
-            if (attributes.ActiveStatusesWasUpdatedThisFrame)
+            if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
-                List<ActionClip.Status> activeStatuses = attributes.GetActiveStatuses();
+                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
                 foreach (StatusIcon statusIcon in statusIcons)
                 {
                     if (activeStatuses.Contains(statusIcon.Status))

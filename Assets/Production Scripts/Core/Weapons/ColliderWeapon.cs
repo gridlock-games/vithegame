@@ -11,7 +11,7 @@ namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<Attributes> hitsOnThisPhysicsUpdate = new List<Attributes>();
+        private List<CombatAgent> hitsOnThisPhysicsUpdate = new List<CombatAgent>();
 
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
@@ -19,9 +19,9 @@ namespace Vi.Core
         private void Update()
         {
             if (!weaponTrailVFX) { return; }
-            if (!parentWeaponHandler) { return; }
+            if (!parentCombatAgent) { return; }
 
-            if (parentWeaponHandler.IsAttacking & parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone) & !isStowed)
+            if (parentCombatAgent.WeaponHandler.IsAttacking & parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone) & !isStowed)
             {
                 weaponTrailVFX.gameObject.SetActive(true);
                 lastWeaponTrailActiveTime = Time.time;
@@ -39,41 +39,41 @@ namespace Vi.Core
         {
             if (!NetworkManager.Singleton.IsServer) { return; }
 
-            if (!parentWeaponHandler) { return; }
-            if (!parentWeaponHandler.IsAttacking) { return; }
-            if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
-            if (!parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
+            if (!parentCombatAgent) { return; }
+            if (!parentCombatAgent.WeaponHandler.IsAttacking) { return; }
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
+            if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
             // Don't evaluate grab attacks here, it's evaluated in the animation handler script
-            if (parentWeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
 
-            if (other.TryGetComponent(out NetworkCollider networkCollider))
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (parentAttributes == networkCollider.Attributes) { return; }
-                if (!CanHit(networkCollider.Attributes)) { return; }
+                if (parentCombatAgent == networkCollider.CombatAgent) { return; }
+                if (!CanHit(networkCollider.CombatAgent)) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.Attributes)) { return; }
+                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
 
-                bool bHit = networkCollider.Attributes.ProcessMeleeHit(parentAttributes,
-                    parentWeaponHandler.CurrentActionClip,
+                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent,
+                    parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
-                    parentAttributes.transform.position
+                    parentCombatAgent.transform.position
                 );
 
                 if (bHit)
                 {
-                    hitsOnThisPhysicsUpdate.Add(networkCollider.Attributes);
-                    parentWeaponHandler.lastMeleeHitTime = Time.time;
+                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
+                    parentCombatAgent.WeaponHandler.lastMeleeHitTime = Time.time;
                 }
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                actionVFX.OnHit(parentAttributes);
+                actionVFX.OnHit(parentCombatAgent);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
             {
-                gameItem.OnHit(parentAttributes);
+                gameItem.OnHit(parentCombatAgent);
             }
         }
 
@@ -86,21 +86,21 @@ namespace Vi.Core
 
         private void OnDrawGizmos()
         {
-            if (!parentWeaponHandler) { return; }
+            if (!parentCombatAgent) { return; }
 
             if (TryGetComponent(out BoxCollider boxCollider))
             {
-                if (parentWeaponHandler.CurrentActionClip)
+                if (parentCombatAgent.WeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                    if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                         {
-                            if (parentWeaponHandler.IsInAnticipation)
+                            if (parentCombatAgent.WeaponHandler.IsInAnticipation)
                                 Gizmos.color = Color.yellow;
-                            else if (parentWeaponHandler.IsAttacking)
+                            else if (parentCombatAgent.WeaponHandler.IsAttacking)
                                 Gizmos.color = Color.red;
-                            else if (parentWeaponHandler.IsInRecovery)
+                            else if (parentCombatAgent.WeaponHandler.IsInRecovery)
                                 Gizmos.color = Color.magenta;
                             else
                                 Gizmos.color = Color.white;
@@ -126,17 +126,17 @@ namespace Vi.Core
             }
             else if (TryGetComponent(out SphereCollider sphereCollider))
             {
-                if (parentWeaponHandler.CurrentActionClip)
+                if (parentCombatAgent.WeaponHandler.CurrentActionClip)
                 {
-                    if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                    if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                     {
-                        if (parentWeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
                         {
-                            if (parentWeaponHandler.IsInAnticipation)
+                            if (parentCombatAgent.WeaponHandler.IsInAnticipation)
                                 Gizmos.color = Color.yellow;
-                            else if (parentWeaponHandler.IsAttacking)
+                            else if (parentCombatAgent.WeaponHandler.IsAttacking)
                                 Gizmos.color = Color.red;
-                            else if (parentWeaponHandler.IsInRecovery)
+                            else if (parentCombatAgent.WeaponHandler.IsInRecovery)
                                 Gizmos.color = Color.magenta;
                             else
                                 Gizmos.color = Color.white;

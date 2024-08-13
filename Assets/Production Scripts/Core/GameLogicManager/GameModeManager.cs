@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Linq;
 using Vi.Utility;
 using Unity.Collections;
-using jomarcentermjm.PlatformAPI;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -49,7 +49,7 @@ namespace Vi.Core.GameModeManagers
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
 
-            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            List<SpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
 
             bool shouldResetSpawnTracker = false;
             foreach (int index in gameItemSpawnIndexTracker)
@@ -78,7 +78,7 @@ namespace Vi.Core.GameModeManagers
 
             int randomIndex = Random.Range(0, possibleSpawnPoints.Count);
             gameItemSpawnIndexTracker.Add(randomIndex);
-            PlayerSpawnPoints.TransformData spawnPoint = new PlayerSpawnPoints.TransformData();
+            SpawnPoints.TransformData spawnPoint = new SpawnPoints.TransformData();
             if (possibleSpawnPoints.Count != 0)
                 spawnPoint = possibleSpawnPoints[randomIndex];
             else
@@ -89,7 +89,7 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        protected GameItem SpawnGameItem(GameItem gameItemPrefab, PlayerSpawnPoints.TransformData spawnPoint)
+        protected GameItem SpawnGameItem(GameItem gameItemPrefab, SpawnPoints.TransformData spawnPoint)
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
 
@@ -98,11 +98,11 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        protected List<PlayerSpawnPoints.TransformData> GetGameItemSpawnPoints()
+        protected List<SpawnPoints.TransformData> GetGameItemSpawnPoints()
         {
             if (!IsServer) { Debug.LogError("GameModeManager.GetGameItemSpawnPoints() should only be called from the server!"); return null; }
 
-            List<PlayerSpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
+            List<SpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
 
             bool shouldResetSpawnTracker = false;
             foreach (int index in gameItemSpawnIndexTracker)
@@ -150,48 +150,43 @@ namespace Vi.Core.GameModeManagers
             public FixedString64Bytes weaponName;
             public KillType killType;
 
-            public KillHistoryElement(Attributes killer, Attributes victim)
+            public KillHistoryElement(CombatAgent killer, CombatAgent victim)
             {
-                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
-                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
-                killerTeam = killerData.team;
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killer.GetTeam()) + killer.GetName();
+                killerTeam = killer.GetTeam();
                 killerNetObjId = killer.NetworkObjectId;
 
                 assistName = "";
                 assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = victimData.team;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
-                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                weaponName = killer.WeaponHandler.GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.Player;
             }
 
-            public KillHistoryElement(Attributes killer, Attributes assist, Attributes victim)
+            public KillHistoryElement(CombatAgent killer, CombatAgent assist, CombatAgent victim)
             {
-                PlayerDataManager.PlayerData killerData = PlayerDataManager.Singleton.GetPlayerData(killer.GetPlayerDataId());
-                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killerData.team) + killerData.character.name;
-                killerTeam = killerData.team;
+                killerName = PlayerDataManager.Singleton.GetTeamPrefix(killer.GetTeam()) + killer.GetName();
+                killerTeam = killer.GetTeam();
                 killerNetObjId = killer.NetworkObjectId;
 
-                PlayerDataManager.PlayerData assistData = PlayerDataManager.Singleton.GetPlayerData(assist.GetPlayerDataId());
-                assistName = PlayerDataManager.Singleton.GetTeamPrefix(assistData.team) + assistData.character.name;
-                assistTeam = assistData.team;
+                assistName = PlayerDataManager.Singleton.GetTeamPrefix(assist.GetTeam()) + assist.GetName();
+                assistTeam = assist.GetTeam();
                 assistNetObjId = assist.NetworkObjectId;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = victimData.team;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
-                weaponName = killer.GetComponent<WeaponHandler>().GetWeapon().name.Replace("(Clone)", "");
+                weaponName = killer.WeaponHandler.GetWeapon().name.Replace("(Clone)", "");
                 killType = KillType.PlayerWithAssist;
             }
 
-            public KillHistoryElement(Attributes victim)
+            public KillHistoryElement(CombatAgent victim)
             {
                 killerName = "";
                 killerTeam = PlayerDataManager.Team.Environment;
@@ -201,9 +196,8 @@ namespace Vi.Core.GameModeManagers
                 assistTeam = PlayerDataManager.Team.Environment;
                 assistNetObjId = 0;
 
-                PlayerDataManager.PlayerData victimData = PlayerDataManager.Singleton.GetPlayerData(victim.GetPlayerDataId());
-                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victimData.team) + victimData.character.name;
-                victimTeam = PlayerDataManager.Team.Environment;
+                victimName = PlayerDataManager.Singleton.GetTeamPrefix(victim.GetTeam()) + victim.GetName();
+                victimTeam = victim.GetTeam();
                 victimNetObjId = victim.NetworkObjectId;
 
                 weaponName = "Environment";
@@ -304,50 +298,64 @@ namespace Vi.Core.GameModeManagers
             return killHistoryList;
         }
 
-        public virtual void OnDamageOccuring(Attributes attacker, Attributes victim, float HPDamage)
+        public virtual void OnDamageOccuring(CombatAgent attacker, CombatAgent victim, float HPDamage)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int attackerIndex = scoreList.IndexOf(new PlayerScore(attacker.GetPlayerDataId()));
-                PlayerScore attackerScore = scoreList[attackerIndex];
-                attackerScore.cumulativeDamageDealt += HPDamage;
-                attackerScore.damageDealtThisRound += HPDamage;
-                scoreList[attackerIndex] = attackerScore;
-
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDamageRecieved += HPDamage;
-                victimScore.damageRecievedThisRound += HPDamage;
-                scoreList[victimIndex] = victimScore;
+                if (attacker is Attributes attackerAttributes)
+                {
+                    int attackerIndex = scoreList.IndexOf(new PlayerScore(attackerAttributes.GetPlayerDataId()));
+                    PlayerScore attackerScore = scoreList[attackerIndex];
+                    attackerScore.cumulativeDamageDealt += HPDamage;
+                    attackerScore.damageDealtThisRound += HPDamage;
+                    scoreList[attackerIndex] = attackerScore;
+                }
+                
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDamageRecieved += HPDamage;
+                    victimScore.damageRecievedThisRound += HPDamage;
+                    scoreList[victimIndex] = victimScore;
+                }
             }
         }
 
-        public virtual void OnPlayerKill(Attributes killer, Attributes victim)
+        public virtual void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int killerIndex = scoreList.IndexOf(new PlayerScore(killer.GetPlayerDataId()));
-                PlayerScore killerScore = scoreList[killerIndex];
-                killerScore.cumulativeKills += 1;
-                killerScore.killsThisRound += 1;
-                scoreList[killerIndex] = killerScore;
+                if (killer is Attributes killerAttributes)
+                {
+                    int killerIndex = scoreList.IndexOf(new PlayerScore(killerAttributes.GetPlayerDataId()));
+                    PlayerScore killerScore = scoreList[killerIndex];
+                    killerScore.cumulativeKills += 1;
+                    killerScore.killsThisRound += 1;
+                    scoreList[killerIndex] = killerScore;
+                }
 
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDeaths += 1;
-                victimScore.deathsThisRound += 1;
-                scoreList[victimIndex] = victimScore;
-
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDeaths += 1;
+                    victimScore.deathsThisRound += 1;
+                    scoreList[victimIndex] = victimScore;
+                }
+                
                 // Damage is in negative numbers
-                Attributes assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
+                CombatAgent assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
                 if (assist)
                 {
-                    int assistIndex = scoreList.IndexOf(new PlayerScore(assist.GetPlayerDataId()));
-                    PlayerScore assistScore = scoreList[assistIndex];
-                    assistScore.cumulativeAssists += 1;
-                    assistScore.assistsThisRound += 1;
-                    scoreList[assistIndex] = assistScore;
-
+                    if (assist is Attributes assistAttributes)
+                    {
+                        int assistIndex = scoreList.IndexOf(new PlayerScore(assistAttributes.GetPlayerDataId()));
+                        PlayerScore assistScore = scoreList[assistIndex];
+                        assistScore.cumulativeAssists += 1;
+                        assistScore.assistsThisRound += 1;
+                        scoreList[assistIndex] = assistScore;
+                    }
                     killHistory.Add(new KillHistoryElement(killer, assist, victim));
                 }
                 else
@@ -359,16 +367,19 @@ namespace Vi.Core.GameModeManagers
 
         private const float minAssistDamage = 30;
 
-        public virtual void OnEnvironmentKill(Attributes victim)
+        public virtual void OnEnvironmentKill(CombatAgent victim)
         {
             if (nextGameActionTimer.Value <= 0)
             {
-                int victimIndex = scoreList.IndexOf(new PlayerScore(victim.GetPlayerDataId()));
-                PlayerScore victimScore = scoreList[victimIndex];
-                victimScore.cumulativeDeaths += 1;
-                victimScore.deathsThisRound += 1;
-                scoreList[victimIndex] = victimScore;
-
+                if (victim is Attributes victimAttributes)
+                {
+                    int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
+                    PlayerScore victimScore = scoreList[victimIndex];
+                    victimScore.cumulativeDeaths += 1;
+                    victimScore.deathsThisRound += 1;
+                    scoreList[victimIndex] = victimScore;
+                }
+                
                 killHistory.Add(new KillHistoryElement(victim));
             }
         }
@@ -836,7 +847,7 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
 
-                    if (attributes.TryGetComponent(out AnimationHandler animationHandler)) { StartCoroutine(PlayAnimation(animationHandler, isVictor)); }
+                    StartCoroutine(PlayAnimation(attributes.AnimationHandler, isVictor));
                 }
             }
             scoresToEvaluate.Clear();

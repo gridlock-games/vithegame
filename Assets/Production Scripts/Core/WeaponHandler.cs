@@ -7,9 +7,12 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.VFX;
+using Vi.Core.CombatAgents;
+using Vi.ProceduralAnimations;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class WeaponHandler : NetworkBehaviour
     {
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
@@ -20,15 +23,13 @@ namespace Vi.Core
         public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
 
         private Weapon weaponInstance;
-        private Attributes attributes;
-        private AnimationHandler animationHandler;
+        private CombatAgent combatAgent;
         private MovementHandler movementHandler;
         private LoadoutManager loadoutManager;
 
         private void Awake()
         {
-            animationHandler = GetComponent<AnimationHandler>();
-            attributes = GetComponent<Attributes>();
+            combatAgent = GetComponent<CombatAgent>();
             movementHandler = GetComponent<MovementHandler>();
             loadoutManager = GetComponent<LoadoutManager>();
             weaponInstance = ScriptableObject.CreateInstance<Weapon>();
@@ -51,8 +52,8 @@ namespace Vi.Core
 
         private IEnumerator SwapAnimatorController()
         {
-            yield return new WaitUntil(() => !animationHandler.IsAiming());
-            animationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
+            yield return new WaitUntil(() => !combatAgent.AnimationHandler.IsAiming());
+            combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
         }
 
         private List<GameObject> stowedWeaponInstances = new List<GameObject>();
@@ -67,11 +68,11 @@ namespace Vi.Core
 
             foreach (Weapon.WeaponModelData data in weapon.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == animationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        GameObject instance = Instantiate(modelData.weaponPrefab, animationHandler.LimbReferences.GetStowedWeaponParent(), true);
+                        GameObject instance = Instantiate(modelData.weaponPrefab, combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(), true);
                         instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
@@ -118,7 +119,7 @@ namespace Vi.Core
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == animationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -141,7 +142,14 @@ namespace Vi.Core
                                 bone = transform;
                                 break;
                             default:
-                                bone = animationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
+                                if (combatAgent.AnimationHandler.Animator.avatar.isHuman)
+                                {
+                                    bone = combatAgent.AnimationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
+                                }
+                                else
+                                {
+                                    bone = combatAgent.AnimationHandler.LimbReferences.GetBoneTransform(modelData.weaponBone);
+                                }
                                 break;
                         }
 
@@ -167,9 +175,9 @@ namespace Vi.Core
                 Debug.LogError("Could not find a weapon model data element for this skin: " + GetComponentInChildren<LimbReferences>().name + " on this melee weapon: " + this);
             }
 
-            if (!CanAim & animationHandler.IsAiming()) { animationHandler.LimbReferences.OnCannotAim(); }
+            if (!CanAim & combatAgent.AnimationHandler.IsAiming()) { combatAgent.AnimationHandler.LimbReferences.OnCannotAim(); }
 
-            animationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
+            combatAgent.AnimationHandler.LimbReferences.SetMeleeVerticalAimEnabled(!CanAim);
 
             List<RuntimeWeapon> runtimeWeaponList = weaponInstances.Values.ToList();
             foreach (RuntimeWeapon runtimeWeapon in runtimeWeaponList)
@@ -185,7 +193,7 @@ namespace Vi.Core
             {
                 if (flashAttack.GetClipType() == ActionClip.ClipType.FlashAttack)
                 {
-                    animationHandler.PlayAction(flashAttack);
+                    combatAgent.AnimationHandler.PlayAction(flashAttack);
                 }
                 else
                 {
@@ -233,7 +241,7 @@ namespace Vi.Core
             actionSoundEffectIdTracker.Clear();
 
             // Action sound effect logic here for normalized time of 0
-            foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+            foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
             {
                 if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
                 {
@@ -283,7 +291,7 @@ namespace Vi.Core
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
-                    attributes.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
+                    combatAgent.StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
                 }
             }
         }
@@ -360,9 +368,9 @@ namespace Vi.Core
                         else
                         {
                             if (actionVFXPrefab.TryGetComponent(out pooledObject))
-                                vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null).gameObject;
+                                vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(combatAgent.AnimationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null).gameObject;
                             else
-                                vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(animationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
+                                vfxInstance = Instantiate(actionVFXPrefab.gameObject, weaponInstances[weaponBone].transform.position, Quaternion.LookRotation(combatAgent.AnimationHandler.GetAimPoint() - weaponInstances[weaponBone].transform.position) * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), isPreviewVFX ? weaponInstances[weaponBone].transform : null);
                             
                             vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                         }
@@ -453,7 +461,7 @@ namespace Vi.Core
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
 
                     // Look at point then apply rotation offset
-                    vfxInstance.transform.LookAt(animationHandler.GetAimPoint());
+                    vfxInstance.transform.LookAt(combatAgent.AnimationHandler.GetAimPoint());
                     vfxInstance.transform.rotation *= Quaternion.Euler(actionVFXPrefab.vfxRotationOffset);
                     break;
                 default:
@@ -492,7 +500,7 @@ namespace Vi.Core
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {
-                        gameInteractiveActionVFX.InitializeVFX(attributes, CurrentActionClip);
+                        gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
                     }
                 }
             }
@@ -514,20 +522,20 @@ namespace Vi.Core
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
-            if (!animationHandler.Animator) { return; }
+            if (!combatAgent.AnimationHandler.Animator) { return; }
 
-            if (animationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
+            if (combatAgent.AnimationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = attributes.GetSpirit() > 0 | attributes.GetStamina() / attributes.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
+                IsBlocking = combatAgent.GetSpirit() > 0 | combatAgent.GetStamina() / combatAgent.GetMaxStamina() > Attributes.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {
                 IsBlocking = false;
             }
 
-            if (animationHandler.IsActionClipPlaying(CurrentActionClip))
+            if (combatAgent.AnimationHandler.IsActionClipPlaying(CurrentActionClip))
             {
-                float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
                 // Action VFX spawning here
                 if (IsServer)
                 {
@@ -540,11 +548,11 @@ namespace Vi.Core
                         }
                     }
                 }
-                
+
                 // Action sound effect logic here
-                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(attributes.GetRaceAndGender(), actionSoundEffectIdTracker))
+                foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
+                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
                     {
                         AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
                         actionSoundEffectIdTracker.Add(actionSoundEffect.id);
@@ -562,9 +570,9 @@ namespace Vi.Core
             else if (CurrentActionClip.IsAttack())
             {
                 bool lastIsAttacking = IsAttacking;
-                if (animationHandler.IsActionClipPlaying(CurrentActionClip))
+                if (combatAgent.AnimationHandler.IsActionClipPlaying(CurrentActionClip))
                 {
-                    float normalizedTime = animationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                    float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
@@ -631,9 +639,9 @@ namespace Vi.Core
 
                         if (!wasThereAHit)
                         {
-                            attributes.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
-                            attributes.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
-                            attributes.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
+                            combatAgent.ProcessEnvironmentDamage(-CurrentActionClip.healthPenaltyOnMiss, NetworkObject);
+                            combatAgent.AddStamina(-CurrentActionClip.staminaPenaltyOnMiss);
+                            combatAgent.AddRage(-CurrentActionClip.ragePenaltyOnMiss);
                         }
                     }
                 }
@@ -667,7 +675,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    Aim(aiming.Value & animationHandler.CanAim());
+                    Aim(aiming.Value & combatAgent.AnimationHandler.CanAim());
                 }
             }
             else
@@ -696,7 +704,7 @@ namespace Vi.Core
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
                 if (actionClip != null)
-                    animationHandler.PlayAction(actionClip);
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
             }
         }
 
@@ -790,7 +798,7 @@ namespace Vi.Core
 
         public void HeavyAttack(bool isPressed)
         {
-            animationHandler.SetHeavyAttackPressedState(isPressed);
+            combatAgent.AnimationHandler.SetHeavyAttackPressedState(isPressed);
 
             if (CanADS)
             {
@@ -820,7 +828,7 @@ namespace Vi.Core
                 {
                     ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
                     if (actionClip != null)
-                        animationHandler.PlayAction(actionClip);
+                        combatAgent.AnimationHandler.PlayAction(actionClip);
                 }
             }
         }
@@ -905,7 +913,7 @@ namespace Vi.Core
                         {
                             if (ability1PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
                             {
-                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability1)) { animationHandler.PlayAction(actionClip); }
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability1)) { combatAgent.AnimationHandler.PlayAction(actionClip); }
                             }
                             ObjectPoolingManager.ReturnObjectToPool(ability1PreviewInstance.GetComponent<PooledObject>());
                             ability1PreviewInstance = null;
@@ -914,7 +922,7 @@ namespace Vi.Core
                 }
                 else if (GetAttack(Weapon.InputAttackType.Ability1) & isPressed) // If there is no preview VFX
                 {
-                    animationHandler.PlayAction(actionClip);
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
                 }
             }
         }
@@ -942,7 +950,7 @@ namespace Vi.Core
                         {
                             if (ability2PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
                             {
-                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability2)) { animationHandler.PlayAction(actionClip); }
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability2)) { combatAgent.AnimationHandler.PlayAction(actionClip); }
                             }
                             ObjectPoolingManager.ReturnObjectToPool(ability2PreviewInstance.GetComponent<PooledObject>());
                             ability2PreviewInstance = null;
@@ -951,7 +959,7 @@ namespace Vi.Core
                 }
                 else if (GetAttack(Weapon.InputAttackType.Ability2) & isPressed) // If there is no preview VFX
                 {
-                    animationHandler.PlayAction(actionClip);
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
                 }
             }
         }
@@ -979,7 +987,7 @@ namespace Vi.Core
                         {
                             if (ability3PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
                             {
-                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability3)) { animationHandler.PlayAction(actionClip); }
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability3)) { combatAgent.AnimationHandler.PlayAction(actionClip); }
                             }
                             ObjectPoolingManager.ReturnObjectToPool(ability3PreviewInstance.GetComponent<PooledObject>());
                             ability3PreviewInstance = null;
@@ -988,7 +996,7 @@ namespace Vi.Core
                 }
                 else if (GetAttack(Weapon.InputAttackType.Ability3) & isPressed) // If there is no preview VFX
                 {
-                    animationHandler.PlayAction(actionClip);
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
                 }
             }
         }
@@ -1016,7 +1024,7 @@ namespace Vi.Core
                         {
                             if (ability4PreviewInstance.TryGetComponent(out ActionVFXPreview preview))
                             {
-                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability4)) { animationHandler.PlayAction(actionClip); }
+                                if (preview.CanCast & GetAttack(Weapon.InputAttackType.Ability4)) { combatAgent.AnimationHandler.PlayAction(actionClip); }
                             }
                             ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance.GetComponent<PooledObject>());
                             ability4PreviewInstance = null;
@@ -1025,7 +1033,7 @@ namespace Vi.Core
                 }
                 else if (GetAttack(Weapon.InputAttackType.Ability4) & isPressed) // If there is no preview VFX
                 {
-                    animationHandler.PlayAction(actionClip);
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
                 }
             }
         }
@@ -1039,19 +1047,19 @@ namespace Vi.Core
             return false;
         }
 
-        public bool IsAiming(LimbReferences.Hand hand) { return animationHandler.LimbReferences.IsAiming(hand) & animationHandler.CanAim(); }
+        public bool IsAiming(LimbReferences.Hand hand) { return combatAgent.AnimationHandler.LimbReferences.IsAiming(hand) & combatAgent.AnimationHandler.CanAim(); }
 
-        public bool IsAiming() { return aiming.Value & animationHandler.CanAim(); }
+        public bool IsAiming() { return aiming.Value & combatAgent.AnimationHandler.CanAim(); }
 
         private void Aim(bool isAiming)
         {
-            animationHandler.Animator.SetBool("Aiming", isAiming);
+            combatAgent.AnimationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
-                CharacterReference.RaceAndGender raceAndGender = attributes.CachedPlayerData.character.raceAndGender;
-                animationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !animationHandler.IsReloading(), animationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+                CharacterReference.RaceAndGender raceAndGender = combatAgent.GetRaceAndGender();
+                combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
-                animationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (animationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !animationHandler.IsReloading());
+                combatAgent.AnimationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (combatAgent.AnimationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !combatAgent.AnimationHandler.IsReloading());
             }
         }
 
@@ -1070,13 +1078,13 @@ namespace Vi.Core
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
-            if (!animationHandler.Animator) { return; }
+            if (!combatAgent.AnimationHandler.Animator) { return; }
 
-            animationHandler.Animator.SetBool("Blocking", IsBlocking);
+            combatAgent.AnimationHandler.Animator.SetBool("Blocking", IsBlocking);
 
             if (IsServer)
             {
-                reloadingAnimParameterValue.Value = animationHandler.Animator.GetBool("Reloading");
+                reloadingAnimParameterValue.Value = combatAgent.AnimationHandler.Animator.GetBool("Reloading");
 
                 if (ShouldUseAmmo())
                 {
@@ -1088,12 +1096,12 @@ namespace Vi.Core
             }
             else
             {
-                animationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
+                combatAgent.AnimationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
 
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                kvp.Value.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | animationHandler.IsAtRest());
+                kvp.Value.SetActive(!CurrentActionClip.weaponBonesToHide.Contains(kvp.Key) | combatAgent.AnimationHandler.IsAtRest());
             }
         }
 
@@ -1123,9 +1131,9 @@ namespace Vi.Core
         private void ReloadOnServer()
         {
             if (reloadRunning) { return; }
-            if (animationHandler.IsReloading()) { return; }
+            if (combatAgent.AnimationHandler.IsReloading()) { return; }
             if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
-            if (!animationHandler.IsAtRest()) { return; }
+            if (!combatAgent.AnimationHandler.IsAtRest()) { return; }
 
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
@@ -1138,9 +1146,9 @@ namespace Vi.Core
         private IEnumerator Reload(ShooterWeapon shooterWeapon)
         {
             reloadRunning = true;
-            animationHandler.Animator.SetBool("Reloading", true);
-            yield return new WaitUntil(() => animationHandler.IsFinishingReload());
-            animationHandler.Animator.SetBool("Reloading", false);
+            combatAgent.AnimationHandler.Animator.SetBool("Reloading", true);
+            yield return new WaitUntil(() => combatAgent.AnimationHandler.IsFinishingReload());
+            combatAgent.AnimationHandler.Animator.SetBool("Reloading", false);
             loadoutManager.Reload(weaponInstance);
             reloadRunning = false;
         }
@@ -1200,15 +1208,15 @@ namespace Vi.Core
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
-            if (animationHandler.WaitingForActionToPlay) { return null; }
-            if (animationHandler.IsReloading()) { return null; }
+            if (combatAgent.AnimationHandler.WaitingForActionToPlay) { return null; }
+            if (combatAgent.AnimationHandler.IsReloading()) { return null; }
 
             // If we are in recovery
             if (IsInRecovery)
             {
                 ActionClip actionClip = null;
                 // If not transitioning to a different action
-                if (!animationHandler.Animator.IsInTransition(animationHandler.Animator.GetLayerIndex("Actions")))
+                if (!combatAgent.AnimationHandler.Animator.IsInTransition(combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions")))
                 {
                     actionClip = SelectAttack(inputAttackType, inputHistory);
                 }
@@ -1253,7 +1261,7 @@ namespace Vi.Core
                 }
                 return actionClip;
             }
-            else if ((animationHandler.IsAtRest() & !animationHandler.IsFlinching()) | animationHandler.IsDodging() | animationHandler.IsPlayingBlockingHitReaction())
+            else if ((combatAgent.AnimationHandler.IsAtRest() & !combatAgent.AnimationHandler.IsFlinching()) | combatAgent.AnimationHandler.IsDodging() | combatAgent.AnimationHandler.IsPlayingBlockingHitReaction())
             {
                 ResetComboSystem();
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);

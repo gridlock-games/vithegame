@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {

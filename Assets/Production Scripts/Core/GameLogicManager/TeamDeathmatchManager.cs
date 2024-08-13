@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -18,7 +19,7 @@ namespace Vi.Core.GameModeManagers
             if (IsServer) { roundResultMessage.Value = "Team deathmatch starting! "; }
         }
 
-        public override void OnPlayerKill(Attributes killer, Attributes victim)
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
 

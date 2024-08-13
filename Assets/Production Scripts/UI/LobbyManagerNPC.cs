@@ -40,7 +40,7 @@ namespace Vi.UI
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.Attributes.IsLocalPlayer) { localPlayerInRange = true; }
+                if (networkCollider.CombatAgent.IsLocalPlayer) { localPlayerInRange = true; }
             }
         }
 
@@ -48,7 +48,7 @@ namespace Vi.UI
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.Attributes.IsLocalPlayer) { localPlayerInRange = false; }
+                if (networkCollider.CombatAgent.IsLocalPlayer) { localPlayerInRange = false; }
             }
         }
 

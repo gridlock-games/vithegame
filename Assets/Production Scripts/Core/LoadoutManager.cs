@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -72,14 +73,12 @@ namespace Vi.Core
             }
         }
 
-        private WeaponHandler weaponHandler;
-        private Attributes attributes;
+        private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
-            attributes = GetComponent<Attributes>();
-            weaponHandler = GetComponent<WeaponHandler>();
+            combatAgent = GetComponent<CombatAgent>();
 
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
             {
@@ -91,8 +90,22 @@ namespace Vi.Core
         {
             currentEquippedWeapon.OnValueChanged += OnCurrentEquippedWeaponChange;
 
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-            ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
+            if (combatAgent is Attributes attributes)
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
+            }
+            else if (combatAgent is Mob mob)
+            {
+                // Equip weapon here
+                PrimaryWeaponOption = mob.GetWeaponOption();
+                SecondaryWeaponOption = mob.GetWeaponOption();
+                combatAgent.WeaponHandler.SetNewWeapon(mob.GetWeaponOption().weapon, mob.GetWeaponOption().animationController);
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle combat agent sub class! " + combatAgent);
+            }
         }
 
         private Coroutine applyLoadoutCoroutine;
@@ -223,25 +236,25 @@ namespace Vi.Core
             switch (current)
             {
                 case 1:
-                    weaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
-                    weaponHandler.SetStowedWeapon(secondaryWeaponInstance);
-                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
+                    combatAgent.WeaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
+                    combatAgent.WeaponHandler.SetStowedWeapon(secondaryWeaponInstance);
+                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
-                    weaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
-                    weaponHandler.SetStowedWeapon(primaryWeaponInstance);
-                    if (IsServer) { attributes.RemoveAllStatusesAssociatedWithWeapon(); }
+                    combatAgent.WeaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
+                    combatAgent.WeaponHandler.SetStowedWeapon(primaryWeaponInstance);
+                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");
                     break;
             }
-            weaponHandler.ClearActionVFXInstances();
+            combatAgent.WeaponHandler.ClearActionVFXInstances();
         }
 
         public bool CanSwapWeapons()
         {
-            if (attributes.GetAilment() != ActionClip.Ailment.None) { return false; }
+            if (combatAgent.GetAilment() != ActionClip.Ailment.None) { return false; }
             if (!animationHandler.IsAtRest()) { return false; }
             if (animationHandler.IsReloading()) { return false; }
             return true;
@@ -263,7 +276,7 @@ namespace Vi.Core
                 ActionClip flashAttack = primaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
+                    if (combatAgent.WeaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(1);
@@ -287,7 +300,7 @@ namespace Vi.Core
                 ActionClip flashAttack = secondaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
+                    if (combatAgent.WeaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
                         if (!animationHandler.AreActionClipRequirementsMet(flashAttack)) { return; }
                         FlashAttackServerRpc(2);
@@ -325,7 +338,7 @@ namespace Vi.Core
         {
             if (!IsSpawned) { return; }
             if (!IsLocalPlayer) { return; }
-            if (!weaponHandler.WeaponInitialized) { return; }
+            if (!combatAgent.WeaponHandler.WeaponInitialized) { return; }
 
             if (currentEquippedWeapon.Value == 1)
             {
@@ -333,12 +346,12 @@ namespace Vi.Core
                 ActionClip flashAttack = secondaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
+                    if (combatAgent.WeaponHandler.CanActivateFlashSwitch() & Time.time - lastSecondaryFlashAttackTime > flashAttackCooldown)
                     {
                         canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
-                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                combatAgent.GlowRenderer.RenderFlashAttack(canFlashAttack);
                 WeaponNameThatCanFlashAttack = canFlashAttack ? SecondaryWeaponOption.weapon.name : string.Empty;
             }
             else if (currentEquippedWeapon.Value == 2)
@@ -347,12 +360,12 @@ namespace Vi.Core
                 ActionClip flashAttack = primaryWeaponInstance.GetFlashAttack();
                 if (flashAttack)
                 {
-                    if (weaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
+                    if (combatAgent.WeaponHandler.CanActivateFlashSwitch() & Time.time - lastPrimaryFlashAttackTime > flashAttackCooldown)
                     {
                         canFlashAttack = animationHandler.AreActionClipRequirementsMet(flashAttack);
                     }
                 }
-                attributes.GlowRenderer.RenderFlashAttack(canFlashAttack);
+                combatAgent.GlowRenderer.RenderFlashAttack(canFlashAttack);
                 WeaponNameThatCanFlashAttack = canFlashAttack ? PrimaryWeaponOption.weapon.name : string.Empty;
             }
             else
@@ -371,13 +384,13 @@ namespace Vi.Core
         {
             if (weaponSlotToSwapTo == 1)
             {
-                yield return new WaitUntil(() => weaponHandler.GetWeapon() == primaryWeaponInstance);
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon() == primaryWeaponInstance);
             }
             else if (weaponSlotToSwapTo == 2)
             {
-                yield return new WaitUntil(() => weaponHandler.GetWeapon() == secondaryWeaponInstance);
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon() == secondaryWeaponInstance);
             }
-            weaponHandler.PlayFlashAttack();
+            combatAgent.WeaponHandler.PlayFlashAttack();
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {
@@ -9,11 +10,11 @@ namespace Vi.UI
     {
         private const float glowAmount = 2.46f;
 
-        private Attributes attributes;
+        private CombatAgent combatAgent;
         private Renderer[] renderers;
         private void Start()
         {
-            attributes = GetComponentInParent<Attributes>();
+            combatAgent = GetComponentInParent<CombatAgent>();
             renderers = GetComponentsInChildren<Renderer>();
 
             for (int i = 0; i < renderers.Length; i++)
@@ -35,15 +36,15 @@ namespace Vi.UI
         {
             for (int i = 0; i < renderers.Length; i++)
             {
-                renderers[i].enabled = attributes.IsSpawned;
+                renderers[i].enabled = combatAgent.IsSpawned;
                 if (!renderers[i].enabled) { continue; }
 
                 foreach (Material mat in rendererMaterialCache[i])
                 {
-                    if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
+                    if (combatAgent.IsSpawned)
                     {
-                        mat.color = attributes.GetRelativeTeamColor();
-                        mat.SetFloat(_Transparency, attributes.GetTeam() == PlayerDataManager.Team.Competitor | attributes.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
+                        mat.color = combatAgent.GetRelativeTeamColor();
+                        mat.SetFloat(_Transparency, combatAgent.GetTeam() == PlayerDataManager.Team.Competitor | combatAgent.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
                     }
                     else
                     {
@@ -52,7 +53,7 @@ namespace Vi.UI
                     }
                     mat.SetFloat(_Glow, glowAmount);
                 }
-                renderers[i].enabled = attributes.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
+                renderers[i].enabled = combatAgent.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
             }
         }
     }

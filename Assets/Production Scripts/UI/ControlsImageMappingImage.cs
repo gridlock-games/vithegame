@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Vi.Core;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {

@@ -41,23 +41,23 @@ namespace Vi.Core.VFX.Axe
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == GetAttacker())
+                    if (networkCollider.CombatAgent == GetAttacker())
                     {
                         if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
                         if (shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
 
                     if (spellType == SpellType.GroundSpell)
                     {
-                        if (networkCollider.Attributes.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                        if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
                     }
 
                     if (shouldAffect)
@@ -66,7 +66,7 @@ namespace Vi.Core.VFX.Axe
                         movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
                     }
                 }
-                else if (colliders[i].GetComponent<Projectile>())
+                else if (colliders[i].transform.root.GetComponent<Projectile>())
                 {
                     if (colliders[i].TryGetComponent(out Rigidbody rb))
                     {
@@ -81,16 +81,16 @@ namespace Vi.Core.VFX.Axe
             int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].TryGetComponent(out NetworkCollider networkCollider))
+                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     bool shouldAffect = false;
-                    if (networkCollider.Attributes == GetAttacker())
+                    if (networkCollider.CombatAgent == GetAttacker())
                     {
                         if (shouldAffectSelf) { shouldAffect = true; }
                     }
                     else
                     {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.Attributes, GetAttacker());
+                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
                         if (shouldAffectEnemies & canHit) { shouldAffect = true; }
                         if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
                     }
@@ -106,12 +106,12 @@ namespace Vi.Core.VFX.Axe
 
                         if (NetworkManager.Singleton.IsServer)
                         {
-                            networkCollider.Attributes.ProcessProjectileHit(GetAttacker(), null, new Dictionary<Attributes, RuntimeWeapon.HitCounterData>(),
-                                copy, networkCollider.Attributes.transform.position, transform.position);
+                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                                copy, networkCollider.CombatAgent.transform.position, transform.position);
                         }
                     }
                 }
-                else if (colliders[i].TryGetComponent(out Rigidbody rb))
+                else if (colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
                 {
                     rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
                 }

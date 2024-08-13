@@ -11,7 +11,7 @@ namespace Vi.Core.GameModeManagers
     {
         protected const float gameItemVolume = 1;
 
-        public virtual void OnHit(Attributes attacker)
+        public virtual void OnHit(CombatAgent attacker)
         {
             
         }

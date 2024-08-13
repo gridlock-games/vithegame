@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using System.Linq;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
+using Vi.Player;
 
 namespace Vi.UI
 {
