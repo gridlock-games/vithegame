@@ -5,7 +5,6 @@ using Vi.Core;
 using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Vi.Core.CombatAgents;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -39,7 +38,7 @@ namespace Vi.ArtificialIntelligence
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
 
                     targetAttributes = null;
-                    foreach (Attributes player in activePlayers)
+                    foreach (CombatAgent player in activePlayers)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }

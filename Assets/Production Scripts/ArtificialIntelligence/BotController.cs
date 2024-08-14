@@ -408,7 +408,6 @@ namespace Vi.ArtificialIntelligence
                 lastWeaponSwapTime = Time.time;
             }
 
-            Debug.Log(name + " " + targetAttributes);
             if (targetAttributes)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
