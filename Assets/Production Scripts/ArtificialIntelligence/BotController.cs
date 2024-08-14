@@ -331,7 +331,7 @@ namespace Vi.ArtificialIntelligence
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
 
                     targetAttributes = null;
-                    foreach (Attributes player in activePlayers)
+                    foreach (CombatAgent player in activePlayers)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
@@ -408,6 +408,7 @@ namespace Vi.ArtificialIntelligence
                 lastWeaponSwapTime = Time.time;
             }
 
+            Debug.Log(name + " " + targetAttributes);
             if (targetAttributes)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
