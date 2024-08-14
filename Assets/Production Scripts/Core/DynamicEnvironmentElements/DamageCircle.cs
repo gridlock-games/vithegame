@@ -91,7 +91,7 @@ namespace Vi.Core.DynamicEnvironmentElements
                 if (col.TryGetComponent(out NetworkCollider networkCollider)) { attributesInside.Add(networkCollider.CombatAgent); }
             }
 
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActiveCombatAgents())
             {
                 if (!attributesInside.Contains(attributes)) { attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject); }
             }

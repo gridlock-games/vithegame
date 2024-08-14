@@ -125,6 +125,8 @@ namespace Vi.Core
             HP.OnValueChanged += OnHPChanged;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+
+            PlayerDataManager.Singleton.AddCombatAgent(this);
         }
 
         public override void OnNetworkDespawn()
@@ -133,6 +135,8 @@ namespace Vi.Core
             HP.OnValueChanged -= OnHPChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
+
+            PlayerDataManager.Singleton.RemoveCombatAgent(this);
         }
 
         protected void OnEnable()

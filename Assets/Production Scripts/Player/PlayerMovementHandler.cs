@@ -623,12 +623,12 @@ namespace Vi.Player
             }
         }
 
-        public Attributes CameraFollowTarget { get; private set; }
+        public CombatAgent CameraFollowTarget { get; private set; }
         public void OnIncrementFollowPlayer()
         {
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                List<Attributes> spectatableAttributesList = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
+                List<CombatAgent> spectatableAttributesList = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
                 if (CameraFollowTarget == null)
                 {
                     if (spectatableAttributesList.Count > 0) { CameraFollowTarget = spectatableAttributesList[0]; }
@@ -653,7 +653,7 @@ namespace Vi.Player
         {
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                List<Attributes> spectatableAttributesList = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
+                List<CombatAgent> spectatableAttributesList = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes).FindAll(item => (!PlayerDataManager.Singleton.CanHit(attributes, item) | item.GetTeam() == PlayerDataManager.Team.Competitor) & item.GetAilment() != ActionClip.Ailment.Death);
                 if (CameraFollowTarget == null)
                 {
                     if (spectatableAttributesList.Count > 0) { CameraFollowTarget = spectatableAttributesList[^1]; }

@@ -26,8 +26,8 @@ namespace Vi.ArtificialIntelligence
             StartCoroutine(EvaluateBotLogic());
         }
 
-        private List<Attributes> activePlayers = new List<Attributes>();
-        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(); }
+        private List<CombatAgent> activePlayers = new List<CombatAgent>();
+        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
 
         CombatAgent targetAttributes;
         private IEnumerator EvaluateBotLogic()

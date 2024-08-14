@@ -276,10 +276,10 @@ namespace Vi.ArtificialIntelligence
             lastMovement = movement;
         }
 
-        private List<Attributes> activePlayers = new List<Attributes>();
-        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(attributes); }
+        private List<CombatAgent> activePlayers = new List<CombatAgent>();
+        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes); }
 
-        private Attributes targetAttributes;
+        private CombatAgent targetAttributes;
 
         private new void Update()
         {

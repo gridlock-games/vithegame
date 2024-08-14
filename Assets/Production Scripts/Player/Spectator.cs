@@ -13,8 +13,8 @@ namespace Vi.Player
     {
         [SerializeField] private float moveSpeed = 7;
 
-        private List<Attributes> playerList = new List<Attributes>();
-        public void SetPlayerList(List<Attributes> playerList)
+        private List<CombatAgent> playerList = new List<CombatAgent>();
+        public void SetPlayerList(List<CombatAgent> playerList)
         {
             this.playerList = playerList;
         }
@@ -326,7 +326,7 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
         }
 
-        private Attributes followTarget;
+        private CombatAgent followTarget;
         private float followCamAngleOffset;
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
 
