@@ -359,13 +359,11 @@ namespace Vi.Core
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
-                AnimationHandler.Animator.enabled = false;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 isRaging.Value = false;
-                AnimationHandler.Animator.enabled = true;
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             }
         }

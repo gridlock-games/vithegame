@@ -76,6 +76,8 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+
             if (targetAttributes)
             {
                 float dist = Vector3.Distance(Destination, transform.position);

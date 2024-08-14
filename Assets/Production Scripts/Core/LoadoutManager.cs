@@ -35,8 +35,8 @@ namespace Vi.Core
 
         public void ReloadAllWeapons()
         {
-            primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount();
-            secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount();
+            if (primaryWeaponInstance) { primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount(); }
+            if (secondaryWeaponInstance) { secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount(); }
         }
 
         public void UseAmmo(Weapon weapon)

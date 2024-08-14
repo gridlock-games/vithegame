@@ -936,31 +936,28 @@ namespace Vi.Core
             }
 
             // Play the action clip based on its type
-            if (actionClip.ailment != ActionClip.Ailment.Death)
+            switch (actionClip.GetClipType())
             {
-                switch (actionClip.GetClipType())
-                {
-                    case ActionClip.ClipType.Dodge:
-                    case ActionClip.ClipType.LightAttack:
-                    case ActionClip.ClipType.Ability:
-                    case ActionClip.ClipType.GrabAttack:
-                    case ActionClip.ClipType.Lunge:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
-                        break;
-                    case ActionClip.ClipType.HeavyAttack:
-                        heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
-                        break;
-                    case ActionClip.ClipType.HitReaction:
-                    case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
-                        break;
-                    case ActionClip.ClipType.Flinch:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
-                        break;
-                    default:
-                        Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
-                        break;
-                }
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Lunge:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+                    break;
+                case ActionClip.ClipType.HeavyAttack:
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
+                    break;
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.FlashAttack:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.Flinch:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
+                    break;
             }
 
             // Set the current action clip for the weapon handler

@@ -884,10 +884,12 @@ namespace Vi.Core.CombatAgents
             {
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 respawnCoroutine = StartCoroutine(RespawnSelf());
+                AnimationHandler.Animator.enabled = false;
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
+                AnimationHandler.Animator.enabled = true;
             }
         }
 
