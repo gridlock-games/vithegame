@@ -364,6 +364,7 @@ namespace Vi.Core
             else if (prev == ActionClip.Ailment.Death)
             {
                 isRaging.Value = false;
+                AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             }
         }

@@ -188,11 +188,15 @@ namespace Vi.Core
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
-            Animator.Play("Empty", actionsLayerIndex);
-            Animator.Play("Empty", flinchLayerIndex);
             combatAgent.SetInviniciblity(0);
             combatAgent.SetUninterruptable(0);
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
+        }
+
+        public void OnRevive()
+        {
+            Animator.Play("Empty", actionsLayerIndex);
+            Animator.Play("Empty", flinchLayerIndex);
         }
 
         public void CancelAllActions(float transitionTime)
