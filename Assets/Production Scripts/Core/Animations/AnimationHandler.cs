@@ -1046,11 +1046,14 @@ namespace Vi.Core
         {
             combatAgent = GetComponent<CombatAgent>();
 
-            Animator = GetComponent<Animator>();
-            actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
-            flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
-            LimbReferences = GetComponent<LimbReferences>();
-            animatorReference = GetComponent<AnimatorReference>();
+            if (TryGetComponent(out Animator animator))
+            {
+                Animator = animator;
+                actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
+                flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
+                LimbReferences = GetComponent<LimbReferences>();
+                animatorReference = GetComponent<AnimatorReference>();
+            }
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
