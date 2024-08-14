@@ -252,7 +252,7 @@ namespace Vi.Core.GameModeManagers
                     Sprite killFeedIcon = null;
                     CharacterReference.WeaponOption weaponOption = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString());
                     if (weaponOption != null) { killFeedIcon = weaponOption.killFeedIcon; }
-                    return killFeedIcon;
+                    return killFeedIcon ? killFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
                 }
                 else if (killType == KillType.Environment)
                     return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
