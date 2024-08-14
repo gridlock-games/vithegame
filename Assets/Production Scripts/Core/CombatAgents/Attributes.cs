@@ -424,12 +424,6 @@ namespace Vi.Core.CombatAgents
             return Time.time - lastBlockTime <= 0.25f;
         }
 
-        public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
-        private const float notBlockingSpiritHitReactionPercentage = 0.4f;
-        private const float blockingSpiritHitReactionPercentage = 0.5f;
-
-        private const float rageDamageMultiplier = 1.15f;
-
         private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (isMeleeHit)
@@ -645,18 +639,6 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        private NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
-        private NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
-
-        public bool IsPulled() { return isPulled.Value; }
-
-        public CombatAgent GetPullAssailant()
-        {
-            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantDataId.Value, out NetworkObject networkObject);
-            if (!networkObject) { Debug.LogError("Could not find pull assailant! " + pullAssailantDataId.Value); return null; }
-            return networkObject.GetComponent<CombatAgent>();
-        }
-
         protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
         {
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
@@ -782,15 +764,6 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private int knockupHitCounter;
-        private const int knockupHitLimit = 5;
-
-        private const float stunDuration = 3;
-        private const float knockdownDuration = 2;
-        private const float knockupDuration = 4;
-        private const float attackerRageToBeAddedOnHit = 2;
-        private const float victimRageToBeAddedOnHit = 1;
-
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
@@ -848,7 +821,6 @@ namespace Vi.Core.CombatAgents
             AddSpirit(spiritRegenRate * Time.deltaTime);
         }
 
-        public const float ragingStaminaCostMultiplier = 1.25f;
         private const float rageDepletionRate = 1;
         private float rageDelayCooldown;
         private void UpdateRage()

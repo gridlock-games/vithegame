@@ -251,6 +251,18 @@ namespace Vi.Core
             grabVictimDataId.Value = default;
         }
 
+        protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
+        protected NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
+
+        public bool IsPulled() { return isPulled.Value; }
+
+        public CombatAgent GetPullAssailant()
+        {
+            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantDataId.Value, out NetworkObject networkObject);
+            if (!networkObject) { Debug.LogError("Could not find pull assailant! " + pullAssailantDataId.Value); return null; }
+            return networkObject.GetComponent<CombatAgent>();
+        }
+
         protected virtual void Update()
         {
             bool isInvincibleThisFrame = IsInvincible();
@@ -294,6 +306,7 @@ namespace Vi.Core
             ActivateRage();
         }
 
+        public const float ragingStaminaCostMultiplier = 1.25f;
         public bool IsRaging() { return isRaging.Value; }
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
@@ -340,6 +353,22 @@ namespace Vi.Core
                 damageMappingThisLife.Add(attacker, damage);
             }
         }
+
+        public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
+
+        protected const float notBlockingSpiritHitReactionPercentage = 0.4f;
+        protected const float blockingSpiritHitReactionPercentage = 0.5f;
+
+        protected const float rageDamageMultiplier = 1.15f;
+
+        protected int knockupHitCounter;
+        protected const int knockupHitLimit = 5;
+
+        protected const float stunDuration = 3;
+        protected const float knockdownDuration = 2;
+        protected const float knockupDuration = 4;
+        protected const float attackerRageToBeAddedOnHit = 2;
+        protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);

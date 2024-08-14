@@ -506,7 +506,7 @@ namespace Vi.Player
 
                 if (attributes.ShouldShake())
                 {
-                    movement += Random.insideUnitSphere * (Time.deltaTime * Attributes.ShakeAmount);
+                    movement += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
                 }
 
                 transform.position += movement;
