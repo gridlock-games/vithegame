@@ -22,10 +22,12 @@ namespace Vi.ArtificialIntelligence
 
         private const float runAnimationTransitionSpeed = 5;
         private const float runSpeed = 4;
+        private const float rotationSpeed = 120;
 
         private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
         private new void Update()
         {
+            if (!IsSpawned) { return; }
             if (IsServer)
             {
                 Vector3 inputDir;
@@ -38,7 +40,7 @@ namespace Vi.ArtificialIntelligence
                     inputDir = NextPosition - transform.position;
                     inputDir.y = 0;
                     transform.position += Time.deltaTime * runSpeed * inputDir.normalized;
-                    transform.rotation = Quaternion.LookRotation(inputDir.normalized);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(inputDir.normalized), Time.deltaTime * rotationSpeed);
                     inputDir = transform.InverseTransformDirection(inputDir).normalized;
                 }
                 moveForwardTarget.Value = inputDir.z;
@@ -50,6 +52,7 @@ namespace Vi.ArtificialIntelligence
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
 
             Collider[] colliders = Physics.OverlapSphere(transform.position, roamRadius, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
@@ -59,12 +62,13 @@ namespace Vi.ArtificialIntelligence
             {
                 float dist = Vector3.Distance(transform.position, colliders[i].transform.position);
                 if (dist > minDistance & minDistanceInitialized) { continue; }
-                minDistance = dist;
-                minDistanceInitialized = true;
 
                 if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent == actionVFX.GetAttacker()) { continue; }
+
+                    minDistance = dist;
+                    minDistanceInitialized = true;
 
                     bool shouldAffect = PlayerDataManager.Singleton.CanHit(actionVFX.GetAttacker(), networkCollider.CombatAgent);
                     if (shouldAffect)
