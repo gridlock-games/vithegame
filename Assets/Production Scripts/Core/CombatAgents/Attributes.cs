@@ -125,8 +125,8 @@ namespace Vi.Core.CombatAgents
 
         public override void OnNetworkSpawn()
         {
-            base.OnNetworkSpawn();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
+            base.OnNetworkSpawn();
 
             if (IsServer)
             {
