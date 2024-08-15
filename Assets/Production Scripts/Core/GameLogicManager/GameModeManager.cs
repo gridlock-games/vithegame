@@ -828,7 +828,10 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (!gameOver.Value & !IsWaitingForPlayers)
                     {
-                        //if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                        if (scoreList.Count == PlayerDataManager.GetGameModeMinPlayers(PlayerDataManager.Singleton.GetGameMode()))
+                        {
+                            EndGamePrematurely("Returning to lobby due to having no opponents!");
+                        }
                     }
                 }
             }

@@ -317,6 +317,18 @@ namespace Vi.Core
             Peaceful
         }
 
+        public static int GetGameModeMinPlayers(GameMode gameMode)
+        {
+            if (gameMode == GameMode.HordeMode)
+            {
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+
         public static string GetGameModeString(GameMode gameMode)
         {
             switch (gameMode)
