@@ -112,6 +112,7 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
+            if (!targetAttributes) { return; }
             Transform target = targetAttributes.transform;
             if (target)
             {

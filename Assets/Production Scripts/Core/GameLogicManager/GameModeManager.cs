@@ -90,6 +90,7 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
+        /*
         protected GameItem SpawnGameItem(GameItem gameItemPrefab, SpawnPoints.TransformData spawnPoint)
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
@@ -131,6 +132,17 @@ namespace Vi.Core.GameModeManagers
             }
 
             return possibleSpawnPoints;
+        }
+        */
+
+        protected Mob SpawnMob(Mob mobPrefab, PlayerDataManager.Team team)
+        {
+            SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobPrefab);
+
+            Mob mob = Instantiate(mobPrefab.gameObject, transformData.position, transformData.rotation).GetComponent<Mob>();
+            mob.SetTeam(team);
+            mob.NetworkObject.Spawn(true);
+            return mob.GetComponent<Mob>();
         }
 
         [SerializeField] private Sprite environmentKillFeedIcon;
@@ -764,7 +776,6 @@ namespace Vi.Core.GameModeManagers
             return highestKillPlayerScores;
         }
 
-
         public virtual string GetLeftScoreString() { return string.Empty; }
 
         public virtual string GetRightScoreString() { return string.Empty; }
@@ -817,7 +828,7 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (!gameOver.Value & !IsWaitingForPlayers)
                     {
-                        if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                        //if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
                     }
                 }
             }

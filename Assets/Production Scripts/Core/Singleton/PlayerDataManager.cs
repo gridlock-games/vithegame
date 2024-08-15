@@ -815,15 +815,9 @@ namespace Vi.Core
             }
         }
 
-        public bool HasPlayerSpawnPoints()
-        {
-            return playerSpawnPoints;
-        }
+        public bool HasPlayerSpawnPoints() { return playerSpawnPoints; }
 
-        public SpawnPoints GetPlayerSpawnPoints()
-        {
-            return playerSpawnPoints;
-        }
+        public SpawnPoints GetPlayerSpawnPoints() { return playerSpawnPoints; }
 
         public Vector3 GetDamageCircleMaxScale()
         {

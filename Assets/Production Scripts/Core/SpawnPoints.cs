@@ -180,8 +180,50 @@ namespace Vi.Core
             return (findMostClearSpawnPoint, returnedSpawnPoints);
         }
 
+        [System.Serializable]
+        public class SpawnPointDefinition
+        {
+            public PlayerDataManager.GameMode[] gameModes;
+            public PlayerDataManager.Team[] teams;
+            public bool findMostClearSpawnPoint = true;
+            public Vector3[] spawnPositions = new Vector3[0];
+            public Vector3[] spawnRotations = new Vector3[0];
+            public int[] spawnPriorities = new int[0];
+        }
+
+        [SerializeField] private MobSpawnPointDefinition[] mobSpawnPoints = new MobSpawnPointDefinition[0];
+
+        public TransformData GetMobSpawnPoint(Mob mobPrefab)
+        {
+            MobSpawnPointDefinition mobSpawnPointDefinition = System.Array.Find(mobSpawnPoints, item => item.mobPrefab == mobPrefab);
+            if (mobSpawnPointDefinition != null) { return mobSpawnPointDefinition.GetRandomOrientation(); }
+            return default;
+        }
+
+        [System.Serializable]
+        private class MobSpawnPointDefinition
+        {
+            public Mob mobPrefab;
+            public Vector3[] spawnPositions = new Vector3[0];
+            public Vector3[] spawnRotations = new Vector3[0];
+
+            public TransformData GetRandomOrientation()
+            {
+                TransformData transformData = new TransformData();
+                if (spawnPositions.Length > 0)
+                {
+                    transformData.position = spawnPositions[Random.Range(0, spawnPositions.Length)];
+                }
+                if (spawnRotations.Length > 0)
+                {
+                    transformData.rotation = Quaternion.Euler(spawnRotations[Random.Range(0, spawnRotations.Length)]);
+                }
+                return transformData;
+            }
+        }
+
         [Header("Gizmos")]
-        [SerializeField] private bool displayDefaultGizmos;
+        [SerializeField] private bool displayDefaultGizmos = true;
         [SerializeField] private bool displayDamageCircleGizmos;
 
         private void OnDrawGizmos()
@@ -215,6 +257,15 @@ namespace Vi.Core
                         Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
                     }
                 }
+
+                foreach (MobSpawnPointDefinition mobSpawnPointDefinition in mobSpawnPoints)
+                {
+                    Gizmos.color = Color.red;
+                    foreach (Vector3 spawnPosition in mobSpawnPointDefinition.spawnPositions)
+                    {
+                        Gizmos.DrawSphere(spawnPosition, 2);
+                    }
+                }
             }
             
             if (displayDamageCircleGizmos)
@@ -225,17 +276,6 @@ namespace Vi.Core
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
             }
-        }
-
-        [System.Serializable]
-        public class SpawnPointDefinition
-        {
-            public PlayerDataManager.GameMode[] gameModes;
-            public PlayerDataManager.Team[] teams;
-            public bool findMostClearSpawnPoint = true;
-            public Vector3[] spawnPositions = new Vector3[0];
-            public Vector3[] spawnRotations = new Vector3[0];
-            public int[] spawnPriorities = new int[0];
         }
     }
 }
