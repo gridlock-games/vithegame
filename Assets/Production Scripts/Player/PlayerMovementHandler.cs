@@ -98,6 +98,7 @@ namespace Vi.Player
                     moveForwardTarget.Value = 0;
                     moveSidesTarget.Value = 0;
                 }
+                isGrounded = true;
                 lastMovement = Vector3.zero;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
             }

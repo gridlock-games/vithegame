@@ -113,6 +113,7 @@ namespace Vi.ArtificialIntelligence
             {
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
+                isGrounded.Value = true;
                 lastMovement = Vector3.zero;
                 return;
             }
