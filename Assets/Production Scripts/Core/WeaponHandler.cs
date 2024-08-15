@@ -314,6 +314,7 @@ namespace Vi.Core
                 previewInstance = Instantiate(pooledObject, orientation.position, orientation.rotation, parent).GetComponent<ActionVFXPreview>();
                 Debug.LogError("No pooled object on preview VFX object!" + actionPreviewVFXPrefab);
             }
+            previewInstance.transform.localScale = actionClip.previewActionVFXScale;
             previewInstance.SetActionVFX(actionClip.actionVFXList[0]);
             return previewInstance.gameObject;
         }
