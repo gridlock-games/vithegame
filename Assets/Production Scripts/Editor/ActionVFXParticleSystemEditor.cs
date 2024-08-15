@@ -9,7 +9,7 @@ namespace Vi.Editor
 {
     [CustomEditor(typeof(ActionVFXParticleSystem))]
     [CanEditMultipleObjects]
-    public class ActionVFXParticleSystemEditor : GameInteractiveActionVFXEditor
+    public class ActionVFXParticleSystemEditor : FollowUpVFXEditor
     {
         private SerializedProperty spParticleSystemType;
 

@@ -9,7 +9,7 @@ namespace Vi.Core.VFX
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NetworkRigidbody))]
-    public class ActionVFXParticleSystem : GameInteractiveActionVFX
+    public class ActionVFXParticleSystem : FollowUpVFX
     {
         private enum ParticleSystemType
         {
@@ -83,19 +83,52 @@ namespace Vi.Core.VFX
                     Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
                     #endif
 
-                    bool bHit = false;
-                    for (int i = 0; i < allHitsCount; i++)
-                    {
-                        bHit = true;
-                        break;
-                    }
-
+                    bool bHit = allHitsCount > 0;
                     if (bHit) { break; }
 
                     endBoundsPoint = Vector3.MoveTowards(endBoundsPoint, Vector3.zero, 0.1f);
                 }
                 Vector3 newScale = new Vector3(DivideBounds(boundsPoint.x, endBoundsPoint.x), DivideBounds(boundsPoint.y, endBoundsPoint.y), DivideBounds(boundsPoint.z, endBoundsPoint.z));
                 transform.localScale = Vector3.Scale(transform.localScale, newScale);
+            }
+        }
+
+        private bool CanHit(CombatAgent combatAgent)
+        {
+            if (!IsSpawned) { return false; }
+            if (!IsServer) { Debug.LogError("ActionVFXParticleSystem.CanHit() should only be called on the server!"); return false; }
+
+            if (!ShouldAffect(combatAgent)) { return false; }
+
+            bool canHit = true;
+            if (hitCounter.ContainsKey(combatAgent))
+            {
+                if (hitCounter[combatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
+                if (Time.time - hitCounter[combatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+            }
+
+            if (spellType == SpellType.GroundSpell)
+            {
+                if (PlayerDataManager.Singleton.CanHit(attacker, combatAgent))
+                {
+                    if (combatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                }
+            }
+            return canHit;
+        }
+
+        private void ProcessHit(CombatAgent combatAgent, Vector3 impactPosition)
+        {
+            if (combatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, impactPosition, shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+            {
+                if (!hitCounter.ContainsKey(combatAgent))
+                {
+                    hitCounter.Add(combatAgent, new(1, Time.time));
+                }
+                else
+                {
+                    hitCounter[combatAgent] = new(hitCounter[combatAgent].hitNumber + 1, Time.time);
+                }
             }
         }
 
@@ -135,34 +168,9 @@ namespace Vi.Core.VFX
                 {
                     if (networkCollider.CombatAgent)
                     {
-                        bool canHit = true;
-                        if (hitCounter.ContainsKey(networkCollider.CombatAgent))
+                        if (CanHit(networkCollider.CombatAgent))
                         {
-                            if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                            if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                        }
-
-                        if (spellType == SpellType.GroundSpell)
-                        {
-                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
-                            {
-                                if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
-                            }
-                        }
-
-                        if (canHit)
-                        {
-                            if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
-                            {
-                                if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
-                                {
-                                    hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
-                                }
-                                else
-                                {
-                                    hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
-                                }
-                            }
+                            ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
                         }
                     }
                 }
@@ -180,34 +188,9 @@ namespace Vi.Core.VFX
                 {
                     if (networkCollider.CombatAgent)
                     {
-                        bool canHit = true;
-                        if (hitCounter.ContainsKey(networkCollider.CombatAgent))
+                        if (CanHit(networkCollider.CombatAgent))
                         {
-                            if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                            if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                        }
-
-                        if (spellType == SpellType.GroundSpell)
-                        {
-                            if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
-                            {
-                                if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
-                            }
-                        }
-
-                        if (canHit)
-                        {
-                            if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, other.ClosestPointOnBounds(transform.position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
-                            {
-                                if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
-                                {
-                                    hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
-                                }
-                                else
-                                {
-                                    hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
-                                }
-                            }
+                            ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
                         }
                     }
                 }
@@ -247,34 +230,9 @@ namespace Vi.Core.VFX
                     {
                         if (networkCollider.CombatAgent)
                         {
-                            bool canHit = true;
-                            if (hitCounter.ContainsKey(networkCollider.CombatAgent))
+                            if (CanHit(networkCollider.CombatAgent))
                             {
-                                if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                            }
-
-                            if (spellType == SpellType.GroundSpell)
-                            {
-                                if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
-                                {
-                                    if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
-                                }
-                            }
-
-                            if (canHit)
-                            {
-                                if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(enter[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
-                                {
-                                    if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
-                                    {
-                                        hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
-                                    }
-                                    else
-                                    {
-                                        hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
-                                    }
-                                }
+                                ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
                             }
                         }
                     }
@@ -295,34 +253,9 @@ namespace Vi.Core.VFX
                         {
                             if (networkCollider.CombatAgent)
                             {
-                                bool canHit = true;
-                                if (hitCounter.ContainsKey(networkCollider.CombatAgent))
+                                if (CanHit(networkCollider.CombatAgent))
                                 {
-                                    if (hitCounter[networkCollider.CombatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                                    if (Time.time - hitCounter[networkCollider.CombatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
-                                }
-
-                                if (spellType == SpellType.GroundSpell)
-                                {
-                                    if (PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent))
-                                    {
-                                        if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
-                                    }
-                                }
-
-                                if (canHit)
-                                {
-                                    if (networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, col.ClosestPointOnBounds(inside[particleIndex].position), shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
-                                    {
-                                        if (!hitCounter.ContainsKey(networkCollider.CombatAgent))
-                                        {
-                                            hitCounter.Add(networkCollider.CombatAgent, new(1, Time.time));
-                                        }
-                                        else
-                                        {
-                                            hitCounter[networkCollider.CombatAgent] = new(hitCounter[networkCollider.CombatAgent].hitNumber + 1, Time.time);
-                                        }
-                                    }
+                                    ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
                                 }
                             }
                         }
