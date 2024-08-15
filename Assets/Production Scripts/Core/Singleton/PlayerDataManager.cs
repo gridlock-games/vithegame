@@ -303,17 +303,6 @@ namespace Vi.Core
             return "";
         }
 
-        public enum GameMode
-        {
-            None,
-            FreeForAll,
-            TeamElimination,
-            EssenceWar,
-            OutpostRush,
-            TeamDeathmatch,
-            HordeMode
-        }
-
         public enum Team
         {
             Environment,
@@ -326,6 +315,41 @@ namespace Vi.Core
             Blue,
             Purple,
             Peaceful
+        }
+
+        public static string GetGameModeString(GameMode gameMode)
+        {
+            switch (gameMode)
+            {
+                case GameMode.None:
+                    return "No Game Mode";
+                case GameMode.FreeForAll:
+                    return "Free For All";
+                case GameMode.TeamElimination:
+                    return "Team Elimination";
+                case GameMode.EssenceWar:
+                    return "Essence War";
+                case GameMode.OutpostRush:
+                    return "Outpost Rush";
+                case GameMode.TeamDeathmatch:
+                    return "Team Deathmatch";
+                case GameMode.HordeMode:
+                    return "Horde Mode";
+                default:
+                    Debug.LogError(gameMode + " doesn't know how to format game mode display string");
+                    return StringUtility.FromCamelCase(gameMode.ToString());
+            }
+        }
+
+        public enum GameMode
+        {
+            None,
+            FreeForAll,
+            TeamElimination,
+            EssenceWar,
+            OutpostRush,
+            TeamDeathmatch,
+            HordeMode
         }
 
         public bool LocalPlayersWasUpdatedThisFrame { get; private set; } = false;
@@ -1006,7 +1030,7 @@ namespace Vi.Core
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         channelCounts[networkListEvent.Value.channel]++;
 
@@ -1024,7 +1048,7 @@ namespace Vi.Core
                     {
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }

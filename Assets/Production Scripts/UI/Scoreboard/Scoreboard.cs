@@ -37,10 +37,22 @@ namespace Vi.UI
         private void Start()
         {
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
-                scoreboardHeaderText.text = "No Game Mode | " + PlayerDataManager.Singleton.GetMapName();
+            {
+                if (NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                {
+                    scoreboardHeaderText.text = "Training Room | " + PlayerDataManager.Singleton.GetMapName();
+                }
+                else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
+                {
+                    scoreboardHeaderText.text = "Player Hub | " + PlayerDataManager.Singleton.GetMapName();
+                }
+                else
+                {
+                    scoreboardHeaderText.text = "No Game Mode | " + PlayerDataManager.Singleton.GetMapName();
+                }
+            }
             else
-                scoreboardHeaderText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " | " + PlayerDataManager.Singleton.GetMapName();
-
+                scoreboardHeaderText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " | " + PlayerDataManager.Singleton.GetMapName();
 
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
 

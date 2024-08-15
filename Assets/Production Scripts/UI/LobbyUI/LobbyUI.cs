@@ -511,7 +511,7 @@ namespace Vi.UI
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
             }
 
-            gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
             List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
@@ -710,7 +710,7 @@ namespace Vi.UI
                 RefreshGameMode();
             }
 
-            gameModeText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
+            gameModeText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
