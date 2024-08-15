@@ -73,6 +73,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3240593576062081041}
   - component: {fileID: 8998743424204234098}
+  - component: {fileID: 102408958681105487}
   m_Layer: 6
   m_Name: Sylvan_Sentinel
   m_TagString: Untagged
@@ -110,6 +111,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a96115ad39cb2d45b04ca28e86fbb19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  canADS: 1
   projectileSpawnPoint: {fileID: 6049529673539774852}
   projectile: {fileID: 2116712592617969172, guid: 3d57fd6cdde3a134aa01786a0dd8f495,
     type: 3}
@@ -136,6 +139,21 @@ MonoBehaviour:
   - raceAndGender: 3
     aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
     bodyAimIKOffset: {x: 25, y: 0, z: 0}
+--- !u!114 &102408958681105487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2860689685286978219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 136
+  isPrewarmObject: 1
 --- !u!1 &5838638584495257002
 GameObject:
   m_ObjectHideFlags: 0

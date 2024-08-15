@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7207123101401044061}
   - component: {fileID: 8537821992100501432}
   - component: {fileID: 6611683347898333082}
+  - component: {fileID: 4007076461763071112}
   m_Layer: 6
   m_Name: Thunderpoint
   m_TagString: Untagged
@@ -60,7 +61,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
   weaponTrailVFX: {fileID: 8919807229246518241}
+--- !u!114 &4007076461763071112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8020639262707093223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 146
+  isPrewarmObject: 1
 --- !u!1001 &3600031835058627102
 PrefabInstance:
   m_ObjectHideFlags: 0

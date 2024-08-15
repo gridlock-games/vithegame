@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 6048885975010916013}
   - component: {fileID: 4091240239163781453}
   - component: {fileID: 8697175391807734052}
+  - component: {fileID: 8405075946129864810}
   m_Layer: 6
   m_Name: shield_base
   m_TagString: Untagged
@@ -260,10 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponTrailMaterial: {fileID: 2100000, guid: bd5ef410d675441c78ce115ba4c6e478, type: 2}
-  weaponTrailGranularity: 60
-  weaponTrailDuration: 0.5
-  weaponTrailFadeTime: 0.25
+  weaponMaterial: 0
+  weaponTrailVFX: {fileID: 0}
 --- !u!65 &8697175391807734052
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -277,3 +276,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.23659573, y: 0.9356718, z: 0.85613513}
   m_Center: {x: 0.12119475, y: -0.039096676, z: 0}
+--- !u!114 &8405075946129864810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6393463382022712343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 132
+  isPrewarmObject: 1
