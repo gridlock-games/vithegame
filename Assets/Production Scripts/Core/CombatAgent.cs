@@ -265,6 +265,20 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
+            if (IsServer)
+            {
+                bool evaluateInvinicibility = true;
+                bool evaluateUninterruptability = true;
+                if (AnimationHandler.IsActionClipPlaying(WeaponHandler.CurrentActionClip))
+                {
+                    if (WeaponHandler.CurrentActionClip.isUninterruptable) { isUninterruptable.Value = true; evaluateUninterruptability = false; }
+                    if (WeaponHandler.CurrentActionClip.isInvincible) { isInvincible.Value = true; evaluateInvinicibility = false; }
+                }
+
+                if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
+                if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
+            }
+
             bool isInvincibleThisFrame = IsInvincible();
             if (!isInvincibleThisFrame)
             {
@@ -287,17 +301,6 @@ namespace Vi.Core
 
             GlowRenderer.RenderInvincible(isInvincibleThisFrame);
             GlowRenderer.RenderUninterruptable(IsUninterruptable());
-
-            bool evaluateInvinicibility = true;
-            bool evaluateUninterruptability = true;
-            if (AnimationHandler.IsActionClipPlaying(WeaponHandler.CurrentActionClip))
-            {
-                if (WeaponHandler.CurrentActionClip.isUninterruptable) { isUninterruptable.Value = true; evaluateUninterruptability = false; }
-                if (WeaponHandler.CurrentActionClip.isInvincible) { isInvincible.Value = true; evaluateInvinicibility = false; }
-            }
-
-            if (evaluateInvinicibility) { isInvincible.Value = Time.time <= invincibilityEndTime; }
-            if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
         }
 
         public void OnActivateRage()

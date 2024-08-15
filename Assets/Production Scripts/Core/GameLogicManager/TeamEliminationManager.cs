@@ -226,11 +226,27 @@ namespace Vi.Core.GameModeManagers
             {
                 if (localTeam == PlayerDataManager.Team.Red)
                 {
-                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
+                    if (redTeamPlayers.Count > 0)
+                    {
+                        return "Your Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Your Team: 0";
+                    }
                 }
                 else if (localTeam == PlayerDataManager.Team.Blue)
                 {
-                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
+                    if (blueTeamPlayers.Count > 0)
+                    {
+                        return "Your Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Your Team: 0";
+                    }
                 }
                 else
                 {
