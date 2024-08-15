@@ -26,11 +26,6 @@ namespace Vi.Core
         [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);
         [SerializeField] private float shrinkSize = 20;
 
-        [Header("Essence War")]
-        public TransformData ancientBossLightSpawnPoint;
-        public TransformData ancientBossCorruptSpawnPoint;
-        public TransformData ancientBossNeutralSpawnPoint;
-
         public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
 
         public TransformData[] GetGameItemSpawnPoints() { return gameItemSpawnPoints; }
@@ -188,7 +183,6 @@ namespace Vi.Core
         [Header("Gizmos")]
         [SerializeField] private bool displayDefaultGizmos;
         [SerializeField] private bool displayDamageCircleGizmos;
-        [SerializeField] private bool displayEssenceWarGizmos;
 
         private void OnDrawGizmos()
         {
@@ -230,22 +224,6 @@ namespace Vi.Core
                 Gizmos.DrawWireSphere(Vector3.zero, damageCircleMaxScale.x / 2);
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
-            }
-            
-            if (displayEssenceWarGizmos)
-            {
-                // Essence War
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawSphere(ancientBossLightSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossLightSpawnPoint.position, ancientBossLightSpawnPoint.rotation * Vector3.forward);
-
-                Gizmos.color = Color.magenta;
-                Gizmos.DrawSphere(ancientBossCorruptSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossCorruptSpawnPoint.position, ancientBossCorruptSpawnPoint.rotation * Vector3.forward);
-
-                Gizmos.color = Color.black;
-                Gizmos.DrawSphere(ancientBossNeutralSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossNeutralSpawnPoint.position, ancientBossNeutralSpawnPoint.rotation * Vector3.forward);
             }
         }
 
