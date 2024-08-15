@@ -352,6 +352,39 @@ namespace Vi.Core
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
         }
 
+        private List<CombatAgent> activeCombatAgents = new List<CombatAgent>();
+        public void AddCombatAgent(CombatAgent combatAgent)
+        {
+            if (!activeCombatAgents.Contains(combatAgent))
+            {
+                activeCombatAgents.Add(combatAgent);
+            }
+            else
+            {
+                Debug.LogError("Trying to add a duplicate combat agent! " + combatAgent);
+            }
+
+            LocalPlayersWasUpdatedThisFrame = true;
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
+        }
+
+        public void RemoveCombatAgent(CombatAgent combatAgent)
+        {
+            if (activeCombatAgents.Contains(combatAgent))
+            {
+                activeCombatAgents.Remove(combatAgent);
+            }
+            else
+            {
+                Debug.LogError("Trying to remove a combat agent that isn't present in the list! " + combatAgent);
+            }
+
+            LocalPlayersWasUpdatedThisFrame = true;
+            if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
+            resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
+        }
+
         private Coroutine resetLocalPlayerBoolCoroutine;
         private IEnumerator ResetLocalPlayersWasUpdatedBool()
         {
@@ -366,17 +399,32 @@ namespace Vi.Core
             {
                 if (attributesToExclude.GetTeam() == Team.Competitor | attributesToExclude.GetTeam() == Team.Peaceful) { return new List<Attributes>(); }
             }
-            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team == team & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+            return localPlayers.Where(kvp => kvp.Value.GetTeam() == team & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+        }
+
+        public List<CombatAgent> GetCombatAgentsOnTeam(Team team, CombatAgent combatAgentToExclude = null)
+        {
+            // If the combatagent to exclude is on competitor or peaceful teams, we don't want to return any teammates for this attributes
+            if (combatAgentToExclude)
+            {
+                if (combatAgentToExclude.GetTeam() == Team.Competitor | combatAgentToExclude.GetTeam() == Team.Peaceful) { return new List<CombatAgent>(); }
+            }
+            return activeCombatAgents.Where(item => item.GetTeam() == team & item != combatAgentToExclude).ToList();
         }
 
         public List<Attributes> GetActivePlayerObjects(Attributes attributesToExclude = null)
         {
-            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+            return localPlayers.Where(kvp => kvp.Value.GetTeam() != Team.Spectator & kvp.Value != attributesToExclude).Select(kvp => kvp.Value).ToList();
+        }
+
+        public List<CombatAgent> GetActiveCombatAgents(CombatAgent combatAgentToExclude = null)
+        {
+            return activeCombatAgents.Where(item => item.GetTeam() != Team.Spectator & item != combatAgentToExclude).ToList();
         }
 
         public List<Attributes> GetActivePlayerObjectsInChannel(int channel)
         {
-            return localPlayers.Where(kvp => kvp.Value.CachedPlayerData.team != Team.Spectator & kvp.Value.CachedPlayerData.channel == channel).Select(kvp => kvp.Value).ToList();
+            return localPlayers.Where(kvp => kvp.Value.GetTeam() != Team.Spectator & kvp.Value.CachedPlayerData.channel == channel).Select(kvp => kvp.Value).ToList();
         }
 
         public Attributes GetPlayerObjectById(int id)

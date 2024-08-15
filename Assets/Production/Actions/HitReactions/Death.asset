@@ -311,11 +311,17 @@ MonoBehaviour:
     audioClips:
     - {fileID: 8300000, guid: 1fdfa764c4c60194484cadaad63fe740, type: 3}
     normalizedPlayTime: 0
+  - raceAndGenders: 08000000
+    audioClips:
+    - {fileID: 8300000, guid: 28fe34a838ba847cf8e7d12f033883f7, type: 3}
+    normalizedPlayTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1

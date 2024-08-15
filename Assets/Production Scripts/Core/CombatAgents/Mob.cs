@@ -181,29 +181,18 @@ namespace Vi.Core.CombatAgents
             HPDamage *= damageMultiplier;
 
             bool shouldPlayHitReaction = false;
-            if (attackerCombatAgent is Attributes attacker)
+            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
-                if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                HPDamage *= attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                if (attack.canEnhance & attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
                 {
-                    HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                    if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
-                    {
-                        HPDamage *= attack.enhancedChargeDamageMultiplier;
-                    }
+                    HPDamage *= attack.enhancedChargeDamageMultiplier;
                 }
-
-                if (attacker.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
-
-                attacker.AddHitToComboCounter();
             }
-            else if (attackerCombatAgent is Mob mob)
-            {
 
-            }
-            else
-            {
-                Debug.LogError("Unsure how to handle subclass type of combat agent! " + attackerCombatAgent);
-            }
+            if (attackerCombatAgent.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
+
+            if (attackerCombatAgent is Attributes attacker) { attacker.AddHitToComboCounter(); }
 
             if (AddHPWithoutApply(HPDamage) <= 0)
             {
@@ -214,13 +203,32 @@ namespace Vi.Core.CombatAgents
             bool hitReactionWasPlayed = false;
             if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
             {
-                if (hitReaction.ailment != ActionClip.Ailment.None)
+                if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
+                {
+                    GetGrabAssailant().CancelGrab();
+                    CancelGrab();
+                }
+
+                if (hitReaction.ailment == ActionClip.Ailment.Grab)
+                {
+                    grabAttackClipName.Value = attack.name;
+                    grabAssailantDataId.Value = attackerCombatAgent.NetworkObjectId;
+                    attackerCombatAgent.SetGrabVictim(NetworkObjectId);
+                    isGrabbed.Value = true;
+
+                    Vector3 victimNewPosition = attackerCombatAgent.MovementHandler.GetPosition() + (attackerCombatAgent.transform.forward * 1.2f);
+                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attackerCombatAgent.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    attackerCombatAgent.AnimationHandler.PlayAction(attackerCombatAgent.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                }
+
+                if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
                 {
                     if (attack.shouldPlayHitReaction
                         | ailment.Value != ActionClip.Ailment.None
+                        | AnimationHandler.IsCharging()
                         | shouldPlayHitReaction)
                     {
-                        if (hitReaction.ailment != ActionClip.Ailment.None)
+                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None))
                         {
                             AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;
@@ -252,7 +260,7 @@ namespace Vi.Core.CombatAgents
                     AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
                 }
 
-                //EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attackerCombatAgent, attack, hitReaction);
             }
 
             if (IsServer)
@@ -279,15 +287,19 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        [SerializeField] private PooledObject hitVFXPrefab;
-        [SerializeField] private PooledObject blockVFXPrefab;
+        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
+        {
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+            }
 
-        protected override PooledObject GetHitVFXPrefab() { return hitVFXPrefab; }
-        protected override PooledObject GetBlockVFXPrefab() { return blockVFXPrefab; }
+            ailment.Value = attackAilment;
+        }
 
         [SerializeField] private Weapon.ArmorType armorType;
 
-        protected override AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return null; }
-        protected override AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return null; }
+        [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
+        public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
     }
 }

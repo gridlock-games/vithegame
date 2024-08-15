@@ -7,6 +7,7 @@ using System.Linq;
 using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.CombatAgents;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -247,7 +248,12 @@ namespace Vi.Core.GameModeManagers
             public Sprite GetKillFeedIcon(KillHistoryElement killHistoryElement)
             {
                 if (killType == KillType.Player | killType == KillType.PlayerWithAssist)
-                    return System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString()).killFeedIcon;
+                {
+                    Sprite killFeedIcon = null;
+                    CharacterReference.WeaponOption weaponOption = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString());
+                    if (weaponOption != null) { killFeedIcon = weaponOption.killFeedIcon; }
+                    return killFeedIcon ? killFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
+                }
                 else if (killType == KillType.Environment)
                     return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
                 else

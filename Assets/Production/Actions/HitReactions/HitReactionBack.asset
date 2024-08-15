@@ -300,12 +300,37 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
-  actionClipSoundEffects: []
+  actionClipSoundEffects:
+  - raceAndGenders: 00000000
+    audioClips:
+    - {fileID: 8300000, guid: 5579f9998575d3347af8b38b89754167, type: 3}
+    - {fileID: 8300000, guid: b2ce82596c1d15e429579c52c19a6a76, type: 3}
+    - {fileID: 8300000, guid: 055790c077663b14ea5df3f6353b1c01, type: 3}
+    - {fileID: 8300000, guid: 4f9da1bcab81cf74699e6444a293c6d0, type: 3}
+    - {fileID: 8300000, guid: 547d8f07d309dc34cbcdf3f9f66a6232, type: 3}
+    - {fileID: 8300000, guid: a375084829bd93045855877527e3baeb, type: 3}
+    - {fileID: 8300000, guid: 22a394aa269732b43854770c38cd2946, type: 3}
+    - {fileID: 8300000, guid: ecb98b55640b3d4489a173453eb3db63, type: 3}
+    - {fileID: 8300000, guid: ad9926cf79632ff4dbbe3eeaa625f126, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 01000000
+    audioClips:
+    - {fileID: 8300000, guid: 6eaaaeb0df840b949a06c88f383c0df5, type: 3}
+    - {fileID: 8300000, guid: 709eb8b2a49e4594ba4d61c56040c5e7, type: 3}
+    - {fileID: 8300000, guid: 336e2ef20a2841947af0a7e273c68561, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 08000000
+    audioClips:
+    - {fileID: 8300000, guid: 290607b917d444520ab22e754ebf0594, type: 3}
+    - {fileID: 8300000, guid: fde5c18418b104e18adafbaaf24947ef, type: 3}
+    normalizedPlayTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1

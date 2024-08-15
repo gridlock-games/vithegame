@@ -35,8 +35,8 @@ namespace Vi.Core
 
         public void ReloadAllWeapons()
         {
-            primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount();
-            secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount();
+            if (primaryWeaponInstance) { primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount(); }
+            if (secondaryWeaponInstance) { secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount(); }
         }
 
         public void UseAmmo(Weapon weapon)
@@ -98,9 +98,11 @@ namespace Vi.Core
             else if (combatAgent is Mob mob)
             {
                 // Equip weapon here
-                PrimaryWeaponOption = mob.GetWeaponOption();
-                SecondaryWeaponOption = mob.GetWeaponOption();
-                combatAgent.WeaponHandler.SetNewWeapon(mob.GetWeaponOption().weapon, mob.GetWeaponOption().animationController);
+                CharacterReference.WeaponOption weaponOption = mob.GetWeaponOption();
+                weaponOption.weapon = Instantiate(mob.GetWeaponOption().weapon);
+                PrimaryWeaponOption = weaponOption;
+                SecondaryWeaponOption = weaponOption;
+                combatAgent.WeaponHandler.SetNewWeapon(weaponOption.weapon, weaponOption.animationController);
             }
             else
             {

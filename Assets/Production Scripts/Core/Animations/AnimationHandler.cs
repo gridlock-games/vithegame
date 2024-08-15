@@ -188,11 +188,15 @@ namespace Vi.Core
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
-            Animator.Play("Empty", actionsLayerIndex);
-            Animator.Play("Empty", flinchLayerIndex);
             combatAgent.SetInviniciblity(0);
             combatAgent.SetUninterruptable(0);
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
+        }
+
+        public void OnRevive()
+        {
+            Animator.Play("Empty", actionsLayerIndex);
+            Animator.Play("Empty", flinchLayerIndex);
         }
 
         public void CancelAllActions(float transitionTime)
@@ -269,14 +273,11 @@ namespace Vi.Core
             }
 
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
-            if (combatAgent is Attributes attributes)
+            if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
-                {
-                    if (attributes.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
-                }
+                if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
             }
-            
+
             if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
             {
                 ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
@@ -498,16 +499,13 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                if (combatAgent is Attributes attr)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
-                    {
-                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attr.GetGrabReactionClip();
-                    }
-                    else
-                    {
-                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
-                    }
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = combatAgent.GetGrabReactionClip();
+                }
+                else
+                {
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
 
@@ -515,38 +513,35 @@ namespace Vi.Core
 
             float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
-            if (actionClip.ailment != ActionClip.Ailment.Death)
+            switch (actionClip.GetClipType())
             {
-                switch (actionClip.GetClipType())
-                {
-                    case ActionClip.ClipType.Dodge:
-                    case ActionClip.ClipType.LightAttack:
-                    case ActionClip.ClipType.Ability:
-                    case ActionClip.ClipType.GrabAttack:
-                    case ActionClip.ClipType.Lunge:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
-                        break;
-                    case ActionClip.ClipType.HeavyAttack:
-                        heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
-                        break;
-                    case ActionClip.ClipType.HitReaction:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
-                        break;
-                    case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
-                        break;
-                    case ActionClip.ClipType.Flinch:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
-                        break;
-                    default:
-                        Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
-                        break;
-                }
-                if (!isFollowUpClip)
-                {
-                    if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
-                    playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
-                }
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Lunge:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+                    break;
+                case ActionClip.ClipType.HeavyAttack:
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
+                    break;
+                case ActionClip.ClipType.HitReaction:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.FlashAttack:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.Flinch:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
+                    break;
+            }
+            if (!isFollowUpClip)
+            {
+                if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
+                playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
             }
 
             // Invoke the PlayActionClientRpc method on the client side
@@ -626,47 +621,23 @@ namespace Vi.Core
 
         private float GetStaminaCostOfClip(ActionClip actionClip)
         {
-            if (combatAgent is Attributes attributes)
+            switch (actionClip.GetClipType())
             {
-                switch (actionClip.GetClipType())
-                {
-                    case ActionClip.ClipType.Dodge:
-                        return attributes.IsRaging() & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * Attributes.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
-                    case ActionClip.ClipType.LightAttack:
-                    case ActionClip.ClipType.HeavyAttack:
-                    case ActionClip.ClipType.Ability:
-                    case ActionClip.ClipType.FlashAttack:
-                    case ActionClip.ClipType.Lunge:
-                        return attributes.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * Attributes.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
-                    case ActionClip.ClipType.HitReaction:
-                    case ActionClip.ClipType.Flinch:
-                    case ActionClip.ClipType.GrabAttack:
-                        return -1;
-                    default:
-                        Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
-                        break;
-                }
-            }
-            else
-            {
-                switch (actionClip.GetClipType())
-                {
-                    case ActionClip.ClipType.Dodge:
-                        return combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
-                    case ActionClip.ClipType.LightAttack:
-                    case ActionClip.ClipType.HeavyAttack:
-                    case ActionClip.ClipType.Ability:
-                    case ActionClip.ClipType.FlashAttack:
-                    case ActionClip.ClipType.Lunge:
-                        return actionClip.agentStaminaCost;
-                    case ActionClip.ClipType.HitReaction:
-                    case ActionClip.ClipType.Flinch:
-                    case ActionClip.ClipType.GrabAttack:
-                        return -1;
-                    default:
-                        Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
-                        break;
-                }
+                case ActionClip.ClipType.Dodge:
+                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * CombatAgent.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.HeavyAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.FlashAttack:
+                case ActionClip.ClipType.Lunge:
+                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * CombatAgent.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.GrabAttack:
+                    return -1;
+                default:
+                    Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
+                    break;
             }
             return -1;
         }
@@ -924,46 +895,40 @@ namespace Vi.Core
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
             {
-                if (combatAgent is Attributes attributes)
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
-                    {
-                        yield return new WaitUntil(() => attributes.GetGrabAssailant());
-                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = attributes.GetGrabReactionClip();
-                    }
-                    else
-                    {
-                        combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
-                    }
+                    yield return new WaitUntil(() => combatAgent.GetGrabAssailant());
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = combatAgent.GetGrabReactionClip();
+                }
+                else
+                {
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
 
             // Play the action clip based on its type
-            if (actionClip.ailment != ActionClip.Ailment.Death)
+            switch (actionClip.GetClipType())
             {
-                switch (actionClip.GetClipType())
-                {
-                    case ActionClip.ClipType.Dodge:
-                    case ActionClip.ClipType.LightAttack:
-                    case ActionClip.ClipType.Ability:
-                    case ActionClip.ClipType.GrabAttack:
-                    case ActionClip.ClipType.Lunge:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
-                        break;
-                    case ActionClip.ClipType.HeavyAttack:
-                        heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
-                        break;
-                    case ActionClip.ClipType.HitReaction:
-                    case ActionClip.ClipType.FlashAttack:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
-                        break;
-                    case ActionClip.ClipType.Flinch:
-                        Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
-                        break;
-                    default:
-                        Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
-                        break;
-                }
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Lunge:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+                    break;
+                case ActionClip.ClipType.HeavyAttack:
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
+                    break;
+                case ActionClip.ClipType.HitReaction:
+                case ActionClip.ClipType.FlashAttack:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.Flinch:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
+                    break;
             }
 
             // Set the current action clip for the weapon handler
@@ -1081,9 +1046,9 @@ namespace Vi.Core
         {
             combatAgent = GetComponent<CombatAgent>();
 
-            if (combatAgent is not Attributes)
+            if (TryGetComponent(out Animator animator))
             {
-                Animator = GetComponent<Animator>();
+                Animator = animator;
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
                 LimbReferences = GetComponent<LimbReferences>();

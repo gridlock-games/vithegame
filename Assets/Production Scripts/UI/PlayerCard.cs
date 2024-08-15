@@ -47,10 +47,10 @@ namespace Vi.UI
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
-        private Attributes attributes;
+        private CombatAgent attributes;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
-        public void Initialize(Attributes attributes)
+        public void Initialize(CombatAgent attributes)
         {
             if ((attributes == this.attributes) & (attributes != null)) { return; }
             this.attributes = attributes;
@@ -65,8 +65,11 @@ namespace Vi.UI
 
         private IEnumerator SetNameText()
         {
-            yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()));
-            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.CachedPlayerData.team) + attributes.CachedPlayerData.character.name.ToString();
+            if (attributes is Attributes attr)
+            {
+                yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId(attr.GetPlayerDataId()));
+            }
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.GetTeam()) + attributes.GetName();
         }
 
         private bool IsMainCard()

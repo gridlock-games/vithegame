@@ -178,7 +178,19 @@ namespace Vi.ScriptableObjects
             HumanFemale,
             OrcMale,
             OrcFemale,
-            Universal
+            Universal,
+            MonsterHuge,
+            MonsterInfernal,
+            MonsterLargeA,
+            MonsterLargeB,
+            MonsterMediumA,
+            MonsterMediumB,
+            MonsterSkeleton,
+            MonsterSmallA,
+            MonsterSmallB,
+            MonsterSpider,
+            MonsterSwamp,
+            MonsterZombie
         }
 
         public enum MaterialApplicationLocation

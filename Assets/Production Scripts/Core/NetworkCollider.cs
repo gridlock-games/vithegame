@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -17,6 +18,16 @@ namespace Vi.Core
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
             Colliders = GetComponentsInChildren<Collider>();
+
+            List<Collider> networkPredictionLayerColliders = new List<Collider>();
+            foreach (Collider col in Colliders)
+            {
+                if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    networkPredictionLayerColliders.Add(col);
+                }
+            }
+            Colliders = networkPredictionLayerColliders.ToArray();
         }
 
         private void Update()

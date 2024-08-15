@@ -398,21 +398,14 @@ namespace Vi.Core
                 }
 
                 Vector3 curveAdjustedLocalRootMotion;
-                if (combatAgent is Attributes attributes)
+                if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
                 {
-                    if (attributes.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
-                    {
-                        curveAdjustedLocalRootMotion = Vector3.zero;
-                    }
-                    else if (attributes.IsPulled())
-                    {
-                        //movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
-                        curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
-                    }
-                    else
-                    {
-                        curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
-                    }
+                    curveAdjustedLocalRootMotion = Vector3.zero;
+                }
+                else if (combatAgent.IsPulled())
+                {
+                    //movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
+                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(combatAgent.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
                 else
                 {
