@@ -349,11 +349,14 @@ namespace Vi.Core
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.Projectile:
-                    if (actionVFXPrefab.TryGetComponent(out pooledObject))
+                    if (isPreviewVFX)
                     {
-                        vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
-                        vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
-                        break;
+                        if (actionVFXPrefab.TryGetComponent(out pooledObject))
+                        {
+                            vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                            break;
+                        }
                     }
 
                     foreach (Weapon.WeaponBone weaponBone in actionClip.effectedWeaponBones)
