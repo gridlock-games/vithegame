@@ -501,7 +501,7 @@ namespace Vi.Core
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
                     Transform parent = netObj.transform.parent;
                     netObj.transform.parent = null;
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {

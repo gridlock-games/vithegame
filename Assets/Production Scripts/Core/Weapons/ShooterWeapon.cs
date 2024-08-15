@@ -115,7 +115,7 @@ namespace Vi.Core
                         Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
                     
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(parentCombatAgent.OwnerClientId, true);
+                    netObj.Spawn(true);
                     lastProjectileSpawnTime = Time.time;
                     projectileSpawnCount++;
                     if (shouldUseAmmo)

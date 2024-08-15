@@ -52,7 +52,7 @@ namespace Vi.Core.VFX
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
                     NetworkObject netObj = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }
             }
