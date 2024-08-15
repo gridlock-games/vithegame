@@ -302,7 +302,7 @@ namespace Vi.Core
         {
             if (actionClip.actionVFXList.Count == 0) { Debug.LogError("Trying to spawn a preview VFX with no action clip referneces! " + actionClip); return null; }
 
-            (SpawnPoints.TransformData orientation, Transform parent) = GetActionVFXOrientation(actionClip, actionClip.actionVFXList[0], attackerTransform, victimTransform);
+            (SpawnPoints.TransformData orientation, Transform parent) = GetActionVFXOrientation(actionClip, actionClip.actionVFXList[0], true, attackerTransform, victimTransform);
 
             ActionVFXPreview previewInstance;
             if (actionPreviewVFXPrefab.TryGetComponent(out PooledObject pooledObject))
@@ -318,7 +318,7 @@ namespace Vi.Core
             return previewInstance.gameObject;
         }
 
-        private (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, Transform attackerTransform, Transform victimTransform = null, bool isPreviewVFX = false)
+        private (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, bool isPreviewVFX, Transform attackerTransform, Transform victimTransform = null)
         {
             SpawnPoints.TransformData orientation = new SpawnPoints.TransformData();
             Transform parent = null;
@@ -435,7 +435,7 @@ namespace Vi.Core
             if (actionVFXTracker.Contains(actionVFXPrefab)) { return null; }
 
             GameObject vfxInstance;
-            (SpawnPoints.TransformData orientation, Transform parent) = GetActionVFXOrientation(actionClip, actionVFXPrefab, attackerTransform, victimTransform);
+            (SpawnPoints.TransformData orientation, Transform parent) = GetActionVFXOrientation(actionClip, actionVFXPrefab, false, attackerTransform, victimTransform);
             if (actionVFXPrefab.TryGetComponent(out PooledObject pooledObject))
             {
                 vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, orientation.position, orientation.rotation, parent).gameObject;
