@@ -46,6 +46,8 @@ namespace Vi.Core
 
 		protected void SetDestination(Vector3 destination)
         {
+			//Vector3 targetPosition = destination;
+			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
 			Destination = destination;
         }
 
