@@ -14,7 +14,6 @@ namespace Vi.Core.VFX
         protected bool ShouldAffect(CombatAgent combatAgent)
         {
             if (!IsSpawned) { return false; }
-            if (!IsServer) { Debug.LogError("FollowUpVFX.ShouldAffect() should only be called on the server!"); return false; }
 
             bool shouldAffect = false;
             if (combatAgent == GetAttacker())

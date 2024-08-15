@@ -271,6 +271,7 @@ namespace Vi.Utility
 
         private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
         {
+            if (!NetworkManager.Singleton.IsServer) { yield break; }
             if (networkObject.transform.parent == parent) { yield break; }
             yield return new WaitUntil(() => networkObject.IsSpawned);
             if (!networkObject.TrySetParent(parent)) { Debug.LogError("Error while setting parent for networ object " + networkObject + " to parent " + parent); }
