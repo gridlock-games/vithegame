@@ -334,7 +334,7 @@ namespace Vi.Core
                 case GameMode.TeamDeathmatch:
                     return "Team Deathmatch";
                 case GameMode.HordeMode:
-                    return "Horde Mode";
+                    return "Corrupted Abyss";
                 default:
                     Debug.LogError(gameMode + " doesn't know how to format game mode display string");
                     return StringUtility.FromCamelCase(gameMode.ToString());

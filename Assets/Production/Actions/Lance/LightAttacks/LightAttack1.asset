@@ -163,7 +163,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 0
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -856,8 +856,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.25
-  recoveryNormalizedTime: 0.6
+  attackingNormalizedTime: 0.28
+  recoveryNormalizedTime: 0.65
   isAffectedByRage: 1
   damage: 6
   healAmount: 0
@@ -891,6 +891,8 @@ MonoBehaviour:
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1

@@ -9326,7 +9326,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YAngleRotationOffset: 20
+  YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
@@ -9343,8 +9343,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.5
+  attackingNormalizedTime: 0.048
+  recoveryNormalizedTime: 0.25
   isAffectedByRage: 1
   damage: 1
   healAmount: 0
@@ -9378,6 +9378,8 @@ MonoBehaviour:
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1

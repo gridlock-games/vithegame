@@ -300,14 +300,16 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: cef828562819f4440b7dc31bd1d29e36, type: 3}
   abilityCooldownTime: 15
+  actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 1964615033384654637, guid: ce68eede11a6d4314ae7301eda89fbd4, type: 3}
   - {fileID: 5575609125080847161, guid: dc1ba384bb78b4ffe885071a364474eb, type: 3}
-  previewActionVFX: {fileID: 5106995833838962627, guid: 32046bdf30755bc44a42984784746cc6,
-    type: 3}
+  previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: -0.3, y: 0, z: 0.3}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1

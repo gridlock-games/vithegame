@@ -289,8 +289,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.3
+  attackingNormalizedTime: 0.28
+  recoveryNormalizedTime: 0.45
   isAffectedByRage: 1
   damage: 9
   healAmount: 0
@@ -324,6 +324,8 @@ MonoBehaviour:
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
