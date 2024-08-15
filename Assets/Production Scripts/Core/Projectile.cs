@@ -187,7 +187,7 @@ namespace Vi.Core
                 if (prefab.GetComponent<FollowUpVFX>())
                 {
                     NetworkObject netObj = Instantiate(prefab, transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     netObj.GetComponent<FollowUpVFX>().InitializeVFX(attacker, attack);
                 }
                 else

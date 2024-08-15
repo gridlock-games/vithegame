@@ -223,6 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2834490366527540041}
   - component: {fileID: 580514349956233488}
+  - component: {fileID: 5787280873212266990}
   m_Layer: 6
   m_Name: SK_CrossBow
   m_TagString: Untagged
@@ -261,10 +262,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a96115ad39cb2d45b04ca28e86fbb19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  canADS: 1
   projectileSpawnPoint: {fileID: 8150045541427819611}
   projectile: {fileID: 6258410500988021796, guid: 67097542e8849844493b7ed19fd45f24,
     type: 3}
   projectileForce: {x: 0, y: 0, z: 30}
+  ammoCountDamageMultipliers: []
   aimHand: 0
   offHandGrip: {fileID: 7091157248621488037}
   bodyAimType: 0
@@ -281,6 +285,21 @@ MonoBehaviour:
   - raceAndGender: 3
     aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
     bodyAimIKOffset: {x: 25, y: 0, z: 0}
+--- !u!114 &5787280873212266990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3178962258874356211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 127
+  isPrewarmObject: 1
 --- !u!1 &3265713617666746969
 GameObject:
   m_ObjectHideFlags: 0

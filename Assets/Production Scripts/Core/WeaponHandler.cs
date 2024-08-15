@@ -56,13 +56,13 @@ namespace Vi.Core
             combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
         }
 
-        private List<GameObject> stowedWeaponInstances = new List<GameObject>();
+        private List<PooledObject> stowedWeaponInstances = new List<PooledObject>();
         public void SetStowedWeapon(Weapon weapon)
         {
             if (!weapon) { return; }
-            foreach (GameObject g in stowedWeaponInstances)
+            foreach (PooledObject g in stowedWeaponInstances)
             {
-                Destroy(g);
+                ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
 
@@ -72,7 +72,7 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        GameObject instance = Instantiate(modelData.weaponPrefab, combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(), true);
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent());
                         instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
@@ -108,7 +108,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
-                Destroy(kvp.Value.gameObject);
+                ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
             }
             weaponInstances.Clear();
             shooterWeapons.Clear();
@@ -123,18 +123,6 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        RuntimeWeapon instance = Instantiate(modelData.weaponPrefab).GetComponent<RuntimeWeapon>();
-
-                        if (!instance)
-                        {
-                            Debug.LogError(instance + " does not have a runtime weapon component!");
-                            continue;
-                        }
-
-                        instance.SetWeaponBone(modelData.weaponBone);
-                        weaponInstances.Add(modelData.weaponBone, instance);
-                        instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
-
                         Transform bone = null;
                         switch (modelData.weaponBone)
                         {
@@ -153,12 +141,26 @@ namespace Vi.Core
                                 break;
                         }
 
-                        instance.transform.SetParent(bone);
+                        RuntimeWeapon instance = null;
+                        if (modelData.weaponPrefab.TryGetComponent(out PooledObject pooledObject))
+                        {
+                            instance = ObjectPoolingManager.SpawnObject(pooledObject, bone).GetComponent<RuntimeWeapon>();
+                        }
+
+                        if (!instance)
+                        {
+                            Debug.LogError(modelData.weaponPrefab + " does not have a runtime weapon component!");
+                            continue;
+                        }
+
+                        instance.SetWeaponBone(modelData.weaponBone);
+                        weaponInstances.Add(modelData.weaponBone, instance);
+                        //instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
+
                         instance.transform.localPosition = modelData.weaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.weaponRotationOffset);
 
-                        ShooterWeapon shooterWeapon = instance.GetComponent<ShooterWeapon>();
-                        if (shooterWeapon)
+                        if (instance.TryGetComponent(out ShooterWeapon shooterWeapon))
                         {
                             shooterWeapons.Add(shooterWeapon);
                             CanAim = true;
@@ -347,11 +349,14 @@ namespace Vi.Core
                     vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
                     break;
                 case ActionVFX.TransformType.Projectile:
-                    if (actionVFXPrefab.TryGetComponent(out pooledObject))
+                    if (isPreviewVFX)
                     {
-                        vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
-                        vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
-                        break;
+                        if (actionVFXPrefab.TryGetComponent(out pooledObject))
+                        {
+                            vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, attackerTransform.position, attackerTransform.rotation * Quaternion.Euler(actionVFXPrefab.vfxRotationOffset), attackerTransform).gameObject;
+                            vfxInstance.transform.position += vfxInstance.transform.rotation * actionVFXPrefab.vfxPositionOffset;
+                            break;
+                        }
                     }
 
                     foreach (Weapon.WeaponBone weaponBone in actionClip.effectedWeaponBones)
@@ -496,7 +501,7 @@ namespace Vi.Core
                     NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
                     Transform parent = netObj.transform.parent;
                     netObj.transform.parent = null;
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     netObj.TrySetParent(parent);
                     if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                     {

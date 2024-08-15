@@ -131,6 +131,20 @@ namespace Vi.Utility
                 }
             }
         }
+
+        [ContextMenu("Find Duplicates")]
+        private void FindDuplicates()
+        {
+            List<PooledObject> query = pooledObjects.GroupBy(x => x)
+              .Where(g => g.Count() > 1)
+              .Select(y => y.Key)
+              .ToList();
+
+            foreach (PooledObject pooledObject in query)
+            {
+                Debug.Log(pooledObject);
+            }
+        }
 #endif
     }
 }

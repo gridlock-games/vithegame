@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
-using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(PooledObject))]
     public class RuntimeWeapon : MonoBehaviour
     {
         [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
@@ -85,7 +86,7 @@ namespace Vi.Core
 
         public Weapon.WeaponBone WeaponBone { get; private set; }
 
-        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { this.WeaponBone = weaponBone; }
+        public void SetWeaponBone(Weapon.WeaponBone weaponBone) { WeaponBone = weaponBone; }
 
         protected CombatAgent parentCombatAgent;
 
@@ -94,9 +95,10 @@ namespace Vi.Core
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
-        protected void Start()
+        protected void OnEnable()
         {
             parentCombatAgent = GetComponentInParent<CombatAgent>();
+            if (!parentCombatAgent) { return; }
 
             colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)

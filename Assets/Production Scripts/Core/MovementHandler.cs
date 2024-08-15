@@ -46,6 +46,8 @@ namespace Vi.Core
 
 		protected void SetDestination(Vector3 destination)
         {
+			//Vector3 targetPosition = destination;
+			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
 			Destination = destination;
         }
 
@@ -102,7 +104,13 @@ namespace Vi.Core
 			RefreshStatus();
         }
 
-		private Vector2 lookSensitivity;
+        protected void OnEnable()
+        {
+			SetDestination(transform.position);
+			CalculatePath(transform.position, NavMesh.AllAreas);
+		}
+
+        private Vector2 lookSensitivity;
 		private void RefreshStatus()
 		{
 			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);

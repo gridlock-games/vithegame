@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4791004615917598424}
   - component: {fileID: -2139034630885355068}
   - component: {fileID: 8938107322807556597}
+  - component: {fileID: 6868807613564413644}
   m_Layer: 6
   m_Name: Citrine_Shield
   m_TagString: Untagged
@@ -59,7 +60,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
   weaponTrailVFX: {fileID: 0}
+--- !u!114 &6868807613564413644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5275617305407401058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 159
+  isPrewarmObject: 1
 --- !u!1001 &1419958511574671185
 PrefabInstance:
   m_ObjectHideFlags: 0

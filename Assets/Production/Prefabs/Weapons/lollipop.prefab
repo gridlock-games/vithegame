@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 518123274900306048}
   - component: {fileID: 1297605476639087757}
+  - component: {fileID: 224109170398371736}
   m_Layer: 6
   m_Name: lollipop
   m_TagString: Untagged
@@ -48,10 +49,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a96115ad39cb2d45b04ca28e86fbb19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  canADS: 1
   projectileSpawnPoint: {fileID: 388568134400591690}
   projectile: {fileID: 2043419672111128291, guid: 75e3996dab961de438450fa8a29cd5b2,
     type: 3}
   projectileForce: {x: 5, y: 0, z: 0}
+  ammoCountDamageMultipliers: []
   aimHand: 0
   offHandGrip: {fileID: 0}
   bodyAimType: 1
@@ -68,6 +72,21 @@ MonoBehaviour:
   - raceAndGender: 3
     aimHandIKOffset: {x: -6.82, y: 75.99, z: 18.2}
     bodyAimIKOffset: {x: -30, y: 25, z: 0}
+--- !u!114 &224109170398371736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899434540764439098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 126
+  isPrewarmObject: 1
 --- !u!1 &5163795561444201306
 GameObject:
   m_ObjectHideFlags: 0
