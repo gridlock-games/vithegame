@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 2001834763269464394}
   - component: {fileID: 6884212871457715500}
   - component: {fileID: 7824715578891863556}
+  - component: {fileID: 5465890439830040082}
   m_Layer: 6
-  m_Name: Fist
+  m_Name: CaveCrasherFist_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,8 +45,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5, z: 0.5}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.7, z: 0.75}
+  m_Center: {x: 0.3, y: -0.1, z: 0.05}
 --- !u!114 &7824715578891863556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,3 +61,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponMaterial: 2
   weaponTrailVFX: {fileID: 0}
+--- !u!114 &5465890439830040082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001834763269464374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 158
+  isPrewarmObject: 1

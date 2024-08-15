@@ -68,7 +68,7 @@ namespace Vi.Core
                 float minDistance = Mathf.Infinity;
                 foreach (Attributes attributes in activePlayerObjects)
                 {
-                    float distance = Vector3.Distance(attributes.GetComponent<MovementHandler>().GetPosition(), transformData.position);
+                    float distance = Vector3.Distance(attributes.MovementHandler.GetPosition(), transformData.position);
                     if (distance < minDistance) { minDistance = distance; }
                 }
                 verifiedSpawnPoints.Add((minDistance, transformData, spawnPriority));
@@ -122,7 +122,7 @@ namespace Vi.Core
                 float minDistance = Mathf.Infinity;
                 foreach (Attributes attributes in activePlayerObjects)
                 {
-                    float distance = Vector3.Distance(attributes.GetComponent<MovementHandler>().GetPosition(), transformData.position);
+                    float distance = Vector3.Distance(attributes.MovementHandler.GetPosition(), transformData.position);
                     if (distance < minDistance) { minDistance = distance; }
                 }
                 verifiedSpawnPoints.Add((minDistance, transformData, spawnPriority));

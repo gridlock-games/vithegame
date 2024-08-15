@@ -5,12 +5,13 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using UnityEngine.AI;
 
 namespace Vi.Core
 {
-    public abstract class MovementHandler : NetworkBehaviour
-    {
-        public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+	public abstract class MovementHandler : NetworkBehaviour
+	{
+		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
 
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
@@ -19,17 +20,17 @@ namespace Vi.Core
 			"ProjectileCollider"
 		};
 
-        public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
-        {
-            transform.position = newPosition;
-            transform.rotation = newRotation;
-        }
+		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+		{
+			transform.position = newPosition;
+			transform.rotation = newRotation;
+		}
 
 		public virtual Vector3 GetPosition() { return transform.position; }
 
-        public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
-        public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
-        public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
+		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
+		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
+		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
@@ -38,16 +39,78 @@ namespace Vi.Core
 
 		public virtual void SetImmovable(bool isImmovable) { }
 
-        protected WeaponHandler weaponHandler;
+		private NavMeshPath path;
+		protected Vector3 NextPosition { get; private set; }
+		protected const float stoppingDistance = 2;
+		protected Vector3 Destination { get; private set; }
+
+		protected void SetDestination(Vector3 destination)
+        {
+			//Vector3 targetPosition = destination;
+			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
+			Destination = destination;
+        }
+
+		protected bool CalculatePath(Vector3 startPosition, int areaMask)
+        {
+			if (NavMesh.CalculatePath(startPosition, Destination, NavMesh.AllAreas, path))
+			{
+				if (path.corners.Length > 1)
+				{
+					NextPosition = path.corners[1];
+				}
+				else if (path.corners.Length > 0)
+				{
+					NextPosition = path.corners[0];
+				}
+				else
+				{
+					NextPosition = startPosition;
+				}
+				return true;
+			}
+			else
+			{
+				NextPosition = Destination;
+				return false;
+			}
+		}
+
+		protected void OnDrawGizmosSelected()
+		{
+			Gizmos.color = Color.magenta;
+			if (!Application.isPlaying) { return; }
+			for (int i = 0; i < path.corners.Length; i++)
+			{
+				Gizmos.DrawSphere(path.corners[i], 0.5f);
+				if (i == 0)
+				{
+					Gizmos.DrawLine(transform.position, path.corners[i]);
+				}
+				else
+				{
+					Gizmos.DrawLine(path.corners[i - 1], path.corners[i]);
+				}
+			}
+		}
+
+		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
         protected void Awake()
-        {
-            weaponHandler = GetComponent<WeaponHandler>();
+		{
+			path = new NavMeshPath();
+			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
 			RefreshStatus();
         }
 
-		private Vector2 lookSensitivity;
+        protected void OnEnable()
+        {
+			SetDestination(transform.position);
+			CalculatePath(transform.position, NavMesh.AllAreas);
+		}
+
+        private Vector2 lookSensitivity;
 		private void RefreshStatus()
 		{
 			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);

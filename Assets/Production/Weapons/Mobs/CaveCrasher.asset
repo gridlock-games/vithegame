@@ -165,18 +165,18 @@ MonoBehaviour:
   - skinPrefab: {fileID: 5154451350289567119, guid: f34b75ab8fb446845ba8cf1bcd88b3a0,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2001834763269464374, guid: b2ec19bc844821646ace4c6bd0b1b281,
+    - weaponPrefab: {fileID: 2001834763269464374, guid: e7dc8b706d0dbe049b3aba5972a7f496,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: -25}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
     - weaponPrefab: {fileID: 2001834763269464374, guid: b2ec19bc844821646ace4c6bd0b1b281,
         type: 3}
       weaponBone: 18
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: -25}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
@@ -234,30 +234,22 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
-  ability1: {fileID: 11400000, guid: 37533bdf5386df04b90799a58da70ded, type: 2}
-  ability2: {fileID: 11400000, guid: 2bcb27f0783651549a4a64a2221be905, type: 2}
-  ability3: {fileID: 11400000, guid: b6df3a76e17dd01499da1b6cd5d1ba43, type: 2}
-  ability4: {fileID: 11400000, guid: 9662a212efaab7842b5ac038d89316cf, type: 2}
-  flashAttack: {fileID: 11400000, guid: c8ddfd40cd7cc43e8a254b19600b53e7, type: 2}
+  ability1: {fileID: 11400000, guid: f70ed881dda1fc84c993b15233afd035, type: 2}
+  ability2: {fileID: 0}
+  ability3: {fileID: 0}
+  ability4: {fileID: 0}
+  flashAttack: {fileID: 0}
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: ea9a41cfab322534e88d232184459c8c, type: 2}
+    attackClip: {fileID: 11400000, guid: 9bd732a36e524244390f6cbc80199360, type: 2}
   - inputs: 0000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 23dbfed4b5eefa14689453a7b02d1159, type: 2}
+    attackClip: {fileID: 11400000, guid: feb767303e70d6b4da9fe2f0c15c9e37, type: 2}
   - inputs: 000000000000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: d2685f7596e5ecf48a4a54ade519ab77, type: 2}
-  - inputs: 00000000000000000000000000000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 8ca4088e1f798ed4db316e9970371d35, type: 2}
-  - inputs: 01000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: d6a89cc1b0d71f04ab151d389a3e06aa, type: 2}
-  grabAttackClipList:
-  - attack: {fileID: 11400000, guid: b6df3a76e17dd01499da1b6cd5d1ba43, type: 2}
-    grabAttackClip: {fileID: 11400000, guid: 9292437416b69594da2ba61a8cae1ee5, type: 2}
+    attackClip: {fileID: 11400000, guid: 2683249dcbf808344871e73f4068c6b2, type: 2}
+  grabAttackClipList: []
   dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 518123274900306048}
   - component: {fileID: 9061045801013658348}
   - component: {fileID: 9139111217671485027}
+  - component: {fileID: 224109170398371736}
   m_Layer: 6
   m_Name: twinblades
   m_TagString: Untagged
@@ -60,6 +61,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  weaponTrailVFX: {fileID: 0}
+--- !u!114 &224109170398371736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899434540764439098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 129
+  isPrewarmObject: 1
 --- !u!1001 &4982991818560231561
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -125,6 +125,8 @@ namespace Vi.Core
             HP.OnValueChanged += OnHPChanged;
 
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+
+            PlayerDataManager.Singleton.AddCombatAgent(this);
         }
 
         public override void OnNetworkDespawn()
@@ -133,6 +135,8 @@ namespace Vi.Core
             HP.OnValueChanged -= OnHPChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance); }
+
+            PlayerDataManager.Singleton.RemoveCombatAgent(this);
         }
 
         protected void OnEnable()
@@ -247,6 +251,18 @@ namespace Vi.Core
             grabVictimDataId.Value = default;
         }
 
+        protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
+        protected NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
+
+        public bool IsPulled() { return isPulled.Value; }
+
+        public CombatAgent GetPullAssailant()
+        {
+            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantDataId.Value, out NetworkObject networkObject);
+            if (!networkObject) { Debug.LogError("Could not find pull assailant! " + pullAssailantDataId.Value); return null; }
+            return networkObject.GetComponent<CombatAgent>();
+        }
+
         protected virtual void Update()
         {
             bool isInvincibleThisFrame = IsInvincible();
@@ -290,6 +306,7 @@ namespace Vi.Core
             ActivateRage();
         }
 
+        public const float ragingStaminaCostMultiplier = 1.25f;
         public bool IsRaging() { return isRaging.Value; }
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
@@ -337,19 +354,60 @@ namespace Vi.Core
             }
         }
 
+        public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
+
+        protected const float notBlockingSpiritHitReactionPercentage = 0.4f;
+        protected const float blockingSpiritHitReactionPercentage = 0.5f;
+
+        protected const float rageDamageMultiplier = 1.15f;
+
+        protected int knockupHitCounter;
+        protected const int knockupHitLimit = 5;
+
+        protected const float stunDuration = 3;
+        protected const float knockdownDuration = 2;
+        protected const float knockupDuration = 4;
+        protected const float attackerRageToBeAddedOnHit = 2;
+        protected const float victimRageToBeAddedOnHit = 1;
+
         protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
-
         public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
-
         public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
-
         public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
+        protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
         public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
-        protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current) { }
+
+        protected Coroutine ailmentResetCoroutine;
+        protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        {
+            AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+
+            if (current == ActionClip.Ailment.Death)
+            {
+                StartCoroutine(ClearDamageMappingAfter1Frame());
+                WeaponHandler.OnDeath();
+                AnimationHandler.OnDeath();
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+            }
+            else if (prev == ActionClip.Ailment.Death)
+            {
+                isRaging.Value = false;
+                AnimationHandler.OnRevive();
+                if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+            }
+        }
+
+        private IEnumerator ClearDamageMappingAfter1Frame()
+        {
+            yield return null;
+            damageMappingThisLife.Clear();
+            lastAttackingCombatAgent = null;
+        }
 
         [HideInInspector] public bool wasStaggeredThisFrame;
         protected IEnumerator ResetStaggerBool()
@@ -471,10 +529,10 @@ namespace Vi.Core
             hitFreezeStartTime = Time.time;
         }
 
-        protected abstract PooledObject GetHitVFXPrefab();
-        protected abstract PooledObject GetBlockVFXPrefab();
-        protected abstract AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment);
-        protected abstract AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial);
+        protected PooledObject GetHitVFXPrefab() { return WeaponHandler.GetWeapon().hitVFXPrefab; }
+        protected PooledObject GetBlockVFXPrefab() { return WeaponHandler.GetWeapon().blockVFXPrefab; }
+        protected AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
+        protected AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return WeaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial); }
 
         protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {

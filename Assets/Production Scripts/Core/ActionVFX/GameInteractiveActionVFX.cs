@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Unity.Netcode.Components;
 using Vi.Utility;
 
 namespace Vi.Core.VFX
 {
-    [RequireComponent(typeof(NetworkObject))]
-    [RequireComponent(typeof(NetworkTransform))]
     public class GameInteractiveActionVFX : ActionVFX
     {
         public enum SpellType
@@ -55,7 +52,7 @@ namespace Vi.Core.VFX
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
                     NetworkObject netObj = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.SpawnWithOwnership(OwnerClientId, true);
+                    netObj.Spawn(true);
                     if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }
             }

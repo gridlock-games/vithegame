@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1040106044479742729}
   - component: {fileID: 833873904222931337}
   - component: {fileID: 5402332562533318633}
+  - component: {fileID: 7151643791083127174}
   m_Layer: 6
   m_Name: broadsword_base
   m_TagString: Untagged
@@ -47,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  weaponTrailVFX: {fileID: 0}
 --- !u!65 &5402332562533318633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -60,6 +63,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.1981304, y: 0.39001963, z: 1.3472049}
   m_Center: {x: -0.0050750524, y: 0.0039102286, z: 0.9869095}
+--- !u!114 &7151643791083127174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370669848205982131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 131
+  isPrewarmObject: 1
 --- !u!1 &1260787836397992771
 GameObject:
   m_ObjectHideFlags: 0

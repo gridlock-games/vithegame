@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7136312059911149408}
   - component: {fileID: 9029875363180281935}
   - component: {fileID: 7716272029718221284}
+  - component: {fileID: 8266887927588981784}
   m_Layer: 6
   m_Name: Greatsword_Shield
   m_TagString: Untagged
@@ -59,6 +60,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  weaponTrailVFX: {fileID: 0}
+--- !u!114 &8266887927588981784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7136312059910720320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 124
+  isPrewarmObject: 1
 --- !u!1001 &1651257942639412176
 PrefabInstance:
   m_ObjectHideFlags: 0
