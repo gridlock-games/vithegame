@@ -87,5 +87,22 @@ namespace Vi.Core.GameModeManagers
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
         }
+
+        public override void OnEnvironmentKill(CombatAgent victim)
+        {
+            base.OnEnvironmentKill(victim);
+            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Red ? PlayerDataManager.Team.Environment : PlayerDataManager.Team.Red;
+            List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            {
+                List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
+                List<int> winningPlayerIds = new List<int>();
+                foreach (Attributes attributes in opposingTeamPlayers)
+                {
+                    winningPlayerIds.Add(attributes.GetPlayerDataId());
+                }
+                OnRoundEnd(winningPlayerIds.ToArray());
+            }
+        }
     }
 }
