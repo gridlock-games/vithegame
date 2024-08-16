@@ -21,7 +21,6 @@ namespace Vi.Core.GameModeManagers
         private new void Awake()
         {
             base.Awake();
-            roundDuration = 180;
             numberOfRoundsWinsToWinGame = waves.Length;
         }
 

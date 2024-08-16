@@ -627,13 +627,16 @@ namespace Vi.Core.GameModeManagers
 
         private void OnRoundTimerChange(float prev, float current)
         {
-            if (Mathf.Approximately(current, roundDuration))
+            if (timerMode == TimerMode.CountDown)
             {
-                OnRoundTimerStart();
-            }
-            else if (current <= 0 & prev > 0)
-            {
-                OnRoundTimerEnd();
+                if (Mathf.Approximately(current, roundDuration))
+                {
+                    OnRoundTimerStart();
+                }
+                else if (current <= 0 & prev > 0)
+                {
+                    OnRoundTimerEnd();
+                }
             }
         }
 
@@ -739,7 +742,18 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    roundTimer.Value = roundDuration;
+                    switch (timerMode)
+                    {
+                        case TimerMode.CountDown:
+                            roundTimer.Value = roundDuration;
+                            break;
+                        case TimerMode.CountUp:
+                            OnRoundStart();
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle timer mode " + timerMode + " when next game action timer reaches 0!");
+                            break;
+                    }
                 }
             }
         }
@@ -987,6 +1001,14 @@ namespace Vi.Core.GameModeManagers
             return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
         }
 
+        protected enum TimerMode
+        {
+            CountDown,
+            CountUp
+        }
+
+        [SerializeField] private TimerMode timerMode = TimerMode.CountDown;
+
         protected void Update()
         {
             if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
@@ -1001,9 +1023,24 @@ namespace Vi.Core.GameModeManagers
             else
             {
                 if (nextGameActionTimer.Value > 0)
+                {
                     nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
+                }
                 else if (!gameOver.Value)
-                    roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+                {
+                    switch (timerMode)
+                    {
+                        case TimerMode.CountDown:
+                            roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+                            break;
+                        case TimerMode.CountUp:
+                            roundTimer.Value += Time.deltaTime;
+                            break;
+                        default:
+                            Debug.LogError("Not sure how to handle timer mode " + timerMode);
+                            break;
+                    }
+                }
             }
         }
 
