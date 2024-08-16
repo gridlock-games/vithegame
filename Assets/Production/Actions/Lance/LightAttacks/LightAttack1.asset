@@ -163,7 +163,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 1
+  shouldPlayHitReaction: 0
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -856,8 +856,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.28
-  recoveryNormalizedTime: 0.65
+  attackingNormalizedTime: 0.25
+  recoveryNormalizedTime: 0.6
   isAffectedByRage: 1
   damage: 6
   healAmount: 0
