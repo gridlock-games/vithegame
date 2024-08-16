@@ -906,9 +906,18 @@ namespace Vi.Core.GameModeManagers
 
             if (networkListEvent.Type == NetworkListEvent<PlayerScore>.EventType.Value)
             {
-                scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
-                scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
-                if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                if (respawnType == RespawnType.Respawn)
+                {
+                    scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                    scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                    if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                }
+                else if (gameOver.Value)
+                {
+                    scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                    scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                    if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                }
             }
         }
 
@@ -933,7 +942,7 @@ namespace Vi.Core.GameModeManagers
                 Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
                 if (attributes)
                 {
-                    if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
+                    if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
 
                     StartCoroutine(PlayAnimation(attributes.AnimationHandler, isVictor));
                 }
