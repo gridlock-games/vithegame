@@ -519,7 +519,7 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
 
-        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public virtual bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
         public bool IsGameOver() { return gameOver.Value; }
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }

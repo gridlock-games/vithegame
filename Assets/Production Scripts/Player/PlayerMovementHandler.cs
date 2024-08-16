@@ -91,18 +91,6 @@ namespace Vi.Player
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                if (IsOwner)
-                {
-                    moveForwardTarget.Value = 0;
-                    moveSidesTarget.Value = 0;
-                }
-                isGrounded = true;
-                lastMovement = Vector3.zero;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, movementPrediction.CurrentRotation);
-            }
-
             Quaternion newRotation = movementPrediction.CurrentRotation;
             if (IsOwner)
             {
@@ -121,6 +109,18 @@ namespace Vi.Player
             else
             {
                 newRotation = inputPayload.rotation;
+            }
+
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                if (IsOwner)
+                {
+                    moveForwardTarget.Value = 0;
+                    moveSidesTarget.Value = 0;
+                }
+                isGrounded = true;
+                lastMovement = Vector3.zero;
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, newRotation);
             }
 
             // Handle gravity

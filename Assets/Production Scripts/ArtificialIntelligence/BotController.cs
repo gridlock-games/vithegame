@@ -108,6 +108,23 @@ namespace Vi.ArtificialIntelligence
         RaycastHit[] allHits = new RaycastHit[10];
         private void ProcessMovementTick()
         {
+            Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
+            lookDirection.Scale(HORIZONTAL_PLANE);
+
+            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
+
+            Quaternion newRotation = currentRotation.Value;
+            if (attributes.ShouldApplyAilmentRotation())
+                newRotation = attributes.GetAilmentRotation();
+            else if (attributes.AnimationHandler.IsGrabAttacking())
+                newRotation = currentRotation.Value;
+            else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
+            else if (!attributes.ShouldPlayHitStop())
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
+
+            currentRotation.Value = newRotation;
+
             // This method is only called on the server
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -128,21 +145,6 @@ namespace Vi.ArtificialIntelligence
             {
                 inputDir = Vector3.zero;
             }
-
-            Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
-            lookDirection.Scale(HORIZONTAL_PLANE);
-
-            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
-
-            Quaternion newRotation = currentRotation.Value;
-            if (attributes.ShouldApplyAilmentRotation())
-                newRotation = attributes.GetAilmentRotation();
-            else if (attributes.AnimationHandler.IsGrabAttacking())
-                newRotation = currentRotation.Value;
-            else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
-            else if (!attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
@@ -273,7 +275,6 @@ namespace Vi.ArtificialIntelligence
             }
 
             currentPosition.Value = newPosition;
-            currentRotation.Value = newRotation;
             lastMovement = movement;
         }
 
