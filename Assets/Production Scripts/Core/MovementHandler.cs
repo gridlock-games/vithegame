@@ -186,7 +186,7 @@ namespace Vi.Core
                 }
 				else
                 {
-					return true;
+					return GameModeManager.Singleton.GetRoundCount() > 0;
                 }
 			}
 			return true;
