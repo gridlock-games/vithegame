@@ -22,10 +22,22 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         private const float nextGameActionDuration = 10;
-        [Header("Leave respawn time as 0 to disable respawns")]
+        [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
 
         protected const float overtimeDuration = 20;
+
+        public enum RespawnType
+        {
+            Respawn,
+            DontRespawn,
+            ResetStats,
+            ResetHP
+        }
+
+        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+
+        public RespawnType GetRespawnType() { return respawnType; }
 
         public int GetNumberOfRoundsWinsToWinGame() { return numberOfRoundsWinsToWinGame; }
 
@@ -642,7 +654,14 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldFadeToBlack()
         {
-            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
+            if (respawnType == RespawnType.Respawn)
+            {
+                return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
@@ -657,7 +676,56 @@ namespace Vi.Core.GameModeManagers
                     if (!respawnsCalledByRoundCount.Contains(GetRoundCount()))
                     {
                         respawnsCalledByRoundCount.Add(GetRoundCount());
-                        PlayerDataManager.Singleton.RespawnAllPlayers();
+                        switch (respawnType)
+                        {
+                            case RespawnType.Respawn:
+                                PlayerDataManager.Singleton.RespawnAllPlayers();
+                                break;
+                            case RespawnType.DontRespawn:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            case RespawnType.ResetStats:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, true, true, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            case RespawnType.ResetHP:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, false, false, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            default:
+                                Debug.LogError("Unsure how to handle respawn type " + respawnType);
+                                break;
+                        }
                         roundResultMessage.Value = "Round " + (GetRoundCount() + 1).ToString() + " is About to Start ";
                     }
                 }

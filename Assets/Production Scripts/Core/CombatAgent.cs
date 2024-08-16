@@ -102,6 +102,7 @@ namespace Vi.Core
         public AnimationHandler AnimationHandler { get; private set; }
         public MovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
+        public LoadoutManager LoadoutManager { get; private set; }
         protected void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
@@ -109,6 +110,7 @@ namespace Vi.Core
             GlowRenderer = GetComponent<GlowRenderer>();
             MovementHandler = GetComponent<MovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
+            LoadoutManager = GetComponent<LoadoutManager>();
         }
 
         public GlowRenderer GlowRenderer { get; private set; }
@@ -331,12 +333,14 @@ namespace Vi.Core
 
         [Rpc(SendTo.Server)] private void ActivateRageServerRpc() { ActivateRage(); }
 
-        public void ResetStats(float hpPercentage, bool resetRage)
+        public void ResetStats(float hpPercentage, bool resetStamina, bool resetSpirit, bool resetRage)
         {
             damageMappingThisLife.Clear();
             HP.Value = GetMaxHP() * hpPercentage;
-            spirit.Value = GetMaxSpirit();
-            stamina.Value = 0;
+            if (resetStamina)
+                stamina.Value = 0;
+            if (resetSpirit)
+                spirit.Value = GetMaxSpirit();
             if (resetRage)
                 rage.Value = 0;
         }

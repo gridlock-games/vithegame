@@ -34,7 +34,7 @@ namespace Vi.UI
 
         public RectTransform GetOnScreenReloadButton() { return onScreenReloadButton; }
 
-        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS); }
+        public void RefreshOnScreenReloadButtonInteractability() { onScreenReloadButton.gameObject.SetActive(attributes.WeaponHandler.CanADS); }
 
         public Button GetPauseMenuButton() { return pauseMenuButton; }
 
@@ -115,63 +115,63 @@ namespace Vi.UI
         public void SwitchWeapon()
         {
             if (!switchWeaponAction.enabled) { return; }
-            loadoutManager.SwitchWeapon();
+            attributes.LoadoutManager.SwitchWeapon();
         }
 
         private InputAction lightAttackAction;
         public void StartLightAttack()
         {
             if (!lightAttackAction.enabled) { return; }
-            weaponHandler.LightAttackHold(true);
+            attributes.WeaponHandler.LightAttackHold(true);
         }
 
-        public void StopLightAttack() { weaponHandler.LightAttackHold(false); }
+        public void StopLightAttack() { attributes.WeaponHandler.LightAttackHold(false); }
 
         private InputAction heavyAttackAction;
         public void StartHeavyAttack()
         {
             if (!heavyAttackAction.enabled) { return; }
-            weaponHandler.HeavyAttackHold(true);
+            attributes.WeaponHandler.HeavyAttackHold(true);
         }
 
         public void StopHeavyAttack()
         {
-            weaponHandler.HeavyAttackHold(false);
+            attributes.WeaponHandler.HeavyAttackHold(false);
         }
 
         private InputAction ability1Action;
         public void Ability1(bool isPressed)
         {
             if (!ability1Action.enabled) { isPressed = false; }
-            weaponHandler.Ability1(isPressed);
+            attributes.WeaponHandler.Ability1(isPressed);
         }
 
         private InputAction ability2Action;
         public void Ability2(bool isPressed)
         {
             if (!ability2Action.enabled) { isPressed = false; }
-            weaponHandler.Ability2(isPressed);
+            attributes.WeaponHandler.Ability2(isPressed);
         }
 
         private InputAction ability3Action;
         public void Ability3(bool isPressed)
         {
             if (!ability3Action.enabled) { isPressed = false; }
-            weaponHandler.Ability3(isPressed);
+            attributes.WeaponHandler.Ability3(isPressed);
         }
 
         private InputAction ability4Action;
         public void Ability4(bool isPressed)
         {
             if (!ability4Action.enabled) { isPressed = false; }
-            weaponHandler.Ability4(isPressed);
+            attributes.WeaponHandler.Ability4(isPressed);
         }
 
         private InputAction reloadAction;
         public void Reload()
         {
             if (!reloadAction.enabled) { return; }
-            weaponHandler.Reload();
+            attributes.WeaponHandler.Reload();
         }
 
         private InputAction dodgeAction;
@@ -181,7 +181,7 @@ namespace Vi.UI
             playerMovementHandler.OnDodge();
         }
 
-        public void Block(bool isPressed) { weaponHandler.Block(isPressed); }
+        public void Block(bool isPressed) { attributes.WeaponHandler.Block(isPressed); }
 
         public void Rage() { attributes.OnActivateRage(); }
 
@@ -189,9 +189,7 @@ namespace Vi.UI
 
         public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
 
-        private WeaponHandler weaponHandler;
         private Attributes attributes;
-        private LoadoutManager loadoutManager;
         private PlayerInput playerInput;
         private PlayerMovementHandler playerMovementHandler;
 
@@ -200,10 +198,10 @@ namespace Vi.UI
 
         private void Awake()
         {
-            weaponHandler = GetComponentInParent<WeaponHandler>();
-            attributes = weaponHandler.GetComponent<Attributes>();
-            
-            playerInput = weaponHandler.GetComponent<PlayerInput>();
+            attributes = GetComponentInParent<Attributes>();
+            playerMovementHandler = attributes.GetComponent<PlayerMovementHandler>();
+
+            playerInput = attributes.GetComponent<PlayerInput>();
             pauseMenuAction = playerInput.actions.FindAction("Pause");
             inventoryAction = playerInput.actions.FindAction("Inventory");
             scoreboardAction = playerInput.actions.FindAction("Scoreboard");
@@ -216,9 +214,6 @@ namespace Vi.UI
             ability4Action = playerInput.actions.FindAction("Ability4");
             reloadAction = playerInput.actions.FindAction("Reload");
             dodgeAction = playerInput.actions.FindAction("Dodge");
-
-            loadoutManager = weaponHandler.GetComponent<LoadoutManager>();
-            playerMovementHandler = weaponHandler.GetComponent<PlayerMovementHandler>();
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
@@ -279,20 +274,20 @@ namespace Vi.UI
         private void UpdateWeapon(bool forceRefresh)
         {
             if (playerInput.currentControlScheme == null) { return; }
-            if (!weaponHandler.WeaponInitialized) { return; }
+            if (!attributes.WeaponHandler.WeaponInitialized) { return; }
 
             if (!forceRefresh)
             {
-                if (lastWeapon == weaponHandler.GetWeapon())
+                if (lastWeapon == attributes.WeaponHandler.GetWeapon())
                 {
-                    lastWeapon = weaponHandler.GetWeapon();
+                    lastWeapon = attributes.WeaponHandler.GetWeapon();
                     return;
                 }
             }
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
-            List<ActionClip> abilities = weaponHandler.GetWeapon().GetAbilities();
+            List<ActionClip> abilities = attributes.WeaponHandler.GetWeapon().GetAbilities();
             bool ability1Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability1"].bindings)
             {
@@ -377,15 +372,15 @@ namespace Vi.UI
 
             if (!ability4Initialized) { ability4.UpdateCard(abilities[3], ""); }
 
-            lastWeapon = weaponHandler.GetWeapon();
+            lastWeapon = attributes.WeaponHandler.GetWeapon();
 
-            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(loadoutManager, loadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary, playerInput, controlsAsset); }
-            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(loadoutManager, loadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary, playerInput, controlsAsset); }
-            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(loadoutManager,
-                loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? loadoutManager.PrimaryWeaponOption.weapon : loadoutManager.SecondaryWeaponOption.weapon,
-                loadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
+            if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(attributes.LoadoutManager, attributes.LoadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary, playerInput, controlsAsset); }
+            if (secondaryWeaponCard.isActiveAndEnabled) { secondaryWeaponCard.Initialize(attributes.LoadoutManager, attributes.LoadoutManager.SecondaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Secondary, playerInput, controlsAsset); }
+            if (mobileWeaponCard.isActiveAndEnabled) { mobileWeaponCard.Initialize(attributes.LoadoutManager,
+                attributes.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? attributes.LoadoutManager.PrimaryWeaponOption.weapon : attributes.LoadoutManager.SecondaryWeaponOption.weapon,
+                attributes.LoadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
 
-            onScreenReloadButton.gameObject.SetActive(weaponHandler.CanADS);
+            onScreenReloadButton.gameObject.SetActive(attributes.WeaponHandler.CanADS);
         }
 
         private void UpdateActiveUIElements()
@@ -427,7 +422,7 @@ namespace Vi.UI
         {
             if (!primaryWeaponCard.isActiveAndEnabled | !secondaryWeaponCard.isActiveAndEnabled) { return; }
 
-            bool primaryIsEquipped = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
+            bool primaryIsEquipped = attributes.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary;
 
             primaryWeaponCard.transform.localPosition = Vector3.Lerp(primaryWeaponCard.transform.localPosition, primaryIsEquipped ? equippedWeaponCardTargetLocalPosition : stowedWeaponCardTargetLocalPosition, Time.deltaTime * weaponCardAnimationSpeed);
             secondaryWeaponCard.transform.localPosition = Vector3.Lerp(secondaryWeaponCard.transform.localPosition, primaryIsEquipped ? stowedWeaponCardTargetLocalPosition : equippedWeaponCardTargetLocalPosition, Time.deltaTime * weaponCardAnimationSpeed);
@@ -460,11 +455,11 @@ namespace Vi.UI
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }
-            if (!weaponHandler.WeaponInitialized) { return; }
+            if (!attributes.WeaponHandler.WeaponInitialized) { return; }
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
-            float dodgeCooldownProgress = weaponHandler.GetWeapon().GetDodgeCooldownProgress();
+            float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
             mobileDodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
             dodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
 
@@ -590,7 +585,7 @@ namespace Vi.UI
 
             lastControlScheme = playerInput.currentControlScheme;
 
-            heavyAttackButton.sprite = weaponHandler.CanADS ? aimIcon : heavyAttackIcon;
+            heavyAttackButton.sprite = attributes.WeaponHandler.CanADS ? aimIcon : heavyAttackIcon;
         }
     }
 }

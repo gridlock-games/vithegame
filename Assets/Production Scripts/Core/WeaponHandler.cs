@@ -24,14 +24,10 @@ namespace Vi.Core
 
         private Weapon weaponInstance;
         private CombatAgent combatAgent;
-        private MovementHandler movementHandler;
-        private LoadoutManager loadoutManager;
 
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
-            movementHandler = GetComponent<MovementHandler>();
-            loadoutManager = GetComponent<LoadoutManager>();
             weaponInstance = ScriptableObject.CreateInstance<Weapon>();
             CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             RefreshStatus();
@@ -90,7 +86,7 @@ namespace Vi.Core
 
         public int GetAmmoCount()
         {
-            return loadoutManager.GetAmmoCount(weaponInstance);
+            return combatAgent.LoadoutManager.GetAmmoCount(weaponInstance);
         }
 
         public int GetMaxAmmoCount()
@@ -101,7 +97,7 @@ namespace Vi.Core
 
         public void UseAmmo()
         {
-            loadoutManager.UseAmmo(weaponInstance);
+            combatAgent.LoadoutManager.UseAmmo(weaponInstance);
         }
 
         private void EquipWeapon()
@@ -735,7 +731,7 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                loadoutManager.ReloadAllWeapons();
+                combatAgent.LoadoutManager.ReloadAllWeapons();
             }
 
             if (IsOwner)
@@ -1043,7 +1039,7 @@ namespace Vi.Core
                 {
                     if (GetAmmoCount() == 0)
                     {
-                        if (movementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                        if (combatAgent.MovementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
             }
@@ -1085,7 +1081,7 @@ namespace Vi.Core
         {
             if (reloadRunning) { return; }
             if (combatAgent.AnimationHandler.IsReloading()) { return; }
-            if (loadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
+            if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (!combatAgent.AnimationHandler.IsAtRest()) { return; }
 
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
@@ -1102,7 +1098,7 @@ namespace Vi.Core
             combatAgent.AnimationHandler.Animator.SetBool("Reloading", true);
             yield return new WaitUntil(() => combatAgent.AnimationHandler.IsFinishingReload());
             combatAgent.AnimationHandler.Animator.SetBool("Reloading", false);
-            loadoutManager.Reload(weaponInstance);
+            combatAgent.LoadoutManager.Reload(weaponInstance);
             reloadRunning = false;
         }
 
@@ -1278,16 +1274,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = movementHandler.GetMoveInput().y > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = movementHandler.GetMoveInput().y < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = movementHandler.GetMoveInput().x < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = movementHandler.GetMoveInput().x > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");

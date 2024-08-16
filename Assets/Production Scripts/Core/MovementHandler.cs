@@ -174,7 +174,21 @@ namespace Vi.Core
 
         public bool CanMove()
 		{
-			if (GameModeManager.Singleton) { return !GameModeManager.Singleton.ShouldDisplayNextGameAction() & !GameModeManager.Singleton.IsGameOver(); }
+			if (GameModeManager.Singleton)
+			{
+				if (GameModeManager.Singleton.IsGameOver())
+                {
+					return false;
+                }
+				else if (GameModeManager.Singleton.GetRespawnType() == GameModeManager.RespawnType.Respawn & GameModeManager.Singleton.ShouldDisplayNextGameAction())
+                {
+					return false;
+                }
+				else
+                {
+					return true;
+                }
+			}
 			return true;
 		}
 	}

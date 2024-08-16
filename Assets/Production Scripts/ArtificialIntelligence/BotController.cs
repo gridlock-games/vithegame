@@ -72,12 +72,10 @@ namespace Vi.ArtificialIntelligence
         }
 
         private Attributes attributes;
-        private LoadoutManager loadoutManager;
         private new void Awake()
         {
             base.Awake();
             attributes = GetComponent<Attributes>();
-            loadoutManager = GetComponent<LoadoutManager>();
             RefreshStatus();
         }
 
@@ -404,9 +402,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
+            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | attributes.LoadoutManager.WeaponNameThatCanFlashAttack != null)
             {
-                loadoutManager.SwitchWeapon();
+                attributes.LoadoutManager.SwitchWeapon();
                 lastWeaponSwapTime = Time.time;
             }
 
