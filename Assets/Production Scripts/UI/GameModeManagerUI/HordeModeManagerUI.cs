@@ -47,7 +47,7 @@ namespace Vi.UI
         private void EvaluateWaveText()
         {
             roundWinThresholdText.text = "Waves Remaining: " + (gameModeManager.GetNumberOfRoundsWinsToWinGame() - gameModeManager.GetRoundCount()).ToString();
-            if (gameModeManager.ShouldDisplayNextGameAction())
+            if (gameModeManager.ShouldDisplayNextGameAction() | gameModeManager.IsGameOver())
             {
                 wavesLeftText.text = "Waves Completed: " + (gameModeManager.GetRoundCount() >= 0 ? gameModeManager.GetRoundCount() : 0).ToString();
             }
