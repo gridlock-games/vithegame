@@ -165,8 +165,7 @@ namespace Vi.Core.GameModeManagers
 
             if (winningPlayersDataIds.Length == 0)
             {
-                string message = "Round Draw! ";
-                roundResultMessage.Value = message;
+                roundResultMessage.Value = "Round Draw! ";
             }
             else
             {

@@ -24,12 +24,34 @@ namespace Vi.Core.GameModeManagers
             roundDuration = 180;
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            roundResultMessage.Value = "Entering Corrupted Abyss! ";
+        }
+
         protected override void OnRoundStart()
         {
             base.OnRoundStart();
             foreach (Mob mob in waves[GetRoundCount()-1].mobPrefabs)
             {
                 SpawnMob(mob, mobTeam);
+            }
+        }
+
+        protected override void OnRoundEnd(int[] winningPlayersDataIds)
+        {
+            base.OnRoundEnd(winningPlayersDataIds);
+
+            if (gameOver.Value) { return; }
+
+            if (winningPlayersDataIds.Length == 0) // Mobs killed all players
+            {
+                roundResultMessage.Value = "The Corruption Consumes You. ";
+            }
+            else // Players won
+            {
+                roundResultMessage.Value = "Wave Defeated. ";
             }
         }
     }
