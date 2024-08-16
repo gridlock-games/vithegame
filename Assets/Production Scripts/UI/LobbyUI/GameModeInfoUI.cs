@@ -17,7 +17,7 @@ namespace Vi.UI
 
         public void Initialize(PlayerDataManager.GameMode gameMode)
         {
-            headerText.text = StringUtility.FromCamelCase(gameMode.ToString());
+            headerText.text = PlayerDataManager.GetGameModeString(gameMode);
 
             foreach (Transform child in gameModeInfoUICardParent)
             {

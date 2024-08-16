@@ -16,7 +16,7 @@ namespace Vi.UI
         public IEnumerator Initialize(PlayerDataManager.GameMode gameMode, Sprite gameModeIcon)
         {
             this.gameMode = gameMode;
-            gameModeText.text = StringUtility.FromCamelCase(gameMode.ToString());
+            gameModeText.text = PlayerDataManager.GetGameModeString(gameMode);
             GetComponent<Image>().sprite = gameModeIcon;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);

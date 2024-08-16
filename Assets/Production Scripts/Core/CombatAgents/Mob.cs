@@ -295,6 +295,11 @@ namespace Vi.Core.CombatAgents
             }
 
             ailment.Value = attackAilment;
+
+            if (ailment.Value == ActionClip.Ailment.Death)
+            {
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+            }
         }
 
         [SerializeField] private Weapon.ArmorType armorType;

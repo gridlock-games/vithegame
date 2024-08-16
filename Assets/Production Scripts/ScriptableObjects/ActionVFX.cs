@@ -10,8 +10,8 @@ namespace Vi.ScriptableObjects
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PooledObject))]
-    //[RequireComponent(typeof(NetworkObject))]
-    //[RequireComponent(typeof(NetworkTransform))]
+    [RequireComponent(typeof(NetworkObject))]
+    [RequireComponent(typeof(NetworkTransform))]
     public class ActionVFX : NetworkBehaviour
     {
         public enum VFXSpawnType

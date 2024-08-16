@@ -7,11 +7,14 @@ using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(PooledObject))]
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(NetworkTransform))]
+    [RequireComponent(typeof(NetworkRigidbody))]
     public class Projectile : NetworkBehaviour
     {
         [Header("Projectile Settings")]
@@ -48,9 +51,11 @@ namespace Vi.Core
         }
 
         private Rigidbody rb;
+        private NetworkTransform networkTransform;
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            networkTransform = GetComponent<NetworkTransform>();
         }
 
         private Vector3 startPosition;

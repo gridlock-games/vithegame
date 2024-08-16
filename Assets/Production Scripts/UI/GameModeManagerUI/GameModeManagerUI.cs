@@ -56,6 +56,7 @@ namespace Vi.UI
         private void OnDestroy()
         {
             gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
+            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
         }
 
         protected void OnScoreListChanged()
@@ -116,7 +117,7 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.MVP:
-                    if (!MVPPreviewObject) { StartCoroutine(CreateMVPPreview()); }
+                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview()); }
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.Initialize(gameModeManager.GetMVPScore().id, true);
                     break;
@@ -143,8 +144,12 @@ namespace Vi.UI
 
         private const float opacityTransitionSpeed = 2;
 
+        private GameObject MVPPreviewObject;
+        private bool MVPPreviewInProgress;
         private IEnumerator CreateMVPPreview()
         {
+            MVPPreviewInProgress = true;
+
             MVPKillsText.text = "";
             MVPDeathsText.text = "";
             MVPAssistsText.text = "";
@@ -179,8 +184,8 @@ namespace Vi.UI
             yield return new WaitUntil(() => animationHandler.Animator);
 
             animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
-        }
 
-        private GameObject MVPPreviewObject;
+            MVPPreviewInProgress = false;
+        }
     }
 }

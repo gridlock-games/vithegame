@@ -66,6 +66,7 @@ namespace Vi.Core
         public void RegisterNewRenderer(Renderer renderer)
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
+            if (!netObj.IsSpawned) { return; }
 
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
             {

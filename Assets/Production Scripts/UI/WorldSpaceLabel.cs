@@ -123,6 +123,7 @@ namespace Vi.UI
 
         private void RefreshRendererToFollow()
         {
+            if (!combatAgent) { return; }
             Renderer[] renderers = combatAgent.GetComponentsInChildren<Renderer>();
             if (renderers.Length == 0) { return; }
             Vector3 highestPoint = renderers[0].bounds.center;

@@ -35,7 +35,13 @@ namespace Vi.Core
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-		public virtual void AddForce(Vector3 force) { }
+		public virtual void AddForce(Vector3 force)
+        {
+			if (TryGetComponent(out Rigidbody rb))
+            {
+				rb.AddForce(force, ForceMode.VelocityChange);
+            }
+        }
 
 		public virtual void SetImmovable(bool isImmovable) { }
 
@@ -168,7 +174,21 @@ namespace Vi.Core
 
         public bool CanMove()
 		{
-			if (GameModeManager.Singleton) { return !GameModeManager.Singleton.ShouldDisplayNextGameAction() & !GameModeManager.Singleton.IsGameOver(); }
+			if (GameModeManager.Singleton)
+			{
+				if (GameModeManager.Singleton.IsGameOver())
+                {
+					return false;
+                }
+				else if (GameModeManager.Singleton.GetRespawnType() == GameModeManager.RespawnType.Respawn & GameModeManager.Singleton.ShouldDisplayNextGameAction())
+                {
+					return false;
+                }
+				else
+                {
+					return GameModeManager.Singleton.GetRoundCount() > 0;
+                }
+			}
 			return true;
 		}
 	}

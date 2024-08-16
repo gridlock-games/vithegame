@@ -38,9 +38,9 @@ namespace Vi.Core.GameModeManagers
         {
             yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
             SpawnPoints playerSpawnPoints = PlayerDataManager.Singleton.GetPlayerSpawnPoints();
-            Instantiate(ancientBossCorruptPrefab, playerSpawnPoints.ancientBossCorruptSpawnPoint.position, playerSpawnPoints.ancientBossCorruptSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
-            Instantiate(ancientBossLightPrefab, playerSpawnPoints.ancientBossLightSpawnPoint.position, playerSpawnPoints.ancientBossLightSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
-            Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
+            //Instantiate(ancientBossCorruptPrefab, playerSpawnPoints.ancientBossCorruptSpawnPoint.position, playerSpawnPoints.ancientBossCorruptSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
+            //Instantiate(ancientBossLightPrefab, playerSpawnPoints.ancientBossLightSpawnPoint.position, playerSpawnPoints.ancientBossLightSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
+            //Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
         }
 
         public override string GetLeftScoreString()

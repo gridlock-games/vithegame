@@ -66,10 +66,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20ea1f94a9781114bae3e861a15cda31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UIPrefab: {fileID: 0}
+  UIPrefab: {fileID: 5187906202301571313, guid: 2a97fa0e590a38b49b031d944bafc35b,
+    type: 3}
   RPPrefab: {fileID: 0}
   numberOfRoundsWinsToWinGame: 2
   roundDuration: 30
-  respawnTime: 5
+  respawnTime: 0
+  respawnType: 3
   environmentKillFeedIcon: {fileID: 21300000, guid: f2c8db0bfcb4a42c3b3ebc9507158784,
     type: 3}
+  timerMode: 1
+  waves:
+  - mobPrefabs:
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+  - mobPrefabs:
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+  - mobPrefabs:
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+  - mobPrefabs:
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}
+    - {fileID: 3115624215988016511, guid: f34b75ab8fb446845ba8cf1bcd88b3a0, type: 3}

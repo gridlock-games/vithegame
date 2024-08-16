@@ -26,11 +26,6 @@ namespace Vi.Core
         [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);
         [SerializeField] private float shrinkSize = 20;
 
-        [Header("Essence War")]
-        public TransformData ancientBossLightSpawnPoint;
-        public TransformData ancientBossCorruptSpawnPoint;
-        public TransformData ancientBossNeutralSpawnPoint;
-
         public TransformData[] GetEnvironmentViewPoints() { return environmentViewPoints; }
 
         public TransformData[] GetGameItemSpawnPoints() { return gameItemSpawnPoints; }
@@ -185,10 +180,52 @@ namespace Vi.Core
             return (findMostClearSpawnPoint, returnedSpawnPoints);
         }
 
+        [System.Serializable]
+        public class SpawnPointDefinition
+        {
+            public PlayerDataManager.GameMode[] gameModes;
+            public PlayerDataManager.Team[] teams;
+            public bool findMostClearSpawnPoint = true;
+            public Vector3[] spawnPositions = new Vector3[0];
+            public Vector3[] spawnRotations = new Vector3[0];
+            public int[] spawnPriorities = new int[0];
+        }
+
+        [SerializeField] private MobSpawnPointDefinition[] mobSpawnPoints = new MobSpawnPointDefinition[0];
+
+        public TransformData GetMobSpawnPoint(Mob mobPrefab)
+        {
+            MobSpawnPointDefinition mobSpawnPointDefinition = System.Array.Find(mobSpawnPoints, item => item.mobPrefab == mobPrefab | item.mobPrefab.name == mobPrefab.name);
+            if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
+            else { return mobSpawnPointDefinition.GetRandomOrientation(); }
+            return default;
+        }
+
+        [System.Serializable]
+        private class MobSpawnPointDefinition
+        {
+            public Mob mobPrefab;
+            public Vector3[] spawnPositions = new Vector3[0];
+            public Vector3[] spawnRotations = new Vector3[0];
+
+            public TransformData GetRandomOrientation()
+            {
+                TransformData transformData = new TransformData();
+                if (spawnPositions.Length > 0)
+                {
+                    transformData.position = spawnPositions[Random.Range(0, spawnPositions.Length)];
+                }
+                if (spawnRotations.Length > 0)
+                {
+                    transformData.rotation = Quaternion.Euler(spawnRotations[Random.Range(0, spawnRotations.Length)]);
+                }
+                return transformData;
+            }
+        }
+
         [Header("Gizmos")]
-        [SerializeField] private bool displayDefaultGizmos;
+        [SerializeField] private bool displayDefaultGizmos = true;
         [SerializeField] private bool displayDamageCircleGizmos;
-        [SerializeField] private bool displayEssenceWarGizmos;
 
         private void OnDrawGizmos()
         {
@@ -221,6 +258,15 @@ namespace Vi.Core
                         Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
                     }
                 }
+
+                foreach (MobSpawnPointDefinition mobSpawnPointDefinition in mobSpawnPoints)
+                {
+                    Gizmos.color = Color.red;
+                    foreach (Vector3 spawnPosition in mobSpawnPointDefinition.spawnPositions)
+                    {
+                        Gizmos.DrawSphere(spawnPosition, 2);
+                    }
+                }
             }
             
             if (displayDamageCircleGizmos)
@@ -231,33 +277,6 @@ namespace Vi.Core
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
             }
-            
-            if (displayEssenceWarGizmos)
-            {
-                // Essence War
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawSphere(ancientBossLightSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossLightSpawnPoint.position, ancientBossLightSpawnPoint.rotation * Vector3.forward);
-
-                Gizmos.color = Color.magenta;
-                Gizmos.DrawSphere(ancientBossCorruptSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossCorruptSpawnPoint.position, ancientBossCorruptSpawnPoint.rotation * Vector3.forward);
-
-                Gizmos.color = Color.black;
-                Gizmos.DrawSphere(ancientBossNeutralSpawnPoint.position, 0.5f);
-                Gizmos.DrawRay(ancientBossNeutralSpawnPoint.position, ancientBossNeutralSpawnPoint.rotation * Vector3.forward);
-            }
-        }
-
-        [System.Serializable]
-        public class SpawnPointDefinition
-        {
-            public PlayerDataManager.GameMode[] gameModes;
-            public PlayerDataManager.Team[] teams;
-            public bool findMostClearSpawnPoint = true;
-            public Vector3[] spawnPositions = new Vector3[0];
-            public Vector3[] spawnRotations = new Vector3[0];
-            public int[] spawnPriorities = new int[0];
         }
     }
 }

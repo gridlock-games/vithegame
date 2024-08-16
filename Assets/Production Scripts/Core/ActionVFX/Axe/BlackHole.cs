@@ -10,7 +10,6 @@ namespace Vi.Core.VFX.Axe
     {
         [SerializeField] private float duration = 3;
         [SerializeField] private float radius = 2;
-        [SerializeField] private float forceMultiplier = 10;
         [SerializeField] private ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
         private float startTime;
@@ -43,34 +42,17 @@ namespace Vi.Core.VFX.Axe
             {
                 if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    bool shouldAffect = false;
-                    if (networkCollider.CombatAgent == GetAttacker())
-                    {
-                        if (shouldAffectSelf) { shouldAffect = true; }
-                    }
-                    else
-                    {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
-                        if (shouldAffectEnemies & canHit) { shouldAffect = true; }
-                        if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
-                    }
-
-                    if (spellType == SpellType.GroundSpell)
-                    {
-                        if (networkCollider.CombatAgent.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
-                    }
-
-                    if (shouldAffect)
+                    if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
+                        movementHandler.AddForce(transform.position - movementHandler.transform.position);
                     }
                 }
                 else if (colliders[i].transform.root.GetComponent<Projectile>())
                 {
                     if (colliders[i].TryGetComponent(out Rigidbody rb))
                     {
-                        rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
+                        rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
                     }
                 }
             }
@@ -83,22 +65,10 @@ namespace Vi.Core.VFX.Axe
             {
                 if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    bool shouldAffect = false;
-                    if (networkCollider.CombatAgent == GetAttacker())
-                    {
-                        if (shouldAffectSelf) { shouldAffect = true; }
-                    }
-                    else
-                    {
-                        bool canHit = PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker());
-                        if (shouldAffectEnemies & canHit) { shouldAffect = true; }
-                        if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
-                    }
-
-                    if (shouldAffect)
+                    if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce((transform.position - movementHandler.transform.position) * forceMultiplier);
+                        movementHandler.AddForce(transform.position - movementHandler.transform.position);
 
                         ActionClip copy = Instantiate(GetAttack());
                         copy.name = GetAttack().name;
@@ -111,9 +81,12 @@ namespace Vi.Core.VFX.Axe
                         }
                     }
                 }
-                else if (colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
+                else if (colliders[i].transform.root.GetComponent<Projectile>())
                 {
-                    rb.AddForce((transform.position - rb.position) * forceMultiplier, ForceMode.VelocityChange);
+                    if (colliders[i].TryGetComponent(out Rigidbody rb))
+                    {
+                        rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
+                    }
                 }
             }
             base.OnDisable();

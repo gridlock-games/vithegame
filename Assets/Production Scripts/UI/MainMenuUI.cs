@@ -68,8 +68,9 @@ namespace Vi.UI
         private bool startServerCalled;
         private const int hubPort = 7777;
 
+        public void StartHubServerButton() { StartCoroutine(StartHubServer()); }
 
-        public IEnumerator StartHubServer()
+        private IEnumerator StartHubServer()
         {
             if (startServerCalled) { yield break; }
 
@@ -127,7 +128,9 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Player Hub Environment");
         }
 
-        public IEnumerator StartLobbyServer()
+        public void StartLobbyServerButton() { StartCoroutine(StartLobbyServer()); }
+
+        private IEnumerator StartLobbyServer()
         {
             if (startServerCalled) { yield break; }
             startServerCalled = true;
@@ -230,6 +233,10 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
+
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
+            WebRequestManager.Singleton.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
 
             if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
 

@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: HammerWeapons
+  m_EditorClassIdentifier: 
+  m_GroupName: HammerWeapons
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 7779d484f4d7bf64a9f82e4c1ffdc837
+  m_SerializeEntries:
+  - m_GUID: 1bf608eaa8ac3b144974fd6af172ca17
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_blackhole_orb.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6cfb5b0f174c4492a81fa53585e21e4a
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_charge_dust_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 66047c3e08b413148ba4224121f2184b
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_fissure.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d1d36cbc73e0346f1a890f406101834a
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_orb_projectile.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 89ff078aac7e48d499356f32170eb49a
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/impact_circle.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 19a727a86aea544888e5d43468a67804
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_heavy_slash_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 38f181e3e58ad4f269993cd7bde28f46
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_whirwind_pull.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8d3f722683f794ac18e8fafdb835723e
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_dash.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0d5da7402b014cd4a843ba22e274c93b
+    m_Address: Assets/Production/Prefabs/VFX/Hammer/axe_ground_smash.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8e03fbcb73ec70c4a8740ad7a3b173aa
+    m_Address: Assets/Production/Weapons/HammerWeapon.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 10ac4963541ce4e47802880c231ada50
+    m_Address: Assets/Production/Prefabs/Weapons/InUse/Hammer/Naga's_Grasp.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f56c8fe4c780d8c4dac0ae5c53a2e46d
+    m_Address: Assets/Production/Prefabs/Weapons/Previews/HammerPreview.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 78ab62a15b50637409c49e43d82a2422
+    m_Address: Assets/Production/Actions/Hammer/Abilities/Ability1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e6c47e45796c18a4e982bf6623ef72e3
+    m_Address: Assets/Production/Actions/Hammer/Abilities/Ability2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 680a19656b558a04498346cf7b29ed76
+    m_Address: Assets/Production/Actions/Hammer/LightAttacks/LightAttack2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e73673792fce43340a8a38f4c76b6ec3
+    m_Address: Assets/Production/Actions/Hammer/LightAttacks/LightAttack1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: fde308ba0a28d4848bede9a081dc11e0
+    m_Address: Assets/Production/Actions/Hammer/HeavyAttacks/HeavyAttack1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 13937c9c11d16cd418a7642b13a97b23
+    m_Address: Assets/Production/Actions/Hammer/Abilities/Ability3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 29605fd86abc1e343846953f6afec9e6
+    m_Address: Assets/Production/Actions/Hammer/Abilities/Ability4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5672bdf4c35c4954e8a87c6f39c829a7
+    m_Address: Assets/Production/Actions/Hammer/FlashAttack.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c043d16ae73cdf645a4dd35aff755ca3
+    m_Address: Assets/Production/Prefabs/Weapons/InUse/Hammer/Embercleave.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e8fce56a306830d4c8e61b155274c45b
+    m_Address: Assets/Production/Prefabs/Weapons/InUse/Hammer/Doomskull_Reaver.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 36ce0604084922742b2ff5c14e4d0bda
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Meshes/Item/Weapons/Axe/SK_Axe_2HL_Fantasy_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: da0bb147337269e4596a17fdf9efabce
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Materials/Item/Weapon/M_Axe_2HL_Ud_02_Rd.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1ac3d69769f069e49bf3b9e46a9f0241
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Meshes/Item/Weapons/Axe/SK_Axe_2HL_Ud_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e343755d800fea24780d6d62b144de4e
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Materials/Item/Weapon/M_Axe_2HL_Fantasy_04_Rd.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: cd9faabd9a91e264a970e28a0d0f4110
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Meshes/Item/Weapons/Axe/SK_Axe_2HL_Fantasy_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1a9ec35e00772db47a79d0b73404939d
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Materials/Item/Weapon/M_Axe_2HL_Fantasy_02_Rd.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 773b9271102befe4da7215aa430208f4
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_02_MR.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5a8f408174c2eae409918a0bcdf36bef
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_02_Rd_D.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e157fd547ce845b44b0e79f2a845a963
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_04_MR.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d8acaed4eed91d24f88a362d374b61a9
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_02_Rd_E.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1da4ee35a2a5d364aa2425592eb2eef4
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_04_N.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d626aa76db9b97444b276428d164f6c8
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Ud_02_MR.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: fe3003f8ffac82e408061f4130a1b127
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_04_Rd_E.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d05fd739a0d22a242821f1de8ddabe25
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_04_Rd_D.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0645ef5969fa3c0409b19aa4f7ef80b5
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Ud_02_N.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e10cdb8ab52a1f343bbdfdac9dc8bb07
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Fantasy_02_N.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7189473c4b803264ea8e03d43025c47c
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Ud_02_E.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 60639aaf0d7406e42b54f9f2a69879e7
+    m_Address: Assets/PackagedPrefabs/MODEL_CHAR_StylizedCharacter/Textures/Item/Weapon/T_Axe_2HL_Ud_02_Rd_D.tga
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 3e0021f894bc12b41a4a7dbec13777c9, type: 2}
+    - {fileID: 11400000, guid: 7ffff801b17a5be4ea8e641231321dbd, type: 2}
