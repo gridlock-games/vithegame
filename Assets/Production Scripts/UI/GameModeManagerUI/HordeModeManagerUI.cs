@@ -10,14 +10,17 @@ namespace Vi.UI
     {
         [SerializeField] private Text wavesLeftText;
 
+        private HordeModeManager hordeModeManager;
+
         private new void Start()
         {
             base.Start();
-            EvaluateWaveText();
+            hordeModeManager = GameModeManager.Singleton.GetComponent<HordeModeManager>();
+            EvaluateWavesText();
         }
 
         private int lastRoundCount = -1;
-        private bool lastDisplayNextGameActionStatus;
+        private int lastWavesCompleted = -1;
         protected new void Update()
         {
             base.Update();
@@ -36,25 +39,19 @@ namespace Vi.UI
                 }
             }
 
-            if (gameModeManager.GetRoundCount() != lastRoundCount | lastDisplayNextGameActionStatus != gameModeManager.ShouldDisplayNextGameAction())
+            if (gameModeManager.GetRoundCount() != lastRoundCount | lastWavesCompleted != hordeModeManager.GetWavesCompleted())
             {
-                EvaluateWaveText();
+                EvaluateWavesText();
             }
-            lastRoundCount = gameModeManager.GetRoundCount();
-            lastDisplayNextGameActionStatus = gameModeManager.ShouldDisplayNextGameAction();
         }
 
-        private void EvaluateWaveText()
+        private void EvaluateWavesText()
         {
             roundWinThresholdText.text = "Waves Remaining: " + (gameModeManager.GetNumberOfRoundsWinsToWinGame() - gameModeManager.GetRoundCount()).ToString();
-            if (gameModeManager.ShouldDisplayNextGameAction() | gameModeManager.IsGameOver())
-            {
-                wavesLeftText.text = "Waves Completed: " + (gameModeManager.GetRoundCount() >= 0 ? gameModeManager.GetRoundCount() : 0).ToString();
-            }
-            else
-            {
-                wavesLeftText.text = "Waves Completed: " + (gameModeManager.GetRoundCount() - 1 >= 0 ? gameModeManager.GetRoundCount() - 1 : 0).ToString();
-            }
+            wavesLeftText.text = "Waves Completed: " + hordeModeManager.GetWavesCompleted().ToString();
+
+            lastRoundCount = gameModeManager.GetRoundCount();
+            lastWavesCompleted = hordeModeManager.GetWavesCompleted();
         }
     }
 }

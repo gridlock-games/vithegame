@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using Vi.Core.CombatAgents;
+using Unity.Netcode;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -61,8 +62,12 @@ namespace Vi.Core.GameModeManagers
             else // Players won
             {
                 roundResultMessage.Value = gameOver.Value ? "Corruption Cleared! " : "Wave Defeated. ";
+                wavesCompleted.Value++;
             }
         }
+
+        private NetworkVariable<int> wavesCompleted = new NetworkVariable<int>();
+        public int GetWavesCompleted() { return wavesCompleted.Value; }
 
         protected override void OnGameEnd(int[] winningPlayersDataIds)
         {
