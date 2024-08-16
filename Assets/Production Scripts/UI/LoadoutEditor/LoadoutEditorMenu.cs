@@ -61,8 +61,7 @@ namespace Vi.UI
                 // Instantiate the player model
                 previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
                     PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(SpawnPoints.previewCharacterRotation),
-                    transform);
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
@@ -72,6 +71,11 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+        }
+
+        private void OnDestroy()
+        {
+            if (previewObject) { Destroy(previewObject); }
         }
 
         private void OnEnable()
