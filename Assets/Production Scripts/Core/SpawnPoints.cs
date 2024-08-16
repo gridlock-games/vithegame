@@ -195,8 +195,9 @@ namespace Vi.Core
 
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
-            MobSpawnPointDefinition mobSpawnPointDefinition = System.Array.Find(mobSpawnPoints, item => item.mobPrefab == mobPrefab);
-            if (mobSpawnPointDefinition != null) { return mobSpawnPointDefinition.GetRandomOrientation(); }
+            MobSpawnPointDefinition mobSpawnPointDefinition = System.Array.Find(mobSpawnPoints, item => item.mobPrefab == mobPrefab | item.mobPrefab.name == mobPrefab.name);
+            if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
+            else { return mobSpawnPointDefinition.GetRandomOrientation(); }
             return default;
         }
 
