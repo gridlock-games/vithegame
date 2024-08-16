@@ -35,6 +35,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundStart()
         {
             base.OnRoundStart();
+
             List<Mob> mobsToRemove = new List<Mob>();
             foreach (Mob mob in currentlySpawnedMobs)
             {

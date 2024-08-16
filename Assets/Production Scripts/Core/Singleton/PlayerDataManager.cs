@@ -897,9 +897,9 @@ namespace Vi.Core
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
-                    foreach (Attributes attributes in GetActivePlayerObjects())
+                    foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
-                        attributes.NetworkObject.Despawn(true);
+                        combatAgent.NetworkObject.Despawn(true);
                     }
 
                     foreach (NetworkObject spectator in localSpectators.Values.ToList())
