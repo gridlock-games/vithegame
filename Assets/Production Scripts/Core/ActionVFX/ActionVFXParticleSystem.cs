@@ -246,23 +246,16 @@ namespace Vi.Core.VFX
             {
                 for (int colliderIndex = 0; colliderIndex < insideColliderData.GetColliderCount(particleIndex); colliderIndex++)
                 {
-                    try
+                    Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
+                    if (col.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                     {
-                        Collider col = (Collider)insideColliderData.GetCollider(particleIndex, colliderIndex);
-                        if (col.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        if (networkCollider.CombatAgent)
                         {
-                            if (networkCollider.CombatAgent)
+                            if (CanHit(networkCollider.CombatAgent))
                             {
-                                if (CanHit(networkCollider.CombatAgent))
-                                {
-                                    ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
-                                }
+                                ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(inside[particleIndex].position));
                             }
                         }
-                    }
-                    catch
-                    {
-                        // Do nothing because this error is dumb
                     }
                 }
             }
