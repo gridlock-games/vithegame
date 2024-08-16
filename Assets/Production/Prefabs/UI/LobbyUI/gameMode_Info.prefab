@@ -546,7 +546,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c1fba6348fb964f4eb2c32ee9d279afe, type: 3}
     - {fileID: 21300000, guid: c1fba6348fb964f4eb2c32ee9d279afe, type: 3}
     cardHeaders:
-    - Eliminate them
+    - Eliminate Them
     - Survive
     - Second Chance
     gameModeMessages:
@@ -554,6 +554,13 @@ MonoBehaviour:
     - Team with most players left standing wins
     - At a disadvantage, watchout for the vi essence. Picking up an essence will
       grant you to revive a teammate with 50% HP
+  - gameMode: 6
+    gameModeSprites:
+    - {fileID: 21300000, guid: c1fba6348fb964f4eb2c32ee9d279afe, type: 3}
+    cardHeaders:
+    - Monsters
+    gameModeMessages:
+    - Defeat waves of corrupted monsters coming to destroy you and your team
 --- !u!1001 &5244708293017700290
 PrefabInstance:
   m_ObjectHideFlags: 0
