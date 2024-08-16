@@ -22,6 +22,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.Awake();
             roundDuration = 180;
+            numberOfRoundsWinsToWinGame = waves.Length;
         }
 
         public override void OnNetworkSpawn()
@@ -30,12 +31,21 @@ namespace Vi.Core.GameModeManagers
             roundResultMessage.Value = "Entering Corrupted Abyss! ";
         }
 
+        List<Mob> currentlySpawnedMobs = new List<Mob>();
         protected override void OnRoundStart()
         {
             base.OnRoundStart();
+            List<Mob> mobsToRemove = new List<Mob>();
+            foreach (Mob mob in currentlySpawnedMobs)
+            {
+                mob.NetworkObject.Despawn(true);
+                mobsToRemove.Add(mob);
+            }
+            currentlySpawnedMobs.RemoveAll(item => mobsToRemove.Contains(item));
+
             foreach (Mob mob in waves[GetRoundCount()-1].mobPrefabs)
             {
-                SpawnMob(mob, mobTeam);
+                currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam));
             }
         }
 
@@ -43,15 +53,37 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnRoundEnd(winningPlayersDataIds);
 
-            if (gameOver.Value) { return; }
-
             if (winningPlayersDataIds.Length == 0) // Mobs killed all players
             {
                 roundResultMessage.Value = "The Corruption Consumes You. ";
+                OnGameEnd(winningPlayersDataIds);
             }
             else // Players won
             {
-                roundResultMessage.Value = "Wave Defeated. ";
+                roundResultMessage.Value = gameOver.Value ? "Corruption Cleared! " : "Wave Defeated. ";
+            }
+        }
+
+        protected override void OnGameEnd(int[] winningPlayersDataIds)
+        {
+            base.OnGameEnd(winningPlayersDataIds);
+            gameEndMessage.Value = "Game Over! ";
+        }
+
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
+        {
+            base.OnPlayerKill(killer, victim);
+            List<CombatAgent> killerTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam());
+            List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            {
+                List<Attributes> killerTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
+                List<int> winningPlayerIds = new List<int>();
+                foreach (Attributes attributes in killerTeamPlayers)
+                {
+                    winningPlayerIds.Add(attributes.GetPlayerDataId());
+                }
+                OnRoundEnd(winningPlayerIds.ToArray());
             }
         }
     }
