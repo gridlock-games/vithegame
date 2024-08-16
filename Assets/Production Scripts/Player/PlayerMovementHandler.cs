@@ -461,9 +461,10 @@ namespace Vi.Player
         }
 
         Vector3 forceAccumulated;
+        private const float forceMultiplier = 10;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += force * Time.fixedDeltaTime; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += forceMultiplier * Time.fixedDeltaTime * force; }
         }
 
         private float positionStrength = 1;

@@ -13,8 +13,6 @@ namespace Vi.Core.VFX
 
         protected bool ShouldAffect(CombatAgent combatAgent)
         {
-            if (!IsSpawned) { return false; }
-
             bool shouldAffect = false;
             if (combatAgent == GetAttacker())
             {

@@ -492,9 +492,10 @@ namespace Vi.ArtificialIntelligence
         }
 
         Vector3 forceAccumulated;
+        private const float forceMultiplier = 10;
         public override void AddForce(Vector3 force)
         {
-            forceAccumulated += force * Time.fixedDeltaTime;
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += forceMultiplier * Time.fixedDeltaTime * force; }
         }
 
         private float positionStrength = 1;

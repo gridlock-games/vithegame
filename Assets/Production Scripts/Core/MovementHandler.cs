@@ -35,7 +35,13 @@ namespace Vi.Core
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-		public virtual void AddForce(Vector3 force) { }
+		public virtual void AddForce(Vector3 force)
+        {
+			if (TryGetComponent(out Rigidbody rb))
+            {
+				rb.AddForce(force, ForceMode.VelocityChange);
+            }
+        }
 
 		public virtual void SetImmovable(bool isImmovable) { }
 
