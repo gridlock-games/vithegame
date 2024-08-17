@@ -138,6 +138,12 @@ namespace Vi.Utility
             return false;
         }
 
+        public bool HasString(string key) { return stringPrefs.ContainsKey(key); }
+        public bool HasFloat(string key) { return floatPrefs.ContainsKey(key); }
+        public bool HasInt(string key) { return intPrefs.ContainsKey(key); }
+        public bool HasBool(string key) { return boolPrefs.ContainsKey(key); }
+        public bool HasColor(string key) { return colorPrefs.ContainsKey(key); }
+
         public void SetFloat(string key, float value)
         {
             if (floatPrefs.ContainsKey(key))

@@ -14,7 +14,7 @@ namespace Vi.Core
 
         public void Initialize(string playerPrefKey)
         {
-            if (FasterPlayerPrefs.Singleton.HasKey(playerPrefKey))
+            if (FasterPlayerPrefs.Singleton.HasColor(playerPrefKey))
             {
 
             }

@@ -47,38 +47,38 @@ namespace Vi.Core
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
-            if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate"))
+            if (!FasterPlayerPrefs.Singleton.HasInt("TargetFrameRate"))
             {
                 int targetFrameRate = Screen.currentResolution.refreshRate + 60;
                 if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 60; }
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("MouseYSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("ZoomSensitivityMultiplier")) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("MobileLookJoystickSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MouseYSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("ZoomSensitivityMultiplier")) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MobileLookJoystickSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
+            if (!FasterPlayerPrefs.Singleton.HasString("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
+            if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
             FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetBool("AutoAim", true); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("AutoAim")) { FasterPlayerPrefs.Singleton.SetBool("AutoAim", true); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", false); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetBool("FPSEnabled", false); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetBool("FPSEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
+            if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("UIOpacity")) { FasterPlayerPrefs.Singleton.SetFloat("UIOpacity", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("UIOpacity")) { FasterPlayerPrefs.Singleton.SetFloat("UIOpacity", 1); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("MasterVolume"))
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MasterVolume"))
             {
                 FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.75f);
                 AudioListener.volume = 0.75f;
@@ -88,13 +88,13 @@ namespace Vi.Core
                 AudioListener.volume = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0)); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0)); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
