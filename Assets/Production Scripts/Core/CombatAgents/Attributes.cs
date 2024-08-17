@@ -544,21 +544,23 @@ namespace Vi.Core.CombatAgents
 
             if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
 
+            bool hitReactionWasPlayed = false;
             if (AddHPWithoutApply(HPDamage) <= 0)
             {
                 attackAilment = ActionClip.Ailment.Death;
-                hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value);
-            }
+                hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
 
-            bool hitReactionWasPlayed = false;
-            if (!IsUninterruptable() | hitReaction.ailment == ActionClip.Ailment.Death)
-            {
-                if (hitReaction.ailment == ActionClip.Ailment.Death & IsGrabbed())
+                if (IsGrabbed())
                 {
                     GetGrabAssailant().CancelGrab();
                     CancelGrab();
                 }
 
+                AnimationHandler.PlayAction(hitReaction);
+                hitReactionWasPlayed = true;
+            }
+            else if (!IsUninterruptable())
+            {
                 if (hitReaction.ailment == ActionClip.Ailment.Grab)
                 {
                     grabAttackClipName.Value = attack.name;
@@ -571,19 +573,24 @@ namespace Vi.Core.CombatAgents
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
-                if (!(IsGrabbed() & hitReaction.ailment == ActionClip.Ailment.None))
+                if (hitReaction.ailment == ActionClip.Ailment.None)
                 {
-                    if (attack.shouldPlayHitReaction
-                        | ailment.Value != ActionClip.Ailment.None
-                        | AnimationHandler.IsCharging()
-                        | shouldPlayHitReaction)
+                    if (!IsGrabbed() & !IsRaging())
                     {
-                        if (!(IsRaging() & hitReaction.ailment == ActionClip.Ailment.None))
+                        if (attack.shouldPlayHitReaction
+                            | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
+                            | AnimationHandler.IsCharging()
+                            | shouldPlayHitReaction) // For spirit logic
                         {
                             AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;
                         }
                     }
+                }
+                else // Hit reaction ailment isn't None
+                {
+                    AnimationHandler.PlayAction(hitReaction);
+                    hitReactionWasPlayed = true;
                 }
             }
 

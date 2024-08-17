@@ -36,10 +36,11 @@ namespace Vi.ScriptableObjects
 
         private void OnEnable()
         {
-            NetworkObject networkObject = GetComponentInParent<NetworkObject>();
-            if (!networkObject) { return; }
-
             Animator animator = GetComponentInParent<Animator>();
+            if (!animator) { return; }
+
+            NetworkObject networkObject = GetComponentInParent<NetworkObject>();
+
             Transform target = animator.transform;
             FindRootBone(ref target, target);
 
@@ -66,7 +67,7 @@ namespace Vi.ScriptableObjects
                             boneMapToFollow.Add(potentialBone, boneToMap);
                         }
                     }
-                    srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
+                    srenderer.updateWhenOffscreen = networkObject ? networkObject.IsLocalPlayer : true;
                 }
                 else // If this is not a cloth
                 {
@@ -83,7 +84,7 @@ namespace Vi.ScriptableObjects
                     }
                     srenderer.bones = newBones;
                     srenderer.rootBone = FindBoundByName(srenderer.rootBone.name, boneMap);
-                    srenderer.updateWhenOffscreen = networkObject.IsLocalPlayer;
+                    srenderer.updateWhenOffscreen = networkObject ? networkObject.IsLocalPlayer : true;
                 }
             }
         }
