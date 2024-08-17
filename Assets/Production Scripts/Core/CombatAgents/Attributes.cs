@@ -33,9 +33,9 @@ namespace Vi.Core.CombatAgents
             if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
             else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
             else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (IsLocalPlayer) { return Color.white; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return Color.red; }
-            else { return Color.cyan; }
+            else if (IsLocalPlayer) { return LocalPlayerColor; }
+            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return EnemyColor; }
+            else { return TeammateColor; }
         }
 
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
@@ -141,11 +141,7 @@ namespace Vi.Core.CombatAgents
 
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
-            if (IsOwner)
-            {
-                spawnedOnOwnerInstance.Value = true;
-                RefreshStatus();
-            }
+            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
         }
 
         public void UpdateNetworkVisiblity()
@@ -299,8 +295,6 @@ namespace Vi.Core.CombatAgents
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            RefreshStatus();
-
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
@@ -775,8 +769,9 @@ namespace Vi.Core.CombatAgents
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
@@ -788,8 +783,6 @@ namespace Vi.Core.CombatAgents
         protected override void Update()
         {
             base.Update();
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 

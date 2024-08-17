@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Vi.Utility
 {
@@ -27,7 +28,7 @@ namespace Vi.Utility
             floatPrefs = JsonConvert.DeserializeObject<Dictionary<string, float>>(PlayerPrefs.GetString(floatPrefKey));
             intPrefs = JsonConvert.DeserializeObject<Dictionary<string, int>>(PlayerPrefs.GetString(intPrefKey));
             boolPrefs = JsonConvert.DeserializeObject<Dictionary<string, bool>>(PlayerPrefs.GetString(boolPrefKey));
-            colorPrefs = JsonConvert.DeserializeObject<Dictionary<string, Color>>(PlayerPrefs.GetString(colorPrefKey));
+            colorPrefs = JsonConvert.DeserializeObject<Dictionary<string, SerializableColor>>(PlayerPrefs.GetString(colorPrefKey));
         }
 
         private const string stringPrefKey = "StringPrefs";
@@ -39,7 +40,48 @@ namespace Vi.Utility
         private Dictionary<string, float> floatPrefs = new Dictionary<string, float>();
         private Dictionary<string, int> intPrefs = new Dictionary<string, int>();
         private Dictionary<string, bool> boolPrefs = new Dictionary<string, bool>();
-        private Dictionary<string, Color> colorPrefs = new Dictionary<string, Color>();
+        private Dictionary<string, SerializableColor> colorPrefs = new Dictionary<string, SerializableColor>();
+
+        private class SerializableColor
+        {
+            public float r;
+            public float g;
+            public float b;
+            public float a;
+
+            public SerializableColor(Color color)
+            {
+                r = color.r;
+                g = color.g;
+                b = color.b;
+                a = color.a;
+            }
+
+            public static implicit operator SerializableColor(Color color) { return new SerializableColor(color); }
+            public static implicit operator Color(SerializableColor serializableColor) { return new Color(serializableColor.r, serializableColor.g, serializableColor.b, serializableColor.a); }
+        }
+
+        public static Color GetDefaultColor(string key)
+        {
+            if (defaultColorPrefs.TryGetValue(key, out Color color))
+            {
+                return color;
+            }
+            else
+            {
+                Debug.LogError(key + " has no entry in the default color dictionary!");
+                return Color.black;
+            }
+        }
+
+        public static Dictionary<string, Color> GetDefaultColorPrefs() { return defaultColorPrefs.ToDictionary(entry => entry.Key, entry => entry.Value); }
+
+        private static readonly Dictionary<string, Color> defaultColorPrefs = new Dictionary<string, Color>()
+        {
+            { "EnemyColor", Color.red },
+            { "TeammateColor", Color.cyan },
+            { "LocalPlayerColor", Color.white }
+        };
 
         public bool PlayerPrefsWasUpdatedThisFrame { get; private set; } = false;
 
@@ -202,6 +244,7 @@ namespace Vi.Utility
                 colorPrefs[key] = value;
             else
                 colorPrefs.Add(key, value);
+
             PlayerPrefs.SetString(colorPrefKey, JsonConvert.SerializeObject(colorPrefs));
 
             PlayerPrefsWasUpdatedThisFrame = true;

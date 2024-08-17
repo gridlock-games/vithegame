@@ -96,6 +96,11 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
 
+            foreach (KeyValuePair<string, Color> kvp in FasterPlayerPrefs.GetDefaultColorPrefs())
+            {
+                if (!FasterPlayerPrefs.Singleton.HasColor(kvp.Key)) { FasterPlayerPrefs.Singleton.SetColor(kvp.Key, kvp.Value); }
+            }
+
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
         }

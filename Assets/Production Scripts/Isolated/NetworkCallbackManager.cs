@@ -5,8 +5,9 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using Vi.Utility;
 using System.Linq;
+using Vi.Core;
 
-namespace Vi.Core
+namespace Vi.Isolated
 {
     public class NetworkCallbackManager : MonoBehaviour
     {
