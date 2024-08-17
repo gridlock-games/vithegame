@@ -59,8 +59,6 @@ namespace AssetDevTools
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.6f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.6f;
 
-        private static readonly string[] layerMaskArray = new string[] { "Default", "Projectile" };
-
         private void ProcessMovement()
         {
             Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
@@ -71,7 +69,7 @@ namespace AssetDevTools
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(transform.position + transform.rotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -89,7 +87,7 @@ namespace AssetDevTools
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(transform.position + transform.rotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
                 }
@@ -117,7 +115,7 @@ namespace AssetDevTools
             float yOffset = 0.2f;
             Vector3 startPos = transform.position;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layerMaskArray), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {

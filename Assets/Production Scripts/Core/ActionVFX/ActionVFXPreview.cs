@@ -4,12 +4,16 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 
 namespace Vi.Core.VFX
 {
-    public class ActionVFXPreview : ActionVFX
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(PooledObject))]
+    public class ActionVFXPreview : MonoBehaviour
     {
+        public ActionVFX ActionVFX { get; private set; }
+        public void SetActionVFX(ActionVFX actionVFX) { ActionVFX = actionVFX; }
+
         public bool CanCast { get; private set; }
 
         private ParticleSystem ps;
@@ -27,17 +31,17 @@ namespace Vi.Core.VFX
         RaycastHit[] fartherAllHits = new RaycastHit[10];
         private void LateUpdate()
         {
-            if (transformType == TransformType.Projectile)
+            if (ActionVFX.transformType == ActionVFX.TransformType.Projectile)
             {
                 transform.LookAt(transform.parent.GetComponent<AnimationHandler>().GetAimPoint());
                 CanCast = true;
             }
-            else if (transformType == TransformType.ConformToGround)
+            else if (ActionVFX.transformType == ActionVFX.TransformType.ConformToGround)
             {
-                Vector3 startPos = transform.parent.position + transform.parent.rotation * raycastOffset;
-                int allHitsCount = Physics.RaycastNonAlloc(startPos, Vector3.down.normalized, allHits, raycastMaxDistance, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
-                Vector3 fartherStartPos = transform.parent.position + transform.parent.rotation * fartherRaycastOffset;
-                int fartherAllHitsCount = Physics.RaycastNonAlloc(fartherStartPos, Vector3.down.normalized, fartherAllHits, raycastMaxDistance * 2, LayerMask.GetMask(layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
+                Vector3 startPos = transform.parent.position + transform.parent.rotation * ActionVFX.raycastOffset;
+                int allHitsCount = Physics.RaycastNonAlloc(startPos, Vector3.down.normalized, allHits, ActionVFX.raycastMaxDistance, LayerMask.GetMask(ActionVFX.layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
+                Vector3 fartherStartPos = transform.parent.position + transform.parent.rotation * ActionVFX.fartherRaycastOffset;
+                int fartherAllHitsCount = Physics.RaycastNonAlloc(fartherStartPos, Vector3.down.normalized, fartherAllHits, ActionVFX.raycastMaxDistance * 2, LayerMask.GetMask(ActionVFX.layersToAccountForInRaycasting), QueryTriggerInteraction.Ignore);
 
                 bool bHit = false;
                 bool fartherBHit = false;
@@ -77,18 +81,18 @@ namespace Vi.Core.VFX
 
                 if (bHit & fartherBHit)
                 {
-                    Vector3 offset = transform.parent.rotation * vfxPositionOffset;
+                    Vector3 offset = transform.parent.rotation * ActionVFX.vfxPositionOffset;
                     transform.position = floorHit.point + offset;
                     Vector3 rel = fartherFloorHit.point + offset - transform.position;
-                    Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, lookRotationUpDirection);
-                    transform.rotation = groundRotation * Quaternion.Euler(vfxRotationOffset);
+                    Quaternion groundRotation = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, ActionVFX.lookRotationUpDirection);
+                    transform.rotation = groundRotation * Quaternion.Euler(ActionVFX.vfxRotationOffset);
 
                     CanCast = true;
                 }
                 else
                 {
                     transform.position = new Vector3(startPos.x, transform.parent.position.y, startPos.z);
-                    transform.rotation = transform.parent.rotation * Quaternion.Euler(vfxRotationOffset);
+                    transform.rotation = transform.parent.rotation * Quaternion.Euler(ActionVFX.vfxRotationOffset);
 
                     CanCast = false;
                 }

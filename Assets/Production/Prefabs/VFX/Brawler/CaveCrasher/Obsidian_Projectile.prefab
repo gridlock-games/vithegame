@@ -234,10 +234,10 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
-  VFXToPlayOnDestroy:
-  - {fileID: 6835742619814306194, guid: b9f77ae0882b9c04c8588c6dfee595de, type: 3}
+  VFXToPlayOnDestroy: []
   spellType: 2
-  followUpVFXToPlayOnDestroy: []
+  followUpVFXToPlayOnDestroy:
+  - {fileID: 3802610379530131370, guid: b9f77ae0882b9c04c8588c6dfee595de, type: 3}
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
   projectileForce: {x: 0, y: 0, z: 10}

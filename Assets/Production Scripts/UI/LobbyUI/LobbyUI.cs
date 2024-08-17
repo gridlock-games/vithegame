@@ -430,11 +430,13 @@ namespace Vi.UI
                         case PlayerDataManager.GameMode.TeamDeathmatch:
                             NetSceneManager.Singleton.LoadScene("Team Deathmatch");
                             break;
+                        case PlayerDataManager.GameMode.HordeMode:
+                            NetSceneManager.Singleton.LoadScene("Horde Mode");
+                            break;
                         default:
                             Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
                             break;
                     }
-
                     NetSceneManager.Singleton.LoadScene(PlayerDataManager.Singleton.GetMapName());
                 }
             }
@@ -511,7 +513,7 @@ namespace Vi.UI
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
             }
 
-            gameModeSpecificSettingsTitleText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
             List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
@@ -571,6 +573,11 @@ namespace Vi.UI
 
                     if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 2 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
+                    break;
+                case PlayerDataManager.GameMode.HordeMode:
+                    canCountDown = playerDataListWithoutSpectators.Count >= 1;
+
+                    if (!canCountDown) { cannotCountDownMessage = "Need 1 or more players to play"; }
                     break;
                 default:
                     Debug.Log("Not sure if we should count down for game mode: " + PlayerDataManager.Singleton.GetGameMode());
@@ -710,7 +717,7 @@ namespace Vi.UI
                 RefreshGameMode();
             }
 
-            gameModeText.text = StringUtility.FromCamelCase(PlayerDataManager.Singleton.GetGameMode().ToString());
+            gameModeText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
@@ -969,15 +976,15 @@ namespace Vi.UI
             }
         }
 
-    //public void HandlePlatformAPI()
-    //{
+        //public void HandlePlatformAPI()
+        //{
 
-    //  //Rich presence
-    //  if (PlatformRichPresence.instance != null)
-    //  {
-    //    //Change logic here that would handle scenario where the player is host.
-    //    PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
-    //  }
-    //}
+        //  //Rich presence
+        //  if (PlatformRichPresence.instance != null)
+        //  {
+        //    //Change logic here that would handle scenario where the player is host.
+        //    PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
+        //  }
+        //}
     }
 }

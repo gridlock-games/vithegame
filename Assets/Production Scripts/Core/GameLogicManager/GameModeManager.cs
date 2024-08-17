@@ -22,10 +22,22 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         private const float nextGameActionDuration = 10;
-        [Header("Leave respawn time as 0 to disable respawns")]
+        [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
 
         protected const float overtimeDuration = 20;
+
+        public enum RespawnType
+        {
+            Respawn,
+            DontRespawn,
+            ResetStats,
+            ResetHP
+        }
+
+        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+
+        public RespawnType GetRespawnType() { return respawnType; }
 
         public int GetNumberOfRoundsWinsToWinGame() { return numberOfRoundsWinsToWinGame; }
 
@@ -90,6 +102,7 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
+        /*
         protected GameItem SpawnGameItem(GameItem gameItemPrefab, SpawnPoints.TransformData spawnPoint)
         {
             if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
@@ -131,6 +144,17 @@ namespace Vi.Core.GameModeManagers
             }
 
             return possibleSpawnPoints;
+        }
+        */
+
+        protected Mob SpawnMob(Mob mobPrefab, PlayerDataManager.Team team)
+        {
+            SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobPrefab);
+
+            Mob mob = Instantiate(mobPrefab.gameObject, transformData.position, transformData.rotation).GetComponent<Mob>();
+            mob.SetTeam(team);
+            mob.NetworkObject.Spawn(true);
+            return mob.GetComponent<Mob>();
         }
 
         [SerializeField] private Sprite environmentKillFeedIcon;
@@ -507,7 +531,7 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldDisplaySpecialNextGameActionMessage() { return ShouldDisplayNextGameAction() & nextGameActionTimer.Value <= 1 & !gameOver.Value; }
 
-        public bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
+        public virtual bool ShouldDisplayNextGameAction() { return nextGameActionTimer.Value > 0; }
         public bool IsGameOver() { return gameOver.Value; }
         public bool ShouldDisplayNextGameActionTimer() { return nextGameActionTimer.Value <= nextGameActionDuration / 2; }
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
@@ -603,13 +627,16 @@ namespace Vi.Core.GameModeManagers
 
         private void OnRoundTimerChange(float prev, float current)
         {
-            if (Mathf.Approximately(current, roundDuration))
+            if (timerMode == TimerMode.CountDown)
             {
-                OnRoundTimerStart();
-            }
-            else if (current <= 0 & prev > 0)
-            {
-                OnRoundTimerEnd();
+                if (Mathf.Approximately(current, roundDuration))
+                {
+                    OnRoundTimerStart();
+                }
+                else if (current <= 0 & prev > 0)
+                {
+                    OnRoundTimerEnd();
+                }
             }
         }
 
@@ -630,7 +657,14 @@ namespace Vi.Core.GameModeManagers
 
         public bool ShouldFadeToBlack()
         {
-            return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
+            if (respawnType == RespawnType.Respawn)
+            {
+                return nextGameActionTimer.Value > nextGameActionDuration / 2 & nextGameActionDuration - nextGameActionTimer.Value > 3 & GetRoundCount() > 0 & !gameOver.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
@@ -645,7 +679,56 @@ namespace Vi.Core.GameModeManagers
                     if (!respawnsCalledByRoundCount.Contains(GetRoundCount()))
                     {
                         respawnsCalledByRoundCount.Add(GetRoundCount());
-                        PlayerDataManager.Singleton.RespawnAllPlayers();
+                        switch (respawnType)
+                        {
+                            case RespawnType.Respawn:
+                                PlayerDataManager.Singleton.RespawnAllPlayers();
+                                break;
+                            case RespawnType.DontRespawn:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            case RespawnType.ResetStats:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, true, true, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            case RespawnType.ResetHP:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, false, false, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            default:
+                                Debug.LogError("Unsure how to handle respawn type " + respawnType);
+                                break;
+                        }
                         roundResultMessage.Value = "Round " + (GetRoundCount() + 1).ToString() + " is About to Start ";
                     }
                 }
@@ -659,7 +742,18 @@ namespace Vi.Core.GameModeManagers
                 }
                 else
                 {
-                    roundTimer.Value = roundDuration;
+                    switch (timerMode)
+                    {
+                        case TimerMode.CountDown:
+                            roundTimer.Value = roundDuration;
+                            break;
+                        case TimerMode.CountUp:
+                            OnRoundStart();
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle timer mode " + timerMode + " when next game action timer reaches 0!");
+                            break;
+                    }
                 }
             }
         }
@@ -764,7 +858,6 @@ namespace Vi.Core.GameModeManagers
             return highestKillPlayerScores;
         }
 
-
         public virtual string GetLeftScoreString() { return string.Empty; }
 
         public virtual string GetRightScoreString() { return string.Empty; }
@@ -817,16 +910,28 @@ namespace Vi.Core.GameModeManagers
                 {
                     if (!gameOver.Value & !IsWaitingForPlayers)
                     {
-                        if (scoreList.Count == 1) { EndGamePrematurely("Returning to lobby due to having no opponents!"); }
+                        if (scoreList.Count < PlayerDataManager.GetGameModeMinPlayers(PlayerDataManager.Singleton.GetGameMode()))
+                        {
+                            EndGamePrematurely("Returning to lobby due to having no opponents!");
+                        }
                     }
                 }
             }
 
             if (networkListEvent.Type == NetworkListEvent<PlayerScore>.EventType.Value)
             {
-                scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
-                scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
-                if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                if (respawnType == RespawnType.Respawn)
+                {
+                    scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                    scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                    if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                }
+                else if (gameOver.Value)
+                {
+                    scoresToEvaluate.RemoveAll(item => item.Item2.Equals(networkListEvent.Value));
+                    scoresToEvaluate.Add((networkListEvent.PreviousValue.roundWins < networkListEvent.Value.roundWins, networkListEvent.Value));
+                    if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
+                }
             }
         }
 
@@ -851,7 +956,7 @@ namespace Vi.Core.GameModeManagers
                 Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(playerScore.id);
                 if (attributes)
                 {
-                    if (attributes.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { continue; }
+                    if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
 
                     StartCoroutine(PlayAnimation(attributes.AnimationHandler, isVictor));
                 }
@@ -896,6 +1001,14 @@ namespace Vi.Core.GameModeManagers
             return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
         }
 
+        protected enum TimerMode
+        {
+            CountDown,
+            CountUp
+        }
+
+        [SerializeField] private TimerMode timerMode = TimerMode.CountDown;
+
         protected void Update()
         {
             if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
@@ -910,9 +1023,24 @@ namespace Vi.Core.GameModeManagers
             else
             {
                 if (nextGameActionTimer.Value > 0)
+                {
                     nextGameActionTimer.Value = Mathf.Clamp(nextGameActionTimer.Value - Time.deltaTime, 0, nextGameActionDuration);
+                }
                 else if (!gameOver.Value)
-                    roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+                {
+                    switch (timerMode)
+                    {
+                        case TimerMode.CountDown:
+                            roundTimer.Value = Mathf.Clamp(roundTimer.Value - Time.deltaTime, 0, roundDuration);
+                            break;
+                        case TimerMode.CountUp:
+                            roundTimer.Value += Time.deltaTime;
+                            break;
+                        default:
+                            Debug.LogError("Not sure how to handle timer mode " + timerMode);
+                            break;
+                    }
+                }
             }
         }
 

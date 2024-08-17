@@ -136,7 +136,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
                 else
                     spawnableObj.transform.SetParent(null);
@@ -169,7 +169,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
                 else
                     spawnableObj.transform.SetParent(null);
@@ -207,7 +207,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
                 else
                     spawnableObj.transform.SetParent(parentTransform);
@@ -250,7 +250,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject) & NetworkManager.Singleton.IsServer)
+                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
                     Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
                 else
                     spawnableObj.transform.SetParent(parentTransform);
@@ -271,6 +271,7 @@ namespace Vi.Utility
 
         private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
         {
+            if (!NetworkManager.Singleton.IsServer) { yield break; }
             if (networkObject.transform.parent == parent) { yield break; }
             yield return new WaitUntil(() => networkObject.IsSpawned);
             if (!networkObject.TrySetParent(parent)) { Debug.LogError("Error while setting parent for networ object " + networkObject + " to parent " + parent); }

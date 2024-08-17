@@ -303,17 +303,6 @@ namespace Vi.Core
             return "";
         }
 
-        public enum GameMode
-        {
-            None,
-            FreeForAll,
-            TeamElimination,
-            EssenceWar,
-            OutpostRush,
-            TeamDeathmatch,
-            HordeMode
-        }
-
         public enum Team
         {
             Environment,
@@ -326,6 +315,53 @@ namespace Vi.Core
             Blue,
             Purple,
             Peaceful
+        }
+
+        public static int GetGameModeMinPlayers(GameMode gameMode)
+        {
+            if (gameMode == GameMode.HordeMode)
+            {
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+
+        public static string GetGameModeString(GameMode gameMode)
+        {
+            switch (gameMode)
+            {
+                case GameMode.None:
+                    return "No Game Mode";
+                case GameMode.FreeForAll:
+                    return "Free For All";
+                case GameMode.TeamElimination:
+                    return "Team Elimination";
+                case GameMode.EssenceWar:
+                    return "Essence War";
+                case GameMode.OutpostRush:
+                    return "Outpost Rush";
+                case GameMode.TeamDeathmatch:
+                    return "Team Deathmatch";
+                case GameMode.HordeMode:
+                    return "Corrupted Abyss";
+                default:
+                    Debug.LogError(gameMode + " doesn't know how to format game mode display string");
+                    return StringUtility.FromCamelCase(gameMode.ToString());
+            }
+        }
+
+        public enum GameMode
+        {
+            None,
+            FreeForAll,
+            TeamElimination,
+            EssenceWar,
+            OutpostRush,
+            TeamDeathmatch,
+            HordeMode
         }
 
         public bool LocalPlayersWasUpdatedThisFrame { get; private set; } = false;
@@ -791,15 +827,9 @@ namespace Vi.Core
             }
         }
 
-        public bool HasPlayerSpawnPoints()
-        {
-            return playerSpawnPoints;
-        }
+        public bool HasPlayerSpawnPoints() { return playerSpawnPoints; }
 
-        public SpawnPoints GetPlayerSpawnPoints()
-        {
-            return playerSpawnPoints;
-        }
+        public SpawnPoints GetPlayerSpawnPoints() { return playerSpawnPoints; }
 
         public Vector3 GetDamageCircleMaxScale()
         {
@@ -867,9 +897,9 @@ namespace Vi.Core
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
                 {
-                    foreach (Attributes attributes in GetActivePlayerObjects())
+                    foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
-                        attributes.NetworkObject.Despawn(true);
+                        combatAgent.NetworkObject.Despawn(true);
                     }
 
                     foreach (NetworkObject spectator in localSpectators.Values.ToList())
@@ -1006,7 +1036,7 @@ namespace Vi.Core
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         channelCounts[networkListEvent.Value.channel]++;
 
@@ -1024,7 +1054,7 @@ namespace Vi.Core
                     {
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : StringUtility.FromCamelCase(GetGameMode().ToString())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
@@ -1040,7 +1070,7 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
-                        LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].GetComponent<LoadoutManager>();
+                        LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].LoadoutManager;
                         loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
@@ -1111,16 +1141,16 @@ namespace Vi.Core
             Vector3 spawnPosition = transformData.position;
             Quaternion spawnRotation = transformData.rotation;
 
-            attributesToRespawn.ResetStats(1, false);
-            attributesToRespawn.GetComponent<AnimationHandler>().CancelAllActions(0);
-            attributesToRespawn.GetComponent<MovementHandler>().SetOrientation(spawnPosition, spawnRotation);
-            attributesToRespawn.GetComponent<LoadoutManager>().SwapLoadoutOnRespawn();
+            attributesToRespawn.ResetStats(1, true, true, false);
+            attributesToRespawn.AnimationHandler.CancelAllActions(0);
+            attributesToRespawn.MovementHandler.SetOrientation(spawnPosition, spawnRotation);
+            attributesToRespawn.LoadoutManager.SwapLoadoutOnRespawn();
         }
 
         public void RevivePlayer(Attributes attributesToRevive)
         {
-            attributesToRevive.ResetStats(0.5f, false);
-            attributesToRevive.GetComponent<AnimationHandler>().CancelAllActions(0);
+            attributesToRevive.ResetStats(0.5f, true, true, false);
+            attributesToRevive.AnimationHandler.CancelAllActions(0);
         }
 
         public void RespawnAllPlayers()

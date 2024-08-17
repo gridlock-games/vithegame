@@ -148,6 +148,15 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
       sceneName: TeamElimination
+  - name: Horde Mode
+    sceneType: 2
+    scenePreviewIcon: {fileID: 0}
+    sceneReferences:
+    - m_AssetGUID: 415594f39eb6f9a43af6ab47aa751300
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+      sceneName: HordeMode
   - name: Essence War
     sceneType: 2
     scenePreviewIcon: {fileID: 0}
@@ -157,24 +166,6 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
       sceneName: EssenceWar
-  - name: Outpost Rush
-    sceneType: 2
-    scenePreviewIcon: {fileID: 0}
-    sceneReferences:
-    - m_AssetGUID: 00b190a22c34d1445a24beded2f70638
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-      sceneName: OutpostRush
-  - name: Team Deathmatch
-    sceneType: 2
-    scenePreviewIcon: {fileID: 0}
-    sceneReferences:
-    - m_AssetGUID: 612cf6047d064e94c93e1160e57bb799
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-      sceneName: TeamDeathmatch
   - name: Tutorial Map
     sceneType: 3
     scenePreviewIcon: {fileID: 21300000, guid: 724704bce32a47346b3c4008ca841391, type: 3}
@@ -193,12 +184,12 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
       sceneName: Arena Map A
-  - name: Essence War Map A
+  - name: Horde Mode Test Map
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: 42d05ecb47aace24a90cd27c1ae59ac8, type: 3}
+    scenePreviewIcon: {fileID: 21300000, guid: b0ff3d6789193044bb5140e434118123, type: 3}
     sceneReferences:
-    - m_AssetGUID: 852bc93269781104a87a02ad00fc5cf6
+    - m_AssetGUID: edecd31c44ac0284c93cbd4db2a8917d
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-      sceneName: Essence War Map A
+      sceneName: HordeModeTestMap

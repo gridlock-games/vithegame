@@ -17,18 +17,8 @@ namespace Vi.Core.DynamicEnvironmentElements
         {
             if (!IsServer) { Debug.LogError("DamageCircle.Shrink() should only be called on the server"); return; }
 
-            targetScale = Vector3.MoveTowards(targetScale, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
-            ShrinkClientRpc();
+            targetScale.Value = Vector3.MoveTowards(targetScale.Value, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
 
-            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
-            {
-                r.enabled = true;
-            }
-        }
-
-        [Rpc(SendTo.NotServer)]
-        private void ShrinkClientRpc()
-        {
             foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
             {
                 r.enabled = true;
@@ -40,44 +30,57 @@ namespace Vi.Core.DynamicEnvironmentElements
             if (!IsServer) { Debug.LogError("DamageCircle.ResetDamageCircle() should only be called on the server"); return; }
 
             transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
-            targetScale = transform.localScale;
-            ResetDamageCircleClientRpc();
-        }
-
-        [Rpc(SendTo.NotServer)]
-        private void ResetDamageCircleClientRpc()
-        {
-            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
-            {
-                r.enabled = false;
-            }
+            targetScale.Value = transform.localScale;
         }
 
         public bool IsPointInsideDamageCircleBounds(Vector3 point)
         {
-            return Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(point.x, point.z)) < targetScale.x;
+            return Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(point.x, point.z)) < targetScale.Value.x;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            shouldRender.OnValueChanged += OnShouldRenderChanged;
+            if (IsServer)
+            {
+                transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
+                targetScale.Value = transform.localScale;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            shouldRender.OnValueChanged -= OnShouldRenderChanged;
+        }
+
+        private void OnShouldRenderChanged(bool prev, bool current)
+        {
+            foreach (Renderer r in renderers)
+            {
+                r.enabled = current;
+            }
         }
 
         private CapsuleCollider capsuleCollider;
-        private void Start()
+        private Renderer[] renderers;
+        private void Awake()
         {
-            transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
-            targetScale = transform.localScale;
             capsuleCollider = GetComponent<CapsuleCollider>();
-
-            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            renderers = GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer r in renderers)
             {
                 r.enabled = false;
             }
         }
 
-        private Vector3 targetScale;
+        private NetworkVariable<Vector3> targetScale = new NetworkVariable<Vector3>();
+        private NetworkVariable<bool> shouldRender = new NetworkVariable<bool>();
         private void Update()
         {
             if (!GameModeManager.Singleton) { Debug.LogError("Damage circle should only be present when there is a game mode manager!"); return; }
             if (!IsServer) { return; }
             
-            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, Time.deltaTime * shrinkSpeed); }
+            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale.Value, Time.deltaTime * shrinkSpeed); }
 
             if (GameModeManager.Singleton.ShouldDisplayNextGameAction() | GameModeManager.Singleton.IsGameOver()) { return; }
 

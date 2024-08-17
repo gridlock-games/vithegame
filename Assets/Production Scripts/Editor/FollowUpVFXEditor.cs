@@ -15,11 +15,7 @@ namespace Vi.Editor
         private SerializedProperty spShouldAffectTeammates;
         private SerializedProperty spShouldAffectEnemies;
 
-        public bool shouldAffectSelf;
-        public bool shouldAffectTeammates;
-        public bool shouldAffectEnemies;
-
-        private new void OnEnable()
+        protected new void OnEnable()
         {
             base.OnEnable();
             spShouldAffectSelf = serializedObject.FindProperty("shouldAffectSelf");
@@ -29,14 +25,13 @@ namespace Vi.Editor
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
             EditorGUILayout.LabelField("Follow Up VFX", EditorStyles.whiteLargeLabel);
 
             EditorGUILayout.PropertyField(spShouldAffectSelf);
             EditorGUILayout.PropertyField(spShouldAffectTeammates);
             EditorGUILayout.PropertyField(spShouldAffectEnemies);
-
-            EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
-            EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
+            EditorGUILayout.Space();
 
             serializedObject.ApplyModifiedProperties();
         }

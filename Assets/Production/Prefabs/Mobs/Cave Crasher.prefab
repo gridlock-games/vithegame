@@ -1268,7 +1268,7 @@ MonoBehaviour:
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
   wasStaggeredThisFrame: 0
-  maxHP: 60
+  maxHP: 20
   weaponOption:
     name: Cave Crasher
     weaponIcon: {fileID: 0}
@@ -1372,6 +1372,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55547efd7c30b224f909ea85d162ae65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9121998075602802991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154451350289567119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 10
+  pooledObjectIndex: 165
+  isPrewarmObject: 1
 --- !u!4 &5818469973870800199 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7437864028208160008, guid: a25419db5e9becb4abb8edc5d77f0428,

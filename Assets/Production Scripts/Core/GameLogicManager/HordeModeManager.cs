@@ -2,11 +2,111 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
+using Vi.Core.CombatAgents;
+using Unity.Netcode;
 
 namespace Vi.Core.GameModeManagers
 {
     public class HordeModeManager : GameModeManager
     {
+        [SerializeField] private Wave[] waves = new Wave[0];
+        
+        [System.Serializable]
+        private class Wave
+        {
+            public Mob[] mobPrefabs;
+        }
 
+        private readonly PlayerDataManager.Team mobTeam = PlayerDataManager.Team.Environment;
+
+        private new void Awake()
+        {
+            base.Awake();
+            numberOfRoundsWinsToWinGame = waves.Length;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            roundResultMessage.Value = "Entering Corrupted Abyss! ";
+        }
+
+        List<Mob> currentlySpawnedMobs = new List<Mob>();
+        protected override void OnRoundStart()
+        {
+            base.OnRoundStart();
+
+            List<Mob> mobsToRemove = new List<Mob>();
+            foreach (Mob mob in currentlySpawnedMobs)
+            {
+                mob.NetworkObject.Despawn(true);
+                mobsToRemove.Add(mob);
+            }
+            currentlySpawnedMobs.RemoveAll(item => mobsToRemove.Contains(item));
+
+            foreach (Mob mob in waves[GetRoundCount()-1].mobPrefabs)
+            {
+                currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam));
+            }
+        }
+
+        protected override void OnRoundEnd(int[] winningPlayersDataIds)
+        {
+            base.OnRoundEnd(winningPlayersDataIds);
+
+            if (winningPlayersDataIds.Length == 0) // Mobs killed all players
+            {
+                roundResultMessage.Value = "The Corruption Consumes You. ";
+                OnGameEnd(winningPlayersDataIds);
+            }
+            else // Players won
+            {
+                roundResultMessage.Value = gameOver.Value ? "Corruption Cleared! " : "Wave Defeated. ";
+                wavesCompleted.Value++;
+            }
+        }
+
+        private NetworkVariable<int> wavesCompleted = new NetworkVariable<int>();
+        public int GetWavesCompleted() { return wavesCompleted.Value; }
+
+        protected override void OnGameEnd(int[] winningPlayersDataIds)
+        {
+            base.OnGameEnd(winningPlayersDataIds);
+            gameEndMessage.Value = "Game Over! ";
+        }
+
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
+        {
+            base.OnPlayerKill(killer, victim);
+            List<CombatAgent> killerTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam());
+            List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            {
+                List<Attributes> killerTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
+                List<int> winningPlayerIds = new List<int>();
+                foreach (Attributes attributes in killerTeamPlayers)
+                {
+                    winningPlayerIds.Add(attributes.GetPlayerDataId());
+                }
+                OnRoundEnd(winningPlayerIds.ToArray());
+            }
+        }
+
+        public override void OnEnvironmentKill(CombatAgent victim)
+        {
+            base.OnEnvironmentKill(victim);
+            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Red ? PlayerDataManager.Team.Environment : PlayerDataManager.Team.Red;
+            List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
+            if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
+            {
+                List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
+                List<int> winningPlayerIds = new List<int>();
+                foreach (Attributes attributes in opposingTeamPlayers)
+                {
+                    winningPlayerIds.Add(attributes.GetPlayerDataId());
+                }
+                OnRoundEnd(winningPlayerIds.ToArray());
+            }
+        }
     }
 }

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LoadoutEditorUI
+  m_EditorClassIdentifier: 
+  m_GroupName: LoadoutEditorUI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: ff0bc7c838d684e449a49faaf9016b18
+  m_SerializeEntries:
+  - m_GUID: b3acf6bb3bae756459ef47d0ad251a96
+    m_Address: Assets/Production/Prefabs/UI/LoadoutEditor/WeaponSelectMenu.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 9f83927185909244e8bf851ed0c22939
+    m_Address: Assets/Production/Prefabs/UI/LoadoutEditor/ArmorSelectMenu.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 2c057a70a1dad014380580abd7143cfa, type: 2}
+    - {fileID: 11400000, guid: 45b74b18bc2d36c48aff4d6770974ae2, type: 2}

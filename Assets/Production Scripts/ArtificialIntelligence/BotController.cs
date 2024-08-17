@@ -72,12 +72,10 @@ namespace Vi.ArtificialIntelligence
         }
 
         private Attributes attributes;
-        private LoadoutManager loadoutManager;
         private new void Awake()
         {
             base.Awake();
             attributes = GetComponent<Attributes>();
-            loadoutManager = GetComponent<LoadoutManager>();
             RefreshStatus();
         }
 
@@ -108,26 +106,6 @@ namespace Vi.ArtificialIntelligence
         RaycastHit[] allHits = new RaycastHit[10];
         private void ProcessMovementTick()
         {
-            // This method is only called on the server
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                moveForwardTarget.Value = 0;
-                moveSidesTarget.Value = 0;
-                lastMovement = Vector3.zero;
-                return;
-            }
-
-            CalculatePath(currentPosition.Value, NavMesh.AllAreas);
-
-            Vector3 inputDir = NextPosition - currentPosition.Value;
-            inputDir.y = 0;
-            inputDir = transform.InverseTransformDirection(inputDir).normalized;
-            
-            if (Vector3.Distance(Destination, currentPosition.Value) < stoppingDistance)
-            {
-                inputDir = Vector3.zero;
-            }
-
             Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
             lookDirection.Scale(HORIZONTAL_PLANE);
 
@@ -142,6 +120,29 @@ namespace Vi.ArtificialIntelligence
                 newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
             else if (!attributes.ShouldPlayHitStop())
                 newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
+
+            currentRotation.Value = newRotation;
+
+            // This method is only called on the server
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                moveForwardTarget.Value = 0;
+                moveSidesTarget.Value = 0;
+                isGrounded.Value = true;
+                lastMovement = Vector3.zero;
+                return;
+            }
+
+            CalculatePath(currentPosition.Value, NavMesh.AllAreas);
+
+            Vector3 inputDir = NextPosition - currentPosition.Value;
+            inputDir.y = 0;
+            inputDir = transform.InverseTransformDirection(inputDir).normalized;
+            
+            if (Vector3.Distance(Destination, currentPosition.Value) < stoppingDistance)
+            {
+                inputDir = Vector3.zero;
+            }
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
@@ -272,7 +273,6 @@ namespace Vi.ArtificialIntelligence
             }
 
             currentPosition.Value = newPosition;
-            currentRotation.Value = newRotation;
             lastMovement = movement;
         }
 
@@ -402,9 +402,9 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | loadoutManager.WeaponNameThatCanFlashAttack != null)
+            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | attributes.LoadoutManager.WeaponNameThatCanFlashAttack != null)
             {
-                loadoutManager.SwitchWeapon();
+                attributes.LoadoutManager.SwitchWeapon();
                 lastWeaponSwapTime = Time.time;
             }
 
@@ -491,9 +491,10 @@ namespace Vi.ArtificialIntelligence
         }
 
         Vector3 forceAccumulated;
+        private const float forceMultiplier = 10;
         public override void AddForce(Vector3 force)
         {
-            forceAccumulated += force * Time.fixedDeltaTime;
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += forceMultiplier * Time.fixedDeltaTime * force; }
         }
 
         private float positionStrength = 1;
