@@ -490,7 +490,7 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            autoAim = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
+            autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
         }
 
         private bool autoAim;

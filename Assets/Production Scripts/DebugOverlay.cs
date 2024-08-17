@@ -123,9 +123,9 @@ public class DebugOverlay : MonoBehaviour
 
     private void RefreshStatus()
     {
-        consoleEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
-        fpsEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
-        pingEnabled = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+        consoleEnabled = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
+        fpsEnabled = FasterPlayerPrefs.Singleton.GetBool("FPSEnabled");
+        pingEnabled = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
     }
 
     private bool consoleEnabled;

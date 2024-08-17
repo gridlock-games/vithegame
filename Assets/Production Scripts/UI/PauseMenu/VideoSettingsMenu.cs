@@ -174,7 +174,7 @@ namespace Vi.UI
 
             hdrToggle.isOn = pipeline.supportsHDR;
 
-            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
 
             SetOriginalVariables();
         }
@@ -233,7 +233,7 @@ namespace Vi.UI
             originalVSyncState = QualitySettings.vSyncCount;
             originalMSAASampleCount = pipeline.msaaSampleCount;
             originalHDR = pipeline.supportsHDR;
-            originalPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            originalPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
 
         public void ApplyChanges()
@@ -257,7 +257,7 @@ namespace Vi.UI
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
             pipeline.supportsHDR = hdrToggle.isOn;
-            FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", postProcessingToggle.isOn.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
 
             vsyncToggle.interactable = true;
 
@@ -308,7 +308,7 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
 
         public void OnQualitySettingsDropdownChange()

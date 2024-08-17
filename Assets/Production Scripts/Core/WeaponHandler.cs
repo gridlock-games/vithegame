@@ -1019,7 +1019,7 @@ namespace Vi.Core
         {
             zoomMode = FasterPlayerPrefs.Singleton.GetString("ZoomMode");
             blockingMode = FasterPlayerPrefs.Singleton.GetString("BlockingMode");
-            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
+            disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
         }
 
         private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
@@ -1142,7 +1142,7 @@ namespace Vi.Core
         void OnDisableBots()
         {
             if (!Application.isEditor) { return; }
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", (!disableBots).ToString());
+            FasterPlayerPrefs.Singleton.SetBool("DisableBots", !disableBots);
 
             if (disableBots)
             {

@@ -7,7 +7,6 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using Firebase;
 using Firebase.Analytics;
-using System.Linq;
 using Vi.Utility;
 
 namespace Vi.Core
@@ -48,8 +47,8 @@ namespace Vi.Core
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
-            if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", false.ToString()); }
-            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            if (!FasterPlayerPrefs.Singleton.HasKey("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
+            FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
 
             if (!FasterPlayerPrefs.Singleton.HasKey("TargetFrameRate"))
             {
@@ -58,7 +57,7 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetString("InvertMouse", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }
             if (!FasterPlayerPrefs.Singleton.HasKey("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
             if (!FasterPlayerPrefs.Singleton.HasKey("MouseYSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
             if (!FasterPlayerPrefs.Singleton.HasKey("ZoomSensitivityMultiplier")) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
@@ -66,14 +65,14 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasKey("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasKey("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
-            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
+            FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetString("AutoAim", true.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("AutoAim")) { FasterPlayerPrefs.Singleton.SetBool("AutoAim", true); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetString("ConsoleEnabled", false.ToString()); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetString("FPSEnabled", false.ToString()); }
-            if (!FasterPlayerPrefs.Singleton.HasKey("PingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PingEnabled", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetBool("FPSEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
 
             if (!FasterPlayerPrefs.Singleton.HasKey("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
@@ -91,11 +90,11 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasKey("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0).ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0)); }
             if (!FasterPlayerPrefs.Singleton.HasKey("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
 
-            if (!FasterPlayerPrefs.Singleton.HasKey("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetString("IsDiscordVerified", false.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasKey("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);

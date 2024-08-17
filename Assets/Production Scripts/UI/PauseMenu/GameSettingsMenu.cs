@@ -22,7 +22,7 @@ namespace Vi.UI
 
         private void SetPlayerPrefFromToggle(Toggle toggle, string playerPrefName)
         {
-            FasterPlayerPrefs.Singleton.SetString(playerPrefName, toggle.isOn.ToString());
+            FasterPlayerPrefs.Singleton.SetBool(playerPrefName, toggle.isOn);
         }
 
         private void SetPlayerPrefFromSlider(Slider slider, string playerPrefName)
@@ -32,10 +32,10 @@ namespace Vi.UI
 
         private void Awake()
         {
-            autoAimToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("AutoAim"));
-            consoleToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("ConsoleEnabled"));
-            showFPSToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("FPSEnabled"));
-            showPingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+            autoAimToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
+            consoleToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
+            showFPSToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("FPSEnabled");
+            showPingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
 
             autoAimToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(autoAimToggle, "AutoAim"); });
             consoleToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(consoleToggle, "ConsoleEnabled"); });

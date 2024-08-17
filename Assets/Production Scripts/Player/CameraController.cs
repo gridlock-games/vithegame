@@ -90,7 +90,7 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
 
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);

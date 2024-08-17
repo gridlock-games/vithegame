@@ -52,7 +52,7 @@ namespace Vi.UI
 
         private void Awake()
         {
-            invertLookToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse"));
+            invertLookToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("InvertMouse");
             mouseXSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity").ToString();
             mouseYSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity").ToString();
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
@@ -176,7 +176,7 @@ namespace Vi.UI
 
         public void SetInvertMouse()
         {
-            FasterPlayerPrefs.Singleton.SetString("InvertMouse", invertLookToggle.isOn.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("InvertMouse", invertLookToggle.isOn);
         }
 
         public void ChangeMouseXSensitivity()

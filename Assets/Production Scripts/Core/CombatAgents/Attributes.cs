@@ -779,7 +779,7 @@ namespace Vi.Core.CombatAgents
         {
             if (IsOwner)
             {
-                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+                pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }
         }
 
