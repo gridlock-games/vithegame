@@ -44,7 +44,6 @@ namespace Vi.Core
             headerText.text = "Preparing Your Vi Experience";
         }
 
-        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         private void InitializePlayerPrefs()
         {
             if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
@@ -103,6 +102,11 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 1000); }
 
+            if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", Application.platform == RuntimePlatform.WindowsPlayer
+                | Application.platform == RuntimePlatform.OSXPlayer | Application.platform == RuntimePlatform.LinuxPlayer
+                | Application.platform == RuntimePlatform.WindowsEditor | Application.platform == RuntimePlatform.OSXEditor
+                | Application.platform == RuntimePlatform.LinuxEditor ? "PRESS" : "HOLD"); }
+
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
         }
@@ -111,10 +115,10 @@ namespace Vi.Core
         {
             if (!FasterPlayerPrefs.Singleton.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
 
-            if (!holdToggleOptions.Contains(FasterPlayerPrefs.Singleton.GetString(key)))
+            if (!WeaponHandler.GetHoldToggleOptions().Contains(FasterPlayerPrefs.Singleton.GetString(key)))
             {
-                if (defaultIndex < 0 | defaultIndex >= holdToggleOptions.Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
-                FasterPlayerPrefs.Singleton.SetString(key, holdToggleOptions[defaultIndex]);
+                if (defaultIndex < 0 | defaultIndex >= WeaponHandler.GetHoldToggleOptions().Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
+                FasterPlayerPrefs.Singleton.SetString(key, WeaponHandler.GetHoldToggleOptions()[defaultIndex]);
             }
         }
 

@@ -607,29 +607,29 @@ namespace Vi.Core
             {
                 if (IsInAnticipation)
                 {
-                    Aim(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+                    AimCharacter(CurrentActionClip.aimDuringAnticipation ? IsInAnticipation : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
 
                     if (CurrentActionClip.aimDuringAttack & isAboutToAttack)
                     {
-                        Aim(CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+                        AimCharacter(CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
                     }
                 }
                 else if (IsAttacking)
                 {
-                    Aim(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+                    AimCharacter(CurrentActionClip.aimDuringAttack ? IsAttacking : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
                 }
                 else if (IsInRecovery)
                 {
-                    Aim(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
+                    AimCharacter(CurrentActionClip.aimDuringRecovery ? IsInRecovery : CurrentActionClip.mustBeAiming & CurrentActionClip.GetClipType() != ActionClip.ClipType.Dodge & CurrentActionClip.GetClipType() != ActionClip.ClipType.HitReaction);
                 }
                 else
                 {
-                    Aim(aiming.Value & combatAgent.AnimationHandler.CanAim());
+                    AimCharacter(aiming.Value & combatAgent.AnimationHandler.CanAim());
                 }
             }
             else
             {
-                Aim(false);
+                AimCharacter(false);
             }
         }
 
@@ -637,33 +637,12 @@ namespace Vi.Core
 
         [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
 
-        public bool CanActivateFlashSwitch()
-        {
-            return IsInRecovery & CurrentActionClip.canFlashAttack;
-        }
+        public static List<string> GetHoldToggleOptions() { return holdToggleOptions.ToList(); }
+        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
+        public static List<string> GetAttackModeOptions() { return attackModeOptions.ToList(); }
+        private static readonly List<string> attackModeOptions = new List<string>() { "PRESS", "HOLD" };
 
-        void OnLightAttack(InputValue value)
-        {
-            LightAttack(value.isPressed);
-        }
-
-        public void LightAttack(bool isPressed)
-        {
-            if (isPressed)
-            {
-                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
-                if (actionClip != null)
-                    combatAgent.AnimationHandler.PlayAction(actionClip);
-            }
-        }
-
-        private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
-        private Coroutine lightAttackHoldCoroutine;
-        public void LightAttackHold(bool isPressed)
-        {
-            lightAttackIsPressed.Value = isPressed;
-        }
+        public bool CanActivateFlashSwitch() { return IsInRecovery & CurrentActionClip.canFlashAttack; }
 
         public override void OnNetworkSpawn()
         {
@@ -677,9 +656,47 @@ namespace Vi.Core
             reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterChange;
         }
 
-        void OnLightAttackHold(InputValue value)
+        public void LightAttack(bool isPressed)
         {
-            lightAttackIsPressed.Value = value.isPressed;
+            if (IsLocalPlayer)
+            {
+                if (lightAttackMode == "PRESS")
+                {
+                    ExecuteLightAttack(isPressed);
+                }
+                else if (lightAttackMode == "HOLD")
+                {
+                    LightAttackHold(isPressed);
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle player prefs Light Attack Mode - " + zoomMode);
+                }
+            }
+            else
+            {
+                ExecuteLightAttack(isPressed);
+            }
+        }
+
+        private void OnLightAttack(InputValue value) { LightAttack(value.isPressed); }
+
+        private void ExecuteLightAttack(bool isPressed)
+        {
+            if (isPressed)
+            {
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
+                if (actionClip != null)
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
+            }
+        }
+
+        private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private Coroutine lightAttackHoldCoroutine;
+        private void LightAttackHold(bool isPressed)
+        {
+            if (!IsOwner) { Debug.LogError("LightAttackHold() should only be called on the owner!"); return; }
+            lightAttackIsPressed.Value = isPressed;
         }
 
         private void OnLightAttackHoldChange(bool prev, bool current)
@@ -697,7 +714,7 @@ namespace Vi.Core
             while (true)
             {
                 yield return null;
-                LightAttack(true);
+                ExecuteLightAttack(true);
             }
         }
 
@@ -722,10 +739,52 @@ namespace Vi.Core
             }
         }
 
+        public void HeavyAttack(bool isPressed)
+        {
+            combatAgent.AnimationHandler.SetHeavyAttackPressedState(isPressed);
+            if (isPressed)
+            {
+                if (!IsBlocking)
+                {
+                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                    if (actionClip != null)
+                        combatAgent.AnimationHandler.PlayAction(actionClip);
+                }
+            }
+        }
+
+        private void OnHeavyAttack(InputValue value) { HeavyAttack(value.isPressed); }
+
         public bool CanAim { get; private set; }
         public bool CanADS { get; private set; }
 
         private NetworkVariable<bool> aiming = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        private void OnAim(InputValue value) { if (CanADS) { AimDownSights(value.isPressed); } }
+
+        public void AimDownSights(bool isPressed)
+        {
+            if (!CanADS) { Debug.LogWarning("Calling AimDownSights() but we can't ADS!"); return; }
+            if (IsLocalPlayer)
+            {
+                if (zoomMode == "TOGGLE")
+                {
+                    if (isPressed) { aiming.Value = !aiming.Value; }
+                }
+                else if (zoomMode == "HOLD")
+                {
+                    aiming.Value = isPressed;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle player prefs ZoomMode - " + zoomMode);
+                }
+            }
+            else
+            {
+                aiming.Value = isPressed;
+            }
+        }
 
         public void OnDeath()
         {
@@ -737,78 +796,6 @@ namespace Vi.Core
             if (IsOwner)
             {
                 aiming.Value = false;
-            }
-        }
-
-        void OnHeavyAttack(InputValue value)
-        {
-            HeavyAttack(value.isPressed);
-        }
-
-        public void HeavyAttack(bool isPressed)
-        {
-            combatAgent.AnimationHandler.SetHeavyAttackPressedState(isPressed);
-
-            if (CanADS)
-            {
-                if (NetworkObject.IsPlayerObject)
-                {
-                    if (zoomMode == "TOGGLE")
-                    {
-                        if (isPressed) { aiming.Value = !aiming.Value; }
-                    }
-                    else if (zoomMode == "HOLD")
-                    {
-                        aiming.Value = isPressed;
-                    }
-                    else
-                    {
-                        Debug.LogError("Not sure how to handle player prefs ZoomMode - " + zoomMode);
-                    }
-                }
-                else
-                {
-                    aiming.Value = isPressed;
-                }
-            }
-            else if (isPressed)
-            {
-                if (!IsBlocking)
-                {
-                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-                    if (actionClip != null)
-                        combatAgent.AnimationHandler.PlayAction(actionClip);
-                }
-            }
-        }
-
-        public void HeavyAttackHold(bool isPressed)
-        {
-            if (heavyAttackHoldCoroutine != null) { StopCoroutine(heavyAttackHoldCoroutine); }
-
-            if (CanAim)
-            {
-                HeavyAttack(isPressed);
-            }
-            else
-            {
-                if (isPressed) { heavyAttackHoldCoroutine = StartCoroutine(HeavyAttackHold()); }
-                else { HeavyAttack(false); }
-            }
-        }
-
-        private Coroutine heavyAttackHoldCoroutine;
-        void OnHeavyAttackHold(InputValue value)
-        {
-            HeavyAttackHold(value.isPressed);
-        }
-
-        private IEnumerator HeavyAttackHold()
-        {
-            while (true)
-            {
-                yield return null;
-                HeavyAttack(true);
             }
         }
 
@@ -1000,7 +987,7 @@ namespace Vi.Core
 
         public bool IsAiming() { return aiming.Value & combatAgent.AnimationHandler.CanAim(); }
 
-        private void Aim(bool isAiming)
+        private void AimCharacter(bool isAiming)
         {
             combatAgent.AnimationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
@@ -1014,11 +1001,13 @@ namespace Vi.Core
 
         private string zoomMode = "TOGGLE";
         private string blockingMode = "HOLD";
+        private string lightAttackMode = Application.isMobilePlatform ? "HOLD" : "PRESS";
         private bool disableBots;
         private void RefreshStatus()
         {
             zoomMode = FasterPlayerPrefs.Singleton.GetString("ZoomMode");
             blockingMode = FasterPlayerPrefs.Singleton.GetString("BlockingMode");
+            lightAttackMode = FasterPlayerPrefs.Singleton.GetString("LightAttackMode");
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
         }
 
@@ -1054,10 +1043,7 @@ namespace Vi.Core
             }
         }
 
-        public void Reload()
-        {
-            OnReload();
-        }
+        public void Reload() { OnReload(); }
 
         void OnReload()
         {
@@ -1071,11 +1057,7 @@ namespace Vi.Core
             }
         }
 
-        [Rpc(SendTo.Server)]
-        private void ReloadServerRpc()
-        {
-            ReloadOnServer();
-        }
+        [Rpc(SendTo.Server)] private void ReloadServerRpc() { ReloadOnServer(); }
 
         private void ReloadOnServer()
         {
@@ -1104,10 +1086,7 @@ namespace Vi.Core
 
         public bool IsBlocking { get; private set; }
         private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        void OnBlock(InputValue value)
-        {
-            Block(value.isPressed);
-        }
+        private void OnBlock(InputValue value) { Block(value.isPressed); }
 
         public void Block(bool isPressed)
         {
@@ -1125,10 +1104,9 @@ namespace Vi.Core
             }
         }
 
+# if UNITY_EDITOR
         void OnTimeScaleChange()
         {
-            if (!Application.isEditor) { return; }
-
             if (Time.timeScale == 1)
             {
                 Time.timeScale = 0.1f;
@@ -1141,9 +1119,7 @@ namespace Vi.Core
 
         void OnDisableBots()
         {
-            if (!Application.isEditor) { return; }
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", !disableBots);
-
             if (disableBots)
             {
                 Debug.Log("Enabled Bot AI");
@@ -1153,6 +1129,7 @@ namespace Vi.Core
                 Debug.Log("Disabled Bot AI");
             }
         }
+# endif
 
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)

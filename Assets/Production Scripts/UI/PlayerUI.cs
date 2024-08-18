@@ -122,21 +122,37 @@ namespace Vi.UI
         public void StartLightAttack()
         {
             if (!lightAttackAction.enabled) { return; }
-            attributes.WeaponHandler.LightAttackHold(true);
+            attributes.WeaponHandler.LightAttack(true);
         }
 
-        public void StopLightAttack() { attributes.WeaponHandler.LightAttackHold(false); }
+        public void StopLightAttack() { attributes.WeaponHandler.LightAttack(false); }
 
         private InputAction heavyAttackAction;
+        private InputAction aimAction;
         public void StartHeavyAttack()
         {
-            if (!heavyAttackAction.enabled) { return; }
-            attributes.WeaponHandler.HeavyAttackHold(true);
+            if (attributes.WeaponHandler.CanADS)
+            {
+                if (!aimAction.enabled) { return; }
+                attributes.WeaponHandler.AimDownSights(true);
+            }
+            else
+            {
+                if (!heavyAttackAction.enabled) { return; }
+                attributes.WeaponHandler.HeavyAttack(true);
+            }
         }
 
         public void StopHeavyAttack()
         {
-            attributes.WeaponHandler.HeavyAttackHold(false);
+            if (attributes.WeaponHandler.CanADS)
+            {
+                attributes.WeaponHandler.AimDownSights(false);
+            }
+            else
+            {
+                attributes.WeaponHandler.HeavyAttack(false);
+            }
         }
 
         private InputAction ability1Action;
@@ -208,6 +224,7 @@ namespace Vi.UI
             switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             lightAttackAction = playerInput.actions.FindAction("LightAttack");
             heavyAttackAction = playerInput.actions.FindAction("HeavyAttack");
+            aimAction = playerInput.actions.FindAction("Aim");
             ability1Action = playerInput.actions.FindAction("Ability1");
             ability2Action = playerInput.actions.FindAction("Ability2");
             ability3Action = playerInput.actions.FindAction("Ability3");

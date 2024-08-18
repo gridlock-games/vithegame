@@ -46,8 +46,6 @@ namespace Vi.UI
             UI
         }
 
-        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
-
         private PlayerInput playerInput;
 
         private void Awake()
@@ -63,11 +61,11 @@ namespace Vi.UI
                 mobileLookJoystickInputParent.gameObject.SetActive(true);
             }
 
-            zoomModeDropdown.AddOptions(holdToggleOptions);
-            zoomModeDropdown.value = holdToggleOptions.IndexOf(FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
+            zoomModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
+            zoomModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
 
-            blockingModeDropdown.AddOptions(holdToggleOptions);
-            blockingModeDropdown.value = holdToggleOptions.IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
+            blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
+            blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
@@ -208,12 +206,12 @@ namespace Vi.UI
 
         public void ChangeZoomMode()
         {
-            FasterPlayerPrefs.Singleton.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
+            FasterPlayerPrefs.Singleton.SetString("ZoomMode", WeaponHandler.GetHoldToggleOptions()[zoomModeDropdown.value]);
         }
 
         public void ChangeBlockingMode()
         {
-            FasterPlayerPrefs.Singleton.SetString("BlockingMode", holdToggleOptions[blockingModeDropdown.value]);
+            FasterPlayerPrefs.Singleton.SetString("BlockingMode", WeaponHandler.GetHoldToggleOptions()[blockingModeDropdown.value]);
         }
 
         public void ChangeMobileLookJoystickSensitivity()
