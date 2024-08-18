@@ -265,7 +265,11 @@ namespace Vi.Core.CombatAgents
             }
             else
             {
-                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
+                if (rageAtMaxVFXInstance)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance);
+                    rageAtMaxVFXInstance = null;
+                }
             }
 
             if (IsServer)
@@ -281,12 +285,20 @@ namespace Vi.Core.CombatAgents
         {
             if (current)
             {
-                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance); }
+                if (rageAtMaxVFXInstance)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(rageAtMaxVFXInstance);
+                    rageAtMaxVFXInstance = null;
+                }
                 if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
             }
             else
             {
-                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ragingVFXInstance); }
+                if (ragingVFXInstance)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(ragingVFXInstance);
+                    ragingVFXInstance = null;
+                }
             }
         }
 
