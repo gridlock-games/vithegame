@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
         [SerializeField] private Slider dpiScaleSlider;
+        [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
         [SerializeField] private Slider renderScaleSlider;
@@ -125,6 +126,7 @@ namespace Vi.UI
             resolutionDropdown.value = currentResIndex;
 
             targetFrameRateInput.text = Application.targetFrameRate.ToString();
+            renderDistanceInput.text = FasterPlayerPrefs.Singleton.GetInt("RenderDistance").ToString();
 
             // Full screen mode dropdown
             // Dropdown Options are assigned in inspector since these don't vary
@@ -322,6 +324,22 @@ namespace Vi.UI
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
+        }
+
+        public void ValidateRenderDistance()
+        {
+            renderDistanceInput.text = Regex.Replace(renderDistanceInput.text, @"[^0-9]", "");
+        }
+
+        public void ChangeRenderDistance()
+        {
+            int renderDistance = int.Parse(renderDistanceInput.text);
+            if (renderDistance < 10)
+            {
+                renderDistance = 10;
+                renderDistanceInput.text = "10";
+            }
+            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
         }
 
         public void ValidateTargetFrameRate()

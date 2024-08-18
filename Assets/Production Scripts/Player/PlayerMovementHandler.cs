@@ -320,7 +320,7 @@ namespace Vi.Player
             if (IsLocalPlayer)
             {
                 cameraController.gameObject.AddComponent<AudioListener>();
-                cameraController.GetComponent<Camera>().enabled = true;
+                cameraController.Camera.enabled = true;
 
                 playerInput.enabled = true;
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");

@@ -101,6 +101,8 @@ namespace Vi.Core
                 if (!FasterPlayerPrefs.Singleton.HasColor(kvp.Key)) { FasterPlayerPrefs.Singleton.SetColor(kvp.Key, kvp.Value); }
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 1000); }
+
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
         }
