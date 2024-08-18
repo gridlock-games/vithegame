@@ -40,21 +40,18 @@ public class DebugOverlay : MonoBehaviour
 
         StartCoroutine(RefreshStatusAfter1Frame());
 
-        # if PLATFORM_ANDROID
-        if (!Application.isEditor)
+#if PLATFORM_ANDROID // && !UNITY_EDITOR
+        if (Debug.isDebugBuild)
         {
-            if (Debug.isDebugBuild)
-            {
-                Debug.Log(Path.Join(Application.persistentDataPath, "myLog.raw"));
-                Profiler.logFile = Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
-                Profiler.enableBinaryLog = true;
-                Profiler.enabled = true;
+            Debug.Log(Path.Join(Application.persistentDataPath, "myLog.raw"));
+            Profiler.logFile = Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+            Profiler.enableBinaryLog = true;
+            Profiler.enabled = true;
 
-                // Optional, if more memory is needed for the buffer
-                //Profiler.maxUsedMemory = 256 * 1024 * 1024;
-            }
+            // Optional, if more memory is needed for the buffer
+            //Profiler.maxUsedMemory = 256 * 1024 * 1024;
         }
-        # endif
+#endif
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
