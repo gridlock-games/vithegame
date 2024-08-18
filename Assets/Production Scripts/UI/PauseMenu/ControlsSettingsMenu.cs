@@ -57,10 +57,7 @@ namespace Vi.UI
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
             mobileLookJoystickSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
 
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                mobileLookJoystickInputParent.gameObject.SetActive(true);
-            }
+            mobileLookJoystickInputParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
