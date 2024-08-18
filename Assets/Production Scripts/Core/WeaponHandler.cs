@@ -1197,9 +1197,30 @@ namespace Vi.Core
                 }
                 return actionClip;
             }
-            else if ((combatAgent.AnimationHandler.IsAtRest() & !combatAgent.AnimationHandler.IsFlinching()) | combatAgent.AnimationHandler.IsDodging() | combatAgent.AnimationHandler.IsPlayingBlockingHitReaction())
+            else if (combatAgent.AnimationHandler.IsAtRest()
+                | combatAgent.AnimationHandler.IsDodging()
+                | combatAgent.AnimationHandler.IsPlayingBlockingHitReaction())
             {
                 ResetComboSystem();
+                ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
+                if (actionClip)
+                {
+                    if (ShouldUseAmmo())
+                    {
+                        if (actionClip.requireAmmo)
+                        {
+                            if (GetAmmoCount() < actionClip.requiredAmmoAmount)
+                            {
+                                OnReload();
+                                return null;
+                            }
+                        }
+                    }
+                }
+                return actionClip;
+            }
+            else if (combatAgent.AnimationHandler.IsFlinching())
+            {
                 ActionClip actionClip = SelectAttack(inputAttackType, inputHistory);
                 if (actionClip)
                 {
