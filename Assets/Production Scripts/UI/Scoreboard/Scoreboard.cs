@@ -175,7 +175,6 @@ namespace Vi.UI
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
             {
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
-                ((RectTransform)instance.transform).anchoredPosition = ((RectTransform)scoreboardElementPrefabFull.transform).anchoredPosition;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
@@ -192,7 +191,6 @@ namespace Vi.UI
                 if (playerData.team == PlayerDataManager.Team.Spectator) { continue; }
 
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
-                ((RectTransform)instance.transform).anchoredPosition = ((RectTransform)scoreboardElementPrefabFull.transform).anchoredPosition;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
