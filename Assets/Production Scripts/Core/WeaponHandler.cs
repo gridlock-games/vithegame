@@ -665,7 +665,6 @@ namespace Vi.Core
         {
             if (IsLocalPlayer)
             {
-                Debug.Log(lightAttackMode);
                 if (lightAttackMode == "PRESS")
                 {
                     ExecuteLightAttack(isPressed);
@@ -689,7 +688,6 @@ namespace Vi.Core
 
         private void ExecuteLightAttack(bool isPressed)
         {
-            Debug.Log("Execute light attack " + isPressed);
             if (isPressed)
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
