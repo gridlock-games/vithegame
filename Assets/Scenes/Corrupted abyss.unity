@@ -843,7 +843,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 08ba2e54177ab954bb869a243f683b11, type: 2}
+  - {fileID: 2100000, guid: beb71becc3f376e4e9956d4367c14f31, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1086,7 +1086,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 619569622}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 27.85, y: 8.19, z: -17.119}
+  m_LocalPosition: {x: 24.36, y: 10.63, z: -18.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5524,18 +5524,9 @@ MonoBehaviour:
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
-  ancientBossLightSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  ancientBossCorruptSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  ancientBossNeutralSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
+  mobSpawnPoints: []
   displayDefaultGizmos: 0
   displayDamageCircleGizmos: 0
-  displayEssenceWarGizmos: 0
 --- !u!1001 &1635005387
 PrefabInstance:
   m_ObjectHideFlags: 0
