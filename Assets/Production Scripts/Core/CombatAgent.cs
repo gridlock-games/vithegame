@@ -142,11 +142,7 @@ namespace Vi.Core
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
 
-            if (worldSpaceLabelInstance)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(worldSpaceLabelInstance);
-                worldSpaceLabelInstance = null;
-            }
+            if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
 
             PlayerDataManager.Singleton.RemoveCombatAgent(this);
         }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Vi.Utility
 {
@@ -29,5 +30,17 @@ namespace Vi.Utility
         }
 
         public bool IsPrewarmObject() { return isPrewarmObject; }
+
+        public UnityAction OnSpawnFromPool;
+        public UnityAction OnReturnToPool;
+
+        public void InvokeOnSpawnFromPoolEvent()
+        {
+            if (OnSpawnFromPool != null) { OnSpawnFromPool.Invoke(); }
+        }
+        public void InvokeOnReturnToPoolEvent()
+        {
+            if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
+        }
     }
 }
