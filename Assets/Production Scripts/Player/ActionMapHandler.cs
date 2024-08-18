@@ -34,7 +34,7 @@ namespace Vi.Player
                 if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
                 if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
 
-                if (weaponHandler) { weaponHandler.ClearActionVFXInstances(); }
+                if (weaponHandler) { weaponHandler.ClearPreviewActionVFXInstances(); }
             }
             else
             {

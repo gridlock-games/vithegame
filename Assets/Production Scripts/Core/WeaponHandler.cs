@@ -804,7 +804,7 @@ namespace Vi.Core
             }
         }
 
-        public void ClearActionVFXInstances()
+        public void ClearPreviewActionVFXInstances()
         {
             if (ability1PreviewInstance)
             {
@@ -829,6 +829,11 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(ability4PreviewInstance.GetComponent<PooledObject>());
                 ability4PreviewInstance = null;
             }
+        }
+
+        void OnCancelAbility()
+        {
+            ClearPreviewActionVFXInstances();
         }
 
         void OnAbility1(InputValue value)
