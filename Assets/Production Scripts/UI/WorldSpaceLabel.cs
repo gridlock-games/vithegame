@@ -47,6 +47,9 @@ namespace Vi.UI
                 statusIcon.InitializeStatusIcon(status);
                 statusIcons.Add(statusIcon);
             }
+
+            canvas = GetComponent<Canvas>();
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
         }
 
         private void OnEnable()
@@ -85,13 +88,15 @@ namespace Vi.UI
                     }
                 }
             }
+            RefreshStatus();
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            canvas = GetComponent<Canvas>();
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            RefreshStatus();
+            team = default;
+            localWeaponHandler = null;
+            combatAgent = null;
+            rendererToFollow = null;
         }
 
         private void RefreshStatus()
