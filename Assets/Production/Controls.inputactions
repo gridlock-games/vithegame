@@ -60,15 +60,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "LightAttackHold",
-                    "type": "Value",
-                    "id": "9f0e2966-fe01-4a0a-a9ae-c0251f559cee",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "HeavyAttack",
                     "type": "Value",
                     "id": "020ea129-7f33-4dae-bf36-6d4c69f3c8bd",
@@ -78,13 +69,22 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "HeavyAttackHold",
+                    "name": "Aim",
                     "type": "Value",
-                    "id": "971a3916-4d44-40cd-991e-cc890eae8a86",
+                    "id": "cd1e9d2a-d41d-4e06-9b22-f877daf44273",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "CancelAbility",
+                    "type": "Button",
+                    "id": "cf884249-f595-44df-b019-dd0780ee69d5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Ability1",
@@ -496,11 +496,33 @@
                 },
                 {
                     "name": "",
+                    "id": "ff59bb17-c34d-491c-a55a-9c04db79ad54",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "LightAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4963394c-29fb-4f3d-bbf2-37b006f90917",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
+                    "action": "HeavyAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f5fe72cf-5ed6-4da4-af1b-8946eafcf91a",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "HeavyAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -601,28 +623,6 @@
                     "processors": "",
                     "groups": "Gamepad;Touchscreen",
                     "action": "Minimap",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "aac1c7f1-fc97-48d5-ab71-b851a9fecfd5",
-                    "path": "<Gamepad>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad;Touchscreen",
-                    "action": "LightAttackHold",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "40be45e8-f56d-463b-9578-53efdd25a84f",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "Gamepad;Touchscreen",
-                    "action": "HeavyAttackHold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -749,6 +749,17 @@
                 },
                 {
                     "name": "",
+                    "id": "b329af0f-f74b-4adb-9ea0-a806fbd2281d",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "SwitchWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "40be275f-c13f-4dd4-a5dc-7ec6341e32d7",
                     "path": "<Gamepad>/dpad/up",
                     "interactions": "",
@@ -788,6 +799,50 @@
                     "processors": "",
                     "groups": "Touchscreen",
                     "action": "ActivateRage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "13eb52a9-9e6e-4eb1-90f5-f964d91a0222",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4c8df095-55c8-4659-bc14-c6fdaf9c3ca2",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "17572d4b-3c34-460c-866f-20fb88e6b08c",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "CancelAbility",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3c22a957-32f4-4d01-9ed0-c65569d66112",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CancelAbility",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

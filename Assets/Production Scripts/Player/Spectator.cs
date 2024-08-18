@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.Player
 {
@@ -301,10 +302,14 @@ namespace Vi.Player
 
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
+        private UniversalAdditionalCameraData cameraData;
+        public Camera cam;
         private new void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            cam = GetComponent<Camera>();
+            cameraData = GetComponent<UniversalAdditionalCameraData>();
             RefreshStatus();
         }
 
@@ -314,8 +319,9 @@ namespace Vi.Player
             targetPosition = transform.position;
         }
 
-        private void OnEnable()
+        private new void OnEnable()
         {
+            base.OnEnable();
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
@@ -344,8 +350,10 @@ namespace Vi.Player
         {
             if (IsOwner)
             {
-                pingEnabled.Value = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PingEnabled"));
+                pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }
+            cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+            cam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);

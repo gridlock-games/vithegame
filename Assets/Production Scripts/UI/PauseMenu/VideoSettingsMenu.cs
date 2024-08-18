@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
         [SerializeField] private Slider dpiScaleSlider;
+        [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
         [SerializeField] private Slider renderScaleSlider;
@@ -125,6 +126,7 @@ namespace Vi.UI
             resolutionDropdown.value = currentResIndex;
 
             targetFrameRateInput.text = Application.targetFrameRate.ToString();
+            renderDistanceInput.text = FasterPlayerPrefs.Singleton.GetInt("RenderDistance").ToString();
 
             // Full screen mode dropdown
             // Dropdown Options are assigned in inspector since these don't vary
@@ -174,7 +176,7 @@ namespace Vi.UI
 
             hdrToggle.isOn = pipeline.supportsHDR;
 
-            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
 
             SetOriginalVariables();
         }
@@ -233,7 +235,7 @@ namespace Vi.UI
             originalVSyncState = QualitySettings.vSyncCount;
             originalMSAASampleCount = pipeline.msaaSampleCount;
             originalHDR = pipeline.supportsHDR;
-            originalPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            originalPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
 
         public void ApplyChanges()
@@ -257,7 +259,7 @@ namespace Vi.UI
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
             pipeline.supportsHDR = hdrToggle.isOn;
-            FasterPlayerPrefs.Singleton.SetString("PostProcessingEnabled", postProcessingToggle.isOn.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
 
             vsyncToggle.interactable = true;
 
@@ -308,7 +310,7 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
 
         public void OnQualitySettingsDropdownChange()
@@ -322,6 +324,22 @@ namespace Vi.UI
             msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
+        }
+
+        public void ValidateRenderDistance()
+        {
+            renderDistanceInput.text = Regex.Replace(renderDistanceInput.text, @"[^0-9]", "");
+        }
+
+        public void ChangeRenderDistance()
+        {
+            int renderDistance = int.Parse(renderDistanceInput.text);
+            if (renderDistance < 10)
+            {
+                renderDistance = 10;
+                renderDistanceInput.text = "10";
+            }
+            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
         }
 
         public void ValidateTargetFrameRate()

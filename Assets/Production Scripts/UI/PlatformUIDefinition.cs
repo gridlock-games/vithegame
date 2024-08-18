@@ -270,7 +270,7 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (FasterPlayerPrefs.Singleton.HasKey(customizablePlayerPrefName))
+            if (FasterPlayerPrefs.Singleton.HasString(customizablePlayerPrefName))
             {
                 List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString(customizablePlayerPrefName));
 

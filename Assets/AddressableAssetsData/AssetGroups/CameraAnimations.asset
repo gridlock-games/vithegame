@@ -10,28 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: HordeMode
+  m_Name: CameraAnimations
   m_EditorClassIdentifier: 
-  m_GroupName: HordeMode
+  m_GroupName: CameraAnimations
   m_Data:
     m_SerializedData: []
-  m_GUID: 4b93ee29e5570614c89af4f02a07eff2
+  m_GUID: ebef1d603ab1c59439fd31c925bfb019
   m_SerializeEntries:
-  - m_GUID: 415594f39eb6f9a43af6ab47aa751300
-    m_Address: Assets/Production/Scenes/Gameplay/HordeMode.unity
+  - m_GUID: 8701fb86dc363434a9a33f24f2b4fedd
+    m_Address: Assets/Production/CameraAnimations/TutorialIntro.anim
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: edecd31c44ac0284c93cbd4db2a8917d
-    m_Address: Assets/Production/Scenes/Environment/HordeModeTestMap.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 2a97fa0e590a38b49b031d944bafc35b
-    m_Address: Assets/Production/Prefabs/UI/GameModeUI/HordeModeUI.prefab
+  - m_GUID: d5630f367afd4374b85f0013be95fc46
+    m_Address: Assets/Production/CameraAnimations/CameraAnimator.controller
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 547dcdfda421d324493ef60ebfb136f6, type: 2}
-    - {fileID: 11400000, guid: cd267b979c0b369408d95a51a9c9b629, type: 2}
+    - {fileID: 11400000, guid: 40d37faccf6032a48bc36738d5094730, type: 2}
+    - {fileID: 11400000, guid: fc5ad075b264423469683fce05c23bd6, type: 2}

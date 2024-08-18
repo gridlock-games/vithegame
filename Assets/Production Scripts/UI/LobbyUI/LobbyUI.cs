@@ -317,7 +317,7 @@ namespace Vi.UI
                 if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
                 {
                     string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
-                    if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                    if (!FasterPlayerPrefs.Singleton.HasString(gameModeString))
                     {
                         FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                         gameModeInfoUI.gameObject.SetActive(true);
@@ -801,7 +801,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.IsLobbyLeader() & IsClient)
             {
                 string gameModeString = PlayerDataManager.Singleton.GetGameMode().ToString();
-                if (!FasterPlayerPrefs.Singleton.HasKey(gameModeString))
+                if (!FasterPlayerPrefs.Singleton.HasString(gameModeString))
                 {
                     FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                     gameModeInfoUI.gameObject.SetActive(true);

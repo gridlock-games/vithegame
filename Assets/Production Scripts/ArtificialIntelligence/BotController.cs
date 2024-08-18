@@ -315,8 +315,8 @@ namespace Vi.ArtificialIntelligence
         
         private void RefreshStatus()
         {
-            disableBots = bool.Parse(FasterPlayerPrefs.Singleton.GetString("DisableBots"));
-            canOnlyLightAttack = bool.Parse(FasterPlayerPrefs.Singleton.GetString("BotsCanOnlyLightAttack"));
+            disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
+            canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
         private bool disableBots;

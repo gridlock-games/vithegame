@@ -114,11 +114,9 @@ namespace Vi.UI
         private void UpdateNameTextAndColors()
         {
             nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(combatAgent.GetTeam()) + combatAgent.GetName();
-
-            Color relativeTeamColor = combatAgent.GetRelativeTeamColor();
             nameDisplay.color = Color.white;
             team = combatAgent.GetTeam();
-            healthFillImage.color = relativeTeamColor == Color.black | team == PlayerDataManager.Team.Competitor ? Color.red : relativeTeamColor;
+            healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
         }
 
         private void RefreshRendererToFollow()
@@ -168,7 +166,10 @@ namespace Vi.UI
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
 
-            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame) { UpdateNameTextAndColors(); }
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame
+                | PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame
+                | FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame)
+            { UpdateNameTextAndColors(); }
 
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }

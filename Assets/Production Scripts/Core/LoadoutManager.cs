@@ -251,7 +251,7 @@ namespace Vi.Core
                     Debug.LogError(current + " not assigned to a weapon");
                     break;
             }
-            combatAgent.WeaponHandler.ClearActionVFXInstances();
+            combatAgent.WeaponHandler.ClearPreviewActionVFXInstances();
         }
 
         public bool CanSwapWeapons()

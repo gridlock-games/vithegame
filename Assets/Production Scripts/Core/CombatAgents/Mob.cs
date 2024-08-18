@@ -54,7 +54,7 @@ namespace Vi.Core.CombatAgents
             }
             else
             {
-                return localTeam == GetTeam() ? Color.cyan : Color.red;
+                return PlayerDataManager.CanHit(localTeam, GetTeam()) ? EnemyColor : TeammateColor;
             }
         }
 

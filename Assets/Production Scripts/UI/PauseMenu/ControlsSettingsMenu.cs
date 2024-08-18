@@ -18,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private InputField mouseXSensitivityInput;
         [SerializeField] private InputField mouseYSensitivityInput;
         [SerializeField] private InputField zoomMultiplierInput;
+        [SerializeField] private TMP_Dropdown lightAttackModeDropdown;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
@@ -46,28 +47,26 @@ namespace Vi.UI
             UI
         }
 
-        private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
-
         private PlayerInput playerInput;
 
         private void Awake()
         {
-            invertLookToggle.isOn = bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse"));
+            invertLookToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("InvertMouse");
             mouseXSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity").ToString();
             mouseYSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity").ToString();
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
             mobileLookJoystickSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
 
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                mobileLookJoystickInputParent.gameObject.SetActive(true);
-            }
+            mobileLookJoystickInputParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
 
-            zoomModeDropdown.AddOptions(holdToggleOptions);
-            zoomModeDropdown.value = holdToggleOptions.IndexOf(FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
+            lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
+            lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
 
-            blockingModeDropdown.AddOptions(holdToggleOptions);
-            blockingModeDropdown.value = holdToggleOptions.IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
+            zoomModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
+            zoomModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
+
+            blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
+            blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
@@ -176,7 +175,7 @@ namespace Vi.UI
 
         public void SetInvertMouse()
         {
-            FasterPlayerPrefs.Singleton.SetString("InvertMouse", invertLookToggle.isOn.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("InvertMouse", invertLookToggle.isOn);
         }
 
         public void ChangeMouseXSensitivity()
@@ -206,14 +205,19 @@ namespace Vi.UI
             }
         }
 
+        public void ChangeLightAttackMode()
+        {
+            FasterPlayerPrefs.Singleton.SetString("LightAttackMode", WeaponHandler.GetAttackModeOptions()[lightAttackModeDropdown.value]);
+        }
+
         public void ChangeZoomMode()
         {
-            FasterPlayerPrefs.Singleton.SetString("ZoomMode", holdToggleOptions[zoomModeDropdown.value]);
+            FasterPlayerPrefs.Singleton.SetString("ZoomMode", WeaponHandler.GetHoldToggleOptions()[zoomModeDropdown.value]);
         }
 
         public void ChangeBlockingMode()
         {
-            FasterPlayerPrefs.Singleton.SetString("BlockingMode", holdToggleOptions[blockingModeDropdown.value]);
+            FasterPlayerPrefs.Singleton.SetString("BlockingMode", WeaponHandler.GetHoldToggleOptions()[blockingModeDropdown.value]);
         }
 
         public void ChangeMobileLookJoystickSensitivity()

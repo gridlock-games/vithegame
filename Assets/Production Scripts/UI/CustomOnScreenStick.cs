@@ -51,7 +51,7 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
-            if (FasterPlayerPrefs.Singleton.HasKey(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
+            if (FasterPlayerPrefs.Singleton.HasFloat(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
         }
 
         private void Update()

@@ -76,8 +76,8 @@ namespace Vi.UI
         private void Awake()
         {
             FindPlayerInput();
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
-            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", true.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
+            FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", true);
 
             foreach (Image image in overlayImages)
             {
@@ -366,7 +366,7 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Block An Attack.";
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Block") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
@@ -382,7 +382,7 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Disable();
@@ -413,7 +413,7 @@ namespace Vi.UI
                 }
 
                 currentOverlayMessage = "Dodge.";
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
                 foreach (InputAction action in playerInput.actions)
                 {
                     if (action.name.Contains("Dodge") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
@@ -423,7 +423,7 @@ namespace Vi.UI
 
                 yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 foreach (InputAction action in playerInput.actions)
                 {
                     playerInput.actions.FindAction(action.name).Disable();
@@ -450,7 +450,7 @@ namespace Vi.UI
                 currentOverlayMessage = "Player Card.";
                 playerUI.GetMainPlayerCard().gameObject.SetActive(true);
                 yield return new WaitForSeconds(2);
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
                 playerUI.GetMainPlayerCard().transform.localScale = new Vector3(3, 3, 3);
 
                 yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
@@ -487,7 +487,7 @@ namespace Vi.UI
                     if (action.name.Contains("Weapon1") | action.name.Contains("Weapon2") | action.name.Contains("SwitchWeapon")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
 
                 foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
                 {
@@ -507,7 +507,7 @@ namespace Vi.UI
                 timerEnabled = true;
                 currentOverlayMessage = "Prepare To Fight!";
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
 
                 foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
                 {
@@ -533,8 +533,8 @@ namespace Vi.UI
                 checkmarkDuration = 1;
                 bufferDurationBetweenActions = 0;
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
-                FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
+                FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
                 currentOverlayMessage = "Defeat The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
@@ -551,7 +551,7 @@ namespace Vi.UI
             }
             else if (currentActionIndex == 12) // Display victory or defeat message
             {
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
 
                 bufferDurationBetweenActions = 3;
@@ -594,7 +594,7 @@ namespace Vi.UI
                     endingMessage.color = new Color(endingMessage.color.r, endingMessage.color.g, endingMessage.color.b, 0);
                 }
 
-                FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", true);
 
                 yield return new WaitForSeconds(2);
 
@@ -628,9 +628,9 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            FasterPlayerPrefs.Singleton.SetString("DisableBots", false.ToString());
-            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
-            FasterPlayerPrefs.Singleton.SetString("BotsCanOnlyLightAttack", false.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
+            FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
+            FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
             Time.timeScale = 1;
         }
 
@@ -687,7 +687,7 @@ namespace Vi.UI
                     overlayImages[i].sprite = i < currentOverlaySprites.Count ? currentOverlaySprites[i] : null;
                 }
 
-                FasterPlayerPrefs.Singleton.SetString("DisableBots", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
 
                 foreach (GameObject instance in UIElementHighlightInstances)
                 {

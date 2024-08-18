@@ -249,8 +249,8 @@ namespace Vi.UI
 
         public void LoginWithVi()
         {
-            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasString("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasString("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             initialParent.SetActive(false);
             initialErrorText.text = "";
@@ -292,8 +292,8 @@ namespace Vi.UI
 
         public void OpenViLogin()
         {
-            if (FasterPlayerPrefs.Singleton.HasKey("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
-            if (FasterPlayerPrefs.Singleton.HasKey("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasString("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
+            if (FasterPlayerPrefs.Singleton.HasString("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
             viLogo.enabled = false;
             initialParent.SetActive(false);
@@ -622,7 +622,7 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => WebRequestManager.Singleton.GameIsUpToDate);
 
-            if (FasterPlayerPrefs.Singleton.HasKey("LastSignInType"))
+            if (FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
             {
                 switch (FasterPlayerPrefs.Singleton.GetString("LastSignInType"))
                 {

@@ -157,7 +157,7 @@ namespace Vi.UI
 
         private void Awake()
         {
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted"))) { tutorialAlertBox.DestroyAlert(); }
+            if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted")) { tutorialAlertBox.DestroyAlert(); }
             else { tutorialAlertBox.gameObject.SetActive(true); }
 
             codeInputBoxParent.SetActive(false);
@@ -431,7 +431,7 @@ namespace Vi.UI
 
         private void RefreshButtonInteractability(bool disableAll = false)
         {
-            bool tutorialInProgress = bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress"));
+            bool tutorialInProgress = FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress");
 
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & (WebRequestManager.Singleton.GameIsUpToDate | tutorialInProgress);
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
@@ -630,7 +630,7 @@ namespace Vi.UI
             }
             PlayerDataManager.Singleton.SetGameModeSettings("");
 
-            tutorialButton.gameObject.SetActive(bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")));
+            tutorialButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
             tutorialButton.onClick.AddListener(() => GoToTutorial());
 
             HandlePlatformAPI(false);
@@ -740,7 +740,7 @@ namespace Vi.UI
 
         public void ReturnToMainMenu()
         {
-            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", false.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
@@ -760,7 +760,7 @@ namespace Vi.UI
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+            if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
             {
                 CreateUIElementHighlight((RectTransform)characterNameInputField.transform);
             }
@@ -797,7 +797,7 @@ namespace Vi.UI
 
             UpdateSelectedCharacter(default);
 
-            if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+            if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
             {
                 CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
             }
@@ -864,7 +864,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             if (NetworkManager.Singleton.StartHost())
             {
-                if (bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialCompleted")))
+                if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
                     NetSceneManager.Singleton.LoadScene("Training Room");
                     NetSceneManager.Singleton.LoadScene("Eclipse Grove");
@@ -905,7 +905,7 @@ namespace Vi.UI
 
         public void StartTutorial()
         {
-            FasterPlayerPrefs.Singleton.SetString("TutorialInProgress", true.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", true);
 
             CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
 
@@ -917,7 +917,7 @@ namespace Vi.UI
 
         public void SkipTutorial()
         {
-            FasterPlayerPrefs.Singleton.SetString("TutorialCompleted", true.ToString());
+            FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", true);
         }
 
         private const string connectToServerCode = "217031";
@@ -937,14 +937,14 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
 
-            if (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("IsDiscordVerified")))
+            if (!FasterPlayerPrefs.Singleton.GetBool("IsDiscordVerified"))
             {
                 codeInputBoxParent.SetActive(true);
 
                 yield return new WaitUntil(() => codeInputField.text == connectToServerCode);
 
                 codeInputBoxParent.SetActive(false);
-                FasterPlayerPrefs.Singleton.SetString("IsDiscordVerified", true.ToString());
+                FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", true);
             }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);

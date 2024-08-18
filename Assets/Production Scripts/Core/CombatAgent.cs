@@ -111,6 +111,7 @@ namespace Vi.Core
             MovementHandler = GetComponent<MovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
+            RefreshStatus();
         }
 
         public GlowRenderer GlowRenderer { get; private set; }
@@ -129,6 +130,11 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
+
+            if (IsOwner)
+            {
+                RefreshStatus();
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -144,11 +150,22 @@ namespace Vi.Core
         protected void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+            RefreshStatus();
         }
 
         protected void OnDisable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+        }
+
+        public Color EnemyColor { get; private set; } = Color.red;
+        public Color TeammateColor { get; private set; } = Color.cyan;
+        public Color LocalPlayerColor { get; private set; } = Color.white;
+        protected virtual void RefreshStatus()
+        {
+            EnemyColor = FasterPlayerPrefs.Singleton.GetColor("EnemyColor");
+            TeammateColor = FasterPlayerPrefs.Singleton.GetColor("TeammateColor");
+            LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
         }
 
         public abstract string GetName();
@@ -267,6 +284,8 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (IsServer)
             {
                 bool evaluateInvinicibility = true;

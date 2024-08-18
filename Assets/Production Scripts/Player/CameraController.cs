@@ -25,6 +25,7 @@ namespace Vi.Player
         [SerializeField] private float collisionPositionOffset = -0.3f;
 
         public GameObject CameraPositionClone { get; private set; }
+        public Camera Camera { get; private set; }
 
         private float targetRotationY;
         private float targetRotationX;
@@ -52,20 +53,28 @@ namespace Vi.Player
         }
 
         private Animator animator;
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+            Camera = GetComponent<Camera>();
+            cameraData = GetComponent<UniversalAdditionalCameraData>();
+
+            movementHandler = GetComponentInParent<PlayerMovementHandler>();
+            weaponHandler = movementHandler.GetComponent<WeaponHandler>();
+            attributes = movementHandler.GetComponent<Attributes>();
+        }
+
         private void Start()
         {
             targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
-            animator = GetComponent<Animator>();
-            movementHandler = GetComponentInParent<PlayerMovementHandler>();
-            weaponHandler = movementHandler.GetComponent<WeaponHandler>();
-            attributes = movementHandler.GetComponent<Attributes>();
             transform.SetParent(null, true);
+
             cameraInterp = new GameObject("Camera Interp");
             CameraPositionClone = new GameObject("Empty Camera Position Clone");
+            
             currentPositionOffset = positionOffset;
-            cameraData = GetComponent<UniversalAdditionalCameraData>();
             RefreshStatus();
 
             cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
@@ -90,7 +99,8 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            cameraData.renderPostProcessing = bool.Parse(FasterPlayerPrefs.Singleton.GetString("PostProcessingEnabled"));
+            cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+            Camera.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
         }
 
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);

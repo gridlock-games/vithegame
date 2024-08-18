@@ -114,7 +114,7 @@ namespace Vi.UI
 
                     if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
                     {
-                        if (FasterPlayerPrefs.Singleton.HasKey("UIOverrides"))
+                        if (FasterPlayerPrefs.Singleton.HasString("UIOverrides"))
                         {
                             List<PlatformUIDefinition.PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString("UIOverrides"));
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
@@ -139,7 +139,7 @@ namespace Vi.UI
             GameObject prefabRef = prefabCrosswalk[draggableUIObject.gameObject];
 
             List<PlatformUIDefinition.PositionOverrideDefinition> overridesList;
-            if (FasterPlayerPrefs.Singleton.HasKey("UIOverrides"))
+            if (FasterPlayerPrefs.Singleton.HasString("UIOverrides"))
             {
                 overridesList = JsonConvert.DeserializeObject<List<PlatformUIDefinition.PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString("UIOverrides"));
             }

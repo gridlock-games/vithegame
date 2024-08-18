@@ -15,7 +15,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                if (!bool.Parse(FasterPlayerPrefs.Singleton.GetString("TutorialInProgress")))
+                if (!FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
                 {
                     StartCoroutine(SpawnBots());
                 }

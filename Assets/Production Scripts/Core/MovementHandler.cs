@@ -119,7 +119,7 @@ namespace Vi.Core
         private Vector2 lookSensitivity;
 		private void RefreshStatus()
 		{
-			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (bool.Parse(FasterPlayerPrefs.Singleton.GetString("InvertMouse")) ? -1 : 1);
+			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (FasterPlayerPrefs.Singleton.GetBool("InvertMouse") ? -1 : 1);
 			zoomSensitivityMultiplier = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier");
 		}
 
