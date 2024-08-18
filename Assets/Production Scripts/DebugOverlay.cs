@@ -40,7 +40,7 @@ public class DebugOverlay : MonoBehaviour
 
         StartCoroutine(RefreshStatusAfter1Frame());
 
-#if PLATFORM_ANDROID // && !UNITY_EDITOR
+#if PLATFORM_ANDROID && !UNITY_EDITOR
         if (Debug.isDebugBuild)
         {
             Debug.Log(Path.Join(Application.persistentDataPath, "myLog.raw"));
