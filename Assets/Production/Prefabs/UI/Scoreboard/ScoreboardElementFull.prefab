@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 8472139578323966923}
   - component: {fileID: 5604898872574020508}
   - component: {fileID: 2967113721175319822}
+  - component: {fileID: 5384671740960004640}
   m_Layer: 5
   m_Name: ScoreboardElementFull
   m_TagString: Untagged
@@ -183,6 +184,21 @@ MonoBehaviour:
   - {fileID: 1753279184447769416}
   - {fileID: 3301928054196002}
   playerDataId: 0
+--- !u!114 &5384671740960004640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204846766558234513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 167
+  isPrewarmObject: 1
 --- !u!1 &383446013327368492
 GameObject:
   m_ObjectHideFlags: 0

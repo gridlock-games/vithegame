@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -30,7 +31,7 @@ namespace Vi.Player
                     playerUIInstance.SetActive(false);
                 playerInput.SwitchCurrentActionMap("UI");
 
-                if (scoreboardInstance) { Destroy(scoreboardInstance); }
+                if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
                 if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
                 if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
 
@@ -70,7 +71,7 @@ namespace Vi.Player
         }
 
         [SerializeField] private GameObject scoreboardPrefab;
-        GameObject scoreboardInstance;
+        PooledObject scoreboardInstance;
         void OnScoreboard(InputValue value)
         {
             ToggleScoreboard(value.isPressed);
@@ -96,12 +97,12 @@ namespace Vi.Player
             if (isOn)
             {
                 if (scoreboardInstance) { return; }
-                scoreboardInstance = Instantiate(scoreboardPrefab);
+                scoreboardInstance = ObjectPoolingManager.SpawnObject(scoreboardPrefab.GetComponent<PooledObject>());
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                Destroy(scoreboardInstance);
+                ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance);
             }
 
             if (playerUIInstance)
