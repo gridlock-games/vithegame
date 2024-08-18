@@ -2784,6 +2784,7 @@ namespace Vi.Core
                 {
                     Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, restart your game.";
                 }
+                IsCheckingGameVersion = false;
                 yield break;
             }
 
