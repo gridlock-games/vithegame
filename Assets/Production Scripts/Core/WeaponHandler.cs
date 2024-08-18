@@ -33,6 +33,11 @@ namespace Vi.Core
             RefreshStatus();
         }
 
+        private void OnEnable()
+        {
+            RefreshStatus();
+        }
+
         public bool WeaponInitialized { get; private set; }
         public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
         public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
@@ -660,6 +665,7 @@ namespace Vi.Core
         {
             if (IsLocalPlayer)
             {
+                Debug.Log(lightAttackMode);
                 if (lightAttackMode == "PRESS")
                 {
                     ExecuteLightAttack(isPressed);
@@ -683,6 +689,7 @@ namespace Vi.Core
 
         private void ExecuteLightAttack(bool isPressed)
         {
+            Debug.Log("Execute light attack " + isPressed);
             if (isPressed)
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);

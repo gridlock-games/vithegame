@@ -18,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private InputField mouseXSensitivityInput;
         [SerializeField] private InputField mouseYSensitivityInput;
         [SerializeField] private InputField zoomMultiplierInput;
+        [SerializeField] private TMP_Dropdown lightAttackModeDropdown;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
@@ -60,6 +61,9 @@ namespace Vi.UI
             {
                 mobileLookJoystickInputParent.gameObject.SetActive(true);
             }
+
+            lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
+            lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
 
             zoomModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             zoomModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("ZoomMode"));
@@ -202,6 +206,11 @@ namespace Vi.UI
             {
                 if (zoomMultiplier > 0) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier); }
             }
+        }
+
+        public void ChangeLightAttackMode()
+        {
+            FasterPlayerPrefs.Singleton.SetString("LightAttackMode", WeaponHandler.GetAttackModeOptions()[lightAttackModeDropdown.value]);
         }
 
         public void ChangeZoomMode()

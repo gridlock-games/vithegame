@@ -100,7 +100,7 @@ namespace Vi.Core
                 if (!FasterPlayerPrefs.Singleton.HasColor(kvp.Key)) { FasterPlayerPrefs.Singleton.SetColor(kvp.Key, kvp.Value); }
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 1000); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 200); }
 
             if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", Application.platform == RuntimePlatform.WindowsPlayer
                 | Application.platform == RuntimePlatform.OSXPlayer | Application.platform == RuntimePlatform.LinuxPlayer
@@ -109,6 +109,8 @@ namespace Vi.Core
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);
+
+            VerifyAttackModePlayerPref("LightAttackMode", 1);
         }
 
         private void VerifyHoldPlayerPref(string key, int defaultIndex)
@@ -118,7 +120,20 @@ namespace Vi.Core
             if (!WeaponHandler.GetHoldToggleOptions().Contains(FasterPlayerPrefs.Singleton.GetString(key)))
             {
                 if (defaultIndex < 0 | defaultIndex >= WeaponHandler.GetHoldToggleOptions().Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
+                Debug.LogError(key + " is getting reset! " + FasterPlayerPrefs.Singleton.GetString(key));
                 FasterPlayerPrefs.Singleton.SetString(key, WeaponHandler.GetHoldToggleOptions()[defaultIndex]);
+            }
+        }
+
+        private void VerifyAttackModePlayerPref(string key, int defaultIndex)
+        {
+            if (!FasterPlayerPrefs.Singleton.HasKey(key)) { Debug.LogError("Calling VerifyHoldPlayerPref but the key isn't present! " + key); return; }
+
+            if (!WeaponHandler.GetAttackModeOptions().Contains(FasterPlayerPrefs.Singleton.GetString(key)))
+            {
+                if (defaultIndex < 0 | defaultIndex >= WeaponHandler.GetAttackModeOptions().Count) { Debug.LogError("(Verify Hold Player Pref) Default Index is not in the list! " + key); return; }
+                Debug.LogError(key + " is getting reset! " + FasterPlayerPrefs.Singleton.GetString(key));
+                FasterPlayerPrefs.Singleton.SetString(key, WeaponHandler.GetAttackModeOptions()[defaultIndex]);
             }
         }
 
