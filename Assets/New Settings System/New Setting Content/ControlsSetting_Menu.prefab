@@ -67,6 +67,24 @@ MonoBehaviour:
   rebindingSectionHeaderPrefab: {fileID: 6143946943025144434, guid: d4699cc84171e854bbbdcf2e2a65336b,
     type: 3}
   rebindableActions:
+  - overrideActionName: Light Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -8365810465465610074, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Heavy Attack
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -4895871817904562169, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Aim Down Sights
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 7397707028696809740, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
   - overrideActionName: Ability 1
     actionGroup: 1
     inputActionReferences:
@@ -89,6 +107,12 @@ MonoBehaviour:
     actionGroup: 1
     inputActionReferences:
     - {fileID: -2013674324404209891, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Cancel Ability
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 8895195887352841417, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
   - overrideActionName: Activate Rage
@@ -120,24 +144,6 @@ MonoBehaviour:
     inputActionReferences:
     - {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     - {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: Light Attack
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: -8365810465465610074, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: Heavy Attack
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: -4895871817904562169, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: Aim Down Sights
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: 7397707028696809740, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
   - overrideActionName: 
@@ -194,7 +200,6 @@ MonoBehaviour:
     inputActionReferences:
     - {fileID: -8441861740736939578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
-    - Keyboard & Mouse
     - Touchscreen
   - overrideActionName: 
     actionGroup: 2
