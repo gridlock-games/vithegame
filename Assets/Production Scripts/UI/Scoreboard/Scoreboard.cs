@@ -104,6 +104,7 @@ namespace Vi.UI
                 if (teamIndex == -1) { Debug.LogError(playerData.character.name + " player data's team isn't in the possible teams list!"); continue; }
 
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabHalf.GetComponent<PooledObject>(), teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                instance.transform.localScale = Vector3.one;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
@@ -123,6 +124,7 @@ namespace Vi.UI
                 if (teamIndex == -1) { Debug.LogError(playerData.character.name + " player data's team isn't in the possible teams list!"); continue; }
 
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabHalf.GetComponent<PooledObject>(), teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                instance.transform.localScale = Vector3.one;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
@@ -154,6 +156,7 @@ namespace Vi.UI
                         if (teamIndex == -1) { Debug.LogError(team + " scoreboard team header's team isn't in the possible teams list!"); continue; }
 
                         PooledObject instance = ObjectPoolingManager.SpawnObject(teamDividerScoreboardLine.GetComponent<PooledObject>(), teamIndex == 0 ? teamDividerParentLeft : teamDividerParentRight);
+                        instance.transform.localScale = Vector3.one;
                         pooledChildObjects.Add(instance);
                         ScoreboardTeamDividerElement dividerElement = instance.GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);
@@ -175,6 +178,7 @@ namespace Vi.UI
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
             {
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                instance.transform.localScale = Vector3.one;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
@@ -191,6 +195,7 @@ namespace Vi.UI
                 if (playerData.team == PlayerDataManager.Team.Spectator) { continue; }
 
                 PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                instance.transform.localScale = Vector3.one;
                 pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
@@ -219,6 +224,7 @@ namespace Vi.UI
                     if (team != PlayerDataManager.Team.Competitor & team != PlayerDataManager.Team.Peaceful)
                     {
                         PooledObject instance = ObjectPoolingManager.SpawnObject(teamDividerScoreboardLine.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                        instance.transform.localScale = Vector3.one;
                         pooledChildObjects.Add(instance);
                         ScoreboardTeamDividerElement dividerElement = instance.GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);
