@@ -925,6 +925,8 @@ namespace Vi.Core
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
                     break;
