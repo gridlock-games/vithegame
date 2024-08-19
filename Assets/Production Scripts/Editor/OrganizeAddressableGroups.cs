@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor;
-using System.IO;
+using System.Linq;
 
 namespace Vi.Editor
 {
@@ -24,10 +24,10 @@ namespace Vi.Editor
 
             AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
 
-            if (!groupToOrganize) { Debug.LogError("No duplicate asset group found!"); }
+            if (!groupToOrganize) { Debug.LogError("No duplicate asset group found!"); return; }
 
             int entryIndex = 0;
-            foreach (AddressableAssetEntry entry in groupToOrganize.entries)
+            foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
             {
                 string[] directories = entry.AssetPath.Split('/');
                 AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == directories[^2]);
@@ -39,11 +39,11 @@ namespace Vi.Editor
 
                 if (!groupToModify)
                 {
-                    groupToModify = settings.CreateGroup(directories[^2], false, false, false, null, null);
-                    Debug.Log(groupToModify);
+                    groupToModify = settings.CreateGroup(directories[^2], false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
                 }
-                //settings.MoveEntry(entry, groupToModify);
+                settings.MoveEntry(entry, groupToModify);
             }
+            settings.RemoveGroup(groupToOrganize);
             EditorUtility.ClearProgressBar();
         }
     }
