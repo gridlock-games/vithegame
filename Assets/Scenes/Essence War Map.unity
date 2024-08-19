@@ -36052,18 +36052,9 @@ MonoBehaviour:
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
-  ancientBossLightSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  ancientBossCorruptSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  ancientBossNeutralSpawnPoint:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
+  mobSpawnPoints: []
   displayDefaultGizmos: 0
   displayDamageCircleGizmos: 0
-  displayEssenceWarGizmos: 0
 --- !u!1 &1633815474
 GameObject:
   m_ObjectHideFlags: 0
@@ -36331,6 +36322,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4941767749321752904, guid: 0a9b66fe64dc7b34fb276d51e509a103,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5755458732775332850, guid: 0a9b66fe64dc7b34fb276d51e509a103,
         type: 3}
