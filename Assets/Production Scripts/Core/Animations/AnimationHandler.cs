@@ -548,7 +548,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name, transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
         }
@@ -881,7 +881,7 @@ namespace Vi.Core
         {
             if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
             {
-                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name == weaponName);
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
 
             // Retrieve the ActionClip based on the actionStateName
