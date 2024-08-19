@@ -99,10 +99,9 @@ namespace Vi.Core
             {
                 // Equip weapon here
                 CharacterReference.WeaponOption weaponOption = mob.GetWeaponOption();
-                weaponOption.weapon = Instantiate(mob.GetWeaponOption().weapon);
                 PrimaryWeaponOption = weaponOption;
                 SecondaryWeaponOption = weaponOption;
-                combatAgent.WeaponHandler.SetNewWeapon(weaponOption.weapon, weaponOption.animationController);
+                combatAgent.WeaponHandler.SetNewWeapon(Instantiate(weaponOption.weapon), weaponOption.animationController);
             }
             else
             {

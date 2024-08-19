@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: HitReactions
+  m_EditorClassIdentifier: 
+  m_GroupName: HitReactions
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 0b1b98aff6fd8244682e45e7ee769e44
+  m_SerializeEntries:
+  - m_GUID: 9dc8643244347494dadf539f987fd495
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionLeft.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5e4f61032e6e9d54380f051fd2315a83
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionStagger.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c0ec34330d54bfe428a47a06f0641b36
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockupLeft.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 107e27049db271f4fb9e47f250223348
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockupStart.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 360bbc05b0e12e440809e3dfe88cdb61
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionFront.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 788768a60d1b40e48945404237a0978e
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockupRight.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1789c1d6050919045b4fd84c10954a42
+    m_Address: Assets/Production/Actions/HitReactions/GrabReaction.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b896f757d35339a408512cb7b113cc8c
+    m_Address: Assets/Production/Actions/HitReactions/Death.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 49ece318b9e7d4747adcf8bd4b4595f4
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionRight.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: cb61798929dd974468c2eae5d29522bf
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockupBack.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 05b1171e4538c0e43b5db798c2e1911d
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionBack.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5ea22a3e631747f40b1d6a2cbe07247e
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionBlockFront.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a114819f2c0ea204fbef7303261d6fba
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockdown.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: eda370bfd1557fa43a556f1efcbad27c
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionKnockupFront.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 19b2b3ef7f2225645a1c7d2cb4fb8da3
+    m_Address: Assets/Production/Actions/HitReactions/HitReactionStun.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 3b5f114add410bf4b967a989320147cd, type: 2}
+    - {fileID: 11400000, guid: 0e756512bc69a3a46b6b1d325543d90d, type: 2}

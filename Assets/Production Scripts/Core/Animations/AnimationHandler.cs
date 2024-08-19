@@ -16,6 +16,7 @@ namespace Vi.Core
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
+            if (!actionClip) { Debug.LogError("Trying to play a null action clip! " + name); return; }
             if (!AreActionClipRequirementsMet(actionClip)) { return; }
 
             if (IsServer)
@@ -31,6 +32,7 @@ namespace Vi.Core
 
         public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
             try
             {
                 return combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
@@ -57,6 +59,7 @@ namespace Vi.Core
 
         public bool IsActionClipPlayingInCurrentState(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling IsActionClipPlayingInCurrentState with a null action clip! " + name); return false; }
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch)
             {
@@ -70,6 +73,7 @@ namespace Vi.Core
 
         private string GetActionClipAnimationStateName(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling GetActionClipAnimationStateName with a null action clip! " + name); return ""; }
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
@@ -79,6 +83,7 @@ namespace Vi.Core
 
         private string GetActionClipAnimationStateNameWithoutLayer(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling GetActionClipAnimationStateNameWithoutLayer with a null action clip! " + name); return ""; }
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
@@ -87,6 +92,7 @@ namespace Vi.Core
 
         public float GetActionClipNormalizedTime(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling GetActionClipNormalizedTime with a null action clip! " + name); return 0; }
             string stateName = GetActionClipAnimationStateName(actionClip);
             float normalizedTime = 0;
             if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(stateName))
@@ -104,10 +110,7 @@ namespace Vi.Core
             return normalizedTime;
         }
 
-        public bool IsAtRest()
-        {
-            return animatorReference.IsAtRest();
-        }
+        public bool IsAtRest() { return animatorReference.IsAtRest(); }
 
         public bool CanAim()
         {
@@ -545,7 +548,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name, transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
         }
@@ -553,6 +556,7 @@ namespace Vi.Core
         private Coroutine evaluateGrabAttackHitsCoroutine;
         private IEnumerator EvaluateGrabAttackHits(ActionClip grabAttackClip)
         {
+            if (!grabAttackClip) { Debug.LogError("Calling EvaluateGrabAttackHits with a null action clip! " + name); yield break; }
             if (grabAttackClip.GetClipType() != ActionClip.ClipType.GrabAttack) { Debug.LogError("AnimationHandler.EvaluateGrabAttackHits() should only be called with a grab attack action clip!"); yield break; }
 
             // Wait until grab attack is playing fully
@@ -593,6 +597,7 @@ namespace Vi.Core
 
         public bool AreActionClipRequirementsMet(ActionClip actionClip)
         {
+            if (!actionClip) { Debug.LogError("Calling AreActionClipRequirementsMet with a null action clip! " + name); return false; }
             if (ShouldApplyStaminaCost(actionClip))
             {
                 float staminaCost = GetStaminaCostOfClip(actionClip);
@@ -876,7 +881,7 @@ namespace Vi.Core
         {
             if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
             {
-                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name == weaponName);
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
 
             // Retrieve the ActionClip based on the actionStateName
@@ -920,6 +925,8 @@ namespace Vi.Core
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
                     break;

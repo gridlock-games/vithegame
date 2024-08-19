@@ -54,7 +54,11 @@ namespace Vi.Core
         public (bool, TransformData) GetSpawnOrientation(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team, int channel)
         {
             (bool findMostClearSpawnPoint, List<(int, TransformData)> possibleSpawnPoints) = GetPossibleSpawnOrientations(gameMode, team);
-            if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
+            if (possibleSpawnPoints.Count == 0)
+            {
+                Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team);
+                return default;
+            }
 
             List<(float, TransformData, int)> verifiedSpawnPoints = new List<(float, TransformData, int)>();
             List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjectsInChannel(channel);
