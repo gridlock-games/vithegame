@@ -28,7 +28,7 @@ namespace Vi.UI
         }
 
         private const float colorTransitionSpeed = 2;
-        private const float colorTransitionThreshold = 0.1f;
+        private const float colorTransitionThreshold = 0.001f;
         private readonly static Color onColor = new Color(1, 1, 1, 1);
         private readonly static Color offColor = new Color(1, 1, 1, 0);
 
@@ -60,39 +60,31 @@ namespace Vi.UI
 
             if (teamEliminationManager.IsViEssenceSpawned())
             {
-                viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
-                if (1 - viLogoImage.color.a < colorTransitionThreshold)
-                {
-                    viLogoImage.sprite = viEssenceIcon;
-                }
-
-                // If the logo is on the vi essence icon
                 if (viLogoImage.sprite == viEssenceIcon)
                 {
-                    // Transition to On Color
                     viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
                 }
-                else // Vi logo image has sprite of vi logo
+                else // Image is vi logo
                 {
-                    // Transition to the off color
                     viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
-                    // Once the alpha is less than the transition threshold, change to the vi essence icon
-                    if (viLogoImage.color.a < colorTransitionThreshold) { viLogoImage.sprite = viEssenceIcon; }
+                    if (Vector4.Distance(viLogoImage.color, offColor) < colorTransitionThreshold)
+                    {
+                        viLogoImage.sprite = viEssenceIcon;
+                    }
                 }
             }
             else // Vi Essence isn't spawned
             {
-                // If the logo is on the vi essence icon
                 if (viLogoImage.sprite == viEssenceIcon)
                 {
-                    // Transition to the off color
                     viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, offColor, Time.deltaTime * colorTransitionSpeed);
-                    // Once the alpha is less than the transition threshold, change to the original vi logo
-                    if (viLogoImage.color.a < colorTransitionThreshold) { viLogoImage.sprite = originalViLogoSprite; }
+                    if (Vector4.Distance(viLogoImage.color, offColor) < colorTransitionThreshold)
+                    {
+                        viLogoImage.sprite = originalViLogoSprite;
+                    }
                 }
-                else // Vi logo image has sprite of vi logo
+                else // Image is vi logoo
                 {
-                    // Transition to On Color
                     viLogoImage.color = Vector4.MoveTowards(viLogoImage.color, onColor, Time.deltaTime * colorTransitionSpeed);
                 }
             }

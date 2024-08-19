@@ -147,6 +147,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
 
@@ -180,6 +181,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
 
@@ -223,6 +225,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
 
@@ -266,6 +269,7 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
 
@@ -285,6 +289,19 @@ namespace Vi.Utility
 
             obj.gameObject.SetActive(false);
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
+            obj.InvokeOnReturnToPoolEvent();
+        }
+
+        public static void ReturnObjectToPool(ref PooledObject obj)
+        {
+            if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
+
+            if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
+
+            obj.gameObject.SetActive(false);
+            objectPools[obj.GetPooledObjectIndex()].Add(obj);
+            obj.InvokeOnReturnToPoolEvent();
+            obj = null;
         }
 
         public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(PooledObject vfxInstance)

@@ -33,6 +33,7 @@ namespace Vi.UI
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
 
+        private PooledObject pooledObject;
         private Canvas canvas;
         private CombatAgent combatAgent;
         private Renderer rendererToFollow;
@@ -41,12 +42,18 @@ namespace Vi.UI
 
         private void Awake()
         {
+            pooledObject = GetComponent<PooledObject>();
+            canvas = GetComponent<Canvas>();
+            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
+
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
                 statusIcon.InitializeStatusIcon(status);
                 statusIcons.Add(statusIcon);
             }
+
+            pooledObject.OnReturnToPool += OnReturnToPool;
         }
 
         private void OnEnable()
@@ -85,13 +92,15 @@ namespace Vi.UI
                     }
                 }
             }
+            RefreshStatus();
         }
 
-        private void Start()
+        private void OnReturnToPool()
         {
-            canvas = GetComponent<Canvas>();
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-            RefreshStatus();
+            team = default;
+            localWeaponHandler = null;
+            combatAgent = null;
+            rendererToFollow = null;
         }
 
         private void RefreshStatus()

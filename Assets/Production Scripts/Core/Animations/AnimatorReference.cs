@@ -65,7 +65,7 @@ namespace Vi.Core
 
                     if (wearableEquipmentInstances[wearableEquipmentOption.equipmentType].TryGetComponent(out PooledObject pooledObject))
                     {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
                     }
                     else
                     {
@@ -164,7 +164,7 @@ namespace Vi.Core
 
                 if (wearableEquipmentInstances[equipmentType].TryGetComponent(out PooledObject pooledObject))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
                 }
                 else
                 {
@@ -208,7 +208,7 @@ namespace Vi.Core
                 {
                     kvp.Value.transform.SetParent(null, true);
                     SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
                     kvp.Value.enabled = true;
                 }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())

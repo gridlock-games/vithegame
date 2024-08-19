@@ -24,6 +24,12 @@ namespace Vi.UI
             initialized = true;
         }
 
+        private void OnDisable()
+        {
+            team = default;
+            initialized = false;
+        }
+
         private void Update()
         {
             if (!initialized) { return; }

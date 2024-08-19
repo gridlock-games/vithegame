@@ -242,6 +242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2595232505713530390}
   - component: {fileID: 6812884964156896193}
+  - component: {fileID: 5964684593763777756}
   m_Layer: 5
   m_Name: TeamDividerScoreboardLine
   m_TagString: Untagged
@@ -286,3 +287,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundImage: {fileID: 7745280944738802867}
   teamText: {fileID: 7438655998034258266}
+--- !u!114 &5964684593763777756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3673125053820292120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 2
+  pooledObjectIndex: 169
+  isPrewarmObject: 1

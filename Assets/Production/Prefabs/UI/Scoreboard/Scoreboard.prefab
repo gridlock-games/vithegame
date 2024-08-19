@@ -886,6 +886,7 @@ GameObject:
   - component: {fileID: 2744231288618173055}
   - component: {fileID: 7043703696539424674}
   - component: {fileID: 2524140718317870212}
+  - component: {fileID: 2461051686954425150}
   m_Layer: 5
   m_Name: Scoreboard
   m_TagString: Untagged
@@ -1027,6 +1028,21 @@ MonoBehaviour:
     objectsToMove: []
   controlSchemeTextDefinitions: []
   controlSchemeDefinitions: []
+--- !u!114 &2461051686954425150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2744231288618173052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 1
+  pooledObjectIndex: 166
+  isPrewarmObject: 1
 --- !u!1 &2794714456179010273
 GameObject:
   m_ObjectHideFlags: 0
@@ -3288,6 +3304,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.r
       value: 0.25490198
+      objectReference: {fileID: 0}
+    - target: {fileID: 5384671740960004640, guid: ffcbec10a251f5d438b9d75cf3a194e5,
+        type: 3}
+      propertyPath: isPrewarmObject
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5994612738194008544, guid: ffcbec10a251f5d438b9d75cf3a194e5,
         type: 3}

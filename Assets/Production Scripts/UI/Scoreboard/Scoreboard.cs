@@ -34,7 +34,7 @@ namespace Vi.UI
             NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<ActionMapHandler>().CloseScoreboard();
         }
 
-        private void Start()
+        private void OnEnable()
         {
             if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
             {
@@ -69,13 +69,29 @@ namespace Vi.UI
                 Debug.LogError("Haven't implemented scoreboard UI when there are " + gameModeInfo.possibleTeams.Length + " possible teams");
                 PopulateScoreboardWith1Column();
             }
+
+            UpdateSpectatorText();
         }
 
         private void Update()
         {
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateSpectatorText(); }
+        }
+
+        private void UpdateSpectatorText()
+        {
             spectatorCountText.text = "Spectator Count: " + PlayerDataManager.Singleton.GetPlayerDataListWithSpectators().Count(item => item.team == PlayerDataManager.Team.Spectator).ToString();
         }
 
+        private void OnDisable()
+        {
+            foreach (PooledObject pooledObject in pooledChildObjects)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+        }
+
+        private List<PooledObject> pooledChildObjects = new List<PooledObject>();
         private void PopulateScoreboardWith2Columns(PlayerDataManager.Team[] teams)
         {
             singleTeamParent.SetActive(false);
@@ -87,7 +103,9 @@ namespace Vi.UI
                 int teamIndex = System.Array.IndexOf(teams, playerData.team);
                 if (teamIndex == -1) { Debug.LogError(playerData.character.name + " player data's team isn't in the possible teams list!"); continue; }
 
-                GameObject instance = Instantiate(scoreboardElementPrefabHalf.gameObject, teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabHalf.GetComponent<PooledObject>(), teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                instance.transform.localScale = Vector3.one;
+                pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
                     scoreboardElement.Initialize(playerData.id);
@@ -105,7 +123,9 @@ namespace Vi.UI
                 int teamIndex = System.Array.IndexOf(teams, playerData.team);
                 if (teamIndex == -1) { Debug.LogError(playerData.character.name + " player data's team isn't in the possible teams list!"); continue; }
 
-                GameObject instance = Instantiate(scoreboardElementPrefabHalf.gameObject, teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabHalf.GetComponent<PooledObject>(), teamIndex == 0 ? scoreboardElementParentLeft : scoreboardElementParentRight);
+                instance.transform.localScale = Vector3.one;
+                pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
                     scoreboardElement.Initialize(playerData.id);
@@ -135,7 +155,10 @@ namespace Vi.UI
                         int teamIndex = System.Array.IndexOf(teams, team);
                         if (teamIndex == -1) { Debug.LogError(team + " scoreboard team header's team isn't in the possible teams list!"); continue; }
 
-                        ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, teamIndex == 0 ? teamDividerParentLeft : teamDividerParentRight).GetComponent<ScoreboardTeamDividerElement>();
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(teamDividerScoreboardLine.GetComponent<PooledObject>(), teamIndex == 0 ? teamDividerParentLeft : teamDividerParentRight);
+                        instance.transform.localScale = Vector3.one;
+                        pooledChildObjects.Add(instance);
+                        ScoreboardTeamDividerElement dividerElement = instance.GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);
                         dividerElement.transform.SetSiblingIndex(i + dividerCounter);
                         dividerCounter++;
@@ -154,7 +177,9 @@ namespace Vi.UI
             List<ScoreboardElement> elementList = new List<ScoreboardElement>();
             foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
             {
-                GameObject instance = Instantiate(scoreboardElementPrefabFull.gameObject, scoreboardElementParentCenter);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                instance.transform.localScale = Vector3.one;
+                pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
                     scoreboardElement.Initialize(playerData.id);
@@ -169,7 +194,9 @@ namespace Vi.UI
             {
                 if (playerData.team == PlayerDataManager.Team.Spectator) { continue; }
 
-                GameObject instance = Instantiate(scoreboardElementPrefabFull.gameObject, scoreboardElementParentCenter);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(scoreboardElementPrefabFull.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                instance.transform.localScale = Vector3.one;
+                pooledChildObjects.Add(instance);
                 if (instance.TryGetComponent(out ScoreboardElement scoreboardElement))
                 {
                     scoreboardElement.Initialize(playerData.id);
@@ -196,7 +223,10 @@ namespace Vi.UI
                 {
                     if (team != PlayerDataManager.Team.Competitor & team != PlayerDataManager.Team.Peaceful)
                     {
-                        ScoreboardTeamDividerElement dividerElement = Instantiate(teamDividerScoreboardLine.gameObject, scoreboardElementParentCenter).GetComponent<ScoreboardTeamDividerElement>();
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(teamDividerScoreboardLine.GetComponent<PooledObject>(), scoreboardElementParentCenter);
+                        instance.transform.localScale = Vector3.one;
+                        pooledChildObjects.Add(instance);
+                        ScoreboardTeamDividerElement dividerElement = instance.GetComponent<ScoreboardTeamDividerElement>();
                         dividerElement.Initialize(team);
                         dividerElement.transform.SetSiblingIndex(i + dividerCounter);
                         dividerCounter++;
