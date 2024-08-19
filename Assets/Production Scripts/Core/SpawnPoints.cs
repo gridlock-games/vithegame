@@ -199,7 +199,7 @@ namespace Vi.Core
 
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
-            MobSpawnPointDefinition mobSpawnPointDefinition = System.Array.Find(mobSpawnPoints, item => item.mobPrefab == mobPrefab | item.mobPrefab.name == mobPrefab.name);
+            MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[Random.Range(0, mobSpawnPoints.Length)];
             if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
             else { return mobSpawnPointDefinition.GetRandomOrientation(); }
             return default;
@@ -208,17 +208,20 @@ namespace Vi.Core
         [System.Serializable]
         private class MobSpawnPointDefinition
         {
-            public Mob mobPrefab;
-            public Vector3[] spawnPositions = new Vector3[0];
-            public Vector3[] spawnRotations = new Vector3[0];
+            public Vector3 spawnPosition;
+            public Vector3 halfExtents;
+            public Vector3[] spawnRotations;
 
             public TransformData GetRandomOrientation()
             {
                 TransformData transformData = new TransformData();
-                if (spawnPositions.Length > 0)
-                {
-                    transformData.position = spawnPositions[Random.Range(0, spawnPositions.Length)];
-                }
+
+                Vector3 pos = new Vector3();
+                pos.x = Random.Range(spawnPosition.x-halfExtents.x, spawnPosition.x+halfExtents.x);
+                pos.y = Random.Range(spawnPosition.y - halfExtents.y, spawnPosition.y + halfExtents.y);
+                pos.z = Random.Range(spawnPosition.z - halfExtents.z, spawnPosition.z + halfExtents.z);
+                transformData.position = pos;
+
                 if (spawnRotations.Length > 0)
                 {
                     transformData.rotation = Quaternion.Euler(spawnRotations[Random.Range(0, spawnRotations.Length)]);
@@ -266,10 +269,7 @@ namespace Vi.Core
                 foreach (MobSpawnPointDefinition mobSpawnPointDefinition in mobSpawnPoints)
                 {
                     Gizmos.color = Color.red;
-                    foreach (Vector3 spawnPosition in mobSpawnPointDefinition.spawnPositions)
-                    {
-                        Gizmos.DrawSphere(spawnPosition, 2);
-                    }
+                    Gizmos.DrawWireCube(mobSpawnPointDefinition.spawnPosition, mobSpawnPointDefinition.halfExtents);
                 }
             }
             
