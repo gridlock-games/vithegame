@@ -24,7 +24,7 @@ namespace Vi.ArtificialIntelligence
             yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer);
             foreach (MobDefinition mobDefinition in mobDefinitions)
             {
-                (bool spawnPointFound, SpawnPoints.TransformData transformData) = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetSpawnOrientation(PlayerDataManager.Singleton.GetGameMode(), mobDefinition.team, PlayerDataManager.defaultChannel);
+                SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobDefinition.mobPrefab);
                 GameObject g = Instantiate(mobDefinition.mobPrefab.gameObject, transformData.position, transformData.rotation);
                 g.GetComponent<Mob>().SetTeam(mobDefinition.team);
                 g.GetComponent<NetworkObject>().Spawn(true);
