@@ -13,5 +13,7 @@ namespace Vi.Core
         public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
         public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
         public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
+
+        public abstract string GetName();
     }
 }
