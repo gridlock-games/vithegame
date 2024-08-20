@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public abstract class HittableAgent : NetworkBehaviour, IHittable
     {
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);

@@ -56,15 +56,15 @@ namespace Vi.Core
             return hitCounter;
         }
 
-        public void AddHit(CombatAgent combatAgent)
+        public void AddHit(IHittable hittable)
         {
-            if (!hitCounter.ContainsKey(combatAgent))
+            if (!hitCounter.ContainsKey(hittable))
             {
-                hitCounter.Add(combatAgent, new HitCounterData(1, Time.time));
+                hitCounter.Add(hittable, new HitCounterData(1, Time.time));
             }
             else
             {
-                hitCounter[combatAgent] = new HitCounterData(hitCounter[combatAgent].hitNumber+1, Time.time);
+                hitCounter[hittable] = new HitCounterData(hitCounter[hittable].hitNumber+1, Time.time);
             }
         }
 

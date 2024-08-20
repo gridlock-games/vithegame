@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core.Structures
 {
@@ -63,7 +64,8 @@ namespace Vi.Core.Structures
             }
         }
 
-        protected bool OnHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Metal;
+        protected bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             float HPDamage = -attack.damage;
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
@@ -77,18 +79,49 @@ namespace Vi.Core.Structures
                 }
             }
 
+            if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
+
+            RenderHit(attacker.NetworkObjectId, impactPosition, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root);
+
             AddHP(HPDamage);
             return true;
         }
 
+        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.WeaponBone weaponBone)
+        {
+            if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
+
+            //GlowRenderer.RenderHit();
+            CombatAgent attackingCombatAgent = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
+
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
+                impactPosition, Weapon.hitSoundEffectVolume);
+
+            RenderHitClientRpc(attackerNetObjId, impactPosition, weaponBone);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.WeaponBone weaponBone)
+        {
+            CombatAgent attackingCombatAgent = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
+
+            //GlowRenderer.RenderHit();
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+            AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
+                impactPosition, Weapon.hitSoundEffectVolume);
+        }
+
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
-            return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
+            return ProcessHit(true, attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
         public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
-            return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
+            return ProcessHit(false, attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
         public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
