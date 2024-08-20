@@ -8,6 +8,7 @@ using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.CombatAgents;
 using Vi.ScriptableObjects;
+using Vi.Core.Structures;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -412,6 +413,11 @@ namespace Vi.Core.GameModeManagers
                 
                 killHistory.Add(new KillHistoryElement(victim));
             }
+        }
+
+        public virtual void OnStructureKill(CombatAgent killer, Structure structure)
+        {
+
         }
 
         public PlayerScore GetMVPScore() { return MVPScore.Value; }

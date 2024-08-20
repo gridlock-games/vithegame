@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core.Structures
 {
@@ -59,6 +60,29 @@ namespace Vi.Core.Structures
             }
         }
 
+        protected float AddHPWithoutApply(float amount)
+        {
+            if (amount > 0)
+            {
+                if (HP.Value < GetMaxHP())
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > GetMaxHP())
+                {
+                    return HP.Value + amount;
+                }
+                else
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            return HP.Value;
+        }
+
         private void OnHPChanged(float prev, float current)
         {
             if (prev > 0 & Mathf.Approximately(current, 0))
@@ -91,7 +115,13 @@ namespace Vi.Core.Structures
 
             RenderHit(attacker.NetworkObjectId, impactPosition, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root);
 
+            if (AddHPWithoutApply(HPDamage) <= 0)
+            {
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnStructureKill(attacker, this); }
+            }
+
             AddHP(HPDamage);
+
             return true;
         }
 
