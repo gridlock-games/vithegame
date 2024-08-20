@@ -56,6 +56,7 @@ namespace Vi.Core.Structures
 
         private void OnHPChanged(float prev, float current)
         {
+            Debug.Log(current + " " + prev + " STRUCTURE");
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
 
@@ -85,7 +86,7 @@ namespace Vi.Core.Structures
             return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
-        public bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        public bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }

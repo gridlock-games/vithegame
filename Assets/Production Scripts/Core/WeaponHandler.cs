@@ -640,8 +640,6 @@ namespace Vi.Core
 
         private const float isAboutToAttackNormalizedTimeOffset = 0.2f;
 
-        [HideInInspector] public float lastMeleeHitTime = Mathf.NegativeInfinity;
-
         public static List<string> GetHoldToggleOptions() { return holdToggleOptions.ToList(); }
         private static readonly List<string> holdToggleOptions = new List<string>() { "HOLD", "TOGGLE" };
         public static List<string> GetAttackModeOptions() { return attackModeOptions.ToList(); }

@@ -48,13 +48,13 @@ namespace Vi.Core.VFX.Staff
                             }
                             else
                             {
-                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                     attack, networkCollider.CombatAgent.transform.position, transform.position);
                             }
                         }
                         else
                         {
-                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                     attack, networkCollider.CombatAgent.transform.position, transform.position);
                         }
                         NetworkObject.Despawn(true);

@@ -149,23 +149,15 @@ namespace Vi.Core
                 bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
                 if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
-            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                shouldDestroy = actionVFX.ShouldBlockProjectiles();
-                actionVFX.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                shouldDestroy = hittable.ShouldBlockProjectiles();
+                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }
-            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
-            {
-                shouldDestroy = true;
-                gameItem.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
-            }
-            else
+            else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
             {
                 // Dont despawn projectiles that come from the same attacker
-                if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
-                {
-                    if (otherProjectile.attacker == attacker) { return; }
-                }
+                if (otherProjectile.attacker == attacker) { return; }
             }
 
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }

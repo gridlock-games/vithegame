@@ -398,7 +398,7 @@ namespace Vi.Core
 
         protected CombatAgent lastAttackingCombatAgent;
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
-        public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
+        public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
         public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
         public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
@@ -442,7 +442,7 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter)
+        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {
             // Combination ailment logic here
             bool applyAilmentRegardless = false;

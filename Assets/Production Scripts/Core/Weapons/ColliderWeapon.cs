@@ -11,7 +11,7 @@ namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<CombatAgent> hitsOnThisPhysicsUpdate = new List<CombatAgent>();
+        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
 
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
@@ -64,26 +64,26 @@ namespace Vi.Core
                 if (bHit)
                 {
                     hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
-                    parentCombatAgent.WeaponHandler.lastMeleeHitTime = Time.time;
                 }
             }
-            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                actionVFX.ProcessMeleeHit(parentCombatAgent,
+                if ((Object)hittable == parentCombatAgent) { return; }
+                if (!CanHit(hittable)) { return; }
+
+                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
+
+                bool bHit = hittable.ProcessMeleeHit(parentCombatAgent,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     parentCombatAgent.transform.position
                 );
-            }
-            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
-            {
-                gameItem.ProcessMeleeHit(parentCombatAgent,
-                    parentCombatAgent.WeaponHandler.CurrentActionClip,
-                    this,
-                    other.ClosestPointOnBounds(transform.position),
-                    parentCombatAgent.transform.position
-                );
+
+                if (bHit)
+                {
+                    hitsOnThisPhysicsUpdate.Add(hittable);
+                }
             }
         }
 

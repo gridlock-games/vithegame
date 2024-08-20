@@ -117,17 +117,17 @@ namespace Vi.Core.VFX
             return canHit;
         }
 
-        private void ProcessHit(CombatAgent combatAgent, Vector3 impactPosition)
+        private void ProcessHit(IHittable hittable, Vector3 impactPosition)
         {
-            if (combatAgent.ProcessProjectileHit(attacker, null, hitCounter, attack, impactPosition, shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+            if (hittable.ProcessProjectileHit(attacker, null, hitCounter, attack, impactPosition, shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
             {
-                if (!hitCounter.ContainsKey(combatAgent))
+                if (!hitCounter.ContainsKey(hittable))
                 {
-                    hitCounter.Add(combatAgent, new(1, Time.time));
+                    hitCounter.Add(hittable, new(1, Time.time));
                 }
                 else
                 {
-                    hitCounter[combatAgent] = new(hitCounter[combatAgent].hitNumber + 1, Time.time);
+                    hitCounter[hittable] = new(hitCounter[hittable].hitNumber + 1, Time.time);
                 }
             }
         }
@@ -197,7 +197,7 @@ namespace Vi.Core.VFX
             }
         }
 
-        private Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>();
+        private Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<IHittable, RuntimeWeapon.HitCounterData>();
 
         protected new void OnDisable()
         {

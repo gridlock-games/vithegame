@@ -76,7 +76,7 @@ namespace Vi.Core.VFX.Axe
 
                         if (NetworkManager.Singleton.IsServer)
                         {
-                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(),
+                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                 copy, networkCollider.CombatAgent.transform.position, transform.position);
                         }
                     }
