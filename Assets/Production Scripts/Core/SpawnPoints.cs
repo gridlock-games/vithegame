@@ -197,9 +197,12 @@ namespace Vi.Core
 
         [SerializeField] private MobSpawnPointDefinition[] mobSpawnPoints = new MobSpawnPointDefinition[0];
 
+        private int mobSpawnPointIndex = -1;
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
-            MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[Random.Range(0, mobSpawnPoints.Length)];
+            mobSpawnPointIndex++;
+            if (mobSpawnPointIndex >= mobSpawnPoints.Length) { mobSpawnPointIndex = 0; }
+            MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[mobSpawnPointIndex];
             if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
             else { return mobSpawnPointDefinition.GetRandomOrientation(); }
             return default;
@@ -209,18 +212,21 @@ namespace Vi.Core
         private class MobSpawnPointDefinition
         {
             public Vector3 spawnPosition;
-            public Vector3 halfExtents;
+            public BoxCollider[] spawnAreas;
             public Vector3[] spawnRotations;
 
             public TransformData GetRandomOrientation()
             {
                 TransformData transformData = new TransformData();
 
-                Vector3 pos = new Vector3();
-                pos.x = Random.Range(spawnPosition.x-halfExtents.x, spawnPosition.x+halfExtents.x);
-                pos.y = Random.Range(spawnPosition.y - halfExtents.y, spawnPosition.y + halfExtents.y);
-                pos.z = Random.Range(spawnPosition.z - halfExtents.z, spawnPosition.z + halfExtents.z);
-                transformData.position = pos;
+                BoxCollider spawnArea = spawnAreas[Random.Range(0, spawnAreas.Length)];
+                Vector3 extents = spawnArea.size / 2f;
+                Vector3 point = new Vector3(
+                    Random.Range(-extents.x, extents.x),
+                    Random.Range(-extents.y, extents.y),
+                    Random.Range(-extents.z, extents.z)
+                );
+                transformData.position = spawnArea.transform.TransformPoint(point);
 
                 if (spawnRotations.Length > 0)
                 {
@@ -264,12 +270,6 @@ namespace Vi.Core
                         Gizmos.DrawWireSphere(spawnPosition, 2);
                         Gizmos.DrawRay(spawnPosition, spawnRotation * Vector3.forward * 5);
                     }
-                }
-
-                foreach (MobSpawnPointDefinition mobSpawnPointDefinition in mobSpawnPoints)
-                {
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawWireCube(mobSpawnPointDefinition.spawnPosition, mobSpawnPointDefinition.halfExtents);
                 }
             }
             
