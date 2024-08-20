@@ -23,6 +23,7 @@ namespace Vi.ArtificialIntelligence
         private void Start()
         {
             UpdateActivePlayersList();
+            UpdateStructureList();
             StartCoroutine(EvaluateBotLogic());
         }
 
@@ -220,6 +221,7 @@ namespace Vi.ArtificialIntelligence
         {
             base.Update();
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+            if (PlayerDataManager.Singleton.StructuresListWasUpdatedThisFrame) { UpdateStructureList(); }
             ProcessMovement();
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
