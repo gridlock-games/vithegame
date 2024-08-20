@@ -66,7 +66,7 @@ namespace Vi.UI
                 if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
                 {
                     structureHPText.text = structure.GetName() + " HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
-                    structureIntermHPImage.fillAmount = HP / maxHP;
+                    structureHPImage.fillAmount = HP / maxHP;
                 }
 
                 lastHP = HP;
