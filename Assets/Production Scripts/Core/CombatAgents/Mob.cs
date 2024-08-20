@@ -12,10 +12,7 @@ namespace Vi.Core.CombatAgents
     {
         private NetworkVariable<PlayerDataManager.Team> team = new NetworkVariable<PlayerDataManager.Team>();
 
-        public void SetTeam(PlayerDataManager.Team team)
-        {
-            this.team.Value = team;
-        }
+        public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
 
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;

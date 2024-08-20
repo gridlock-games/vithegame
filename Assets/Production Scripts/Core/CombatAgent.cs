@@ -10,7 +10,7 @@ namespace Vi.Core
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(StatusAgent))]
-    public abstract class CombatAgent : NetworkBehaviour
+    public abstract class CombatAgent : NetworkBehaviour, IHittable
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();

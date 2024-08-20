@@ -152,12 +152,12 @@ namespace Vi.Core
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
                 shouldDestroy = actionVFX.ShouldBlockProjectiles();
-                actionVFX.OnHit(attacker);
+                actionVFX.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
             {
                 shouldDestroy = true;
-                gameItem.OnHit(attacker);
+                gameItem.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }
             else
             {

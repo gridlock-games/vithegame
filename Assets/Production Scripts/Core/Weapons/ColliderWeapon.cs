@@ -69,11 +69,21 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
             {
-                actionVFX.OnHit(parentCombatAgent);
+                actionVFX.ProcessMeleeHit(parentCombatAgent,
+                    parentCombatAgent.WeaponHandler.CurrentActionClip,
+                    this,
+                    other.ClosestPointOnBounds(transform.position),
+                    parentCombatAgent.transform.position
+                );
             }
             else if (other.transform.root.TryGetComponent(out GameItem gameItem))
             {
-                gameItem.OnHit(parentCombatAgent);
+                gameItem.ProcessMeleeHit(parentCombatAgent,
+                    parentCombatAgent.WeaponHandler.CurrentActionClip,
+                    this,
+                    other.ClosestPointOnBounds(transform.position),
+                    parentCombatAgent.transform.position
+                );
             }
         }
 
