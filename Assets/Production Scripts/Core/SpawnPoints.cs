@@ -197,9 +197,12 @@ namespace Vi.Core
 
         [SerializeField] private MobSpawnPointDefinition[] mobSpawnPoints = new MobSpawnPointDefinition[0];
 
+        private int mobSpawnPointIndex = -1;
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
-            MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[Random.Range(0, mobSpawnPoints.Length)];
+            mobSpawnPointIndex++;
+            if (mobSpawnPointIndex >= mobSpawnPoints.Length) { mobSpawnPointIndex = 0; }
+            MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[mobSpawnPointIndex];
             if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
             else { return mobSpawnPointDefinition.GetRandomOrientation(); }
             return default;
