@@ -693,18 +693,17 @@ namespace Vi.UI
                     }
                 }
 
-                if (Application.isEditor)
+#if UNITY_EDITOR
+                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
                 {
-                    foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                    if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
-                        if (!serverListElementList.Find(item => item.Server._id == server._id))
-                        {
-                            ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
-                            serverListElementInstance.Initialize(this, server);
-                            serverListElementList.Add(serverListElementInstance);
-                        }
+                        ServerListElement serverListElementInstance = Instantiate(serverListElement.gameObject, serverListElementParent).GetComponent<ServerListElement>();
+                        serverListElementInstance.Initialize(this, server);
+                        serverListElementList.Add(serverListElementInstance);
                     }
                 }
+# endif
             }
 
             serverListElementList = serverListElementList.OrderBy(item => item.pingTime).ToList();
