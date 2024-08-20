@@ -33,6 +33,7 @@ namespace Vi.Core.Structures
         }
 
         public override string GetName() { return name.Replace("(Clone)", ""); }
+        public override PlayerDataManager.Team GetTeam() { return team; }
         public float GetHP() { return HP.Value; }
         public float GetMaxHP() { return maxHP; }
 
@@ -60,16 +61,20 @@ namespace Vi.Core.Structures
 
         private void OnHPChanged(float prev, float current)
         {
-            Debug.Log(current + " " + prev + " STRUCTURE");
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
-
+                foreach (Renderer r in GetComponentsInChildren<Renderer>())
+                {
+                    r.forceRenderingOff = true;
+                }
             }
         }
 
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Metal;
         protected bool ProcessHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
+
             float HPDamage = -attack.damage;
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
 

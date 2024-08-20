@@ -166,7 +166,7 @@ namespace Vi.Core
             return true;
         }
 
-        public bool CanHit(CombatAgent attacker, CombatAgent victim)
+        public bool CanHit(HittableAgent attacker, HittableAgent victim)
         {
             if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
             if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }

@@ -15,5 +15,6 @@ namespace Vi.Core
         public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
 
         public abstract string GetName();
+        public abstract PlayerDataManager.Team GetTeam();
     }
 }

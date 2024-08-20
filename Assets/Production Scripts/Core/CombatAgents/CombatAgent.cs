@@ -167,7 +167,6 @@ namespace Vi.Core
             LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
         }
 
-        public abstract PlayerDataManager.Team GetTeam();
         public abstract Color GetRelativeTeamColor();
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
 

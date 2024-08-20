@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
+using Vi.Core.Structures;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -28,7 +29,10 @@ namespace Vi.ArtificialIntelligence
         private List<CombatAgent> activePlayers = new List<CombatAgent>();
         private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
 
-        CombatAgent targetAttributes;
+        private Structure[] structures = new Structure[0];
+        private void UpdateStructureList() { structures = PlayerDataManager.Singleton.GetActiveStructures(); }
+
+        HittableAgent targetObject;
         private IEnumerator EvaluateBotLogic()
         {
             while (true)
@@ -37,18 +41,32 @@ namespace Vi.ArtificialIntelligence
                 {
                     activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
 
-                    targetAttributes = null;
+                    targetObject = null;
+                    float distanceToStructure = 100;
+                    foreach (Structure structure in structures)
+                    {
+                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
+                        targetObject = structure;
+                        distanceToStructure = Vector3.Distance(transform.position, structure.transform.position);
+                        break;
+                    }
+
                     foreach (CombatAgent player in activePlayers)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
-                        targetAttributes = player;
+
+                        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+                        if (distanceToPlayer < 11 & distanceToPlayer < distanceToStructure)
+                        {
+                            targetObject = player;
+                        }
                         break;
                     }
 
-                    if (targetAttributes)
+                    if (targetObject)
                     {
-                        SetDestination(targetAttributes.transform.position);
+                        SetDestination(targetObject.transform.position);
                     }
                     else
                     {
@@ -77,7 +95,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (targetAttributes)
+            if (targetObject)
             {
                 float dist = Vector3.Distance(Destination, transform.position);
                 if (dist < lightAttackDistance)
@@ -112,8 +130,8 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (!targetAttributes) { return; }
-            Transform target = targetAttributes.transform;
+            if (!targetObject) { return; }
+            Transform target = targetObject.transform;
             if (target)
             {
                 SetDestination(target.position);
