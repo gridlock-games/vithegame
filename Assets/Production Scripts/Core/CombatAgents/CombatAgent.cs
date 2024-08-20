@@ -10,7 +10,7 @@ namespace Vi.Core
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(StatusAgent))]
-    public abstract class CombatAgent : NetworkBehaviour, IHittable
+    public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
@@ -397,10 +397,7 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
-        public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
-        public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
-        public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
-        public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
+        
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();

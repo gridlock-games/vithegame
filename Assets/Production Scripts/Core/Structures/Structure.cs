@@ -6,7 +6,7 @@ using Vi.ScriptableObjects;
 
 namespace Vi.Core.Structures
 {
-    public class Structure : NetworkBehaviour, IHittable
+    public class Structure : HittableAgent
     {
         [SerializeField] private float maxHP = 100;
         [SerializeField] private PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
@@ -81,17 +81,17 @@ namespace Vi.Core.Structures
             return true;
         }
 
-        public bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
-        public bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             return OnHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
-        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
-        public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
+        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
     }
 }
