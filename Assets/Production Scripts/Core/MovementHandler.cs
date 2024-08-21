@@ -56,7 +56,11 @@ namespace Vi.Core
 			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
 
 			if (!IsSpawned) { return; }
-			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, 100, -1))
+			//if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+   //         {
+			//	Destination = myNavHit.position;
+			//}
+			if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
             {
 				Destination = myNavHit.position;
 			}
@@ -88,7 +92,7 @@ namespace Vi.Core
 			}
 			else
 			{
-				if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, -1))
+				if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
 				{
 					Debug.Log("Path calculation failed! Setting position..." + myNavHit.position);
                     SetOrientation(myNavHit.position, transform.rotation);
