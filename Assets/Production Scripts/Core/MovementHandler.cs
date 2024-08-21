@@ -55,6 +55,7 @@ namespace Vi.Core
 			//Vector3 targetPosition = destination;
 			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
 
+			if (!IsSpawned) { return; }
 			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, 100, -1))
             {
 				Destination = myNavHit.position;
@@ -68,6 +69,7 @@ namespace Vi.Core
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
+			if (!IsSpawned) { return false; }
 			if (NavMesh.CalculatePath(startPosition, Destination, NavMesh.AllAreas, path))
 			{
 				if (path.corners.Length > 1)
