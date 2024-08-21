@@ -19,18 +19,17 @@ namespace Vi.Core.DynamicEnvironmentElements
 
             targetScale.Value = Vector3.MoveTowards(targetScale.Value, PlayerDataManager.Singleton.GetDamageCircleMinScale(), PlayerDataManager.Singleton.GetDamageCircleShrinkSize());
 
-            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
-            {
-                r.enabled = true;
-            }
+            shouldRender.Value = true;
         }
 
         public void ResetDamageCircle()
         {
             if (!IsServer) { Debug.LogError("DamageCircle.ResetDamageCircle() should only be called on the server"); return; }
 
+            targetScale.Value = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
             transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
-            targetScale.Value = transform.localScale;
+
+            shouldRender.Value = false;
         }
 
         public bool IsPointInsideDamageCircleBounds(Vector3 point)
