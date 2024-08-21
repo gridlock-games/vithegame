@@ -315,7 +315,9 @@ namespace Vi.Core
             Green,
             Blue,
             Purple,
-            Peaceful
+            Peaceful,
+            Light,
+            Corruption
         }
 
         public static int GetGameModeMinPlayers(GameMode gameMode)
