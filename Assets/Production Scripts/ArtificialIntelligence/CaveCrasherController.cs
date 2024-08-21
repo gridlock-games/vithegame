@@ -87,11 +87,12 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private const float lightAttackDistance = 3;
+        private const float lightAttackDistance = 1;
 
         private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
 
+        private RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void EvaluteAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -99,13 +100,51 @@ namespace Vi.ArtificialIntelligence
             if (targetObject)
             {
                 float dist = Vector3.Distance(Destination, transform.position);
+                bool actionReached = false;
                 if (dist < lightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
+                    actionReached = true;
                 }
                 else if (dist < ability1Distance & dist > ability1DistanceMin)
                 {
                     weaponHandler.Ability1(true);
+                    actionReached = true;
+                }
+
+                if (!actionReached)
+                {
+                    #if UNITY_EDITOR
+                    ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                    #endif
+
+                    int rootMotionHitCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
+                        ActionClip.boxCastHalfExtents, transform.forward.normalized, rootMotionHits,
+                        transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
+                    float minDistance = 0;
+                    bool minDistanceInitialized = false;
+                    IHittable target = null;
+                    for (int i = 0; i < rootMotionHitCount; i++)
+                    {
+                        if (rootMotionHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+
+                        if (rootMotionHits[i].transform.root.TryGetComponent(out IHittable hittable))
+                        {
+                            if ((Object)hittable == combatAgent) { continue; }
+                            target = hittable;
+                        }
+
+                        minDistance = rootMotionHits[i].distance;
+                        minDistanceInitialized = true;
+                    }
+
+                    if (minDistance < lightAttackDistance & target != null)
+                    {
+                        Debug.Log(target);
+                        weaponHandler.LightAttack(true);
+                        actionReached = true;
+                    }
                 }
             }
         }
