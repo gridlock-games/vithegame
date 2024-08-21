@@ -49,25 +49,6 @@ namespace Vi.UI
             return PlayerDataManager.Singleton.GetPlayerData(playerDataId).team;
         }
 
-        private List<Vector2> childSizeDeltas = new List<Vector2>();
-        private void Awake()
-        {
-            foreach (Transform child in transform)
-            {
-                childSizeDeltas.Add(((RectTransform)child).sizeDelta);
-            }
-        }
-
-        private void OnEnable()
-        {
-            int counter = 0;
-            foreach (Transform child in transform)
-            {
-                ((RectTransform)child).sizeDelta = childSizeDeltas[counter];
-                counter++;
-            }
-        }
-
         private void OnDisable()
         {
             initialized = false;
