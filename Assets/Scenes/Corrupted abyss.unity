@@ -17632,8 +17632,16 @@ MonoBehaviour:
   gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 0000000006000000
+    teams: 01000000
+    findMostClearSpawnPoint: 1
+    spawnPositions:
+    - {x: 0, y: 12, z: 0}
+    spawnRotations:
+    - {x: 0, y: 90, z: 0}
+    spawnPriorities: 
+  - gameModes: 0000000006000000
     teams: 0200000003000000
-    findMostClearSpawnPoint: 0
+    findMostClearSpawnPoint: 1
     spawnPositions:
     - {x: 15, y: 0, z: 0}
     - {x: -15, y: 0, z: 0}
