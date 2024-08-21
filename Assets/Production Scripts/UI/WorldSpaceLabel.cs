@@ -125,7 +125,7 @@ namespace Vi.UI
             nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(combatAgent.GetTeam()) + combatAgent.GetName();
             nameDisplay.color = Color.white;
             team = combatAgent.GetTeam();
-            healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
+            healthFillImage.color = team == PlayerDataManager.Team.Competitor | team == PlayerDataManager.Team.Environment ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
         }
 
         private void RefreshRendererToFollow()
