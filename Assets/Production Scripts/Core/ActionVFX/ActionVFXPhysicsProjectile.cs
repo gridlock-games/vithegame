@@ -113,27 +113,19 @@ namespace Vi.Core.VFX
 
                 if (canHit)
                 {
-                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<CombatAgent, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
                     if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
                 }
             }
-            else if (other.transform.root.TryGetComponent(out GameInteractiveActionVFX actionVFX))
+            else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                shouldDestroy = actionVFX.ShouldBlockProjectiles();
-                actionVFX.OnHit(attacker);
+                shouldDestroy = hittable.ShouldBlockProjectiles();
+                hittable.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
-            else if (other.transform.root.TryGetComponent(out GameItem gameItem))
-            {
-                shouldDestroy = true;
-                gameItem.OnHit(attacker);
-            }
-            else
+            else if (other.transform.root.TryGetComponent(out ActionVFXPhysicsProjectile otherProjectile))
             {
                 // Dont despawn projectiles that come from the same attacker
-                if (other.transform.root.TryGetComponent(out ActionVFXPhysicsProjectile otherProjectile))
-                {
-                    if (otherProjectile.attacker == attacker) { return; }
-                }
+                if (otherProjectile.attacker == attacker) { return; }
             }
 
             if (!other.isTrigger | shouldDestroy)

@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Core.CombatAgents;
 using Unity.Netcode;
+using Vi.Core.Structures;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -107,6 +108,19 @@ namespace Vi.Core.GameModeManagers
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
+        }
+
+        public override void OnStructureKill(CombatAgent killer, Structure structure)
+        {
+            base.OnStructureKill(killer, structure);
+            PlayerDataManager.Team opposingTeam = PlayerDataManager.Team.Environment;
+            List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
+            List<int> winningPlayerIds = new List<int>();
+            foreach (Attributes attributes in opposingTeamPlayers)
+            {
+                winningPlayerIds.Add(attributes.GetPlayerDataId());
+            }
+            OnRoundEnd(winningPlayerIds.ToArray());
         }
     }
 }

@@ -8,9 +8,8 @@ using Unity.Collections;
 
 namespace Vi.Core
 {
-    [DisallowMultipleComponent]
     [RequireComponent(typeof(StatusAgent))]
-    public abstract class CombatAgent : NetworkBehaviour
+    public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
@@ -168,8 +167,6 @@ namespace Vi.Core
             LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
         }
 
-        public abstract string GetName();
-        public abstract PlayerDataManager.Team GetTeam();
         public abstract Color GetRelativeTeamColor();
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
 
@@ -397,10 +394,7 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
-        public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
-        public abstract bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1);
-        public abstract bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject);
-        public abstract bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject);
+        
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
@@ -442,7 +436,7 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<CombatAgent, RuntimeWeapon.HitCounterData> hitCounter)
+        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {
             // Combination ailment logic here
             bool applyAilmentRegardless = false;
@@ -515,7 +509,7 @@ namespace Vi.Core
         private float hitFreezeStartTime = Mathf.NegativeInfinity;
         protected void StartHitStop(CombatAgent attacker, bool isMeleeHit)
         {
-            if (!IsServer) { Debug.LogError("Attributes.StartHitStop() should only be called on the server!"); return; }
+            if (!IsServer) { Debug.LogError("CombatAgent.StartHitStop() should only be called on the server!"); return; }
 
             if (isMeleeHit)
             {
@@ -555,9 +549,9 @@ namespace Vi.Core
             hitFreezeStartTime = Time.time;
         }
 
-        protected PooledObject GetHitVFXPrefab() { return WeaponHandler.GetWeapon().hitVFXPrefab; }
+        public PooledObject GetHitVFXPrefab() { return WeaponHandler.GetWeapon().hitVFXPrefab; }
         protected PooledObject GetBlockVFXPrefab() { return WeaponHandler.GetWeapon().blockVFXPrefab; }
-        protected AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
+        public AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
         protected AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return WeaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial); }
 
         protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)

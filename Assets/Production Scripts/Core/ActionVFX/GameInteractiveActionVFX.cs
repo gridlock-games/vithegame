@@ -7,7 +7,7 @@ using Vi.Utility;
 
 namespace Vi.Core.VFX
 {
-    public class GameInteractiveActionVFX : ActionVFX
+    public class GameInteractiveActionVFX : ActionVFX, IHittable
     {
         public enum SpellType
         {
@@ -58,16 +58,31 @@ namespace Vi.Core.VFX
             }
         }
 
-        public virtual void OnHit(CombatAgent attacker)
+        protected virtual bool OnHit(CombatAgent attacker)
         {
-            if (!IsSpawned) { return; }
+            if (!IsSpawned) { return false; }
             if (shouldDestroyOnEnemyHit)
             {
                 if (PlayerDataManager.Singleton.CanHit(attacker, this.attacker))
                 {
                     NetworkObject.Despawn(true);
+                    return true;
                 }
             }
+            return false;
         }
+
+        public bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        {
+            return OnHit(attacker);
+        }
+
+        public bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        {
+            return OnHit(attacker);
+        }
+
+        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
+        public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
     }
 }

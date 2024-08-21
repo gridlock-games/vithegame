@@ -31,14 +31,14 @@ namespace Vi.Core
             }
         }
 
-        protected Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
+        protected Dictionary<IHittable, HitCounterData> hitCounter = new Dictionary<IHittable, HitCounterData>();
 
-        public Dictionary<CombatAgent, HitCounterData> GetHitCounter()
+        public Dictionary<IHittable, HitCounterData> GetHitCounter()
         {
-            Dictionary<CombatAgent, HitCounterData> hitCounter = new Dictionary<CombatAgent, HitCounterData>();
+            Dictionary<IHittable, HitCounterData> hitCounter = new Dictionary<IHittable, HitCounterData>();
             foreach (RuntimeWeapon runtimeWeapon in associatedRuntimeWeapons)
             {
-                foreach (KeyValuePair<CombatAgent, HitCounterData> kvp in runtimeWeapon.hitCounter)
+                foreach (KeyValuePair<IHittable, HitCounterData> kvp in runtimeWeapon.hitCounter)
                 {
                     if (hitCounter.ContainsKey(kvp.Key))
                     {
@@ -56,15 +56,15 @@ namespace Vi.Core
             return hitCounter;
         }
 
-        public void AddHit(CombatAgent combatAgent)
+        public void AddHit(IHittable hittable)
         {
-            if (!hitCounter.ContainsKey(combatAgent))
+            if (!hitCounter.ContainsKey(hittable))
             {
-                hitCounter.Add(combatAgent, new HitCounterData(1, Time.time));
+                hitCounter.Add(hittable, new HitCounterData(1, Time.time));
             }
             else
             {
-                hitCounter[combatAgent] = new HitCounterData(hitCounter[combatAgent].hitNumber+1, Time.time);
+                hitCounter[hittable] = new HitCounterData(hitCounter[hittable].hitNumber+1, Time.time);
             }
         }
 
@@ -73,13 +73,13 @@ namespace Vi.Core
             hitCounter.Clear();
         }
         
-        public bool CanHit(CombatAgent attributes)
+        public bool CanHit(IHittable hittable)
         {
-            Dictionary<CombatAgent, HitCounterData> hitCounter = GetHitCounter();
-            if (hitCounter.ContainsKey(attributes))
+            Dictionary<IHittable, HitCounterData> hitCounter = GetHitCounter();
+            if (hitCounter.ContainsKey(hittable))
             {
-                if (hitCounter[attributes].hitNumber >= parentCombatAgent.WeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
-                if (Time.time - hitCounter[attributes].timeOfHit < parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed)) { return false; }
+                if (hitCounter[hittable].hitNumber >= parentCombatAgent.WeaponHandler.CurrentActionClip.maxHitLimit) { return false; }
+                if (Time.time - hitCounter[hittable].timeOfHit < parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed)) { return false; }
             }
             return true;
         }

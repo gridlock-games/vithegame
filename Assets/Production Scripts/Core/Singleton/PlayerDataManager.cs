@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using Vi.Utility;
 using Newtonsoft.Json;
 using Vi.Core.CombatAgents;
+using Vi.Core.Structures;
 
 namespace Vi.Core
 {
@@ -165,7 +166,7 @@ namespace Vi.Core
             return true;
         }
 
-        public bool CanHit(CombatAgent attacker, CombatAgent victim)
+        public bool CanHit(HittableAgent attacker, HittableAgent victim)
         {
             if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
             if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }
@@ -427,6 +428,42 @@ namespace Vi.Core
             yield return null;
             LocalPlayersWasUpdatedThisFrame = false;
         }
+
+        public bool StructuresListWasUpdatedThisFrame { get; private set; } = false;
+        private List<Structure> activeStructures = new List<Structure>();
+        public void AddStructure(Structure structure)
+        {
+            activeStructures.Add(structure);
+
+            StructuresListWasUpdatedThisFrame = true;
+            if (resetStructureBoolCoroutine != null) { StopCoroutine(resetStructureBoolCoroutine); }
+            resetStructureBoolCoroutine = StartCoroutine(ResetStructuresWasUpdatedBool());
+        }
+
+        public void RemoveStructure(Structure structure)
+        {
+            if (activeStructures.Contains(structure))
+            {
+                activeStructures.Remove(structure);
+            }
+            else
+            {
+                Debug.LogError("Trying to remove a structure that isn't present in the list! " + structure);
+            }
+            
+            StructuresListWasUpdatedThisFrame = true;
+            if (resetStructureBoolCoroutine != null) { StopCoroutine(resetStructureBoolCoroutine); }
+            resetStructureBoolCoroutine = StartCoroutine(ResetStructuresWasUpdatedBool());
+        }
+
+        private Coroutine resetStructureBoolCoroutine;
+        private IEnumerator ResetStructuresWasUpdatedBool()
+        {
+            yield return null;
+            StructuresListWasUpdatedThisFrame = false;
+        }
+
+        public Structure[] GetActiveStructures() { return activeStructures.ToArray(); }
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {

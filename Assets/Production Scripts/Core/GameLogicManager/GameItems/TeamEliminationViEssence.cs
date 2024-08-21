@@ -45,10 +45,10 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public override void OnHit(CombatAgent attacker)
+        protected override bool OnHit(CombatAgent attacker)
         {
-            if (!IsServer) { Debug.LogError("TeamEliminationViEssence.OnHit() should only be called on the server!"); return; }
-            if (!IsSpawned) { return; }
+            if (!IsServer) { Debug.LogError("TeamEliminationViEssence.OnHit() should only be called on the server!"); return false; }
+            if (!IsSpawned) { return false; }
 
             List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attacker.GetTeam());
             // If the number of dead players on the attacker's team is greater than 1
@@ -57,7 +57,9 @@ namespace Vi.Core.GameModeManagers
                 damageCircle.Shrink();
                 teamEliminationManager.OnViEssenceActivation();
                 NetworkObject.Despawn(true);
+                return true;
             }
+            return false;
         }
 
         private void OnDrawGizmos()
