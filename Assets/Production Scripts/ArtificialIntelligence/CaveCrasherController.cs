@@ -87,7 +87,7 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private const float lightAttackDistance = 1;
+        private const float lightAttackDistance = 2;
 
         private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
@@ -139,9 +139,8 @@ namespace Vi.ArtificialIntelligence
                         minDistanceInitialized = true;
                     }
 
-                    if (minDistance < lightAttackDistance & target != null)
+                    if (minDistance < 1 & target != null)
                     {
-                        Debug.Log(target);
                         weaponHandler.LightAttack(true);
                         actionReached = true;
                     }
