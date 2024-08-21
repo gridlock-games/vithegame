@@ -372,7 +372,6 @@ namespace Vi.Core
             localPlayers.Add(clientId, playerObject);
             LocalPlayersWasUpdatedThisFrame = true;
 
-            UpdateIgnoreCollisionsMatrix();
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
 
@@ -383,7 +382,6 @@ namespace Vi.Core
         {
             localPlayers.Remove(clientId);
             LocalPlayersWasUpdatedThisFrame = true;
-            UpdateIgnoreCollisionsMatrix();
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
@@ -1032,27 +1030,27 @@ namespace Vi.Core
             }
         }
 
-        public void UpdateIgnoreCollisionsMatrix()
-        {
-            foreach (Attributes player in localPlayers.Values)
-            {
-                if (!player) { continue; }
+        //public void UpdateIgnoreCollisionsMatrix()
+        //{
+        //    foreach (Attributes player in localPlayers.Values)
+        //    {
+        //        if (!player) { continue; }
 
-                foreach (Attributes otherPlayer in localPlayers.Values)
-                {
-                    if (!otherPlayer) { continue; }
-                    if (otherPlayer == player) { continue; }
+        //        foreach (Attributes otherPlayer in localPlayers.Values)
+        //        {
+        //            if (!otherPlayer) { continue; }
+        //            if (otherPlayer == player) { continue; }
 
-                    foreach (Collider col in player.NetworkCollider.Colliders)
-                    {
-                        foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
-                        {
-                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
-                        }
-                    }
-                }
-            }
-        }
+        //            foreach (Collider col in player.NetworkCollider.Colliders)
+        //            {
+        //                foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
+        //                {
+        //                    Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
@@ -1132,8 +1130,6 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
-
-            UpdateIgnoreCollisionsMatrix();
 
             DataListWasUpdatedThisFrame = true;
 

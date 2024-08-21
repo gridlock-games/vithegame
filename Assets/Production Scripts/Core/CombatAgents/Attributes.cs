@@ -142,6 +142,20 @@ namespace Vi.Core.CombatAgents
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
+            {
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    foreach (Collider col in NetworkCollider.Colliders)
+                    {
+                        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
+                        {
+                            Physics.IgnoreCollision(col, otherCol, true);
+                        }
+                    }
+                }
+            }
         }
 
         public void UpdateNetworkVisiblity()
@@ -180,7 +194,6 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
-            PlayerDataManager.Singleton.UpdateIgnoreCollisionsMatrix();
         }
 
         private IEnumerator InitStats()
