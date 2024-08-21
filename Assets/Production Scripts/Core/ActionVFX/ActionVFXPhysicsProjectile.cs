@@ -119,6 +119,8 @@ namespace Vi.Core.VFX
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
+                if ((Object)hittable == attacker) { return; }
+
                 shouldDestroy = hittable.ShouldBlockProjectiles();
                 hittable.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
