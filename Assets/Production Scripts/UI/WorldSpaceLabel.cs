@@ -91,6 +91,7 @@ namespace Vi.UI
                         statusIcon.SetActive(false);
                     }
                 }
+                transform.position = combatAgent.transform.position;
             }
             RefreshStatus();
         }
