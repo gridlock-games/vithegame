@@ -31,7 +31,14 @@ namespace Vi.UI
 
         public void CloseSelf()
         {
-            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<ActionMapHandler>().CloseScoreboard();
+            if (NetworkManager.Singleton.LocalClient.PlayerObject)
+            {
+                NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<ActionMapHandler>().CloseScoreboard();
+            }
+            else
+            {
+                ObjectPoolingManager.ReturnObjectToPool(GetComponent<PooledObject>());
+            }
         }
 
         private void OnEnable()
