@@ -177,12 +177,14 @@ namespace Vi.Core
         {
             { Team.Competitor, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Red, Color.red },
-            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255) },
+            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255, 1) },
             { Team.Yellow, Color.yellow },
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
             { Team.Purple, Color.magenta },
-            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) }
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
+            { Team.Light, new Color(1, 215 / 255f, 0, 1) },
+            { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
         };
 
         public static Color GetTeamColor(Team team)
@@ -272,6 +274,8 @@ namespace Vi.Core
             {
                 case Team.Environment:
                 case Team.Peaceful:
+                case Team.Light:
+                case Team.Corruption:
                     return team.ToString();
                 case Team.Competitor:
                     return "Competitors";
