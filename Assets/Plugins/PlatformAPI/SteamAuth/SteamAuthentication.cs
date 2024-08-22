@@ -23,9 +23,9 @@ namespace jomarcentermjm.PlatformAPI
     private const string AuthorizationProcessingEndpoint = "steamauth.vi-assets.com/";
     // Start is called before the first frame update
     private const string APIURL = "http://steamauth.vi-assets.com/";
-    private static Action<bool, string, FirebaseAuth> _callback;
+    private static Action<bool, string, FirebaseUser> _callback;
 
-    public static void Auth(Action<bool, string, FirebaseAuth> callback)
+    public static void Auth(Action<bool, string, FirebaseUser> callback)
     {
       _callback = callback;
       if (!SteamAPI.Init())
@@ -76,7 +76,7 @@ namespace jomarcentermjm.PlatformAPI
 
       void SignInWithFirebaseToken(string customToken)
       {
-        Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
 
         auth.SignInWithCustomTokenAsync(customToken).ContinueWith(task => {
           if (task.IsFaulted)
@@ -85,7 +85,9 @@ namespace jomarcentermjm.PlatformAPI
           }
           else if (task.IsCompleted)
           {
-            _callback(true, null ,auth);
+            FirebaseUser newUser = task.Result.User;
+            _callback(true, null , newUser);
+            
             //Send to MainMenu UI
             //Firebase.Auth.FirebaseUser newUser = task.Result;
             //Debug.Log("User signed in successfully: " + newUser.UserId);

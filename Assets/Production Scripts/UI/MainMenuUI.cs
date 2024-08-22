@@ -273,22 +273,10 @@ namespace Vi.UI
       openDialogue("Steam");
     }
 
-    private IEnumerator WaitForSteamAuth(string customToken)
-    {
-      Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+    //private IEnumerator WaitForSteamAuth(string customToken)
+    //{
 
-      auth.SignInWithCustomTokenAsync(customToken).ContinueWith(task => {
-        if (task.IsFaulted)
-        {
-          Debug.LogError("Firebase sign-in failed: " + task.Exception);
-        }
-        else if (task.IsCompleted)
-        {
-          Firebase.Auth.FirebaseUser newUser = task.Result;
-          Debug.Log("User signed in successfully: " + newUser.UserId);
-        }
-      });
-    }
+    //}
 
       public void OpenCreateAccount()
         {
