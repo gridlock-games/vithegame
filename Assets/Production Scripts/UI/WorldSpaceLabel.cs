@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using UnityEngine.SceneManagement;
 using Vi.Core.CombatAgents;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -126,7 +127,15 @@ namespace Vi.UI
             nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(combatAgent.GetTeam()) + combatAgent.GetName();
             nameDisplay.color = Color.white;
             team = combatAgent.GetTeam();
-            healthFillImage.color = team == PlayerDataManager.Team.Competitor | team == PlayerDataManager.Team.Environment ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
+
+            if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Contains(team))
+            {
+                healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
+            }
+            else
+            {
+                healthFillImage.color = PlayerDataManager.GetTeamColor(team);
+            }
         }
 
         private void RefreshRendererToFollow()
