@@ -674,8 +674,8 @@ namespace Vi.UI
             leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
             rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
 
-            leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(rightTeamParent.transformParent));
-            rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "");
+            leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
+            rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             string dataString = "";
