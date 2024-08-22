@@ -47,29 +47,33 @@ namespace Vi.UI
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
-        private CombatAgent attributes;
+        private CombatAgent combatAgent;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
-        public void Initialize(CombatAgent attributes)
+        private static readonly Color hpFillImageDefaultColor = new Color(241 / 255f, 87 / 255f, 67 / 255f, 1);
+
+        public void Initialize(CombatAgent combatAgent, bool useTeamColor = false)
         {
-            if ((attributes == this.attributes) & (attributes != null)) { return; }
-            this.attributes = attributes;
+            if ((combatAgent == this.combatAgent) & (combatAgent != null)) { return; }
+            this.combatAgent = combatAgent;
             if (!canvas) { canvas = GetComponent<Canvas>(); }
-            canvas.enabled = attributes != null;
+            canvas.enabled = combatAgent != null;
 
             if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
-            if (attributes) { StartCoroutine(SetNameText()); }
+            if (combatAgent) { StartCoroutine(SetNameText()); }
+
+            if (combatAgent) { healthFillImage.color = useTeamColor ? PlayerDataManager.GetTeamColor(combatAgent.GetTeam()) : hpFillImageDefaultColor; }
         }
 
         private Coroutine setNameTextCoroutine;
 
         private IEnumerator SetNameText()
         {
-            if (attributes is Attributes attr)
+            if (combatAgent is Attributes attr)
             {
                 yield return new WaitUntil(() => PlayerDataManager.Singleton.ContainsId(attr.GetPlayerDataId()));
             }
-            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(attributes.GetTeam()) + attributes.GetName();
+            nameDisplay.text = PlayerDataManager.Singleton.GetTeamPrefix(combatAgent.GetTeam()) + combatAgent.GetName();
         }
 
         private bool IsMainCard()
@@ -183,15 +187,15 @@ namespace Vi.UI
 
         private void Update()
         {
-            if (!attributes) { canvas.enabled = false; return; }
+            if (!combatAgent) { canvas.enabled = false; return; }
 
-            float HP = attributes.GetHP();
+            float HP = combatAgent.GetHP();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
-            float rage = attributes.GetRage();
+            float rage = combatAgent.GetRage();
 
-            float maxHP = attributes.GetMaxHP();
-            float maxRage = attributes.GetMaxRage();
+            float maxHP = combatAgent.GetMaxHP();
+            float maxRage = combatAgent.GetMaxRage();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
@@ -212,13 +216,13 @@ namespace Vi.UI
 
             if (!staminaAndSpiritAreDisabled)
             {
-                float stamina = attributes.GetStamina();
+                float stamina = combatAgent.GetStamina();
                 if (stamina < 0.1f & stamina > 0) { stamina = 0.1f; }
-                float spirit = attributes.GetSpirit();
+                float spirit = combatAgent.GetSpirit();
                 if (spirit < 0.1f & spirit > 0) { spirit = 0.1f; }
 
-                float maxStamina = attributes.GetMaxStamina();
-                float maxSpirit = attributes.GetMaxSpirit();
+                float maxStamina = combatAgent.GetMaxStamina();
+                float maxSpirit = combatAgent.GetMaxSpirit();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
@@ -249,9 +253,9 @@ namespace Vi.UI
 
             if (!playerUI)
             {
-                if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
+                if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
                 {
-                    List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
+                    List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
                     foreach (StatusIcon statusIcon in statusIcons)
                     {
                         if (activeStatuses.Contains(statusIcon.Status))
@@ -269,7 +273,7 @@ namespace Vi.UI
 
             if (!IsMainCard())
             {
-                Color colorTarget = attributes.GetAilment() == ActionClip.Ailment.Death ? deathTintColor : aliveTintColor;
+                Color colorTarget = combatAgent.GetAilment() == ActionClip.Ailment.Death ? deathTintColor : aliveTintColor;
                 if (colorTarget != lastColorTarget)
                 {
                     foreach (Material material in tintMaterialInstances)
@@ -281,11 +285,11 @@ namespace Vi.UI
             }
 
             RageStatus currentRageStatus;
-            if (attributes.IsRaging())
+            if (combatAgent.IsRaging())
             {
                 currentRageStatus = RageStatus.IsRaging;
             }
-            else if (attributes.CanActivateRage())
+            else if (combatAgent.CanActivateRage())
             {
                 currentRageStatus = RageStatus.CanActivateRage;
             }
