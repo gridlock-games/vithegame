@@ -676,6 +676,10 @@ namespace Vi.Core.GameModeManagers
         public bool WaitingToPlayGame() { return nextGameActionTimer.Value > 0; }
 
         private List<int> respawnsCalledByRoundCount = new List<int>();
+
+        protected string roundAboutToStartPrefix = "Round ";
+        protected string roundAboutToStartSuffix = " is About to Start ";
+
         private void OnNextGameActionTimerChange(float prev, float current)
         {
             if (!gameOver.Value & GetRoundCount() > 0)
@@ -735,7 +739,7 @@ namespace Vi.Core.GameModeManagers
                                 Debug.LogError("Unsure how to handle respawn type " + respawnType);
                                 break;
                         }
-                        roundResultMessage.Value = "Round " + (GetRoundCount() + 1).ToString() + " is About to Start ";
+                        roundResultMessage.Value = roundAboutToStartPrefix + (GetRoundCount() + 1).ToString() + roundAboutToStartSuffix;
                     }
                 }
             }

@@ -177,12 +177,14 @@ namespace Vi.Core
         {
             { Team.Competitor, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Red, Color.red },
-            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255) },
+            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255, 1) },
             { Team.Yellow, Color.yellow },
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
             { Team.Purple, Color.magenta },
-            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) }
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
+            { Team.Light, new Color(1, 215 / 255f, 0, 1) },
+            { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
         };
 
         public static Color GetTeamColor(Team team)
@@ -272,6 +274,8 @@ namespace Vi.Core
             {
                 case Team.Environment:
                 case Team.Peaceful:
+                case Team.Light:
+                case Team.Corruption:
                     return team.ToString();
                 case Team.Competitor:
                     return "Competitors";
@@ -315,7 +319,9 @@ namespace Vi.Core
             Green,
             Blue,
             Purple,
-            Peaceful
+            Peaceful,
+            Light,
+            Corruption
         }
 
         public static int GetGameModeMinPlayers(GameMode gameMode)
@@ -372,7 +378,6 @@ namespace Vi.Core
             localPlayers.Add(clientId, playerObject);
             LocalPlayersWasUpdatedThisFrame = true;
 
-            UpdateIgnoreCollisionsMatrix();
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
 
@@ -383,7 +388,6 @@ namespace Vi.Core
         {
             localPlayers.Remove(clientId);
             LocalPlayersWasUpdatedThisFrame = true;
-            UpdateIgnoreCollisionsMatrix();
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
             resetLocalPlayerBoolCoroutine = StartCoroutine(ResetLocalPlayersWasUpdatedBool());
@@ -1032,27 +1036,27 @@ namespace Vi.Core
             }
         }
 
-        public void UpdateIgnoreCollisionsMatrix()
-        {
-            foreach (Attributes player in localPlayers.Values)
-            {
-                if (!player) { continue; }
+        //public void UpdateIgnoreCollisionsMatrix()
+        //{
+        //    foreach (Attributes player in localPlayers.Values)
+        //    {
+        //        if (!player) { continue; }
 
-                foreach (Attributes otherPlayer in localPlayers.Values)
-                {
-                    if (!otherPlayer) { continue; }
-                    if (otherPlayer == player) { continue; }
+        //        foreach (Attributes otherPlayer in localPlayers.Values)
+        //        {
+        //            if (!otherPlayer) { continue; }
+        //            if (otherPlayer == player) { continue; }
 
-                    foreach (Collider col in player.NetworkCollider.Colliders)
-                    {
-                        foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
-                        {
-                            Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
-                        }
-                    }
-                }
-            }
-        }
+        //            foreach (Collider col in player.NetworkCollider.Colliders)
+        //            {
+        //                foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
+        //                {
+        //                    Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
@@ -1132,8 +1136,6 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Full:
                     break;
             }
-
-            UpdateIgnoreCollisionsMatrix();
 
             DataListWasUpdatedThisFrame = true;
 

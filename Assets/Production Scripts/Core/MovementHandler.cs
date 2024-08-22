@@ -54,11 +54,26 @@ namespace Vi.Core
         {
 			//Vector3 targetPosition = destination;
 			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
-			Destination = destination;
+
+			if (!IsSpawned) { return; }
+			//if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+   //         {
+			//	Destination = myNavHit.position;
+			//}
+			if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+            {
+				Destination = myNavHit.position;
+			}
+			else
+            {
+				Debug.Log("Destination point is not on nav mesh!");
+				Destination = destination;
+			}
         }
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
+			if (!IsSpawned) { return false; }
 			if (NavMesh.CalculatePath(startPosition, Destination, NavMesh.AllAreas, path))
 			{
 				if (path.corners.Length > 1)
@@ -77,12 +92,17 @@ namespace Vi.Core
 			}
 			else
 			{
+				if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+				{
+					//Debug.Log("Path calculation failed! Setting position..." + myNavHit.position);
+                    SetOrientation(myNavHit.position, transform.rotation);
+                }
 				NextPosition = Destination;
 				return false;
 			}
 		}
 
-		protected void OnDrawGizmosSelected()
+		protected void OnDrawGizmos()
 		{
 			Gizmos.color = Color.magenta;
 			if (!Application.isPlaying) { return; }

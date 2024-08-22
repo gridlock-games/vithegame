@@ -142,6 +142,20 @@ namespace Vi.Core.CombatAgents
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+
+            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
+            {
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    foreach (Collider col in NetworkCollider.Colliders)
+                    {
+                        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
+                        {
+                            Physics.IgnoreCollision(col, otherCol, true);
+                        }
+                    }
+                }
+            }
         }
 
         public void UpdateNetworkVisiblity()
@@ -180,7 +194,6 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
-            PlayerDataManager.Singleton.UpdateIgnoreCollisionsMatrix();
         }
 
         private IEnumerator InitStats()
@@ -866,7 +879,24 @@ namespace Vi.Core.CombatAgents
         }
 
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
-        public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
+        public float GetRespawnTimeAsPercentage()
+        {
+            if (GetRespawnTime() <= 5)
+            {
+                if (GameModeManager.Singleton.GetRespawnTime() <= 5)
+                {
+                    return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime());
+                }
+                else
+                {
+                    return 1 - (GetRespawnTime() / 5);
+                }
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
         public bool IsRespawning { get; private set; }
         [HideInInspector] public bool isWaitingForSpawnPoint;

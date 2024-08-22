@@ -18,12 +18,15 @@ namespace Vi.Core.GameModeManagers
             public Mob[] mobPrefabs;
         }
 
-        private readonly PlayerDataManager.Team mobTeam = PlayerDataManager.Team.Environment;
+        private readonly PlayerDataManager.Team mobTeam = PlayerDataManager.Team.Corruption;
 
         private new void Awake()
         {
             base.Awake();
             numberOfRoundsWinsToWinGame = waves.Length;
+
+            roundAboutToStartPrefix = "Wave ";
+            roundAboutToStartSuffix = " Incoming. ";
         }
 
         public override void OnNetworkSpawn()
@@ -96,7 +99,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
-            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Red ? PlayerDataManager.Team.Environment : PlayerDataManager.Team.Red;
+            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Light ? PlayerDataManager.Team.Corruption : PlayerDataManager.Team.Light;
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
             {
@@ -113,7 +116,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnStructureKill(CombatAgent killer, Structure structure)
         {
             base.OnStructureKill(killer, structure);
-            PlayerDataManager.Team opposingTeam = PlayerDataManager.Team.Environment;
+            PlayerDataManager.Team opposingTeam = PlayerDataManager.Team.Corruption;
             List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
             List<int> winningPlayerIds = new List<int>();
             foreach (Attributes attributes in opposingTeamPlayers)

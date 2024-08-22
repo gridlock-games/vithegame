@@ -42,5 +42,43 @@ namespace Vi.Utility
         {
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
+
+        private List<Vector2> childSizeDeltas = new List<Vector2>();
+        private Vector2 offsetMax;
+        private Vector2 offsetMin;
+        private void Awake()
+        {
+            if (transform is RectTransform rectTransform)
+            {
+                offsetMax = rectTransform.offsetMax;
+                offsetMin = rectTransform.offsetMin;
+
+                foreach (Transform child in transform)
+                {
+                    childSizeDeltas.Add(((RectTransform)child).sizeDelta);
+                }
+                OnSpawnFromPool += ResetSizes;
+            }
+        }
+
+        private void ResetSizes()
+        {
+            if (transform is RectTransform rectTransform)
+            {
+                rectTransform.offsetMax = offsetMax;
+                rectTransform.offsetMin = offsetMin;
+
+                int counter = 0;
+                foreach (Transform child in transform)
+                {
+                    ((RectTransform)child).sizeDelta = childSizeDeltas[counter];
+                    counter++;
+                }
+            }
+            else
+            {
+                Debug.LogError("Calling PooledObject.ResetSizes() on a transform that isn't a rect transform!");
+            }
+        }
     }
 }

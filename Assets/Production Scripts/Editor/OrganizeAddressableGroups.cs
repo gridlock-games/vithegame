@@ -30,16 +30,23 @@ namespace Vi.Editor
             foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
             {
                 string[] directories = entry.AssetPath.Split('/');
-                AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == directories[^2]);
+                string targetGroupName = "";
+                for (int i = 0; i < directories.Length-1; i++)
+                {
+                    targetGroupName += directories[i] + " ";
+                }
+                targetGroupName.Trim();
 
-                if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + directories[^2],
+                AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == targetGroupName);
+
+                if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + targetGroupName,
                         (entryIndex + 1).ToString() + " out of " + groupToOrganize.entries.Count.ToString() + " assets " + entry.TargetAsset.name,
                         entryIndex / groupToOrganize.entries.Count))
                 { break; }
 
                 if (!groupToModify)
                 {
-                    groupToModify = settings.CreateGroup(directories[^2], false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
+                    groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
                 }
                 settings.MoveEntry(entry, groupToModify);
             }

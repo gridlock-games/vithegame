@@ -70,12 +70,12 @@ namespace Vi.UI
 
             foreach (PlayerCard playerCard in leftPlayerCards)
             {
-                playerCard.Initialize(null);
+                playerCard.Initialize(null, true);
             }
 
             foreach (PlayerCard playerCard in rightPlayerCards)
             {
-                playerCard.Initialize(null);
+                playerCard.Initialize(null, true);
             }
 
             if (gameModeInfo.possibleTeams.Length == 1)
@@ -87,7 +87,7 @@ namespace Vi.UI
                     {
                         if (i / 2 < leftPlayerCards.Length)
                         {
-                            leftPlayerCards[i / 2].Initialize(attributesList[i]);
+                            leftPlayerCards[i / 2].Initialize(attributesList[i], true);
                             initializedAttributesList.Add(attributesList[i]);
                         }
                     }
@@ -95,7 +95,7 @@ namespace Vi.UI
                     {
                         if (i / 2 < rightPlayerCards.Length)
                         {
-                            rightPlayerCards[i / 2].Initialize(attributesList[i]);
+                            rightPlayerCards[i / 2].Initialize(attributesList[i], true);
                             initializedAttributesList.Add(attributesList[i]);
                         }
                     }
@@ -112,7 +112,7 @@ namespace Vi.UI
                         {
                             if (i < leftPlayerCards.Length)
                             {
-                                leftPlayerCards[i].Initialize(attributesList[i]);
+                                leftPlayerCards[i].Initialize(attributesList[i], true);
                                 initializedAttributesList.Add(attributesList[i]);
                             }
                         }
@@ -120,7 +120,7 @@ namespace Vi.UI
                         {
                             if (i < rightPlayerCards.Length)
                             {
-                                rightPlayerCards[i].Initialize(attributesList[i]);
+                                rightPlayerCards[i].Initialize(attributesList[i], true);
                                 initializedAttributesList.Add(attributesList[i]);
                             }
                         }

@@ -89,6 +89,7 @@ namespace Vi.UI
             {
                 ObjectPoolingManager.ReturnObjectToPool(pooledObject);
             }
+            pooledChildObjects.Clear();
         }
 
         private List<PooledObject> pooledChildObjects = new List<PooledObject>();

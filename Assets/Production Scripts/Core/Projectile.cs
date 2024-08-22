@@ -151,6 +151,7 @@ namespace Vi.Core
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
+                if ((Object)hittable == attacker) { return; }
                 shouldDestroy = hittable.ShouldBlockProjectiles();
                 hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }

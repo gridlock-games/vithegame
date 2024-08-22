@@ -37,7 +37,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnEnvironmentKill(victim);
 
-            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Red ? PlayerDataManager.Team.Blue : PlayerDataManager.Team.Red;
+            PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Light ? PlayerDataManager.Team.Corruption : PlayerDataManager.Team.Light;
             List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
             {
@@ -137,8 +137,8 @@ namespace Vi.Core.GameModeManagers
 
         private bool CanSpawnViEssenceGameLogicCondition()
         {
-            List<Attributes> redTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
-            List<Attributes> blueTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
+            List<Attributes> redTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+            List<Attributes> blueTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
 
             return (redTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1 & blueTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1)
                 | (redTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count > 1 & blueTeam.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 1);
@@ -219,13 +219,21 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Red) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> lightTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+                if (lightTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + GetPlayerScore(lightTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": 0";
+                }
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
+                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
                     if (redTeamPlayers.Count > 0)
                     {
                         return "Your Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
@@ -235,9 +243,9 @@ namespace Vi.Core.GameModeManagers
                         return "Your Team: 0";
                     }
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
+                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
                     if (blueTeamPlayers.Count > 0)
                     {
                         return "Your Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
@@ -257,27 +265,27 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerDataManager.Team GetLeftScoreTeam()
         {
-            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Red; }
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Light; }
 
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Team.Red;
+                return PlayerDataManager.Team.Light;
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    return PlayerDataManager.Team.Red;
+                    return PlayerDataManager.Team.Light;
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    return PlayerDataManager.Team.Blue;
+                    return PlayerDataManager.Team.Corruption;
                 }
                 else
                 {
                     Debug.LogError("Not sure how to handle team " + localTeam);
-                    return PlayerDataManager.Team.Red;
+                    return PlayerDataManager.Team.Light;
                 }
             }
         }
@@ -289,13 +297,21 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Blue) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> corruptionTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
+                if (corruptionTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + GetPlayerScore(corruptionTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": 0";
+                }
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue);
+                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
                     if (blueTeamPlayers.Count > 0)
                     {
                         return "Enemy Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
@@ -305,9 +321,9 @@ namespace Vi.Core.GameModeManagers
                         return "Enemy Team: 0";
                     }
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red);
+                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
                     if (redTeamPlayers.Count > 0)
                     {
                         return "Enemy Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
@@ -327,27 +343,27 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerDataManager.Team GetRightScoreTeam()
         {
-            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Blue; }
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Corruption; }
 
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Team.Blue;
+                return PlayerDataManager.Team.Corruption;
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    return PlayerDataManager.Team.Blue;
+                    return PlayerDataManager.Team.Corruption;
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    return PlayerDataManager.Team.Red;
+                    return PlayerDataManager.Team.Light;
                 }
                 else
                 {
                     Debug.LogError("Not sure how to handle team " + localTeam);
-                    return PlayerDataManager.Team.Blue;
+                    return PlayerDataManager.Team.Corruption;
                 }
             }
         }

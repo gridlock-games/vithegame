@@ -1051,6 +1051,7 @@ namespace Vi.Core
         CombatAgent combatAgent;
         private void Awake()
         {
+            lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
             combatAgent = GetComponent<CombatAgent>();
 
             if (TryGetComponent(out Animator animator))
