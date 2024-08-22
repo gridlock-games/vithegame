@@ -557,14 +557,16 @@ namespace Vi.UI
                     killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
                 }
 
-                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F0") : "";
-
+                bool isGameOver = false;
                 bool alreadyFading = false;
                 bool gameModeManagerShouldFadeToBlack = false;
                 if (GameModeManager.Singleton)
                 {
                     gameModeManagerShouldFadeToBlack = GameModeManager.Singleton.ShouldFadeToBlack();
+                    isGameOver = GameModeManager.Singleton.IsGameOver();
                 }
+
+                respawnTimerText.text = attributes.IsRespawning & !isGameOver ? "Respawning in " + attributes.GetRespawnTime().ToString("F0") : "";
 
                 if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
                 {
@@ -573,7 +575,7 @@ namespace Vi.UI
                     alreadyFading = true;
                 }
 
-                if (attributes.IsRespawning)
+                if (attributes.IsRespawning & !isGameOver)
                 {
                     if (!alreadyFading)
                     {

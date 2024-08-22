@@ -913,7 +913,7 @@ namespace Vi.Core.CombatAgents
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            if (IsServer)
+            if (IsServer & !GameModeManager.Singleton.IsGameOver())
             {
                 yield return PlayerDataManager.Singleton.RespawnPlayer(this);
             }
