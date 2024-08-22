@@ -543,12 +543,12 @@ namespace Vi.UI
             else
             {
                 NetworkObject killerNetObj = attributes.GetKiller();
-                Attributes killerAttributes = null;
-                if (killerNetObj) { killerAttributes = killerNetObj.GetComponent<Attributes>(); }
+                CombatAgent killerCombatAgent = null;
+                if (killerNetObj) { killerCombatAgent = killerNetObj.GetComponent<CombatAgent>(); }
 
-                if (killerAttributes)
+                if (killerCombatAgent)
                 {
-                    killerCard.Initialize(killerAttributes);
+                    killerCard.Initialize(killerCombatAgent);
                     killedByText.text = "Killed by";
                 }
                 else
