@@ -24,6 +24,9 @@ namespace Vi.Core.GameModeManagers
         {
             base.Awake();
             numberOfRoundsWinsToWinGame = waves.Length;
+
+            roundAboutToStartPrefix = "Wave ";
+            roundAboutToStartSuffix = " Incoming. ";
         }
 
         public override void OnNetworkSpawn()
