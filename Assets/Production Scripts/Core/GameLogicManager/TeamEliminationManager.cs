@@ -219,7 +219,15 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> lightTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+                if (lightTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + GetPlayerScore(lightTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": 0";
+                }
             }
             else
             {
@@ -289,7 +297,15 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> corruptionTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
+                if (corruptionTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + GetPlayerScore(corruptionTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": 0";
+                }
             }
             else
             {
