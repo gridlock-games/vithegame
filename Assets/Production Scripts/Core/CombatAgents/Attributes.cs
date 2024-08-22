@@ -873,7 +873,11 @@ namespace Vi.Core.CombatAgents
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
+                if (respawnCoroutine != null)
+                {
+                    IsRespawning = false;
+                    StopCoroutine(respawnCoroutine);
+                }
                 AnimationHandler.Animator.enabled = true;
             }
         }
