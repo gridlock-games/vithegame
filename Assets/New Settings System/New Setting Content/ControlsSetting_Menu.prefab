@@ -85,6 +85,24 @@ MonoBehaviour:
     - {fileID: 7397707028696809740, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
+  - overrideActionName: Reload
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Block
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Dodge
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -3073957792324674350, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
   - overrideActionName: Ability 1
     actionGroup: 1
     inputActionReferences:
@@ -121,64 +139,10 @@ MonoBehaviour:
     - {fileID: -5435891241600975454, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
-  - overrideActionName: 
+  - overrideActionName: Switch Weapon
     actionGroup: 1
     inputActionReferences:
-    - {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: -3073957792324674350, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 0
-    inputActionReferences:
-    - {fileID: 7500517785045450566, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 3
-    inputActionReferences:
-    - {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    - {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 3
-    inputActionReferences:
-    - {fileID: -6165872021668447691, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 0
-    inputActionReferences:
-    - {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    - {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-    - Gamepad
-  - overrideActionName: 
-    actionGroup: 3
-    inputActionReferences:
-    - {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    - {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    - {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 3
-    inputActionReferences:
-    - {fileID: -4942588444766842868, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -8441861740736939578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
   - overrideActionName: Use Primary Weapon
@@ -195,28 +159,70 @@ MonoBehaviour:
     excludedControlSchemes:
     - Gamepad
     - Touchscreen
-  - overrideActionName: Switch Weapon
-    actionGroup: 1
+  - overrideActionName: Move
+    actionGroup: 0
     inputActionReferences:
-    - {fileID: -8441861740736939578, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 7313222210157018801, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 5365613749261237800, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
-  - overrideActionName: 
+    - Gamepad
+  - overrideActionName: Interact
+    actionGroup: 0
+    inputActionReferences:
+    - {fileID: 7500517785045450566, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Inventory
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5010067017688946583, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: 8225736777724624955, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Pause
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -5963996712888178221, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7211278920651480426, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -5186865438714708761, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Scoreboard
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -4942588444766842868, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Ascend
     actionGroup: 2
     inputActionReferences:
     - {fileID: 5304234536181186105, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Descend
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2555118930296445826, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Increase Move Speed
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+  - overrideActionName: Follow Next Player
+    actionGroup: 2
+    inputActionReferences:
+    - {fileID: -9119437012531945337, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
   - overrideActionName: Follow Previous Player
     actionGroup: 2
     inputActionReferences:
     - {fileID: -7939484115188895425, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: 
-    actionGroup: 2
-    inputActionReferences:
-    - {fileID: 2555118930296445826, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
   - overrideActionName: Environment View Toggle
@@ -295,18 +301,6 @@ MonoBehaviour:
     excludedControlSchemes:
     - Touchscreen
     - Gamepad
-  - overrideActionName: Follow Next Player
-    actionGroup: 2
-    inputActionReferences:
-    - {fileID: -9119437012531945337, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
-  - overrideActionName: Increase Move Speed
-    actionGroup: 2
-    inputActionReferences:
-    - {fileID: 2374337403819867002, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
 --- !u!1 &1061705503343636783
 GameObject:
   m_ObjectHideFlags: 0
