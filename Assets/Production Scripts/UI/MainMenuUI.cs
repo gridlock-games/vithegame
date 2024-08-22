@@ -145,7 +145,7 @@ namespace Vi.UI
 
             Debug.Log(serverConfig);
 
-            string serverIP = null;
+      string serverIP = null;
             if (File.Exists(serverConfig))
             {
                 string[] lines = File.ReadAllLines(serverConfig);
@@ -268,10 +268,29 @@ namespace Vi.UI
 
         public void LoginWithSteam()
         {
-            initialErrorText.text = "Login with Steam has not been implemented yet";
-        }
+      Debug.Log("Logging in with Steam");
+      dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.steam);
+      openDialogue("Steam");
+    }
 
-        public void OpenCreateAccount()
+    private IEnumerator WaitForSteamAuth(string customToken)
+    {
+      Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+
+      auth.SignInWithCustomTokenAsync(customToken).ContinueWith(task => {
+        if (task.IsFaulted)
+        {
+          Debug.LogError("Firebase sign-in failed: " + task.Exception);
+        }
+        else if (task.IsCompleted)
+        {
+          Firebase.Auth.FirebaseUser newUser = task.Result;
+          Debug.Log("User signed in successfully: " + newUser.UserId);
+        }
+      });
+    }
+
+      public void OpenCreateAccount()
         {
             usernameInput.text = "";
             passwordInput.text = "";
@@ -578,7 +597,9 @@ namespace Vi.UI
             initialErrorText.text = "Apple sign in not implemented yet";
         }
 
-        public void Logout()
+
+
+    public void Logout()
         {
             WebRequestManager.Singleton.Logout();
             initialParent.SetActive(true);
