@@ -557,7 +557,7 @@ namespace Vi.UI
                     killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
                 }
 
-                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F4") : "";
+                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F0") : "";
 
                 bool alreadyFading = false;
                 bool gameModeManagerShouldFadeToBlack = false;

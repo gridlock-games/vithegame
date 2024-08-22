@@ -879,7 +879,24 @@ namespace Vi.Core.CombatAgents
         }
 
         public float GetRespawnTime() { return Mathf.Clamp(GameModeManager.Singleton.GetRespawnTime() - (Time.time - respawnSelfCalledTime), 0, GameModeManager.Singleton.GetRespawnTime()); }
-        public float GetRespawnTimeAsPercentage() { return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime()); }
+        public float GetRespawnTimeAsPercentage()
+        {
+            if (GetRespawnTime() <= 5)
+            {
+                if (GameModeManager.Singleton.GetRespawnTime() <= 5)
+                {
+                    return 1 - (GetRespawnTime() / GameModeManager.Singleton.GetRespawnTime());
+                }
+                else
+                {
+                    return 1 - (GetRespawnTime() / 5);
+                }
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
         public bool IsRespawning { get; private set; }
         [HideInInspector] public bool isWaitingForSpawnPoint;
