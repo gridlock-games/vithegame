@@ -71,16 +71,20 @@ namespace Vi.UI
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
             if (!playerInput) { playerInput = FindObjectOfType<PlayerInput>(); }
+
+            originalSizeDelta = rebindingElementParent.sizeDelta;
         }
 
         private const float elementSpacing = 100;
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
+        private Vector2 originalSizeDelta;
         private void RegenerateInputBindingMenu()
         {
             foreach (GameObject g in rebindingElementObjects)
             {
                 Destroy(g);
             }
+            rebindingElementParent.sizeDelta = originalSizeDelta;
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 

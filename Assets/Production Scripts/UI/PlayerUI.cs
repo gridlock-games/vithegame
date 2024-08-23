@@ -543,12 +543,12 @@ namespace Vi.UI
             else
             {
                 NetworkObject killerNetObj = attributes.GetKiller();
-                Attributes killerAttributes = null;
-                if (killerNetObj) { killerAttributes = killerNetObj.GetComponent<Attributes>(); }
+                CombatAgent killerCombatAgent = null;
+                if (killerNetObj) { killerCombatAgent = killerNetObj.GetComponent<CombatAgent>(); }
 
-                if (killerAttributes)
+                if (killerCombatAgent)
                 {
-                    killerCard.Initialize(killerAttributes);
+                    killerCard.Initialize(killerCombatAgent);
                     killedByText.text = "Killed by";
                 }
                 else
@@ -557,14 +557,16 @@ namespace Vi.UI
                     killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
                 }
 
-                respawnTimerText.text = attributes.IsRespawning ? "Respawning in " + attributes.GetRespawnTime().ToString("F0") : "";
-
+                bool isGameOver = false;
                 bool alreadyFading = false;
                 bool gameModeManagerShouldFadeToBlack = false;
                 if (GameModeManager.Singleton)
                 {
                     gameModeManagerShouldFadeToBlack = GameModeManager.Singleton.ShouldFadeToBlack();
+                    isGameOver = GameModeManager.Singleton.IsGameOver();
                 }
+
+                respawnTimerText.text = attributes.IsRespawning & !isGameOver ? "Respawning in " + attributes.GetRespawnTime().ToString("F0") : "";
 
                 if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
                 {
@@ -573,7 +575,7 @@ namespace Vi.UI
                     alreadyFading = true;
                 }
 
-                if (attributes.IsRespawning)
+                if (attributes.IsRespawning & !isGameOver)
                 {
                     if (!alreadyFading)
                     {

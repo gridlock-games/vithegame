@@ -410,21 +410,23 @@ namespace Vi.ArtificialIntelligence
 
             if (targetAttributes)
             {
+                if (weaponHandler.CanADS)
+                {
+                    weaponHandler.AimDownSights(true);
+                }
+
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
                 {
-                    if (weaponHandler.CanADS) { weaponHandler.HeavyAttack(true); }
-                    else { weaponHandler.HeavyAttack(false); }
-
                     weaponHandler.LightAttack(true);
 
                     EvaluateAbility();
                 }
                 else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                 {
-                    if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
-
-                    if (weaponHandler.CanADS) { weaponHandler.LightAttack(true); }
-                    else { weaponHandler.LightAttack(false); }
+                    if (!weaponHandler.CanADS)
+                    {
+                        if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
+                    }
 
                     EvaluateAbility();
                 }

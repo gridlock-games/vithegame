@@ -47,7 +47,7 @@ namespace Vi.Core
 
 		private NavMeshPath path;
 		protected Vector3 NextPosition { get; private set; }
-		protected const float stoppingDistance = 2;
+		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get; private set; }
 
 		protected void SetDestination(Vector3 destination)

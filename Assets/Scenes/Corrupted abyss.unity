@@ -17628,7 +17628,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environmentViewPoints: []
+  environmentViewPoints:
+  - position: {x: 27.54, y: 8.55, z: -22.95}
+    rotation: {x: 0.082256064, y: 0.16567303, z: -0.013868275, w: 0.98264647}
+  - position: {x: -27.54, y: 8.55, z: 22.95}
+    rotation: {x: -0.013868274, y: 0.98264647, z: -0.082256064, w: -0.16567302}
+  - position: {x: 8.44, y: 9.65, z: 15.89}
+    rotation: {x: 0.044216614, y: -0.9544672, z: 0.18138388, w: 0.23267397}
   gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 0000000006000000
