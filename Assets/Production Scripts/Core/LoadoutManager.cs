@@ -76,8 +76,6 @@ namespace Vi.Core
         private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
         private InputAction switchWeaponAction;
-        private InputAction weapon1Action;
-        private InputAction weapon2Action;
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
@@ -91,8 +89,6 @@ namespace Vi.Core
             if (TryGetComponent(out PlayerInput playerInput))
             {
                 switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
-                weapon1Action = playerInput.actions.FindAction("Weapon1");
-                weapon2Action = playerInput.actions.FindAction("Weapon2");
             }
         }
 
