@@ -178,12 +178,12 @@
                 },
                 {
                     "name": "SwitchWeapon",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "4f0eea53-c759-4370-b316-0751f15be24e",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "ActivateRage",
@@ -719,7 +719,7 @@
                 {
                     "name": "",
                     "id": "b329af0f-f74b-4adb-9ea0-a806fbd2281d",
-                    "path": "<Mouse>/middleButton",
+                    "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",

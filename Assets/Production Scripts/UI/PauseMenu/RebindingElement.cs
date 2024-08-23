@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -118,9 +119,56 @@ namespace Vi.UI
             if (playerUI) { playerUI.OnRebinding(); }
         }
 
+        public void FilterCandidates()
+        {
+            if (rebindingOperation.scores.Count == 0) { return; }
+
+            float maxScore = rebindingOperation.scores.Max();
+            List<InputControl> candidatesToRemove = new List<InputControl>();
+            List<InputControl> candidatesThatHaveMaxScore = new List<InputControl>();
+            for (int i = 0; i < rebindingOperation.scores.Count; i++)
+            {
+                if (rebindingOperation.scores[i] == maxScore)
+                {
+                    candidatesThatHaveMaxScore.Add(rebindingOperation.candidates[i]);
+                }
+                else
+                {
+                    candidatesToRemove.Add(rebindingOperation.candidates[i]);
+                }
+            }
+
+            int minChildren = candidatesThatHaveMaxScore.Min(item => item.children.Count);
+            foreach (InputControl candidate in candidatesThatHaveMaxScore)
+            {
+                if (candidate.children.Count != minChildren)
+                {
+                    candidatesToRemove.Add(candidate);
+                }
+            }
+
+            foreach (InputControl candidate in candidatesToRemove)
+            {
+                rebindingOperation.RemoveCandidate(candidate);
+            }
+        }
+
+        public void CancelRebinding()
+        {
+            rebindingOperation.Dispose();
+            button.interactable = true;
+
+            Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+        }
+
         private void Awake()
         {
             button = GetComponentInChildren<Button>();
+        }
+
+        private void OnDestroy()
+        {
+            if (rebindingOperation != null) { rebindingOperation.Dispose(); }
         }
 
         private void StartRebind()
@@ -128,8 +176,11 @@ namespace Vi.UI
             SetIsRebinding();
 
             rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
+                .OnPotentialMatch((operation) => FilterCandidates())
                 .OnComplete(operation => SetFinishedRebinding())
-                .OnCancel(operation => SetFinishedRebinding())
+                .WithCancelingThrough("<Keyboard>/escape")
+                .OnCancel(operation => CancelRebinding())
+                .WithTimeout(10)
                 .Start();
         }
     }

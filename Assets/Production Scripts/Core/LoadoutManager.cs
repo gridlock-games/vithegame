@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
-using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.CombatAgents;
+using UnityEngine.InputSystem;
 
 namespace Vi.Core
 {
@@ -75,6 +75,9 @@ namespace Vi.Core
 
         private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
+        private InputAction switchWeaponAction;
+        private InputAction weapon1Action;
+        private InputAction weapon2Action;
         private void Awake()
         {
             animationHandler = GetComponent<AnimationHandler>();
@@ -83,6 +86,13 @@ namespace Vi.Core
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
             {
                 equippedEquipment.Add(equipmentType, null);
+            }
+
+            if (TryGetComponent(out PlayerInput playerInput))
+            {
+                switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
+                weapon1Action = playerInput.actions.FindAction("Weapon1");
+                weapon2Action = playerInput.actions.FindAction("Weapon2");
             }
         }
 
@@ -312,9 +322,22 @@ namespace Vi.Core
             }
         }
 
-        void OnSwitchWeapon()
+        void OnSwitchWeapon(InputValue value)
         {
-            SwitchWeapon();
+            System.Type valueType = switchWeaponAction.activeControl.valueType;
+            if (valueType == typeof(float))
+            {
+                if (value.isPressed) { SwitchWeapon(); }
+            }
+            else if (valueType == typeof(Vector2))
+            {
+                if (value.Get<Vector2>() != Vector2.zero) { SwitchWeapon(); }
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle value type! " + valueType);
+                SwitchWeapon();
+            }
         }
 
         public void SwitchWeapon()
