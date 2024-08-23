@@ -327,7 +327,7 @@ namespace Vi.Core
             System.Type valueType = switchWeaponAction.activeControl.valueType;
             if (valueType == typeof(float))
             {
-                if (value.isPressed) { SwitchWeapon(); }
+                if (!Mathf.Approximately(0, value.Get<float>())) { SwitchWeapon(); }
             }
             else if (valueType == typeof(Vector2))
             {
