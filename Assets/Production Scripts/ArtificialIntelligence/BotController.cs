@@ -302,7 +302,7 @@ namespace Vi.ArtificialIntelligence
 
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                SetDestination(currentPosition.Value);
+                SetDestination(currentPosition.Value, true);
             }
             else
             {
@@ -341,13 +341,13 @@ namespace Vi.ArtificialIntelligence
 
                     if (disableBots)
                     {
-                        SetDestination(currentPosition.Value);
+                        SetDestination(currentPosition.Value, true);
                     }
                     else
                     {
                         if (targetAttributes)
                         {
-                            SetDestination(targetAttributes.transform.position);
+                            SetDestination(targetAttributes.transform.position, true);
                         }
                         else
                         {
@@ -357,7 +357,7 @@ namespace Vi.ArtificialIntelligence
                                 Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
                                 randomDirection += transform.position;
                                 NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                                SetDestination(hit.position);
+                                SetDestination(hit.position, true);
                             }
                         }
                         EvaluteAction();
@@ -365,7 +365,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else if (disableBots)
                 {
-                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value); }
+                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
                 }
 
                 yield return new WaitForSeconds(0.1f);
@@ -390,6 +390,7 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
+            return;
             if (canOnlyLightAttack)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)

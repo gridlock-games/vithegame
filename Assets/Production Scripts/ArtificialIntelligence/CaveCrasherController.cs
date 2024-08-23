@@ -67,7 +67,7 @@ namespace Vi.ArtificialIntelligence
 
                     if (targetObject)
                     {
-                        SetDestination(targetObject.transform.position);
+                        SetDestination(targetObject.transform.position, false);
                     }
                     else
                     {
@@ -77,7 +77,7 @@ namespace Vi.ArtificialIntelligence
                             Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
                             randomDirection += transform.position;
                             NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            SetDestination(hit.position);
+                            SetDestination(hit.position, false);
                         }
                     }
                     EvaluteAction();
@@ -177,7 +177,7 @@ namespace Vi.ArtificialIntelligence
             Transform target = targetObject.transform;
             if (target)
             {
-                SetDestination(target.position);
+                SetDestination(target.position, false);
                 CalculatePath(transform.position, NavMesh.AllAreas);
             }
 
