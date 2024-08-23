@@ -164,7 +164,7 @@ namespace Vi.Core
             }
 		}
 
-		protected void OnDrawGizmos()
+		protected void OnDrawGizmosSelected()
 		{
 			if (!Application.isPlaying) { return; }
 

@@ -223,7 +223,7 @@ namespace Vi.Player
             {
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount() : 0;
+                targetDirection *= isGrounded ? GetRunSpeed() : 0;
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
@@ -493,6 +493,11 @@ namespace Vi.Player
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
         }
 
+        private float GetRunSpeed()
+        {
+            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
+        }
+
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];
         private void UpdateLocomotion()
@@ -504,14 +509,14 @@ namespace Vi.Player
             }
             else
             {
-                Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (movementPrediction.CurrentPosition - transform.position);
+                Vector3 newPosition = Vector3.MoveTowards(transform.position, movementPrediction.CurrentPosition, Time.deltaTime * GetRunSpeed());
 
                 if (attributes.ShouldShake())
                 {
-                    movement += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
+                    newPosition += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
                 }
 
-                transform.position += movement;
+                transform.position = newPosition;
             }
 
             if (weaponHandler.CurrentActionClip != null)
@@ -676,12 +681,21 @@ namespace Vi.Player
             }
         }
 
-        //private void OnDrawGizmos()
-        //{
-        //    if (!Application.isPlaying) { return; }
-        //    Gizmos.color = Color.green;
-        //    Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
-        //}
+        private void OnDrawGizmos()
+        {
+            if (!Application.isPlaying) { return; }
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(movementPrediction.CurrentPosition, 0.3f);
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawSphere(Vector3.MoveTowards(transform.position, movementPrediction.CurrentPosition, Time.deltaTime), 0.3f);
+
+            //UnityEditor.Handles.Label(movementPrediction.CurrentPosition + Vector3.up * 2, i + " | " + angle.ToString("F1"));
+
+            //Gizmos.color = Color.green;
+            //Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
+        }
     }
 }
 
