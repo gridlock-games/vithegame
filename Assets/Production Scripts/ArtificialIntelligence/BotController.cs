@@ -390,7 +390,6 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluteAction()
         {
-            return;
             if (canOnlyLightAttack)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)

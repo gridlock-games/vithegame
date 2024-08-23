@@ -100,7 +100,8 @@ namespace Vi.Core
 				{
 					// If there is a point in the path that has an angle of 0, use that as our next position
 					Vector3 prevCorner = startPosition;
-					List<int> indexesToConsider = new List<int>();
+					bool overrideIndexFound = false;
+					int overrideIndex = 0;
 					for (int i = 0; i < Mathf.Min(path.corners.Length, 3); i++)
 					{
 						Vector3 corner = path.corners[i];
@@ -116,16 +117,17 @@ namespace Vi.Core
 						{
 							if (Mathf.Abs(startPosition.y - corner.y) > nextPositionDistanceThreshold)
                             {
-								indexesToConsider.Add(i);
+								overrideIndexFound = true;
+								overrideIndex = i;
 							}
 						}
 
 						prevCorner = corner;
 					}
 
-					if (indexesToConsider.Count > 0)
+					if (overrideIndexFound)
 					{
-						NextPosition = path.corners[indexesToConsider.Max()];
+						NextPosition = path.corners[overrideIndex];
 						return true;
 					}
 
