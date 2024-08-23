@@ -40,18 +40,21 @@ namespace Vi.Core
 
         private void OnCollisionEnter(Collision collision)
         {
+            if (!MovementHandler) { return; }
             if (collision.transform.root == transform.root) { return; }
             MovementHandler.ReceiveOnCollisionEnterMessage(collision);
         }
 
         private void OnCollisionStay(Collision collision)
         {
+            if (!MovementHandler) { return; }
             if (collision.transform.root == transform.root) { return; }
             MovementHandler.ReceiveOnCollisionStayMessage(collision);
         }
 
         private void OnCollisionExit(Collision collision)
         {
+            if (!MovementHandler) { return; }
             if (collision.transform.root == transform.root) { return; }
             MovementHandler.ReceiveOnCollisionExitMessage(collision);
         }

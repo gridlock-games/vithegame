@@ -375,7 +375,7 @@ namespace Vi.ArtificialIntelligence
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 0.5f;
+        private const float chargeAttackDuration = 1;
         private const float chargeWaitDuration = 2;
         private float lastChargeAttackTime;
 
@@ -417,9 +417,11 @@ namespace Vi.ArtificialIntelligence
 
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
                 {
-                    weaponHandler.LightAttack(true);
-
-                    EvaluateAbility();
+                    if (!isHeavyAttacking)
+                    {
+                        weaponHandler.LightAttack(true);
+                        EvaluateAbility();
+                    }
                 }
                 else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                 {
@@ -427,7 +429,6 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
                     }
-
                     EvaluateAbility();
                 }
             }
