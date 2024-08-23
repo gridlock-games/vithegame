@@ -41,7 +41,7 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Vector3 inputDir;
-                float dist = Vector3.Distance(Destination, transform.position);
+                float dist = Vector3.Distance(new Vector3(Destination.x, transform.position.y, Destination.z), transform.position);
                 if (dist >= stoppingDistance)
                 {
                     inputDir = NextPosition - transform.position;
