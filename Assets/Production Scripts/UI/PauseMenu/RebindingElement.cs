@@ -16,6 +16,7 @@ namespace Vi.UI
         private Button button;
 
         private PlayerInput playerInput;
+        private InputAction pauseAction;
         private ControlsSettingsMenu.RebindableAction rebindableAction;
         private InputControlScheme controlScheme;
         private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
@@ -79,6 +80,7 @@ namespace Vi.UI
             this.rebindableAction = rebindableAction;
             this.controlScheme = controlScheme;
             this.bindingIndex = bindingIndex;
+            pauseAction = playerInput.actions.FindAction("Pause");
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(delegate { StartRebind(); });
@@ -175,13 +177,28 @@ namespace Vi.UI
         {
             SetIsRebinding();
 
-            rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
-                .OnPotentialMatch((operation) => FilterCandidates())
-                .OnComplete(operation => SetFinishedRebinding())
-                .WithCancelingThrough("<Keyboard>/escape")
-                .OnCancel(operation => CancelRebinding())
-                .WithTimeout(10)
-                .Start();
+            InputControl cancelControl = null;
+            if (pauseAction.controls.Count > 0) { cancelControl = pauseAction.controls[0]; }
+
+            if (cancelControl == null)
+            {
+                rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
+                    .OnPotentialMatch((operation) => FilterCandidates())
+                    .OnComplete(operation => SetFinishedRebinding())
+                    .OnCancel(operation => CancelRebinding())
+                    .WithTimeout(10)
+                    .Start();
+            }
+            else
+            {
+                rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
+                    .OnPotentialMatch((operation) => FilterCandidates())
+                    .OnComplete(operation => SetFinishedRebinding())
+                    .WithCancelingThrough(cancelControl)
+                    .OnCancel(operation => CancelRebinding())
+                    .WithTimeout(10)
+                    .Start();
+            }
         }
     }
 }
