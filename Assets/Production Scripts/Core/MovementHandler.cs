@@ -33,6 +33,18 @@ namespace Vi.Core
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
+		public virtual Vector3 GetVelocity()
+        {
+			if (TryGetComponent(out Rigidbody rb))
+            {
+				return rb.velocity;
+            }
+			else
+            {
+				return Vector3.zero;
+            }
+        }
+
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;

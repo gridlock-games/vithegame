@@ -250,8 +250,9 @@ namespace Vi.Player
                 {
                     break;
                 }
-
-                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime()); }
+#if UNITY_EDITOR
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
                 startPos.y += yOffset;
                 stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
 
@@ -307,8 +308,8 @@ namespace Vi.Player
                 }
             }
 
-            movement += forceAccumulated;
-            forceAccumulated = Vector3.zero;
+            movement += forceAccumulated * GetTickRateDeltaTime();
+            forceAccumulated = Vector3.MoveTowards(forceAccumulated, Vector3.zero, drag * GetTickRateDeltaTime());
 
             lastMovement = movement;
 
@@ -324,6 +325,8 @@ namespace Vi.Player
 
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
+
+        private const float drag = 1;
 
         public override void OnNetworkSpawn()
         {
@@ -470,11 +473,12 @@ namespace Vi.Player
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
+        public override Vector3 GetVelocity() { return forceAccumulated; }
+
         Vector3 forceAccumulated;
-        private const float forceMultiplier = 10;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += forceMultiplier * Time.fixedDeltaTime * force; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += force; }
         }
 
         private float positionStrength = 1;
