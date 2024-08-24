@@ -135,7 +135,7 @@ namespace Vi.Player
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
                 LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
@@ -159,7 +159,7 @@ namespace Vi.Player
             }
             else // If no sphere cast hit
             {
-                if (Physics.Raycast(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset,
+                if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
                     Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
@@ -190,12 +190,12 @@ namespace Vi.Player
                     movement = rootMotion;
 
                     # if UNITY_EDITOR
-                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
                     # endif
 
                     int rootMotionHitCount = Physics.BoxCastNonAlloc(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset,
-                        ActionClip.boxCastHalfExtents, (movementPrediction.CurrentRotation * Vector3.forward).normalized, rootMotionHits,
-                        movementPrediction.CurrentRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+                        ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
+                        newRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
                     
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
 
@@ -207,7 +207,7 @@ namespace Vi.Player
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
                                 angleList.Add((networkCollider,
-                                    Mathf.Abs(targetRot.eulerAngles.y - movementPrediction.CurrentRotation.eulerAngles.y),
+                                    Mathf.Abs(targetRot.eulerAngles.y - newRotation.eulerAngles.y),
                                     rootMotionHits[i]));
                             }
                         }
