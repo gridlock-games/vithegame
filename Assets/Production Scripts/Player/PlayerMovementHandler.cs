@@ -517,6 +517,14 @@ namespace Vi.Player
             return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
+        private void LateUpdate()
+        {
+            Vector3 camDirection = cameraController.GetCamDirection();
+            camDirection.Scale(HORIZONTAL_PLANE);
+
+            transform.rotation = Quaternion.LookRotation(camDirection);
+        }
+
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];
         private void UpdateLocomotion()
@@ -580,12 +588,39 @@ namespace Vi.Player
                 }
             }
 
-            if (attributes.ShouldApplyAilmentRotation())
-                transform.rotation = attributes.GetAilmentRotation();
-            else if (weaponHandler.IsAiming())
-                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-            else
-                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
+            //Vector3 camDirection = cameraController.GetCamDirection();
+            //camDirection.Scale(HORIZONTAL_PLANE);
+
+            //transform.rotation = Quaternion.LookRotation(camDirection);
+
+            //if (IsOwner)
+            //{
+            //    Vector3 camDirection = cameraController.GetCamDirection();
+            //    camDirection.Scale(HORIZONTAL_PLANE);
+
+            //    if (attributes.ShouldApplyAilmentRotation())
+            //        transform.rotation = attributes.GetAilmentRotation();
+            //    else if (attributes.AnimationHandler.IsGrabAttacking())
+            //        transform.rotation = movementPrediction.CurrentRotation;
+            //    else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+            //        transform.rotation = Quaternion.LookRotation(camDirection);
+            //    else if (!attributes.ShouldPlayHitStop())
+            //        transform.rotation = Quaternion.LookRotation(camDirection);
+            //}
+
+            //if (attributes.ShouldApplyAilmentRotation())
+            //    transform.rotation = attributes.GetAilmentRotation();
+            //else if (weaponHandler.IsAiming())
+            //    transform.rotation = movementPrediction.CurrentRotation;
+            //else
+            //    transform.rotation = movementPrediction.CurrentRotation;
+
+            //if (attributes.ShouldApplyAilmentRotation())
+            //    transform.rotation = attributes.GetAilmentRotation();
+            //else if (weaponHandler.IsAiming())
+            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
+            //else
+            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
 
             if (autoAim)
             {

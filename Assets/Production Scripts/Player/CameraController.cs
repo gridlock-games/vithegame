@@ -85,7 +85,7 @@ namespace Vi.Player
             transform.position = CameraPositionClone.transform.position;
             transform.rotation = CameraPositionClone.transform.rotation;
 
-            LateUpdate();
+            Update();
         }
 
         private void OnDestroy()
@@ -107,7 +107,7 @@ namespace Vi.Player
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
 
         private float followCamAngleOffset;
-        private void LateUpdate()
+        private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
