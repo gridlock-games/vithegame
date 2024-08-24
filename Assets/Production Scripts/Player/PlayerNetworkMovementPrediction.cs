@@ -51,17 +51,18 @@ namespace Vi.Player
             CurrentPosition = newPosition;
             overridePosition = newPosition;
             applyOverridePosition = true;
+
+            overrideRotation.Value = newRotation;
+            applyOverrideRotation.Value = true;
             SetRotationClientRpc(newRotation);
         }
 
-        private bool applyOverrideRotation;
-        private Quaternion overrideRotation;
+        private NetworkVariable<bool> applyOverrideRotation = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+        private NetworkVariable<Quaternion> overrideRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
         [Rpc(SendTo.Owner)]
         private void SetRotationClientRpc(Quaternion newRotation)
         {
             movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
-            overrideRotation = newRotation;
-            applyOverrideRotation = true;
         }
 
         public float playerObjectTeleportThreshold = 2;
@@ -84,6 +85,7 @@ namespace Vi.Player
         {
             CurrentPosition = transform.position;
             CurrentRotation = transform.rotation;
+            if (NetworkManager.Singleton.IsServer) { overrideRotation.Value = transform.rotation; }
         }
 
         private void Start()
@@ -98,6 +100,7 @@ namespace Vi.Player
         {
             if (IsServer)
             {
+                overrideRotation.Value = transform.rotation;
                 latestServerState.Value = new StatePayload(0, CurrentPosition, CurrentRotation);
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             }
@@ -105,7 +108,6 @@ namespace Vi.Player
             {
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
             }
-
             CurrentPosition = transform.position;
             CurrentRotation = transform.rotation;
         }
@@ -232,13 +234,33 @@ namespace Vi.Player
             }
         }
 
+        private bool removeRotationServerRpcSent;
+        [Rpc(SendTo.Server)] private void RemoveRotationOverrideRpc() { applyOverrideRotation.Value = false; }
+
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
             if (applyOverridePosition) { movementHandler.SetPredictionRigidbodyPosition(overridePosition); statePayload.position = overridePosition; applyOverridePosition = false; }
-            if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
             
+            if (IsServer)
+            {
+                if (applyOverrideRotation.Value) { statePayload.rotation = overrideRotation.Value; }
+            }
+
+            if (IsOwner)
+            {
+                if (applyOverrideRotation.Value)
+                {
+                    statePayload.rotation = overrideRotation.Value;
+                    if (!removeRotationServerRpcSent) { RemoveRotationOverrideRpc(); }
+                    removeRotationServerRpcSent = true;
+                }
+                else
+                {
+                    removeRotationServerRpcSent = false;
+                }
+            }
             return statePayload;
         }
 
