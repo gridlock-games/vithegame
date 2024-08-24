@@ -623,7 +623,15 @@ namespace Vi.Player
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
-                transform.rotation = Quaternion.LookRotation(camDirection);
+
+                if (attributes.ShouldApplyAilmentRotation())
+                    transform.rotation = attributes.GetAilmentRotation();
+                else if (attributes.AnimationHandler.IsGrabAttacking())
+                    transform.rotation = movementPrediction.CurrentRotation;
+                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+                    transform.rotation = Quaternion.LookRotation(camDirection);
+                else if (!attributes.ShouldPlayHitStop())
+                    transform.rotation = Quaternion.LookRotation(camDirection);
             }
             else
             {
