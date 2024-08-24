@@ -164,6 +164,7 @@ namespace Vi.Core
             }
 		}
 
+#if UNITY_EDITOR
 		protected void OnDrawGizmosSelected()
 		{
 			if (!Application.isPlaying) { return; }
@@ -195,6 +196,7 @@ namespace Vi.Core
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(Destination, 0.3f);
         }
+#endif
 
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;

@@ -80,6 +80,11 @@ namespace Vi.Player
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
+        private float GetTickRateDeltaTime()
+        {
+            return 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale;
+        }
+
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
@@ -137,7 +142,7 @@ namespace Vi.Player
             {
                 if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 bHit = true;
-                amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
+                amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
                 minDistance = allGravityHits[i].distance;
                 minDistanceInitialized = true;
             }
@@ -157,7 +162,7 @@ namespace Vi.Player
                 else
                 {
                     isGrounded = false;
-                    gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity;
+                    gravity += GetTickRateDeltaTime() * Physics.gravity;
                 }
             }
 
@@ -180,7 +185,7 @@ namespace Vi.Player
                     movement = rootMotion;
 
                     # if UNITY_EDITOR
-                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
+                    ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, movementPrediction.CurrentRotation * Vector3.forward, movementPrediction.CurrentRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
                     # endif
 
                     int rootMotionHitCount = Physics.BoxCastNonAlloc(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset,
@@ -224,7 +229,7 @@ namespace Vi.Player
                 Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded ? GetRunSpeed() : 0;
-                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
@@ -241,7 +246,7 @@ namespace Vi.Player
                     break;
                 }
 
-                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
+                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime()); }
                 startPos.y += yOffset;
                 stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
 
@@ -509,7 +514,13 @@ namespace Vi.Player
             }
             else
             {
-                Vector3 newPosition = Vector3.MoveTowards(transform.position, movementPrediction.CurrentPosition, Time.deltaTime * GetRunSpeed());
+                Vector3 newPosition;
+                Vector2 horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
+                    new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
+                    Time.deltaTime * GetRunSpeed());
+                newPosition.x = horizontalPosition.x;
+                newPosition.z = horizontalPosition.y;
+                newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y);
 
                 if (attributes.ShouldShake())
                 {
@@ -690,11 +701,6 @@ namespace Vi.Player
 
             Gizmos.color = Color.white;
             Gizmos.DrawSphere(Vector3.MoveTowards(transform.position, movementPrediction.CurrentPosition, Time.deltaTime), 0.3f);
-
-            //UnityEditor.Handles.Label(movementPrediction.CurrentPosition + Vector3.up * 2, i + " | " + angle.ToString("F1"));
-
-            //Gizmos.color = Color.green;
-            //Gizmos.DrawWireSphere(movementPrediction.CurrentPosition + movementPrediction.CurrentRotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
         }
     }
 }
