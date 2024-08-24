@@ -164,8 +164,7 @@ namespace Vi.Core
             }
 		}
 
-#if UNITY_EDITOR
-		protected void OnDrawGizmosSelected()
+		protected virtual void OnDrawGizmosSelected()
 		{
 			if (!Application.isPlaying) { return; }
 
@@ -186,8 +185,9 @@ namespace Vi.Core
 				Gizmos.DrawSphere(corner, 0.25f);
 				Gizmos.DrawLine(prevCorner, corner);
 				Gizmos.color = Color.black;
+#if UNITY_EDITOR
 				UnityEditor.Handles.Label(corner + Vector3.up * 2, i + " | " + angle.ToString("F1"));
-
+#endif
 				prevCorner = corner;
 			}
             Gizmos.color = Color.white;
@@ -196,7 +196,6 @@ namespace Vi.Core
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(Destination, 0.3f);
         }
-#endif
 
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;

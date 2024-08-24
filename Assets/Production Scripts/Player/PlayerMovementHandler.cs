@@ -85,6 +85,11 @@ namespace Vi.Player
             return 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale;
         }
 
+        private float GetRootMotionSpeed()
+        {
+            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
+        }
+
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
@@ -168,7 +173,7 @@ namespace Vi.Player
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -503,6 +508,11 @@ namespace Vi.Player
             return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
         }
 
+        private float GetAnimatorSpeed()
+        {
+            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+        }
+
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];
         private void UpdateLocomotion()
@@ -515,9 +525,19 @@ namespace Vi.Player
             else
             {
                 Vector3 newPosition;
-                Vector2 horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
-                    new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                    Time.deltaTime * GetRunSpeed());
+                Vector2 horizontalPosition;
+                if (attributes.AnimationHandler.ShouldApplyRootMotion())
+                {
+                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
+                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed());
+                }
+                else
+                {
+                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
+                        Time.deltaTime * GetRunSpeed());
+                }
                 newPosition.x = horizontalPosition.x;
                 newPosition.z = horizontalPosition.y;
                 newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y);
@@ -551,7 +571,7 @@ namespace Vi.Player
                     }
                     else
                     {
-                        attributes.AnimationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                        attributes.AnimationHandler.Animator.speed = GetAnimatorSpeed();
                     }
                 }
             }
@@ -692,7 +712,7 @@ namespace Vi.Player
             }
         }
 
-        private void OnDrawGizmos()
+        protected override void OnDrawGizmosSelected()
         {
             if (!Application.isPlaying) { return; }
 
