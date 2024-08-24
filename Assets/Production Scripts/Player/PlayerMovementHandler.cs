@@ -231,7 +231,7 @@ namespace Vi.Player
             }
             else
             {
-                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.moveInput.x, 0, inputPayload.moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded ? GetRunSpeed() : 0;
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;

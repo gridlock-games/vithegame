@@ -11,13 +11,13 @@ namespace Vi.Player
         public struct InputPayload
         {
             public int tick;
-            public Vector2 inputVector;
+            public Vector2 moveInput;
             public Quaternion rotation;
 
-            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
             {
                 this.tick = tick;
-                this.inputVector = inputVector;
+                this.moveInput = moveInput;
                 this.rotation = rotation;
             }
         }
@@ -120,7 +120,7 @@ namespace Vi.Player
 
         private void HandleServerTick()
         {
-            inputQueue.Enqueue(new InputPayload(currentOwnerTick.Value, inputVector.Value, inputRotation.Value));
+            inputQueue.Enqueue(new InputPayload(currentOwnerTick.Value, moveInput.Value, inputRotation.Value));
 
             int bufferIndex = ProcessInputQueue();
 
@@ -133,7 +133,7 @@ namespace Vi.Player
         }
 
         private NetworkVariable<int> currentOwnerTick = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<Vector2> inputVector = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector2> moveInput = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Quaternion> inputRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void HandleClientTick()
@@ -148,7 +148,7 @@ namespace Vi.Player
                 }
 
                 currentOwnerTick.Value = currentTick;
-                inputVector.Value = movementHandler.GetMoveInput();
+                moveInput.Value = movementHandler.GetMoveInput();
                 inputRotation.Value = transform.rotation;
 
                 InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
