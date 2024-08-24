@@ -199,12 +199,20 @@ namespace Vi.Core
 
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
+		protected InputAction moveAction;
+		protected InputAction lookAction;
+
         protected void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
 			RefreshStatus();
+			if (playerInput)
+            {
+				moveAction = playerInput.actions.FindAction("Move");
+				lookAction = playerInput.actions.FindAction("Look");
+            }
         }
 
         protected void OnEnable()
@@ -232,9 +240,9 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-			if (playerInput)
+			if (lookAction != null)
             {
-				if (!playerInput.actions.FindAction("Look").enabled) { return Vector2.zero; }
+				if (!lookAction.enabled) { return Vector2.zero; }
             }
 
 			bool shouldUseZoomSensMultiplier = false;
@@ -254,9 +262,9 @@ namespace Vi.Core
 
         public Vector2 GetMoveInput()
 		{
-			if (playerInput)
+			if (moveAction != null)
 			{
-				if (!playerInput.actions.FindAction("Move").enabled) { return Vector2.zero; }
+				if (!moveAction.enabled) { return Vector2.zero; }
 			}
 			return moveInput;
 		}
