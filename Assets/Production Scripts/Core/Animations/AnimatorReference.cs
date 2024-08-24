@@ -338,6 +338,7 @@ namespace Vi.Core
 
         public bool IsAtRest()
         {
+            if (!animator) { return false; }
             if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
             {
                 return NextActionsAnimatorStateInfo.IsName("Empty");
