@@ -14,7 +14,6 @@ namespace Vi.Player
     {
         [Header("Camera Settings")]
         [SerializeField] private Transform cameraPivot;
-        [SerializeField] private float orbitSpeed = 8;
         [SerializeField] private float smoothTime = 0.1f;
         [SerializeField] private float maxPitch = 40;
         [SerializeField] private Vector3 positionOffset = new Vector3(0, 0, 3);
@@ -105,6 +104,8 @@ namespace Vi.Player
 
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
+
+        public const float orbitSpeed = 15;
 
         private float followCamAngleOffset;
         private void Update()

@@ -464,7 +464,6 @@ namespace Vi.Player
             lookInput += lookInputToAdd;
             }
 #endif
-
             UpdateLocomotion();
             attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
@@ -482,7 +481,6 @@ namespace Vi.Player
         }
 
         private float positionStrength = 1;
-        //private float rotationStrength = 1;
         void FixedUpdate()
         {
             if (Vector3.Distance(movementPredictionRigidbody.position, movementPrediction.CurrentPosition) > 4)
@@ -493,10 +491,6 @@ namespace Vi.Player
             {
                 Vector3 deltaPos = movementPrediction.CurrentPosition - movementPredictionRigidbody.position;
                 movementPredictionRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
-
-                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
-                //if (angle > 180.0f) angle -= 360.0f;
-                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
             }
         }
 
@@ -515,14 +509,6 @@ namespace Vi.Player
         private float GetAnimatorSpeed()
         {
             return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
-        }
-
-        private void LateUpdate()
-        {
-            Vector3 camDirection = cameraController.GetCamDirection();
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            transform.rotation = Quaternion.LookRotation(camDirection);
         }
 
         private bool autoAim;
@@ -588,40 +574,6 @@ namespace Vi.Player
                 }
             }
 
-            //Vector3 camDirection = cameraController.GetCamDirection();
-            //camDirection.Scale(HORIZONTAL_PLANE);
-
-            //transform.rotation = Quaternion.LookRotation(camDirection);
-
-            //if (IsOwner)
-            //{
-            //    Vector3 camDirection = cameraController.GetCamDirection();
-            //    camDirection.Scale(HORIZONTAL_PLANE);
-
-            //    if (attributes.ShouldApplyAilmentRotation())
-            //        transform.rotation = attributes.GetAilmentRotation();
-            //    else if (attributes.AnimationHandler.IsGrabAttacking())
-            //        transform.rotation = movementPrediction.CurrentRotation;
-            //    else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-            //        transform.rotation = Quaternion.LookRotation(camDirection);
-            //    else if (!attributes.ShouldPlayHitStop())
-            //        transform.rotation = Quaternion.LookRotation(camDirection);
-            //}
-
-            //if (attributes.ShouldApplyAilmentRotation())
-            //    transform.rotation = attributes.GetAilmentRotation();
-            //else if (weaponHandler.IsAiming())
-            //    transform.rotation = movementPrediction.CurrentRotation;
-            //else
-            //    transform.rotation = movementPrediction.CurrentRotation;
-
-            //if (attributes.ShouldApplyAilmentRotation())
-            //    transform.rotation = attributes.GetAilmentRotation();
-            //else if (weaponHandler.IsAiming())
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-            //else
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-
             if (autoAim)
             {
                 if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
@@ -662,6 +614,20 @@ namespace Vi.Player
                         }
                     }
                 }
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (cameraController)
+            {
+                Vector3 camDirection = cameraController.GetCamDirection();
+                camDirection.Scale(HORIZONTAL_PLANE);
+                transform.rotation = Quaternion.LookRotation(camDirection);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, Time.deltaTime * CameraController.orbitSpeed);
             }
         }
 
