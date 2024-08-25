@@ -17,35 +17,24 @@ namespace Vi.Core.VFX
         [SerializeField] private float timeToActivateGravity = 0;
         [SerializeField] private float killDistance = 50;
 
-        private bool initialized;
-
-        public override void InitializeVFX(CombatAgent attacker, ActionClip attack)
-        {
-            ClearInitialization();
-
-            this.attacker = attacker;
-            this.attack = attack;
-            initialized = true;
-        }
-
-        private void ClearInitialization()
-        {
-            attacker = null;
-            attack = null;
-            initialized = false;
-        }
-
         private Rigidbody rb;
         private new void Awake()
         {
             base.Awake();
             rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
         }
 
+        public override void InitializeVFX(CombatAgent attacker, ActionClip attack)
+        {
+            base.InitializeVFX(attacker, attack);
+            startPosition = attacker.MovementHandler.GetPosition();
+        }
+
+        private Vector3 startPosition;
         private new void OnEnable()
         {
             base.OnEnable();
+            rb.useGravity = false;
             StartCoroutine(ActivateGravityCoroutine());
         }
 
@@ -79,24 +68,17 @@ namespace Vi.Core.VFX
             rb.useGravity = true;
         }
 
-        private Vector3 startPosition;
-        private void Start()
-        {
-            startPosition = transform.position;
-        }
-
-        private bool despawnCalled;
         private void Update()
         {
+            if (!attacker) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
-            if (despawnCalled) { return; }
-            if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); despawnCalled = true; }
+            if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!initialized) { return; }
+            if (!attacker) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -130,10 +112,7 @@ namespace Vi.Core.VFX
                 if (otherProjectile.attacker == attacker) { return; }
             }
 
-            if (!other.isTrigger | shouldDestroy)
-            {
-                NetworkObject.Despawn(true);
-            }
+            if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
         }
     }
 }
