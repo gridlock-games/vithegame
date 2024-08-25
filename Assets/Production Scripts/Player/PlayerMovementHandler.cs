@@ -68,7 +68,6 @@ namespace Vi.Player
             for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
             {
                 Vector3 normal = collision.GetContact(0).normal;
-                //AddForce(normal * Time.fixedDeltaTime);
                 Vector3 newVelocity;
                 newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
                 newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
@@ -81,7 +80,6 @@ namespace Vi.Player
 
         private const float friction = 1;
 
-        private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             //if (collision.collider.GetComponent<NetworkCollider>())
@@ -95,7 +93,6 @@ namespace Vi.Player
             for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
             {
                 Vector3 normal = collision.GetContact(0).normal;
-                //AddForce(normal * Time.fixedDeltaTime);
                 Vector3 newVelocity;
                 newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
                 newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
@@ -156,7 +153,6 @@ namespace Vi.Player
                 }
                 isGrounded = true;
                 velocity = Vector3.zero;
-                lastMovement = Vector3.zero;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, newRotation);
             }
 
@@ -172,6 +168,7 @@ namespace Vi.Player
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allGravityHitsCount; i++)
             {
+                if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
                 if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 bHit = true;
                 amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
@@ -335,16 +332,13 @@ namespace Vi.Player
                 }
             }
 
-            lastMovement = movement;
-
             float multiplier = 1.0f - drag * GetTickRateDeltaTime();
             if (multiplier < 0.0f) multiplier = 0.0f;
             velocity = multiplier * velocity;
-            //Debug.Log(velocity);
             movement += velocity;
 
             Vector3 newPosition;
-            if (attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+            if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
             {
                 newPosition = movementPrediction.CurrentPosition + movement;
             }
@@ -356,7 +350,7 @@ namespace Vi.Player
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
-        [SerializeField] private float drag = 1;
+        private const float drag = 1;
 
         public override void OnNetworkSpawn()
         {
@@ -514,7 +508,7 @@ namespace Vi.Player
         {
             if (Application.isEditor)
             {
-                AddForce(transform.forward);
+                AddForce(transform.forward + Vector3.up);
             }
         }
 
@@ -555,7 +549,7 @@ namespace Vi.Player
         {
             if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
             {
-                //Debug.Log("Teleporting player: " + OwnerClientId);
+                Debug.Log("Teleporting player: " + OwnerClientId + " " + name);
                 transform.position = movementPrediction.CurrentPosition;
             }
             else
@@ -566,17 +560,17 @@ namespace Vi.Player
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.magnitude);
+                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.sqrMagnitude);
                 }
                 else
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        Time.deltaTime * GetRunSpeed() + velocity.magnitude);
+                        Time.deltaTime * GetRunSpeed() + velocity.sqrMagnitude);
                 }
                 newPosition.x = horizontalPosition.x;
                 newPosition.z = horizontalPosition.y;
-                newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y);
+                newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y + velocity.sqrMagnitude);
 
                 if (attributes.ShouldShake())
                 {
@@ -772,6 +766,9 @@ namespace Vi.Player
 
             Gizmos.color = Color.white;
             Gizmos.DrawSphere(Vector3.MoveTowards(transform.position, movementPrediction.CurrentPosition, Time.deltaTime), 0.3f);
+
+            //Gizmos.color = Color.green;
+            //Gizmos.DrawSphere(movementPrediction.CurrentPosition + transform.rotation * gravitySphereCastPositionOffset, gravitySphereCastRadius);
         }
     }
 }

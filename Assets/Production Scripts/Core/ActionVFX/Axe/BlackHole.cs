@@ -8,7 +8,7 @@ namespace Vi.Core.VFX.Axe
 {
     public class BlackHole : FollowUpVFX
     {
-        private const float duration = 9999;
+        private const float duration = 3;
         private const float radius = 5;
         private static readonly ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
@@ -34,9 +34,6 @@ namespace Vi.Core.VFX.Axe
             }
         }
 
-        private const float pullStrength = 3;
-        private readonly Vector3 velocityLimits = new Vector3(5, 5, 5);
-
         Collider[] colliders = new Collider[20];
         private void FixedUpdate()
         {
@@ -48,26 +45,8 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        Vector3 force = (transform.position - movementHandler.GetPosition()).normalized * pullStrength;
-
-                        // Move vehicle horizontally
-                        if (movementHandler.GetVelocity().x > velocityLimits.x)
-                            force.x -= movementHandler.GetVelocity().x - velocityLimits.x;
-                        if (movementHandler.GetVelocity().x < -velocityLimits.x)
-                            force.x -= movementHandler.GetVelocity().x + velocityLimits.x;
-                        if (movementHandler.GetVelocity().z > velocityLimits.z)
-                            force.z -= movementHandler.GetVelocity().z - velocityLimits.z;
-                        if (movementHandler.GetVelocity().z < -velocityLimits.z)
-                            force.z -= movementHandler.GetVelocity().z + velocityLimits.z;
-                        //if (Vector3.Distance(transform.position, movementHandler.GetPosition()) < 0.2f)
-                        //{
-                        //    force.x = 0 - movementHandler.GetVelocity().x;
-                        //    force.z = 0 - movementHandler.GetVelocity().z;
-                        //}
-                        //force = Vector3.ClampMagnitude(force, currentRotorSpeed * forceClampMultiplier);
-                        //Debug.Log(force);
-                        Debug.Log("GRAVITY PULLING");
-                        movementHandler.AddForce(force);
+                        Vector3 rel = transform.position - movementHandler.GetPosition();
+                        movementHandler.AddForce((rel - movementHandler.GetVelocity()) * Time.fixedDeltaTime);
                     }
                 }
                 else if (!colliders[i].transform.root.GetComponent<ActionVFX>() & colliders[i].transform.root.TryGetComponent(out Rigidbody rb))

@@ -12,11 +12,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: axe_blackhole_orb
       objectReference: {fileID: 0}
-    - target: {fileID: 6232070354447274069, guid: 41a31a48c379e8a4fbb0a8d7a177da13,
-        type: 3}
-      propertyPath: lengthInSec
-      value: 999
-      objectReference: {fileID: 0}
     - target: {fileID: 7203276818646312152, guid: 41a31a48c379e8a4fbb0a8d7a177da13,
         type: 3}
       propertyPath: m_RootOrder
@@ -92,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 559323971
+  GlobalObjectIdHash: 761906137
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -182,4 +177,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 88
-  isPrewarmObject: 0
+  isPrewarmObject: 1
