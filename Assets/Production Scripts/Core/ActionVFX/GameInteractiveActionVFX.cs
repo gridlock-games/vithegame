@@ -64,7 +64,7 @@ namespace Vi.Core.VFX
             base.OnDisable();
             attacker = null;
             attack = null;
-            attackerNetworkObjectId.Value = default;
+            if (NetworkManager.Singleton.IsServer) { attackerNetworkObjectId.Value = default; }
         }
 
         public override void OnNetworkDespawn()
