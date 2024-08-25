@@ -560,17 +560,17 @@ namespace Vi.Player
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.sqrMagnitude);
+                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
                 }
                 else
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        Time.deltaTime * GetRunSpeed() + velocity.sqrMagnitude);
+                        Time.deltaTime * GetRunSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
                 }
                 newPosition.x = horizontalPosition.x;
                 newPosition.z = horizontalPosition.y;
-                newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y + velocity.sqrMagnitude);
+                newPosition.y = Mathf.MoveTowards(transform.position.y, movementPrediction.CurrentPosition.y, Time.deltaTime * -Physics.gravity.y + velocity.y / Time.fixedDeltaTime);
 
                 if (attributes.ShouldShake())
                 {
