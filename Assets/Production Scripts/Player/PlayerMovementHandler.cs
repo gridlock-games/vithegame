@@ -73,7 +73,6 @@ namespace Vi.Player
                 newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
                 newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
                 newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
-                Debug.Log(velocity + " " + normal + " " + newVelocity);
                 velocity = newVelocity;
             }
 
@@ -101,7 +100,6 @@ namespace Vi.Player
                 newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
                 newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
                 newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
-                Debug.Log(velocity + " " + normal + " " + newVelocity);
                 velocity = newVelocity;
             }
 
