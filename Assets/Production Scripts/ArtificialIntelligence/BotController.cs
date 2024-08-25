@@ -38,8 +38,21 @@ namespace Vi.ArtificialIntelligence
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                velocity = newVelocity;
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
+
+        private const float friction = 1;
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
@@ -51,6 +64,17 @@ namespace Vi.ArtificialIntelligence
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                velocity = newVelocity;
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
