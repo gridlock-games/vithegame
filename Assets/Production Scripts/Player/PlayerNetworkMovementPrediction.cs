@@ -69,7 +69,6 @@ namespace Vi.Player
 
         private const int BUFFER_SIZE = 1024;
 
-        private int currentTick;
         private StatePayload[] stateBuffer;
         private InputPayload[] inputBuffer;
         private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
@@ -130,8 +129,6 @@ namespace Vi.Player
             {
                 latestServerState.Value = stateBuffer[bufferIndex];
             }
-
-            currentTick++;
         }
 
         private NetworkVariable<int> currentOwnerTick = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -149,11 +146,11 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                currentOwnerTick.Value = currentTick;
+                currentOwnerTick.Value = NetworkManager.NetworkTickSystem.LocalTime.Tick;
                 moveInput.Value = movementHandler.GetMoveInput();
                 inputRotation.Value = transform.rotation;
 
-                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
+                InputPayload inputPayload = new InputPayload(NetworkManager.NetworkTickSystem.LocalTime.Tick, movementHandler.GetMoveInput(), transform.rotation);
 
                 if (!IsHost)
                 {
@@ -166,9 +163,6 @@ namespace Vi.Player
                 CurrentPosition = latestServerState.Value.position;
                 CurrentRotation = latestServerState.Value.rotation;
             }
-
-            // If we are the host, this is also called in the HandleServerTick() method
-            if (!IsHost) { currentTick++; }
         }
 
         private int ProcessInputQueue()
@@ -214,7 +208,7 @@ namespace Vi.Player
 
                 Vector3 currentPositionCached = latestServerState.Value.position;
                 Quaternion currentRotationCached = latestServerState.Value.rotation;
-                while (tickToProcess < currentTick)
+                while (tickToProcess < currentOwnerTick.Value)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 

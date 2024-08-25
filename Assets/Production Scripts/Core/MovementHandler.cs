@@ -17,7 +17,6 @@ namespace Vi.Core
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
 			"Default",
-			"Projectile",
 			"ProjectileCollider"
 		};
 

@@ -64,8 +64,23 @@ namespace Vi.Player
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                //AddForce(normal * Time.fixedDeltaTime);
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                Debug.Log(velocity + " " + normal + " " + newVelocity);
+                velocity = newVelocity;
+            }
+
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
+
+        private const float friction = 1;
 
         private Vector3 lastMovement;
         public override void ReceiveOnCollisionStayMessage(Collision collision)
@@ -77,12 +92,25 @@ namespace Vi.Player
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { movementPredictionRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                //AddForce(normal * Time.fixedDeltaTime);
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                Debug.Log(velocity + " " + normal + " " + newVelocity);
+                velocity = newVelocity;
+            }
+
             movementPrediction.ProcessCollisionEvent(collision, movementPredictionRigidbody.position);
         }
 
         private float GetTickRateDeltaTime()
         {
-            return 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale;
+            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
         }
 
         private float GetRootMotionSpeed()
@@ -129,6 +157,7 @@ namespace Vi.Player
                     moveSidesTarget.Value = 0;
                 }
                 isGrounded = true;
+                velocity = Vector3.zero;
                 lastMovement = Vector3.zero;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, newRotation);
             }
@@ -308,25 +337,28 @@ namespace Vi.Player
                 }
             }
 
-            movement += forceAccumulated * GetTickRateDeltaTime();
-            forceAccumulated = Vector3.MoveTowards(forceAccumulated, Vector3.zero, drag * GetTickRateDeltaTime());
-
             lastMovement = movement;
 
+            float multiplier = 1.0f - drag * GetTickRateDeltaTime();
+            if (multiplier < 0.0f) multiplier = 0.0f;
+            velocity = multiplier * velocity;
+            //Debug.Log(velocity);
+            movement += velocity;
+
             Vector3 newPosition;
-            if (Mathf.Approximately(movement.y, 0))
+            if (attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {
-                newPosition = movementPrediction.CurrentPosition + movement + gravity;
+                newPosition = movementPrediction.CurrentPosition + movement;
             }
             else
             {
-                newPosition = movementPrediction.CurrentPosition + movement;
+                newPosition = movementPrediction.CurrentPosition + movement + gravity;
             }
 
             return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
         }
 
-        private const float drag = 1;
+        [SerializeField] private float drag = 1;
 
         public override void OnNetworkSpawn()
         {
@@ -472,12 +504,20 @@ namespace Vi.Player
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
-        public override Vector3 GetVelocity() { return forceAccumulated; }
+        public override Vector3 GetVelocity() { return velocity; }
 
-        Vector3 forceAccumulated;
+        Vector3 velocity;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += force; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force; }
+        }
+
+        void OnAddForce()
+        {
+            if (Application.isEditor)
+            {
+                AddForce(transform.forward);
+            }
         }
 
         private float positionStrength = 1;
@@ -528,13 +568,13 @@ namespace Vi.Player
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed());
+                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.magnitude);
                 }
                 else
                 {
                     horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
                         new Vector2(movementPrediction.CurrentPosition.x, movementPrediction.CurrentPosition.z),
-                        Time.deltaTime * GetRunSpeed());
+                        Time.deltaTime * GetRunSpeed() + velocity.magnitude);
                 }
                 newPosition.x = horizontalPosition.x;
                 newPosition.z = horizontalPosition.y;
@@ -725,7 +765,7 @@ namespace Vi.Player
             }
         }
 
-        protected override void OnDrawGizmosSelected()
+        protected void OnDrawGizmos()
         {
             if (!Application.isPlaying) { return; }
 
