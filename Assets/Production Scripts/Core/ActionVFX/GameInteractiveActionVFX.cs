@@ -25,16 +25,38 @@ namespace Vi.Core.VFX
 
         public bool ShouldBlockProjectiles() { return shouldBlockProjectiles; }
 
-        protected CombatAgent attacker;
-        protected ActionClip attack;
+        private CombatAgent attacker;
+        private ActionClip attack;
+        private NetworkVariable<ulong> attackerNetworkObjectId = new NetworkVariable<ulong>();
 
-        public CombatAgent GetAttacker() { return attacker; }
-        public ActionClip GetAttack() { return attack; }
+        public CombatAgent GetAttacker()
+        {
+            if (attacker)
+            {
+                return attacker;
+            }
+            else
+            {
+                if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetworkObjectId.Value, out NetworkObject networkObject))
+                {
+                    if (networkObject) { return networkObject.GetComponent<CombatAgent>(); }
+                }
+            }
+            return null;
+        }
+
+        public ActionClip GetAttack()
+        {
+            if (!IsServer) { Debug.LogError("GameInteractiveActionVFX.GetAttack() should only be called on the server!"); }
+            return attack;
+        }
 
         public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
+            if (!IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
             this.attacker = attacker;
             this.attack = attack;
+            attackerNetworkObjectId.Value = attacker.NetworkObjectId;
         }
 
         protected new void OnDisable()
@@ -42,6 +64,7 @@ namespace Vi.Core.VFX
             base.OnDisable();
             attacker = null;
             attack = null;
+            attackerNetworkObjectId.Value = default;
         }
 
         public override void OnNetworkDespawn()

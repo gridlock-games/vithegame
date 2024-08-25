@@ -103,13 +103,13 @@ namespace Vi.Core.VFX
             bool canHit = true;
             if (hitCounter.ContainsKey(combatAgent))
             {
-                if (hitCounter[combatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : attack.maxHitLimit)) { canHit = false; }
-                if (Time.time - hitCounter[combatAgent].timeOfHit < attack.GetTimeBetweenHits(1)) { canHit = false; }
+                if (hitCounter[combatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : GetAttack().maxHitLimit)) { canHit = false; }
+                if (Time.time - hitCounter[combatAgent].timeOfHit < GetAttack().GetTimeBetweenHits(1)) { canHit = false; }
             }
 
             if (spellType == SpellType.GroundSpell)
             {
-                if (PlayerDataManager.Singleton.CanHit(attacker, combatAgent))
+                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), combatAgent))
                 {
                     if (combatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                 }
@@ -119,7 +119,7 @@ namespace Vi.Core.VFX
 
         private void ProcessHit(IHittable hittable, Vector3 impactPosition)
         {
-            if (hittable.ProcessProjectileHit(attacker, null, hitCounter, attack, impactPosition, shouldUseAttackerPositionForHitAngles ? attacker.transform.position : transform.position))
+            if (hittable.ProcessProjectileHit(GetAttacker(), null, hitCounter, GetAttack(), impactPosition, shouldUseAttackerPositionForHitAngles ? GetAttacker().transform.position : transform.position))
             {
                 if (!hitCounter.ContainsKey(hittable))
                 {

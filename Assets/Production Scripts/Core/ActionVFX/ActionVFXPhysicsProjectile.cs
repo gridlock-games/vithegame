@@ -70,22 +70,22 @@ namespace Vi.Core.VFX
 
         private void Update()
         {
-            if (!attacker) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (!GetAttacker()) { return; }
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!attacker) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+            if (!GetAttacker()) { return; }
 
             bool shouldDestroy = false;
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.CombatAgent == attacker) { return; }
+                if (networkCollider.CombatAgent == GetAttacker()) { return; }
 
                 bool canHit = true;
                 if (spellType == SpellType.GroundSpell)
@@ -95,21 +95,21 @@ namespace Vi.Core.VFX
 
                 if (canHit)
                 {
-                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
                     if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
                 }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                if ((Object)hittable == attacker) { return; }
+                if ((Object)hittable == GetAttacker()) { return; }
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                hittable.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
             else if (other.transform.root.TryGetComponent(out ActionVFXPhysicsProjectile otherProjectile))
             {
                 // Dont despawn projectiles that come from the same attacker
-                if (otherProjectile.attacker == attacker) { return; }
+                if (otherProjectile.GetAttacker() == GetAttacker()) { return; }
             }
 
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }
