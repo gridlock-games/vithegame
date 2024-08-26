@@ -87,7 +87,7 @@ namespace Vi.Player
             ToggleScoreboard(false);
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
         }

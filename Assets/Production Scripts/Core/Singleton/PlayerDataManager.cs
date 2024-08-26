@@ -929,6 +929,15 @@ namespace Vi.Core
                         playersToSpawnQueue.Enqueue(playerDataList[i]);
                     }
                 }
+
+                if (scene.name == "Lobby")
+                {
+                    disconnectedPlayerDataList.Clear();
+                    if (GameModeManager.Singleton)
+                    {
+                        GameModeManager.Singleton.ClearDisconnectedScoreList();
+                    }
+                }
             }
         }
 
