@@ -215,7 +215,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 CurrentPosition = latestServerState.Value.position;
                 CurrentRotation = latestServerState.Value.rotation;
