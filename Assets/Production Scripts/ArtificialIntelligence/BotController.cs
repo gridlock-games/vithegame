@@ -315,6 +315,16 @@ namespace Vi.ArtificialIntelligence
             velocity = multiplier * velocity;
             movement += velocity;
 
+            networkColliderRigidbody.position = currentPosition.Value;
+            if (networkColliderRigidbody.SweepTest(movement.normalized, out RaycastHit movementHit, movement.magnitude, QueryTriggerInteraction.Ignore))
+            {
+                if (movementHit.distance > 0.5f)
+                {
+                    movement = Vector3.ClampMagnitude(movement, movementHit.distance);
+                    velocity = Vector3.zero;
+                }
+            }
+
             Vector3 newPosition;
             if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
             {
@@ -370,7 +380,7 @@ namespace Vi.ArtificialIntelligence
         Vector3 velocity;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force * Time.fixedDeltaTime; }
         }
 
         private void RefreshStatus()
@@ -586,7 +596,11 @@ namespace Vi.ArtificialIntelligence
 
         private void UpdateLocomotion()
         {
-            if (Vector3.Distance(transform.position, currentPosition.Value) > 2)
+            if (velocity.magnitude > 0.01f)
+            {
+                transform.position = currentPosition.Value;
+            }
+            else if (Vector3.Distance(transform.position, currentPosition.Value) > 2)
             {
                 Debug.Log("Teleporting player: " + OwnerClientId + " " + name);
                 transform.position = currentPosition.Value;
