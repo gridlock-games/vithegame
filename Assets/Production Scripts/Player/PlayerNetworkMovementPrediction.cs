@@ -230,7 +230,7 @@ namespace Vi.Player
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                     // Process new movement with reconciled state
-                    StatePayload statePayload = movementHandler.ProcessMovement(inputBuffer[bufferIndex]);
+                    StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
                     CurrentPosition = statePayload.position;
                     CurrentRotation = statePayload.rotation;
 
