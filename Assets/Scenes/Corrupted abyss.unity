@@ -2170,6 +2170,7 @@ GameObject:
   - component: {fileID: 340179734}
   - component: {fileID: 340179736}
   - component: {fileID: 340179735}
+  - component: {fileID: 340179737}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (5)
   m_TagString: Untagged
@@ -2243,6 +2244,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 340179733}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &340179737
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340179733}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!4 &349597634 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f1dd508f32c01ff46a3bb156b3c367d6,
@@ -2465,6 +2480,7 @@ GameObject:
   - component: {fileID: 401511577}
   - component: {fileID: 401511579}
   - component: {fileID: 401511578}
+  - component: {fileID: 401511580}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (5)
   m_TagString: Untagged
@@ -2538,6 +2554,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 401511576}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &401511580
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401511576}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!1 &409374051
 GameObject:
   m_ObjectHideFlags: 0
@@ -4171,6 +4201,7 @@ GameObject:
   - component: {fileID: 731964011}
   - component: {fileID: 731964013}
   - component: {fileID: 731964012}
+  - component: {fileID: 731964014}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (6)
   m_TagString: Untagged
@@ -4244,6 +4275,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 731964010}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &731964014
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731964010}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!1 &736395504
 GameObject:
   m_ObjectHideFlags: 0
@@ -5996,6 +6041,7 @@ GameObject:
   - component: {fileID: 1020129684}
   - component: {fileID: 1020129686}
   - component: {fileID: 1020129685}
+  - component: {fileID: 1020129687}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (6)
   m_TagString: Untagged
@@ -6069,6 +6115,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1020129683}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &1020129687
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1020129683}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!4 &1026800211 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7977269971668113879, guid: c48cba296d677964683ab65248bc9438,
@@ -6737,6 +6797,7 @@ GameObject:
   - component: {fileID: 1101942619}
   - component: {fileID: 1101942621}
   - component: {fileID: 1101942620}
+  - component: {fileID: 1101942622}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (4)
   m_TagString: Untagged
@@ -6810,6 +6871,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101942618}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &1101942622
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101942618}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!1 &1106266352
 GameObject:
   m_ObjectHideFlags: 0
@@ -7283,6 +7358,7 @@ GameObject:
   - component: {fileID: 1220918837}
   - component: {fileID: 1220918839}
   - component: {fileID: 1220918838}
+  - component: {fileID: 1220918840}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (7)
   m_TagString: Untagged
@@ -7356,6 +7432,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1220918836}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &1220918840
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220918836}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!1 &1238646112
 GameObject:
   m_ObjectHideFlags: 0
@@ -7367,6 +7457,7 @@ GameObject:
   - component: {fileID: 1238646113}
   - component: {fileID: 1238646115}
   - component: {fileID: 1238646114}
+  - component: {fileID: 1238646116}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (7)
   m_TagString: Untagged
@@ -7440,6 +7531,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1238646112}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &1238646116
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238646112}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!4 &1247353514 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7977269971668113879, guid: c48cba296d677964683ab65248bc9438,
@@ -25290,6 +25395,7 @@ GameObject:
   - component: {fileID: 2093057499}
   - component: {fileID: 2093057501}
   - component: {fileID: 2093057500}
+  - component: {fileID: 2093057502}
   m_Layer: 0
   m_Name: prop_Tower_LOD2 (4)
   m_TagString: Untagged
@@ -25363,6 +25469,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2093057498}
   m_Mesh: {fileID: 1660925506755095691, guid: 68ba996077bbd614b9cbb8b576bda913, type: 3}
+--- !u!136 &2093057502
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2093057498}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1.4795254
+  m_Height: 6.05677
+  m_Direction: 1
+  m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
 --- !u!1 &2119116853
 GameObject:
   m_ObjectHideFlags: 0
