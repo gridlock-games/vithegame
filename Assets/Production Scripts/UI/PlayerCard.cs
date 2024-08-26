@@ -62,7 +62,7 @@ namespace Vi.UI
             if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
             if (combatAgent) { StartCoroutine(SetNameText()); }
 
-            if (combatAgent) { healthFillImage.color = useTeamColor ? PlayerDataManager.GetTeamColor(combatAgent.GetTeam()) : hpFillImageDefaultColor; }
+            if (combatAgent) { healthFillImage.color = useTeamColor & combatAgent.GetTeam() != PlayerDataManager.Team.Competitor ? PlayerDataManager.GetTeamColor(combatAgent.GetTeam()) : hpFillImageDefaultColor; }
         }
 
         private Coroutine setNameTextCoroutine;
