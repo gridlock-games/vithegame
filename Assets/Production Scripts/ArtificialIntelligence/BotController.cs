@@ -380,7 +380,7 @@ namespace Vi.ArtificialIntelligence
         Vector3 velocity;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force; }
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force * Time.fixedDeltaTime; }
         }
 
         private void RefreshStatus()
