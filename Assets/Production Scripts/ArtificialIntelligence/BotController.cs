@@ -187,10 +187,10 @@ namespace Vi.ArtificialIntelligence
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allHitsCount; i++)
             {
+                bHit = true;
                 if (Mathf.Approximately(allHits[i].distance, 0)) { continue; }
                 if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
                 amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
-                bHit = true;
                 minDistance = allHits[i].distance;
                 minDistanceInitialized = true;
             }

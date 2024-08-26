@@ -309,38 +309,38 @@ namespace Vi.Player
                 }
             }
 
-            //bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            ////bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            //if (wasPlayerHit)
-            //{
-            //    bool collidersIgnoreEachOther = false;
-            //    foreach (Collider c in attributes.NetworkCollider.Colliders)
-            //    {
-            //        if (Physics.GetIgnoreCollision(playerHit.collider, c))
-            //        {
-            //            collidersIgnoreEachOther = true;
-            //            break;
-            //        }
-            //    }
+            bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            if (wasPlayerHit)
+            {
+                bool collidersIgnoreEachOther = false;
+                foreach (Collider c in attributes.NetworkCollider.Colliders)
+                {
+                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
+                    {
+                        collidersIgnoreEachOther = true;
+                        break;
+                    }
+                }
 
-            //    if (!collidersIgnoreEachOther)
-            //    {
-            //        Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
-            //        float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+                if (!collidersIgnoreEachOther)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
+                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
-            //        if (angle > 180) { angle -= 360; }
+                    if (angle > 180) { angle -= 360; }
 
-            //        if (angle > -20 & angle < 20)
-            //        {
-            //            movement = Vector3.zero;
-            //        }
-            //    }
-            //}
+                    if (angle > -20 & angle < 20)
+                    {
+                        movement = Vector3.zero;
+                    }
+                }
+            }
 
-            //float multiplier = 1.0f - drag * GetTickRateDeltaTime();
-            //if (multiplier < 0.0f) multiplier = 0.0f;
-            //velocity = multiplier * velocity;
-            //movement += velocity;
+            float multiplier = 1.0f - drag * GetTickRateDeltaTime();
+            if (multiplier < 0.0f) multiplier = 0.0f;
+            velocity = multiplier * velocity;
+            movement += velocity;
 
             Vector3 newPosition;
             if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
