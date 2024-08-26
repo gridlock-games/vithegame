@@ -631,6 +631,8 @@ namespace Vi.Core.GameModeManagers
             scoreList.RemoveAt(index);
         }
 
+        public void ClearDisconnectedScoreList() { disconnectedScoreList.Clear(); }
+
         private void OnRoundTimerChange(float prev, float current)
         {
             if (timerMode == TimerMode.CountDown)
