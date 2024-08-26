@@ -18,14 +18,14 @@ namespace Vi.ArtificialIntelligence
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             actionVFX = GetComponent<GameInteractiveActionVFX>();
-            SetDestination(transform.position);
+            SetDestination(transform.position, true);
         }
 
         public override void OnNetworkSpawn()
         {
             if (IsServer)
             {
-                SetDestination(transform.position);
+                SetDestination(transform.position, true);
                 CalculatePath(transform.position, NavMesh.AllAreas);
             }
         }
@@ -41,7 +41,7 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Vector3 inputDir;
-                float dist = Vector3.Distance(Destination, transform.position);
+                float dist = Vector3.Distance(new Vector3(Destination.x, transform.position.y, Destination.z), transform.position);
                 if (dist >= stoppingDistance)
                 {
                     inputDir = NextPosition - transform.position;
@@ -85,7 +85,7 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition()); }
+                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition(), true); }
                 }
             }
             CalculatePath(transform.position, NavMesh.AllAreas);

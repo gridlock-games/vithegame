@@ -4,7 +4,6 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
-using Vi.Core.GameModeManagers;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
@@ -51,11 +50,9 @@ namespace Vi.Core
         }
 
         private Rigidbody rb;
-        private NetworkTransform networkTransform;
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            networkTransform = GetComponent<NetworkTransform>();
         }
 
         private Vector3 startPosition;
@@ -159,6 +156,10 @@ namespace Vi.Core
             {
                 // Dont despawn projectiles that come from the same attacker
                 if (otherProjectile.attacker == attacker) { return; }
+            }
+            else if (other.attachedRigidbody)
+            {
+                other.attachedRigidbody.AddForceAtPosition(rb.velocity, other.ClosestPointOnBounds(transform.position), ForceMode.VelocityChange);
             }
 
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }

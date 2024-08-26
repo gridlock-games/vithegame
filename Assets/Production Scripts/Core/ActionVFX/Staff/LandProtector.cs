@@ -24,7 +24,7 @@ namespace Vi.Core.VFX.Staff
                 if (!gameInteractiveActionVFX.IsSpawned) { return; }
                 if (spellTypesToCancel.Contains(gameInteractiveActionVFX.GetSpellType()))
                 {
-                    if (PlayerDataManager.Singleton.CanHit(attacker, gameInteractiveActionVFX.GetAttacker()))
+                    if (PlayerDataManager.Singleton.CanHit(GetAttacker(), gameInteractiveActionVFX.GetAttacker()))
                     {
                         PlayEffects(gameInteractiveActionVFX.transform.position);
                         gameInteractiveActionVFX.NetworkObject.Despawn(true);
@@ -34,7 +34,7 @@ namespace Vi.Core.VFX.Staff
             else if (other.TryGetComponent(out Projectile projectile))
             {
                 if (!projectile.IsSpawned) { return; }
-                if (PlayerDataManager.Singleton.CanHit(attacker, projectile.GetAttacker()))
+                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), projectile.GetAttacker()))
                 {
                     PlayEffects(projectile.transform.position);
                     projectile.canHitPlayers = false;
