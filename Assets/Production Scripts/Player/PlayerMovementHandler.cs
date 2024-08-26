@@ -163,42 +163,42 @@ namespace Vi.Player
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            //int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-            //    gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
-            //    LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
+                gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
+                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
-            //bool bHit = false;
-            //float minDistance = 0;
-            //bool minDistanceInitialized = false;
-            //Vector3 amountToAddToGravity = Vector3.zero;
-            //for (int i = 0; i < allGravityHitsCount; i++)
-            //{
-            //    if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
-            //    if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-            //    bHit = true;
-            //    amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
-            //    minDistance = allGravityHits[i].distance;
-            //    minDistanceInitialized = true;
-            //}
-            //gravity += amountToAddToGravity;
+            bool bHit = false;
+            float minDistance = 0;
+            bool minDistanceInitialized = false;
+            Vector3 amountToAddToGravity = Vector3.zero;
+            for (int i = 0; i < allGravityHitsCount; i++)
+            {
+                if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
+                if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                bHit = true;
+                amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
+                minDistance = allGravityHits[i].distance;
+                minDistanceInitialized = true;
+            }
+            gravity += amountToAddToGravity;
 
-            //if (bHit)
-            //{
-            //    isGrounded = true;
-            //}
-            //else // If no sphere cast hit
-            //{
-            //    if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-            //        Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-            //    {
-            //        isGrounded = true;
-            //    }
-            //    else
-            //    {
-            //        isGrounded = false;
-            //        gravity += GetTickRateDeltaTime() * Physics.gravity;
-            //    }
-            //}
+            if (bHit)
+            {
+                isGrounded = true;
+            }
+            else // If no sphere cast hit
+            {
+                if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
+                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                {
+                    isGrounded = true;
+                }
+                else
+                {
+                    isGrounded = false;
+                    gravity += GetTickRateDeltaTime() * Physics.gravity;
+                }
+            }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
