@@ -173,9 +173,9 @@ namespace Vi.Player
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allGravityHitsCount; i++)
             {
+                bHit = true;
                 if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
                 if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                bHit = true;
                 amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
                 minDistance = allGravityHits[i].distance;
                 minDistanceInitialized = true;
@@ -266,31 +266,31 @@ namespace Vi.Player
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
-            
-            //if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+
+            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-//            float yOffset = 0.2f;
-//            Vector3 startPos = movementPrediction.CurrentPosition;
-//            startPos.y += yOffset;
-//            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-//            {
-//                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
-//                {
-//                    break;
-//                }
-//#if UNITY_EDITOR
-//                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
-//#endif
-//                startPos.y += yOffset;
-//                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
+            float yOffset = 0.2f;
+            Vector3 startPos = movementPrediction.CurrentPosition;
+            startPos.y += yOffset;
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            {
+                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                {
+                    break;
+                }
+#if UNITY_EDITOR
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
+                startPos.y += yOffset;
+                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
 
-//                if (stairMovement > 0.5f)
-//                {
-//                    stairMovement = 0;
-//                    break;
-//                }
-//            }
+                if (stairMovement > 0.5f)
+                {
+                    stairMovement = 0;
+                    break;
+                }
+            }
 
             movement.y += stairMovement;
 
