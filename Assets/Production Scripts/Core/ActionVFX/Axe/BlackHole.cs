@@ -66,7 +66,7 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce(4 * Physics.gravity);
+                        movementHandler.AddForce(2 * Physics.gravity);
 
                         if (NetworkManager.Singleton.IsServer)
                         {

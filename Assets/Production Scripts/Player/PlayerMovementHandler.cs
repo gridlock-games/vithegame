@@ -558,7 +558,11 @@ namespace Vi.Player
         RaycastHit[] cameraHits = new RaycastHit[10];
         private void UpdateLocomotion()
         {
-            if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
+            if (velocity.magnitude > 0.01f)
+            {
+                transform.position = movementPrediction.CurrentPosition;
+            }
+            else if (Vector3.Distance(transform.position, movementPrediction.CurrentPosition) > movementPrediction.playerObjectTeleportThreshold)
             {
                 Debug.Log("Teleporting player: " + OwnerClientId + " " + name);
                 transform.position = movementPrediction.CurrentPosition;
