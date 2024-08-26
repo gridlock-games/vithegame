@@ -113,6 +113,11 @@ namespace Vi.Player
             return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
         }
 
+        public float GetRunSpeed()
+        {
+            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
+        }
+
         [Header("Network Prediction")]
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
@@ -158,42 +163,42 @@ namespace Vi.Player
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
-            int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-                gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
-                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            //int allGravityHitsCount = Physics.SphereCastNonAlloc(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
+            //    gravitySphereCastRadius, Physics.gravity.normalized, allGravityHits, gravitySphereCastPositionOffset.magnitude,
+            //    LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
-            bool bHit = false;
-            float minDistance = 0;
-            bool minDistanceInitialized = false;
-            Vector3 amountToAddToGravity = Vector3.zero;
-            for (int i = 0; i < allGravityHitsCount; i++)
-            {
-                if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
-                if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                bHit = true;
-                amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
-                minDistance = allGravityHits[i].distance;
-                minDistanceInitialized = true;
-            }
-            gravity += amountToAddToGravity;
+            //bool bHit = false;
+            //float minDistance = 0;
+            //bool minDistanceInitialized = false;
+            //Vector3 amountToAddToGravity = Vector3.zero;
+            //for (int i = 0; i < allGravityHitsCount; i++)
+            //{
+            //    if (Mathf.Approximately(allGravityHits[i].distance, 0)) { continue; }
+            //    if (allGravityHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+            //    bHit = true;
+            //    amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allGravityHits[i].distance) * Physics.gravity;
+            //    minDistance = allGravityHits[i].distance;
+            //    minDistanceInitialized = true;
+            //}
+            //gravity += amountToAddToGravity;
 
-            if (bHit)
-            {
-                isGrounded = true;
-            }
-            else // If no sphere cast hit
-            {
-                if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-                {
-                    isGrounded = true;
-                }
-                else
-                {
-                    isGrounded = false;
-                    gravity += GetTickRateDeltaTime() * Physics.gravity;
-                }
-            }
+            //if (bHit)
+            //{
+            //    isGrounded = true;
+            //}
+            //else // If no sphere cast hit
+            //{
+            //    if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
+            //        Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            //    {
+            //        isGrounded = true;
+            //    }
+            //    else
+            //    {
+            //        isGrounded = false;
+            //        gravity += GetTickRateDeltaTime() * Physics.gravity;
+            //    }
+            //}
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
@@ -262,30 +267,30 @@ namespace Vi.Player
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
             
-            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+            //if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            float yOffset = 0.2f;
-            Vector3 startPos = movementPrediction.CurrentPosition;
-            startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-            {
-                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
-                {
-                    break;
-                }
-#if UNITY_EDITOR
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
-#endif
-                startPos.y += yOffset;
-                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
+//            float yOffset = 0.2f;
+//            Vector3 startPos = movementPrediction.CurrentPosition;
+//            startPos.y += yOffset;
+//            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+//            {
+//                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+//                {
+//                    break;
+//                }
+//#if UNITY_EDITOR
+//                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+//#endif
+//                startPos.y += yOffset;
+//                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
 
-                if (stairMovement > 0.5f)
-                {
-                    stairMovement = 0;
-                    break;
-                }
-            }
+//                if (stairMovement > 0.5f)
+//                {
+//                    stairMovement = 0;
+//                    break;
+//                }
+//            }
 
             movement.y += stairMovement;
 
@@ -304,38 +309,38 @@ namespace Vi.Player
                 }
             }
 
-            bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            if (wasPlayerHit)
-            {
-                bool collidersIgnoreEachOther = false;
-                foreach (Collider c in attributes.NetworkCollider.Colliders)
-                {
-                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
-                    {
-                        collidersIgnoreEachOther = true;
-                        break;
-                    }
-                }
+            //bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            ////bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+            //if (wasPlayerHit)
+            //{
+            //    bool collidersIgnoreEachOther = false;
+            //    foreach (Collider c in attributes.NetworkCollider.Colliders)
+            //    {
+            //        if (Physics.GetIgnoreCollision(playerHit.collider, c))
+            //        {
+            //            collidersIgnoreEachOther = true;
+            //            break;
+            //        }
+            //    }
 
-                if (!collidersIgnoreEachOther)
-                {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
-                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+            //    if (!collidersIgnoreEachOther)
+            //    {
+            //        Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - movementPrediction.CurrentPosition, Vector3.up);
+            //        float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
-                    if (angle > 180) { angle -= 360; }
+            //        if (angle > 180) { angle -= 360; }
 
-                    if (angle > -20 & angle < 20)
-                    {
-                        movement = Vector3.zero;
-                    }
-                }
-            }
+            //        if (angle > -20 & angle < 20)
+            //        {
+            //            movement = Vector3.zero;
+            //        }
+            //    }
+            //}
 
-            float multiplier = 1.0f - drag * GetTickRateDeltaTime();
-            if (multiplier < 0.0f) multiplier = 0.0f;
-            velocity = multiplier * velocity;
-            movement += velocity;
+            //float multiplier = 1.0f - drag * GetTickRateDeltaTime();
+            //if (multiplier < 0.0f) multiplier = 0.0f;
+            //velocity = multiplier * velocity;
+            //movement += velocity;
 
             Vector3 newPosition;
             if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
@@ -390,19 +395,19 @@ namespace Vi.Player
             if (movementPredictionRigidbody) { Destroy(movementPredictionRigidbody.gameObject); }
         }
 
+        private PlayerNetworkMovementPrediction movementPrediction;
+        private Attributes attributes;
         private new void Awake()
         {
             base.Awake();
+            movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
+            attributes = GetComponent<Attributes>();
             RefreshStatus();
         }
 
-        private PlayerNetworkMovementPrediction movementPrediction;
-        private Attributes attributes;
         private void Start()
         {
             movementPredictionRigidbody.transform.SetParent(null, true);
-            movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
-            attributes = GetComponent<Attributes>();
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
             {
@@ -531,11 +536,6 @@ namespace Vi.Player
         private void RefreshStatus()
         {
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
-        }
-
-        private float GetRunSpeed()
-        {
-            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
         }
 
         private float GetAnimatorSpeed()
