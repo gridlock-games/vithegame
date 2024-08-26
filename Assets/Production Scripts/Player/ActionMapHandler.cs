@@ -92,6 +92,11 @@ namespace Vi.Player
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
         }
 
+        private void OnDestroy()
+        {
+            if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
+        }
+
         private void ToggleScoreboard(bool isOn)
         {
             if (ExternalUI) { return; }
