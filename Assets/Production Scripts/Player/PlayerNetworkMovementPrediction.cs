@@ -40,13 +40,15 @@ namespace Vi.Player
         {
             public int tick;
             public Vector2 moveInput;
+            public bool isGrounded;
             public Vector3 position;
             public Quaternion rotation;
 
-            public StatePayload(int tick, InputPayload inputPayload, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, InputPayload inputPayload, bool isGrounded, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
                 moveInput = inputPayload.moveInput;
+                this.isGrounded = isGrounded;
                 this.position = position;
                 this.rotation = rotation;
             }
@@ -55,8 +57,21 @@ namespace Vi.Player
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
+                serializer.SerializeValue(ref isGrounded);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
+            }
+        }
+
+        public bool IsGrounded()
+        {
+            if (IsOwner)
+            {
+                return stateBuffer[Mathf.Max(0, NetworkManager.NetworkTickSystem.LocalTime.Tick-1) % BUFFER_SIZE].isGrounded;
+            }
+            else
+            {
+                return latestServerState.Value.isGrounded;
             }
         }
 
@@ -153,7 +168,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 overrideRotation.Value = transform.rotation;
-                latestServerState.Value = new StatePayload(0, new InputPayload(), CurrentPosition, CurrentRotation);
+                latestServerState.Value = new StatePayload(0, new InputPayload(), true, CurrentPosition, CurrentRotation);
                 stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
 
                 inputBuffer.OnListChanged += OnInputBufferChanged;

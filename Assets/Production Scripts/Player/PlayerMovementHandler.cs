@@ -122,7 +122,6 @@ namespace Vi.Player
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
-        private bool isGrounded = true;
         RaycastHit[] allGravityHits = new RaycastHit[10];
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
@@ -149,9 +148,8 @@ namespace Vi.Player
 
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                isGrounded = true;
                 velocity = Vector3.zero;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, movementPrediction.CurrentPosition, newRotation);
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, true, movementPrediction.CurrentPosition, newRotation);
             }
 
             // Handle gravity
@@ -175,6 +173,7 @@ namespace Vi.Player
             }
             gravity += amountToAddToGravity;
 
+            bool isGrounded = true;
             if (bHit)
             {
                 isGrounded = true;
@@ -338,7 +337,7 @@ namespace Vi.Player
                 newPosition = movementPrediction.CurrentPosition + movement + gravity;
             }
 
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, newPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, isGrounded, newPosition, newRotation);
         }
 
         private const float drag = 1;
@@ -431,7 +430,7 @@ namespace Vi.Player
             Vector2 walkCycleAnims = movementPrediction.GetWalkCycleAnimationParameters();
             attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded);
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", movementPrediction.IsGrounded());
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
