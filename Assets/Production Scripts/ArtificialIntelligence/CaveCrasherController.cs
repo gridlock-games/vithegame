@@ -46,6 +46,7 @@ namespace Vi.ArtificialIntelligence
                     float distanceToStructure = 100;
                     foreach (Structure structure in structures)
                     {
+                        if (!structure) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
                         targetObject = structure;
                         distanceToStructure = Vector3.Distance(transform.position, structure.transform.position);

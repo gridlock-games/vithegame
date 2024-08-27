@@ -7925,7 +7925,6 @@ Transform:
   m_Children:
   - {fileID: 509020945}
   - {fileID: 377678899}
-  - {fileID: 2119116854}
   m_Father: {fileID: 1449839911}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -21411,7 +21410,6 @@ MonoBehaviour:
     spawnAreas:
     - {fileID: 509020946}
     - {fileID: 377678900}
-    - {fileID: 2119116855}
     spawnRotations:
     - {x: 0, y: 90, z: 0}
   - spawnPosition: {x: -65, y: 4, z: 8}
@@ -26017,51 +26015,6 @@ CapsuleCollider:
   m_Height: 6.05677
   m_Direction: 1
   m_Center: {x: 0.007967948, y: 1.5635445, z: 0}
---- !u!1 &2119116853
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2119116854}
-  - component: {fileID: 2119116855}
-  m_Layer: 0
-  m_Name: MobSpawnArea c
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2119116854
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2119116853}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.6600037, y: 0, z: 10.84}
-  m_LocalScale: {x: 4, y: 1, z: 6}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1253690684}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2119116855
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2119116853}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2121086920
 PrefabInstance:
   m_ObjectHideFlags: 0
