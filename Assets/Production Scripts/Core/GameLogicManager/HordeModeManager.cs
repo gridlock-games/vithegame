@@ -51,7 +51,7 @@ namespace Vi.Core.GameModeManagers
             }
             currentlySpawnedMobs.RemoveAll(item => mobsToRemove.Contains(item));
 
-            foreach (Mob mob in waves[GetRoundCount()-1].mobPrefabs)
+            foreach (Mob mob in waves[GetRoundCount() - 1].mobPrefabs)
             {
                 currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam));
             }
