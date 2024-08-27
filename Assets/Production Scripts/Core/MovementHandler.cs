@@ -34,14 +34,8 @@ namespace Vi.Core
 
 		public virtual Vector3 GetVelocity()
         {
-			if (TryGetComponent(out Rigidbody rb))
-            {
-				return rb.velocity;
-            }
-			else
-            {
-				return Vector3.zero;
-            }
+			if (rb) { return rb.velocity; }
+			return Vector3.zero;
         }
 
 		//protected const float collisionPushDampeningFactor = 0;
@@ -49,10 +43,7 @@ namespace Vi.Core
 		protected const float bodyRadius = 0.5f;
 		public virtual void AddForce(Vector3 force)
         {
-			if (TryGetComponent(out Rigidbody rb))
-            {
-				rb.AddForce(force, ForceMode.VelocityChange);
-            }
+			if (rb) { rb.AddForce(force * Time.fixedDeltaTime, ForceMode.VelocityChange); }
         }
 
 		public virtual void SetImmovable(bool isImmovable) { }
@@ -212,12 +203,14 @@ namespace Vi.Core
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
+		protected Rigidbody rb;
 
         protected void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
+			rb = GetComponent<Rigidbody>();
 			RefreshStatus();
 			if (playerInput)
             {
