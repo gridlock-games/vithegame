@@ -271,14 +271,48 @@ namespace Vi.UI
       Debug.Log("Logging in with Steam");
       dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.steam);
       openDialogue("Steam");
+      SteamUserAccountData suad;
+      SteamAuthentication.Auth((success, error, tokenData, steamuserAccountData, steamusername) =>
+      {
+        if (success)
+        {
+          Debug.Log("Success");
+          StartCoroutine(WaitForSteamAuth(steamuserAccountData, steamusername));
+
+          
+          
+        }
+        else
+        {
+          Debug.LogError("Steam sign in error - " + error);
+          oAuthParent.SetActive(false);
+
+        }
+      });
     }
 
-    //private IEnumerator WaitForSteamAuth(string customToken)
-    //{
+    private IEnumerator WaitForSteamAuth(SteamUserAccountData suad, string steamUsername)
+    {
+      Debug.Log("Waiting on endpoint");
+      yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(suad.userEmail, $"steam:{suad.steamID}");
 
-    //}
+      if (WebRequestManager.Singleton.IsLoggedIn)
+      {
+        Debug.Log("is logged in");
+        initialParent.SetActive(false);
+        oAuthParent.SetActive(false);
+        welcomeUserText.text = steamUsername;
+        FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Steam");
+      }
+      else
+      {
+        Debug.Log("hit a else");
+        oAuthParent.SetActive(false);
+        initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+      }
+    }
 
-      public void OpenCreateAccount()
+    public void OpenCreateAccount()
         {
             usernameInput.text = "";
             passwordInput.text = "";
@@ -454,6 +488,7 @@ namespace Vi.UI
 
             if (!refresh)
             {
+        
                 credential = GoogleAuthProvider.GetCredential(tokenData.id_token, tokenData.access_token);
             }
 
@@ -672,13 +707,19 @@ namespace Vi.UI
             dlp.SetLoginSource(loginSource);
         }
 
-        public void CloseOAuthDialogue()
+        public void CloseOAuthDialogue(DeepLinkProcessing.loginSiteSource ls = DeepLinkProcessing.loginSiteSource.google)
         {
             oAuthParent.SetActive(false);
 
             //Shutdown any possible Listner - Google
             if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
-            { GoogleAuth.ShutdownListner(); }
+            {
+                if (ls == DeepLinkProcessing.loginSiteSource.google)
+                {
+          GoogleAuth.ShutdownListner();
+        }
+
+      }
         }
 
         private void openDialogue(string platformname)

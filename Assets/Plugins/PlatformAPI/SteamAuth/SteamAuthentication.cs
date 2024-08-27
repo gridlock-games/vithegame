@@ -5,7 +5,12 @@ using System;
 using UnityEngine.Networking;
 using Codice.CM.WorkspaceServer.DataStore;
 using Firebase.Auth;
-
+using Mono.Cecil.Cil;
+using System.Collections.Specialized;
+using System.Web;
+using Proyecto26;
+using System.Text;
+using Google.MiniJSON;
 
 
 
@@ -18,14 +23,22 @@ using Steamworks;
 
 namespace jomarcentermjm.PlatformAPI
 {
+  [Serializable]
+  public class SteamUserAccountData
+  {
+    public string firebaseToken;
+    public uint steamID;
+    public string userEmail;
+  }
   public static partial class SteamAuthentication
   {
     private const string AuthorizationProcessingEndpoint = "steamauth.vi-assets.com/";
     // Start is called before the first frame update
-    private const string APIURL = "http://steamauth.vi-assets.com/";
-    private static Action<bool, string, FirebaseUser> _callback;
+    //private const string APIURL = "http://steamauth.vi-assets.com/";
+    private const string APIURL = "http://localhost:1337/";
+    private static Action<bool, string, FirebaseUser, SteamUserAccountData, string> _callback;
 
-    public static void Auth(Action<bool, string, FirebaseUser> callback)
+    public static void Auth(Action<bool, string, FirebaseUser, SteamUserAccountData, string> callback)
     {
       _callback = callback;
       if (!SteamAPI.Init())
@@ -47,34 +60,35 @@ namespace jomarcentermjm.PlatformAPI
       if (authTicketHandle != HAuthTicket.Invalid)
       {
         string sessionTicketDataString = BitConverter.ToString(sessionTicket, 0, (int)ticketSize).Replace("-", "");
-
-        var sessionToken = SendSessionTicketToServer(sessionTicketDataString);
+        Debug.Log(sessionTicketDataString);
+        SteamSendSessionTicketToServer(sessionTicketDataString);
       }
 
-      IEnumerator SendSessionTicketToServer(string sessionTicket)
+      void SteamSendSessionTicketToServer(string sessionTicket)
       {
-        WWWForm form = new WWWForm();
-        form.AddField("sessionTicket", sessionTicket);
-        form.AddField("Content-Type", "application/json");
 
-        using (UnityWebRequest www = UnityWebRequest.Post(APIURL + "steamticketverify", form))
+        string convertingData = $"{{\r\n    \"sessionTicket\" : \"{sessionTicket}\"\r\n}}";
+        Debug.Log(sessionTicket);
+        byte[] convertedST = Encoding.ASCII.GetBytes(convertingData);
+        RestClient.Request(new RequestHelper
         {
-          yield return www.SendWebRequest();
+          Method = "POST",
+          Uri = $"{APIURL}steamticketverify",
+          ContentType = "application/json",
+          BodyRaw = convertedST
+        }).Then(
+response =>
+{
+  //getting long code
+  Debug.Log(response.Text);
+  SteamUserAccountData steamuseraccountdata = JsonUtility.FromJson<SteamUserAccountData>(response.Text);
+  SignInWithFirebaseToken(steamuseraccountdata.firebaseToken, steamuseraccountdata);
 
-          if (www.result != UnityWebRequest.Result.Success)
-          {
-            Debug.LogError(www.error);
-          }
-          else
-          {
-            string authenticationData = www.downloadHandler.text;
-            //Send to final verification
+}).Catch(Debug.LogError);
 
-          }
-        }
       }
 
-      void SignInWithFirebaseToken(string customToken)
+      void SignInWithFirebaseToken(string customToken, SteamUserAccountData steamuseraccountdata)
       {
         FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
 
@@ -86,7 +100,8 @@ namespace jomarcentermjm.PlatformAPI
           else if (task.IsCompleted)
           {
             FirebaseUser newUser = task.Result.User;
-            _callback(true, null , newUser);
+            Debug.Log(newUser.ToString());
+            _callback(true, null , newUser, steamuseraccountdata, SteamFriends.GetPersonaName());
             
             //Send to MainMenu UI
             //Firebase.Auth.FirebaseUser newUser = task.Result;
@@ -96,6 +111,9 @@ namespace jomarcentermjm.PlatformAPI
       }
 
     }
+
+
+
 
     private static string webpageHTML()
     {
