@@ -291,10 +291,10 @@ namespace Vi.UI
       });
     }
 
-    private IEnumerator WaitForSteamAuth(SteamUserAccountData suad, string steamUsername)
+    private IEnumerator WaitForSteamAuth(FirebaseUser fireAuth,SteamUserAccountData suad, string steamUsername)
     {
       Debug.Log("Waiting on endpoint");
-      yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(suad.userEmail, $"steam:{suad.steamID}");
+      yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(suad.userEmail, fireAuth.UserId);
 
       if (WebRequestManager.Singleton.IsLoggedIn)
       {
