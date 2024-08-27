@@ -27,9 +27,9 @@ namespace Vi.Player
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
 
-        public override void SetImmovable(bool isKinematic)
+        public override void SetImmovable(bool isImmovable)
         {
-            movementPredictionRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
+            movementPredictionRigidbody.constraints = isImmovable ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
         }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
@@ -122,9 +122,6 @@ namespace Vi.Player
         [SerializeField] private Rigidbody movementPredictionRigidbody;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
-        private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private bool isGrounded = true;
         RaycastHit[] allGravityHits = new RaycastHit[10];
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
@@ -151,14 +148,8 @@ namespace Vi.Player
 
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                if (IsOwner)
-                {
-                    moveForwardTarget.Value = 0;
-                    moveSidesTarget.Value = 0;
-                }
-                isGrounded = true;
                 velocity = Vector3.zero;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, movementPrediction.CurrentPosition, newRotation);
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, true, movementPrediction.CurrentPosition, newRotation);
             }
 
             // Handle gravity
@@ -182,6 +173,7 @@ namespace Vi.Player
             }
             gravity += amountToAddToGravity;
 
+            bool isGrounded = true;
             if (bHit)
             {
                 isGrounded = true;
@@ -200,7 +192,6 @@ namespace Vi.Player
                 }
             }
 
-            Vector3 animDir = Vector3.zero;
             // Apply movement
             Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
@@ -264,7 +255,6 @@ namespace Vi.Player
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= isGrounded ? GetRunSpeed() : 0;
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;
-                animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
@@ -293,21 +283,6 @@ namespace Vi.Player
             }
 
             movement.y += stairMovement;
-
-            animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            if (IsOwner)
-            {
-                if (weaponHandler.GetWeapon().IsWalking(weaponHandler.IsBlocking))
-                {
-                    moveForwardTarget.Value = animDir.z / 2;
-                    moveSidesTarget.Value = animDir.x / 2;
-                }
-                else
-                {
-                    moveForwardTarget.Value = animDir.z;
-                    moveSidesTarget.Value = animDir.x;
-                }
-            }
 
             bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
@@ -342,7 +317,6 @@ namespace Vi.Player
             velocity = multiplier * velocity;
             movement += velocity;
 
-            SetPredictionRigidbodyPosition(movementPrediction.CurrentPosition);
             if (movementPredictionRigidbody.SweepTest(movement.normalized, out RaycastHit movementHit, movement.magnitude, QueryTriggerInteraction.Ignore))
             {
                 if (movementHit.distance > 0.5f)
@@ -362,7 +336,7 @@ namespace Vi.Player
                 newPosition = movementPrediction.CurrentPosition + movement + gravity;
             }
 
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, newPosition, newRotation);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, isGrounded, newPosition, newRotation);
         }
 
         private const float drag = 1;
@@ -452,6 +426,11 @@ namespace Vi.Player
 
             if (!IsSpawned) { return; }
 
+            Vector2 walkCycleAnims = movementPrediction.GetWalkCycleAnimationParameters();
+            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", movementPrediction.IsGrounded());
+
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
@@ -504,10 +483,6 @@ namespace Vi.Player
             }
 #endif
             UpdateLocomotion();
-            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded);
-
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 

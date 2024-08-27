@@ -161,8 +161,8 @@ namespace Vi.Core
 					if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
 					{
 						Debug.LogError("Path calculation failed! Setting position..." + myNavHit.position);
-						//SetOrientation(myNavHit.position, transform.rotation);
-					}
+                        //SetOrientation(myNavHit.position, transform.rotation);
+                    }
 					NextPosition = Destination;
 					return false;
 				}
