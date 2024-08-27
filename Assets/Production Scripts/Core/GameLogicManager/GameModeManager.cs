@@ -152,7 +152,7 @@ namespace Vi.Core.GameModeManagers
         {
             SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobPrefab);
 
-            Mob mob = Instantiate(mobPrefab.gameObject, transformData.position, transformData.rotation).GetComponent<Mob>();
+            Mob mob = ObjectPoolingManager.SpawnObject(mobPrefab.GetComponent<PooledObject>(), transformData.position, transformData.rotation).GetComponent<Mob>();
             mob.SetTeam(team);
             mob.NetworkObject.Spawn(true);
             return mob.GetComponent<Mob>();

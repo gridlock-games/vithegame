@@ -257,7 +257,7 @@ namespace Vi.ArtificialIntelligence
             moveForwardTarget.Value = animDir.z;
             moveSidesTarget.Value = animDir.x;
 
-            if (GetVelocity().magnitude <= 0.01f)
+            if (GetVelocity().magnitude <= 1)
             {
                 transform.position += movement;
             }
