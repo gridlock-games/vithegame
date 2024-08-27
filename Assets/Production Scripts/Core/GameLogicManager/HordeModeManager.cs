@@ -32,7 +32,10 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Entering Corrupted Abyss! ";
+            if (IsServer)
+            {
+                roundResultMessage.Value = "Entering Corrupted Abyss! ";
+            }
         }
 
         List<Mob> currentlySpawnedMobs = new List<Mob>();
