@@ -64,6 +64,7 @@ namespace Vi.ArtificialIntelligence
             System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
             float minDistance = 0;
             bool minDistanceInitialized = false;
+            bool targetFound = false;
             for (int i = 0; i < colliders.Length; i++)
             {
                 float dist = Vector3.Distance(transform.position, colliders[i].transform.position);
@@ -85,9 +86,10 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition(), true); }
+                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition(), true); targetFound = true; }
                 }
             }
+            if (!targetFound) { SetDestination(transform.position, true); }
             CalculatePath(transform.position, NavMesh.AllAreas);
         }
     }
