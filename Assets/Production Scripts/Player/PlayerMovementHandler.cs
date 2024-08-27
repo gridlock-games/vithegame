@@ -317,7 +317,6 @@ namespace Vi.Player
             velocity = multiplier * velocity;
             movement += velocity;
 
-            SetPredictionRigidbodyPosition(movementPrediction.CurrentPosition);
             if (movementPredictionRigidbody.SweepTest(movement.normalized, out RaycastHit movementHit, movement.magnitude, QueryTriggerInteraction.Ignore))
             {
                 if (movementHit.distance > 0.5f)

@@ -315,7 +315,6 @@ namespace Vi.ArtificialIntelligence
             velocity = multiplier * velocity;
             movement += velocity;
 
-            networkColliderRigidbody.position = currentPosition.Value;
             if (networkColliderRigidbody.SweepTest(movement.normalized, out RaycastHit movementHit, movement.magnitude, QueryTriggerInteraction.Ignore))
             {
                 if (movementHit.distance > 0.5f)
