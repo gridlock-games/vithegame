@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
@@ -38,12 +39,14 @@ namespace Vi.Player
         public struct StatePayload : INetworkSerializable
         {
             public int tick;
+            public Vector2 moveInput;
             public Vector3 position;
             public Quaternion rotation;
 
-            public StatePayload(int tick, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, InputPayload inputPayload, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
+                moveInput = inputPayload.moveInput;
                 this.position = position;
                 this.rotation = rotation;
             }
@@ -51,9 +54,47 @@ namespace Vi.Player
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref moveInput);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
             }
+        }
+
+        public Vector2 GetWalkCycleAnimationParameters()
+        {
+            if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                return GetWalkCycleAnimParams(IsOwner ? movementHandler.GetMoveInput() : latestServerState.Value.moveInput);
+            }
+        }
+
+        private Vector2 GetWalkCycleAnimParams(Vector2 moveInput)
+        {
+            Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+            animDir = Vector2.ClampMagnitude(animDir, 1);
+
+            if (combatAgent.WeaponHandler.IsBlocking)
+            {
+                switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                {
+                    case Weapon.BlockingLocomotion.NoMovement:
+                        animDir = Vector2.zero;
+                        break;
+                    case Weapon.BlockingLocomotion.CanWalk:
+                        animDir /= 2;
+                        break;
+                    case Weapon.BlockingLocomotion.CanRun:
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                        break;
+                }
+            }
+            return animDir;
         }
 
         private bool applyOverridePosition;
@@ -92,10 +133,12 @@ namespace Vi.Player
         public Quaternion CurrentRotation { get; private set; }
 
         private PlayerMovementHandler movementHandler;
+        private CombatAgent combatAgent;
 
         private void Awake()
         {
             movementHandler = GetComponent<PlayerMovementHandler>();
+            combatAgent = GetComponent<CombatAgent>();
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             inputQueue = new Queue<InputPayload>();
@@ -110,7 +153,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 overrideRotation.Value = transform.rotation;
-                latestServerState.Value = new StatePayload(0, CurrentPosition, CurrentRotation);
+                latestServerState.Value = new StatePayload(0, new InputPayload(), CurrentPosition, CurrentRotation);
                 stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
 
                 inputBuffer.OnListChanged += OnInputBufferChanged;
