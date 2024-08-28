@@ -96,11 +96,11 @@ namespace Vi.ArtificialIntelligence
                 float dist = Vector3.Distance(Destination, transform.position);
                 if (dist < lightAttackDistance)
                 {
-                    weaponHandler.LightAttack(true);
+                    //weaponHandler.LightAttack(true);
                 }
                 else if (dist < ability1Distance & dist > ability1DistanceMin)
                 {
-                    weaponHandler.Ability1(true);
+                    //weaponHandler.Ability1(true);
                 }
             }
         }
