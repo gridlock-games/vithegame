@@ -5615,7 +5615,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 362449380}
-  - {fileID: 1307807559}
   m_Father: {fileID: 1449839911}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7992,7 +7991,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1292102346}
   - component: {fileID: 1292102345}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Light Probe Group (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15545,51 +15544,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9eb4363413f599e42b8236e6d2838f69, type: 3}
---- !u!1 &1307807558
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1307807559}
-  - component: {fileID: 1307807560}
-  m_Layer: 0
-  m_Name: MobSpawnArea b
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1307807559
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1307807558}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.82, y: 0, z: 11.72}
-  m_LocalScale: {x: 5, y: 1, z: 7}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 872297772}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1307807560
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1307807558}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1312425916
 GameObject:
   m_ObjectHideFlags: 0
@@ -20571,7 +20525,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1338164282}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Bake
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21368,7 +21322,7 @@ MonoBehaviour:
   - spawnPosition: {x: -65, y: 4, z: 8}
     spawnAreas:
     - {fileID: 362449381}
-    - {fileID: 1307807560}
+    - {fileID: 0}
     spawnRotations:
     - {x: 0, y: -90, z: 0}
   displayDefaultGizmos: 1
@@ -22906,7 +22860,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1550466566}
   - component: {fileID: 1550466565}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Reflection Probe (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24754,7 +24708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1918030389}
   - component: {fileID: 1918030388}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Global Volume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
