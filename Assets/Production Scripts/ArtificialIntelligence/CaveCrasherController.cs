@@ -211,7 +211,7 @@ namespace Vi.ArtificialIntelligence
 
             if (GetVelocity().magnitude <= 1)
             {
-                //transform.position += movement;
+                transform.position += movement;
             }
         }
 

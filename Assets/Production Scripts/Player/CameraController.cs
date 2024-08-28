@@ -205,6 +205,10 @@ namespace Vi.Player
                     }
                 }
             }
+        }
+
+        private void LateUpdate()
+        {
             movementHandler.ResetLookInput();
         }
 
