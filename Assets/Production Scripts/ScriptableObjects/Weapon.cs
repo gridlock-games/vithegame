@@ -37,6 +37,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float walkSpeed = 2.5f;
         [SerializeField] private BlockingLocomotion blockingLocomotion = BlockingLocomotion.CanRun;
 
+        public BlockingLocomotion GetBlockingLocomotion() { return blockingLocomotion; }
+
         public enum BlockingLocomotion
         {
             NoMovement,

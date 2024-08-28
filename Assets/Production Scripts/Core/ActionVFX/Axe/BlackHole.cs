@@ -46,7 +46,7 @@ namespace Vi.Core.VFX.Axe
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
                         Vector3 rel = transform.position - movementHandler.GetPosition();
-                        movementHandler.AddForce((rel - movementHandler.GetVelocity()) * Time.fixedDeltaTime);
+                        movementHandler.AddForce(rel - movementHandler.GetVelocity());
                     }
                 }
                 else if (!colliders[i].transform.root.GetComponent<ActionVFX>() & colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
@@ -66,7 +66,7 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        //movementHandler.AddForce(transform.position - movementHandler.transform.position);
+                        movementHandler.AddForce(2 * Physics.gravity);
 
                         if (NetworkManager.Singleton.IsServer)
                         {

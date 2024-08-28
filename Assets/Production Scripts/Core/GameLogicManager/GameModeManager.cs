@@ -103,56 +103,11 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        /*
-        protected GameItem SpawnGameItem(GameItem gameItemPrefab, SpawnPoints.TransformData spawnPoint)
-        {
-            if (!IsServer) { Debug.LogError("GameModeManager.SpawnGameItem() should only be called from the server!"); return null; }
-
-            GameItem gameItemInstance = ObjectPoolingManager.SpawnObject(gameItemPrefab.GetComponent<PooledObject>(), spawnPoint.position, spawnPoint.rotation).GetComponent<GameItem>();
-            gameItemInstance.NetworkObject.Spawn(true);
-            return gameItemInstance;
-        }
-
-        protected List<SpawnPoints.TransformData> GetGameItemSpawnPoints()
-        {
-            if (!IsServer) { Debug.LogError("GameModeManager.GetGameItemSpawnPoints() should only be called from the server!"); return null; }
-
-            List<SpawnPoints.TransformData> possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
-
-            bool shouldResetSpawnTracker = false;
-            foreach (int index in gameItemSpawnIndexTracker)
-            {
-                try
-                {
-                    possibleSpawnPoints.RemoveAt(index);
-                }
-                catch
-                {
-                    shouldResetSpawnTracker = true;
-                    break;
-                }
-            }
-
-            if (shouldResetSpawnTracker)
-            {
-                gameItemSpawnIndexTracker.Clear();
-                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
-            }
-            else if (possibleSpawnPoints.Count == 0)
-            {
-                gameItemSpawnIndexTracker.Clear();
-                possibleSpawnPoints = PlayerDataManager.Singleton.GetGameItemSpawnPoints().ToList();
-            }
-
-            return possibleSpawnPoints;
-        }
-        */
-
         protected Mob SpawnMob(Mob mobPrefab, PlayerDataManager.Team team)
         {
             SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobPrefab);
 
-            Mob mob = Instantiate(mobPrefab.gameObject, transformData.position, transformData.rotation).GetComponent<Mob>();
+            Mob mob = ObjectPoolingManager.SpawnObject(mobPrefab.GetComponent<PooledObject>(), transformData.position, transformData.rotation).GetComponent<Mob>();
             mob.SetTeam(team);
             mob.NetworkObject.Spawn(true);
             return mob.GetComponent<Mob>();
@@ -630,6 +585,8 @@ namespace Vi.Core.GameModeManagers
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { disconnectedScoreList.Add(new DisconnectedPlayerScore(characterId, scoreList[index])); }
             scoreList.RemoveAt(index);
         }
+
+        public void ClearDisconnectedScoreList() { disconnectedScoreList.Clear(); }
 
         private void OnRoundTimerChange(float prev, float current)
         {
