@@ -22,6 +22,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3497586699638762050, guid: d70b60ce62a60ad4cb47c0699528d73b,
+        type: 3}
+      propertyPath: m_Radius
+      value: 5.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3497586699638762050, guid: d70b60ce62a60ad4cb47c0699528d73b,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4346061218697999113, guid: d70b60ce62a60ad4cb47c0699528d73b,
         type: 3}
       propertyPath: m_Layer
@@ -144,7 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 656070470
+  GlobalObjectIdHash: 353795319
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
