@@ -227,7 +227,7 @@ namespace Vi.UI
                 currentOverlayMessage = "Attack The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("LightAttack") | action.name.Contains("Move")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("LightAttack") | action.name.Contains("Move") | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
@@ -261,7 +261,7 @@ namespace Vi.UI
                 currentOverlayMessage = "Perform A Combo On The Enemy.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("LightAttack") | action.name.Contains("Move") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("LightAttack") | action.name.Contains("Move") | action.name.Contains("Look") | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
                 }
                 attributes.ResetComboCounter();
 
@@ -298,7 +298,7 @@ namespace Vi.UI
                 List<string> abilityNames = new List<string>() { "Ability1", "Ability2", "Ability3" };
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (abilityNames.Contains(action.name) | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
                     else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
@@ -324,7 +324,7 @@ namespace Vi.UI
                 List<string> abilityNames = new List<string>() { "Ability4" };
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (abilityNames.Contains(action.name)) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (abilityNames.Contains(action.name) | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
                     else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
@@ -372,6 +372,8 @@ namespace Vi.UI
                     if (action.name.Contains("Block") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
                     else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
+
+                if (weaponHandler.CanADS) { weaponHandler.AimDownSights(false); }
 
                 foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
                 {
