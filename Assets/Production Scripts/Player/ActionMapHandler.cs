@@ -90,6 +90,7 @@ namespace Vi.Player
         private void OnDestroy()
         {
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
+            Cursor.lockState = CursorLockMode.None;
         }
 
         private void ToggleScoreboard(bool isOn)
