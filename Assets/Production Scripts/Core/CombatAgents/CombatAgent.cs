@@ -413,10 +413,10 @@ namespace Vi.Core
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+                if (IsServer) { isRaging.Value = false; }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                isRaging.Value = false;
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             }

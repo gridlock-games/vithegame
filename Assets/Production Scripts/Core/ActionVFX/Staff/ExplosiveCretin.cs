@@ -35,9 +35,9 @@ namespace Vi.Core.VFX.Staff
             {
                 if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (networkCollider.CombatAgent == attacker) { continue; }
+                    if (networkCollider.CombatAgent == GetAttacker()) { continue; }
 
-                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(attacker, networkCollider.CombatAgent);
+                    bool shouldAffect = PlayerDataManager.Singleton.CanHit(GetAttacker(), networkCollider.CombatAgent);
                     if (shouldAffect)
                     {
                         if (spellType == SpellType.GroundSpell)
@@ -48,14 +48,14 @@ namespace Vi.Core.VFX.Staff
                             }
                             else
                             {
-                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
-                                    attack, networkCollider.CombatAgent.transform.position, transform.position);
+                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
+                                    GetAttack(), networkCollider.CombatAgent.transform.position, transform.position);
                             }
                         }
                         else
                         {
-                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
-                                    attack, networkCollider.CombatAgent.transform.position, transform.position);
+                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
+                                    GetAttack(), networkCollider.CombatAgent.transform.position, transform.position);
                         }
                         NetworkObject.Despawn(true);
                     }

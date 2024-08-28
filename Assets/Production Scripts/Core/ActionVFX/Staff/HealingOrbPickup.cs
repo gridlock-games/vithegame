@@ -22,7 +22,7 @@ namespace Vi.Core.VFX.Staff
 
             if (other.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (!PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, attacker))
+                if (!PlayerDataManager.Singleton.CanHit(networkCollider.CombatAgent, GetAttacker()))
                 {
                     if (!Mathf.Approximately(networkCollider.CombatAgent.GetHP(), networkCollider.CombatAgent.GetMaxHP()))
                     {

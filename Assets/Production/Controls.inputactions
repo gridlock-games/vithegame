@@ -195,6 +195,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "IncrementFollowPlayer",
+                    "type": "Button",
+                    "id": "99a8075a-7c7c-4567-b413-ff71f15308d1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DecrementFollowPlayer",
+                    "type": "Button",
+                    "id": "d5e4b67c-0a93-452a-9a68-f5b4d1ccdab0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "DisableBots",
                     "type": "Button",
                     "id": "788e612b-1b33-4ef0-ba01-1b9fe58a4d25",
@@ -213,18 +231,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "IncrementFollowPlayer",
+                    "name": "AddForce",
                     "type": "Button",
-                    "id": "99a8075a-7c7c-4567-b413-ff71f15308d1",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "DecrementFollowPlayer",
-                    "type": "Button",
-                    "id": "d5e4b67c-0a93-452a-9a68-f5b4d1ccdab0",
+                    "id": "c17c26bf-db90-4a59-90cc-91f1870a38a6",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -586,17 +595,6 @@
                 },
                 {
                     "name": "",
-                    "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
-                    "path": "<Keyboard>/p",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "TimeScaleChange",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3dcc3ad7-9e2b-432f-801d-78a1ccd3b81f",
                     "path": "<Keyboard>/i",
                     "interactions": "",
@@ -636,17 +634,6 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Weapon2",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0c164bc4-cb67-4967-b518-63e813fa52e9",
-                    "path": "<Keyboard>/o",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "DisableBots",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -812,6 +799,39 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "CancelAbility",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eb38da9c-c182-49b2-a9b8-636de0dbee7c",
+                    "path": "<Keyboard>/u",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AddForce",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "TimeScaleChange",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c164bc4-cb67-4967-b518-63e813fa52e9",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "DisableBots",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

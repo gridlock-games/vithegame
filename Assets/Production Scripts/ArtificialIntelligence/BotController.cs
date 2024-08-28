@@ -28,7 +28,6 @@ namespace Vi.ArtificialIntelligence
             networkColliderRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
         }
 
-        private Vector3 lastMovement;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             if (!IsServer) { return; }
@@ -39,8 +38,21 @@ namespace Vi.ArtificialIntelligence
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                velocity = newVelocity;
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
+
+        private const float friction = 1;
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
@@ -52,6 +64,17 @@ namespace Vi.ArtificialIntelligence
             //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
             //    }
             //}
+
+            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
+            {
+                Vector3 normal = collision.GetContact(0).normal;
+                Vector3 newVelocity;
+                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
+                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
+                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
+                velocity = newVelocity;
+            }
+
             currentPosition.Value = networkColliderRigidbody.position;
         }
 
@@ -92,8 +115,16 @@ namespace Vi.ArtificialIntelligence
             if (networkColliderRigidbody) { Destroy(networkColliderRigidbody.gameObject); }
         }
 
-        [SerializeField] private float angularSpeed = 540;
-        [SerializeField] private float runSpeed = 5;
+        private float GetTickRateDeltaTime()
+        {
+            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
+        }
+
+        private float GetRootMotionSpeed()
+        {
+            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
+        }
+
         [SerializeField] private float runAnimationTransitionSpeed = 5;
         [SerializeField] private float gravitySphereCastRadius = 0.75f;
         [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
@@ -117,9 +148,9 @@ namespace Vi.ArtificialIntelligence
             else if (attributes.AnimationHandler.IsGrabAttacking())
                 newRotation = currentRotation.Value;
             else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * GetTickRateDeltaTime());
             else if (!attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * (1f / NetworkManager.NetworkTickSystem.TickRate));
+                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * GetTickRateDeltaTime());
 
             currentRotation.Value = newRotation;
 
@@ -129,7 +160,7 @@ namespace Vi.ArtificialIntelligence
                 moveForwardTarget.Value = 0;
                 moveSidesTarget.Value = 0;
                 isGrounded.Value = true;
-                lastMovement = Vector3.zero;
+                velocity = Vector3.zero;
                 return;
             }
 
@@ -156,9 +187,10 @@ namespace Vi.ArtificialIntelligence
             Vector3 amountToAddToGravity = Vector3.zero;
             for (int i = 0; i < allHitsCount; i++)
             {
-                if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                amountToAddToGravity = 1f / NetworkManager.NetworkTickSystem.TickRate * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
                 bHit = true;
+                if (Mathf.Approximately(allHits[i].distance, 0)) { continue; }
+                if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
                 minDistance = allHits[i].distance;
                 minDistanceInitialized = true;
             }
@@ -178,13 +210,13 @@ namespace Vi.ArtificialIntelligence
                 else
                 {
                     isGrounded.Value = false;
-                    gravity += 1f / NetworkManager.NetworkTickSystem.TickRate * Physics.gravity;
+                    gravity += GetTickRateDeltaTime() * Physics.gravity;
                 }
             }
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -206,8 +238,8 @@ namespace Vi.ArtificialIntelligence
                 //Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
                 Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded.Value ? Mathf.Max(0, runSpeed - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount() : 0;
-                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : 1f / NetworkManager.NetworkTickSystem.TickRate * Time.timeScale * targetDirection;
+                targetDirection *= isGrounded.Value ? GetRunSpeed() : 0;
+                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;
                 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
             }
 
@@ -223,8 +255,9 @@ namespace Vi.ArtificialIntelligence
                 {
                     break;
                 }
-
-                if (Application.isEditor) { Debug.DrawRay(startPos, movement.normalized, Color.cyan, 1f / NetworkManager.NetworkTickSystem.TickRate); }
+#if UNITY_EDITOR
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
                 startPos.y += yOffset;
                 stairMovement = startPos.y - currentPosition.Value.y - yOffset;
 
@@ -238,43 +271,64 @@ namespace Vi.ArtificialIntelligence
             movement.y += stairMovement;
 
             animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            if (IsOwner)
+            if (weaponHandler.GetWeapon().IsWalking(weaponHandler.IsBlocking))
+            {
+                moveForwardTarget.Value = animDir.z / 2;
+                moveSidesTarget.Value = animDir.x / 2;
+            }
+            else
             {
                 moveForwardTarget.Value = animDir.z;
                 moveSidesTarget.Value = animDir.x;
             }
-
+            
             bool wasPlayerHit = Physics.CapsuleCast(currentPosition.Value, currentPosition.Value + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             //bool wasPlayerHit = Physics.Raycast(currentPosition.Value + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             if (wasPlayerHit)
             {
-                Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
-                float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                if (angle > 180) { angle -= 360; }
-
-                if (angle > -20 & angle < 20)
+                bool collidersIgnoreEachOther = false;
+                foreach (Collider c in attributes.NetworkCollider.Colliders)
                 {
-                    movement = Vector3.zero;
+                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
+                    {
+                        collidersIgnoreEachOther = true;
+                        break;
+                    }
+                }
+
+                if (!collidersIgnoreEachOther)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
+                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+
+                    if (angle > 180) { angle -= 360; }
+
+                    if (angle > -20 & angle < 20)
+                    {
+                        movement = Vector3.zero;
+                    }
                 }
             }
 
-            movement += forceAccumulated;
-            forceAccumulated = Vector3.zero;
+            float multiplier = 1.0f - drag * GetTickRateDeltaTime();
+            if (multiplier < 0.0f) multiplier = 0.0f;
+            velocity = multiplier * velocity;
+            movement += velocity;
 
             Vector3 newPosition;
-            if (Mathf.Approximately(movement.y, 0))
-            {
-                newPosition = currentPosition.Value + movement + gravity;
-            }
-            else
+            if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
             {
                 newPosition = currentPosition.Value + movement;
             }
+            else
+            {
+                newPosition = currentPosition.Value + movement + gravity;
+            }
 
             currentPosition.Value = newPosition;
-            lastMovement = movement;
         }
+
+        private const float drag = 1;
 
         private List<CombatAgent> activePlayers = new List<CombatAgent>();
         private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes); }
@@ -302,17 +356,23 @@ namespace Vi.ArtificialIntelligence
 
             if (attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                SetDestination(currentPosition.Value);
+                SetDestination(currentPosition.Value, true);
             }
-            else
-            {
-                UpdateLocomotion();
-                attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-                attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-                attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
-            }
+
+            UpdateLocomotion();
+            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
         }
-        
+
+        public override Vector3 GetVelocity() { return velocity; }
+
+        Vector3 velocity;
+        public override void AddForce(Vector3 force)
+        {
+            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force; }
+        }
+
         private void RefreshStatus()
         {
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
@@ -341,13 +401,13 @@ namespace Vi.ArtificialIntelligence
 
                     if (disableBots)
                     {
-                        SetDestination(currentPosition.Value);
+                        SetDestination(currentPosition.Value, true);
                     }
                     else
                     {
                         if (targetAttributes)
                         {
-                            SetDestination(targetAttributes.transform.position);
+                            SetDestination(targetAttributes.transform.position, true);
                         }
                         else
                         {
@@ -357,7 +417,7 @@ namespace Vi.ArtificialIntelligence
                                 Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
                                 randomDirection += transform.position;
                                 NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                                SetDestination(hit.position);
+                                SetDestination(hit.position, true);
                             }
                         }
                         EvaluteAction();
@@ -365,7 +425,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else if (disableBots)
                 {
-                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value); }
+                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
                 }
 
                 yield return new WaitForSeconds(0.1f);
@@ -375,7 +435,7 @@ namespace Vi.ArtificialIntelligence
         private const float lightAttackDistance = 3;
         private const float heavyAttackDistance = 7;
 
-        private const float chargeAttackDuration = 0.5f;
+        private const float chargeAttackDuration = 1;
         private const float chargeWaitDuration = 2;
         private float lastChargeAttackTime;
 
@@ -413,22 +473,30 @@ namespace Vi.ArtificialIntelligence
                 if (weaponHandler.CanADS)
                 {
                     weaponHandler.AimDownSights(true);
-                }
-
-                if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
-                {
-                    weaponHandler.LightAttack(true);
-
-                    EvaluateAbility();
-                }
-                else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
-                {
-                    if (!weaponHandler.CanADS)
+                    if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                     {
-                        if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
+                        weaponHandler.LightAttack(true);
+                        EvaluateAbility();
                     }
-
-                    EvaluateAbility();
+                }
+                else
+                {
+                    if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
+                    {
+                        if (!isHeavyAttacking)
+                        {
+                            weaponHandler.LightAttack(true);
+                            EvaluateAbility();
+                        }
+                    }
+                    else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
+                    {
+                        if (!weaponHandler.CanADS)
+                        {
+                            if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
+                        }
+                        EvaluateAbility();
+                    }
                 }
             }
 
@@ -492,15 +560,7 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        Vector3 forceAccumulated;
-        private const float forceMultiplier = 10;
-        public override void AddForce(Vector3 force)
-        {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { forceAccumulated += forceMultiplier * Time.fixedDeltaTime * force; }
-        }
-
         private float positionStrength = 1;
-        //private float rotationStrength = 1;
         void FixedUpdate()
         {
             if (Vector3.Distance(networkColliderRigidbody.position, currentPosition.Value) > 4)
@@ -511,30 +571,52 @@ namespace Vi.ArtificialIntelligence
             {
                 Vector3 deltaPos = currentPosition.Value - networkColliderRigidbody.position;
                 networkColliderRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
-
-                //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
-                //if (angle > 180.0f) angle -= 360.0f;
-                //movementPredictionRigidbody.angularVelocity = 1f / Time.fixedDeltaTime * 0.01745329251994f * angle * Mathf.Pow(rotationStrength, 90f * Time.fixedDeltaTime) * axis;
             }
+        }
+
+        private float GetRunSpeed()
+        {
+            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
+        }
+
+        private float GetAnimatorSpeed()
+        {
+            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
         private void UpdateLocomotion()
         {
             if (Vector3.Distance(transform.position, currentPosition.Value) > 2)
             {
-                //Debug.Log("Teleporting player: " + OwnerClientId);
+                Debug.Log("Teleporting player: " + OwnerClientId + " " + name);
                 transform.position = currentPosition.Value;
             }
             else
             {
-                Vector3 movement = Time.deltaTime * (NetworkManager.NetworkTickSystem.TickRate / 2) * (currentPosition.Value - transform.position);
+                Vector3 newPosition;
+                Vector2 horizontalPosition;
+                if (attributes.AnimationHandler.ShouldApplyRootMotion())
+                {
+                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(currentPosition.Value.x, currentPosition.Value.z),
+                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
+                }
+                else
+                {
+                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
+                        new Vector2(currentPosition.Value.x, currentPosition.Value.z),
+                        Time.deltaTime * GetRunSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
+                }
+                newPosition.x = horizontalPosition.x;
+                newPosition.z = horizontalPosition.y;
+                newPosition.y = Mathf.MoveTowards(transform.position.y, currentPosition.Value.y, Time.deltaTime * -Physics.gravity.y + velocity.y / Time.fixedDeltaTime);
 
                 if (attributes.ShouldShake())
                 {
-                    movement += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
+                    newPosition += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
                 }
 
-                transform.position += movement;
+                transform.position = newPosition;
             }
 
             if (weaponHandler.CurrentActionClip != null)
@@ -558,7 +640,7 @@ namespace Vi.ArtificialIntelligence
                     }
                     else
                     {
-                        attributes.AnimationHandler.Animator.speed = (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+                        attributes.AnimationHandler.Animator.speed = GetAnimatorSpeed();
                     }
                 }
             }
@@ -569,6 +651,11 @@ namespace Vi.ArtificialIntelligence
                 transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
             else
                 transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
+        }
+
+        private void LateUpdate()
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
         }
 
         void OnDodge()
