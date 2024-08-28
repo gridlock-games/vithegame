@@ -58,6 +58,12 @@ namespace Vi.UI
         [SerializeField] private GameObject playParent;
 
         [SerializeField] private Text welcomeUserText;
+        [SerializeField] private Image welcomeUserImage;
+
+        [SerializeField] private Sprite facebookImageSprite;
+        [SerializeField] private Sprite googleImageSprite;
+        [SerializeField] private Sprite steamImageSprite;
+        [SerializeField] private Sprite baseImageSprite;
 
         [Header("Editor Only")]
         [SerializeField] private Button startHubServerButton;
@@ -302,6 +308,7 @@ namespace Vi.UI
         initialParent.SetActive(false);
         oAuthParent.SetActive(false);
         welcomeUserText.text = steamUsername;
+        welcomeUserImage.sprite = steamImageSprite;
         FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Steam");
       }
       else
@@ -434,6 +441,7 @@ namespace Vi.UI
             yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
 
             welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
+            welcomeUserImage.sprite = baseImageSprite;
             usernameInput.interactable = true;
             passwordInput.interactable = true;
         }
@@ -521,6 +529,7 @@ namespace Vi.UI
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
                 welcomeUserText.text = authResult.User.DisplayName;
+        welcomeUserImage.sprite = googleImageSprite;
                 FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Google");
                 FasterPlayerPrefs.Singleton.SetString("GoogleIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
@@ -605,6 +614,7 @@ namespace Vi.UI
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
                 welcomeUserText.text = authResult.User.DisplayName;
+                welcomeUserImage.sprite = facebookImageSprite;
                 FasterPlayerPrefs.Singleton.SetString("LastSignInType", "Facebook");
                 FasterPlayerPrefs.Singleton.SetString("FacebookIdTokenResponse", JsonUtility.ToJson(tokenData));
             }
