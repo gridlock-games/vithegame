@@ -87,8 +87,6 @@ namespace Vi.ArtificialIntelligence
 
         private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
-
-        private RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void EvaluteAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -98,11 +96,11 @@ namespace Vi.ArtificialIntelligence
                 float dist = Vector3.Distance(Destination, transform.position);
                 if (dist < lightAttackDistance)
                 {
-                    //weaponHandler.LightAttack(true);
+                    weaponHandler.LightAttack(true);
                 }
                 else if (dist < ability1Distance & dist > ability1DistanceMin)
                 {
-                    //weaponHandler.Ability1(true);
+                    weaponHandler.Ability1(true);
                 }
             }
         }
@@ -213,7 +211,7 @@ namespace Vi.ArtificialIntelligence
 
             if (GetVelocity().magnitude <= 1)
             {
-                transform.position += movement;
+                //transform.position += movement;
             }
         }
 

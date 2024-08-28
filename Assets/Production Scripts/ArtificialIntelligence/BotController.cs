@@ -404,7 +404,7 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
-                        targetAttributes = player;
+                        if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
                         break;
                     }
 
@@ -414,11 +414,7 @@ namespace Vi.ArtificialIntelligence
                     }
                     else
                     {
-                        if (targetAttributes)
-                        {
-                            SetDestination(targetAttributes.transform.position, true);
-                        }
-                        else
+                        if (!targetAttributes)
                         {
                             if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
                             {
