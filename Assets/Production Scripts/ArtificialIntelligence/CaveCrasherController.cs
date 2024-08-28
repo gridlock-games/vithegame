@@ -6,6 +6,7 @@ using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Core.Structures;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -18,13 +19,13 @@ namespace Vi.ArtificialIntelligence
             base.Awake();
             animator = GetComponent<Animator>();
             combatAgent = GetComponent<CombatAgent>();
+            GetComponent<PooledObject>().OnSpawnFromPool += OnSpawnFromPool;
         }
 
-        private void Start()
+        private void OnSpawnFromPool()
         {
             UpdateActivePlayersList();
             UpdateStructureList();
-            StartCoroutine(EvaluateBotLogic());
         }
 
         private List<CombatAgent> activePlayers = new List<CombatAgent>();
@@ -34,57 +35,51 @@ namespace Vi.ArtificialIntelligence
         private void UpdateStructureList() { structures = PlayerDataManager.Singleton.GetActiveStructures(); }
 
         HittableAgent targetObject;
-        private IEnumerator EvaluateBotLogic()
+        private void EvaluateBotLogic()
         {
-            while (true)
+            if (IsOwner)
             {
-                if (IsOwner)
+                targetObject = null;
+                float distanceToStructure = 100;
+                foreach (Structure structure in structures)
                 {
-                    activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
-
-                    targetObject = null;
-                    float distanceToStructure = 100;
-                    foreach (Structure structure in structures)
-                    {
-                        if (!structure) { continue; }
-                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        targetObject = structure;
-                        distanceToStructure = Vector3.Distance(transform.position, structure.transform.position);
-                        break;
-                    }
-
-                    foreach (CombatAgent player in activePlayers)
-                    {
-                        if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
-                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
-
-                        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-                        if (distanceToPlayer < 11 & distanceToPlayer < distanceToStructure)
-                        {
-                            targetObject = player;
-                        }
-                        break;
-                    }
-
-                    if (targetObject)
-                    {
-                        SetDestination(targetObject.transform.position, false);
-                    }
-                    else
-                    {
-                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
-                        {
-                            float walkRadius = 500;
-                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                            randomDirection += transform.position;
-                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            SetDestination(hit.position, false);
-                        }
-                    }
-                    EvaluteAction();
+                    if (!structure) { Debug.LogError("There is a null strcture in the structures list!"); continue; }
+                    if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
+                    targetObject = structure;
+                    distanceToStructure = Vector3.Distance(transform.position, structure.transform.position);
+                    break;
                 }
 
-                yield return new WaitForSeconds(0.1f);
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                foreach (CombatAgent player in activePlayers)
+                {
+                    if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                    if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
+
+                    float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+                    if (distanceToPlayer < 11 & distanceToPlayer < distanceToStructure)
+                    {
+                        targetObject = player;
+                    }
+                    break;
+                }
+
+                if (targetObject)
+                {
+                    SetDestination(targetObject.transform.position, false);
+                }
+                else
+                {
+                    if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
+                    {
+                        float walkRadius = 500;
+                        Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                        randomDirection += transform.position;
+                        NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                        SetDestination(hit.position, false);
+                    }
+                }
+                EvaluteAction();
             }
         }
 
@@ -92,8 +87,6 @@ namespace Vi.ArtificialIntelligence
 
         private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
-
-        private RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void EvaluteAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -109,47 +102,6 @@ namespace Vi.ArtificialIntelligence
                 {
                     weaponHandler.Ability1(true);
                 }
-            }
-        }
-
-        private void EvalLightAttack()
-        {
-#if UNITY_EDITOR
-            ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.blue, 1f / NetworkManager.NetworkTickSystem.TickRate);
-#endif
-
-            int rootMotionHitCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
-                ActionClip.boxCastHalfExtents, transform.forward.normalized, rootMotionHits,
-                transform.rotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-
-            float minDistance = 0;
-            bool minDistanceInitialized = false;
-            IHittable target = null;
-            for (int i = 0; i < rootMotionHitCount; i++)
-            {
-                if (rootMotionHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-
-                if (rootMotionHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
-                {
-                    if (networkCollider.CombatAgent == combatAgent) { continue; }
-
-                    target = networkCollider.CombatAgent;
-                    minDistance = rootMotionHits[i].distance;
-                    minDistanceInitialized = true;
-                }
-                else if (rootMotionHits[i].transform.root.TryGetComponent(out IHittable hittable))
-                {
-                    if ((Object)hittable == combatAgent) { continue; }
-                    target = hittable;
-                    minDistance = rootMotionHits[i].distance;
-                    minDistanceInitialized = true;
-                }
-            }
-
-            Debug.Log(minDistance + " " + target);
-            if (minDistance < lightAttackDistance & target != null)
-            {
-                weaponHandler.LightAttack(true);
             }
         }
 
@@ -257,7 +209,10 @@ namespace Vi.ArtificialIntelligence
             moveForwardTarget.Value = animDir.z;
             moveSidesTarget.Value = animDir.x;
 
-            transform.position += movement;
+            if (GetVelocity().magnitude <= 1)
+            {
+                transform.position += movement;
+            }
         }
 
         private new void Update()
@@ -266,6 +221,7 @@ namespace Vi.ArtificialIntelligence
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
             if (PlayerDataManager.Singleton.StructuresListWasUpdatedThisFrame) { UpdateStructureList(); }
             ProcessMovement();
+            EvaluateBotLogic();
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
             animator.SetFloat("MoveSides", Mathf.MoveTowards(animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }

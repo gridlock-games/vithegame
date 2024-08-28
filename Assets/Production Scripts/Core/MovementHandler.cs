@@ -22,8 +22,14 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
+			Debug.Log(name + " setting orientation " + newPosition);
 			transform.position = newPosition;
 			transform.rotation = newRotation;
+
+			if (rb)
+            {
+				rb.velocity = Vector3.zero;
+            }
 		}
 
 		public virtual Vector3 GetPosition() { return transform.position; }
@@ -34,14 +40,8 @@ namespace Vi.Core
 
 		public virtual Vector3 GetVelocity()
         {
-			if (TryGetComponent(out Rigidbody rb))
-            {
-				return rb.velocity;
-            }
-			else
-            {
-				return Vector3.zero;
-            }
+			if (rb) { return rb.velocity; }
+			return Vector3.zero;
         }
 
 		//protected const float collisionPushDampeningFactor = 0;
@@ -49,10 +49,7 @@ namespace Vi.Core
 		protected const float bodyRadius = 0.5f;
 		public virtual void AddForce(Vector3 force)
         {
-			if (TryGetComponent(out Rigidbody rb))
-            {
-				rb.AddForce(force, ForceMode.VelocityChange);
-            }
+			if (rb) { rb.AddForce(force * Time.fixedDeltaTime, ForceMode.VelocityChange); }
         }
 
 		public virtual void SetImmovable(bool isImmovable) { }
@@ -61,23 +58,22 @@ namespace Vi.Core
 		protected Vector3 Destination { get; private set; }
 
 		private const float destinationNavMeshDistanceThreshold = 20;
-		protected void SetDestination(Vector3 destination, bool useExactDestination)
+		protected bool SetDestination(Vector3 destination, bool useExactDestination)
         {
-			//Vector3 targetPosition = destination;
-			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
-
-			if (!IsSpawned) { return; }
+			if (!IsSpawned) { return false; }
 
 			if (useExactDestination)
             {
 				if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
 				{
 					Destination = myNavHit.position;
+					return true;
 				}
 				else
 				{
-					Debug.LogError("Destination point is not on nav mesh!");
-					Destination = destination;
+                    Debug.LogError("Destination point is not on nav mesh! " + name);
+                    Destination = destination;
+					return false;
 				}
 			}
 			else
@@ -85,11 +81,13 @@ namespace Vi.Core
 				if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
 				{
 					Destination = myNavHit.position;
+					return true;
 				}
 				else
 				{
-					Debug.LogError("Destination point is not on nav mesh!");
-					Destination = destination;
+                    Debug.LogError("Destination point is not on nav mesh! " + name);
+                    Destination = destination;
+					return false;
 				}
 			}
         }
@@ -99,12 +97,13 @@ namespace Vi.Core
 
 		private const float nextPositionAngleThreshold = 10;
 		private const float nextPositionDistanceThreshold = 1;
+		private const float startPositionNavMeshDistanceThreshold = 10;
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
 			if (!IsSpawned) { return false; }
 
-			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
             {
 				startPosition = hit.position;
 				if (NavMesh.CalculatePath(startPosition, Destination, areaMask, path))
@@ -158,18 +157,19 @@ namespace Vi.Core
 				}
 				else
 				{
-					if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
-					{
-						Debug.LogError("Path calculation failed! Setting position..." + myNavHit.position);
-                        //SetOrientation(myNavHit.position, transform.rotation);
-                    }
+					//Debug.LogError("Path calculation failed! " + name);
+					//SetOrientation(myNavHit.position, transform.rotation);
 					NextPosition = Destination;
 					return false;
 				}
 			}
 			else
             {
-				Debug.LogError("Start Position is not on navmesh!");
+				Debug.LogError("Start Position is not on navmesh! " + name);
+				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, NavMesh.AllAreas))
+				{
+					SetOrientation(myNavHit.position, transform.rotation);
+				}
 				NextPosition = Destination;
 				return false;
             }
@@ -212,12 +212,14 @@ namespace Vi.Core
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
+		protected Rigidbody rb;
 
         protected void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
+			rb = GetComponent<Rigidbody>();
 			RefreshStatus();
 			if (playerInput)
             {

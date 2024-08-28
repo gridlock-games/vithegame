@@ -144,6 +144,14 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
 
             PlayerDataManager.Singleton.RemoveCombatAgent(this);
+
+            if (IsServer)
+            {
+                SetInviniciblity(0);
+                SetUninterruptable(0);
+                ResetAilment();
+                StatusAgent.RemoveAllStatuses();
+            }
         }
 
         protected void OnEnable()

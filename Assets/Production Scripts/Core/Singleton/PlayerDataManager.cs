@@ -467,7 +467,11 @@ namespace Vi.Core
             StructuresListWasUpdatedThisFrame = false;
         }
 
-        public Structure[] GetActiveStructures() { return activeStructures.ToArray(); }
+        public Structure[] GetActiveStructures()
+        {
+            activeStructures.RemoveAll(item => !item);
+            return activeStructures.ToArray();
+        }
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
