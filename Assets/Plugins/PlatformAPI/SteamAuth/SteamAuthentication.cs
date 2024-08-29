@@ -29,6 +29,7 @@ namespace jomarcentermjm.PlatformAPI
     public string firebaseToken;
     public uint steamID;
     public string userEmail;
+    public bool isSteamCafe;
   }
   public static partial class SteamAuthentication
   {
