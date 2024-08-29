@@ -307,7 +307,7 @@ namespace Vi.Player
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
-            if (applyOverridePosition) { movementHandler.SetPredictionRigidbodyPosition(overridePosition); statePayload.position = overridePosition; applyOverridePosition = false; }
+            if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
             
             if (IsServer)
             {

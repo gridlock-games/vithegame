@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
-using System.Linq;
 
 namespace Vi.Core
 {
@@ -22,7 +21,6 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
-			Debug.Log(name + " setting orientation " + newPosition);
 			transform.position = newPosition;
 			transform.rotation = newRotation;
 

@@ -413,7 +413,7 @@ namespace Vi.Core
                     curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
                 }
 
-                networkRootMotion += curveAdjustedLocalRootMotion;
+                networkRootMotion += curveAdjustedLocalRootMotion / Time.deltaTime;
                 localRootMotion += curveAdjustedLocalRootMotion;
             }
         }
