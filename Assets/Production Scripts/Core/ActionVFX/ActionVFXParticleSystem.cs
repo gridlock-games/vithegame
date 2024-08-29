@@ -25,8 +25,8 @@ namespace Vi.Core.VFX
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
-        private ParticleSystem[] particleSystems;
-        private Collider[] colliders;
+        private ParticleSystem[] particleSystems = new ParticleSystem[0];
+        private Collider[] colliders = new Collider[0];
         private new void Awake()
         {
             base.Awake();
@@ -68,8 +68,9 @@ namespace Vi.Core.VFX
         }
 
         RaycastHit[] allHits = new RaycastHit[10];
-        private void Start()
+        private new void OnEnable()
         {
+            base.OnEnable();
             if (scaleVFXBasedOnEdges)
             {
                 Vector3 endBoundsPoint = boundsPoint;
@@ -79,7 +80,7 @@ namespace Vi.Core.VFX
                         (transform.rotation * boundsLocalAxis).normalized, allHits, 1,
                         LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
 
-                    # if UNITY_EDITOR
+                    #if UNITY_EDITOR
                     Debug.DrawRay(transform.position + (transform.rotation * endBoundsPoint), transform.rotation * boundsLocalAxis, Color.yellow, 3);
                     #endif
 
@@ -203,6 +204,15 @@ namespace Vi.Core.VFX
         {
             base.OnDisable();
             hitCounter.Clear();
+            foreach (ParticleSystem ps in particleSystems)
+            {
+                for (int i = 0; i < ps.trigger.colliderCount; i++)
+                {
+                    ps.trigger.RemoveCollider(i);
+                }
+            }
+
+            particleEnterCalledThisFrame = false;
         }
 
         private bool particleEnterCalledThisFrame;

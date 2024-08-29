@@ -55,8 +55,12 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatuses() should only be called on the server"); return; }
 
             if (stopAllStatusesCoroutine != null) { StopCoroutine(stopAllStatusesCoroutine); }
-            stopAllStatuses = true;
-            stopAllStatusesCoroutine = StartCoroutine(ResetStopAllStatusesBool());
+
+            if (gameObject.activeInHierarchy)
+            {
+                stopAllStatuses = true;
+                stopAllStatusesCoroutine = StartCoroutine(ResetStopAllStatusesBool());
+            }
         }
 
         private Coroutine stopAllStatusesCoroutine;
