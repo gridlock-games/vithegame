@@ -281,48 +281,57 @@ namespace Vi.Core
                 if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
             }
 
-            if (actionClip.IsAttack() & actionClip.canLunge & !isFollowUpClip)
+            if (!isFollowUpClip)
             {
-                ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
-                lungeClip.name = lungeClip.name.Replace("(Clone)", "");
-                lungeClip.isInvincible = actionClip.isInvincible;
-                lungeClip.isUninterruptable = actionClip.isUninterruptable;
-
-                if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
+                if (actionClip.IsAttack())
                 {
-                    // Lunge mechanic
-                    # if UNITY_EDITOR
-                    ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
-                    # endif
-                    int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
-                        ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
-                        ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-
-                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                    for (int i = 0; i < allHitsCount; i++)
+                    if (actionClip.canLunge)
                     {
-                        if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                        if (!IsLunging())
                         {
-                            if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                            ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
+                            lungeClip.name = lungeClip.name.Replace("(Clone)", "");
+                            lungeClip.isInvincible = actionClip.isInvincible;
+                            lungeClip.isUninterruptable = actionClip.isUninterruptable;
+
+                            if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                                angleList.Add((networkCollider,
-                                    Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
-                                    allHits[i]));
-                            }
-                        }
-                    }
+                                // Lunge mechanic
+                                #if UNITY_EDITOR
+                                ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
+                                #endif
+                                int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
+                                    ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
+                                    ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
 
-                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
-                    {
-                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                        float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
-                        if (angle < ActionClip.maximumLungeAngle & dist >= actionClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
-                        {
-                            PlayAction(lungeClip);
-                            waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
-                            return;
+                                List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                                for (int i = 0; i < allHitsCount; i++)
+                                {
+                                    if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                                    {
+                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                                        {
+                                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                            angleList.Add((networkCollider,
+                                                Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
+                                                allHits[i]));
+                                        }
+                                    }
+                                }
+
+                                angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                                foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                                {
+                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                    float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
+                                    if (angle < ActionClip.maximumLungeAngle & dist >= actionClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
+                                    {
+                                        PlayAction(lungeClip);
+                                        waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
+                                        return;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

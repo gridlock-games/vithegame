@@ -59,14 +59,14 @@ namespace Vi.UI
 
         private void OnEnable()
         {
+            transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
+
             if (!combatAgent)
             {
                 combatAgent = GetComponentInParent<CombatAgent>();
 
                 transform.SetParent(null, true);
-
-                transform.localScale = Vector3.zero;
-                healthBarParent.localScale = Vector3.zero;
 
                 rendererToFollow = null;
 

@@ -110,7 +110,7 @@ namespace Vi.Player
             else
             {
                 if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
-                ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance);
+                if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
             }
 
             if (playerUIInstance)
@@ -119,9 +119,12 @@ namespace Vi.Player
                 spectatorUIInstance.SetActive(!isOn);
         }
 
-        void OnHeavyAttack()
+        private void OnAim(InputValue value)
         {
-            if (scoreboardInstance) { Cursor.lockState = CursorLockMode.None; }
+            if (value.isPressed)
+            {
+                if (scoreboardInstance) { Cursor.lockState = CursorLockMode.None; }
+            }
         }
 
         [SerializeField] private GameObject pausePrefab;
