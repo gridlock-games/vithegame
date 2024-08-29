@@ -281,7 +281,7 @@ namespace Vi.Core
                 if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
             }
 
-            if (isFollowUpClip)
+            if (!isFollowUpClip)
             {
                 if (actionClip.IsAttack())
                 {
