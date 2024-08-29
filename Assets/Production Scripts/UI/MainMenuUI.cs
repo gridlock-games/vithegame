@@ -724,10 +724,8 @@ namespace Vi.UI
             //Shutdown any possible Listner - Google
             if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
             {
-                if (ls == DeepLinkProcessing.loginSiteSource.google)
-                {
+
           GoogleAuth.ShutdownListner();
-        }
 
       }
         }
