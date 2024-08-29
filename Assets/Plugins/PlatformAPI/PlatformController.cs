@@ -45,7 +45,7 @@ namespace jomarcentermjm.PlatformAPI
       if (activePlayform == GamePlatform.Steam && Application.platform != RuntimePlatform.LinuxServer)
       {
         AttmptSteam();
-        AttemptDiscord();
+        //AttemptDiscord();
       }
     }
 
@@ -64,13 +64,13 @@ namespace jomarcentermjm.PlatformAPI
       return false;
     }
 
-    bool AttemptDiscord()
-    {
-#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
-      this.gameObject.AddComponent<DiscordManager>();
-      return true;
-#endif
-      return false;
-    }
+//    bool AttemptDiscord()
+//    {
+//#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
+//      this.gameObject.AddComponent<DiscordManager>();
+//      return true;
+//#endif
+//      return false;
+//    }
   }
 }
