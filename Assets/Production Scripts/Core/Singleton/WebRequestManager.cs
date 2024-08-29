@@ -11,6 +11,7 @@ using System.Linq;
 using Vi.Utility;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
@@ -662,46 +663,61 @@ namespace Vi.Core
         {
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
-            yield return getRequest.SendWebRequest();
 
-            Characters.Clear();
-            if (getRequest.result != UnityWebRequest.Result.Success)
+            if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
-                getRequest.Dispose();
-                yield break;
+                Characters.Clear();
+                for (int i = 0; i < 5; i++)
+                {
+                    Character character = GetRandomizedCharacter(false);
+                    character._id = i.ToString();
+                    character.name = PlayerDataManager.Singleton.GetRandomPlayerName(character.raceAndGender);
+                    Characters.Add(character);
+                }
             }
-            string json = getRequest.downloadHandler.text;
-            try
+            else
             {
+                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
+                yield return getRequest.SendWebRequest();
+
+                Characters.Clear();
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
+                    getRequest.Dispose();
+                    yield break;
+                }
+                string json = getRequest.downloadHandler.text;
                 try
                 {
-                    foreach (CharacterJson jsonStruct in CharacterJson.DeserializeJsonList(json))
+                    try
                     {
-                        Characters.Add(jsonStruct.ToCharacter());
+                        foreach (CharacterJson jsonStruct in CharacterJson.DeserializeJsonList(json))
+                        {
+                            Characters.Add(jsonStruct.ToCharacter());
+                        }
                     }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError(e);
+                        foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
+                        {
+                            Characters.Add(jsonStruct.ToCharacter());
+                        }
+                    }
+
                 }
                 catch (System.Exception e)
                 {
                     Debug.LogError(e);
-                    foreach (CharacterJson jsonStruct in JsonConvert.DeserializeObject<List<CharacterJson>>(json))
-                    {
-                        Characters.Add(jsonStruct.ToCharacter());
-                    }
                 }
-                
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e);
-            }
 
-            getRequest.Dispose();
+                getRequest.Dispose();
+            }
 
             foreach (Character character in Characters)
             {
-                yield return GetCharacterInventory(character._id.ToString());
+                yield return GetCharacterInventory(character);
 
                 List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
                 CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
@@ -739,34 +755,41 @@ namespace Vi.Core
 
         private IEnumerator CharacterByIdGetRequest(string characterId)
         {
-            if (IsGettingCharacterById) { yield break; }
-            IsGettingCharacterById = true;
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
+            if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
+                CharacterById = Characters.Find(item => item._id == characterId);
+            }
+            else
+            {
+                if (IsGettingCharacterById) { yield break; }
+                IsGettingCharacterById = true;
+                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
+                yield return getRequest.SendWebRequest();
+
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
+                    getRequest.Dispose();
+                    yield break;
+                }
+                string json = getRequest.downloadHandler.text;
+                try
+                {
+                    CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
+
+                    CharacterJson.DeserializeJson(json);
+                }
+                catch
+                {
+                    CharacterById = GetDefaultCharacter();
+                }
+
                 getRequest.Dispose();
-                yield break;
+
+                yield return GetCharacterInventory(CharacterById._id.ToString());
+
+                IsGettingCharacterById = false;
             }
-            string json = getRequest.downloadHandler.text;
-            try
-            {
-                CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
-
-                CharacterJson.DeserializeJson(json);
-            }
-            catch
-            {
-                CharacterById = GetDefaultCharacter();
-            }
-
-            getRequest.Dispose();
-
-            yield return GetCharacterInventory(CharacterById._id.ToString());
-
-            IsGettingCharacterById = false;
         }
 
         public IEnumerator UpdateCharacterCosmetics(Character character)
@@ -796,6 +819,52 @@ namespace Vi.Core
         }
 
         public Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
+        public IEnumerator GetCharacterInventory(Character character)
+        {
+            string characterId = character._id.ToString();
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
+                CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+                List<InventoryItem> allItems = new List<InventoryItem>();
+                foreach (var option in armorOptions)
+                {
+                    allItems.Add(new InventoryItem(characterId, new List<int>(), option.itemWebId, true, option.itemWebId));
+                }
+
+                foreach (var option in weaponOptions)
+                {
+                    allItems.Add(new InventoryItem(characterId, new List<int>(), option.itemWebId, true, option.itemWebId));
+                }
+
+                if (!InventoryItems.ContainsKey(characterId))
+                    InventoryItems.Add(characterId, allItems);
+                else
+                    InventoryItems[characterId] = allItems;
+            }
+            else
+            {
+                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
+                yield return getRequest.SendWebRequest();
+
+                if (getRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Get Request Error in WebRequestManager.GetCharacterInventory()");
+                    getRequest.Dispose();
+                    yield break;
+                }
+                string json = getRequest.downloadHandler.text;
+
+                if (!InventoryItems.ContainsKey(characterId))
+                    InventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
+                else
+                    InventoryItems[characterId] = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
+
+                getRequest.Dispose();
+            }
+        }
+
         public IEnumerator GetCharacterInventory(string characterId)
         {
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
@@ -824,6 +893,15 @@ namespace Vi.Core
             public string itemId;
             public bool enabled;
             public string id;
+
+            public InventoryItem(string charId, List<int> loadoutSlot, string itemId, bool enabled, string id)
+            {
+                this.charId = charId;
+                this.loadoutSlot = loadoutSlot;
+                this.itemId = itemId;
+                this.enabled = enabled;
+                this.id = id;
+            }
         }
 
         private IEnumerator AddItemToInventory(string charId, string itemId)
@@ -2504,6 +2582,8 @@ namespace Vi.Core
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
 
+            if (Application.internetReachability == NetworkReachability.NotReachable) { Debug.LogWarning("No internet connection, can't create items"); yield break; }
+
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "items/getItems");
             yield return getRequest.SendWebRequest();
 
@@ -2767,6 +2847,16 @@ namespace Vi.Core
         private Coroutine gameVersionCheckCoroutine;
         private IEnumerator CheckGameVersionRequest()
         {
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
+                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
+
+                IsLoggedIn = true;
+                currentlyLoggedInUserId = "";
+                yield break;
+            }
+
             IsCheckingGameVersion = true;
 
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/version");
@@ -2776,13 +2866,10 @@ namespace Vi.Core
             {
                 Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "game/version");
                 getRequest.Dispose();
-                if (Application.internetReachability == NetworkReachability.NotReachable)
+                if (Application.internetReachability != NetworkReachability.NotReachable)
                 {
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
-                }
-                else
-                {
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, restart your game.";
+                    yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version.";
                 }
                 IsCheckingGameVersion = false;
                 yield break;
