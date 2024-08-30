@@ -44,10 +44,10 @@ namespace jomarcentermjm.PlatformAPI
       _callback = callback;
       if (!SteamAPI.Init())
       {
-        Debug.LogError("Failed to initialize Steam API.");
+        Debug.LogError("SteamAPI does not work on non-steam versions.");
         return;
       }
-
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
       //Get a session Ticket
       byte[] sessionTicket = new byte[1024];
       uint ticketSize;
@@ -86,7 +86,7 @@ response =>
   SignInWithFirebaseToken(steamuseraccountdata.firebaseToken, steamuseraccountdata);
 
 }).Catch(Debug.LogError);
-
+#endif
       }
 
       void SignInWithFirebaseToken(string customToken, SteamUserAccountData steamuseraccountdata)
