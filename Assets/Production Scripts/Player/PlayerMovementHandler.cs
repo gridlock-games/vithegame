@@ -101,7 +101,7 @@ namespace Vi.Player
             }
         }
 
-        RaycastHit[] rootMotionHits = new RaycastHit[10];
+        //RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void FixedUpdate()
         {
             Vector2 moveInput = GetMoveInput();

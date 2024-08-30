@@ -401,7 +401,6 @@ namespace Vi.ArtificialIntelligence
 
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
-        RaycastHit[] rootMotionHits = new RaycastHit[10];
         void FixedUpdate()
         {
             CalculatePath(currentPosition.Value, NavMesh.AllAreas);
