@@ -174,6 +174,8 @@ namespace Vi.ArtificialIntelligence
         {
             transform.position = rb.transform.position;
 
+            if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
+
             Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
             camDirection.Scale(HORIZONTAL_PLANE);
 

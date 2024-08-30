@@ -280,6 +280,8 @@ namespace Vi.Player
         {
             transform.position = rb.transform.position;
 
+            if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
+
             if (cameraController)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
