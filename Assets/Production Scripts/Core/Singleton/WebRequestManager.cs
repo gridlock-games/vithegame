@@ -533,6 +533,7 @@ namespace Vi.Core
 
         public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
         {
+      Debug.Log("attempt to login to firebase");
             IsLoggingIn = true;
             LogInErrorText = "";
             LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
