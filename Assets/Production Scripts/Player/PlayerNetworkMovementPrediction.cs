@@ -77,39 +77,39 @@ namespace Vi.Player
 
         public Vector2 GetWalkCycleAnimationParameters()
         {
-            if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
+            if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+            {
+                return Vector2.zero;
+            }
+            else if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 return Vector2.zero;
             }
             else
             {
-                return GetWalkCycleAnimParams(IsOwner ? movementHandler.GetMoveInput() : latestServerState.Value.moveInput);
-            }
-        }
+                Vector2 moveInput = movementHandler.GetMoveInput();
+                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+                animDir = Vector2.ClampMagnitude(animDir, 1);
 
-        private Vector2 GetWalkCycleAnimParams(Vector2 moveInput)
-        {
-            Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
-            animDir = Vector2.ClampMagnitude(animDir, 1);
-
-            if (combatAgent.WeaponHandler.IsBlocking)
-            {
-                switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                if (combatAgent.WeaponHandler.IsBlocking)
                 {
-                    case Weapon.BlockingLocomotion.NoMovement:
-                        animDir = Vector2.zero;
-                        break;
-                    case Weapon.BlockingLocomotion.CanWalk:
-                        animDir /= 2;
-                        break;
-                    case Weapon.BlockingLocomotion.CanRun:
-                        break;
-                    default:
-                        Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
-                        break;
+                    switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                    {
+                        case Weapon.BlockingLocomotion.NoMovement:
+                            animDir = Vector2.zero;
+                            break;
+                        case Weapon.BlockingLocomotion.CanWalk:
+                            animDir /= 2;
+                            break;
+                        case Weapon.BlockingLocomotion.CanRun:
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                            break;
+                    }
                 }
+                return animDir;
             }
-            return animDir;
         }
 
         private bool applyOverridePosition;

@@ -23,20 +23,18 @@ namespace Vi.Core
 		{
 			transform.position = newPosition;
 			transform.rotation = newRotation;
-
-			if (rb)
-            {
-				rb.velocity = Vector3.zero;
-            }
+			if (rb) { rb.velocity = Vector3.zero; }
 		}
 
 		public virtual Vector3 GetPosition() { return transform.position; }
+
+		public virtual Quaternion GetRotation() { return transform.rotation; }
 
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
-		public virtual Vector3 GetVelocity()
+		public Vector3 GetVelocity()
         {
 			if (rb) { return rb.velocity; }
 			return Vector3.zero;
@@ -45,12 +43,15 @@ namespace Vi.Core
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-		public virtual void AddForce(Vector3 force)
+		public void AddForce(Vector3 force)
         {
-			if (rb) { rb.AddForce(force * Time.fixedDeltaTime, ForceMode.VelocityChange); }
+			if (rb) { rb.AddForce(force, ForceMode.VelocityChange); }
         }
 
-		public virtual void SetImmovable(bool isImmovable) { }
+		public void SetImmovable(bool isImmovable)
+        {
+			rb.constraints = isImmovable ? RigidbodyConstraints.FreezeAll : originalRigidbodyConstraints;
+		}
 
 		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get; private set; }
@@ -211,6 +212,7 @@ namespace Vi.Core
 		protected InputAction moveAction;
 		protected InputAction lookAction;
 		protected Rigidbody rb;
+		private RigidbodyConstraints originalRigidbodyConstraints;
 
         protected void Awake()
 		{
@@ -224,6 +226,7 @@ namespace Vi.Core
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
+			if (rb) { originalRigidbodyConstraints = rb.constraints; }
         }
 
         protected void OnEnable()
@@ -278,6 +281,13 @@ namespace Vi.Core
 				if (!moveAction.enabled) { return Vector2.zero; }
 			}
 			return moveInput;
+		}
+
+		public Vector2 GetPathMoveInput()
+        {
+			if (Vector3.Distance(NextPosition, GetPosition()) < 0.2f) { return Vector2.zero; }
+			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition()).normalized;
+			return new Vector2(moveInput.x, moveInput.z);
 		}
 
 		public void SetMoveInput(Vector2 moveInput) { this.moveInput = moveInput; }

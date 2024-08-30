@@ -1137,6 +1137,11 @@ namespace Vi.Core
                 Debug.Log("Disabled Bot AI");
             }
         }
+
+        void OnAddForce()
+        {
+            combatAgent.MovementHandler.AddForce((transform.forward + Vector3.up) * 50);
+        }
 # endif
 
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();

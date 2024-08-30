@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1564116883212529237}
   - component: {fileID: -8539089533449040199}
   - component: {fileID: 1300232046518436515}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,13 +72,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba99df51c81a4b42a5c6f1011b84da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stoppingDistance: 2
   networkColliderRigidbody: {fileID: 1932007755210931332}
-  angularSpeed: 540
-  runSpeed: 5
   runAnimationTransitionSpeed: 5
   gravitySphereCastRadius: 0.6
   gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
-  activePlayers: []
 --- !u!114 &1564116883212529234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,7 +89,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be40cd5f87ae9742b4c0a6556d7b3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lastMeleeHitTime: -Infinity
 --- !u!114 &1564116883212529235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,7 +104,8 @@ MonoBehaviour:
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
   wasStaggeredThisFrame: 0
-  heartbeatSoundEffect: {fileID: 0}
+  heartbeatSoundEffect: {fileID: 8300000, guid: d22fc966ad7a64afd923f2e84ef54228,
+    type: 3}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
   ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
@@ -171,7 +169,7 @@ GameObject:
   - component: {fileID: 3521786726156393372}
   - component: {fileID: 7708987338065568187}
   m_Layer: 6
-  m_Name: NetworkMovement
+  m_Name: BotRigidbody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
