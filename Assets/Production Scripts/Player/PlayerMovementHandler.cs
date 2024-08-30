@@ -284,8 +284,15 @@ namespace Vi.Player
                 {
                     rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
                 }
+                else
+                {
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
+                    rb.AddForce(counterForce, ForceMode.VelocityChange);
+                }
             }
         }
+
+        private const float airborneHorizontalDragMultiplier = 0.1f;
 
         private void LateUpdate()
         {
