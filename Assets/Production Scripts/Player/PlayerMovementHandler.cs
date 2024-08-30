@@ -216,9 +216,8 @@ namespace Vi.Player
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            float yOffset = 0.2f;
             Vector3 startPos = movementPrediction.CurrentPosition;
-            startPos.y += yOffset;
+            startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
@@ -228,17 +227,17 @@ namespace Vi.Player
 #if UNITY_EDITOR
                 Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
 #endif
-                startPos.y += yOffset;
-                stairMovement = startPos.y - movementPrediction.CurrentPosition.y - yOffset;
+                startPos.y += stairStepHeight;
+                stairMovement += stairStepHeight;
 
-                if (stairMovement > 0.5f)
+                if (stairMovement > maxStairStepHeight)
                 {
                     stairMovement = 0;
                     break;
                 }
             }
 
-            movement.y += stairMovement * 4;
+            movement = Vector3.MoveTowards(movement, Vector3.zero, stairMovement);
 
             bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
@@ -284,13 +283,18 @@ namespace Vi.Player
                 {
                     rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
                 }
-                else
+                else // Decelerate horizontal movement while airborne
                 {
                     Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
                     rb.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
+
+            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
         }
+
+        private const float stairStepHeight = 0.01f;
+        private const float maxStairStepHeight = 0.5f;
 
         private const float airborneHorizontalDragMultiplier = 0.1f;
 
