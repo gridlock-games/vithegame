@@ -334,7 +334,7 @@ namespace Vi.UI
                     {
                         FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                         gameModeInfoUI.gameObject.SetActive(true);
-                        gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                        gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), true);
                     }
                 }
             }
@@ -827,7 +827,7 @@ namespace Vi.UI
                 {
                     FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                     gameModeInfoUI.gameObject.SetActive(true);
-                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), true);
                 }
             }
         }
@@ -836,6 +836,12 @@ namespace Vi.UI
         {
             roomSettingsParent.SetActive(false);
             lobbyUIParent.SetActive(true);
+        }
+
+        public void OpenGameModeInfoUI()
+        {
+            gameModeInfoUI.gameObject.SetActive(true);
+            gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), false);
         }
 
         public void AddBot(PlayerDataManager.Team team)

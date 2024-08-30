@@ -15,7 +15,7 @@ namespace Vi.UI
         [SerializeField] private Button okButton;
         [SerializeField] private List<GameModeInfoUIData> gameModeInfoUIDatas;
 
-        public void Initialize(PlayerDataManager.GameMode gameMode)
+        public void Initialize(PlayerDataManager.GameMode gameMode, bool shouldResetTimer)
         {
             headerText.text = PlayerDataManager.GetGameModeString(gameMode);
 
@@ -31,10 +31,20 @@ namespace Vi.UI
                 gameModeInfoUICard.Initialize(data.gameModeSprites[i], data.cardHeaders[i], data.gameModeMessages[i]);
             }
 
-            okButtonText = okButton.GetComponentInChildren<Text>();
-            okButton.interactable = false;
-            if (okButtonCoroutine != null) { StopCoroutine(okButtonCoroutine); }
-            okButtonCoroutine = PersistentLocalObjects.Singleton.StartCoroutine(ActivateOKButton());
+            if (shouldResetTimer)
+            {
+                okButtonText = okButton.GetComponentInChildren<Text>();
+                okButton.interactable = false;
+                if (okButtonCoroutine != null) { StopCoroutine(okButtonCoroutine); }
+                okButtonCoroutine = PersistentLocalObjects.Singleton.StartCoroutine(ActivateOKButton());
+            }
+            else
+            {
+                if (okButtonCoroutine != null) { StopCoroutine(okButtonCoroutine); }
+                okButtonText = okButton.GetComponentInChildren<Text>();
+                okButton.interactable = true;
+                okButtonText.text = "Okay";
+            }
         }
 
         private Coroutine okButtonCoroutine;
