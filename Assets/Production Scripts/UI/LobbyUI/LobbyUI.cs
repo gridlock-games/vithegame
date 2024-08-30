@@ -293,34 +293,25 @@ namespace Vi.UI
             // Maps
             RefreshMapOptions();
 
-            // Teams
-            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
-            {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
-                if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
-            }
-
+            // Even out teams
             if (IsServer)
             {
-                List<int> botClientIds = new List<int>();
+                Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
+                foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
+                {
+                    teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
+                }
+
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     PlayerDataManager.PlayerData newPlayerData = playerData;
-                    if (playerData.id < 0)
-                    {
-                        if (!possibleTeams.Contains(playerData.team))
-                        {
-                            Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
-                            foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
-                            {
-                                teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
-                            }
-                            // Get the team with the lowest player count
-                            newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
+                    // Get the team with the lowest player count
+                    newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
 
-                            PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
-                        }
-                    }
+                    PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+
+                    if (teamCounts.ContainsKey(playerData.team)) { teamCounts[playerData.team]--; }
+                    teamCounts[newPlayerData.team]++;
                 }
             }
 
@@ -607,7 +598,7 @@ namespace Vi.UI
             if (playerDataListWithoutSpectators.Count > maxPlayersForMap)
             {
                 canCountDown = false;
-                cannotCountDownMessage = "Cannot play a match on " + PlayerDataManager.Singleton.GetMapName() + " with more than " + maxPlayersForMap.ToString() + " players";
+                cannotCountDownMessage = "Cannot play a " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " match on " + PlayerDataManager.Singleton.GetMapName() + " with more than " + maxPlayersForMap.ToString() + " players";
             }
 
             bool roomSettingsParsedProperly = true;
