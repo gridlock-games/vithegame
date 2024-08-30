@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using Vi.ScriptableObjects;
 using Unity.Netcode;
-using Vi.Utility;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -273,23 +272,11 @@ namespace Vi.Core
             public SkinnedMeshRenderer[] skinnedMeshRenderers;
         }
 
-        // Variable to store network root motion
-        private Vector3 networkRootMotion;
-        // Method to apply network root motion
-        public Vector3 ApplyNetworkRootMotion()
+        private Vector3 accumulatedRootMotion;
+        public Vector3 ApplyRootMotion()
         {
-            Vector3 _ = networkRootMotion;
-            networkRootMotion = Vector3.zero;
-            return _;
-        }
-
-        // Variable to store local root motion
-        private Vector3 localRootMotion;
-        // Method to apply local root motion
-        public Vector3 ApplyLocalRootMotion()
-        {
-            Vector3 _ = localRootMotion;
-            localRootMotion = Vector3.zero;
+            Vector3 _ = accumulatedRootMotion;
+            accumulatedRootMotion = Vector3.zero;
             return _;
         }
 
@@ -412,31 +399,8 @@ namespace Vi.Core
                 {
                     curveAdjustedLocalRootMotion = worldSpaceRootMotion;
                 }
-
-                networkRootMotion += curveAdjustedLocalRootMotion / Time.fixedDeltaTime;
-                localRootMotion += curveAdjustedLocalRootMotion;
+                accumulatedRootMotion += curveAdjustedLocalRootMotion / Time.fixedDeltaTime;
             }
         }
-
-        //private void OnAnimatorIK(int layerIndex)
-        //{
-        //    if (limbReferences.RightHandFollowTarget)
-        //    {
-        //        if (limbReferences.RightHandFollowTarget.target)
-        //        {
-        //            animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
-        //            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
-        //        }
-        //    }
-
-        //    if (limbReferences.LeftHandFollowTarget)
-        //    {
-        //        if (limbReferences.LeftHandFollowTarget.target)
-        //        {
-        //            animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
-        //            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
-        //        }
-        //    }
-        //}
     }
 }

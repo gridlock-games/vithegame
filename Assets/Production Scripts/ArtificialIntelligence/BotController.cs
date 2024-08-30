@@ -421,7 +421,7 @@ namespace Vi.ArtificialIntelligence
                 newRotation = Quaternion.LookRotation(camDirection);
 
             // Apply movement
-            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
+            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {

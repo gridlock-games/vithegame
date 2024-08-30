@@ -75,43 +75,6 @@ namespace Vi.Player
             }
         }
 
-        public Vector2 GetWalkCycleAnimationParameters()
-        {
-            if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
-            {
-                return Vector2.zero;
-            }
-            else if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
-            {
-                return Vector2.zero;
-            }
-            else
-            {
-                Vector2 moveInput = movementHandler.GetMoveInput();
-                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
-                animDir = Vector2.ClampMagnitude(animDir, 1);
-
-                if (combatAgent.WeaponHandler.IsBlocking)
-                {
-                    switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
-                    {
-                        case Weapon.BlockingLocomotion.NoMovement:
-                            animDir = Vector2.zero;
-                            break;
-                        case Weapon.BlockingLocomotion.CanWalk:
-                            animDir /= 2;
-                            break;
-                        case Weapon.BlockingLocomotion.CanRun:
-                            break;
-                        default:
-                            Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
-                            break;
-                    }
-                }
-                return animDir;
-            }
-        }
-
         private bool applyOverridePosition;
         private Vector3 overridePosition;
         public void SetOrientation(Vector3 newPosition, Quaternion newRotation)

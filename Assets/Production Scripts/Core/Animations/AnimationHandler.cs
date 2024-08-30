@@ -963,8 +963,7 @@ namespace Vi.Core
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
-        public Vector3 ApplyLocalRootMotion() { return animatorReference.ApplyLocalRootMotion(); }
-        public Vector3 ApplyNetworkRootMotion() { return animatorReference.ApplyNetworkRootMotion(); }
+        public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
 
         public Animator Animator { get; private set; }
         public LimbReferences LimbReferences { get; private set; }

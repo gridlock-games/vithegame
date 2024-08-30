@@ -126,7 +126,7 @@ namespace Vi.Player
             }
 
             // Apply movement
-            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
+            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -449,9 +449,46 @@ namespace Vi.Player
             return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
+        private Vector2 GetWalkCycleAnimationParameters()
+        {
+            if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            {
+                return Vector2.zero;
+            }
+            else if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                Vector2 moveInput = GetMoveInput();
+                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                animDir = Vector2.ClampMagnitude(animDir, 1);
+
+                if (attributes.WeaponHandler.IsBlocking)
+                {
+                    switch (attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                    {
+                        case Weapon.BlockingLocomotion.NoMovement:
+                            animDir = Vector2.zero;
+                            break;
+                        case Weapon.BlockingLocomotion.CanWalk:
+                            animDir /= 2;
+                            break;
+                        case Weapon.BlockingLocomotion.CanRun:
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle blocking locomotion type: " + attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                            break;
+                    }
+                }
+                return animDir;
+            }
+        }
+
         private void UpdateAnimatorParameters()
         {
-            Vector2 walkCycleAnims = movementPrediction.GetWalkCycleAnimationParameters();
+            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
             attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
