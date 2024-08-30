@@ -522,11 +522,18 @@ namespace Vi.UI
                 rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team);
             }
 
+            int inputFieldCount = 0;
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
+
+                if (customSettingsParent.parent.gameObject.activeSelf)
+                {
+                    inputFieldCount = customSettingsParent.inputFields.Length;
+                }
             }
 
+            gameModeSpecificSettingsTitleText.gameObject.SetActive(inputFieldCount > 0);
             gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
