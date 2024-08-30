@@ -268,9 +268,22 @@ namespace Vi.Player
                 }
             }
 
-            if (IsGrounded())
+            bool evaluateForce = true;
+            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {
-                rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+                {
+                    rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                    evaluateForce = false;
+                }
+            }
+
+            if (evaluateForce)
+            {
+                if (IsGrounded())
+                {
+                    rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                }
             }
         }
 
