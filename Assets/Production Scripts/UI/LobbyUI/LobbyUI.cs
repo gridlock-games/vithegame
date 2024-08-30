@@ -267,6 +267,9 @@ namespace Vi.UI
             leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
             rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
 
+            leftTeamParent.joinTeamButton.gameObject.SetActive(teamParentDict.Count > 1);
+            rightTeamParent.joinTeamButton.gameObject.SetActive(teamParentDict.Count > 1);
+
             if (PlayerDataManager.Singleton.IsLobbyLeader())
             {
                 leftTeamParent.teamNameOverrideInputField.text = "";
