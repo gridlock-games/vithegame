@@ -400,6 +400,12 @@ namespace Vi.ArtificialIntelligence
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
         void FixedUpdate()
         {
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                rb.velocity = Vector3.zero;
+                return;
+            }
+
             CalculatePath(currentPosition.Value, NavMesh.AllAreas);
 
             Vector2 moveInput = GetPathMoveInput();

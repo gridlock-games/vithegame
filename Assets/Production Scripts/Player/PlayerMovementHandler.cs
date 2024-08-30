@@ -109,6 +109,12 @@ namespace Vi.Player
         //RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void FixedUpdate()
         {
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                rb.velocity = Vector3.zero;
+                return;
+            }
+
             Vector2 moveInput = GetMoveInput();
             Quaternion inputRotation = rb.rotation;
 
