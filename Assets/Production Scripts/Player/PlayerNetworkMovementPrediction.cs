@@ -40,15 +40,13 @@ namespace Vi.Player
         {
             public int tick;
             public Vector2 moveInput;
-            public bool isGrounded;
             public Vector3 position;
             public Quaternion rotation;
 
-            public StatePayload(int tick, InputPayload inputPayload, bool isGrounded, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, InputPayload inputPayload, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
                 moveInput = inputPayload.moveInput;
-                this.isGrounded = isGrounded;
                 this.position = position;
                 this.rotation = rotation;
             }
@@ -57,21 +55,8 @@ namespace Vi.Player
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
-                serializer.SerializeValue(ref isGrounded);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
-            }
-        }
-
-        public bool IsGrounded()
-        {
-            if (IsOwner)
-            {
-                return stateBuffer[Mathf.Max(0, NetworkManager.NetworkTickSystem.LocalTime.Tick-1) % BUFFER_SIZE].isGrounded;
-            }
-            else
-            {
-                return latestServerState.Value.isGrounded;
             }
         }
 
@@ -107,16 +92,15 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
 
+        public StatePayload GetLatestServerState() { return latestServerState.Value; }
+
         public Vector3 CurrentPosition { get; private set; }
         public Quaternion CurrentRotation { get; private set; }
 
         private PlayerMovementHandler movementHandler;
-        private CombatAgent combatAgent;
-
         private void Awake()
         {
             movementHandler = GetComponent<PlayerMovementHandler>();
-            combatAgent = GetComponent<CombatAgent>();
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             inputQueue = new Queue<InputPayload>();
@@ -131,7 +115,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 overrideRotation.Value = transform.rotation;
-                latestServerState.Value = new StatePayload(0, new InputPayload(), true, CurrentPosition, CurrentRotation);
+                latestServerState.Value = new StatePayload(0, new InputPayload(), CurrentPosition, CurrentRotation);
                 stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
 
                 inputBuffer.OnListChanged += OnInputBufferChanged;

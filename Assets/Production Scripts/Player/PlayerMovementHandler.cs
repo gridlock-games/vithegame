@@ -58,7 +58,7 @@ namespace Vi.Player
 
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, false, rb.position, Quaternion.identity);
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, rb.position, rb.rotation);
         }
 
         List<Collider> groundColliders = new List<Collider>();
@@ -171,6 +171,7 @@ namespace Vi.Player
                         if (angle < ActionClip.maximumRootMotionLimitRotationAngle)
                         {
                             movement = Vector3.ClampMagnitude(movement, hit.distance);
+                            Debug.Log(hit.distance);
                             break;
                         }
                     }
@@ -461,7 +462,7 @@ namespace Vi.Player
             }
             else
             {
-                Vector2 moveInput = GetMoveInput();
+                Vector2 moveInput = IsOwner ? GetMoveInput() : movementPrediction.GetLatestServerState().moveInput;
                 Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
