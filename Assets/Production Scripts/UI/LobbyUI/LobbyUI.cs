@@ -14,6 +14,7 @@ namespace Vi.UI
 {
     public class LobbyUI : NetworkBehaviour
     {
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
@@ -305,12 +306,22 @@ namespace Vi.UI
                 List<int> botClientIds = new List<int>();
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
-                    if (playerData.id < 0) { botClientIds.Add(playerData.id); }
-                }
+                    PlayerDataManager.PlayerData newPlayerData = playerData;
+                    if (playerData.id < 0)
+                    {
+                        if (!possibleTeams.Contains(playerData.team))
+                        {
+                            Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
+                            foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
+                            {
+                                teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
+                            }
+                            // Get the team with the lowest player count
+                            newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
 
-                foreach (int clientId in botClientIds)
-                {
-                    PlayerDataManager.Singleton.KickPlayer(clientId);
+                            PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+                        }
+                    }
                 }
             }
 
@@ -724,6 +735,8 @@ namespace Vi.UI
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
+
+            backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
         }
 
         private GameObject previewObject;
