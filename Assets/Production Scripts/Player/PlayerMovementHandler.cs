@@ -15,8 +15,6 @@ namespace Vi.Player
     {
         [SerializeField] private CameraController cameraController;
 
-        [Header("Locomotion Settings")]
-        [SerializeField] private float angularSpeed = 540;
         [Header("Animation Settings")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
 
@@ -65,15 +63,11 @@ namespace Vi.Player
             return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
         }
 
-        [Header("Network Prediction")]
-        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
-        [SerializeField] private float gravitySphereCastRadius = 0.75f;
-        RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                velocity = Vector3.zero;
+                //rb.velocity = Vector3.zero;
                 return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, true, movementPrediction.CurrentPosition, Quaternion.identity);
             }
 
@@ -114,6 +108,8 @@ namespace Vi.Player
             }
         }
 
+        [Header("Is Grounded")]
+        [SerializeField] private float isGroundedSphereCheckRadius = 0.6f;
         private bool IsGrounded()
         {
             if (groundColliders.Count > 0)
@@ -122,10 +118,11 @@ namespace Vi.Player
             }
             else
             {
-                return Physics.CheckSphere(rb.position, gravitySphereCastRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                return Physics.CheckSphere(rb.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             }
         }
 
+        RaycastHit[] rootMotionHits = new RaycastHit[10];
         private void FixedUpdate()
         {
             PlayerNetworkMovementPrediction.InputPayload inputPayload = new PlayerNetworkMovementPrediction.InputPayload(0, GetMoveInput(), rb.rotation);
@@ -237,8 +234,6 @@ namespace Vi.Player
                 }
             }
 
-            movement = Vector3.MoveTowards(movement, Vector3.zero, stairMovement);
-
             bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             if (wasPlayerHit)
@@ -282,6 +277,10 @@ namespace Vi.Player
                 if (IsGrounded())
                 {
                     rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0))
+                    {
+                        rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                    }
                 }
                 else // Decelerate horizontal movement while airborne
                 {
@@ -471,12 +470,11 @@ namespace Vi.Player
             if (attributes.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
-        public override Vector3 GetVelocity() { return velocity; }
+        public override Vector3 GetVelocity() { return rb.velocity; }
 
-        Vector3 velocity;
         public override void AddForce(Vector3 force)
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force * Time.fixedDeltaTime; }
+            //if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force * Time.fixedDeltaTime; }
         }
 
         void OnAddForce()

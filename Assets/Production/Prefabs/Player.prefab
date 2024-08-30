@@ -222,10 +222,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoppingDistance: 2
   cameraController: {fileID: 3945128956232022059}
-  angularSpeed: 540
   runAnimationTransitionSpeed: 5
-  gravitySphereCastPositionOffset: {x: 0, y: 0.6, z: 0}
-  gravitySphereCastRadius: 0.6
+  isGroundedSphereCheckRadius: 0.6
 --- !u!114 &3945128955595459581
 MonoBehaviour:
   m_ObjectHideFlags: 0
