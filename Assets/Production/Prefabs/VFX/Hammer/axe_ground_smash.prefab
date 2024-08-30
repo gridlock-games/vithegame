@@ -5021,10 +5021,10 @@ GameObject:
   - component: {fileID: 7249162916143604617}
   - component: {fileID: 82199973914113988}
   - component: {fileID: 3730964296283589503}
-  - component: {fileID: 4398858583647616671}
   - component: {fileID: 2555935206191910977}
   - component: {fileID: 2034959681056108070}
   - component: {fileID: 429544265911649066}
+  - component: {fileID: 7433761406714450970}
   m_Layer: 6
   m_Name: axe_ground_smash
   m_TagString: Untagged
@@ -9957,7 +9957,7 @@ MonoBehaviour:
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
-  particleSystemType: 0
+  particleSystemType: 1
   shouldUseAttackerPositionForHitAngles: 1
   shouldOverrideMaxHits: 0
   maxHitOverride: 1
@@ -9980,19 +9980,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &4398858583647616671
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8669111835701529733}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 6, y: 6, z: 6}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2555935206191910977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10051,6 +10038,19 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 93
   isPrewarmObject: 0
+--- !u!135 &7433761406714450970
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8669111835701529733}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 3.28
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9157057456878649055
 GameObject:
   m_ObjectHideFlags: 0
