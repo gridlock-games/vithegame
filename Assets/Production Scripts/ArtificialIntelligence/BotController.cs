@@ -80,6 +80,15 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned) { return; }
 
+            if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+            {
+                SetImmovable(attributes.AnimationHandler.IsGrabAttacking());
+            }
+            else
+            {
+                SetImmovable(attributes.IsGrabbed());
+            }
+
             if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(currentPosition.Value, true); }
 
             UpdateAnimatorParameters();
@@ -221,10 +230,6 @@ namespace Vi.ArtificialIntelligence
                     }
                     EvaluteAction();
                 }
-            }
-            else if (disableBots)
-            {
-                if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
             }
         }
 

@@ -387,6 +387,8 @@ namespace Vi.Player
 
             FindMainCamera();
 
+            if (!IsSpawned) { return; }
+
             if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
             {
                 SetImmovable(attributes.AnimationHandler.IsGrabAttacking());
@@ -395,8 +397,6 @@ namespace Vi.Player
             {
                 SetImmovable(attributes.IsGrabbed());
             }
-
-            if (!IsSpawned) { return; }
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
