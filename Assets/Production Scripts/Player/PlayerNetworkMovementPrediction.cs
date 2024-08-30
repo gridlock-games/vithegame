@@ -87,9 +87,6 @@ namespace Vi.Player
 
         public StatePayload GetLatestServerState() { return latestServerState.Value; }
 
-        public Vector3 CurrentPosition { get; private set; }
-        public Quaternion CurrentRotation { get; private set; }
-
         private PlayerMovementHandler movementHandler;
         private void Awake()
         {
@@ -98,8 +95,6 @@ namespace Vi.Player
             inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             inputQueue = new Queue<InputPayload>();
 
-            CurrentPosition = transform.position;
-            CurrentRotation = transform.rotation;
             if (NetworkManager.Singleton.IsServer) { overrideRotation.Value = transform.rotation; }
         }
 
@@ -108,7 +103,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 overrideRotation.Value = transform.rotation;
-                latestServerState.Value = new StatePayload(0, new InputPayload(), CurrentPosition, CurrentRotation);
+                latestServerState.Value = new StatePayload(0, new InputPayload(), transform.position, transform.rotation);
                 stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
 
                 inputBuffer.OnListChanged += OnInputBufferChanged;
@@ -120,8 +115,6 @@ namespace Vi.Player
 
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
             }
-            CurrentPosition = transform.position;
-            CurrentRotation = transform.rotation;
         }
 
         public override void OnNetworkDespawn()
@@ -179,8 +172,7 @@ namespace Vi.Player
             }
             else // If we are not the owner of this object
             {
-                CurrentPosition = latestServerState.Value.position;
-                CurrentRotation = latestServerState.Value.rotation;
+
             }
         }
 
@@ -194,8 +186,6 @@ namespace Vi.Player
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 StatePayload statePayload = ProcessInput(inputPayload);
-                CurrentPosition = statePayload.position;
-                CurrentRotation = statePayload.rotation;
 
                 stateBuffer[bufferIndex] = statePayload;
             }
@@ -215,9 +205,6 @@ namespace Vi.Player
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
-                CurrentPosition = latestServerState.Value.position;
-                CurrentRotation = latestServerState.Value.rotation;
-
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
@@ -229,8 +216,6 @@ namespace Vi.Player
 
                     // Process new movement with reconciled state
                     StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
-                    CurrentPosition = statePayload.position;
-                    CurrentRotation = statePayload.rotation;
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
@@ -267,25 +252,6 @@ namespace Vi.Player
                 }
             }
             return statePayload;
-        }
-
-        public void ProcessCollisionEvent(Collision collision, Vector3 newPosition)
-        {
-            CurrentPosition = newPosition;
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (OwnerClientId == 0)
-                Gizmos.color = Color.red;
-            else if (OwnerClientId == 1)
-                Gizmos.color = Color.blue;
-            else if (OwnerClientId == 2)
-                Gizmos.color = Color.green;
-            else
-                Gizmos.color = Color.black;
-
-            Gizmos.DrawWireSphere(CurrentPosition, 0.25f);
         }
     }
 }
