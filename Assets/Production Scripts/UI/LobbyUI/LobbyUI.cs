@@ -8,7 +8,6 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
-using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
@@ -686,7 +685,7 @@ namespace Vi.UI
                 characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
             }
 
-            roomSettingsButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown));
+            roomSettingsButton.gameObject.SetActive(isLobbyLeader & Mathf.Approximately(startGameTimer.Value, startGameTime));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
             
             leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
