@@ -652,7 +652,23 @@ namespace Vi.Core
             List<string> potentialNames = botNames[raceAndGender];
             potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
             potentialNames.RemoveAll(item => string.IsNullOrWhiteSpace(item));
-            return potentialNames[Random.Range(0, potentialNames.Count)];
+
+            List<int> validNameIndexes = new List<int>();
+            for (int i = 0; i < potentialNames.Count; i++)
+            {
+                validNameIndexes.Add(i);
+            }
+
+            foreach (PlayerData playerData in GetPlayerDataListWithSpectators())
+            {
+                int index = potentialNames.IndexOf(playerData.character.name.ToString());
+                if (index != -1)
+                {
+                    validNameIndexes.Remove(index);
+                }
+            }
+
+            return potentialNames[validNameIndexes[Random.Range(0, validNameIndexes.Count)]];
         }
 
         private int botClientId = 0;
