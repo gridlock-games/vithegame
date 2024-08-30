@@ -60,15 +60,8 @@ namespace Vi.Player
             }
         }
 
-        private bool applyOverridePosition;
-        private Vector3 overridePosition;
-        public void SetOrientation(Vector3 newPosition, Quaternion newRotation)
+        public void SetRotation(Quaternion newRotation)
         {
-            if (!IsServer) { Debug.LogError("PlayerNetworkMovementPrediction.SetOrientation() should only be called on the server!"); return; }
-            CurrentPosition = newPosition;
-            overridePosition = newPosition;
-            applyOverridePosition = true;
-
             overrideRotation.Value = newRotation;
             applyOverrideRotation.Value = true;
             SetRotationClientRpc(newRotation);
@@ -254,7 +247,6 @@ namespace Vi.Player
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
-            if (applyOverridePosition) { statePayload.position = overridePosition; applyOverridePosition = false; }
             
             if (IsServer)
             {

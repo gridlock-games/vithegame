@@ -1,19 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Collections;
-using System.Linq;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class NetworkCollider : MonoBehaviour
     {
         public CombatAgent CombatAgent { get; private set; }
         public MovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
 
+        private Rigidbody rb;
+
         private void Awake()
         {
+            rb = GetComponent<Rigidbody>();
             MovementHandler = GetComponentInParent<MovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
@@ -30,12 +33,17 @@ namespace Vi.Core
             Colliders = networkPredictionLayerColliders.ToArray();
         }
 
+        private ActionClip.Ailment lastAilmentEvaluated;
         private void Update()
         {
-            foreach (Collider c in Colliders)
+            if (CombatAgent.GetAilment() != lastAilmentEvaluated)
             {
-                c.enabled = CombatAgent.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
+                foreach (Collider c in Colliders)
+                {
+                    c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death;
+                }
             }
+            lastAilmentEvaluated = CombatAgent.GetAilment();
         }
 
         private void OnCollisionEnter(Collision collision)

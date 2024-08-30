@@ -46,7 +46,6 @@ namespace Vi.ArtificialIntelligence
         {
             rb.transform.SetParent(null, true);
             UpdateActivePlayersList();
-            StartCoroutine(EvaluateBotLogic());
         }
 
         private new void OnDestroy()
@@ -85,6 +84,7 @@ namespace Vi.ArtificialIntelligence
 
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
+            EvaluateBotLogic();
         }
 
         private void UpdateAnimatorParameters()
@@ -187,49 +187,44 @@ namespace Vi.ArtificialIntelligence
                 transform.rotation = Quaternion.LookRotation(camDirection);
         }
 
-        private IEnumerator EvaluateBotLogic()
+        private void EvaluateBotLogic()
         {
-            while (true)
+            if (IsServer)
             {
-                if (IsOwner)
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+
+                targetAttributes = null;
+                foreach (CombatAgent player in activePlayers)
                 {
-                    activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+                    if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                    if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
+                    if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
+                    break;
+                }
 
-                    targetAttributes = null;
-                    foreach (CombatAgent player in activePlayers)
+                if (disableBots)
+                {
+                    SetDestination(currentPosition.Value, true);
+                }
+                else
+                {
+                    if (!targetAttributes)
                     {
-                        if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
-                        if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
-                        if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
-                        break;
-                    }
-
-                    if (disableBots)
-                    {
-                        SetDestination(currentPosition.Value, true);
-                    }
-                    else
-                    {
-                        if (!targetAttributes)
+                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
                         {
-                            if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
-                            {
-                                float walkRadius = 500;
-                                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                                randomDirection += transform.position;
-                                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                                SetDestination(hit.position, true);
-                            }
+                            float walkRadius = 500;
+                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                            randomDirection += transform.position;
+                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                            SetDestination(hit.position, true);
                         }
-                        EvaluteAction();
                     }
+                    EvaluteAction();
                 }
-                else if (disableBots)
-                {
-                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
-                }
-
-                yield return new WaitForSeconds(0.1f);
+            }
+            else if (disableBots)
+            {
+                if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
             }
         }
 

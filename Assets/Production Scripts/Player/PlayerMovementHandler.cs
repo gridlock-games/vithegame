@@ -18,7 +18,12 @@ namespace Vi.Player
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            movementPrediction.SetOrientation(newPosition, newRotation);
+            if (!IsServer) { Debug.LogError("PlayerMovementHandler.SetOrientation() should only be called on the server!"); return; }
+
+            rb.position = newPosition;
+            rb.velocity = Vector3.zero;
+
+            movementPrediction.SetRotation(newRotation);
         }
 
         public override Vector3 GetPosition() { return movementPrediction.CurrentPosition; }
