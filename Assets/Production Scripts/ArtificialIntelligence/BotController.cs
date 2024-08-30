@@ -179,21 +179,47 @@ namespace Vi.ArtificialIntelligence
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
+        private Quaternion EvaluateRotation()
+        {
+            Quaternion rot = currentRotation.Value;
+            if (IsServer)
+            {
+                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
+                camDirection.Scale(HORIZONTAL_PLANE);
+
+                if (attributes.ShouldApplyAilmentRotation())
+                    rot = attributes.GetAilmentRotation();
+                else if (attributes.AnimationHandler.IsGrabAttacking())
+                {
+                    CombatAgent grabVictim = attributes.GetGrabVictim();
+                    if (grabVictim)
+                    {
+                        Vector3 rel = grabVictim.MovementHandler.GetPosition() - GetPosition();
+                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                        rot = Quaternion.LookRotation(rel, Vector3.up);
+                    }
+                    else
+                    {
+                        rot = Quaternion.LookRotation(camDirection);
+                    }
+                }
+                else if (!attributes.ShouldPlayHitStop())
+                    rot = Quaternion.LookRotation(camDirection);
+            }
+            else
+            {
+                rot = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
+            }
+            return rot;
+        }
+
         private void LateUpdate()
         {
             transform.position = rb.transform.position;
 
             if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
 
-            Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            if (attributes.ShouldApplyAilmentRotation())
-                transform.rotation = attributes.GetAilmentRotation();
-            else if (attributes.AnimationHandler.IsGrabAttacking())
-                transform.rotation = currentRotation.Value;
-            else if (!attributes.ShouldPlayHitStop())
-                transform.rotation = Quaternion.LookRotation(camDirection);
+            transform.rotation = EvaluateRotation();
         }
 
         private void EvaluateBotLogic()
@@ -414,18 +440,7 @@ namespace Vi.ArtificialIntelligence
             CalculatePath(currentPosition.Value, NavMesh.AllAreas);
 
             Vector2 moveInput = GetPathMoveInput();
-            Quaternion inputRotation = rb.rotation;
-
-            Quaternion newRotation = currentRotation.Value;
-            Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            if (attributes.ShouldApplyAilmentRotation())
-                newRotation = attributes.GetAilmentRotation();
-            else if (attributes.AnimationHandler.IsGrabAttacking())
-                newRotation = inputRotation;
-            else if (!attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.LookRotation(camDirection);
+            Quaternion newRotation = EvaluateRotation();
 
             // Apply movement
             Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();

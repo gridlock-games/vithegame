@@ -336,6 +336,12 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAtRestIgnoringTransition()
+        {
+            if (!animator) { return false; }
+            return CurrentActionsAnimatorStateInfo.IsName("Empty");
+        }
+
         public bool ShouldApplyRootMotion()
         {
             if (!combatAgent.WeaponHandler) { return false; }
@@ -345,7 +351,7 @@ namespace Vi.Core
 
         private void Update()
         {
-            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
+            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
         }
 
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }

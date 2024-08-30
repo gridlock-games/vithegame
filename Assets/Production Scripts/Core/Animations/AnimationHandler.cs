@@ -111,6 +111,7 @@ namespace Vi.Core
         }
 
         public bool IsAtRest() { return animatorReference.IsAtRest(); }
+        public bool IsAtRestIgnoringTransition() { return animatorReference.IsAtRestIgnoringTransition(); }
 
         public bool CanAim()
         {
@@ -171,7 +172,7 @@ namespace Vi.Core
         {
             if (!lastClipPlayed) { return false; }
             if (lastClipPlayed.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
-            return !IsAtRest();
+            return !IsAtRestIgnoringTransition();
         }
 
         public bool IsCharging()
