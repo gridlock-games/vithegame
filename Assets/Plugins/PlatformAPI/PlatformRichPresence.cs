@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 #if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
 using Steamworks;
-using Discord;
+//using Discord;
 #endif
 
 namespace jomarcentermjm.PlatformAPI
@@ -49,12 +49,12 @@ namespace jomarcentermjm.PlatformAPI
             if (subImageID == null) subImageID = defaultSubImageID;
 
             //Discord
-            var discordManager = gameObject.GetComponent<DiscordManager>();
-            if (discordManager != null)
-            {
-                //Debug.Log("Successful reporting on discord");
-                discordManager.ChangeActivityMessage(title, description, mainImageID, mainImageDesc, subImageID, subImageDesc);
-            }
+            //var discordManager = gameObject.GetComponent<DiscordManager>();
+            //if (discordManager != null)
+            //{
+            //    //Debug.Log("Successful reporting on discord");
+            //    discordManager.ChangeActivityMessage(title, description, mainImageID, mainImageDesc, subImageID, subImageDesc);
+            //}
 #endif
         }
 

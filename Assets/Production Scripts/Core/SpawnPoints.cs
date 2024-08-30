@@ -200,6 +200,7 @@ namespace Vi.Core
         private int mobSpawnPointIndex = -1;
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
+            if (mobSpawnPoints.Length == 0) { return default; }
             mobSpawnPointIndex++;
             if (mobSpawnPointIndex >= mobSpawnPoints.Length) { mobSpawnPointIndex = 0; }
             MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[mobSpawnPointIndex];

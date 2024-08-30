@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -15,6 +16,7 @@ namespace Vi.UI
         private Button button;
 
         private PlayerInput playerInput;
+        private InputAction pauseAction;
         private ControlsSettingsMenu.RebindableAction rebindableAction;
         private InputControlScheme controlScheme;
         private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
@@ -78,6 +80,7 @@ namespace Vi.UI
             this.rebindableAction = rebindableAction;
             this.controlScheme = controlScheme;
             this.bindingIndex = bindingIndex;
+            pauseAction = playerInput.actions.FindAction("Pause");
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(delegate { StartRebind(); });
@@ -118,19 +121,84 @@ namespace Vi.UI
             if (playerUI) { playerUI.OnRebinding(); }
         }
 
+        public void FilterCandidates()
+        {
+            if (rebindingOperation.scores.Count == 0) { return; }
+
+            float maxScore = rebindingOperation.scores.Max();
+            List<InputControl> candidatesToRemove = new List<InputControl>();
+            List<InputControl> candidatesThatHaveMaxScore = new List<InputControl>();
+            for (int i = 0; i < rebindingOperation.scores.Count; i++)
+            {
+                if (rebindingOperation.scores[i] == maxScore)
+                {
+                    candidatesThatHaveMaxScore.Add(rebindingOperation.candidates[i]);
+                }
+                else
+                {
+                    candidatesToRemove.Add(rebindingOperation.candidates[i]);
+                }
+            }
+
+            int minChildren = candidatesThatHaveMaxScore.Min(item => item.children.Count);
+            foreach (InputControl candidate in candidatesThatHaveMaxScore)
+            {
+                if (candidate.children.Count != minChildren)
+                {
+                    candidatesToRemove.Add(candidate);
+                }
+            }
+
+            foreach (InputControl candidate in candidatesToRemove)
+            {
+                rebindingOperation.RemoveCandidate(candidate);
+            }
+        }
+
+        public void CancelRebinding()
+        {
+            rebindingOperation.Dispose();
+            button.interactable = true;
+
+            Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
+        }
+
         private void Awake()
         {
             button = GetComponentInChildren<Button>();
+        }
+
+        private void OnDestroy()
+        {
+            if (rebindingOperation != null) { rebindingOperation.Dispose(); }
         }
 
         private void StartRebind()
         {
             SetIsRebinding();
 
-            rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
-                .OnComplete(operation => SetFinishedRebinding())
-                .OnCancel(operation => SetFinishedRebinding())
-                .Start();
+            InputControl cancelControl = null;
+            if (pauseAction.controls.Count > 0) { cancelControl = pauseAction.controls[0]; }
+
+            if (cancelControl == null)
+            {
+                rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
+                    .OnPotentialMatch((operation) => FilterCandidates())
+                    .OnComplete(operation => SetFinishedRebinding())
+                    .OnCancel(operation => CancelRebinding())
+                    .WithTimeout(10)
+                    .Start();
+            }
+            else
+            {
+                rebindingOperation = rebindableAction.inputActionReferences[0].action.PerformInteractiveRebinding(bindingIndex)
+                    .OnPotentialMatch((operation) => FilterCandidates())
+                    .OnComplete(operation => SetFinishedRebinding())
+                    .WithCancelingThrough(cancelControl)
+                    .OnCancel(operation => CancelRebinding())
+                    .WithTimeout(10)
+                    .Start();
+            }
         }
     }
 }

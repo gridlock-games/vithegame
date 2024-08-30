@@ -8,9 +8,9 @@ namespace Vi.Core.VFX.Axe
 {
     public class BlackHole : FollowUpVFX
     {
-        [SerializeField] private float duration = 3;
-        [SerializeField] private float radius = 2;
-        [SerializeField] private ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
+        private const float duration = 3;
+        private const float radius = 5;
+        private static readonly ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
         private float startTime;
         private ParticleSystem ps;
@@ -37,7 +37,7 @@ namespace Vi.Core.VFX.Axe
         Collider[] colliders = new Collider[20];
         private void FixedUpdate()
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction", "Projectile" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
                 if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
@@ -45,15 +45,13 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce(transform.position - movementHandler.transform.position);
+                        Vector3 rel = transform.position - movementHandler.GetPosition();
+                        movementHandler.AddForce(rel - movementHandler.GetVelocity());
                     }
                 }
-                else if (colliders[i].transform.root.GetComponent<Projectile>())
+                else if (!colliders[i].transform.root.GetComponent<ActionVFX>() & colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
                 {
-                    if (colliders[i].TryGetComponent(out Rigidbody rb))
-                    {
-                        rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
-                    }
+                    rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
                 }
             }
         }
@@ -68,14 +66,14 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce(transform.position - movementHandler.transform.position);
-
-                        ActionClip copy = Instantiate(GetAttack());
-                        copy.name = GetAttack().name;
-                        copy.ailment = ailmentToTriggerOnEnd;
+                        movementHandler.AddForce(2 * Physics.gravity);
 
                         if (NetworkManager.Singleton.IsServer)
                         {
+                            ActionClip copy = Instantiate(GetAttack());
+                            copy.name = GetAttack().name;
+                            copy.ailment = ailmentToTriggerOnEnd;
+
                             networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                 copy, networkCollider.CombatAgent.transform.position, transform.position);
                         }

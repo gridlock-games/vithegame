@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -16,14 +17,19 @@ namespace Vi.Core
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
 			"Default",
-			"Projectile",
 			"ProjectileCollider"
 		};
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
+			Debug.Log(name + " setting orientation " + newPosition);
 			transform.position = newPosition;
 			transform.rotation = newRotation;
+
+			if (rb)
+            {
+				rb.velocity = Vector3.zero;
+            }
 		}
 
 		public virtual Vector3 GetPosition() { return transform.position; }
@@ -32,107 +38,199 @@ namespace Vi.Core
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
+		public virtual Vector3 GetVelocity()
+        {
+			if (rb) { return rb.velocity; }
+			return Vector3.zero;
+        }
+
 		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
 		public virtual void AddForce(Vector3 force)
         {
-			if (TryGetComponent(out Rigidbody rb))
-            {
-				rb.AddForce(force, ForceMode.VelocityChange);
-            }
+			if (rb) { rb.AddForce(force * Time.fixedDeltaTime, ForceMode.VelocityChange); }
         }
 
 		public virtual void SetImmovable(bool isImmovable) { }
 
-		private NavMeshPath path;
-		protected Vector3 NextPosition { get; private set; }
-		protected const float stoppingDistance = 2;
+		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get; private set; }
 
-		protected void SetDestination(Vector3 destination)
+		private const float destinationNavMeshDistanceThreshold = 20;
+		protected bool SetDestination(Vector3 destination, bool useExactDestination)
         {
-			//Vector3 targetPosition = destination;
-			//if (new Vector2(Destination.x, Destination.z) != new Vector2(targetPosition.x, targetPosition.z)) { }
+			if (!IsSpawned) { return false; }
 
-			if (!IsSpawned) { return; }
-			//if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
-   //         {
-			//	Destination = myNavHit.position;
-			//}
-			if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+			if (useExactDestination)
             {
-				Destination = myNavHit.position;
+				if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				{
+					Destination = myNavHit.position;
+					return true;
+				}
+				else
+				{
+                    Debug.LogError("Destination point is not on nav mesh! " + name);
+                    Destination = destination;
+					return false;
+				}
 			}
 			else
             {
-				Debug.Log("Destination point is not on nav mesh!");
-				Destination = destination;
+				if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				{
+					Destination = myNavHit.position;
+					return true;
+				}
+				else
+				{
+                    Debug.LogError("Destination point is not on nav mesh! " + name);
+                    Destination = destination;
+					return false;
+				}
 			}
         }
+
+		private NavMeshPath path;
+		protected Vector3 NextPosition { get; private set; }
+
+		private const float nextPositionAngleThreshold = 10;
+		private const float nextPositionDistanceThreshold = 1;
+		private const float startPositionNavMeshDistanceThreshold = 10;
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
 			if (!IsSpawned) { return false; }
-			if (NavMesh.CalculatePath(startPosition, Destination, NavMesh.AllAreas, path))
-			{
-				if (path.corners.Length > 1)
+
+			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
+            {
+				startPosition = hit.position;
+				if (NavMesh.CalculatePath(startPosition, Destination, areaMask, path))
 				{
-					NextPosition = path.corners[1];
-				}
-				else if (path.corners.Length > 0)
-				{
-					NextPosition = path.corners[0];
+					// If there is a point in the path that has an angle of 0, use that as our next position
+					Vector3 prevCorner = startPosition;
+					bool overrideIndexFound = false;
+					int overrideIndex = 0;
+					for (int i = 0; i < Mathf.Min(path.corners.Length, 3); i++)
+					{
+						Vector3 corner = path.corners[i];
+
+						Vector3 toTarget = corner - startPosition;
+						toTarget.y = 0;
+
+						Vector3 prevTo = corner - prevCorner;
+						prevTo.y = 0;
+
+						float angle = Vector3.Angle(prevTo, toTarget);
+						if (angle <= nextPositionAngleThreshold)
+						{
+							if (Mathf.Abs(startPosition.y - corner.y) > nextPositionDistanceThreshold)
+                            {
+								overrideIndexFound = true;
+								overrideIndex = i;
+							}
+						}
+
+						prevCorner = corner;
+					}
+
+					if (overrideIndexFound)
+					{
+						NextPosition = path.corners[overrideIndex];
+						return true;
+					}
+
+					if (path.corners.Length > 1)
+					{
+						NextPosition = path.corners[1];
+					}
+					else if (path.corners.Length > 0)
+					{
+						NextPosition = path.corners[0];
+					}
+					else
+					{
+						NextPosition = startPosition;
+					}
+					return true;
 				}
 				else
 				{
-					NextPosition = startPosition;
+					//Debug.LogError("Path calculation failed! " + name);
+					//SetOrientation(myNavHit.position, transform.rotation);
+					NextPosition = Destination;
+					return false;
 				}
-				return true;
 			}
 			else
-			{
-				if (NavMesh.SamplePosition(GetPosition(), out NavMeshHit myNavHit, 100, NavMesh.AllAreas))
+            {
+				Debug.LogError("Start Position is not on navmesh! " + name);
+				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, NavMesh.AllAreas))
 				{
-					//Debug.Log("Path calculation failed! Setting position..." + myNavHit.position);
-                    SetOrientation(myNavHit.position, transform.rotation);
-                }
+					SetOrientation(myNavHit.position, transform.rotation);
+				}
 				NextPosition = Destination;
 				return false;
-			}
+            }
 		}
 
-		protected void OnDrawGizmos()
+		protected virtual void OnDrawGizmosSelected()
 		{
-			Gizmos.color = Color.magenta;
 			if (!Application.isPlaying) { return; }
+
+			Vector3 prevCorner = transform.position;
 			for (int i = 0; i < path.corners.Length; i++)
-			{
-				Gizmos.DrawSphere(path.corners[i], 0.5f);
-				if (i == 0)
-				{
-					Gizmos.DrawLine(transform.position, path.corners[i]);
-				}
-				else
-				{
-					Gizmos.DrawLine(path.corners[i - 1], path.corners[i]);
-				}
+            {
+				Vector3 corner = path.corners[i];
+
+				Vector3 toTarget = corner - transform.position;
+				toTarget.y = 0;
+
+				Vector3 prevTo = corner - prevCorner;
+				prevTo.y = 0;
+
+				float angle = Vector3.Angle(prevTo, toTarget);
+
+				Gizmos.color = Color.magenta;
+				Gizmos.DrawSphere(corner, 0.25f);
+				Gizmos.DrawLine(prevCorner, corner);
+				Gizmos.color = Color.black;
+#if UNITY_EDITOR
+				UnityEditor.Handles.Label(corner + Vector3.up * 2, i + " | " + angle.ToString("F1"));
+#endif
+				prevCorner = corner;
 			}
-		}
+            Gizmos.color = Color.white;
+            Gizmos.DrawSphere(NextPosition, 0.3f);
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(Destination, 0.3f);
+        }
 
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
+		protected InputAction moveAction;
+		protected InputAction lookAction;
+		protected Rigidbody rb;
+
         protected void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
+			rb = GetComponent<Rigidbody>();
 			RefreshStatus();
+			if (playerInput)
+            {
+				moveAction = playerInput.actions.FindAction("Move");
+				lookAction = playerInput.actions.FindAction("Look");
+            }
         }
 
         protected void OnEnable()
         {
-			SetDestination(transform.position);
+			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
 		}
 
@@ -155,9 +253,9 @@ namespace Vi.Core
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
         {
-			if (playerInput)
+			if (lookAction != null)
             {
-				if (!playerInput.actions.FindAction("Look").enabled) { return Vector2.zero; }
+				if (!lookAction.enabled) { return Vector2.zero; }
             }
 
 			bool shouldUseZoomSensMultiplier = false;
@@ -177,9 +275,9 @@ namespace Vi.Core
 
         public Vector2 GetMoveInput()
 		{
-			if (playerInput)
+			if (moveAction != null)
 			{
-				if (!playerInput.actions.FindAction("Move").enabled) { return Vector2.zero; }
+				if (!moveAction.enabled) { return Vector2.zero; }
 			}
 			return moveInput;
 		}

@@ -873,7 +873,11 @@ namespace Vi.Core.CombatAgents
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                if (respawnCoroutine != null) { StopCoroutine(respawnCoroutine); }
+                if (respawnCoroutine != null)
+                {
+                    IsRespawning = false;
+                    StopCoroutine(respawnCoroutine);
+                }
                 AnimationHandler.Animator.enabled = true;
             }
         }
@@ -909,7 +913,7 @@ namespace Vi.Core.CombatAgents
             IsRespawning = true;
             respawnSelfCalledTime = Time.time;
             yield return new WaitForSeconds(GameModeManager.Singleton.GetRespawnTime());
-            if (IsServer)
+            if (IsServer & !GameModeManager.Singleton.IsGameOver())
             {
                 yield return PlayerDataManager.Singleton.RespawnPlayer(this);
             }

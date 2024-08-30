@@ -144,6 +144,14 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
 
             PlayerDataManager.Singleton.RemoveCombatAgent(this);
+
+            if (IsServer)
+            {
+                SetInviniciblity(0);
+                SetUninterruptable(0);
+                ResetAilment();
+                StatusAgent.RemoveAllStatuses();
+            }
         }
 
         protected void OnEnable()
@@ -413,10 +421,10 @@ namespace Vi.Core
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+                if (IsServer) { isRaging.Value = false; }
             }
             else if (prev == ActionClip.Ailment.Death)
             {
-                isRaging.Value = false;
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             }

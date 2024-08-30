@@ -71,8 +71,11 @@ namespace Vi.Utility
                 int counter = 0;
                 foreach (Transform child in transform)
                 {
-                    ((RectTransform)child).sizeDelta = childSizeDeltas[counter];
-                    counter++;
+                    if (counter < childSizeDeltas.Count)
+                    {
+                        ((RectTransform)child).sizeDelta = childSizeDeltas[counter];
+                        counter++;
+                    }
                 }
             }
             else

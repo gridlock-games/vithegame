@@ -159,15 +159,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Minimap",
-                    "type": "Value",
-                    "id": "c9db039e-09b7-45e9-a5d8-12b324c8a7a6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Weapon1",
                     "type": "Button",
                     "id": "34cd7cb1-fda2-4428-8e12-d488a8d59177",
@@ -187,17 +178,35 @@
                 },
                 {
                     "name": "SwitchWeapon",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "4f0eea53-c759-4370-b316-0751f15be24e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "ActivateRage",
+                    "type": "Button",
+                    "id": "4dd09bbf-3e1b-492e-a039-bfa74bf67e63",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ActivateRage",
+                    "name": "IncrementFollowPlayer",
                     "type": "Button",
-                    "id": "4dd09bbf-3e1b-492e-a039-bfa74bf67e63",
+                    "id": "99a8075a-7c7c-4567-b413-ff71f15308d1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DecrementFollowPlayer",
+                    "type": "Button",
+                    "id": "d5e4b67c-0a93-452a-9a68-f5b4d1ccdab0",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -222,18 +231,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "IncrementFollowPlayer",
+                    "name": "AddForce",
                     "type": "Button",
-                    "id": "99a8075a-7c7c-4567-b413-ff71f15308d1",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "DecrementFollowPlayer",
-                    "type": "Button",
-                    "id": "d5e4b67c-0a93-452a-9a68-f5b4d1ccdab0",
+                    "id": "c17c26bf-db90-4a59-90cc-91f1870a38a6",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -595,39 +595,6 @@
                 },
                 {
                     "name": "",
-                    "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
-                    "path": "<Keyboard>/p",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "TimeScaleChange",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2eb95d8a-94cf-40f7-a52b-d7199c6009d7",
-                    "path": "<Keyboard>/m",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "Minimap",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "5f8c2b21-3964-4cd3-b6f3-a2fec2200bc5",
-                    "path": "<Gamepad>/dpad/right",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad;Touchscreen",
-                    "action": "Minimap",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3dcc3ad7-9e2b-432f-801d-78a1ccd3b81f",
                     "path": "<Keyboard>/i",
                     "interactions": "",
@@ -667,17 +634,6 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Weapon2",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0c164bc4-cb67-4967-b518-63e813fa52e9",
-                    "path": "<Keyboard>/o",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "DisableBots",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -750,7 +706,7 @@
                 {
                     "name": "",
                     "id": "b329af0f-f74b-4adb-9ea0-a806fbd2281d",
-                    "path": "<Mouse>/middleButton",
+                    "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
@@ -843,6 +799,39 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "CancelAbility",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eb38da9c-c182-49b2-a9b8-636de0dbee7c",
+                    "path": "<Keyboard>/u",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AddForce",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dcbc4062-f178-47ad-b35e-186dfe605a98",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "TimeScaleChange",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c164bc4-cb67-4967-b518-63e813fa52e9",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "DisableBots",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

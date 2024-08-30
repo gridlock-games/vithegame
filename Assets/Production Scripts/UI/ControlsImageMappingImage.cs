@@ -31,6 +31,7 @@ namespace Vi.UI
         private void UpdateImage()
         {
             if (!playerInput) { return; }
+            if (string.IsNullOrEmpty(playerInput.currentControlScheme)) { return; }
             if (playerInput.currentControlScheme == lastEvaluatedControlScheme) { return; }
 
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;

@@ -32,7 +32,10 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            roundResultMessage.Value = "Entering Corrupted Abyss! ";
+            if (IsServer)
+            {
+                roundResultMessage.Value = "Entering Corrupted Abyss! ";
+            }
         }
 
         List<Mob> currentlySpawnedMobs = new List<Mob>();
@@ -48,7 +51,7 @@ namespace Vi.Core.GameModeManagers
             }
             currentlySpawnedMobs.RemoveAll(item => mobsToRemove.Contains(item));
 
-            foreach (Mob mob in waves[GetRoundCount()-1].mobPrefabs)
+            foreach (Mob mob in waves[GetRoundCount() - 1].mobPrefabs)
             {
                 currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam));
             }

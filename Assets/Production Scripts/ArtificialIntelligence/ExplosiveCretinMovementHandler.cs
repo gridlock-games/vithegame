@@ -18,6 +18,16 @@ namespace Vi.ArtificialIntelligence
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             actionVFX = GetComponent<GameInteractiveActionVFX>();
+            SetDestination(transform.position, true);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsServer)
+            {
+                SetDestination(transform.position, true);
+                CalculatePath(transform.position, NavMesh.AllAreas);
+            }
         }
 
         private const float runAnimationTransitionSpeed = 5;
@@ -31,19 +41,15 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Vector3 inputDir;
-                if (Vector3.Distance(Destination, transform.position) < stoppingDistance)
-                {
-                    inputDir = Vector3.zero;
-                }
-                else
+                float dist = Vector3.Distance(new Vector3(Destination.x, transform.position.y, Destination.z), transform.position);
+                if (dist >= stoppingDistance)
                 {
                     inputDir = NextPosition - transform.position;
                     inputDir.y = 0;
                     transform.position += Time.deltaTime * runSpeed * inputDir.normalized;
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(inputDir.normalized), Time.deltaTime * rotationSpeed);
-                    inputDir = transform.InverseTransformDirection(inputDir).normalized;
                 }
-                moveForwardTarget.Value = inputDir.z;
+                moveForwardTarget.Value = Mathf.Clamp01(dist);
             }
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
@@ -58,6 +64,7 @@ namespace Vi.ArtificialIntelligence
             System.Array.Sort(colliders, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
             float minDistance = 0;
             bool minDistanceInitialized = false;
+            bool targetFound = false;
             for (int i = 0; i < colliders.Length; i++)
             {
                 float dist = Vector3.Distance(transform.position, colliders[i].transform.position);
@@ -79,9 +86,10 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition()); }
+                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition(), true); targetFound = true; }
                 }
             }
+            if (!targetFound) { SetDestination(transform.position, true); }
             CalculatePath(transform.position, NavMesh.AllAreas);
         }
     }

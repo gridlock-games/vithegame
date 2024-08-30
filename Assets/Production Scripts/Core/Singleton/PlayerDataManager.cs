@@ -467,7 +467,11 @@ namespace Vi.Core
             StructuresListWasUpdatedThisFrame = false;
         }
 
-        public Structure[] GetActiveStructures() { return activeStructures.ToArray(); }
+        public Structure[] GetActiveStructures()
+        {
+            activeStructures.RemoveAll(item => !item);
+            return activeStructures.ToArray();
+        }
 
         public List<Attributes> GetPlayerObjectsOnTeam(Team team, Attributes attributesToExclude = null)
         {
@@ -927,6 +931,15 @@ namespace Vi.Core
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
                         playersToSpawnQueue.Enqueue(playerDataList[i]);
+                    }
+                }
+
+                if (scene.name == "Lobby")
+                {
+                    disconnectedPlayerDataList.Clear();
+                    if (GameModeManager.Singleton)
+                    {
+                        GameModeManager.Singleton.ClearDisconnectedScoreList();
                     }
                 }
             }

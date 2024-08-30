@@ -2,35 +2,53 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.Player
 {
     [RequireComponent(typeof(PlayerMovementHandler))]
     public class PlayerNetworkMovementPrediction : NetworkBehaviour
     {
-        public struct InputPayload
+        public struct InputPayload : INetworkSerializable, System.IEquatable<InputPayload>
         {
             public int tick;
-            public Vector2 inputVector;
+            public Vector2 moveInput;
             public Quaternion rotation;
 
-            public InputPayload(int tick, Vector2 inputVector, Quaternion rotation)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
             {
                 this.tick = tick;
-                this.inputVector = inputVector;
+                this.moveInput = moveInput;
                 this.rotation = rotation;
+            }
+
+            public bool Equals(InputPayload other)
+            {
+                return tick == other.tick & moveInput == other.moveInput & rotation == other.rotation;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref moveInput);
+                serializer.SerializeValue(ref rotation);
             }
         }
 
         public struct StatePayload : INetworkSerializable
         {
             public int tick;
+            public Vector2 moveInput;
+            public bool isGrounded;
             public Vector3 position;
             public Quaternion rotation;
 
-            public StatePayload(int tick, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, InputPayload inputPayload, bool isGrounded, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
+                moveInput = inputPayload.moveInput;
+                this.isGrounded = isGrounded;
                 this.position = position;
                 this.rotation = rotation;
             }
@@ -38,9 +56,60 @@ namespace Vi.Player
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref moveInput);
+                serializer.SerializeValue(ref isGrounded);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
             }
+        }
+
+        public bool IsGrounded()
+        {
+            if (IsOwner)
+            {
+                return stateBuffer[Mathf.Max(0, NetworkManager.NetworkTickSystem.LocalTime.Tick-1) % BUFFER_SIZE].isGrounded;
+            }
+            else
+            {
+                return latestServerState.Value.isGrounded;
+            }
+        }
+
+        public Vector2 GetWalkCycleAnimationParameters()
+        {
+            if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                return GetWalkCycleAnimParams(IsOwner ? movementHandler.GetMoveInput() : latestServerState.Value.moveInput);
+            }
+        }
+
+        private Vector2 GetWalkCycleAnimParams(Vector2 moveInput)
+        {
+            Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+            animDir = Vector2.ClampMagnitude(animDir, 1);
+
+            if (combatAgent.WeaponHandler.IsBlocking)
+            {
+                switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                {
+                    case Weapon.BlockingLocomotion.NoMovement:
+                        animDir = Vector2.zero;
+                        break;
+                    case Weapon.BlockingLocomotion.CanWalk:
+                        animDir /= 2;
+                        break;
+                    case Weapon.BlockingLocomotion.CanRun:
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                        break;
+                }
+            }
+            return animDir;
         }
 
         private bool applyOverridePosition;
@@ -51,26 +120,26 @@ namespace Vi.Player
             CurrentPosition = newPosition;
             overridePosition = newPosition;
             applyOverridePosition = true;
+
+            overrideRotation.Value = newRotation;
+            applyOverrideRotation.Value = true;
             SetRotationClientRpc(newRotation);
         }
 
-        private bool applyOverrideRotation;
-        private Quaternion overrideRotation;
+        private NetworkVariable<bool> applyOverrideRotation = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+        private NetworkVariable<Quaternion> overrideRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
         [Rpc(SendTo.Owner)]
         private void SetRotationClientRpc(Quaternion newRotation)
         {
             movementHandler.SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
-            overrideRotation = newRotation;
-            applyOverrideRotation = true;
         }
 
         public float playerObjectTeleportThreshold = 2;
 
         private const int BUFFER_SIZE = 1024;
 
-        private int currentTick;
         private StatePayload[] stateBuffer;
-        private InputPayload[] inputBuffer;
+        private NetworkList<InputPayload> inputBuffer;
         private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
@@ -79,33 +148,38 @@ namespace Vi.Player
         public Quaternion CurrentRotation { get; private set; }
 
         private PlayerMovementHandler movementHandler;
+        private CombatAgent combatAgent;
 
         private void Awake()
         {
+            movementHandler = GetComponent<PlayerMovementHandler>();
+            combatAgent = GetComponent<CombatAgent>();
+            stateBuffer = new StatePayload[BUFFER_SIZE];
+            inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            inputQueue = new Queue<InputPayload>();
+
             CurrentPosition = transform.position;
             CurrentRotation = transform.rotation;
-        }
-
-        private void Start()
-        {
-            movementHandler = GetComponent<PlayerMovementHandler>();
-            stateBuffer = new StatePayload[BUFFER_SIZE];
-            inputBuffer = new InputPayload[BUFFER_SIZE];
-            inputQueue = new Queue<InputPayload>();
+            if (NetworkManager.Singleton.IsServer) { overrideRotation.Value = transform.rotation; }
         }
 
         public override void OnNetworkSpawn()
         {
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(0, CurrentPosition, CurrentRotation);
+                overrideRotation.Value = transform.rotation;
+                latestServerState.Value = new StatePayload(0, new InputPayload(), true, CurrentPosition, CurrentRotation);
+                stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
+
+                inputBuffer.OnListChanged += OnInputBufferChanged;
                 NetworkManager.NetworkTickSystem.Tick += HandleServerTick;
             }
             if (IsClient)
             {
+                stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
+
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
             }
-
             CurrentPosition = transform.position;
             CurrentRotation = transform.rotation;
         }
@@ -113,28 +187,35 @@ namespace Vi.Player
         public override void OnNetworkDespawn()
         {
             if (IsServer)
+            {
+                inputBuffer.OnListChanged -= OnInputBufferChanged;
                 NetworkManager.NetworkTickSystem.Tick -= HandleServerTick;
+            }
             if (IsClient)
                 NetworkManager.NetworkTickSystem.Tick -= HandleClientTick;
         }
 
+        public void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
+        {
+            if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value)
+            {
+                inputQueue.Enqueue(networkListEvent.Value);
+            }
+            else
+            {
+                Debug.Log("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
+            }
+        }
+
         private void HandleServerTick()
         {
-            inputQueue.Enqueue(new InputPayload(currentOwnerTick.Value, inputVector.Value, inputRotation.Value));
-
             int bufferIndex = ProcessInputQueue();
 
             if (bufferIndex != -1)
             {
                 latestServerState.Value = stateBuffer[bufferIndex];
             }
-
-            currentTick++;
         }
-
-        private NetworkVariable<int> currentOwnerTick = new NetworkVariable<int>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<Vector2> inputVector = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<Quaternion> inputRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private void HandleClientTick()
         {
@@ -147,11 +228,8 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                currentOwnerTick.Value = currentTick;
-                inputVector.Value = movementHandler.GetMoveInput();
-                inputRotation.Value = transform.rotation;
-
-                InputPayload inputPayload = new InputPayload(currentTick, movementHandler.GetMoveInput(), transform.rotation);
+                InputPayload inputPayload = new InputPayload(NetworkManager.NetworkTickSystem.LocalTime.Tick, movementHandler.GetMoveInput(), transform.rotation);
+                inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
 
                 if (!IsHost)
                 {
@@ -164,9 +242,6 @@ namespace Vi.Player
                 CurrentPosition = latestServerState.Value.position;
                 CurrentRotation = latestServerState.Value.rotation;
             }
-
-            // If we are the host, this is also called in the HandleServerTick() method
-            if (!IsHost) { currentTick++; }
         }
 
         private int ProcessInputQueue()
@@ -178,8 +253,6 @@ namespace Vi.Player
                 InputPayload inputPayload = inputQueue.Dequeue();
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
-                inputBuffer[bufferIndex] = inputPayload;
-
                 StatePayload statePayload = ProcessInput(inputPayload);
                 CurrentPosition = statePayload.position;
                 CurrentRotation = statePayload.rotation;
@@ -190,6 +263,7 @@ namespace Vi.Player
             return bufferIndex;
         }
 
+        private const float serverReconciliationThreshold = 0.0001f;
         private void HandleServerReconciliation()
         {
             lastProcessedState = latestServerState.Value;
@@ -197,7 +271,7 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
-            if (positionError > 0.001f)
+            if (positionError > serverReconciliationThreshold)
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
@@ -209,36 +283,50 @@ namespace Vi.Player
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
                 int tickToProcess = latestServerState.Value.tick + 1;
-
-                Vector3 currentPositionCached = latestServerState.Value.position;
-                Quaternion currentRotationCached = latestServerState.Value.rotation;
-                while (tickToProcess < currentTick)
+                while (tickToProcess < NetworkManager.NetworkTickSystem.LocalTime.Tick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                     // Process new movement with reconciled state
                     StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
-                    currentPositionCached = statePayload.position;
-                    currentRotationCached = statePayload.rotation;
+                    CurrentPosition = statePayload.position;
+                    CurrentRotation = statePayload.rotation;
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
 
                     tickToProcess++;
                 }
-
-                CurrentPosition = currentPositionCached;
-                CurrentRotation = currentRotationCached;
             }
         }
+
+        private bool removeRotationServerRpcSent;
+        [Rpc(SendTo.Server)] private void RemoveRotationOverrideRpc() { applyOverrideRotation.Value = false; }
 
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
             StatePayload statePayload = movementHandler.ProcessMovement(input);
             if (applyOverridePosition) { movementHandler.SetPredictionRigidbodyPosition(overridePosition); statePayload.position = overridePosition; applyOverridePosition = false; }
-            if (applyOverrideRotation) { statePayload.rotation = overrideRotation; applyOverrideRotation = false; }
             
+            if (IsServer)
+            {
+                if (applyOverrideRotation.Value) { statePayload.rotation = overrideRotation.Value; }
+            }
+
+            if (IsOwner)
+            {
+                if (applyOverrideRotation.Value)
+                {
+                    statePayload.rotation = overrideRotation.Value;
+                    if (!removeRotationServerRpcSent) { RemoveRotationOverrideRpc(); }
+                    removeRotationServerRpcSent = true;
+                }
+                else
+                {
+                    removeRotationServerRpcSent = false;
+                }
+            }
             return statePayload;
         }
 

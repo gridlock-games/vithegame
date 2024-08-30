@@ -39,16 +39,19 @@ namespace Vi.Player
             }
             else
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
                 playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
             }
         }
 
+        private NetworkObject networkObject;
+
         private void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
+            networkObject = GetComponent<NetworkObject>();
         }
 
         private void OnEnable()
@@ -57,12 +60,12 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
-                Cursor.lockState = CursorLockMode.Locked;
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
-                Cursor.lockState = CursorLockMode.Locked;
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
             else
             {
@@ -87,7 +90,7 @@ namespace Vi.Player
             ToggleScoreboard(false);
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
         }
@@ -106,8 +109,8 @@ namespace Vi.Player
             }
             else
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance);
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
             }
 
             if (playerUIInstance)
@@ -116,9 +119,12 @@ namespace Vi.Player
                 spectatorUIInstance.SetActive(!isOn);
         }
 
-        void OnHeavyAttack()
+        private void OnAim(InputValue value)
         {
-            if (scoreboardInstance) { Cursor.lockState = CursorLockMode.None; }
+            if (value.isPressed)
+            {
+                if (scoreboardInstance) { Cursor.lockState = CursorLockMode.None; }
+            }
         }
 
         [SerializeField] private GameObject pausePrefab;
@@ -135,7 +141,7 @@ namespace Vi.Player
 
             if (pauseInstance)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
                 pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
@@ -165,7 +171,7 @@ namespace Vi.Player
 
             if (inventoryInstance)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
                 inventoryInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
