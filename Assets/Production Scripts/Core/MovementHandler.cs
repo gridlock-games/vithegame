@@ -34,19 +34,8 @@ namespace Vi.Core
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
-		public Vector3 GetVelocity()
-        {
-			if (rb) { return rb.velocity; }
-			return Vector3.zero;
-        }
-
-		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-		public void AddForce(Vector3 force)
-        {
-			if (rb) { rb.AddForce(force, ForceMode.VelocityChange); }
-        }
 
 		public void SetImmovable(bool isImmovable)
         {
@@ -207,6 +196,8 @@ namespace Vi.Core
             Gizmos.DrawSphere(Destination, 0.3f);
         }
 
+		public Rigidbody GetRigidbody() { return rb; }
+
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
@@ -285,7 +276,7 @@ namespace Vi.Core
 
 		public Vector2 GetPathMoveInput()
         {
-			if (Vector3.Distance(NextPosition, GetPosition()) < 0.2f) { return Vector2.zero; }
+			if (Vector3.Distance(NextPosition, GetPosition()) < 0.5f) { return Vector2.zero; }
 			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition()).normalized;
 			return new Vector2(moveInput.x, moveInput.z);
 		}

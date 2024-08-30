@@ -1142,7 +1142,7 @@ namespace Vi.Core
 
         void OnAddForce()
         {
-            combatAgent.MovementHandler.AddForce((transform.forward + Vector3.up) * 50);
+            combatAgent.MovementHandler.GetRigidbody().AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
 

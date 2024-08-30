@@ -46,7 +46,7 @@ namespace Vi.Core.VFX.Axe
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
                         Vector3 rel = transform.position - movementHandler.GetPosition();
-                        movementHandler.AddForce(rel - movementHandler.GetVelocity());
+                        movementHandler.GetRigidbody().AddForce(rel - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
                     }
                 }
                 else if (!colliders[i].transform.root.GetComponent<ActionVFX>() & colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
@@ -55,6 +55,8 @@ namespace Vi.Core.VFX.Axe
                 }
             }
         }
+
+        private const float explosionForce = 50;
 
         private new void OnDisable()
         {
@@ -66,7 +68,7 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.AddForce(2 * Physics.gravity);
+                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position, radius, -1, ForceMode.VelocityChange);
 
                         if (NetworkManager.Singleton.IsServer)
                         {
