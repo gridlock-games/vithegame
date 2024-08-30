@@ -5723,11 +5723,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
       propertyPath: m_Name
-      value: Apple Sign In Button (1)
+      value: Steam Sign-in button
       objectReference: {fileID: 0}
     - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -5906,7 +5906,7 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -5916,7 +5916,7 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -5981,12 +5981,12 @@ PrefabInstance:
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1187.95
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.7099991
       objectReference: {fileID: 0}
     - target: {fileID: 224256163020186276, guid: 4abbb9b2178b0d74a945436a1669b6e7,
         type: 3}
@@ -6550,6 +6550,11 @@ MonoBehaviour:
   startHubServerButton: {fileID: 2019563764}
   startLobbyServerButton: {fileID: 345409258}
   startAutoClientButton: {fileID: 1651335559}
+  _SteamUserAccountData:
+    firebaseToken: 
+    steamID: 0
+    userEmail: 
+    isSteamCafe: 0
 --- !u!1001 &2019563762
 PrefabInstance:
   m_ObjectHideFlags: 0
