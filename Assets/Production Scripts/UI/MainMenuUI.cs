@@ -725,7 +725,7 @@ namespace Vi.UI
       dlp.SetLoginSource(loginSource);
     }
 
-    public void CloseOAuthDialogue(DeepLinkProcessing.loginSiteSource ls = DeepLinkProcessing.loginSiteSource.google)
+    public void CloseOAuthDialogue()
     {
       oAuthParent.SetActive(false);
 
