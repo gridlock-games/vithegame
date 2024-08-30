@@ -418,25 +418,25 @@ namespace Vi.Core
             }
         }
 
-        private void OnAnimatorIK(int layerIndex)
-        {
-            if (limbReferences.RightHandFollowTarget)
-            {
-                if (limbReferences.RightHandFollowTarget.target)
-                {
-                    animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
-                    animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
-                }
-            }
+        //private void OnAnimatorIK(int layerIndex)
+        //{
+        //    if (limbReferences.RightHandFollowTarget)
+        //    {
+        //        if (limbReferences.RightHandFollowTarget.target)
+        //        {
+        //            animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
+        //            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
+        //        }
+        //    }
 
-            if (limbReferences.LeftHandFollowTarget)
-            {
-                if (limbReferences.LeftHandFollowTarget.target)
-                {
-                    animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
-                    animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
-                }
-            }
-        }
+        //    if (limbReferences.LeftHandFollowTarget)
+        //    {
+        //        if (limbReferences.LeftHandFollowTarget.target)
+        //        {
+        //            animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
+        //            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
+        //        }
+        //    }
+        //}
     }
 }

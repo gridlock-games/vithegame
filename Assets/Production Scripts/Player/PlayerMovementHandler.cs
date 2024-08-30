@@ -137,8 +137,6 @@ namespace Vi.Player
                     newRotation = attributes.GetAilmentRotation();
                 else if (attributes.AnimationHandler.IsGrabAttacking())
                     newRotation = inputPayload.rotation;
-                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                    newRotation = Quaternion.LookRotation(camDirection);
                 else if (!attributes.ShouldPlayHitStop())
                     newRotation = Quaternion.LookRotation(camDirection);
             }
@@ -277,7 +275,7 @@ namespace Vi.Player
                 if (IsGrounded())
                 {
                     rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0))
+                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
                         rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
                     }
@@ -310,8 +308,6 @@ namespace Vi.Player
                     transform.rotation = attributes.GetAilmentRotation();
                 else if (attributes.AnimationHandler.IsGrabAttacking())
                     transform.rotation = movementPrediction.CurrentRotation;
-                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                    transform.rotation = Quaternion.LookRotation(camDirection);
                 else if (!attributes.ShouldPlayHitStop())
                     transform.rotation = Quaternion.LookRotation(camDirection);
             }
@@ -319,6 +315,7 @@ namespace Vi.Player
             {
                 transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
             }
+            rigidbodyRotationClone.rotation = transform.rotation;
         }
 
         private const float drag = 1;
@@ -363,6 +360,7 @@ namespace Vi.Player
             if (rb) { Destroy(rb.gameObject); }
         }
 
+        [SerializeField] private Transform rigidbodyRotationClone;
         private PlayerNetworkMovementPrediction movementPrediction;
         private Attributes attributes;
         private new void Awake()
