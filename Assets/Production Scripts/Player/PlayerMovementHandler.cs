@@ -71,6 +71,65 @@ namespace Vi.Player
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
         {
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                velocity = Vector3.zero;
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, true, movementPrediction.CurrentPosition, Quaternion.identity);
+            }
+
+            Vector3 newPosition = rb.position;
+
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, false, newPosition, Quaternion.identity);
+        }
+
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+            // Set falling velocity here
+        }
+
+        List<Collider> groundColliders = new List<Collider>();
+        ContactPoint[] stayContacts = new ContactPoint[3];
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            int contactCount = collision.GetContacts(stayContacts);
+            for (int i = 0; i < contactCount; i++)
+            {
+                if (stayContacts[i].normal.y >= 0.9f)
+                {
+                    if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
+                    break;
+                }
+                else // Normal is not pointing up
+                {
+                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
+                }
+            }
+        }
+
+        public override void ReceiveOnCollisionExitMessage(Collision collision)
+        {
+            if (groundColliders.Contains(collision.collider))
+            {
+                groundColliders.Remove(collision.collider);
+            }
+        }
+
+        private bool IsGrounded()
+        {
+            if (groundColliders.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return Physics.CheckSphere(rb.position, gravitySphereCastRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            PlayerNetworkMovementPrediction.InputPayload inputPayload = new PlayerNetworkMovementPrediction.InputPayload(0, GetMoveInput(), rb.rotation);
+
             Quaternion newRotation = movementPrediction.CurrentRotation;
             if (IsOwner)
             {
@@ -91,37 +150,8 @@ namespace Vi.Player
                 newRotation = inputPayload.rotation;
             }
 
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                velocity = Vector3.zero;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, true, movementPrediction.CurrentPosition, newRotation);
-            }
-
-            // Handle gravity
-            bool bHit = Physics.SphereCast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-                gravitySphereCastRadius, Physics.gravity.normalized, out RaycastHit _, gravitySphereCastPositionOffset.magnitude,
-                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-
-            bool isGrounded;
-            if (bHit)
-            {
-                isGrounded = true;
-            }
-            else // If no sphere cast hit
-            {
-                if (Physics.Raycast(movementPrediction.CurrentPosition + newRotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-                {
-                    isGrounded = true;
-                }
-                else
-                {
-                    isGrounded = false;
-                }
-            }
-
             // Apply movement
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
+            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -136,15 +166,13 @@ namespace Vi.Player
                 else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
                 {
                     movement = rootMotion;
-
-                    # if UNITY_EDITOR
+#if UNITY_EDITOR
                     ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
-                    # endif
-
+#endif
                     int rootMotionHitCount = Physics.BoxCastNonAlloc(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset,
                         ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
                         newRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    
+
                     List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
 
                     for (int i = 0; i < rootMotionHitCount; i++)
@@ -179,9 +207,9 @@ namespace Vi.Player
             }
             else
             {
-                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.moveInput.x, 0, inputPayload.moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                Vector3 targetDirection = newRotation * (new Vector3(inputPayload.moveInput.x, 0, inputPayload.moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded ? GetRunSpeed() : 0;
+                targetDirection *= GetRunSpeed();
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
@@ -210,7 +238,7 @@ namespace Vi.Player
                 }
             }
 
-            movement.y += stairMovement;
+            movement.y += stairMovement * 4;
 
             bool wasPlayerHit = Physics.CapsuleCast(movementPrediction.CurrentPosition, movementPrediction.CurrentPosition + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
             //bool wasPlayerHit = Physics.Raycast(movementPrediction.CurrentPosition + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
@@ -240,11 +268,34 @@ namespace Vi.Player
                 }
             }
 
-            rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-            //rb.AddForce(movement, ForceMode.VelocityChange);
-            Vector3 newPosition = rb.position;
+            if (IsGrounded())
+            {
+                rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+            }
+        }
 
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, isGrounded, newPosition, newRotation);
+        private void LateUpdate()
+        {
+            transform.position = rb.transform.position;
+
+            if (cameraController)
+            {
+                Vector3 camDirection = cameraController.GetCamDirection();
+                camDirection.Scale(HORIZONTAL_PLANE);
+
+                if (attributes.ShouldApplyAilmentRotation())
+                    transform.rotation = attributes.GetAilmentRotation();
+                else if (attributes.AnimationHandler.IsGrabAttacking())
+                    transform.rotation = movementPrediction.CurrentRotation;
+                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
+                    transform.rotation = Quaternion.LookRotation(camDirection);
+                else if (!attributes.ShouldPlayHitStop())
+                    transform.rotation = Quaternion.LookRotation(camDirection);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
+            }
         }
 
         private const float drag = 1;
@@ -286,6 +337,7 @@ namespace Vi.Player
         {
             base.OnDestroy();
             if (cameraController) { Destroy(cameraController.gameObject); }
+            if (rb) { Destroy(rb.gameObject); }
         }
 
         private PlayerNetworkMovementPrediction movementPrediction;
@@ -300,6 +352,7 @@ namespace Vi.Player
 
         private void Start()
         {
+            rb.transform.SetParent(null, true);
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
             {
                 cameraController.PlayAnimation("TutorialIntro");
@@ -336,7 +389,8 @@ namespace Vi.Player
             Vector2 walkCycleAnims = movementPrediction.GetWalkCycleAnimationParameters();
             attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetBool("IsGrounded", movementPrediction.IsGrounded());
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
+            attributes.AnimationHandler.Animator.SetFloat("VerticalSpeed", rb.velocity.y);
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
@@ -493,28 +547,6 @@ namespace Vi.Player
         }
 
         public static readonly Vector3 targetSystemOffset = new Vector3(0, 1, 0);
-
-        private void LateUpdate()
-        {
-            if (cameraController)
-            {
-                Vector3 camDirection = cameraController.GetCamDirection();
-                camDirection.Scale(HORIZONTAL_PLANE);
-
-                if (attributes.ShouldApplyAilmentRotation())
-                    rb.MoveRotation(attributes.GetAilmentRotation());
-                else if (attributes.AnimationHandler.IsGrabAttacking())
-                    rb.MoveRotation(movementPrediction.CurrentRotation);
-                else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                    rb.MoveRotation(Quaternion.LookRotation(camDirection));
-                else if (!attributes.ShouldPlayHitStop())
-                    rb.MoveRotation(Quaternion.LookRotation(camDirection));
-            }
-            else
-            {
-                rb.MoveRotation(Quaternion.Slerp(transform.rotation, movementPrediction.CurrentRotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed));
-            }
-        }
 
         void OnLook(InputValue value)
         {

@@ -217,7 +217,7 @@ namespace Vi.Core
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
-			rb = GetComponent<Rigidbody>();
+			rb = GetComponentInChildren<Rigidbody>();
 			RefreshStatus();
 			if (playerInput)
             {
