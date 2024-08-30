@@ -42,12 +42,12 @@ namespace jomarcentermjm.PlatformAPI
     public static void Auth(Action<bool, string, FirebaseUser, SteamUserAccountData, string> callback)
     {
       _callback = callback;
+#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
       if (!SteamAPI.Init())
       {
         Debug.LogError("SteamAPI does not work on non-steam versions.");
         return;
       }
-#if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
       //Get a session Ticket
       byte[] sessionTicket = new byte[1024];
       uint ticketSize;
@@ -86,6 +86,10 @@ response =>
   SignInWithFirebaseToken(steamuseraccountdata.firebaseToken, steamuseraccountdata);
 
 }).Catch(Debug.LogError);
+
+#else
+Debug.LogError("SteamAPI does not work on non-steam versions.");
+_callback(false, "Cannot run on non-steam machine" , null, null, null);
 #endif
       }
 
