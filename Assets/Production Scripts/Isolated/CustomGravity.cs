@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Isolated
 {
@@ -7,16 +8,19 @@ namespace Vi.Isolated
     {
         [SerializeField] private float gravityScale = 1;
 
-        Rigidbody rb;
+        private Rigidbody rb;
+        private NetworkObject networkObject;
 
         private void Awake()
         {
+            networkObject = GetComponentInParent<NetworkObject>();
             rb = GetComponent<Rigidbody>();
             rb.useGravity = false;
         }
 
         void FixedUpdate()
         {
+            if (!networkObject.IsSpawned) { return; }
             Vector3 gravity = Physics.gravity * gravityScale;
             rb.AddForce(gravity, ForceMode.Acceleration);
         }
