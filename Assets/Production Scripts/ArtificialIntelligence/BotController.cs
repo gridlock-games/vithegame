@@ -433,43 +433,6 @@ namespace Vi.ArtificialIntelligence
                 {
                     movement = Vector3.zero;
                 }
-                else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
-                {
-                    movement = rootMotion;
-#if UNITY_EDITOR
-                    ExtDebug.DrawBoxCastBox(currentPosition.Value + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
-#endif
-                    int rootMotionHitCount = Physics.BoxCastNonAlloc(currentPosition.Value + ActionClip.boxCastOriginPositionOffset,
-                        ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
-                        newRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-
-                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-
-                    for (int i = 0; i < rootMotionHitCount; i++)
-                    {
-                        if (rootMotionHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
-                        {
-                            if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
-                            {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - currentPosition.Value, Vector3.up);
-                                angleList.Add((networkCollider,
-                                    Mathf.Abs(targetRot.eulerAngles.y - newRotation.eulerAngles.y),
-                                    rootMotionHits[i]));
-                            }
-                        }
-                    }
-
-                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
-                    {
-                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - currentPosition.Value, Vector3.up);
-                        if (angle < ActionClip.maximumRootMotionLimitRotationAngle)
-                        {
-                            movement = Vector3.ClampMagnitude(movement, hit.distance);
-                            break;
-                        }
-                    }
-                }
                 else
                 {
                     movement = rootMotion;

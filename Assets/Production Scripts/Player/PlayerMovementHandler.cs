@@ -141,6 +141,7 @@ namespace Vi.Player
                 else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
                 {
                     movement = rootMotion;
+                    /*
 #if UNITY_EDITOR
                     ExtDebug.DrawBoxCastBox(movementPrediction.CurrentPosition + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
 #endif
@@ -170,11 +171,12 @@ namespace Vi.Player
                         Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - movementPrediction.CurrentPosition, Vector3.up);
                         if (angle < ActionClip.maximumRootMotionLimitRotationAngle)
                         {
-                            movement = Vector3.ClampMagnitude(movement, hit.distance);
-                            Debug.Log(hit.distance);
+                            Vector2 newHorizontalMovement = Vector2.ClampMagnitude(new Vector2(movement.x, movement.z), hit.distance);
+                            movement.x = newHorizontalMovement.x;
+                            movement.z = newHorizontalMovement.y;
                             break;
                         }
-                    }
+                    }*/
                 }
                 else
                 {
