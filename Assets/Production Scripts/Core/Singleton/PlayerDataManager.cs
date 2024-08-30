@@ -652,6 +652,7 @@ namespace Vi.Core
             List<string> potentialNames = botNames[raceAndGender];
             potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
             potentialNames.RemoveAll(item => string.IsNullOrWhiteSpace(item));
+            potentialNames = potentialNames.Distinct().ToList();
 
             List<int> validNameIndexes = new List<int>();
             for (int i = 0; i < potentialNames.Count; i++)
@@ -662,10 +663,7 @@ namespace Vi.Core
             foreach (PlayerData playerData in GetPlayerDataListWithSpectators())
             {
                 int index = potentialNames.IndexOf(playerData.character.name.ToString());
-                if (index != -1)
-                {
-                    validNameIndexes.Remove(index);
-                }
+                if (index != -1) { validNameIndexes.Remove(index); }
             }
 
             return potentialNames[validNameIndexes[Random.Range(0, validNameIndexes.Count)]];
