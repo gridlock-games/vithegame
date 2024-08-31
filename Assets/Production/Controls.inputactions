@@ -247,15 +247,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "CheckServerReconciliation",
-                    "type": "Button",
-                    "id": "4dfdc58e-c505-4884-bd19-8e91bb07d7de",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -861,17 +852,6 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "HandleServerReconciliation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4fa65dd7-d7b6-40be-8c1e-c6e3b2ffd60a",
-                    "path": "<Keyboard>/k",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard & Mouse",
-                    "action": "CheckServerReconciliation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

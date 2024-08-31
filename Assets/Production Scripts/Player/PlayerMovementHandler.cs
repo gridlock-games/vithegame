@@ -146,13 +146,6 @@ namespace Vi.Player
         }
 
         private int physicsTick;
-        private void FinishPhysicsTick(PlayerNetworkMovementPrediction.StatePayload statePayload)
-        {
-            physicsTick++;
-            if (IsServer) { latestServerState.Value = statePayload; }
-            stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-        }
-
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -161,7 +154,16 @@ namespace Vi.Player
             {
                 // Sync position here with latest server state
                 rb.MovePosition(latestServerState.Value.position);
-                return;
+            }
+
+            if (IsServer)
+            {
+                if (serverInputQueue.TryDequeue(out PlayerNetworkMovementPrediction.InputPayload inputPayload))
+                {
+                    PlayerNetworkMovementPrediction.StatePayload statePayload = Move(inputPayload);
+                    stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
+                    latestServerState.Value = statePayload;
+                }
             }
 
             if (IsOwner)
@@ -173,17 +175,25 @@ namespace Vi.Player
                     //HandleServerReconciliation();
                 }
 
-                PlayerNetworkMovementPrediction.InputPayload ip = new PlayerNetworkMovementPrediction.InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
-                inputBuffer[ip.tick % BUFFER_SIZE] = ip;
+                PlayerNetworkMovementPrediction.InputPayload inputPayload = new PlayerNetworkMovementPrediction.InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
+                inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                physicsTick++;
+
+                // This would mean we are the host. The server handles inputs from the server input queue
+                if (!IsServer)
+                {
+                    PlayerNetworkMovementPrediction.StatePayload statePayload = Move(inputPayload);
+                    stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
+                }
             }
+        }
 
-            if (!inputQueue.TryDequeue(out PlayerNetworkMovementPrediction.InputPayload inputPayload)) { return; }
-
+        private PlayerNetworkMovementPrediction.StatePayload Move(PlayerNetworkMovementPrediction.InputPayload inputPayload)
+        {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                FinishPhysicsTick(new PlayerNetworkMovementPrediction.StatePayload(physicsTick, default, rb.position, transform.rotation));
-                return;
+                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, default, rb.position, transform.rotation);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
@@ -294,10 +304,10 @@ namespace Vi.Player
                     }
                 }
             }
-            
+
             rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
 
-            FinishPhysicsTick(new PlayerNetworkMovementPrediction.StatePayload(physicsTick, default, rb.position, newRotation));
+            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, default, rb.position, newRotation);
         }
 
         private const float stairStepHeight = 0.01f;
@@ -373,7 +383,7 @@ namespace Vi.Player
             rb.isKinematic = !IsServer & !IsOwner;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
 
-            if (IsServer | IsOwner)
+            if (IsServer)
             {
                 inputBuffer.OnListChanged += OnInputBufferChanged;
             }
@@ -387,7 +397,7 @@ namespace Vi.Player
                 Cursor.lockState = CursorLockMode.None;
             }
 
-            if (IsServer | IsOwner)
+            if (IsServer)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
             }
@@ -397,7 +407,7 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<PlayerNetworkMovementPrediction.InputPayload>.EventType.Value)
             {
-                inputQueue.Enqueue(networkListEvent.Value);
+                serverInputQueue.Enqueue(networkListEvent.Value);
             }
             else
             {
@@ -418,7 +428,7 @@ namespace Vi.Player
         private NetworkList<PlayerNetworkMovementPrediction.InputPayload> inputBuffer;
         private NetworkVariable<PlayerNetworkMovementPrediction.StatePayload> latestServerState = new NetworkVariable<PlayerNetworkMovementPrediction.StatePayload>();
         private PlayerNetworkMovementPrediction.StatePayload lastProcessedState;
-        private Queue<PlayerNetworkMovementPrediction.InputPayload> inputQueue;
+        private Queue<PlayerNetworkMovementPrediction.InputPayload> serverInputQueue;
 
         private PlayerNetworkMovementPrediction movementPrediction;
         private Attributes attributes;
@@ -432,7 +442,7 @@ namespace Vi.Player
 
             stateBuffer = new PlayerNetworkMovementPrediction.StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<PlayerNetworkMovementPrediction.InputPayload>(new PlayerNetworkMovementPrediction.InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
-            inputQueue = new Queue<PlayerNetworkMovementPrediction.InputPayload>();
+            serverInputQueue = new Queue<PlayerNetworkMovementPrediction.InputPayload>();
         }
 
         private void Start()

@@ -35,7 +35,7 @@ namespace Vi.Core.VFX.Axe
             }
         }
 
-        private const float pullStrength = 3;
+        private const float pullStrength = 6;
 
         private void OnTriggerStay(Collider other)
         {
