@@ -9,15 +9,16 @@ namespace Vi.Core.VFX.Axe
     public class BlackHole : FollowUpVFX
     {
         private const float duration = 3;
-        private const float radius = 5;
         private static readonly ActionClip.Ailment ailmentToTriggerOnEnd = ActionClip.Ailment.Knockdown;
 
         private float startTime;
         private ParticleSystem ps;
+        private SphereCollider sphereCollider;
         private new void Awake()
         {
             base.Awake();
             ps = GetComponent<ParticleSystem>();
+            sphereCollider = GetComponent<SphereCollider>();
         }
 
         private new void OnEnable()
@@ -34,41 +35,37 @@ namespace Vi.Core.VFX.Axe
             }
         }
 
-        Collider[] colliders = new Collider[20];
-        private void FixedUpdate()
+        private void OnTriggerStay(Collider other)
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction", "Projectile" }), QueryTriggerInteraction.Collide);
-            for (int i = 0; i < count; i++)
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                if (ShouldAffect(networkCollider.CombatAgent))
                 {
-                    if (ShouldAffect(networkCollider.CombatAgent))
-                    {
-                        MovementHandler movementHandler = networkCollider.MovementHandler;
-                        Vector3 rel = transform.position - movementHandler.GetPosition();
-                        movementHandler.GetRigidbody().AddForce(rel - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
-                    }
+                    MovementHandler movementHandler = networkCollider.MovementHandler;
+                    Vector3 rel = transform.position - movementHandler.GetPosition();
+                    movementHandler.GetRigidbody().AddForce(rel - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
                 }
-                else if (!colliders[i].transform.root.GetComponent<ActionVFX>() & colliders[i].transform.root.TryGetComponent(out Rigidbody rb))
-                {
-                    rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
-                }
+            }
+            else if (!other.transform.root.GetComponent<ActionVFX>() & other.transform.root.TryGetComponent(out Rigidbody rb))
+            {
+                rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
             }
         }
 
         private const float explosionForce = 50;
 
+        private Collider[] overlapSphereColliders = new Collider[20];
         private new void OnDisable()
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, radius, colliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, sphereCollider.radius, overlapSphereColliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
             for (int i = 0; i < count; i++)
             {
-                if (colliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                if (overlapSphereColliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position, radius, -1, ForceMode.VelocityChange);
+                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position, sphereCollider.radius, -1, ForceMode.VelocityChange);
 
                         if (NetworkManager.Singleton.IsServer)
                         {
@@ -81,21 +78,15 @@ namespace Vi.Core.VFX.Axe
                         }
                     }
                 }
-                else if (colliders[i].transform.root.GetComponent<Projectile>())
+                else if (overlapSphereColliders[i].transform.root.GetComponent<Projectile>())
                 {
-                    if (colliders[i].TryGetComponent(out Rigidbody rb))
+                    if (overlapSphereColliders[i].TryGetComponent(out Rigidbody rb))
                     {
                         rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
                     }
                 }
             }
             base.OnDisable();
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, radius);
         }
     }
 }
