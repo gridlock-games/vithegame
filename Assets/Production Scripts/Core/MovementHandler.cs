@@ -80,7 +80,27 @@ namespace Vi.Core
 			}
         }
 
-		private NavMeshPath path;
+		protected bool IsAffectedByExternalForce { get; private set; }
+		public void ExternalForceAffecting()
+        {
+			IsAffectedByExternalForce = true;
+			if (resetIsAffectedByExternalForceCoroutine != null) { StopCoroutine(resetIsAffectedByExternalForceCoroutine); }
+			resetIsAffectedByExternalForceCoroutine = StartCoroutine(ResetIsAffectedByExternalForce());
+        }
+
+		private Coroutine resetIsAffectedByExternalForceCoroutine;
+		private IEnumerator ResetIsAffectedByExternalForce()
+        {
+			yield return new WaitForFixedUpdate();
+			IsAffectedByExternalForce = false;
+        }
+
+        private void OnDisable()
+        {
+			IsAffectedByExternalForce = false;
+        }
+
+        private NavMeshPath path;
 		protected Vector3 NextPosition { get; private set; }
 
 		private const float nextPositionAngleThreshold = 10;

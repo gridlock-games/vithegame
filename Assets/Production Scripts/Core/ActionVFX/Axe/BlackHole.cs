@@ -35,6 +35,8 @@ namespace Vi.Core.VFX.Axe
             }
         }
 
+        private const float pullStrength = 3;
+
         private void OnTriggerStay(Collider other)
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
@@ -42,8 +44,9 @@ namespace Vi.Core.VFX.Axe
                 if (ShouldAffect(networkCollider.CombatAgent))
                 {
                     MovementHandler movementHandler = networkCollider.MovementHandler;
+                    movementHandler.ExternalForceAffecting();
                     Vector3 rel = transform.position - movementHandler.GetPosition();
-                    movementHandler.GetRigidbody().AddForce(rel - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
+                    movementHandler.GetRigidbody().AddForce(rel * pullStrength - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
                 }
             }
             else if (!other.transform.root.GetComponent<ActionVFX>() & other.transform.root.TryGetComponent(out Rigidbody rb))
