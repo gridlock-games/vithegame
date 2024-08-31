@@ -106,19 +106,88 @@ namespace Vi.Player
             }
         }
 
-        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        //RaycastHit[] rootMotionHits = new RaycastHit[10];
+        void OnHandleServerReconciliation()
+        {
+            HandleServerReconciliation();
+        }
+
+        private const float serverReconciliationThreshold = 0.0001f;
+        private void HandleServerReconciliation()
+        {
+            lastProcessedState = latestServerState.Value;
+
+            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
+            float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
+
+            Debug.Log(OwnerClientId + " Position Error Before: " + positionError);
+            if (positionError > serverReconciliationThreshold)
+            {
+                // Update buffer at index of latest server state
+                stateBuffer[serverStateBufferIndex] = latestServerState.Value;
+
+                // Now re-simulate the rest of the ticks up to the current tick on the client
+                int tickToProcess = latestServerState.Value.tick + 1;
+                while (tickToProcess < physicsTick)
+                {
+                    int bufferIndex = tickToProcess % BUFFER_SIZE;
+
+                    // Process new movement with reconciled state
+                    //PlayerNetworkMovementPrediction.StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
+                    PlayerNetworkMovementPrediction.StatePayload statePayload = latestServerState.Value;
+
+                    // Update buffer with recalculated state
+                    stateBuffer[bufferIndex] = statePayload;
+
+                    tickToProcess++;
+                }
+                rb.position = latestServerState.Value.position;
+            }
+            Debug.Log(OwnerClientId + " Position Error After: " + Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position));
+        }
+
+        private int physicsTick;
+        private void FinishPhysicsTick(PlayerNetworkMovementPrediction.StatePayload statePayload)
+        {
+            physicsTick++;
+            if (IsServer) { latestServerState.Value = statePayload; }
+            stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
+        }
+
         private void FixedUpdate()
         {
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            if (!IsSpawned) { return; }
+
+            if (!IsOwner & !IsServer)
             {
-                rb.velocity = Vector3.zero;
+                // Sync position here with latest server state
+                rb.MovePosition(latestServerState.Value.position);
                 return;
             }
 
-            Vector2 moveInput = GetMoveInput();
-            Quaternion newRotation = EvaluateRotation();
-            if (IsOwner) { currentRotation.Value = newRotation; }
+            if (IsOwner)
+            {
+                if (!latestServerState.Equals(default(PlayerNetworkMovementPrediction.StatePayload)) &&
+                   (lastProcessedState.Equals(default(PlayerNetworkMovementPrediction.StatePayload)) ||
+                   !latestServerState.Equals(lastProcessedState)))
+                {
+                    //HandleServerReconciliation();
+                }
+
+                PlayerNetworkMovementPrediction.InputPayload ip = new PlayerNetworkMovementPrediction.InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
+                inputBuffer[ip.tick % BUFFER_SIZE] = ip;
+            }
+
+            if (!inputQueue.TryDequeue(out PlayerNetworkMovementPrediction.InputPayload inputPayload)) { return; }
+
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                rb.velocity = Vector3.zero;
+                FinishPhysicsTick(new PlayerNetworkMovementPrediction.StatePayload(physicsTick, default, rb.position, transform.rotation));
+                return;
+            }
+
+            Vector2 moveInput = inputPayload.moveInput;
+            Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
             Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
@@ -227,6 +296,8 @@ namespace Vi.Player
             }
             
             rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+
+            FinishPhysicsTick(new PlayerNetworkMovementPrediction.StatePayload(physicsTick, default, rb.position, newRotation));
         }
 
         private const float stairStepHeight = 0.01f;
@@ -236,7 +307,7 @@ namespace Vi.Player
 
         private Quaternion EvaluateRotation()
         {
-            Quaternion rot = currentRotation.Value;
+            Quaternion rot = transform.rotation;
             if (cameraController)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
@@ -263,7 +334,7 @@ namespace Vi.Player
             }
             else
             {
-                rot = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
+                rot = Quaternion.Slerp(transform.rotation, latestServerState.Value.rotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
             }
             return rot;
         }
@@ -299,7 +370,13 @@ namespace Vi.Player
                 Destroy(playerInput);
             }
             rb.useGravity = true;
+            rb.isKinematic = !IsServer & !IsOwner;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+
+            if (IsServer | IsOwner)
+            {
+                inputBuffer.OnListChanged += OnInputBufferChanged;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -308,6 +385,23 @@ namespace Vi.Player
             {
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
+            }
+
+            if (IsServer | IsOwner)
+            {
+                inputBuffer.OnListChanged -= OnInputBufferChanged;
+            }
+        }
+
+        private void OnInputBufferChanged(NetworkListEvent<PlayerNetworkMovementPrediction.InputPayload> networkListEvent)
+        {
+            if (networkListEvent.Type == NetworkListEvent<PlayerNetworkMovementPrediction.InputPayload>.EventType.Value)
+            {
+                inputQueue.Enqueue(networkListEvent.Value);
+            }
+            else
+            {
+                Debug.Log("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }
         }
 
@@ -318,6 +412,14 @@ namespace Vi.Player
             if (rb) { Destroy(rb.gameObject); }
         }
 
+        private const int BUFFER_SIZE = 1024;
+
+        private PlayerNetworkMovementPrediction.StatePayload[] stateBuffer;
+        private NetworkList<PlayerNetworkMovementPrediction.InputPayload> inputBuffer;
+        private NetworkVariable<PlayerNetworkMovementPrediction.StatePayload> latestServerState = new NetworkVariable<PlayerNetworkMovementPrediction.StatePayload>();
+        private PlayerNetworkMovementPrediction.StatePayload lastProcessedState;
+        private Queue<PlayerNetworkMovementPrediction.InputPayload> inputQueue;
+
         private PlayerNetworkMovementPrediction movementPrediction;
         private Attributes attributes;
         private new void Awake()
@@ -325,7 +427,12 @@ namespace Vi.Player
             base.Awake();
             movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             attributes = GetComponent<Attributes>();
+            rb.isKinematic = true;
             RefreshStatus();
+
+            stateBuffer = new PlayerNetworkMovementPrediction.StatePayload[BUFFER_SIZE];
+            inputBuffer = new NetworkList<PlayerNetworkMovementPrediction.InputPayload>(new PlayerNetworkMovementPrediction.InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            inputQueue = new Queue<PlayerNetworkMovementPrediction.InputPayload>();
         }
 
         private void Start()
@@ -444,7 +551,7 @@ namespace Vi.Player
             }
             else
             {
-                Vector2 moveInput = IsOwner ? GetMoveInput() : movementPrediction.GetLatestServerState().moveInput;
+                Vector2 moveInput = IsOwner ? GetMoveInput() : latestServerState.Value.moveInput;
                 Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 

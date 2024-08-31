@@ -85,8 +85,6 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
 
-        public StatePayload GetLatestServerState() { return latestServerState.Value; }
-
         private PlayerMovementHandler movementHandler;
         private void Awake()
         {

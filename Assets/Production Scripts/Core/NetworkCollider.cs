@@ -12,11 +12,8 @@ namespace Vi.Core
         public MovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
 
-        private Rigidbody rb;
-
         private void Awake()
         {
-            rb = GetComponent<Rigidbody>();
             MovementHandler = GetComponentInParent<MovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
