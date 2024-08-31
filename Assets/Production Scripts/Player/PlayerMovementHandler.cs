@@ -23,8 +23,10 @@ namespace Vi.Player
             rb.position = newPosition;
             rb.velocity = Vector3.zero;
 
-            movementPrediction.SetRotation(newRotation);
+            SetRotationClientRpc(newRotation);
         }
+
+        [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
 
         public override Vector3 GetPosition() { return rb.position; }
 
@@ -61,9 +63,57 @@ namespace Vi.Player
             return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
         }
 
-        public PlayerNetworkMovementPrediction.StatePayload ProcessMovement(PlayerNetworkMovementPrediction.InputPayload inputPayload)
+        public struct InputPayload : INetworkSerializable, System.IEquatable<InputPayload>
         {
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, inputPayload, rb.position, rb.rotation);
+            public int tick;
+            public Vector2 moveInput;
+            public Quaternion rotation;
+
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
+            {
+                this.tick = tick;
+                this.moveInput = moveInput;
+                this.rotation = rotation;
+            }
+
+            public bool Equals(InputPayload other)
+            {
+                return tick == other.tick & moveInput == other.moveInput & rotation == other.rotation;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref moveInput);
+                serializer.SerializeValue(ref rotation);
+            }
+        }
+
+        public struct StatePayload : INetworkSerializable
+        {
+            public int tick;
+            public Vector2 moveInput;
+            public Vector3 position;
+            public Vector3 velocity;
+            public Quaternion rotation;
+
+            public StatePayload(InputPayload inputPayload, Rigidbody rb, Quaternion rotation)
+            {
+                tick = inputPayload.tick;
+                moveInput = inputPayload.moveInput;
+                position = rb.position;
+                velocity = rb.velocity;
+                this.rotation = rotation;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref tick);
+                serializer.SerializeValue(ref moveInput);
+                serializer.SerializeValue(ref position);
+                serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref velocity);
+            }
         }
 
         List<Collider> groundColliders = new List<Collider>();
@@ -106,11 +156,6 @@ namespace Vi.Player
             }
         }
 
-        void OnHandleServerReconciliation()
-        {
-            HandleServerReconciliation();
-        }
-
         private const float serverReconciliationThreshold = 0.0001f;
         private void HandleServerReconciliation()
         {
@@ -119,30 +164,35 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
-            Debug.Log(OwnerClientId + " Position Error Before: " + positionError);
             if (positionError > serverReconciliationThreshold)
             {
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
+                Physics.autoSimulation = false;
+                rb.position = latestServerState.Value.position;
+                rb.velocity = latestServerState.Value.velocity;
+                Physics.Simulate(Time.fixedDeltaTime);
+
                 int tickToProcess = latestServerState.Value.tick + 1;
                 while (tickToProcess < physicsTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                     // Process new movement with reconciled state
-                    //PlayerNetworkMovementPrediction.StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
-                    PlayerNetworkMovementPrediction.StatePayload statePayload = latestServerState.Value;
+                    StatePayload statePayload = Move(inputBuffer[bufferIndex]);
+                    Physics.Simulate(Time.fixedDeltaTime);
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
 
                     tickToProcess++;
                 }
-                rb.position = latestServerState.Value.position;
+                Physics.autoSimulation = true;
             }
-            Debug.Log(OwnerClientId + " Position Error After: " + Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position));
         }
 
         private int physicsTick;
@@ -158,9 +208,9 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                if (serverInputQueue.TryDequeue(out PlayerNetworkMovementPrediction.InputPayload inputPayload))
+                if (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
-                    PlayerNetworkMovementPrediction.StatePayload statePayload = Move(inputPayload);
+                    StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
                 }
@@ -168,32 +218,32 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                if (!latestServerState.Equals(default(PlayerNetworkMovementPrediction.StatePayload)) &&
-                   (lastProcessedState.Equals(default(PlayerNetworkMovementPrediction.StatePayload)) ||
+                if (!latestServerState.Equals(default(StatePayload)) &&
+                   (lastProcessedState.Equals(default(StatePayload)) ||
                    !latestServerState.Equals(lastProcessedState)))
                 {
-                    //HandleServerReconciliation();
+                    HandleServerReconciliation();
                 }
 
-                PlayerNetworkMovementPrediction.InputPayload inputPayload = new PlayerNetworkMovementPrediction.InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
                 inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 physicsTick++;
 
                 // This would mean we are the host. The server handles inputs from the server input queue
                 if (!IsServer)
                 {
-                    PlayerNetworkMovementPrediction.StatePayload statePayload = Move(inputPayload);
+                    StatePayload statePayload = Move(inputPayload);
                     stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 }
             }
         }
 
-        private PlayerNetworkMovementPrediction.StatePayload Move(PlayerNetworkMovementPrediction.InputPayload inputPayload)
+        private StatePayload Move(InputPayload inputPayload)
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, default, rb.position, transform.rotation);
+                return new StatePayload(inputPayload, rb, transform.rotation);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
@@ -307,7 +357,7 @@ namespace Vi.Player
 
             rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
 
-            return new PlayerNetworkMovementPrediction.StatePayload(inputPayload.tick, default, rb.position, newRotation);
+            return new StatePayload(inputPayload, rb, newRotation);
         }
 
         private const float stairStepHeight = 0.01f;
@@ -403,9 +453,9 @@ namespace Vi.Player
             }
         }
 
-        private void OnInputBufferChanged(NetworkListEvent<PlayerNetworkMovementPrediction.InputPayload> networkListEvent)
+        private void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
         {
-            if (networkListEvent.Type == NetworkListEvent<PlayerNetworkMovementPrediction.InputPayload>.EventType.Value)
+            if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value)
             {
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
@@ -424,25 +474,23 @@ namespace Vi.Player
 
         private const int BUFFER_SIZE = 1024;
 
-        private PlayerNetworkMovementPrediction.StatePayload[] stateBuffer;
-        private NetworkList<PlayerNetworkMovementPrediction.InputPayload> inputBuffer;
-        private NetworkVariable<PlayerNetworkMovementPrediction.StatePayload> latestServerState = new NetworkVariable<PlayerNetworkMovementPrediction.StatePayload>();
-        private PlayerNetworkMovementPrediction.StatePayload lastProcessedState;
-        private Queue<PlayerNetworkMovementPrediction.InputPayload> serverInputQueue;
+        private StatePayload[] stateBuffer;
+        private NetworkList<InputPayload> inputBuffer;
+        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
+        private StatePayload lastProcessedState;
+        private Queue<InputPayload> serverInputQueue;
 
-        private PlayerNetworkMovementPrediction movementPrediction;
         private Attributes attributes;
         private new void Awake()
         {
             base.Awake();
-            movementPrediction = GetComponent<PlayerNetworkMovementPrediction>();
             attributes = GetComponent<Attributes>();
             rb.isKinematic = true;
             RefreshStatus();
 
-            stateBuffer = new PlayerNetworkMovementPrediction.StatePayload[BUFFER_SIZE];
-            inputBuffer = new NetworkList<PlayerNetworkMovementPrediction.InputPayload>(new PlayerNetworkMovementPrediction.InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
-            serverInputQueue = new Queue<PlayerNetworkMovementPrediction.InputPayload>();
+            stateBuffer = new StatePayload[BUFFER_SIZE];
+            inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            serverInputQueue = new Queue<InputPayload>();
         }
 
         private void Start()

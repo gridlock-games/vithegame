@@ -226,10 +226,15 @@ namespace Vi.Player
         private bool removeRotationServerRpcSent;
         [Rpc(SendTo.Server)] private void RemoveRotationOverrideRpc() { applyOverrideRotation.Value = false; }
 
+        private StatePayload ProcessMovement(InputPayload inputPayload)
+        {
+            return new StatePayload(inputPayload.tick, inputPayload, transform.position, transform.rotation);
+        }
+
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            StatePayload statePayload = movementHandler.ProcessMovement(input);
+            StatePayload statePayload = ProcessMovement(input);
             
             if (IsServer)
             {
