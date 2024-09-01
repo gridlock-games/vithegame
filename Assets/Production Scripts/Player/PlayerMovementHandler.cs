@@ -8,6 +8,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Unity.Collections;
 
 namespace Vi.Player
 {
@@ -68,12 +69,14 @@ namespace Vi.Player
             public int tick;
             public Vector2 moveInput;
             public Quaternion rotation;
+            public FixedString32Bytes tryingToPlayActionClipName;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, ActionClip tryingToPlayActionClip)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
                 this.rotation = rotation;
+                tryingToPlayActionClipName = tryingToPlayActionClip ? tryingToPlayActionClip.name : "";
             }
 
             public bool Equals(InputPayload other)
@@ -86,6 +89,7 @@ namespace Vi.Player
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref tryingToPlayActionClipName);
             }
         }
 
@@ -225,7 +229,7 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation(), attributes.AnimationHandler.GetFirstActionClipInQueue());
                 inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 physicsTick++;
 
@@ -243,11 +247,17 @@ namespace Vi.Player
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new StatePayload(inputPayload, rb, transform.rotation);
+                return new StatePayload(inputPayload, rb, inputPayload.rotation);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
+
+            if (inputPayload.tryingToPlayActionClipName != "")
+            {
+                attributes.AnimationHandler.PlayActionOnClient(inputPayload.tryingToPlayActionClipName.ToString());
+                Debug.Log(inputPayload.tick + " " + inputPayload.tryingToPlayActionClipName);
+            }
 
             // Apply movement
             Vector3 movement;
