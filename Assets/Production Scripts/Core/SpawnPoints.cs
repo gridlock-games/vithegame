@@ -22,6 +22,7 @@ namespace Vi.Core
         public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(18.07f, 0, 0);
 
         [Header("Damage Circle")]
+        [SerializeField] private Vector3 damageCircleSpawnPosition;
         [SerializeField] private Vector3 damageCircleMaxScale = new Vector3(100, 200, 100);
         [SerializeField] private Vector3 damageCircleMinScale = new Vector3(5, 200, 5);
         [SerializeField] private float shrinkSize = 20;
@@ -278,9 +279,9 @@ namespace Vi.Core
             {
                 // Damage Circle
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(Vector3.zero, damageCircleMaxScale.x / 2);
+                Gizmos.DrawWireSphere(damageCircleSpawnPosition, damageCircleMaxScale.x / 2);
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(Vector3.zero, damageCircleMinScale.x / 2);
+                Gizmos.DrawWireSphere(damageCircleSpawnPosition, damageCircleMinScale.x / 2);
             }
         }
     }

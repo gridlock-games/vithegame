@@ -15,7 +15,7 @@ namespace Vi.Player
         [Header("Camera Settings")]
         [SerializeField] private Transform cameraPivot;
         [SerializeField] private float smoothTime = 0.1f;
-        [SerializeField] private float maxPitch = 40;
+        [SerializeField] private float maxPitch = 90;
         [SerializeField] private Vector3 positionOffset = new Vector3(0, 0, 3);
         [Header("Aiming Settings")]
         [SerializeField] private float aimingTransitionSpeed = 8;
@@ -41,7 +41,7 @@ namespace Vi.Player
             this.targetRotationX = targetRotationX;
             this.targetRotationY = targetRotationY - 180;
 
-            cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+            cameraInterp.transform.position = GetCameraTargetPosition();
             cameraInterp.transform.rotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
         }
 
@@ -76,7 +76,7 @@ namespace Vi.Player
             currentPositionOffset = positionOffset;
             RefreshStatus();
 
-            cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+            cameraInterp.transform.position = GetCameraTargetPosition();
 
             CameraPositionClone.transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * currentPositionOffset;
             CameraPositionClone.transform.LookAt(cameraInterp.transform);
@@ -100,6 +100,12 @@ namespace Vi.Player
         {
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             Camera.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+        }
+
+        private Vector3 GetCameraTargetPosition()
+        {
+            //cameraPivot.TransformPoint(Vector3.zero);
+            return cameraPivot.position;
         }
 
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
@@ -162,17 +168,16 @@ namespace Vi.Player
             else
             {
                 Quaternion targetCameraInterpRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
-
                 if (weaponHandler.IsAiming() | IsAnimating)
                 {
-                    cameraInterp.transform.position = cameraPivot.TransformPoint(Vector3.zero);
+                    cameraInterp.transform.position = GetCameraTargetPosition();
                     cameraInterp.transform.rotation = targetCameraInterpRotation;
                 }
                 else
                 {
                     cameraInterp.transform.position = Vector3.SmoothDamp(
                        cameraInterp.transform.position,
-                       cameraPivot.TransformPoint(Vector3.zero),
+                       GetCameraTargetPosition(),
                        ref _velocityPosition,
                        smoothTime
                     );

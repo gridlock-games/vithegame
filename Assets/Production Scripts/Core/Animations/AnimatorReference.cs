@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using Vi.ScriptableObjects;
 using Unity.Netcode;
-using Vi.Utility;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -273,23 +272,11 @@ namespace Vi.Core
             public SkinnedMeshRenderer[] skinnedMeshRenderers;
         }
 
-        // Variable to store network root motion
-        private Vector3 networkRootMotion;
-        // Method to apply network root motion
-        public Vector3 ApplyNetworkRootMotion()
+        private Vector3 accumulatedRootMotion;
+        public Vector3 ApplyRootMotion()
         {
-            Vector3 _ = networkRootMotion;
-            networkRootMotion = Vector3.zero;
-            return _;
-        }
-
-        // Variable to store local root motion
-        private Vector3 localRootMotion;
-        // Method to apply local root motion
-        public Vector3 ApplyLocalRootMotion()
-        {
-            Vector3 _ = localRootMotion;
-            localRootMotion = Vector3.zero;
+            Vector3 _ = accumulatedRootMotion;
+            accumulatedRootMotion = Vector3.zero;
             return _;
         }
 
@@ -349,6 +336,12 @@ namespace Vi.Core
             }
         }
 
+        public bool IsAtRestIgnoringTransition()
+        {
+            if (!animator) { return false; }
+            return CurrentActionsAnimatorStateInfo.IsName("Empty");
+        }
+
         public bool ShouldApplyRootMotion()
         {
             if (!combatAgent.WeaponHandler) { return false; }
@@ -358,7 +351,7 @@ namespace Vi.Core
 
         private void Update()
         {
-            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
+            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
         }
 
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
@@ -410,32 +403,9 @@ namespace Vi.Core
                 }
                 else
                 {
-                    curveAdjustedLocalRootMotion = transform.root.rotation * worldSpaceRootMotion;
+                    curveAdjustedLocalRootMotion = worldSpaceRootMotion;
                 }
-
-                networkRootMotion += curveAdjustedLocalRootMotion;
-                localRootMotion += curveAdjustedLocalRootMotion;
-            }
-        }
-
-        private void OnAnimatorIK(int layerIndex)
-        {
-            if (limbReferences.RightHandFollowTarget)
-            {
-                if (limbReferences.RightHandFollowTarget.target)
-                {
-                    animator.SetIKPosition(AvatarIKGoal.RightHand, limbReferences.RightHandFollowTarget.target.position);
-                    animator.SetIKPositionWeight(AvatarIKGoal.RightHand, limbReferences.GetRightHandReachRig().weight);
-                }
-            }
-
-            if (limbReferences.LeftHandFollowTarget)
-            {
-                if (limbReferences.LeftHandFollowTarget.target)
-                {
-                    animator.SetIKPosition(AvatarIKGoal.LeftHand, limbReferences.LeftHandFollowTarget.target.position);
-                    animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, limbReferences.GetLeftHandReachRig().weight);
-                }
+                accumulatedRootMotion += curveAdjustedLocalRootMotion / Time.fixedDeltaTime;
             }
         }
     }

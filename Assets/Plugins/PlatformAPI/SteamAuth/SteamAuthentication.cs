@@ -1,29 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.Networking;
-using Codice.CM.WorkspaceServer.DataStore;
 using Firebase.Auth;
-using Mono.Cecil.Cil;
-using System.Collections.Specialized;
-using System.Web;
 using Proyecto26;
 using System.Text;
-using Google.MiniJSON;
-
-
 
 #if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
-
 using Steamworks;
-
 #endif
-
 
 namespace jomarcentermjm.PlatformAPI
 {
-  [Serializable]
+    [Serializable]
   public class SteamUserAccountData
   {
     public string firebaseToken;

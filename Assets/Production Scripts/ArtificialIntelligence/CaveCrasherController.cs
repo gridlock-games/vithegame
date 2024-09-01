@@ -152,7 +152,7 @@ namespace Vi.ArtificialIntelligence
 
             Vector3 animDir = Vector3.zero;
             // Apply movement
-            Vector3 rootMotion = combatAgent.AnimationHandler.ApplyNetworkRootMotion() * Mathf.Clamp01(runSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount() + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount());
+            Vector3 rootMotion = combatAgent.AnimationHandler.ApplyRootMotion() * Mathf.Clamp01(runSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount() + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount());
             Vector3 movement;
             if (combatAgent.ShouldPlayHitStop())
             {
@@ -209,7 +209,7 @@ namespace Vi.ArtificialIntelligence
             moveForwardTarget.Value = animDir.z;
             moveSidesTarget.Value = animDir.x;
 
-            if (GetVelocity().magnitude <= 1)
+            if (rb.velocity.magnitude <= 1)
             {
                 transform.position += movement;
             }

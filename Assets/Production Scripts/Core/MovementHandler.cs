@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
-using System.Linq;
 
 namespace Vi.Core
 {
@@ -22,37 +21,26 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
-			Debug.Log(name + " setting orientation " + newPosition);
 			transform.position = newPosition;
 			transform.rotation = newRotation;
-
-			if (rb)
-            {
-				rb.velocity = Vector3.zero;
-            }
+			if (rb) { rb.velocity = Vector3.zero; }
 		}
 
 		public virtual Vector3 GetPosition() { return transform.position; }
+
+		public virtual Quaternion GetRotation() { return transform.rotation; }
 
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
-		public virtual Vector3 GetVelocity()
-        {
-			if (rb) { return rb.velocity; }
-			return Vector3.zero;
-        }
-
-		//protected const float collisionPushDampeningFactor = 0;
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-		public virtual void AddForce(Vector3 force)
-        {
-			if (rb) { rb.AddForce(force * Time.fixedDeltaTime, ForceMode.VelocityChange); }
-        }
 
-		public virtual void SetImmovable(bool isImmovable) { }
+		public void SetImmovable(bool isImmovable)
+        {
+			rb.constraints = isImmovable ? RigidbodyConstraints.FreezeAll : originalRigidbodyConstraints;
+		}
 
 		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get; private set; }
@@ -92,7 +80,27 @@ namespace Vi.Core
 			}
         }
 
-		private NavMeshPath path;
+		protected bool IsAffectedByExternalForce { get; private set; }
+		public void ExternalForceAffecting()
+        {
+			IsAffectedByExternalForce = true;
+			if (resetIsAffectedByExternalForceCoroutine != null) { StopCoroutine(resetIsAffectedByExternalForceCoroutine); }
+			resetIsAffectedByExternalForceCoroutine = StartCoroutine(ResetIsAffectedByExternalForce());
+        }
+
+		private Coroutine resetIsAffectedByExternalForceCoroutine;
+		private IEnumerator ResetIsAffectedByExternalForce()
+        {
+			yield return new WaitForFixedUpdate();
+			IsAffectedByExternalForce = false;
+        }
+
+        private void OnDisable()
+        {
+			IsAffectedByExternalForce = false;
+        }
+
+        private NavMeshPath path;
 		protected Vector3 NextPosition { get; private set; }
 
 		private const float nextPositionAngleThreshold = 10;
@@ -208,24 +216,28 @@ namespace Vi.Core
             Gizmos.DrawSphere(Destination, 0.3f);
         }
 
+		public Rigidbody GetRigidbody() { return rb; }
+
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
 		protected Rigidbody rb;
+		private RigidbodyConstraints originalRigidbodyConstraints;
 
         protected void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
-			rb = GetComponent<Rigidbody>();
+			rb = GetComponentInChildren<Rigidbody>();
 			RefreshStatus();
 			if (playerInput)
             {
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
+			if (rb) { originalRigidbodyConstraints = rb.constraints; }
         }
 
         protected void OnEnable()
@@ -280,6 +292,13 @@ namespace Vi.Core
 				if (!moveAction.enabled) { return Vector2.zero; }
 			}
 			return moveInput;
+		}
+
+		public Vector2 GetPathMoveInput()
+        {
+			if (Vector3.Distance(NextPosition, GetPosition()) < 0.5f) { return Vector2.zero; }
+			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition()).normalized;
+			return new Vector2(moveInput.x, moveInput.z);
 		}
 
 		public void SetMoveInput(Vector2 moveInput) { this.moveInput = moveInput; }

@@ -40,15 +40,13 @@ namespace Vi.Player
         {
             public int tick;
             public Vector2 moveInput;
-            public bool isGrounded;
             public Vector3 position;
             public Quaternion rotation;
 
-            public StatePayload(int tick, InputPayload inputPayload, bool isGrounded, Vector3 position, Quaternion rotation)
+            public StatePayload(int tick, InputPayload inputPayload, Vector3 position, Quaternion rotation)
             {
                 this.tick = tick;
                 moveInput = inputPayload.moveInput;
-                this.isGrounded = isGrounded;
                 this.position = position;
                 this.rotation = rotation;
             }
@@ -57,70 +55,13 @@ namespace Vi.Player
             {
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
-                serializer.SerializeValue(ref isGrounded);
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
             }
         }
 
-        public bool IsGrounded()
+        public void SetRotation(Quaternion newRotation)
         {
-            if (IsOwner)
-            {
-                return stateBuffer[Mathf.Max(0, NetworkManager.NetworkTickSystem.LocalTime.Tick-1) % BUFFER_SIZE].isGrounded;
-            }
-            else
-            {
-                return latestServerState.Value.isGrounded;
-            }
-        }
-
-        public Vector2 GetWalkCycleAnimationParameters()
-        {
-            if (!movementHandler.CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
-            {
-                return Vector2.zero;
-            }
-            else
-            {
-                return GetWalkCycleAnimParams(IsOwner ? movementHandler.GetMoveInput() : latestServerState.Value.moveInput);
-            }
-        }
-
-        private Vector2 GetWalkCycleAnimParams(Vector2 moveInput)
-        {
-            Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
-            animDir = Vector2.ClampMagnitude(animDir, 1);
-
-            if (combatAgent.WeaponHandler.IsBlocking)
-            {
-                switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
-                {
-                    case Weapon.BlockingLocomotion.NoMovement:
-                        animDir = Vector2.zero;
-                        break;
-                    case Weapon.BlockingLocomotion.CanWalk:
-                        animDir /= 2;
-                        break;
-                    case Weapon.BlockingLocomotion.CanRun:
-                        break;
-                    default:
-                        Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
-                        break;
-                }
-            }
-            return animDir;
-        }
-
-        private bool applyOverridePosition;
-        private Vector3 overridePosition;
-        public void SetOrientation(Vector3 newPosition, Quaternion newRotation)
-        {
-            if (!IsServer) { Debug.LogError("PlayerNetworkMovementPrediction.SetOrientation() should only be called on the server!"); return; }
-            CurrentPosition = newPosition;
-            overridePosition = newPosition;
-            applyOverridePosition = true;
-
             overrideRotation.Value = newRotation;
             applyOverrideRotation.Value = true;
             SetRotationClientRpc(newRotation);
@@ -144,22 +85,14 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> inputQueue;
 
-        public Vector3 CurrentPosition { get; private set; }
-        public Quaternion CurrentRotation { get; private set; }
-
         private PlayerMovementHandler movementHandler;
-        private CombatAgent combatAgent;
-
         private void Awake()
         {
             movementHandler = GetComponent<PlayerMovementHandler>();
-            combatAgent = GetComponent<CombatAgent>();
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             inputQueue = new Queue<InputPayload>();
 
-            CurrentPosition = transform.position;
-            CurrentRotation = transform.rotation;
             if (NetworkManager.Singleton.IsServer) { overrideRotation.Value = transform.rotation; }
         }
 
@@ -168,7 +101,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 overrideRotation.Value = transform.rotation;
-                latestServerState.Value = new StatePayload(0, new InputPayload(), true, CurrentPosition, CurrentRotation);
+                latestServerState.Value = new StatePayload(0, new InputPayload(), transform.position, transform.rotation);
                 stateBuffer[latestServerState.Value.tick % BUFFER_SIZE] = latestServerState.Value;
 
                 inputBuffer.OnListChanged += OnInputBufferChanged;
@@ -180,8 +113,6 @@ namespace Vi.Player
 
                 NetworkManager.NetworkTickSystem.Tick += HandleClientTick;
             }
-            CurrentPosition = transform.position;
-            CurrentRotation = transform.rotation;
         }
 
         public override void OnNetworkDespawn()
@@ -239,8 +170,7 @@ namespace Vi.Player
             }
             else // If we are not the owner of this object
             {
-                CurrentPosition = latestServerState.Value.position;
-                CurrentRotation = latestServerState.Value.rotation;
+
             }
         }
 
@@ -254,8 +184,6 @@ namespace Vi.Player
                 bufferIndex = inputPayload.tick % BUFFER_SIZE;
 
                 StatePayload statePayload = ProcessInput(inputPayload);
-                CurrentPosition = statePayload.position;
-                CurrentRotation = statePayload.rotation;
 
                 stateBuffer[bufferIndex] = statePayload;
             }
@@ -275,9 +203,6 @@ namespace Vi.Player
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
-                CurrentPosition = latestServerState.Value.position;
-                CurrentRotation = latestServerState.Value.rotation;
-
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
@@ -289,8 +214,6 @@ namespace Vi.Player
 
                     // Process new movement with reconciled state
                     StatePayload statePayload = ProcessInput(inputBuffer[bufferIndex]);
-                    CurrentPosition = statePayload.position;
-                    CurrentRotation = statePayload.rotation;
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
@@ -303,11 +226,15 @@ namespace Vi.Player
         private bool removeRotationServerRpcSent;
         [Rpc(SendTo.Server)] private void RemoveRotationOverrideRpc() { applyOverrideRotation.Value = false; }
 
+        private StatePayload ProcessMovement(InputPayload inputPayload)
+        {
+            return new StatePayload(inputPayload.tick, inputPayload, transform.position, transform.rotation);
+        }
+
         private StatePayload ProcessInput(InputPayload input)
         {
             // Should always be in sync with same function on Client
-            StatePayload statePayload = movementHandler.ProcessMovement(input);
-            if (applyOverridePosition) { movementHandler.SetPredictionRigidbodyPosition(overridePosition); statePayload.position = overridePosition; applyOverridePosition = false; }
+            StatePayload statePayload = ProcessMovement(input);
             
             if (IsServer)
             {
@@ -328,25 +255,6 @@ namespace Vi.Player
                 }
             }
             return statePayload;
-        }
-
-        public void ProcessCollisionEvent(Collision collision, Vector3 newPosition)
-        {
-            CurrentPosition = newPosition;
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (OwnerClientId == 0)
-                Gizmos.color = Color.red;
-            else if (OwnerClientId == 1)
-                Gizmos.color = Color.blue;
-            else if (OwnerClientId == 2)
-                Gizmos.color = Color.green;
-            else
-                Gizmos.color = Color.black;
-
-            Gizmos.DrawWireSphere(CurrentPosition, 0.25f);
         }
     }
 }

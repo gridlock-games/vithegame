@@ -12,86 +12,26 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotController : MovementHandler
     {
-        [SerializeField] private Rigidbody networkColliderRigidbody;
-
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             currentPosition.Value = newPosition;
             currentRotation.Value = newRotation;
-            networkColliderRigidbody.position = newPosition;
+            rb.position = newPosition;
         }
 
         public override Vector3 GetPosition() { return currentPosition.Value; }
 
-        public override void SetImmovable(bool isKinematic)
-        {
-            networkColliderRigidbody.constraints = isKinematic ? RigidbodyConstraints.FreezeAll : RigidbodyConstraints.FreezeRotation;
-        }
-
-        public override void ReceiveOnCollisionEnterMessage(Collision collision)
-        {
-            if (!IsServer) { return; }
-            //if (collision.collider.GetComponent<NetworkCollider>())
-            //{
-            //    if (collision.relativeVelocity.magnitude > 1)
-            //    {
-            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-            //    }
-            //}
-
-            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
-            {
-                Vector3 normal = collision.GetContact(0).normal;
-                Vector3 newVelocity;
-                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
-                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
-                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
-                velocity = newVelocity;
-            }
-
-            currentPosition.Value = networkColliderRigidbody.position;
-        }
-
-        private const float friction = 1;
-
-        public override void ReceiveOnCollisionStayMessage(Collision collision)
-        {
-            if (!IsServer) { return; }
-            //if (collision.collider.GetComponent<NetworkCollider>())
-            //{
-            //    if (collision.relativeVelocity.magnitude > 1)
-            //    {
-            //        if (Vector3.Angle(lastMovement, collision.relativeVelocity) < 90) { networkColliderRigidbody.AddForce(-collision.relativeVelocity * collisionPushDampeningFactor, ForceMode.VelocityChange); }
-            //    }
-            //}
-
-            for (int i = 0; i < Mathf.Min(collision.contactCount, 1); i++)
-            {
-                Vector3 normal = collision.GetContact(0).normal;
-                Vector3 newVelocity;
-                newVelocity.x = Mathf.MoveTowards(velocity.x, 0, Mathf.Abs(normal.x) * friction * Time.fixedDeltaTime);
-                newVelocity.y = Mathf.MoveTowards(velocity.y, 0, Mathf.Abs(normal.y) * friction * Time.fixedDeltaTime);
-                newVelocity.z = Mathf.MoveTowards(velocity.z, 0, Mathf.Abs(normal.z) * friction * Time.fixedDeltaTime);
-                velocity = newVelocity;
-            }
-
-            currentPosition.Value = networkColliderRigidbody.position;
-        }
+        public override Quaternion GetRotation() { return currentRotation.Value; }
 
         public override void OnNetworkSpawn()
         {
             if (IsServer)
             {
-                NetworkManager.NetworkTickSystem.Tick += ProcessMovementTick;
                 currentPosition.Value = transform.position;
                 currentRotation.Value = transform.rotation;
             }
-            networkColliderRigidbody.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            if (IsServer) { NetworkManager.NetworkTickSystem.Tick -= ProcessMovementTick; }
+            rb.useGravity = true;
+            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         private Attributes attributes;
@@ -104,15 +44,14 @@ namespace Vi.ArtificialIntelligence
 
         private void Start()
         {
-            networkColliderRigidbody.transform.SetParent(null, true);
+            rb.transform.SetParent(null, true);
             UpdateActivePlayersList();
-            StartCoroutine(EvaluateBotLogic());
         }
 
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (networkColliderRigidbody) { Destroy(networkColliderRigidbody.gameObject); }
+            if (rb) { Destroy(rb.gameObject); }
         }
 
         private float GetTickRateDeltaTime()
@@ -125,225 +64,12 @@ namespace Vi.ArtificialIntelligence
             return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
         }
 
-        [SerializeField] private float runAnimationTransitionSpeed = 5;
-        [SerializeField] private float gravitySphereCastRadius = 0.75f;
-        [SerializeField] private Vector3 gravitySphereCastPositionOffset = new Vector3(0, 0.75f, 0);
-        private NetworkVariable<float> moveForwardTarget = new NetworkVariable<float>();
-        private NetworkVariable<float> moveSidesTarget = new NetworkVariable<float>();
-        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
-        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
-        private NetworkVariable<bool> isGrounded = new NetworkVariable<bool>();
-        
-        RaycastHit[] allHits = new RaycastHit[10];
-        private void ProcessMovementTick()
-        {
-            Vector3 lookDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
-            lookDirection.Scale(HORIZONTAL_PLANE);
-
-            float randomMaxAngleOfRotation = Random.Range(60f, 120f);
-
-            Quaternion newRotation = currentRotation.Value;
-            if (attributes.ShouldApplyAilmentRotation())
-                newRotation = attributes.GetAilmentRotation();
-            else if (attributes.AnimationHandler.IsGrabAttacking())
-                newRotation = currentRotation.Value;
-            else if (weaponHandler.IsAiming() & !attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * GetTickRateDeltaTime());
-            else if (!attributes.ShouldPlayHitStop())
-                newRotation = Quaternion.RotateTowards(currentRotation.Value, lookDirection != Vector3.zero ? Quaternion.LookRotation(lookDirection) : currentRotation.Value, randomMaxAngleOfRotation * GetTickRateDeltaTime());
-
-            currentRotation.Value = newRotation;
-
-            // This method is only called on the server
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                moveForwardTarget.Value = 0;
-                moveSidesTarget.Value = 0;
-                isGrounded.Value = true;
-                velocity = Vector3.zero;
-                return;
-            }
-
-            CalculatePath(currentPosition.Value, NavMesh.AllAreas);
-
-            Vector3 inputDir = NextPosition - currentPosition.Value;
-            inputDir.y = 0;
-            inputDir = transform.InverseTransformDirection(inputDir).normalized;
-            
-            if (Vector3.Distance(Destination, currentPosition.Value) < stoppingDistance)
-            {
-                inputDir = Vector3.zero;
-            }
-
-            // Handle gravity
-            Vector3 gravity = Vector3.zero;
-            int allHitsCount = Physics.SphereCastNonAlloc(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                gravitySphereCastRadius, Physics.gravity.normalized, allHits, gravitySphereCastPositionOffset.magnitude,
-                LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-
-            bool bHit = false;
-            float minDistance = 0;
-            bool minDistanceInitialized = false;
-            Vector3 amountToAddToGravity = Vector3.zero;
-            for (int i = 0; i < allHitsCount; i++)
-            {
-                bHit = true;
-                if (Mathf.Approximately(allHits[i].distance, 0)) { continue; }
-                if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                amountToAddToGravity = GetTickRateDeltaTime() * Mathf.Clamp01(allHits[i].distance) * Physics.gravity;
-                minDistance = allHits[i].distance;
-                minDistanceInitialized = true;
-            }
-            gravity += amountToAddToGravity;
-
-            if (bHit)
-            {
-                isGrounded.Value = true;
-            }
-            else // If no sphere cast hit
-            {
-                if (Physics.Raycast(currentPosition.Value + currentRotation.Value * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-                {
-                    isGrounded.Value = true;
-                }
-                else
-                {
-                    isGrounded.Value = false;
-                    gravity += GetTickRateDeltaTime() * Physics.gravity;
-                }
-            }
-
-            Vector3 animDir = Vector3.zero;
-            // Apply movement
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyNetworkRootMotion() * GetRootMotionSpeed();
-            Vector3 movement;
-            if (attributes.ShouldPlayHitStop())
-            {
-                movement = Vector3.zero;
-            }
-            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
-            {
-                if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
-                {
-                    movement = Vector3.zero;
-                }
-                else
-                {
-                    movement = rootMotion;
-                }
-            }
-            else
-            {
-                //Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.inputVector.x, 0, inputPayload.inputVector.y) * (attributes.IsFeared() ? -1 : 1));
-                Vector3 targetDirection = newRotation * (new Vector3(inputDir.x, 0, inputDir.z) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
-                targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= isGrounded.Value ? GetRunSpeed() : 0;
-                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : GetTickRateDeltaTime() * targetDirection;
-                animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
-            }
-
-            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
-
-            float stairMovement = 0;
-            float yOffset = 0.2f;
-            Vector3 startPos = currentPosition.Value;
-            startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
-            {
-                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
-                {
-                    break;
-                }
-#if UNITY_EDITOR
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
-#endif
-                startPos.y += yOffset;
-                stairMovement = startPos.y - currentPosition.Value.y - yOffset;
-
-                if (stairMovement > 0.5f)
-                {
-                    stairMovement = 0;
-                    break;
-                }
-            }
-
-            movement.y += stairMovement;
-
-            animDir = transform.InverseTransformDirection(Vector3.ClampMagnitude(animDir, 1));
-            if (weaponHandler.GetWeapon().IsWalking(weaponHandler.IsBlocking))
-            {
-                moveForwardTarget.Value = animDir.z / 2;
-                moveSidesTarget.Value = animDir.x / 2;
-            }
-            else
-            {
-                moveForwardTarget.Value = animDir.z;
-                moveSidesTarget.Value = animDir.x;
-            }
-            
-            bool wasPlayerHit = Physics.CapsuleCast(currentPosition.Value, currentPosition.Value + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            //bool wasPlayerHit = Physics.Raycast(currentPosition.Value + bodyHeightOffset / 2, movement.normalized, out RaycastHit playerHit, movement.magnitude, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-            if (wasPlayerHit)
-            {
-                bool collidersIgnoreEachOther = false;
-                foreach (Collider c in attributes.NetworkCollider.Colliders)
-                {
-                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
-                    {
-                        collidersIgnoreEachOther = true;
-                        break;
-                    }
-                }
-
-                if (!collidersIgnoreEachOther)
-                {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
-                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                    if (angle > 180) { angle -= 360; }
-
-                    if (angle > -20 & angle < 20)
-                    {
-                        movement = Vector3.zero;
-                    }
-                }
-            }
-
-            float multiplier = 1.0f - drag * GetTickRateDeltaTime();
-            if (multiplier < 0.0f) multiplier = 0.0f;
-            velocity = multiplier * velocity;
-            movement += velocity;
-
-            if (networkColliderRigidbody.SweepTest(movement.normalized, out RaycastHit movementHit, movement.magnitude, QueryTriggerInteraction.Ignore))
-            {
-                if (movementHit.distance > 0.5f)
-                {
-                    movement = Vector3.ClampMagnitude(movement, movementHit.distance);
-                    velocity = Vector3.zero;
-                }
-            }
-
-            Vector3 newPosition;
-            if ((attributes.AnimationHandler.ShouldApplyRootMotion() & weaponHandler.CurrentActionClip.shouldIgnoreGravity) | !Mathf.Approximately(stairMovement, 0))
-            {
-                newPosition = currentPosition.Value + movement;
-            }
-            else
-            {
-                newPosition = currentPosition.Value + movement + gravity;
-            }
-
-            currentPosition.Value = newPosition;
-        }
-
-        private const float drag = 1;
-
         private List<CombatAgent> activePlayers = new List<CombatAgent>();
         private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes); }
 
         private CombatAgent targetAttributes;
 
+        private const float runAnimationTransitionSpeed = 5;
         private new void Update()
         {
             base.Update();
@@ -351,6 +77,8 @@ namespace Vi.ArtificialIntelligence
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
+            if (!IsSpawned) { return; }
 
             if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
             {
@@ -360,80 +88,174 @@ namespace Vi.ArtificialIntelligence
             {
                 SetImmovable(attributes.IsGrabbed());
             }
-            
-            if (!IsSpawned) { return; }
 
-            if (attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                SetDestination(currentPosition.Value, true);
-            }
+            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(currentPosition.Value, true); }
 
-            UpdateLocomotion();
-            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), moveSidesTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetBool("IsGrounded", isGrounded.Value);
+            UpdateAnimatorParameters();
+            UpdateAnimatorSpeed();
+            EvaluateBotLogic();
         }
 
-        public override Vector3 GetVelocity() { return velocity; }
-
-        Vector3 velocity;
-        public override void AddForce(Vector3 force)
+        private void UpdateAnimatorParameters()
         {
-            if (!attributes.IsGrabbed() & !attributes.AnimationHandler.IsGrabAttacking()) { velocity += force * Time.fixedDeltaTime; }
+            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
+            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
+            attributes.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
+            attributes.AnimationHandler.Animator.SetFloat("VerticalSpeed", rb.velocity.y);
         }
 
+        private Vector2 GetWalkCycleAnimationParameters()
+        {
+            if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            {
+                return Vector2.zero;
+            }
+            else if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                Vector2 moveInput = GetPathMoveInput();
+                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                animDir = Vector2.ClampMagnitude(animDir, 1);
+
+                if (attributes.WeaponHandler.IsBlocking)
+                {
+                    switch (attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                    {
+                        case Weapon.BlockingLocomotion.NoMovement:
+                            animDir = Vector2.zero;
+                            break;
+                        case Weapon.BlockingLocomotion.CanWalk:
+                            animDir /= 2;
+                            break;
+                        case Weapon.BlockingLocomotion.CanRun:
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle blocking locomotion type: " + attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                            break;
+                    }
+                }
+                return animDir;
+            }
+        }
+
+        private void UpdateAnimatorSpeed()
+        {
+            if (weaponHandler.CurrentActionClip != null)
+            {
+                if (attributes.ShouldPlayHitStop())
+                {
+                    attributes.AnimationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    if (attributes.IsGrabbed())
+                    {
+                        CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            if (grabAssailant.AnimationHandler)
+                            {
+                                attributes.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        attributes.AnimationHandler.Animator.speed = GetAnimatorSpeed();
+                    }
+                }
+            }
+        }
+
+        private bool disableBots;
+        private bool canOnlyLightAttack;
         private void RefreshStatus()
         {
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
-        private bool disableBots;
-        private bool canOnlyLightAttack;
-
-        private IEnumerator EvaluateBotLogic()
+        private Quaternion EvaluateRotation()
         {
-            while (true)
+            Quaternion rot = currentRotation.Value;
+            if (IsServer)
             {
-                if (IsOwner)
+                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
+                camDirection.Scale(HORIZONTAL_PLANE);
+
+                if (attributes.ShouldApplyAilmentRotation())
+                    rot = attributes.GetAilmentRotation();
+                else if (attributes.AnimationHandler.IsGrabAttacking())
                 {
-                    activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
-
-                    targetAttributes = null;
-                    foreach (CombatAgent player in activePlayers)
+                    CombatAgent grabVictim = attributes.GetGrabVictim();
+                    if (grabVictim)
                     {
-                        if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
-                        if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
-                        if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
-                        break;
-                    }
-
-                    if (disableBots)
-                    {
-                        SetDestination(currentPosition.Value, true);
+                        Vector3 rel = grabVictim.MovementHandler.GetPosition() - GetPosition();
+                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                        rot = Quaternion.LookRotation(rel, Vector3.up);
                     }
                     else
                     {
-                        if (!targetAttributes)
-                        {
-                            if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
-                            {
-                                float walkRadius = 500;
-                                Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                                randomDirection += transform.position;
-                                NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                                SetDestination(hit.position, true);
-                            }
-                        }
-                        EvaluteAction();
+                        rot = Quaternion.LookRotation(camDirection);
                     }
                 }
-                else if (disableBots)
+                else if (!attributes.ShouldPlayHitStop())
+                    rot = Quaternion.LookRotation(camDirection);
+            }
+            else
+            {
+                rot = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
+            }
+            return rot;
+        }
+
+        private void LateUpdate()
+        {
+            transform.position = rb.transform.position;
+
+            if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
+
+            transform.rotation = Quaternion.Lerp(transform.rotation, EvaluateRotation(), Time.deltaTime * 15);
+        }
+
+        private void EvaluateBotLogic()
+        {
+            if (IsServer)
+            {
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+
+                targetAttributes = null;
+                foreach (CombatAgent player in activePlayers)
                 {
-                    if (new Vector2(Destination.x, Destination.z) != new Vector2(currentPosition.Value.x, currentPosition.Value.z)) { SetDestination(currentPosition.Value, true); }
+                    if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                    if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
+                    if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
+                    break;
                 }
 
-                yield return new WaitForSeconds(0.1f);
+                if (disableBots)
+                {
+                    SetDestination(currentPosition.Value, true);
+                }
+                else
+                {
+                    if (!targetAttributes)
+                    {
+                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
+                        {
+                            float walkRadius = 500;
+                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+                            randomDirection += transform.position;
+                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
+                            SetDestination(hit.position, true);
+                        }
+                    }
+                    EvaluteAction();
+                }
             }
         }
 
@@ -565,19 +387,177 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private float positionStrength = 1;
-        void FixedUpdate()
+        List<Collider> groundColliders = new List<Collider>();
+        ContactPoint[] stayContacts = new ContactPoint[3];
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
-            if (Vector3.Distance(networkColliderRigidbody.position, currentPosition.Value) > 4)
+            int contactCount = collision.GetContacts(stayContacts);
+            for (int i = 0; i < contactCount; i++)
             {
-                networkColliderRigidbody.position = currentPosition.Value;
+                if (stayContacts[i].normal.y >= 0.9f)
+                {
+                    if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
+                    break;
+                }
+                else // Normal is not pointing up
+                {
+                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
+                }
+            }
+        }
+
+        public override void ReceiveOnCollisionExitMessage(Collision collision)
+        {
+            if (groundColliders.Contains(collision.collider))
+            {
+                groundColliders.Remove(collision.collider);
+            }
+        }
+
+        private const float isGroundedSphereCheckRadius = 0.6f;
+        private bool IsGrounded()
+        {
+            if (groundColliders.Count > 0)
+            {
+                return true;
             }
             else
             {
-                Vector3 deltaPos = currentPosition.Value - networkColliderRigidbody.position;
-                networkColliderRigidbody.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+                return Physics.CheckSphere(rb.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             }
         }
+
+        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
+        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
+        void FixedUpdate()
+        {
+            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                rb.velocity = Vector3.zero;
+                return;
+            }
+
+            CalculatePath(currentPosition.Value, NavMesh.AllAreas);
+
+            Vector2 moveInput = GetPathMoveInput();
+            Quaternion newRotation = EvaluateRotation();
+
+            // Apply movement
+            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
+            Vector3 movement;
+            if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
+            }
+            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            {
+                if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                {
+                    movement = Vector3.zero;
+                }
+                else
+                {
+                    movement = rootMotion;
+                }
+            }
+            else
+            {
+                Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
+                targetDirection *= GetRunSpeed();
+                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
+            }
+
+            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+
+            float stairMovement = 0;
+            Vector3 startPos = currentPosition.Value;
+            startPos.y += stairStepHeight;
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            {
+                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                {
+                    break;
+                }
+#if UNITY_EDITOR
+                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
+                startPos.y += stairStepHeight;
+                stairMovement += stairStepHeight;
+
+                if (stairMovement > maxStairStepHeight)
+                {
+                    stairMovement = 0;
+                    break;
+                }
+            }
+
+            if (Physics.CapsuleCast(currentPosition.Value, currentPosition.Value + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            {
+                bool collidersIgnoreEachOther = false;
+                foreach (Collider c in attributes.NetworkCollider.Colliders)
+                {
+                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
+                    {
+                        collidersIgnoreEachOther = true;
+                        break;
+                    }
+                }
+
+                if (!collidersIgnoreEachOther)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
+                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
+
+                    if (angle > 180) { angle -= 360; }
+
+                    if (angle > -20 & angle < 20)
+                    {
+                        movement = Vector3.zero;
+                    }
+                }
+            }
+
+            if (!IsAffectedByExternalForce)
+            {
+                bool evaluateForce = true;
+                if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+                {
+                    if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+                    {
+                        rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                        evaluateForce = false;
+                    }
+                }
+
+                if (evaluateForce)
+                {
+                    if (IsGrounded())
+                    {
+                        rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                        if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                        {
+                            rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                        }
+                    }
+                    else // Decelerate horizontal movement while airborne
+                    {
+                        Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
+                        rb.AddForce(counterForce, ForceMode.VelocityChange);
+                    }
+                }
+
+                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            }
+            
+            currentPosition.Value = rb.position;
+            currentRotation.Value = rb.rotation;
+        }
+
+        private const float stairStepHeight = 0.01f;
+        private const float maxStairStepHeight = 0.5f;
+
+        private const float airborneHorizontalDragMultiplier = 0.1f;
 
         private float GetRunSpeed()
         {
@@ -589,88 +569,10 @@ namespace Vi.ArtificialIntelligence
             return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
-        private void UpdateLocomotion()
-        {
-            if (velocity.magnitude > 0.01f)
-            {
-                transform.position = currentPosition.Value;
-            }
-            else if (Vector3.Distance(transform.position, currentPosition.Value) > 2)
-            {
-                Debug.Log("Teleporting player: " + OwnerClientId + " " + name);
-                transform.position = currentPosition.Value;
-            }
-            else
-            {
-                Vector3 newPosition;
-                Vector2 horizontalPosition;
-                if (attributes.AnimationHandler.ShouldApplyRootMotion())
-                {
-                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
-                        new Vector2(currentPosition.Value.x, currentPosition.Value.z),
-                        attributes.AnimationHandler.ApplyLocalRootMotion().magnitude * GetRootMotionSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
-                }
-                else
-                {
-                    horizontalPosition = Vector2.MoveTowards(new Vector2(transform.position.x, transform.position.z),
-                        new Vector2(currentPosition.Value.x, currentPosition.Value.z),
-                        Time.deltaTime * GetRunSpeed() + velocity.sqrMagnitude / Time.fixedDeltaTime);
-                }
-                newPosition.x = horizontalPosition.x;
-                newPosition.z = horizontalPosition.y;
-                newPosition.y = Mathf.MoveTowards(transform.position.y, currentPosition.Value.y, Time.deltaTime * -Physics.gravity.y + velocity.y / Time.fixedDeltaTime);
-
-                if (attributes.ShouldShake())
-                {
-                    newPosition += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount);
-                }
-
-                transform.position = newPosition;
-            }
-
-            if (weaponHandler.CurrentActionClip != null)
-            {
-                if (attributes.ShouldPlayHitStop())
-                {
-                    attributes.AnimationHandler.Animator.speed = 0;
-                }
-                else
-                {
-                    if (attributes.IsGrabbed())
-                    {
-                        CombatAgent grabAssailant = attributes.GetGrabAssailant();
-                        if (grabAssailant)
-                        {
-                            if (grabAssailant.AnimationHandler)
-                            {
-                                attributes.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        attributes.AnimationHandler.Animator.speed = GetAnimatorSpeed();
-                    }
-                }
-            }
-
-            if (attributes.ShouldApplyAilmentRotation())
-                transform.rotation = attributes.GetAilmentRotation();
-            else if (weaponHandler.IsAiming())
-                transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-            else
-                transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, Time.deltaTime * NetworkManager.NetworkTickSystem.TickRate);
-        }
-
-        private void LateUpdate()
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
-        }
-
         void OnDodge()
         {
-            Vector3 moveInput = transform.InverseTransformDirection(NextPosition - currentPosition.Value).normalized;
-            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.z) * (attributes.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
+            Vector2 moveInput = GetPathMoveInput();
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             attributes.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }

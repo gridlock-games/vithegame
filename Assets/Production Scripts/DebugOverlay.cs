@@ -20,10 +20,6 @@ public class DebugOverlay : MonoBehaviour
     [SerializeField] private Text dividerText;
     [SerializeField] private Text pingText;
 
-    static string myLog = "";
-    private string output;
-    private string stack;
-
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -88,12 +84,25 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
+    static string myLog = "";
+    private string output;
+    private string stack;
+
     public void Log(string logString, string stackTrace, LogType type)
     {
+        if (!consoleEnabled) { return; }
+
         output = logString;
         stack = stackTrace;
 
-        myLog = type.ToString() + ": " + output + "\n" + stack + "\n" + myLog;
+        if (type.ToString() == LogType.Error.ToString())
+        {
+            myLog = type.ToString() + ": " + output + "\n" + stack + "\n" + myLog;
+        }
+        else
+        {
+            myLog = type.ToString() + ": " + output + "\n" + myLog;
+        }
 
         if (myLog.Length > 1000)
         {
@@ -123,6 +132,23 @@ public class DebugOverlay : MonoBehaviour
         consoleEnabled = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
         fpsEnabled = FasterPlayerPrefs.Singleton.GetBool("FPSEnabled");
         pingEnabled = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
+
+        if (!consoleEnabled)
+        {
+            myLog = "";
+            consoleLogText.text = "";
+        }
+        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
+        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
+        consoleParent.enabled = consoleEnabled;
+
+        if (!fpsEnabled) { fpsText.text = ""; }
+
+        if (!pingEnabled)
+        {
+            pingText.text = "";
+            dividerText.text = "";
+        }
     }
 
     private bool consoleEnabled;
@@ -134,12 +160,6 @@ public class DebugOverlay : MonoBehaviour
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
         
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
-        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
-
-        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
-
-        consoleParent.enabled = consoleEnabled;
 
         if (fpsEnabled)
         {
@@ -177,10 +197,6 @@ public class DebugOverlay : MonoBehaviour
             }
             fpsText.color = fpsTextColor;
         }
-        else
-        {
-            fpsText.text = "";
-        }
 
         if (pingEnabled)
         {
@@ -213,11 +229,6 @@ public class DebugOverlay : MonoBehaviour
                 dividerText.text = "";
                 pingText.color = Color.green;
             }
-        }
-        else
-        {
-            pingText.text = "";
-            dividerText.text = "";
         }
     }
 }

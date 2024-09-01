@@ -8,12 +8,12 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
-using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
     public class LobbyUI : NetworkBehaviour
     {
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
         [Header("Lobby UI Assignments")]
@@ -267,6 +267,9 @@ namespace Vi.UI
             leftTeamParent.SetActive(teamParentDict.ContainsValue(leftTeamParent.transformParent));
             rightTeamParent.SetActive(teamParentDict.ContainsValue(rightTeamParent.transformParent));
 
+            leftTeamParent.joinTeamButton.gameObject.SetActive(teamParentDict.Count > 1);
+            rightTeamParent.joinTeamButton.gameObject.SetActive(teamParentDict.Count > 1);
+
             if (PlayerDataManager.Singleton.IsLobbyLeader())
             {
                 leftTeamParent.teamNameOverrideInputField.text = "";
@@ -290,24 +293,25 @@ namespace Vi.UI
             // Maps
             RefreshMapOptions();
 
-            // Teams
-            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId))
-            {
-                PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
-                if (!possibleTeams.Contains(localTeam) & localTeam != PlayerDataManager.Team.Spectator) { leftTeamParent.joinTeamButton.onClick.Invoke(); }
-            }
-
+            // Even out teams
             if (IsServer)
             {
-                List<int> botClientIds = new List<int>();
-                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
+                foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
                 {
-                    if (playerData.id < 0) { botClientIds.Add(playerData.id); }
+                    teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
                 }
 
-                foreach (int clientId in botClientIds)
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
-                    PlayerDataManager.Singleton.KickPlayer(clientId);
+                    PlayerDataManager.PlayerData newPlayerData = playerData;
+                    // Get the team with the lowest player count
+                    newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
+
+                    PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+
+                    if (teamCounts.ContainsKey(playerData.team)) { teamCounts[playerData.team]--; }
+                    teamCounts[newPlayerData.team]++;
                 }
             }
 
@@ -321,7 +325,7 @@ namespace Vi.UI
                     {
                         FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                         gameModeInfoUI.gameObject.SetActive(true);
-                        gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                        gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), true);
                     }
                 }
             }
@@ -508,11 +512,18 @@ namespace Vi.UI
                 rightTeamParent.teamTitleText.text = PlayerDataManager.Singleton.GetTeamText(rightTeamParent.team);
             }
 
+            int inputFieldCount = 0;
             foreach (CustomSettingsParent customSettingsParent in customSettingsParents)
             {
                 customSettingsParent.parent.gameObject.SetActive(customSettingsParent.gameMode == PlayerDataManager.Singleton.GetGameMode());
+
+                if (customSettingsParent.parent.gameObject.activeSelf)
+                {
+                    inputFieldCount = customSettingsParent.inputFields.Length;
+                }
             }
 
+            gameModeSpecificSettingsTitleText.gameObject.SetActive(inputFieldCount > 0);
             gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
@@ -587,7 +598,7 @@ namespace Vi.UI
             if (playerDataListWithoutSpectators.Count > maxPlayersForMap)
             {
                 canCountDown = false;
-                cannotCountDownMessage = "Cannot play a match on " + PlayerDataManager.Singleton.GetMapName() + " with more than " + maxPlayersForMap.ToString() + " players";
+                cannotCountDownMessage = "Cannot play a " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " match on " + PlayerDataManager.Singleton.GetMapName() + " with more than " + maxPlayersForMap.ToString() + " players";
             }
 
             bool roomSettingsParsedProperly = true;
@@ -665,7 +676,7 @@ namespace Vi.UI
                 characterLockTimeText.text = "Locking Characters in " + characterLockTimer.Value.ToString("F0");
             }
 
-            roomSettingsButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown));
+            roomSettingsButton.gameObject.SetActive(isLobbyLeader & Mathf.Approximately(startGameTimer.Value, startGameTime));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
             
             leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
@@ -721,6 +732,8 @@ namespace Vi.UI
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
+
+            backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
         }
 
         private GameObject previewObject;
@@ -805,7 +818,7 @@ namespace Vi.UI
                 {
                     FasterPlayerPrefs.Singleton.SetString(gameModeString, "");
                     gameModeInfoUI.gameObject.SetActive(true);
-                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode());
+                    gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), true);
                 }
             }
         }
@@ -814,6 +827,12 @@ namespace Vi.UI
         {
             roomSettingsParent.SetActive(false);
             lobbyUIParent.SetActive(true);
+        }
+
+        public void OpenGameModeInfoUI()
+        {
+            gameModeInfoUI.gameObject.SetActive(true);
+            gameModeInfoUI.Initialize(PlayerDataManager.Singleton.GetGameMode(), false);
         }
 
         public void AddBot(PlayerDataManager.Team team)
