@@ -62,7 +62,7 @@ namespace Vi.ScriptableObjects
 
         protected void Awake()
         {
-            
+            colliders = GetComponentsInChildren<Collider>();
         }
 
         private PooledObject pooledObject;
@@ -86,12 +86,13 @@ namespace Vi.ScriptableObjects
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
         }
 
+        protected Collider[] colliders = new Collider[0];
         public override void OnNetworkSpawn()
         {
             if (IsServer)
             {
                 StartCoroutine(DespawnVFXAfterPlaying());
-                foreach (Collider col in GetComponentsInChildren<Collider>())
+                foreach (Collider col in colliders)
                 {
                     col.enabled = IsServer;
                 }

@@ -238,6 +238,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "HandleServerReconciliation",
+                    "type": "Button",
+                    "id": "e147a039-adb9-4820-b907-88613b7fd55d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -808,7 +817,7 @@
                     "path": "<Keyboard>/u",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard & Mouse",
                     "action": "AddForce",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -832,6 +841,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "DisableBots",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4fce1421-c56c-4b63-9de3-6548c542e981",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "HandleServerReconciliation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

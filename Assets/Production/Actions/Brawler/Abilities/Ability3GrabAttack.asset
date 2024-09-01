@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -254,7 +255,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  YAngleRotationOffset: 20
+  YAngleRotationOffset: 342
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15

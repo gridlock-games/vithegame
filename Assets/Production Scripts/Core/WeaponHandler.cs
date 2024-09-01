@@ -315,6 +315,8 @@ namespace Vi.Core
                 previewInstance = Instantiate(pooledObject, orientation.position, orientation.rotation, parent).GetComponent<ActionVFXPreview>();
                 Debug.LogError("No pooled object on preview VFX object!" + actionPreviewVFXPrefab);
             }
+            previewInstance.transform.rotation *= Quaternion.Euler(actionClip.previewActionVFXRotationOffset);
+            previewInstance.transform.position += previewInstance.transform.rotation * actionClip.previewActionVFXPositionOffset;
             previewInstance.transform.localScale = actionClip.previewActionVFXScale;
             previewInstance.SetActionVFX(actionClip.actionVFXList[0]);
             return previewInstance.gameObject;
@@ -1136,6 +1138,11 @@ namespace Vi.Core
             {
                 Debug.Log("Disabled Bot AI");
             }
+        }
+
+        void OnAddForce()
+        {
+            combatAgent.MovementHandler.GetRigidbody().AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
 

@@ -26,7 +26,6 @@ namespace Vi.Core.VFX
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
         private ParticleSystem[] particleSystems = new ParticleSystem[0];
-        private Collider[] colliders = new Collider[0];
         private new void Awake()
         {
             base.Awake();
@@ -49,15 +48,6 @@ namespace Vi.Core.VFX
             foreach (Collider col in colliders)
             {
                 if (!col.isTrigger) { Debug.LogError("Make sure all colliders on particle systems are triggers! " + this); }
-            }
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            foreach (Collider col in colliders)
-            {
-                col.enabled = IsServer;
             }
         }
 

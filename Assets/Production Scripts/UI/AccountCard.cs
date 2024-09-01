@@ -24,7 +24,7 @@ namespace Vi.UI
             this.playerDataId = playerDataId;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             nameDisplayText.text = playerData.character.name.ToString();
-            backgroundImage.color = PlayerDataManager.GetTeamColor(playerData.team);
+            backgroundImage.color = playerData.team == PlayerDataManager.Team.Competitor ? Color.white : PlayerDataManager.GetTeamColor(playerData.team);
 
             lockedUIImage.sprite = isLocked | playerDataId < 0 ? lockedSprite : unlockedSprite;
 

@@ -564,8 +564,7 @@ namespace Vi.Core
                     "Alexander",
                     "Wei",
                     "Min",
-                    "Jun",
-                    ""
+                    "Jun"
                 }
             },
             { CharacterReference.RaceAndGender.HumanFemale, new List<string>()
@@ -648,6 +647,28 @@ namespace Vi.Core
             }
         };
 
+        public string GetRandomPlayerName(CharacterReference.RaceAndGender raceAndGender)
+        {
+            List<string> potentialNames = botNames[raceAndGender];
+            potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
+            potentialNames.RemoveAll(item => string.IsNullOrWhiteSpace(item));
+            potentialNames = potentialNames.Distinct().ToList();
+
+            List<int> validNameIndexes = new List<int>();
+            for (int i = 0; i < potentialNames.Count; i++)
+            {
+                validNameIndexes.Add(i);
+            }
+
+            foreach (PlayerData playerData in GetPlayerDataListWithSpectators())
+            {
+                int index = potentialNames.IndexOf(playerData.character.name.ToString());
+                if (index != -1) { validNameIndexes.Remove(index); }
+            }
+
+            return potentialNames[validNameIndexes[Random.Range(0, validNameIndexes.Count)]];
+        }
+
         private int botClientId = 0;
         public void AddBotData(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1)
         {
@@ -663,12 +684,7 @@ namespace Vi.Core
                 botClientId--;
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
-
-                List<string> potentialNames = botNames[botCharacter.raceAndGender];
-                potentialNames.AddRange(botNames[CharacterReference.RaceAndGender.Universal]);
-                botCharacter.name = potentialNames[Random.Range(0, potentialNames.Count)];
-                if (string.IsNullOrWhiteSpace(botCharacter.name.ToString())) { botCharacter.name = "Bot"; Debug.LogError("Bot " + botClientId + " name is empty!"); }
-
+                botCharacter.name = GetRandomPlayerName(botCharacter.raceAndGender);
                 PlayerData botData = new PlayerData(botClientId,
                     defaultChannel,
                     botCharacter,

@@ -133,7 +133,7 @@ namespace Vi.Isolated
                                 teamCounts.Add(possibleTeam, playerDataListWithoutSpectators.Where(item => item.team == possibleTeam).ToArray().Length);
                             }
                             // Get the team with the lowest player count
-                            clientTeam = teamCounts.Aggregate((l, r) => l.Value < r.Value ? l : r).Key;
+                            clientTeam = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
                         }
                     }
                     else // Game in progress
