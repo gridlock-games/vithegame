@@ -984,7 +984,6 @@ namespace Vi.Core
             {
                 Debug.LogError("Couldn't find animation clip associated with " + lastClipPlayed);
             }
-            Debug.Log(rootMotion + " " + actionClipProgress);
             actionClipProgress += step;
             return rootMotion;
         }

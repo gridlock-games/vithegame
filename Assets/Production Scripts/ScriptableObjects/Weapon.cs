@@ -4,8 +4,10 @@ using UnityEngine;
 using System.Reflection;
 using System.Linq;
 using Vi.Utility;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Animations;
+#endif
 
 namespace Vi.ScriptableObjects
 {
