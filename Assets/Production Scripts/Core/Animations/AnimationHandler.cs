@@ -33,15 +33,10 @@ namespace Vi.Core
         public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
         {
             if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
-            try
-            {
-                return combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
-            }
-            catch
-            {
-                Debug.LogError("Action clip " + actionClip.name + " is not present in the animator override controller! " + combatAgent.WeaponHandler.AnimatorOverrideControllerInstance);
-                return 2;
-            }
+            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(actionClip));
+            if (clip) { return clip.length; }
+            Debug.LogError("Couldn't find an animation clip for action clip " + actionClip.name + " with weapon " + combatAgent.WeaponHandler.GetWeapon());
+            return 2;
         }
 
         public bool IsActionClipPlaying(ActionClip actionClip)
@@ -560,7 +555,7 @@ namespace Vi.Core
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
@@ -952,7 +947,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            lastClipPlayed = actionClip;
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         [Rpc(SendTo.Owner)] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
@@ -963,8 +958,36 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
-        public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
+        public bool ShouldApplyRootMotion() { return actionClipProgress < 1; }
         public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
+
+        private void SetLastActionClip(ActionClip actionClip)
+        {
+            lastClipPlayed = actionClip;
+            actionClipProgress = 0;
+        }
+
+        private float actionClipProgress = 1;
+        public Vector3 ApplyRootMotion(float step)
+        {
+            Vector3 rootMotion = Vector3.zero;
+            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(lastClipPlayed));
+
+            if (clip)
+            {
+                AnimationClipReference.AnimationData data = PlayerDataManager.Singleton.GetCharacterReference().GetAnimationClipReference().GetAnimationData(clip);
+                rootMotion.x = data.sidesMotion.Evaluate(actionClipProgress);
+                rootMotion.y = data.verticalMotion.Evaluate(actionClipProgress);
+                rootMotion.z = data.forwardMotion.Evaluate(actionClipProgress);
+            }
+            else
+            {
+                Debug.LogError("Couldn't find animation clip associated with " + lastClipPlayed);
+            }
+            Debug.Log(rootMotion + " " + actionClipProgress);
+            actionClipProgress += step;
+            return rootMotion;
+        }
 
         public Animator Animator { get; private set; }
         public LimbReferences LimbReferences { get; private set; }

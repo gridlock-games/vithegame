@@ -250,7 +250,6 @@ namespace Vi.Player
             Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
-            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -264,7 +263,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    movement = rootMotion;
+                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
                 }
             }
             else

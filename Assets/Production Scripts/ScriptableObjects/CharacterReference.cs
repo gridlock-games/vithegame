@@ -461,6 +461,15 @@ namespace Vi.ScriptableObjects
                 equipmentOptions[equipmentOptionIndex].AddIcon(raceAndGender, AssetDatabase.LoadAssetAtPath<Sprite>(armorIconPath));
             }
         }
+
+        [ContextMenu("Assign Animations On Weapons")]
+        private void AssignAnimationsOnWeapons()
+        {
+            foreach (WeaponOption weaponOption in weaponOptions)
+            {
+                weaponOption.weapon.FindAnimations();
+            }
+        }
         #endif
     }
 }
