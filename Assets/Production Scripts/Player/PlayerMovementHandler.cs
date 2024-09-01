@@ -255,10 +255,17 @@ namespace Vi.Player
 
             if (inputPayload.tryingToPlayActionClipName != "")
             {
-                attributes.AnimationHandler.PlayActionOnClient(inputPayload.tryingToPlayActionClipName.ToString());
                 Debug.Log(inputPayload.tick + " " + inputPayload.tryingToPlayActionClipName);
+                if (IsServer)
+                {
+                    attributes.AnimationHandler.PlayActionOnServer(inputPayload.tryingToPlayActionClipName.ToString(), false);
+                }
+                else
+                {
+                    attributes.AnimationHandler.PlayPredictedActionOnClient(inputPayload.tryingToPlayActionClipName.ToString());
+                }
             }
-
+            
             // Apply movement
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
