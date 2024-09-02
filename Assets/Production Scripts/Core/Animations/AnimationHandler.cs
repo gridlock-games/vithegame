@@ -1083,6 +1083,7 @@ namespace Vi.Core
                 rootMotion.x = data.sidesMotion.Evaluate(actionClipProgress);
                 rootMotion.y = data.verticalMotion.Evaluate(actionClipProgress);
                 rootMotion.z = data.forwardMotion.Evaluate(actionClipProgress);
+                rootMotion = Quaternion.Euler(0, -data.horizontalRotationOffset, 0) * rootMotion;
             }
             else
             {

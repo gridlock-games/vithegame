@@ -31,14 +31,26 @@ namespace Vi.ScriptableObjects
             public AnimationCurve sidesMotion;
             public AnimationCurve verticalMotion;
             public AnimationCurve forwardMotion;
+            public float horizontalRotationOffset;
 
-            public AnimationData(AnimationClip animationClip, AnimationCurve sidesMotion, AnimationCurve verticalMotion, AnimationCurve forwardMotion)
+            public AnimationData(AnimationClip animationClip)
+            {
+                name = animationClip.name;
+                this.animationClip = animationClip;
+                sidesMotion = default;
+                verticalMotion = default;
+                forwardMotion = default;
+                horizontalRotationOffset = default;
+            }
+
+            public AnimationData(AnimationClip animationClip, AnimationCurve sidesMotion, AnimationCurve verticalMotion, AnimationCurve forwardMotion, float horizontalRotationOffset)
             {
                 name = animationClip.name;
                 this.animationClip = animationClip;
                 this.sidesMotion = sidesMotion;
                 this.verticalMotion = verticalMotion;
                 this.forwardMotion = forwardMotion;
+                this.horizontalRotationOffset = horizontalRotationOffset;
             }
 
             public bool Equals(AnimationData other)
@@ -67,11 +79,25 @@ namespace Vi.ScriptableObjects
                 allClips.AddRange(animatorController.animationClips);
             }
 
-            serializedAnimationData.Clear();
             foreach (AnimationClip animationClip in allClips.Distinct())
             {
                 if (!animationClip.hasRootCurves) { continue; }
+                if (serializedAnimationData.Contains(new AnimationData(animationClip))) { continue; }
 
+                float rotationOffset = 0;
+                ModelImporter modelImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(animationClip)) as ModelImporter;
+                if (modelImporter)
+                {
+                    foreach (ModelImporterClipAnimation modelImporterClipAnimation in modelImporter.clipAnimations)
+                    {
+                        if (modelImporterClipAnimation.name == animationClip.name)
+                        {
+                            rotationOffset = modelImporterClipAnimation.rotationOffset;
+                            break;
+                        }
+                    }
+                }
+                
                 AnimationCurve sidesMotion = default;
                 AnimationCurve verticalMotion = default;
                 AnimationCurve forwardMotion = default;
@@ -104,7 +130,7 @@ namespace Vi.ScriptableObjects
                     }
                 }
 
-                AnimationData animationData = new AnimationData(animationClip, sidesMotion, verticalMotion, forwardMotion);
+                AnimationData animationData = new AnimationData(animationClip, sidesMotion, verticalMotion, forwardMotion, rotationOffset);
                 if (!serializedAnimationData.Contains(animationData)) { serializedAnimationData.Add(animationData); }
             }
         }
