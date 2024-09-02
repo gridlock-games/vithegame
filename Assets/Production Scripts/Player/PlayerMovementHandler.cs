@@ -371,9 +371,8 @@ namespace Vi.Player
                         rb.AddForce(counterForce, ForceMode.VelocityChange);
                     }
                 }
+                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
-
-            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
 
             return new StatePayload(inputPayload, rb, newRotation);
         }

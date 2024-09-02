@@ -534,9 +534,8 @@ namespace Vi.ArtificialIntelligence
                         rb.AddForce(counterForce, ForceMode.VelocityChange);
                     }
                 }
+                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
-
-            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
         }
 
         private const float stairStepHeight = 0.01f;

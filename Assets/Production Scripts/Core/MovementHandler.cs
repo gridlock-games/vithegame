@@ -98,6 +98,10 @@ namespace Vi.Core
 		private IEnumerator ResetIsAffectedByExternalForce()
         {
 			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
 			IsAffectedByExternalForce = false;
         }
 
