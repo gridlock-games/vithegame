@@ -456,6 +456,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
                 cameraController.gameObject.AddComponent<AudioListener>();
@@ -473,9 +474,7 @@ namespace Vi.Player
                 Destroy(cameraController.gameObject);
                 Destroy(playerInput);
             }
-            rb.useGravity = true;
             rb.isKinematic = !IsServer & !IsOwner;
-            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
 
             if (IsServer)
             {
@@ -576,7 +575,7 @@ namespace Vi.Player
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
+            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled & playerInput.currentActionMap != null)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
