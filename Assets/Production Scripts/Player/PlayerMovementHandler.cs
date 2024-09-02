@@ -170,7 +170,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -258,11 +258,11 @@ namespace Vi.Player
                 Debug.Log(inputPayload.tick + " " + inputPayload.tryingToPlayActionClipName);
                 if (IsServer)
                 {
-                    attributes.AnimationHandler.PlayActionOnServer(inputPayload.tryingToPlayActionClipName.ToString(), false);
+                    attributes.AnimationHandler.PlayActionOnServer(inputPayload.tryingToPlayActionClipName.ToString(), false, inputPayload.tick);
                 }
                 else
                 {
-                    attributes.AnimationHandler.PlayPredictedActionOnClient(inputPayload.tryingToPlayActionClipName.ToString());
+                    attributes.AnimationHandler.PlayPredictedActionOnClient(inputPayload.tryingToPlayActionClipName.ToString(), inputPayload.tick);
                 }
             }
             

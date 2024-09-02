@@ -11,7 +11,6 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
-        public bool WaitingForActionToPlay { get; private set; }
 
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
@@ -24,11 +23,14 @@ namespace Vi.Core
             {
                 PlayActionOnServer(actionClip.name, isFollowUpClip);
             }
-            else
+            else if (IsOwner)
             {
-                WaitingForActionToPlay = true;
                 //PlayActionServerRpc(actionClip.name, isFollowUpClip);
                 clientActionClipQueue.Enqueue(actionClip);
+            }
+            else
+            {
+                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip);
             }
         }
 
@@ -263,8 +265,6 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
-        RaycastHit[] allHits = new RaycastHit[10];
-
         private struct CanPlayActionClipResult
         {
             public bool canPlay;
@@ -276,6 +276,8 @@ namespace Vi.Core
                 this.shouldUseDodgeCancelTransitionTime = shouldUseDodgeCancelTransitionTime;
             }
         }
+
+        RaycastHit[] allHits = new RaycastHit[10];
 
         private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
@@ -500,9 +502,8 @@ namespace Vi.Core
         }
 
         // This method plays the action on the server
-        public void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        public void PlayActionOnServer(string actionClipName, bool isFollowUpClip, int associatedTick = 0)
         {
-            WaitingForActionToPlay = false;
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
@@ -591,7 +592,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, associatedTick);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
@@ -904,27 +905,28 @@ namespace Vi.Core
             }
         }
 
-        // Remote Procedure Call method for playing the action on the server
-        [Rpc(SendTo.Server)]
-        private void PlayActionServerRpc(string actionStateName, bool isFollowUpClip)
-        {
-            PlayActionOnServer(actionStateName, isFollowUpClip);
-            ResetActionClientRpc();
-        }
-
         // Remote Procedure Call method for playing the action on the client
         [Rpc(SendTo.NotServer)]
-        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
+        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime, int associatedTick)
         {
             if (IsServer) { return; }
-            if (lastPredictedClientActionPlayed == actionClipName) { return; }
+
+            // If we already have played this action in the prediction method
+            if (predictedActionTracker.ContainsKey(associatedTick % BUFFER_SIZE))
+            {
+                if (predictedActionTracker[associatedTick % BUFFER_SIZE] == actionClipName) { return; }
+            }
             StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
         }
 
-        private string lastPredictedClientActionPlayed;
-        public void PlayPredictedActionOnClient(string actionClipName)
+        private Dictionary<int, string> predictedActionTracker = new Dictionary<int, string>(BUFFER_SIZE);
+
+        private const int BUFFER_SIZE = 1024;
+
+        public void PlayPredictedActionOnClient(string actionClipName, int associatedTick)
         {
-            lastPredictedClientActionPlayed = actionClipName;
+            predictedActionTracker[associatedTick % BUFFER_SIZE] = actionClipName;
+
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
             float transitionTime = actionClip.transitionTime;
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
@@ -1053,8 +1055,6 @@ namespace Vi.Core
 
             if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
-
-        [Rpc(SendTo.Owner)] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
 
         // Coroutine for setting invincibility status during a dodge
         private void SetInvincibleStatusOnDodge(string actionStateName)
