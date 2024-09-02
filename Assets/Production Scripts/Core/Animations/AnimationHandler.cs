@@ -1062,7 +1062,7 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
-        public bool ShouldApplyRootMotion() { return actionClipProgress < 1; }
+        public bool ShouldApplyRootMotion() { return actionClipProgress < 1 & lastClipPlayed.shouldApplyRootMotion; }
         public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
 
         private void SetLastActionClip(ActionClip actionClip)

@@ -161,6 +161,7 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationThreshold = 0.0001f;
+        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private void HandleServerReconciliation()
         {
             lastProcessedState = latestServerState.Value;
@@ -171,6 +172,7 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -415,9 +417,35 @@ namespace Vi.Player
             return rot;
         }
 
+        private const float serverReconciliationLerpDuration = 1;
+        private const float serverReconciliationTeleportThreshold = 2;
+
         private void LateUpdate()
         {
-            transform.position = rb.transform.position;
+            if (!IsSpawned) { return; }
+
+            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
+            {
+                float dist = Vector3.Distance(transform.position, rb.transform.position);
+                if (dist > serverReconciliationTeleportThreshold)
+                {
+                    transform.position = rb.transform.position;
+                    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                }
+                else if (dist < 0.01f)
+                {
+                    transform.position = rb.transform.position;
+                    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                }
+                else
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, rb.transform.position, Time.deltaTime * GetRunSpeed());
+                }
+            }
+            else
+            {
+                transform.position = rb.transform.position;
+            }
 
             if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
 
