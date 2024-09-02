@@ -32,7 +32,7 @@ namespace Vi.Core
 			rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
 		}
 
-        public virtual Vector3 GetPosition() { return transform.position; }
+        public virtual Vector3 GetPosition() { return rb.position; }
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
@@ -115,7 +115,7 @@ namespace Vi.Core
 
 		private const float nextPositionAngleThreshold = 10;
 		private const float nextPositionDistanceThreshold = 1;
-		private const float startPositionNavMeshDistanceThreshold = 10;
+		private const float startPositionNavMeshDistanceThreshold = 20;
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {

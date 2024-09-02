@@ -49,9 +49,12 @@ namespace Vi.Core.VFX.Axe
                     movementHandler.GetRigidbody().AddForce(rel * pullStrength - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
                 }
             }
-            else if (!other.transform.root.GetComponent<ActionVFX>() & other.transform.root.TryGetComponent(out Rigidbody rb))
+            else if (other.transform.root.GetComponent<Projectile>())
             {
-                rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
+                if (other.transform.root.TryGetComponent(out Rigidbody rb))
+                {
+                    rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
+                }
             }
         }
 

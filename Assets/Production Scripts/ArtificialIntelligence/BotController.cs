@@ -15,13 +15,10 @@ namespace Vi.ArtificialIntelligence
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             if (!IsServer) { Debug.LogError("BotController.SetOrientation() should only be called on the server!"); return; }
-            
             rb.position = newPosition;
             transform.rotation = newRotation;
         }
 
-        public override Vector3 GetPosition() { return rb.position; }
-        
         private Attributes attributes;
         private new void Awake()
         {

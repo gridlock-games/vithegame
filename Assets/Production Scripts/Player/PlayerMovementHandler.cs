@@ -29,8 +29,6 @@ namespace Vi.Player
 
         [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
 
-        public override Vector3 GetPosition() { return rb.position; }
-
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
         public Transform TargetToLockOn { get; private set; }
