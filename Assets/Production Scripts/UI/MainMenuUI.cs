@@ -299,6 +299,7 @@ namespace Vi.UI
         else
         {
           Debug.LogError("Steam sign in error - " + error);
+          initialErrorText.text = error;
           oAuthParent.SetActive(false);
         }
       });
@@ -319,7 +320,7 @@ namespace Vi.UI
 
       if (WebRequestManager.Singleton.IsLoggedIn)
       {
-        Debug.Log("is logged in");
+
         initialParent.SetActive(false);
         oAuthParent.SetActive(false);
         welcomeUserText.text = steamUsername;
@@ -328,7 +329,7 @@ namespace Vi.UI
       }
       else
       {
-        Debug.Log("hit a else");
+
         oAuthParent.SetActive(false);
         initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
       }

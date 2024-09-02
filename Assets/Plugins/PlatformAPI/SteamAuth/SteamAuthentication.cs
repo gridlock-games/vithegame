@@ -33,6 +33,7 @@ namespace jomarcentermjm.PlatformAPI
       if (!SteamAPI.Init())
       {
         Debug.LogError("SteamAPI does not work on non-steam versions.");
+        _callback.Invoke(false, "Steam is not running/API error", null, null,"empty user");
         return;
       }
       //Get a session Ticket
