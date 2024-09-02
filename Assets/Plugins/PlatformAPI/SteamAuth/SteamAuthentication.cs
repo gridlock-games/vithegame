@@ -35,8 +35,8 @@ namespace jomarcentermjm.PlatformAPI
   {
     private const string AuthorizationProcessingEndpoint = "steamauth.vi-assets.com/";
     // Start is called before the first frame update
-    //private const string APIURL = "http://steamauth.vi-assets.com/";
-    private const string APIURL = "http://localhost:1337/";
+    private const string APIURL = "http://thirdpartyauth.vi-assets.com/serviceapi";
+    //private const string APIURL = "38.54.25.140:7751";
     private static Action<bool, string, FirebaseUser, SteamUserAccountData, string> _callback;
 
     public static void Auth(Action<bool, string, FirebaseUser, SteamUserAccountData, string> callback)
@@ -74,7 +74,7 @@ namespace jomarcentermjm.PlatformAPI
         RestClient.Request(new RequestHelper
         {
           Method = "POST",
-          Uri = $"{APIURL}steamticketverify",
+          Uri = $"{APIURL}/steamticketverify",
           ContentType = "application/json",
           BodyRaw = convertedST
         }).Then(

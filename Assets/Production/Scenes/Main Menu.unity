@@ -6047,6 +6047,12 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1911871307}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1911871309 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1197047962697914, guid: 4abbb9b2178b0d74a945436a1669b6e7,
+    type: 3}
+  m_PrefabInstance: {fileID: 1911871307}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1938353908
 GameObject:
   m_ObjectHideFlags: 0
@@ -6537,6 +6543,7 @@ MonoBehaviour:
   openRegisterAccountButton: {fileID: 1038056991}
   forgotPasswordButton: {fileID: 227929228}
   loginErrorText: {fileID: 2010544571}
+  steamLoginButton: {fileID: 1911871309}
   oAuthParent: {fileID: 160895985}
   oAuthMessageText: {fileID: 1973996067}
   playParent: {fileID: 77962636}
