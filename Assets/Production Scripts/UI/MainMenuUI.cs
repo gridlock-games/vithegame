@@ -49,6 +49,8 @@ namespace Vi.UI
     [SerializeField] private Button forgotPasswordButton;
     [SerializeField] private Text loginErrorText;
 
+    [Header("Individual Login Buttons")]
+    [SerializeField] private GameObject steamLoginButton;
     [Header("OAuth")]
     [SerializeField] private GameObject oAuthParent;
 
@@ -677,6 +679,12 @@ namespace Vi.UI
         auth = FirebaseAuth.DefaultInstance;
         StartCoroutine(AutomaticallyAttemptLogin());
         HandlePlatformAPI();
+      }
+
+      //Running on Steam Version
+      if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.LinuxPlayer)
+      {
+        steamLoginButton.SetActive(true);
       }
     }
 
