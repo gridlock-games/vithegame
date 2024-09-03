@@ -5,6 +5,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -1127,9 +1128,9 @@ namespace Vi.Core
                         AnimationClipReference.AnimationData data = PlayerDataManager.Singleton.GetCharacterReference().GetAnimationClipReference().GetAnimationData(clip);
                         float normalizedTime = actionClipProgress;
 
-                        rootMotion.x += data.sidesMotion.Evaluate(normalizedTime);
-                        rootMotion.y += data.verticalMotion.Evaluate(normalizedTime);
-                        rootMotion.z += data.forwardMotion.Evaluate(normalizedTime);
+                        rootMotion.x += data.sidesMotion.EvaluateNormalizedTime(normalizedTime);
+                        rootMotion.y += data.verticalMotion.EvaluateNormalizedTime(normalizedTime);
+                        rootMotion.z += data.forwardMotion.EvaluateNormalizedTime(normalizedTime);
 
                         bool shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
                         if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
@@ -1138,15 +1139,15 @@ namespace Vi.Core
                         {
                             if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                             {
-                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(normalizedTime);
-                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(normalizedTime);
-                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().EvaluateNormalizedTime(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().EvaluateNormalizedTime(normalizedTime);
+                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().EvaluateNormalizedTime(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().EvaluateNormalizedTime(normalizedTime);
+                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().EvaluateNormalizedTime(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().EvaluateNormalizedTime(normalizedTime);
                             }
                             else
                             {
-                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime);
-                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime);
-                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().EvaluateNormalizedTime(normalizedTime);
+                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().EvaluateNormalizedTime(normalizedTime);
+                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().EvaluateNormalizedTime(normalizedTime);
                             }
                         }
                         rootMotion = Quaternion.Euler(0, -data.horizontalRotationOffset, 0) * rootMotion;
