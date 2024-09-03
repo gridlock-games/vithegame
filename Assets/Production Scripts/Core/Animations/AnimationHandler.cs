@@ -209,7 +209,6 @@ namespace Vi.Core
             combatAgent.SetUninterruptable(0);
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
             actionClipProgress = 1;
-            lastRootMotionResult = Vector3.zero;
         }
 
         public void OnRevive()
@@ -217,7 +216,6 @@ namespace Vi.Core
             Animator.Play("Empty", actionsLayerIndex);
             Animator.Play("Empty", flinchLayerIndex);
             actionClipProgress = 1;
-            lastRootMotionResult = Vector3.zero;
         }
 
         public void CancelAllActions(float transitionTime)
@@ -240,7 +238,6 @@ namespace Vi.Core
             combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
             
             actionClipProgress = 1;
-            lastRootMotionResult = Vector3.zero;
             CancelAllActionsClientRpc(transitionTime);
         }
 
@@ -259,7 +256,6 @@ namespace Vi.Core
             combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
 
             actionClipProgress = 1;
-            lastRootMotionResult = Vector3.zero;
         }
 
         // Stores the type of the last action clip played
@@ -832,6 +828,7 @@ namespace Vi.Core
                         EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount);
                         if (chargeTime > ActionClip.chargeAttackTime) // Attack
                         {
+                            actionClipProgress = 0;
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
 
@@ -872,6 +869,7 @@ namespace Vi.Core
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
             if (chargeTime > ActionClip.chargeAttackTime) // Attack
             {
+                actionClipProgress = 0;
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", false);
 
@@ -1096,15 +1094,13 @@ namespace Vi.Core
         private void SetLastActionClip(ActionClip actionClip)
         {
             lastClipPlayed = actionClip;
-            if (IsServer | IsOwner)
+            if ((IsServer | IsOwner) & lastClipPlayed.GetClipType() != ActionClip.ClipType.HeavyAttack)
             {
                 actionClipProgress = 0;
-                lastRootMotionResult = Vector3.zero;
             }
         }
 
         private float actionClipProgress = 1;
-        private Vector3 lastRootMotionResult;
         public Vector3 ApplyRootMotion(float step)
         {
             Vector3 rootMotion = Vector3.zero;
@@ -1114,14 +1110,12 @@ namespace Vi.Core
                 if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
                 {
                     rootMotion = Vector3.zero;
-                    lastRootMotionResult = Vector3.zero;
                 }
                 else // Not grabbed or ailment is not none
                 {
                     if (combatAgent.IsPulled())
                     {
                         rootMotion = Vector3.ClampMagnitude(combatAgent.GetPullAssailant().transform.position - transform.root.position, rootMotion.magnitude);
-                        lastRootMotionResult = Vector3.zero;
                     }
                     else // Not pulled
                     {
@@ -1159,6 +1153,10 @@ namespace Vi.Core
                 Debug.LogError("Couldn't find animation clip associated with " + lastClipPlayed);
             }
             actionClipProgress += step;
+            if (actionClipProgress >= 1)
+            {
+                rootMotion = -combatAgent.MovementHandler.GetRigidbody().velocity;
+            }
             return rootMotion;
         }
 
