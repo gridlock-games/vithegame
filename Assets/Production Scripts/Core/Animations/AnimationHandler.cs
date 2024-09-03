@@ -1082,7 +1082,7 @@ namespace Vi.Core
         private void SetLastActionClip(ActionClip actionClip)
         {
             lastClipPlayed = actionClip;
-            actionClipProgress = 0;
+            if (IsServer | IsOwner) { actionClipProgress = 0; }
         }
 
         private float actionClipProgress = 1;
