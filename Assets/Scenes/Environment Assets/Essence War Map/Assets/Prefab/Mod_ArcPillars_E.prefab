@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 835656149936477416}
   - component: {fileID: 4338940348087311181}
   - component: {fileID: 2005214591206453127}
+  - component: {fileID: 9192993230702819273}
   m_Layer: 0
   m_Name: Mod_ArcPillars_E
   m_TagString: Untagged
@@ -83,3 +84,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &9192993230702819273
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59400548115664466}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.536049, y: 6.4938583, z: 3.8902557}
+  m_Center: {x: -0.12678564, y: 3.2688317, z: -0.22397864}
