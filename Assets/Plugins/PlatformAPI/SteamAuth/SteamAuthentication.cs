@@ -73,11 +73,15 @@ namespace jomarcentermjm.PlatformAPI
             SteamUserAccountData steamuseraccountdata = JsonUtility.FromJson<SteamUserAccountData>(response.Text);
             SignInWithFirebaseToken(steamuseraccountdata.firebaseToken, steamuseraccountdata);
 
-        }).Catch(Debug.LogError);
+        }).Catch(errorMessage =>
+        {
+          Debug.LogError(errorMessage);
+          _callback(false, "error connecting to VI authentication server", null, null, null);
+        });
 
                 //#else
-                Debug.LogError("SteamAPI does not work on non-steam versions.");
-                _callback(false, "Cannot run on non-steam machine", null, null, null);
+                //Debug.LogError("SteamAPI does not work on non-steam versions.");
+                //_callback(false, "Cannot run on non-steam machine", null, null, null);
                 //#endif
             }
 
