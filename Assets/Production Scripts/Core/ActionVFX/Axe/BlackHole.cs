@@ -37,10 +37,14 @@ namespace Vi.Core.VFX.Axe
 
         private const float pullStrength = 6;
 
+        List<NetworkCollider> networkCollidersEvaluatedThisPhysicsUpdate = new List<NetworkCollider>();
         private void OnTriggerStay(Collider other)
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (networkCollidersEvaluatedThisPhysicsUpdate.Contains(networkCollider)) { return; }
+                networkCollidersEvaluatedThisPhysicsUpdate.Add(networkCollider);
+
                 if (ShouldAffect(networkCollider.CombatAgent))
                 {
                     MovementHandler movementHandler = networkCollider.MovementHandler;
@@ -56,6 +60,13 @@ namespace Vi.Core.VFX.Axe
                     rb.AddForce(transform.position - rb.position, ForceMode.VelocityChange);
                 }
             }
+        }
+
+        private bool clearListNextUpdate;
+        private void FixedUpdate()
+        {
+            if (clearListNextUpdate) { networkCollidersEvaluatedThisPhysicsUpdate.Clear(); }
+            clearListNextUpdate = networkCollidersEvaluatedThisPhysicsUpdate.Count > 0;
         }
 
         private const float explosionForce = 50;
