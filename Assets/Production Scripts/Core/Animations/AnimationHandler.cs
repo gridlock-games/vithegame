@@ -207,12 +207,16 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(0);
             combatAgent.SetUninterruptable(0);
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
+            actionClipProgress = 1;
+            lastRootMotionResult = Vector3.zero;
         }
 
         public void OnRevive()
         {
             Animator.Play("Empty", actionsLayerIndex);
             Animator.Play("Empty", flinchLayerIndex);
+            actionClipProgress = 1;
+            lastRootMotionResult = Vector3.zero;
         }
 
         public void CancelAllActions(float transitionTime)
@@ -233,7 +237,9 @@ namespace Vi.Core
             combatAgent.ResetAilment();
             combatAgent.StatusAgent.RemoveAllStatuses();
             combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
-
+            
+            actionClipProgress = 1;
+            lastRootMotionResult = Vector3.zero;
             CancelAllActionsClientRpc(transitionTime);
         }
 
@@ -250,6 +256,9 @@ namespace Vi.Core
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
             combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+
+            actionClipProgress = 1;
+            lastRootMotionResult = Vector3.zero;
         }
 
         // Stores the type of the last action clip played
@@ -1076,59 +1085,72 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
-        public bool ShouldApplyRootMotion() { return actionClipProgress < 1 & lastClipPlayed.shouldApplyRootMotion; }
+        public bool ShouldApplyRootMotion()
+        {
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { actionClipProgress = 1; }
+            return actionClipProgress < 1 & lastClipPlayed.shouldApplyRootMotion;
+        }
         public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
 
         private void SetLastActionClip(ActionClip actionClip)
         {
             lastClipPlayed = actionClip;
-            if (IsServer | IsOwner) { actionClipProgress = 0; }
+            if (IsServer | IsOwner)
+            {
+                actionClipProgress = 0;
+                lastRootMotionResult = Vector3.zero;
+            }
         }
 
         private float actionClipProgress = 1;
+        private Vector3 lastRootMotionResult;
         public Vector3 ApplyRootMotion(float step)
         {
             Vector3 rootMotion = Vector3.zero;
             AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(lastClipPlayed));
-
             if (clip)
             {
                 if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
                 {
                     rootMotion = Vector3.zero;
+                    lastRootMotionResult = Vector3.zero;
                 }
                 else // Not grabbed or ailment is not none
                 {
-                    AnimationClipReference.AnimationData data = PlayerDataManager.Singleton.GetCharacterReference().GetAnimationClipReference().GetAnimationData(clip);
-                    rootMotion.x = data.sidesMotion.Evaluate(actionClipProgress);
-                    rootMotion.y = data.verticalMotion.Evaluate(actionClipProgress);
-                    rootMotion.z = data.forwardMotion.Evaluate(actionClipProgress);
-
-                    bool shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
-                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
-
-                    if (shouldApplyMultiplierCurves)
-                    {
-                        if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
-                        {
-                            rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(actionClipProgress) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(actionClipProgress);
-                            rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(actionClipProgress) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(actionClipProgress);
-                            rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(actionClipProgress) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(actionClipProgress);
-                        }
-                        else
-                        {
-                            rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(actionClipProgress);
-                            rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(actionClipProgress);
-                            rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(actionClipProgress);
-                        }
-                    }
-
                     if (combatAgent.IsPulled())
                     {
                         rootMotion = Vector3.ClampMagnitude(combatAgent.GetPullAssailant().transform.position - transform.root.position, rootMotion.magnitude);
+                        lastRootMotionResult = Vector3.zero;
                     }
+                    else // Not pulled
+                    {
+                        AnimationClipReference.AnimationData data = PlayerDataManager.Singleton.GetCharacterReference().GetAnimationClipReference().GetAnimationData(clip);
+                        float normalizedTime = actionClipProgress;
 
-                    rootMotion = Quaternion.Euler(0, -data.horizontalRotationOffset, 0) * rootMotion;
+                        rootMotion.x += data.sidesMotion.Evaluate(normalizedTime);
+                        rootMotion.y += data.verticalMotion.Evaluate(normalizedTime);
+                        rootMotion.z += data.forwardMotion.Evaluate(normalizedTime);
+
+                        bool shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
+                        if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
+
+                        if (shouldApplyMultiplierCurves)
+                        {
+                            if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                            {
+                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                            }
+                            else
+                            {
+                                rootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                                rootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                                rootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                            }
+                        }
+                        rootMotion = Quaternion.Euler(0, -data.horizontalRotationOffset, 0) * rootMotion;
+                    }
                 }
             }
             else

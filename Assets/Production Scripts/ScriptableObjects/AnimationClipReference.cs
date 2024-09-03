@@ -133,6 +133,7 @@ namespace Vi.ScriptableObjects
                 AnimationData animationData = new AnimationData(animationClip, sidesMotion, verticalMotion, forwardMotion, rotationOffset);
                 if (!serializedAnimationData.Contains(animationData)) { serializedAnimationData.Add(animationData); }
             }
+            serializedAnimationData.Sort((x, y) => x.name.CompareTo(y.name));
         }
 #endif
     }
