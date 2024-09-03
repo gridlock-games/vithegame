@@ -61,13 +61,18 @@ namespace Vi.Core.VFX.Axe
         private const float explosionForce = 50;
 
         private Collider[] overlapSphereColliders = new Collider[20];
-        private new void OnDisable()
+
+        public override void OnNetworkDespawn()
         {
             int count = Physics.OverlapSphereNonAlloc(transform.position, sphereCollider.radius, overlapSphereColliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
+            List<NetworkCollider> networkCollidersEvaluated = new List<NetworkCollider>();
             for (int i = 0; i < count; i++)
             {
                 if (overlapSphereColliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
+                    if (networkCollidersEvaluated.Contains(networkCollider)) { continue; }
+                    networkCollidersEvaluated.Add(networkCollider);
+
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
@@ -92,7 +97,7 @@ namespace Vi.Core.VFX.Axe
                     }
                 }
             }
-            base.OnDisable();
+            base.OnNetworkDespawn();
         }
     }
 }
