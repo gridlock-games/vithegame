@@ -4,6 +4,10 @@ using UnityEngine;
 using System.Reflection;
 using System.Linq;
 using Vi.Utility;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.Animations;
+#endif
 
 namespace Vi.ScriptableObjects
 {
@@ -588,8 +592,17 @@ namespace Vi.ScriptableObjects
         public ActionClip GetLungeClip() { return lunge; }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+        private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
         private void Awake()
         {
+            actionClipLookup = GetActionClipLookup();
+            animationClipLookup = animationClipLookupKeys.Zip(animationClipLookupValues, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
+        }
+
+        private Dictionary<string, ActionClip> GetActionClipLookup()
+        {
+            Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+
             if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
             if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
             if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
@@ -631,6 +644,8 @@ namespace Vi.ScriptableObjects
                 if (grabAttackCrosswalk.attack) { actionClipLookup.TryAdd(grabAttackCrosswalk.attack.name, grabAttackCrosswalk.attack); }
                 if (grabAttackCrosswalk.grabAttackClip) { actionClipLookup.TryAdd(grabAttackCrosswalk.grabAttackClip.name, grabAttackCrosswalk.grabAttackClip); }
             }
+
+            return actionClipLookup;
         }
 
         public ActionClip GetActionClipByName(string clipName)
@@ -765,5 +780,75 @@ namespace Vi.ScriptableObjects
             if (Application.isPlaying) { Debug.LogError("Action clip Not Found: " + clipName); }
             return null;
         }
+
+        public AnimationClip GetAnimationClip(string animationStateNameWithoutLayer)
+        {
+            if (animationClipLookup.ContainsKey(animationStateNameWithoutLayer))
+            {
+                return animationClipLookup[animationStateNameWithoutLayer];
+            }
+            else
+            {
+                Debug.LogError("Couldn't find an animation clip with state name: " + animationStateNameWithoutLayer);
+                return null;
+            }
+        }
+
+        [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
+        [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
+        [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
+
+#if UNITY_EDITOR
+        [ContextMenu("Find Animations")]
+        public void FindAnimations()
+        {
+            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
+            foreach (CharacterReference.WeaponOption weaponOption in characterReference.GetWeaponOptions())
+            {
+                if (weaponOption.weapon == this)
+                {
+                    Dictionary<string, ActionClip> actionClipLookup = GetActionClipLookup();
+                    animationClipLookupKeys.Clear();
+                    animationClipLookupValues.Clear();
+                    string path = AssetDatabase.GetAssetPath(weaponOption.animationController.runtimeAnimatorController);
+
+                    List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+                    weaponOption.animationController.GetOverrides(overrides);
+
+                    AnimatorController animatorController = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
+                    foreach (AnimatorControllerLayer layer in animatorController.layers)
+                    {
+                        if (layer.name != "Actions") { continue; }
+                        foreach (ChildAnimatorState state in layer.stateMachine.states)
+                        {
+                            if (state.state.motion is AnimationClip animationClip)
+                            {
+                                bool overrideFound = false;
+                                foreach (KeyValuePair<AnimationClip, AnimationClip> ovride in overrides)
+                                {
+                                    if (ovride.Key == animationClip)
+                                    {
+                                        if (!ovride.Value) { continue; }
+                                        overrideFound = true;
+                                        animationClipLookupKeys.Add(state.state.name);
+                                        animationClipLookupValues.Add(ovride.Value);
+                                        break;
+                                    }
+                                }
+
+                                if (!overrideFound)
+                                {
+                                    animationClipLookupKeys.Add(state.state.name);
+                                    animationClipLookupValues.Add(animationClip);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }

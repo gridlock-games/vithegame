@@ -8,6 +8,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Unity.Collections;
 
 namespace Vi.Player
 {
@@ -27,8 +28,6 @@ namespace Vi.Player
         }
 
         [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
-
-        public override Vector3 GetPosition() { return rb.position; }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
@@ -68,12 +67,14 @@ namespace Vi.Player
             public int tick;
             public Vector2 moveInput;
             public Quaternion rotation;
+            public FixedString32Bytes tryingToPlayActionClipName;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, ActionClip tryingToPlayActionClip)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
                 this.rotation = rotation;
+                tryingToPlayActionClipName = tryingToPlayActionClip ? tryingToPlayActionClip.name : "";
             }
 
             public bool Equals(InputPayload other)
@@ -86,6 +87,7 @@ namespace Vi.Player
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref tryingToPlayActionClipName);
             }
         }
 
@@ -157,6 +159,7 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationThreshold = 0.0001f;
+        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private void HandleServerReconciliation()
         {
             lastProcessedState = latestServerState.Value;
@@ -166,7 +169,8 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -225,7 +229,7 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation(), attributes.AnimationHandler.GetFirstActionClipInQueue());
                 inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 physicsTick++;
 
@@ -243,14 +247,26 @@ namespace Vi.Player
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new StatePayload(inputPayload, rb, transform.rotation);
+                return new StatePayload(inputPayload, rb, inputPayload.rotation);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
 
+            if (inputPayload.tryingToPlayActionClipName != "")
+            {
+                Debug.Log(inputPayload.tick + " " + inputPayload.tryingToPlayActionClipName);
+                if (IsServer)
+                {
+                    attributes.AnimationHandler.PlayActionOnServer(inputPayload.tryingToPlayActionClipName.ToString(), false, inputPayload.tick);
+                }
+                else
+                {
+                    attributes.AnimationHandler.PlayPredictedActionOnClient(inputPayload.tryingToPlayActionClipName.ToString(), inputPayload.tick);
+                }
+            }
+            
             // Apply movement
-            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -264,7 +280,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    movement = rootMotion;
+                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
                 }
             }
             else
@@ -353,9 +369,8 @@ namespace Vi.Player
                         rb.AddForce(counterForce, ForceMode.VelocityChange);
                     }
                 }
+                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
-
-            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
 
             return new StatePayload(inputPayload, rb, newRotation);
         }
@@ -399,9 +414,35 @@ namespace Vi.Player
             return rot;
         }
 
+        private const float serverReconciliationLerpDuration = 1;
+        private const float serverReconciliationTeleportThreshold = 2;
+
         private void LateUpdate()
         {
-            transform.position = rb.transform.position;
+            if (!IsSpawned) { return; }
+
+            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
+            {
+                float dist = Vector3.Distance(transform.position, rb.transform.position);
+                if (dist > serverReconciliationTeleportThreshold)
+                {
+                    transform.position = rb.transform.position;
+                    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                }
+                else if (dist < 0.01f)
+                {
+                    transform.position = rb.transform.position;
+                    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                }
+                else
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, rb.transform.position, Time.deltaTime * GetRunSpeed());
+                }
+            }
+            else
+            {
+                transform.position = rb.transform.position;
+            }
 
             if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
 
@@ -412,6 +453,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
                 cameraController.gameObject.AddComponent<AudioListener>();
@@ -429,9 +471,7 @@ namespace Vi.Player
                 Destroy(cameraController.gameObject);
                 Destroy(playerInput);
             }
-            rb.useGravity = true;
             rb.isKinematic = !IsServer & !IsOwner;
-            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
 
             if (IsServer)
             {
@@ -532,7 +572,7 @@ namespace Vi.Player
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
+            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled & playerInput.currentActionMap != null)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
                 if (playerInput.currentActionMap.name == playerInput.defaultActionMap)

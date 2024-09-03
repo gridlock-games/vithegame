@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1638b263df31273498d3ab2eb131b0d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityScale: 1
+  gravityScale: 2
 --- !u!1 &3945128955595459076
 GameObject:
   m_ObjectHideFlags: 0
@@ -222,8 +222,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoppingDistance: 2
   cameraController: {fileID: 3945128956232022059}
-  runAnimationTransitionSpeed: 5
-  isGroundedSphereCheckRadius: 0.6
   rigidbodyRotationClone: {fileID: 2914105215791135215}
 --- !u!114 &3945128955595459581
 MonoBehaviour:

@@ -2870,7 +2870,7 @@ namespace Vi.Core
                 if (Application.internetReachability != NetworkReachability.NotReachable)
                 {
                     yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version.";
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version. Servers may be offline.";
                 }
                 IsCheckingGameVersion = false;
                 yield break;

@@ -14,24 +14,9 @@ namespace Vi.ArtificialIntelligence
     {
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            currentPosition.Value = newPosition;
-            currentRotation.Value = newRotation;
+            if (!IsServer) { Debug.LogError("BotController.SetOrientation() should only be called on the server!"); return; }
             rb.position = newPosition;
-        }
-
-        public override Vector3 GetPosition() { return currentPosition.Value; }
-
-        public override Quaternion GetRotation() { return currentRotation.Value; }
-
-        public override void OnNetworkSpawn()
-        {
-            if (IsServer)
-            {
-                currentPosition.Value = transform.position;
-                currentRotation.Value = transform.rotation;
-            }
-            rb.useGravity = true;
-            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+            transform.rotation = newRotation;
         }
 
         private Attributes attributes;
@@ -44,7 +29,6 @@ namespace Vi.ArtificialIntelligence
 
         private void Start()
         {
-            rb.transform.SetParent(null, true);
             UpdateActivePlayersList();
         }
 
@@ -89,7 +73,7 @@ namespace Vi.ArtificialIntelligence
                 SetImmovable(attributes.IsGrabbed());
             }
 
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(currentPosition.Value, true); }
+            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
 
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
@@ -181,10 +165,10 @@ namespace Vi.ArtificialIntelligence
 
         private Quaternion EvaluateRotation()
         {
-            Quaternion rot = currentRotation.Value;
+            Quaternion rot = transform.rotation;
             if (IsServer)
             {
-                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - currentPosition.Value).normalized : (NextPosition - currentPosition.Value).normalized;
+                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
@@ -206,10 +190,6 @@ namespace Vi.ArtificialIntelligence
                 else if (!attributes.ShouldPlayHitStop())
                     rot = Quaternion.LookRotation(camDirection);
             }
-            else
-            {
-                rot = Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
-            }
             return rot;
         }
 
@@ -226,7 +206,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, currentPosition.Value).CompareTo(Vector3.Distance(y.transform.position, currentPosition.Value)));
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, rb.position).CompareTo(Vector3.Distance(y.transform.position, rb.position)));
 
                 targetAttributes = null;
                 foreach (CombatAgent player in activePlayers)
@@ -239,7 +219,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (disableBots)
                 {
-                    SetDestination(currentPosition.Value, true);
+                    SetDestination(rb.position, true);
                 }
                 else
                 {
@@ -427,23 +407,28 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
-        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
         void FixedUpdate()
         {
+            Move();
+        }
+
+        private void Move()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
                 return;
             }
 
-            CalculatePath(currentPosition.Value, NavMesh.AllAreas);
+            CalculatePath(rb.position, NavMesh.AllAreas);
 
             Vector2 moveInput = GetPathMoveInput();
-            Quaternion newRotation = EvaluateRotation();
+            Quaternion newRotation = transform.rotation;
 
             // Apply movement
-            Vector3 rootMotion = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
             {
@@ -457,7 +442,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = rootMotion;
+                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
                 }
             }
             else
@@ -471,7 +456,7 @@ namespace Vi.ArtificialIntelligence
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            Vector3 startPos = currentPosition.Value;
+            Vector3 startPos = rb.position;
             startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
@@ -492,7 +477,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(currentPosition.Value, currentPosition.Value + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(rb.position, rb.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in attributes.NetworkCollider.Colliders)
@@ -506,7 +491,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (!collidersIgnoreEachOther)
                 {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - currentPosition.Value, Vector3.up);
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - rb.position, Vector3.up);
                     float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
                     if (angle > 180) { angle -= 360; }
@@ -546,12 +531,8 @@ namespace Vi.ArtificialIntelligence
                         rb.AddForce(counterForce, ForceMode.VelocityChange);
                     }
                 }
-
                 rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
-            
-            currentPosition.Value = rb.position;
-            currentRotation.Value = rb.rotation;
         }
 
         private const float stairStepHeight = 0.01f;

@@ -11,37 +11,50 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
-        public bool WaitingForActionToPlay { get; private set; }
 
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
             if (!actionClip) { Debug.LogError("Trying to play a null action clip! " + name); return; }
-            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+            CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
+            if (!canPlayActionClipResult.canPlay) { return; }
 
             if (IsServer)
             {
                 PlayActionOnServer(actionClip.name, isFollowUpClip);
             }
+            else if (IsOwner)
+            {
+                //PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                clientActionClipQueue.Enqueue(actionClip);
+            }
             else
             {
-                WaitingForActionToPlay = true;
-                PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip);
+            }
+        }
+
+        private Queue<ActionClip> clientActionClipQueue = new Queue<ActionClip>();
+
+        public ActionClip GetFirstActionClipInQueue()
+        {
+            if (clientActionClipQueue.Count > 0)
+            {
+                return clientActionClipQueue.Dequeue();
+            }
+            else
+            {
+                return null;
             }
         }
 
         public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
         {
             if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
-            try
-            {
-                return combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[GetActionClipAnimationStateNameWithoutLayer(actionClip)].length + actionClip.transitionTime;
-            }
-            catch
-            {
-                Debug.LogError("Action clip " + actionClip.name + " is not present in the animator override controller! " + combatAgent.WeaponHandler.AnimatorOverrideControllerInstance);
-                return 2;
-            }
+            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(actionClip));
+            if (clip) { return clip.length; }
+            Debug.LogError("Couldn't find an animation clip for action clip " + actionClip.name + " with weapon " + combatAgent.WeaponHandler.GetWeapon());
+            return 2;
         }
 
         public bool IsActionClipPlaying(ActionClip actionClip)
@@ -252,34 +265,42 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
+        private struct CanPlayActionClipResult
+        {
+            public bool canPlay;
+            public bool shouldUseDodgeCancelTransitionTime;
+
+            public CanPlayActionClipResult(bool canPlay, bool shouldUseDodgeCancelTransitionTime)
+            {
+                this.canPlay = canPlay;
+                this.shouldUseDodgeCancelTransitionTime = shouldUseDodgeCancelTransitionTime;
+            }
+        }
+
         RaycastHit[] allHits = new RaycastHit[10];
 
-        // This method plays the action on the server
-        private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
-            WaitingForActionToPlay = false;
-            // Retrieve the appropriate ActionClip based on the provided actionStateName
-            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
-            if (!combatAgent.MovementHandler.CanMove()) { return; }
-            if ((combatAgent.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return; }
-            if (actionClip.mustBeAiming & !combatAgent.WeaponHandler.IsAiming()) { return; }
-            if (combatAgent.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return; }
+            if (!combatAgent.MovementHandler.CanMove()) { return default; }
+            if ((combatAgent.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return default; }
+            if (actionClip.mustBeAiming & !combatAgent.WeaponHandler.IsAiming()) { return default; }
+            if (combatAgent.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return default; }
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                if (combatAgent.WeaponHandler.GetWeapon().IsDodgeOnCooldown()) { return; }
+                if (combatAgent.WeaponHandler.GetWeapon().IsDodgeOnCooldown()) { return default; }
             }
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
-                if (combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return; }
+                if (combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return default; }
             }
 
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return; }
+                if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return default; }
             }
 
             if (!isFollowUpClip)
@@ -298,9 +319,9 @@ namespace Vi.Core
                             if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                             {
                                 // Lunge mechanic
-                                #if UNITY_EDITOR
+#if UNITY_EDITOR
                                 ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
-                                #endif
+#endif
                                 int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
                                     ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
                                     ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
@@ -329,7 +350,7 @@ namespace Vi.Core
                                     {
                                         PlayAction(lungeClip);
                                         waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
-                                        return;
+                                        return default;
                                     }
                                 }
                             }
@@ -346,7 +367,7 @@ namespace Vi.Core
             // If we are transitioning to the same state as this actionclip
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
+                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return default; }
             }
 
             bool isInTransition = Animator.IsInTransition(actionsLayerIndex);
@@ -368,11 +389,11 @@ namespace Vi.Core
                             {
                                 if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
                                 {
-                                    return;
+                                    return default;
                                 }
                                 else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
                                 {
-                                    if (combatAgent.WeaponHandler.IsInRecovery) { return; }
+                                    if (combatAgent.WeaponHandler.IsInRecovery) { return default; }
                                 }
                             }
                         }
@@ -381,14 +402,14 @@ namespace Vi.Core
                             if (animatorReference.CurrentActionsAnimatorStateInfo.IsTag("CanDodge"))
                             {
                                 // If we are in transition and not returning to the empty state
-                                if (isInTransition & !animatorReference.NextActionsAnimatorStateInfo.IsName("Empty")) { return; }
+                                if (isInTransition & !animatorReference.NextActionsAnimatorStateInfo.IsName("Empty")) { return default; }
                             }
 
                             shouldEvaluatePreviousState = false;
                         }
                         else
                         {
-                            return;
+                            return default;
                         }
                         break;
                     case ActionClip.ClipType.LightAttack:
@@ -400,19 +421,19 @@ namespace Vi.Core
                             if (IsDodging())
                             {
                                 // Check the dodge time threshold, this allows dodges to be interrupted faster by attacks
-                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return; }
+                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromDodgeNormalizedTimeThreshold) { return default; }
                                 shouldUseDodgeCancelTransitionTime = true;
                                 shouldEvaluatePreviousState = false;
                             }
                             else if (IsPlayingBlockingHitReaction())
                             {
                                 // Check the blocking hit reaction time threshold, this allows us to counter from blocking
-                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return; }
+                                if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < canAttackFromBlockingHitReactionNormalizedTimeThreshold) { return default; }
                                 shouldEvaluatePreviousState = false;
                             }
                             else if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)
                             {
-                                return;
+                                return default;
                             }
                         }
                         break;
@@ -431,30 +452,30 @@ namespace Vi.Core
                     // If we are in the middle of dodging, or playing a hit reaction, don't play this clip unless it's a hit reaction
                     if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return; }
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return default; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return default; }
                     }
                 }
 
                 if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
-                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
+                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return default; }
                     if (!actionClip.canCancelLightAttacks)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return default; }
                     }
                     if (!actionClip.canCancelHeavyAttacks)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack) { return; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack) { return default; }
                     }
                     if (!actionClip.canCancelAbilities)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return; }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return default; }
                     }
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
-                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
+                    if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return default; }
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
@@ -464,7 +485,7 @@ namespace Vi.Core
                     & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
                     & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
                     {
-                        return;
+                        return default;
                     }
                 }
             }
@@ -472,10 +493,22 @@ namespace Vi.Core
             // Checks if the action is not a hit reaction and prevents the animation from getting stuck
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return; }
+                if (animatorReference.NextActionsAnimatorStateInfo.IsName(animationStateName)) { return default; }
             }
 
-            if (!AreActionClipRequirementsMet(actionClip)) { return; }
+            if (!AreActionClipRequirementsMet(actionClip)) { return default; }
+
+            return new CanPlayActionClipResult(true, shouldUseDodgeCancelTransitionTime);
+        }
+
+        // This method plays the action on the server
+        public void PlayActionOnServer(string actionClipName, bool isFollowUpClip, int associatedTick = 0)
+        {
+            // Retrieve the appropriate ActionClip based on the provided actionStateName
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+
+            CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
+            if (!canPlayActionClipResult.canPlay) { return; }
 
             // Check stamina and rage requirements
             if (ShouldApplyStaminaCost(actionClip))
@@ -507,7 +540,7 @@ namespace Vi.Core
                     Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
                 }
             }
-            
+
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
             if (actionClip.ailment == ActionClip.Ailment.Grab)
@@ -524,7 +557,8 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
-            float transitionTime = shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+            float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
             switch (actionClip.GetClipType())
             {
@@ -558,9 +592,9 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, associatedTick);
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { lastClipPlayed = actionClip; }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
@@ -871,20 +905,85 @@ namespace Vi.Core
             }
         }
 
-        // Remote Procedure Call method for playing the action on the server
-        [Rpc(SendTo.Server)]
-        private void PlayActionServerRpc(string actionStateName, bool isFollowUpClip)
-        {
-            PlayActionOnServer(actionStateName, isFollowUpClip);
-            ResetActionClientRpc();
-        }
-
         // Remote Procedure Call method for playing the action on the client
         [Rpc(SendTo.NotServer)]
-        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
+        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime, int associatedTick)
         {
             if (IsServer) { return; }
+
+            // If we already have played this action in the prediction method
+            if (predictedActionTracker.ContainsKey(associatedTick % BUFFER_SIZE))
+            {
+                if (predictedActionTracker[associatedTick % BUFFER_SIZE] == actionClipName) { return; }
+            }
             StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+        }
+
+        private Dictionary<int, string> predictedActionTracker = new Dictionary<int, string>(BUFFER_SIZE);
+
+        private const int BUFFER_SIZE = 1024;
+
+        public void PlayPredictedActionOnClient(string actionClipName, int associatedTick)
+        {
+            predictedActionTracker[associatedTick % BUFFER_SIZE] = actionClipName;
+
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+            float transitionTime = actionClip.transitionTime;
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
+            {
+                if (heavyAttackCoroutine != null)
+                {
+                    StopCoroutine(heavyAttackCoroutine);
+                    Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
+                }
+            }
+
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+
+            if (actionClip.ailment == ActionClip.Ailment.Grab)
+            {
+                if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = combatAgent.GetGrabReactionClip();
+                }
+                else
+                {
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
+                }
+            }
+
+            // Play the action clip based on its type
+            switch (actionClip.GetClipType())
+            {
+                case ActionClip.ClipType.Dodge:
+                case ActionClip.ClipType.LightAttack:
+                case ActionClip.ClipType.Ability:
+                case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Lunge:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+                    break;
+                case ActionClip.ClipType.HeavyAttack:
+                    heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
+                    break;
+                case ActionClip.ClipType.HitReaction:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.FlashAttack:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    break;
+                case ActionClip.ClipType.Flinch:
+                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, flinchLayerIndex, 0);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to play animation state for clip type: " + actionClip.GetClipType());
+                    break;
+            }
+
+            // Set the current action clip for the weapon handler
+            combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
+            UpdateAnimationLayerWeights(actionClip.avatarLayer);
+
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
@@ -896,6 +995,8 @@ namespace Vi.Core
 
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+
+            //if (IsActionClipPlaying(actionClip)) { yield break; }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
@@ -952,10 +1053,8 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            lastClipPlayed = actionClip;
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
-
-        [Rpc(SendTo.Owner)] private void ResetActionClientRpc() { WaitingForActionToPlay = false; }
 
         // Coroutine for setting invincibility status during a dodge
         private void SetInvincibleStatusOnDodge(string actionStateName)
@@ -963,8 +1062,36 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
         }
 
-        public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
+        public bool ShouldApplyRootMotion() { return actionClipProgress < 1 & lastClipPlayed.shouldApplyRootMotion; }
         public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
+
+        private void SetLastActionClip(ActionClip actionClip)
+        {
+            lastClipPlayed = actionClip;
+            actionClipProgress = 0;
+        }
+
+        private float actionClipProgress = 1;
+        public Vector3 ApplyRootMotion(float step)
+        {
+            Vector3 rootMotion = Vector3.zero;
+            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(lastClipPlayed));
+
+            if (clip)
+            {
+                AnimationClipReference.AnimationData data = PlayerDataManager.Singleton.GetCharacterReference().GetAnimationClipReference().GetAnimationData(clip);
+                rootMotion.x = data.sidesMotion.Evaluate(actionClipProgress);
+                rootMotion.y = data.verticalMotion.Evaluate(actionClipProgress);
+                rootMotion.z = data.forwardMotion.Evaluate(actionClipProgress);
+                rootMotion = Quaternion.Euler(0, -data.horizontalRotationOffset, 0) * rootMotion;
+            }
+            else
+            {
+                Debug.LogError("Couldn't find animation clip associated with " + lastClipPlayed);
+            }
+            actionClipProgress += step;
+            return rootMotion;
+        }
 
         public Animator Animator { get; private set; }
         public LimbReferences LimbReferences { get; private set; }
