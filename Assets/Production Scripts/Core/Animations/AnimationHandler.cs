@@ -16,8 +16,6 @@ namespace Vi.Core
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
             if (!actionClip) { Debug.LogError("Trying to play a null action clip! " + name); return; }
-            CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
-            if (!canPlayActionClipResult.canPlay) { return; }
 
             if (IsServer)
             {
@@ -25,7 +23,8 @@ namespace Vi.Core
             }
             else if (IsOwner)
             {
-                //PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
+                if (!canPlayActionClipResult.canPlay) { return; }
                 clientActionClipQueue.Enqueue(actionClip);
             }
             else
@@ -278,7 +277,6 @@ namespace Vi.Core
         }
 
         RaycastHit[] allHits = new RaycastHit[10];
-
         private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
@@ -438,6 +436,15 @@ namespace Vi.Core
                         }
                         break;
                     case ActionClip.ClipType.HitReaction:
+                        // If we are transitioning to the last played clip, and the last played clip is a hit reaction that shouldn't be interrupted
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction)
+                        {
+                            if (lastClipPlayed.ailment == ActionClip.Ailment.Knockdown)
+                            {
+                                if (animatorReference.NextActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName)) { return default; }
+                            }
+                        }
+                        break;
                     case ActionClip.ClipType.Lunge:
                     case ActionClip.ClipType.GrabAttack:
                     case ActionClip.ClipType.Flinch:
@@ -595,6 +602,9 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, associatedTick);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+
+            // Update the animator so that other action clips will be evaluated properly on this frame
+            Animator.Update(Time.deltaTime);
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
