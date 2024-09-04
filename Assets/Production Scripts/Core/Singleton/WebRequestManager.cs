@@ -2466,7 +2466,7 @@ namespace Vi.Core
         {
             HordeModeLeaderboardResultPayload payload = new HordeModeLeaderboardResultPayload(charId, clearTime, wave);
 
-            string json = JsonUtility.ToJson(payload);
+            string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
@@ -2513,9 +2513,9 @@ namespace Vi.Core
 
         public IEnumerator SendKillsLeaderboardResult(string charId, int kills, int deaths, int assists)
         {
-            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, kills, deaths, (kills + assists) / (float)deaths);
+            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, kills, deaths, deaths == 0 ? kills + assists : (kills + assists) / (float)deaths);
 
-            string json = JsonUtility.ToJson(payload);
+            string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
