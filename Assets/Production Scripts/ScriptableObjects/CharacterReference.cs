@@ -11,6 +11,9 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "CharacterReference", menuName = "Production/Character Reference")]
     public class CharacterReference : ScriptableObject
     {
+        public AnimationClipReference GetAnimationClipReference() { return animationClipReference; }
+
+        [SerializeField] private AnimationClipReference animationClipReference;
         public Sprite defaultEnvironmentKillIcon;
         [SerializeField] private PlayerModelOption[] playerModelOptions;
         [SerializeField] private WeaponOption[] weaponOptions;
@@ -456,6 +459,15 @@ namespace Vi.ScriptableObjects
                 importer.SaveAndReimport();
 
                 equipmentOptions[equipmentOptionIndex].AddIcon(raceAndGender, AssetDatabase.LoadAssetAtPath<Sprite>(armorIconPath));
+            }
+        }
+
+        [ContextMenu("Assign Animations On Weapons")]
+        private void AssignAnimationsOnWeapons()
+        {
+            foreach (WeaponOption weaponOption in weaponOptions)
+            {
+                weaponOption.weapon.FindAnimations();
             }
         }
         #endif

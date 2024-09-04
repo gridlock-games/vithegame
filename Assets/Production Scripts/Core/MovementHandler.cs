@@ -26,7 +26,13 @@ namespace Vi.Core
 			if (rb) { rb.velocity = Vector3.zero; }
 		}
 
-		public virtual Vector3 GetPosition() { return transform.position; }
+        public override void OnNetworkSpawn()
+        {
+			rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+			rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+		}
+
+        public virtual Vector3 GetPosition() { return rb.position; }
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
@@ -92,6 +98,10 @@ namespace Vi.Core
 		private IEnumerator ResetIsAffectedByExternalForce()
         {
 			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
+			yield return new WaitForFixedUpdate();
 			IsAffectedByExternalForce = false;
         }
 
@@ -105,7 +115,7 @@ namespace Vi.Core
 
 		private const float nextPositionAngleThreshold = 10;
 		private const float nextPositionDistanceThreshold = 1;
-		private const float startPositionNavMeshDistanceThreshold = 10;
+		private const float startPositionNavMeshDistanceThreshold = 20;
 
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
@@ -296,9 +306,8 @@ namespace Vi.Core
 
 		public Vector2 GetPathMoveInput()
         {
-			if (Vector3.Distance(NextPosition, GetPosition()) < 0.5f) { return Vector2.zero; }
-			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition()).normalized;
-			return new Vector2(moveInput.x, moveInput.z);
+			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition());
+			return new Vector2(moveInput.x, moveInput.z).normalized;
 		}
 
 		public void SetMoveInput(Vector2 moveInput) { this.moveInput = moveInput; }
