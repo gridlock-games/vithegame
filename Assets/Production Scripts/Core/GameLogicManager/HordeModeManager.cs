@@ -80,6 +80,12 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnGameEnd(winningPlayersDataIds);
             gameEndMessage.Value = "Game Over! ";
+            if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+            {
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendHordeModeLeaderboardResult(
+                    PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                    roundTimer.Value, GetWavesCompleted()));
+            }
         }
 
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)

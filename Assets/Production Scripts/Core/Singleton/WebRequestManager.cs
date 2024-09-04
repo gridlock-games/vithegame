@@ -2462,6 +2462,55 @@ namespace Vi.Core
             }
         }
 
+        public IEnumerator SendHordeModeLeaderboardResult(string charId, float clearTime, int wave)
+        {
+            HordeModeLeaderboardResultPayload payload = new HordeModeLeaderboardResultPayload(charId, clearTime, wave);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/postLeaderBoard", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/postLeaderBoard", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.SendHordeModeLeaderboardResult()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        private struct HordeModeRecord
+        {
+            public int wave;
+            public float clearTime;
+        }
+
+        private struct HordeModeLeaderboardResultPayload
+        {
+            public string charId;
+            public HordeModeRecord record;
+            public string boardType;
+
+            public HordeModeLeaderboardResultPayload(string charId, float clearTime, int wave)
+            {
+                this.charId = charId;
+                record = new HordeModeRecord()
+                {
+                    wave = wave,
+                    clearTime = clearTime
+                };
+                boardType = "horde";
+            }
+        }
+
         private void Start()
         {
             if (Application.isEditor) { StartCoroutine(CreateItems()); }
