@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1595010233994021071}
   - component: {fileID: 2417666426289293162}
   - component: {fileID: 462095633487786912}
+  - component: {fileID: 3932178104818906615}
   m_Layer: 0
   m_Name: Mod_ArcPillars_A (3)
   m_TagString: Untagged
@@ -83,6 +84,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &3932178104818906615
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119310826948252277}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -4016461415385810731, guid: 7cb7ec8b7b4db554cb300f466962cf87, type: 3}
 --- !u!1 &4555360256339164233
 GameObject:
   m_ObjectHideFlags: 0
@@ -191,3 +206,23 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4555360256688808690}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3340361351444428328 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1255586168890168538, guid: 0370705c67458e1418da9ea4853ad1a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4555360256688808690}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &3637903401575159130
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3340361351444428328}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7732550156390377052, guid: 55f196c1eae113b4b94ac94f446cf03d, type: 3}
