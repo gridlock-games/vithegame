@@ -230,7 +230,10 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation(), attributes.AnimationHandler.GetFirstActionClipInQueue());
-                inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                else
+                    inputBuffer.Add(inputPayload);
                 physicsTick++;
 
                 // This would mean we are the host. The server handles inputs from the server input queue
@@ -495,7 +498,7 @@ namespace Vi.Player
 
         private void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
         {
-            if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value)
+            if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
@@ -529,7 +532,7 @@ namespace Vi.Player
             RefreshStatus();
 
             stateBuffer = new StatePayload[BUFFER_SIZE];
-            inputBuffer = new NetworkList<InputPayload>(new InputPayload[BUFFER_SIZE], NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            inputBuffer = new NetworkList<InputPayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             serverInputQueue = new Queue<InputPayload>();
         }
 
