@@ -6608,8 +6608,8 @@ MonoBehaviour:
     spawnRotations:
     - {x: 0, y: 0, z: 0}
     spawnPriorities: 
-  - gameModes: 000000000100000002000000
-    teams: 020000000a0000000b000000
+  - gameModes: 0000000001000000
+    teams: 02000000
     findMostClearSpawnPoint: 0
     spawnPositions:
     - {x: 3, y: 4, z: -24}
@@ -6619,6 +6619,26 @@ MonoBehaviour:
     spawnRotations:
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    spawnPriorities: 
+  - gameModes: 02000000
+    teams: 0b000000
+    findMostClearSpawnPoint: 0
+    spawnPositions:
+    - {x: 3, y: 4, z: -24}
+    - {x: -3, y: 4, z: -24}
+    spawnRotations:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    spawnPriorities: 
+  - gameModes: 02000000
+    teams: 0a000000
+    findMostClearSpawnPoint: 0
+    spawnPositions:
+    - {x: 3, y: 4, z: 24}
+    - {x: -3, y: 4, z: 24}
+    spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 180, z: 0}
     spawnPriorities: 
