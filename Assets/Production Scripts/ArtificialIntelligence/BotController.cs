@@ -101,7 +101,7 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Vector2 moveInput = GetPathMoveInput();
+                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
                 Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
