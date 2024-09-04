@@ -403,6 +403,21 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        protected virtual void OnGameOverChanged(bool prev, bool current)
+        {
+            if (current & IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendKillsLeaderboardResult(
+                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                        localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
+                }
+            }
+        }
+
         private void EndGamePrematurely(string gameEndMessage)
         {
             gameOver.Value = true;
@@ -516,6 +531,8 @@ namespace Vi.Core.GameModeManagers
                 //roundTimer.Value = roundDuration;
                 nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
+
+            gameOver.OnValueChanged += OnGameOverChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -526,6 +543,8 @@ namespace Vi.Core.GameModeManagers
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
+
+            gameOver.OnValueChanged -= OnGameOverChanged;
         }
 
         public void AddPlayerScore(int id, FixedString64Bytes characterId)

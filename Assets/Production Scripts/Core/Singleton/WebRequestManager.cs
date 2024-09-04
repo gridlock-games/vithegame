@@ -2469,22 +2469,22 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/postLeaderBoard", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
 
-            if (putRequest.result != UnityWebRequest.Result.Success)
+            if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/postLeaderBoard", jsonData);
-                putRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return putRequest.SendWebRequest();
+                postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
             }
 
-            if (putRequest.result != UnityWebRequest.Result.Success)
+            if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.SendHordeModeLeaderboardResult()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.SendHordeModeLeaderboardResult()" + postRequest.error);
             }
-            putRequest.Dispose();
+            postRequest.Dispose();
         }
 
         private struct HordeModeRecord
@@ -2508,6 +2508,57 @@ namespace Vi.Core
                     clearTime = clearTime
                 };
                 boardType = "horde";
+            }
+        }
+
+        public IEnumerator SendKillsLeaderboardResult(string charId, int kills, int deaths, int assists)
+        {
+            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, kills, deaths, (kills + assists) / (float)deaths);
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            postRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return postRequest.SendWebRequest();
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return postRequest.SendWebRequest();
+            }
+
+            if (postRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.SendKillsLeaderboardResult()" + postRequest.error);
+            }
+            postRequest.Dispose();
+        }
+
+        private struct KillsRecord
+        {
+            public int kills;
+            public int deaths;
+            public float KDA;
+        }
+
+        private struct KillsLeaderboardResultPayload
+        {
+            public string charId;
+            public KillsRecord record;
+            public string boardType;
+
+            public KillsLeaderboardResultPayload(string charId, int kills, int deaths, float KDA)
+            {
+                this.charId = charId;
+                record = new KillsRecord()
+                {
+                    kills = kills,
+                    deaths = deaths,
+                    KDA = KDA
+                };
+                boardType = "kills";
             }
         }
 
