@@ -15,7 +15,6 @@ namespace Vi.Player
     public class PlayerMovementHandler : MovementHandler
     {
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private Transform rigidbodyRotationClone;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
@@ -435,8 +434,6 @@ namespace Vi.Player
             if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
 
             transform.rotation = EvaluateRotation();
-
-            rigidbodyRotationClone.rotation = transform.rotation;
         }
 
         public override void OnNetworkSpawn()
