@@ -505,20 +505,22 @@ namespace Vi.Core
         [ServerRpc]
         private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip)
         {
-            PlayActionOnServer(actionClipName, isFollowUpClip);
-            ResetWaitingForActionToPlayClientRpc();
+            if (!PlayActionOnServer(actionClipName, isFollowUpClip))
+            {
+                ResetWaitingForActionToPlayClientRpc();
+            }
         }
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
         // This method plays the action on the server
-        private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip)
         {
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
-            if (!canPlayActionClipResult.canPlay) { return; }
+            if (!canPlayActionClipResult.canPlay) { return false; }
 
             // Check stamina and rage requirements
             if (ShouldApplyStaminaCost(actionClip))
@@ -608,6 +610,7 @@ namespace Vi.Core
 
             // Update the animator so that other action clips will be evaluated properly on this frame
             Animator.Update(Time.deltaTime);
+            return true;
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
@@ -925,6 +928,7 @@ namespace Vi.Core
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
             StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+            WaitingForActionClipToPlay = false;
         }
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
@@ -1024,6 +1028,7 @@ namespace Vi.Core
         private float actionClipProgress = 1;
         public Vector3 ApplyRootMotion(float step)
         {
+            if (actionClipProgress >= 1) { return Vector3.zero; }
             Vector3 rootMotion = Vector3.zero;
             AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(lastClipPlayed));
             if (clip)

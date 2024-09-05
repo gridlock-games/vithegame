@@ -228,25 +228,18 @@ namespace Vi.Player
                     }
                 }
 
-                if (attributes.AnimationHandler.WaitingForActionClipToPlay)
-                {
-
-                }
+                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
-                {
-                    InputPayload inputPayload = new InputPayload(movementTick, GetMoveInput(), EvaluateRotation());
-                    if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                        inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                    else
-                        inputBuffer.Add(inputPayload);
-                    movementTick++;
+                    inputBuffer.Add(inputPayload);
+                movementTick++;
 
-                    // This would mean we are the host. The server handles inputs from the server input queue
-                    if (!IsServer)
-                    {
-                        StatePayload statePayload = Move(inputPayload);
-                        stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-                    }
+                // This would mean we are the host. The server handles inputs from the server input queue
+                if (!IsServer)
+                {
+                    StatePayload statePayload = Move(inputPayload);
+                    stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 }
             }
         }
@@ -256,27 +249,38 @@ namespace Vi.Player
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new StatePayload(inputPayload, rb, inputPayload.rotation);
+                return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
+            bool kinematicWasSet = false;
             Vector3 movement = Vector3.zero;
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime);
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
             }
             else if (attributes.AnimationHandler.ShouldApplyRootMotion())
             {
-                if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                if (IsServer)
                 {
-                    movement = Vector3.zero;
+                    if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                    {
+                        movement = Vector3.zero;
+                    }
+                    else
+                    {
+                        movement = newRotation * rootMotion * GetRootMotionSpeed();
+                    }
                 }
                 else
                 {
-                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
+                    rb.isKinematic = true;
+                    kinematicWasSet = true;
+                    rb.MovePosition(latestServerState.Value.position);
                 }
             }
             else if (attributes.AnimationHandler.IsAtRest())
@@ -286,6 +290,8 @@ namespace Vi.Player
                 targetDirection *= GetRunSpeed();
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
+
+            rb.isKinematic = kinematicWasSet;
 
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
@@ -845,6 +851,9 @@ namespace Vi.Player
         protected void OnDrawGizmos()
         {
             if (!Application.isPlaying) { return; }
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(latestServerState.Value.position, 0.5f);
 
             //Gizmos.color = Color.yellow;
             //Gizmos.DrawSphere(rb.position, 0.3f);
