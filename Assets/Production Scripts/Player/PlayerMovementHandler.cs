@@ -67,14 +67,12 @@ namespace Vi.Player
             public int tick;
             public Vector2 moveInput;
             public Quaternion rotation;
-            public FixedString32Bytes tryingToPlayActionClipName;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, ActionClip tryingToPlayActionClip)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
                 this.rotation = rotation;
-                tryingToPlayActionClipName = tryingToPlayActionClip ? tryingToPlayActionClip.name : "";
             }
 
             public bool Equals(InputPayload other)
@@ -87,7 +85,6 @@ namespace Vi.Player
                 serializer.SerializeValue(ref tick);
                 serializer.SerializeValue(ref moveInput);
                 serializer.SerializeValue(ref rotation);
-                serializer.SerializeValue(ref tryingToPlayActionClipName);
             }
         }
 
@@ -229,7 +226,7 @@ namespace Vi.Player
                     HandleServerReconciliation();
                 }
 
-                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation(), attributes.AnimationHandler.GetFirstActionClipInQueue());
+                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
@@ -256,19 +253,6 @@ namespace Vi.Player
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
 
-            if (inputPayload.tryingToPlayActionClipName != "")
-            {
-                Debug.Log(inputPayload.tick + " " + inputPayload.tryingToPlayActionClipName);
-                if (IsServer)
-                {
-                    attributes.AnimationHandler.PlayActionOnServer(inputPayload.tryingToPlayActionClipName.ToString(), false, inputPayload.tick);
-                }
-                else
-                {
-                    attributes.AnimationHandler.PlayPredictedActionOnClient(inputPayload.tryingToPlayActionClipName.ToString(), inputPayload.tick);
-                }
-            }
-            
             // Apply movement
             Vector3 movement;
             if (attributes.ShouldPlayHitStop())
