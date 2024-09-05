@@ -90,30 +90,30 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 8.14
   intensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 4.7
   scatter:
-    m_OverrideState: 0
-    m_Value: 0.7
+    m_OverrideState: 1
+    m_Value: 0.732
   clamp:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 65472
   tint:
     m_OverrideState: 0
     m_Value: {r: 0.9716981, g: 0.6056249, b: 0.26125845, a: 1}
   highQualityFiltering:
-    m_OverrideState: 0
-    m_Value: 0
-  skipIterations:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
+  skipIterations:
+    m_OverrideState: 1
+    m_Value: 4
   dirtTexture:
     m_OverrideState: 0
-    m_Value: {fileID: 0}
+    m_Value: {fileID: 2800000, guid: e4735a73168b8a64b98aa913e36e5507, type: 3}
     dimension: 1
   dirtIntensity:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 40.3
 --- !u!114 &1550592982888179920
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -128,13 +128,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   redOutRedIn:
-    m_OverrideState: 0
-    m_Value: 100
+    m_OverrideState: 1
+    m_Value: 20
   redOutGreenIn:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: -19
   redOutBlueIn:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   greenOutRedIn:
     m_OverrideState: 0
@@ -182,16 +182,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
   m_Name: DepthOfField
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1
   gaussianStart:
     m_OverrideState: 1
-    m_Value: 22.07
+    m_Value: 3.9
   gaussianEnd:
     m_OverrideState: 1
-    m_Value: 30.51
+    m_Value: 66.8
   gaussianMaxRadius:
     m_OverrideState: 1
     m_Value: 1
@@ -200,13 +200,13 @@ MonoBehaviour:
     m_Value: 0
   focusDistance:
     m_OverrideState: 1
-    m_Value: 10
+    m_Value: 95.71
   aperture:
     m_OverrideState: 1
     m_Value: 21.6
   focalLength:
     m_OverrideState: 1
-    m_Value: 243
+    m_Value: 300
   bladeCount:
     m_OverrideState: 1
     m_Value: 5
@@ -234,13 +234,13 @@ MonoBehaviour:
     m_Value: 0.5
   contrast:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 13.4
   colorFilter:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   hueShift:
     m_OverrideState: 0
-    m_Value: 9
+    m_Value: -4
   saturation:
     m_OverrideState: 1
     m_Value: 20

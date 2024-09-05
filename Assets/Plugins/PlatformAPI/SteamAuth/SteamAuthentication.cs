@@ -49,7 +49,6 @@ namespace jomarcentermjm.PlatformAPI
             if (authTicketHandle != HAuthTicket.Invalid)
             {
                 string sessionTicketDataString = BitConverter.ToString(sessionTicket, 0, (int)ticketSize).Replace("-", "");
-                Debug.Log(sessionTicketDataString);
                 SteamSendSessionTicketToServer(sessionTicketDataString);
             }
 
@@ -57,7 +56,6 @@ namespace jomarcentermjm.PlatformAPI
             {
 
                 string convertingData = $"{{\r\n    \"sessionTicket\" : \"{sessionTicket}\"\r\n}}";
-                Debug.Log(sessionTicket);
                 byte[] convertedST = Encoding.ASCII.GetBytes(convertingData);
                 RestClient.Request(new RequestHelper
                 {
