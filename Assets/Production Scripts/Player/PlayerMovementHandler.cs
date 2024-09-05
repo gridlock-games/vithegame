@@ -607,7 +607,7 @@ namespace Vi.Player
             }
 #endif
             UpdateTransform();
-            cameraController.UpdateCamera();
+            if (cameraController) { cameraController.UpdateCamera(); }
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
             AutoAim();
