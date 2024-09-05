@@ -61,6 +61,7 @@ public class BugReportSystem : MonoBehaviour
     bugReportFormJSON.captureDateTime = System.DateTime.UtcNow.ToString();
 
     //Get the username of the reporter
+    //todo: Get the actual username of the user (otherwise just the email from auth provider)
 
     //Gather basic device infomation
     bugReportFormJSON.osVersion = SystemInfo.operatingSystem;
@@ -91,26 +92,42 @@ public class BugReportSystem : MonoBehaviour
     //Transfer Image Data
   }
 
+  void CompiletoJSONFile()
+  {
+
+  }
+
   private void CompileToTxtFile()
   {
     //Compile and combine all the data into one stringable object.
     string compiledStringData = $"Vi Bug Report data \n" +
-      $"generation date: {captureDateTime} \n" +
+      $"generation date: {bugReportFormJSON.captureDateTime} \n" +
       $"reporter username: [tba]" +
       $"<System Information> \n" +
-      $"os: {osVersion} \n" +
-      $"device: {deviceName} \n" +
-      $"Processor: {deviceProcessor} \n" +
-      $"VideoCard: {deviceVideoCard} \n" +
+      $"os: {bugReportFormJSON.osVersion} \n" +
+      $"device: {bugReportFormJSON.deviceName} \n" +
+      $"Processor: {bugReportFormJSON.deviceProcessor} \n" +
+      $"VideoCard: {bugReportFormJSON.deviceVideoCard} \n" +
       $"<REPORT INFO> \n" +
       $"brief Description: \n" +
-      $"{briefDescription} \n" +
+      $"{bugReportFormJSON.briefDescription} \n" +
       $"Reproduction Step: \n" +
-      $"{reproductionStep} \n" +
+      $"{bugReportFormJSON.reproductionStep} \n" +
       $"Additional Infotmation: \n" +
-      $"{additionalReport} \n" +
+      $"{bugReportFormJSON.additionalReport} \n" +
       $"screenshot attached: {doSendScreenShot}";
 
-      //Save to bug report folder
+    //Save to bug report folder
+    SaveFileTextContent(compiledStringData);
+  }
+
+  public void SaveFileTextContent(string content)
+  {
+
+  }
+
+  public void SaveFileImageContent()
+  {
+
   }
 }
