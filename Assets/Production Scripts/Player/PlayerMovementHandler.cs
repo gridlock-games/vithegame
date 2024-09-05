@@ -254,7 +254,7 @@ namespace Vi.Player
             Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
-            Vector3 movement;
+            Vector3 movement = Vector3.zero;
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
@@ -270,7 +270,7 @@ namespace Vi.Player
                     movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
                 }
             }
-            else
+            else if (attributes.AnimationHandler.IsAtRest())
             {
                 Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
