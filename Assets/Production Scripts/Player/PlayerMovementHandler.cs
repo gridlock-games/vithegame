@@ -405,7 +405,7 @@ namespace Vi.Player
         private const float serverReconciliationTeleportThreshold = 2;
         private const float serverReconciliationLerpSpeed = 8;
 
-        private void LateUpdate()
+        private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
 
@@ -609,6 +609,8 @@ namespace Vi.Player
             lookInput += lookInputToAdd;
             }
 #endif
+            UpdateTransform();
+            cameraController.UpdateCamera();
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
             AutoAim();
