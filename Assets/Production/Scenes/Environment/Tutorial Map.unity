@@ -1223,9 +1223,17 @@ MonoBehaviour:
     spawnPositions:
     - {x: 0, y: 3.5, z: 18}
     - {x: 0, y: 3.5, z: -18}
+    - {x: 12, y: 3.5, z: -10}
+    - {x: -12, y: 3.5, z: -10}
+    - {x: 12, y: 3.5, z: 10}
+    - {x: -12, y: 3.5, z: 10}
     spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
+    - {x: 0, y: -45, z: 0}
+    - {x: 0, y: 45, z: 0}
+    - {x: 0, y: -135, z: 0}
+    - {x: 0, y: 135, z: 0}
     spawnPriorities: 
   - gameModes: 02000000
     teams: 0a000000
@@ -1233,7 +1241,9 @@ MonoBehaviour:
     spawnPositions:
     - {x: -5, y: 3.5, z: -18}
     - {x: 5, y: 3.5, z: -18}
+    - {x: 0, y: 3.5, z: -18}
     spawnRotations:
+    - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     spawnPriorities: 
@@ -1243,7 +1253,9 @@ MonoBehaviour:
     spawnPositions:
     - {x: -5, y: 3.5, z: 18}
     - {x: 5, y: 3.5, z: 18}
+    - {x: 0, y: 3.5, z: 18}
     spawnRotations:
+    - {x: 0, y: 180, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 180, z: 0}
     spawnPriorities: 
