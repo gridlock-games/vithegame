@@ -165,7 +165,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -178,7 +178,7 @@ namespace Vi.Player
                 Physics.Simulate(Time.fixedDeltaTime);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
-                while (tickToProcess < physicsTick)
+                while (tickToProcess < movementTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
@@ -195,7 +195,7 @@ namespace Vi.Player
             }
         }
 
-        private int physicsTick;
+        private int movementTick = 0;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -218,25 +218,39 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                if (!latestServerState.Equals(default(StatePayload)) &&
+                if (latestServerState.Value.tick > 0)
+                {
+                    if (!latestServerState.Equals(default(StatePayload)) &&
                    (lastProcessedState.Equals(default(StatePayload)) ||
                    !latestServerState.Equals(lastProcessedState)))
+                    {
+                        HandleServerReconciliation();
+                    }
+                }
+                else
                 {
-                    HandleServerReconciliation();
+                    Debug.Log(movementTick + " " + latestServerState.Value.tick);
                 }
 
-                InputPayload inputPayload = new InputPayload(physicsTick, GetMoveInput(), EvaluateRotation());
-                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                else
-                    inputBuffer.Add(inputPayload);
-                physicsTick++;
-
-                // This would mean we are the host. The server handles inputs from the server input queue
-                if (!IsServer)
+                if (attributes.AnimationHandler.WaitingForActionClipToPlay)
                 {
-                    StatePayload statePayload = Move(inputPayload);
-                    stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
+
+                }
+                else
+                {
+                    InputPayload inputPayload = new InputPayload(movementTick, GetMoveInput(), EvaluateRotation());
+                    if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                        inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                    else
+                        inputBuffer.Add(inputPayload);
+                    movementTick++;
+
+                    // This would mean we are the host. The server handles inputs from the server input queue
+                    if (!IsServer)
+                    {
+                        StatePayload statePayload = Move(inputPayload);
+                        stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
+                    }
                 }
             }
         }

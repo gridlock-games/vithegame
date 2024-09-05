@@ -12,6 +12,7 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
+        public bool WaitingForActionClipToPlay { get; private set; }
 
         // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
@@ -26,6 +27,7 @@ namespace Vi.Core
             {
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
+                WaitingForActionClipToPlay = true;
                 PlayActionServerRpc(actionClip.name, isFollowUpClip);
             }
             else
@@ -504,7 +506,10 @@ namespace Vi.Core
         private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip)
         {
             PlayActionOnServer(actionClipName, isFollowUpClip);
+            ResetWaitingForActionToPlayClientRpc();
         }
+
+        [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
         // This method plays the action on the server
         private void PlayActionOnServer(string actionClipName, bool isFollowUpClip)
