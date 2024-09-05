@@ -1226,8 +1226,29 @@ MonoBehaviour:
     spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
-    spawnPriorities: 0000000001000000
+    spawnPriorities: 
+  - gameModes: 02000000
+    teams: 0a000000
+    findMostClearSpawnPoint: 1
+    spawnPositions:
+    - {x: -5, y: 3.5, z: -18}
+    - {x: 5, y: 3.5, z: -18}
+    spawnRotations:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    spawnPriorities: 
+  - gameModes: 02000000
+    teams: 0b000000
+    findMostClearSpawnPoint: 1
+    spawnPositions:
+    - {x: -5, y: 3.5, z: 18}
+    - {x: 5, y: 3.5, z: 18}
+    spawnRotations:
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    spawnPriorities: 
   previewCharacterPosition: {x: 0, y: -20, z: 0}
+  damageCircleSpawnPosition: {x: 0, y: 0, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
   damageCircleMinScale: {x: 5, y: 200, z: 5}
   shrinkSize: 20
