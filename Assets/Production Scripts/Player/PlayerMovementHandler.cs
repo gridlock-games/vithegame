@@ -227,10 +227,6 @@ namespace Vi.Player
                         HandleServerReconciliation();
                     }
                 }
-                else
-                {
-                    Debug.Log(movementTick + " " + latestServerState.Value.tick);
-                }
 
                 if (attributes.AnimationHandler.WaitingForActionClipToPlay)
                 {
