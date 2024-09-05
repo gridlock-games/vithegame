@@ -82,6 +82,19 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Game Over! ";
         }
 
+        protected override void OnGameOverChanged(bool prev, bool current)
+        {
+            if (current & IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendHordeModeLeaderboardResult(
+                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                        roundTimer.Value, GetWavesCompleted()));
+                }
+            }
+        }
+
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
