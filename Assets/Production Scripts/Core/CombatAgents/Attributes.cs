@@ -347,7 +347,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
@@ -375,7 +375,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
