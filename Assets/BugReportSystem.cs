@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class BugReportFormJSON
+{
+  public string osVersion;
+  public string deviceName;
+  public string userName;
+  public string captureDateTime;
+  public string deviceProcessor;
+  public string deviceVideoCard;
+
+  public string briefDescription;
+  public string reproductionStep;
+  public string additionalReport;
+}
 public class BugReportSystem : MonoBehaviour
 {
   Texture2D captureTexture;
   RawImage screenshotUI;
 
-  //RawData
-  string osVersion;
-  string deviceName;
-  string userName;
-  string captureDateTime;
-  string deviceProcessor;
-  string deviceVideoCard;
-
-  string briefDescription;
-  string reproductionStep;
-  string additionalReport;
+  BugReportFormJSON bugReportFormJSON;
 
   //UI
   [SerializeField] InputField briefDescriptionIF;
@@ -32,7 +35,7 @@ public class BugReportSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+    bugReportFormJSON = new BugReportFormJSON();
     }
 
     // Update is called once per frame
@@ -55,15 +58,15 @@ public class BugReportSystem : MonoBehaviour
   void GatherUserData()
   {
     //Capture Date and time
-    captureDateTime = System.DateTime.UtcNow.ToString();
+    bugReportFormJSON.captureDateTime = System.DateTime.UtcNow.ToString();
 
     //Get the username of the reporter
 
     //Gather basic device infomation
-    osVersion = SystemInfo.operatingSystem;
-    deviceName = $"{SystemInfo.deviceName} - {SystemInfo.deviceModel} - {SystemInfo.deviceType}";
-    deviceVideoCard = $"{SystemInfo.graphicsDeviceVendor} - {SystemInfo.graphicsDeviceName} - {SystemInfo.graphicsDeviceVersion}";
-    deviceProcessor = $"{SystemInfo.processorType}";
+    bugReportFormJSON.osVersion = SystemInfo.operatingSystem;
+    bugReportFormJSON.deviceName = $"{SystemInfo.deviceName} - {SystemInfo.deviceModel} - {SystemInfo.deviceType}";
+    bugReportFormJSON.deviceVideoCard = $"{SystemInfo.graphicsDeviceVendor} - {SystemInfo.graphicsDeviceName} - {SystemInfo.graphicsDeviceVersion}";
+    bugReportFormJSON.deviceProcessor = $"{SystemInfo.processorType}";
 
     //Prints out the data on user UI for transpaency
 
@@ -72,10 +75,24 @@ public class BugReportSystem : MonoBehaviour
   void SendReportToServer()
   {
     //Gather all the details provided by the user store them as sendable data
-    briefDescription = briefDescriptionIF.text;
-    reproductionStep = reproductionStepIF.text;
-    additionalReport = additionalReportIF.text;
+    bugReportFormJSON.briefDescription = briefDescriptionIF.text;
+    bugReportFormJSON.reproductionStep = reproductionStepIF.text;
+    bugReportFormJSON.additionalReport = additionalReportIF.text;
 
+    //Save as human readable file as a backup
+    CompileToTxtFile();
+
+    //Save as a JSON file for easier file conversion purposes
+
+    //prep data for transfer
+
+    //Transfer String Data
+
+    //Transfer Image Data
+  }
+
+  private void CompileToTxtFile()
+  {
     //Compile and combine all the data into one stringable object.
     string compiledStringData = $"Vi Bug Report data \n" +
       $"generation date: {captureDateTime} \n" +
@@ -94,10 +111,6 @@ public class BugReportSystem : MonoBehaviour
       $"{additionalReport} \n" +
       $"screenshot attached: {doSendScreenShot}";
 
-    //prep data for transfer
-
-    //Transfer String Data
-
-    //Transfer Image Data
+      //Save to bug report folder
   }
 }
