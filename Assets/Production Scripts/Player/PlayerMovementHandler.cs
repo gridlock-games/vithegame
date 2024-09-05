@@ -249,7 +249,7 @@ namespace Vi.Player
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
+                return new StatePayload(inputPayload, rb, inputPayload.rotation);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
