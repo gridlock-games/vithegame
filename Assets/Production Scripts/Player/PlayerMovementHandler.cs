@@ -180,7 +180,7 @@ namespace Vi.Player
                 Physics.Simulate(Time.fixedDeltaTime);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
-                while (tickToProcess < MovementTick)
+                while (tickToProcess < movementTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
@@ -231,18 +231,19 @@ namespace Vi.Player
                     }
                 }
 
-                InputPayload inputPayload = new InputPayload(MovementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
                     inputBuffer.Add(inputPayload);
-                MovementTick++;
+                movementTick++;
 
                 StatePayload statePayload = Move(inputPayload);
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
             }
         }
 
+        private int movementTick;
         private StatePayload Move(InputPayload inputPayload)
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)

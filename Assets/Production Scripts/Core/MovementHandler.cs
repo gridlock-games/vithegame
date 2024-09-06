@@ -318,7 +318,6 @@ namespace Vi.Core
             moveInput = value.Get<Vector2>();
         }
 
-		public int MovementTick { get; protected set; }
         public bool CanMove()
 		{
 			if (GameModeManager.Singleton)
