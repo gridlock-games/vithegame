@@ -214,8 +214,8 @@ namespace Vi.Player
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-                    Physics.Simulate(Time.fixedDeltaTime);
                     NetworkPhysicsSimulation.AddStepsProcessed(1);
+                    Physics.Simulate(Time.fixedDeltaTime);
                 }
             }
 
