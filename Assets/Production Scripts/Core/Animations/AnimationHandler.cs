@@ -505,6 +505,7 @@ namespace Vi.Core
         [ServerRpc]
         private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip)
         {
+            Debug.Log(combatAgent.MovementHandler.MovementTick + " " + actionClipName);
             if (!PlayActionOnServer(actionClipName, isFollowUpClip))
             {
                 ResetWaitingForActionToPlayClientRpc();
@@ -927,6 +928,7 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
+            Debug.Log(combatAgent.MovementHandler.MovementTick);
             StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
             WaitingForActionClipToPlay = false;
         }

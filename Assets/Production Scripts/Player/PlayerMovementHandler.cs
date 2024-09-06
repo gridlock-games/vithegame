@@ -160,6 +160,8 @@ namespace Vi.Player
         {
             lastProcessedState = latestServerState.Value;
 
+            if (attributes.AnimationHandler.ShouldApplyRootMotion()) { return; }
+
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
@@ -178,7 +180,7 @@ namespace Vi.Player
                 Physics.Simulate(Time.fixedDeltaTime);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
-                while (tickToProcess < movementTick)
+                while (tickToProcess < MovementTick)
                 {
                     int bufferIndex = tickToProcess % BUFFER_SIZE;
 
@@ -195,7 +197,6 @@ namespace Vi.Player
             }
         }
 
-        private int movementTick = 0;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -206,13 +207,15 @@ namespace Vi.Player
                 rb.MovePosition(latestServerState.Value.position);
             }
 
-            if (IsServer)
+            if (!IsClient)
             {
-                if (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+                while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
+                    Physics.Simulate(Time.fixedDeltaTime);
+                    NetworkPhysicsSimulation.AddStepsProcessed(1);
                 }
             }
 
@@ -228,19 +231,15 @@ namespace Vi.Player
                     }
                 }
 
-                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(MovementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
                     inputBuffer.Add(inputPayload);
-                movementTick++;
+                MovementTick++;
 
-                // This would mean we are the host. The server handles inputs from the server input queue
-                if (!IsServer)
-                {
-                    StatePayload statePayload = Move(inputPayload);
-                    stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-                }
+                StatePayload statePayload = Move(inputPayload);
+                stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
             }
         }
 
@@ -474,7 +473,7 @@ namespace Vi.Player
             }
             rb.isKinematic = !IsServer & !IsOwner;
 
-            if (IsServer)
+            if (!IsClient)
             {
                 inputBuffer.OnListChanged += OnInputBufferChanged;
             }
@@ -488,7 +487,7 @@ namespace Vi.Player
                 Cursor.lockState = CursorLockMode.None;
             }
 
-            if (IsServer)
+            if (!IsClient)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
             }
