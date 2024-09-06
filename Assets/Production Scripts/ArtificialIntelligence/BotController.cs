@@ -101,8 +101,8 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
-                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : transform.InverseTransformDirection(NextPosition - GetPosition());
+                Vector2 animDir = new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1);
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
                 if (attributes.WeaponHandler.IsBlocking)
@@ -445,7 +445,7 @@ namespace Vi.ArtificialIntelligence
                     movement = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
                 }
             }
-            else if(attributes.AnimationHandler.IsAtRest())
+            else if (attributes.AnimationHandler.IsAtRest())
             {
                 Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
