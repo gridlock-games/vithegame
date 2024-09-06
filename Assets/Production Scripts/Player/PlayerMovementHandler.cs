@@ -258,7 +258,7 @@ namespace Vi.Player
             // Apply movement
             bool kinematicWasSet = false;
             Vector3 movement = Vector3.zero;
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime);
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;

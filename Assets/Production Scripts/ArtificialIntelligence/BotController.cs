@@ -442,7 +442,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
+                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
                 }
             }
             else if(attributes.AnimationHandler.IsAtRest())
