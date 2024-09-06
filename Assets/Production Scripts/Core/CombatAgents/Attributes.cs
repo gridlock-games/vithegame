@@ -347,7 +347,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
@@ -375,7 +375,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
@@ -465,7 +465,7 @@ namespace Vi.Core.CombatAgents
             if (IsInvincible()) { return false; }
             if (isMeleeHit)
             {
-                if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
+                if (attacker.wasStaggeredThisFrame) { return false; }
 
                 if (!IsUninterruptable())
                 {

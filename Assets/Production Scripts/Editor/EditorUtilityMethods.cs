@@ -108,6 +108,7 @@ namespace Vi.Editor
                     i / textures.Length);
 
                 string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
+                if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
 
                 try

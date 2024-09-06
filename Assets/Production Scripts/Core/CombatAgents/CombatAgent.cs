@@ -538,7 +538,7 @@ namespace Vi.Core
             }
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
             CombatAgent attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
@@ -550,7 +550,7 @@ namespace Vi.Core
             attacker.hitFreezeStartTime = Time.time;
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void StartHitStopClientRpc()
         {
             shouldShake = true;
@@ -575,7 +575,7 @@ namespace Vi.Core
             RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
@@ -594,7 +594,7 @@ namespace Vi.Core
             RenderHitGlowOnlyClientRpc();
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitGlowOnlyClientRpc()
         {
             GlowRenderer.RenderHit();
@@ -611,7 +611,7 @@ namespace Vi.Core
             RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             GlowRenderer.RenderBlock();

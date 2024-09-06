@@ -49,24 +49,26 @@ namespace Vi.Core
 		}
 
 		[SerializeField] protected float stoppingDistance = 2;
-		protected Vector3 Destination { get; private set; }
+		protected Vector3 Destination { get { return destination.Value; } }
+		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();
 
 		private const float destinationNavMeshDistanceThreshold = 20;
 		protected bool SetDestination(Vector3 destination, bool useExactDestination)
         {
 			if (!IsSpawned) { return false; }
+			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
 
 			if (useExactDestination)
             {
 				if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
 				{
-					Destination = myNavHit.position;
+					this.destination.Value = myNavHit.position;
 					return true;
 				}
 				else
 				{
                     Debug.LogError("Destination point is not on nav mesh! " + name);
-                    Destination = destination;
+                    this.destination.Value = destination;
 					return false;
 				}
 			}
@@ -74,13 +76,13 @@ namespace Vi.Core
             {
 				if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
 				{
-					Destination = myNavHit.position;
+					this.destination.Value = myNavHit.position;
 					return true;
 				}
 				else
 				{
                     Debug.LogError("Destination point is not on nav mesh! " + name);
-                    Destination = destination;
+					this.destination.Value = destination;
 					return false;
 				}
 			}
@@ -111,7 +113,8 @@ namespace Vi.Core
         }
 
         private NavMeshPath path;
-		protected Vector3 NextPosition { get; private set; }
+		protected Vector3 NextPosition { get { return nextPosition.Value; } }
+		private NetworkVariable<Vector3> nextPosition = new NetworkVariable<Vector3>();
 
 		private const float nextPositionAngleThreshold = 10;
 		private const float nextPositionDistanceThreshold = 1;
@@ -120,6 +123,7 @@ namespace Vi.Core
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
 			if (!IsSpawned) { return false; }
+			if (!IsServer) { Debug.LogError("MovementHandler.CalculatePath() should only be called on the server!"); return false; }
 
 			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
             {
@@ -155,21 +159,21 @@ namespace Vi.Core
 
 					if (overrideIndexFound)
 					{
-						NextPosition = path.corners[overrideIndex];
+						nextPosition.Value = path.corners[overrideIndex];
 						return true;
 					}
 
 					if (path.corners.Length > 1)
 					{
-						NextPosition = path.corners[1];
+						nextPosition.Value = path.corners[1];
 					}
 					else if (path.corners.Length > 0)
 					{
-						NextPosition = path.corners[0];
+						nextPosition.Value = path.corners[0];
 					}
 					else
 					{
-						NextPosition = startPosition;
+						nextPosition.Value = startPosition;
 					}
 					return true;
 				}
@@ -177,7 +181,7 @@ namespace Vi.Core
 				{
 					//Debug.LogError("Path calculation failed! " + name);
 					//SetOrientation(myNavHit.position, transform.rotation);
-					NextPosition = Destination;
+					nextPosition.Value = Destination;
 					return false;
 				}
 			}
@@ -188,7 +192,7 @@ namespace Vi.Core
 				{
 					SetOrientation(myNavHit.position, transform.rotation);
 				}
-				NextPosition = Destination;
+				nextPosition.Value = Destination;
 				return false;
             }
 		}
