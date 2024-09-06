@@ -73,7 +73,10 @@ namespace Vi.ArtificialIntelligence
                 SetImmovable(attributes.IsGrabbed());
             }
 
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+            if (IsServer)
+            {
+                if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+            }
 
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
