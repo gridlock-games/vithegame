@@ -56,7 +56,7 @@ namespace Vi.Core.VFX.Staff
             PlayEffectsClientRpc(position, soundIndex, VFXIndex);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void PlayEffectsClientRpc(Vector3 position, int soundIndex, int VFXIndex)
         {
             AudioManager.Singleton.PlayClipAtPoint(gameObject, soundToPlayOnSpellCancel[soundIndex], position, actionVFXSoundEffectVolume);
