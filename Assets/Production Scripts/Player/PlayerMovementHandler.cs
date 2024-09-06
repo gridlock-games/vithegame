@@ -170,7 +170,8 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                return;
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -212,13 +213,23 @@ namespace Vi.Player
 
             if (!IsClient)
             {
+                if (serverInputQueue.Count == 0)
+                {
+                    Debug.Log(NetworkPhysicsSimulation.excludedRigidbodies.Contains(rb));
+                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, latestServerState.Value.rotation));
+                    statePayload.tick--;
+                    stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
+                    latestServerState.Value = statePayload;
+                }
+
                 while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-                    NetworkPhysicsSimulation.AddStepsProcessed(1);
-                    Physics.Simulate(Time.fixedDeltaTime);
+
+                    NetworkPhysicsSimulation.AddExcludedRigidbody(rb);
+                    NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb });
                 }
             }
 
@@ -227,8 +238,8 @@ namespace Vi.Player
                 if (latestServerState.Value.tick > 0)
                 {
                     if (!latestServerState.Equals(default(StatePayload)) &&
-                   (lastProcessedState.Equals(default(StatePayload)) ||
-                   !latestServerState.Equals(lastProcessedState)))
+                        (lastProcessedState.Equals(default(StatePayload)) ||
+                        !latestServerState.Equals(lastProcessedState)))
                     {
                         HandleServerReconciliation();
                     }
@@ -506,7 +517,7 @@ namespace Vi.Player
             }
             else
             {
-                Debug.Log("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
+                Debug.LogError("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }
         }
 
