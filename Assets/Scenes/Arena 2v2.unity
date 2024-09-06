@@ -1657,7 +1657,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environmentViewPoints: []
+  environmentViewPoints:
+  - position: {x: 7, y: 5, z: 0}
+    rotation: {x: -0.1830127, y: 0.68301266, z: -0.1830127, w: -0.68301266}
+  - position: {x: -8, y: 5, z: 10}
+    rotation: {x: 0.07782834, y: 0.9212198, z: -0.24684022, w: 0.29045948}
+  - position: {x: -8, y: 5, z: -10}
+    rotation: {x: 0.20533495, y: 0.58801836, z: -0.15755905, w: 0.76632047}
   gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 000000000100000002000000
@@ -1674,13 +1680,17 @@ MonoBehaviour:
     spawnPositions:
     - {x: 0, y: 4, z: 21}
     - {x: 0, y: 4, z: -21}
-    - {x: 9, y: 0.5, z: 0}
-    - {x: -9, y: 0.5, z: 0}
+    - {x: 9, y: 0.5, z: 9}
+    - {x: -9, y: 0.5, z: 9}
+    - {x: 9, y: 0.5, z: -9}
+    - {x: -9, y: 0.5, z: -9}
     spawnRotations:
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 0, z: 0}
-    - {x: 0, y: -90, z: 0}
-    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: -135, z: 0}
+    - {x: 0, y: 135, z: 0}
+    - {x: 0, y: -45, z: 0}
+    - {x: 0, y: 45, z: 0}
     spawnPriorities: 
   - gameModes: 02000000
     teams: 0a000000
@@ -1688,7 +1698,9 @@ MonoBehaviour:
     spawnPositions:
     - {x: 4.5, y: 4, z: 24}
     - {x: -4.5, y: 4, z: 24}
+    - {x: 0, y: 4, z: 21}
     spawnRotations:
+    - {x: 0, y: 180, z: 0}
     - {x: 0, y: 180, z: 0}
     - {x: 0, y: 180, z: 0}
     spawnPriorities: 
@@ -1698,7 +1710,9 @@ MonoBehaviour:
     spawnPositions:
     - {x: 4.5, y: 4, z: -24}
     - {x: -4.5, y: 4, z: -24}
+    - {x: 0, y: 4, z: -21}
     spawnRotations:
+    - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     - {x: 0, y: 0, z: 0}
     spawnPriorities: 

@@ -8121,7 +8121,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environmentViewPoints: []
+  environmentViewPoints:
+  - position: {x: 8, y: 8, z: -6}
+    rotation: {x: -0.15607397, y: 0.43171126, z: -0.07612236, w: -0.88513935}
   gameItemSpawnPoints: []
   spawnPoints:
   - gameModes: 000000000100000002000000

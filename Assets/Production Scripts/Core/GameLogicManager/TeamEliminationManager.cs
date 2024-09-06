@@ -131,6 +131,7 @@ namespace Vi.Core.GameModeManagers
 
         private bool CanSpawnViEssence()
         {
+            if (PlayerDataManager.Singleton.GetGameItemSpawnPoints().Length == 0) { return false; }
             if (IsViEssenceSpawned()) { return false; }
             return CanSpawnViEssenceGameLogicCondition();
         }
