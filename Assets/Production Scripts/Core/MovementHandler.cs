@@ -56,6 +56,7 @@ namespace Vi.Core
 		protected bool SetDestination(Vector3 destination, bool useExactDestination)
         {
 			if (!IsSpawned) { return false; }
+			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
 
 			if (useExactDestination)
             {
@@ -122,6 +123,7 @@ namespace Vi.Core
 		protected bool CalculatePath(Vector3 startPosition, int areaMask)
         {
 			if (!IsSpawned) { return false; }
+			if (!IsServer) { Debug.LogError("MovementHandler.CalculatePath() should only be called on the server!"); return false; }
 
 			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
             {
