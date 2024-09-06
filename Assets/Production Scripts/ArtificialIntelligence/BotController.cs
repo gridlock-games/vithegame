@@ -73,7 +73,10 @@ namespace Vi.ArtificialIntelligence
                 SetImmovable(attributes.IsGrabbed());
             }
 
-            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+            if (IsServer)
+            {
+                if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+            }
 
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
@@ -101,8 +104,8 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Vector2 moveInput = GetPathMoveInput();
-                Vector2 animDir = (new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
+                Vector2 animDir = new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1);
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
                 if (attributes.WeaponHandler.IsBlocking)
@@ -429,7 +432,7 @@ namespace Vi.ArtificialIntelligence
             Quaternion newRotation = transform.rotation;
 
             // Apply movement
-            Vector3 movement;
+            Vector3 movement = Vector3.zero;
             if (attributes.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
@@ -442,10 +445,10 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion(Time.fixedDeltaTime) * GetRootMotionSpeed();
+                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
                 }
             }
-            else
+            else if (attributes.AnimationHandler.IsAtRest())
             {
                 Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);

@@ -106,7 +106,7 @@ namespace Vi.UI
                     }
                     else if (emptyServers.Length < emptyLobbyServersRequired)
                     {
-                        //StartCoroutine(CreateNewLobby());
+                        StartCoroutine(CreateNewLobby());
                     }
                 }
             }

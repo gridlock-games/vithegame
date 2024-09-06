@@ -84,7 +84,7 @@ namespace Vi.Player
             transform.position = CameraPositionClone.transform.position;
             transform.rotation = CameraPositionClone.transform.rotation;
 
-            Update();
+            UpdateCamera();
         }
 
         private void OnDestroy()
@@ -114,7 +114,7 @@ namespace Vi.Player
         public const float orbitSpeed = 15;
 
         private float followCamAngleOffset;
-        private void Update()
+        public void UpdateCamera()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
