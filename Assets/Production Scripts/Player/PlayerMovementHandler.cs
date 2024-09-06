@@ -94,14 +94,16 @@ namespace Vi.Player
             public Vector3 position;
             public Vector3 velocity;
             public Quaternion rotation;
+            public bool usedRootMotion;
 
-            public StatePayload(InputPayload inputPayload, Rigidbody rb, Quaternion rotation)
+            public StatePayload(InputPayload inputPayload, Rigidbody rb, Quaternion rotation, bool usedRootMotion)
             {
                 tick = inputPayload.tick;
                 moveInput = inputPayload.moveInput;
                 position = rb.position;
                 velocity = rb.velocity;
                 this.rotation = rotation;
+                this.usedRootMotion = usedRootMotion;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -111,6 +113,7 @@ namespace Vi.Player
                 serializer.SerializeValue(ref position);
                 serializer.SerializeValue(ref rotation);
                 serializer.SerializeValue(ref velocity);
+                serializer.SerializeValue(ref usedRootMotion);
             }
         }
 
@@ -249,13 +252,14 @@ namespace Vi.Player
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 rb.velocity = Vector3.zero;
-                return new StatePayload(inputPayload, rb, inputPayload.rotation);
+                return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
+            bool shouldApplyRootMotion = attributes.AnimationHandler.ShouldApplyRootMotion();
             bool kinematicWasSet = false;
             Vector3 movement = Vector3.zero;
             Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
@@ -263,7 +267,7 @@ namespace Vi.Player
             {
                 movement = Vector3.zero;
             }
-            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            else if (shouldApplyRootMotion)
             {
                 if (IsServer)
                 {
@@ -276,7 +280,7 @@ namespace Vi.Player
                         movement = newRotation * rootMotion * GetRootMotionSpeed();
                     }
                 }
-                else
+                else if (latestServerState.Value.usedRootMotion)
                 {
                     rb.isKinematic = true;
                     kinematicWasSet = true;
@@ -374,7 +378,7 @@ namespace Vi.Player
                 rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
 
-            return new StatePayload(inputPayload, rb, newRotation);
+            return new StatePayload(inputPayload, rb, newRotation, shouldApplyRootMotion);
         }
 
         private const float stairStepHeight = 0.01f;
