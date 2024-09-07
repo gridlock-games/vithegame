@@ -13,7 +13,7 @@ namespace Vi.Utility
         {
             if (activeRigidbodies.Contains(rb))
             {
-                Debug.LogError("Trying to add a rigidbody " + rb.name + " but it is already present in list");
+                Debug.LogWarning("Trying to add a rigidbody " + rb.name + " but it is already present in list");
             }
             else
             {
@@ -29,7 +29,7 @@ namespace Vi.Utility
             }
             else
             {
-                Debug.LogError("Trying to remove a rigidbody " + rb.name + " but it is not present in list");
+                Debug.LogWarning("Trying to remove a rigidbody " + rb.name + " but it is not present in list");
             }
         }
 
