@@ -426,6 +426,8 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
+            if (IsAffectedByExternalForce) { return; }
+
             CalculatePath(rb.position, NavMesh.AllAreas);
 
             Vector2 moveInput = GetPathMoveInput();
@@ -506,42 +508,42 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (!IsAffectedByExternalForce)
+            bool evaluateForce = true;
+            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {
-                bool evaluateForce = true;
-                if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+                if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
-                    {
-                        rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
-                        evaluateForce = false;
-                    }
+                    rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                    evaluateForce = false;
                 }
-
-                if (evaluateForce)
-                {
-                    if (IsGrounded())
-                    {
-                        rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-                        if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
-                        {
-                            rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
-                        }
-                    }
-                    else // Decelerate horizontal movement while airborne
-                    {
-                        Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
-                        rb.AddForce(counterForce, ForceMode.VelocityChange);
-                    }
-                }
-                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
+
+            if (evaluateForce)
+            {
+                if (IsGrounded())
+                {
+                    rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    {
+                        rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                    }
+                }
+                else // Decelerate horizontal movement while airborne
+                {
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
+                    rb.AddForce(counterForce, ForceMode.VelocityChange);
+                }
+            }
+            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            rb.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
         private const float stairStepHeight = 0.01f;
         private const float maxStairStepHeight = 0.5f;
 
         private const float airborneHorizontalDragMultiplier = 0.1f;
+
+        private const float gravityScale = 2;
 
         private float GetRunSpeed()
         {
