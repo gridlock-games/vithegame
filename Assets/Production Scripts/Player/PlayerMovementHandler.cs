@@ -163,6 +163,11 @@ namespace Vi.Player
         {
             lastProcessedState = latestServerState.Value;
 
+            if (!CanMove())
+            {
+                if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
+                return;
+            }
             if (attributes.AnimationHandler.ShouldApplyRootMotion())
             {
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
@@ -267,7 +272,11 @@ namespace Vi.Player
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                if (!IsServer)
+                if (IsServer)
+                {
+                    rb.velocity = Vector3.zero;
+                }
+                else
                 {
                     rb.isKinematic = true;
                     rb.MovePosition(latestServerState.Value.position);
