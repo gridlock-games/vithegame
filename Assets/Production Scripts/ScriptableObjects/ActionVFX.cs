@@ -86,9 +86,9 @@ namespace Vi.ScriptableObjects
 
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
 
-            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+            if (TryGetComponent(out Rigidbody rb))
             {
-                NetworkPhysicsSimulation.AddRigidbody(rigidbody);
+                NetworkPhysicsSimulation.AddRigidbody(rb);
             }
         }
 
@@ -177,9 +177,9 @@ namespace Vi.ScriptableObjects
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
 
-            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+            if (TryGetComponent(out Rigidbody rb))
             {
-                NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
+                NetworkPhysicsSimulation.RemoveRigidbody(rb);
             }
         }
     }

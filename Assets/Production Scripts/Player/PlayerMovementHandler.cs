@@ -179,8 +179,8 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
-                Debug.Log(positionError + " " + (Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex + 1].position) < serverReconciliationThreshold));
+                Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                //Debug.Log(positionError + " " + (Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex + 1].position) < serverReconciliationThreshold));
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
