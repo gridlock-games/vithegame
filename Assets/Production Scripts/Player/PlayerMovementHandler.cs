@@ -163,6 +163,11 @@ namespace Vi.Player
         {
             lastProcessedState = latestServerState.Value;
 
+            if (attributes.GetAilment() == ActionClip.Ailment.Death)
+            {
+                if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
+                return;
+            }
             if (!CanMove())
             {
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
@@ -173,7 +178,7 @@ namespace Vi.Player
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
                 return;
             }
-
+            
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
