@@ -263,7 +263,11 @@ namespace Vi.Player
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                rb.velocity = Vector3.zero;
+                if (!IsServer)
+                {
+                    rb.isKinematic = true;
+                    rb.MovePosition(latestServerState.Value.position);
+                }
                 return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
             }
 
