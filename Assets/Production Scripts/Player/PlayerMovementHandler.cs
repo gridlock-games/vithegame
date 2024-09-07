@@ -288,6 +288,16 @@ namespace Vi.Player
                 return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
             }
 
+            if (IsAffectedByExternalForce)
+            {
+                if (!IsServer)
+                {
+                    rb.isKinematic = true;
+                    rb.MovePosition(latestServerState.Value.position);
+                }
+                return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
+            }
+
             Vector2 moveInput = inputPayload.moveInput;
             Quaternion newRotation = inputPayload.rotation;
 
@@ -380,36 +390,33 @@ namespace Vi.Player
                 }
             }
 
-            if (!IsAffectedByExternalForce)
+            bool evaluateForce = true;
+            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {
-                bool evaluateForce = true;
-                if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+                if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
-                    {
-                        rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
-                        evaluateForce = false;
-                    }
+                    rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                    evaluateForce = false;
                 }
-
-                if (evaluateForce)
-                {
-                    if (IsGrounded())
-                    {
-                        rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-                        if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
-                        {
-                            rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
-                        }
-                    }
-                    else // Decelerate horizontal movement while airborne
-                    {
-                        Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
-                        rb.AddForce(counterForce, ForceMode.VelocityChange);
-                    }
-                }
-                rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
+
+            if (evaluateForce)
+            {
+                if (IsGrounded())
+                {
+                    rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
+                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    {
+                        rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                    }
+                }
+                else // Decelerate horizontal movement while airborne
+                {
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
+                    rb.AddForce(counterForce, ForceMode.VelocityChange);
+                }
+            }
+            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             rb.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             return new StatePayload(inputPayload, rb, newRotation, shouldApplyRootMotion);
         }
