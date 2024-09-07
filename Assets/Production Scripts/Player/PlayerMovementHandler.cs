@@ -163,7 +163,11 @@ namespace Vi.Player
         {
             lastProcessedState = latestServerState.Value;
 
-            if (attributes.AnimationHandler.ShouldApplyRootMotion()) { return; }
+            if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            {
+                if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
+                return;
+            }
 
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
@@ -171,6 +175,7 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(positionError + " " + (Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex + 1].position) < serverReconciliationThreshold));
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -215,7 +220,6 @@ namespace Vi.Player
                 if (serverInputQueue.Count == 0)
                 {
                     StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, latestServerState.Value.rotation));
-                    statePayload.tick--;
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
                 }
@@ -225,7 +229,14 @@ namespace Vi.Player
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-                    if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
+
+                    if (serverInputQueue.Count > 0)
+                    {
+                        Physics.autoSimulation = false;
+                        Physics.Simulate(Time.fixedDeltaTime);
+                        Physics.autoSimulation = true;
+                    }
+                    //if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
                 }
             }
 
