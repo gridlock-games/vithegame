@@ -8,98 +8,6 @@ namespace Vi.Core
 {
     public class NetworkPhysicsSimulation : MonoBehaviour
     {
-        private NetworkManager networkManager;
-
-        private void Awake()
-        {
-            networkManager = GetComponent<NetworkManager>();
-        }
-
-        private static float timer;
-
-        /*
-        void Update()
-        {
-            if (Physics.autoSimulation)
-                return; // do nothing if the automatic simulation is enabled
-
-            if (networkManager.IsClient)
-                return;
-
-            timer += Time.deltaTime;
-
-            // Catch up with the game time.
-            // Advance the physics simulation in portions of Time.fixedDeltaTime
-            // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
-            while (timer >= Time.fixedDeltaTime)
-            {
-                timer -= Time.fixedDeltaTime;
-
-                Rigidbody[] allRigidbodies = FindObjectsByType<Rigidbody>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-                List<RigidbodyData> rigidbodyDataBeforeSimulate = new List<RigidbodyData>();
-                foreach (Rigidbody rb in allRigidbodies)
-                {
-                    rigidbodyDataBeforeSimulate.Add(new RigidbodyData(rb));
-                }
-
-                Physics.Simulate(Time.fixedDeltaTime);
-
-                for (int i = 0; i < allRigidbodies.Length; i++)
-                {
-                    if (!excludedRigidbodies.Contains(allRigidbodies[i])) { continue; }
-
-                    allRigidbodies[i].position = rigidbodyDataBeforeSimulate[i].position;
-                    allRigidbodies[i].velocity = rigidbodyDataBeforeSimulate[i].velocity;
-                    allRigidbodies[i].rotation = rigidbodyDataBeforeSimulate[i].rotation;
-                    allRigidbodies[i].angularVelocity = rigidbodyDataBeforeSimulate[i].angularVelocity;
-
-                    excludedRigidbodies.Remove(allRigidbodies[i]);
-                }
-            }
-
-            // Here you can access the transforms state right after the simulation, if needed
-        }*/
-
-        private void FixedUpdate()
-        {
-            if (Physics.autoSimulation)
-                return; // do nothing if the automatic simulation is enabled
-
-            if (networkManager.IsClient)
-                return;
-
-            timer += Time.fixedDeltaTime;
-
-            // Catch up with the game time.
-            // Advance the physics simulation in portions of Time.fixedDeltaTime
-            // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
-            while (timer >= Time.fixedDeltaTime)
-            {
-                timer -= Time.fixedDeltaTime;
-
-                Rigidbody[] allRigidbodies = FindObjectsByType<Rigidbody>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-                List<RigidbodyData> rigidbodyDataBeforeSimulate = new List<RigidbodyData>();
-                foreach (Rigidbody rb in allRigidbodies)
-                {
-                    rigidbodyDataBeforeSimulate.Add(new RigidbodyData(rb));
-                }
-
-                Physics.Simulate(Time.fixedDeltaTime);
-
-                for (int i = 0; i < allRigidbodies.Length; i++)
-                {
-                    if (!excludedRigidbodies.Contains(allRigidbodies[i])) { continue; }
-
-                    allRigidbodies[i].position = rigidbodyDataBeforeSimulate[i].position;
-                    allRigidbodies[i].velocity = rigidbodyDataBeforeSimulate[i].velocity;
-                    allRigidbodies[i].rotation = rigidbodyDataBeforeSimulate[i].rotation;
-                    allRigidbodies[i].angularVelocity = rigidbodyDataBeforeSimulate[i].angularVelocity;
-
-                    excludedRigidbodies.Remove(allRigidbodies[i]);
-                }
-            }
-        }
-
         private struct RigidbodyData
         {
             public Vector3 position;
@@ -116,8 +24,6 @@ namespace Vi.Core
             }
         }
 
-        private static List<Rigidbody> excludedRigidbodies = new List<Rigidbody>();
-
         public static void SimulateCertainObjects(Rigidbody[] rigidbodiesToSimulate)
         {
             Rigidbody[] allRigidbodies = FindObjectsByType<Rigidbody>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
@@ -127,7 +33,9 @@ namespace Vi.Core
                 rigidbodyDataBeforeSimulate.Add(new RigidbodyData(rb));
             }
 
+            Physics.autoSimulation = false;
             Physics.Simulate(Time.fixedDeltaTime);
+            Physics.autoSimulation = true;
 
             for (int i = 0; i < allRigidbodies.Length; i++)
             {

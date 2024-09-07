@@ -184,8 +184,6 @@ namespace Vi.Isolated
             if (NetworkManager.Singleton.IsClient) { yield break; }
             Debug.Log("Started Server at " + networkTransport.ConnectionData.Address + ". Make sure you opened port " + networkTransport.ConnectionData.Port + " for UDP traffic!");
 
-            Physics.autoSimulation = false;
-
             yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub") | NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"));
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
