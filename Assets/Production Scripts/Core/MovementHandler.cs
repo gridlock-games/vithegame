@@ -36,6 +36,8 @@ namespace Vi.Core
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
+		public virtual void OnServerActionClipPlayed() { }
+
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }

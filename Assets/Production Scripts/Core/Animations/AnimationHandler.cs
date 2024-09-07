@@ -603,6 +603,8 @@ namespace Vi.Core
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
 
+            combatAgent.MovementHandler.OnServerActionClipPlayed();
+
             // Update the animator so that other action clips will be evaluated properly on this frame
             Animator.Update(Time.deltaTime);
             return true;

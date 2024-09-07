@@ -205,6 +205,19 @@ namespace Vi.Player
             }
         }
 
+        public override void OnServerActionClipPlayed()
+        {
+            Debug.Log("Server action clip played, processing inputs - " + serverInputQueue.Count);
+            while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+            {
+                StatePayload statePayload = Move(inputPayload);
+                stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
+                latestServerState.Value = statePayload;
+
+                if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
+            }
+        }
+
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -217,20 +230,11 @@ namespace Vi.Player
 
             if (!IsClient)
             {
-                if (serverInputQueue.Count == 0)
-                {
-                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, latestServerState.Value.rotation));
-                    stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                    latestServerState.Value = statePayload;
-                }
-
-                while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+                if (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-
-                    if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
                 }
             }
 
