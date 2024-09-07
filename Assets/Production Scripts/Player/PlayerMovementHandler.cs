@@ -230,13 +230,7 @@ namespace Vi.Player
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
 
-                    if (serverInputQueue.Count > 0)
-                    {
-                        Physics.autoSimulation = false;
-                        Physics.Simulate(Time.fixedDeltaTime);
-                        Physics.autoSimulation = true;
-                    }
-                    //if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
+                    if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
                 }
             }
 

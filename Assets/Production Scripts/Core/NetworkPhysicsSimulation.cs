@@ -27,25 +27,14 @@ namespace Vi.Core
         public static void SimulateCertainObjects(Rigidbody[] rigidbodiesToSimulate)
         {
             Rigidbody[] allRigidbodies = FindObjectsByType<Rigidbody>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            List<RigidbodyData> rigidbodyDataBeforeSimulate = new List<RigidbodyData>();
             foreach (Rigidbody rb in allRigidbodies)
             {
-                rigidbodyDataBeforeSimulate.Add(new RigidbodyData(rb));
+                if (!rigidbodiesToSimulate.Contains(rb)) { rb.Sleep(); }
             }
 
             Physics.autoSimulation = false;
             Physics.Simulate(Time.fixedDeltaTime);
             Physics.autoSimulation = true;
-
-            for (int i = 0; i < allRigidbodies.Length; i++)
-            {
-                if (rigidbodiesToSimulate.Contains(allRigidbodies[i])) { continue; }
-
-                allRigidbodies[i].position = rigidbodyDataBeforeSimulate[i].position;
-                allRigidbodies[i].velocity = rigidbodyDataBeforeSimulate[i].velocity;
-                allRigidbodies[i].rotation = rigidbodyDataBeforeSimulate[i].rotation;
-                allRigidbodies[i].angularVelocity = rigidbodyDataBeforeSimulate[i].angularVelocity;
-            }
         }
     }
 }
