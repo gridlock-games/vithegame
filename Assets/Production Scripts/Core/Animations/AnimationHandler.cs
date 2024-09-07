@@ -598,12 +598,12 @@ namespace Vi.Core
                 playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
             }
 
+            combatAgent.MovementHandler.OnServerActionClipPlayed();
+
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
-
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
 
             // Update the animator so that other action clips will be evaluated properly on this frame
             Animator.Update(Time.deltaTime);

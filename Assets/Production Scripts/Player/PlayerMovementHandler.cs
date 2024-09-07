@@ -185,7 +185,7 @@ namespace Vi.Player
                 Physics.autoSimulation = false;
                 rb.position = latestServerState.Value.position;
                 rb.velocity = latestServerState.Value.velocity;
-                Physics.Simulate(Time.fixedDeltaTime);
+                NetworkPhysicsSimulation.SimulateOneRigidbody(rb);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
                 while (tickToProcess < movementTick)
@@ -194,7 +194,7 @@ namespace Vi.Player
 
                     // Process new movement with reconciled state
                     StatePayload statePayload = Move(inputBuffer[bufferIndex]);
-                    Physics.Simulate(Time.fixedDeltaTime);
+                    NetworkPhysicsSimulation.SimulateOneRigidbody(rb);
 
                     // Update buffer with recalculated state
                     stateBuffer[bufferIndex] = statePayload;
@@ -214,7 +214,7 @@ namespace Vi.Player
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                 latestServerState.Value = statePayload;
 
-                if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
+                if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateOneRigidbody(rb); }
             }
         }
 
@@ -250,7 +250,7 @@ namespace Vi.Player
                     }
                 }
 
-                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay | attributes.AnimationHandler.ShouldApplyRootMotion() ? Vector2.zero : GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else

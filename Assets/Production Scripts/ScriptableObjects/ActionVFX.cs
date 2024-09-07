@@ -5,6 +5,7 @@ using Vi.Utility;
 using Unity.Netcode;
 using UnityEngine.VFX;
 using Unity.Netcode.Components;
+using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
@@ -84,6 +85,11 @@ namespace Vi.ScriptableObjects
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
+
+            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+            {
+                NetworkPhysicsSimulation.AddRigidbody(rigidbody);
+            }
         }
 
         protected Collider[] colliders = new Collider[0];
@@ -169,6 +175,11 @@ namespace Vi.ScriptableObjects
             foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
+            }
+
+            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+            {
+                NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
             }
         }
     }

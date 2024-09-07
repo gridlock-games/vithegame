@@ -109,10 +109,7 @@ namespace Vi.Core
 			IsAffectedByExternalForce = false;
         }
 
-        private void OnDisable()
-        {
-			IsAffectedByExternalForce = false;
-        }
+        
 
         private NavMeshPath path;
 		protected Vector3 NextPosition { get { return nextPosition.Value; } }
@@ -260,9 +257,24 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
+
+			foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+			{
+				NetworkPhysicsSimulation.AddRigidbody(rigidbody);
+			}
 		}
 
-        private Vector2 lookSensitivity;
+		private void OnDisable()
+		{
+			IsAffectedByExternalForce = false;
+
+			foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
+			{
+				NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
+			}
+		}
+
+		private Vector2 lookSensitivity;
 		private void RefreshStatus()
 		{
 			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (FasterPlayerPrefs.Singleton.GetBool("InvertMouse") ? -1 : 1);
