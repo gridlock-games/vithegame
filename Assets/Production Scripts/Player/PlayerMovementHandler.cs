@@ -410,7 +410,7 @@ namespace Vi.Player
                 }
                 rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             }
-
+            rb.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             return new StatePayload(inputPayload, rb, newRotation, shouldApplyRootMotion);
         }
 
@@ -418,6 +418,8 @@ namespace Vi.Player
         private const float maxStairStepHeight = 0.5f;
 
         private const float airborneHorizontalDragMultiplier = 0.1f;
+
+        private const float gravityScale = 2;
 
         private Quaternion EvaluateRotation()
         {
