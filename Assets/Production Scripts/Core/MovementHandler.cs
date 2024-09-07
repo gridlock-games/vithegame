@@ -257,21 +257,13 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-
-			foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
-			{
-				NetworkPhysicsSimulation.AddRigidbody(rigidbody);
-			}
+			NetworkPhysicsSimulation.AddRigidbody(rb);
 		}
 
 		private void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-
-			foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>(true))
-			{
-				NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
-			}
+			NetworkPhysicsSimulation.RemoveRigidbody(rb);
 		}
 
 		private Vector2 lookSensitivity;

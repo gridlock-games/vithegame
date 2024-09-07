@@ -171,6 +171,11 @@ namespace Vi.ProceduralAnimations
                 }
                 weaponBoneMapping.Add(keys[i], values[i]);
             }
+
+            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
+            {
+                rigidbody.detectCollisions = false;
+            }
         }
 
         private Dictionary<Weapon.WeaponBone, Transform> weaponBoneMapping = new Dictionary<Weapon.WeaponBone, Transform>();
