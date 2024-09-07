@@ -170,8 +170,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(OwnerClientId + " Position Error: " + positionError);
-                return;
+                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -215,7 +214,6 @@ namespace Vi.Player
             {
                 if (serverInputQueue.Count == 0)
                 {
-                    Debug.Log(NetworkPhysicsSimulation.excludedRigidbodies.Contains(rb));
                     StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, latestServerState.Value.rotation));
                     statePayload.tick--;
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -227,9 +225,7 @@ namespace Vi.Player
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-
-                    NetworkPhysicsSimulation.AddExcludedRigidbody(rb);
-                    NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb });
+                    if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateCertainObjects(new Rigidbody[] { rb }); }
                 }
             }
 
