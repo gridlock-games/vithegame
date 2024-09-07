@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -17,6 +18,14 @@ namespace Vi.Utility
             else
             {
                 activeRigidbodies.Add(rb);
+
+                if (rb.transform.root.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (networkObject.IsSpawned)
+                    {
+                        rb.detectCollisions = networkObject.IsOwner | NetworkManager.Singleton.IsServer;
+                    }
+                }
             }
         }
 

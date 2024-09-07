@@ -212,7 +212,6 @@ namespace Vi.Player
 
         public override void OnServerActionClipPlayed()
         {
-            Debug.Log("Server action clip played, processing inputs - " + serverInputQueue.Count);
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
                 StatePayload statePayload = Move(inputPayload);

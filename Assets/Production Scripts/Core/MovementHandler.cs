@@ -257,13 +257,33 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-			NetworkPhysicsSimulation.AddRigidbody(rb);
+			if (TryGetComponent(out PooledObject pooledObject))
+            {
+				if (!pooledObject.IsPrewarmObject())
+                {
+					NetworkPhysicsSimulation.AddRigidbody(rb);
+				}
+            }
+			else
+            {
+				NetworkPhysicsSimulation.AddRigidbody(rb);
+			}
 		}
 
 		private void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-			NetworkPhysicsSimulation.RemoveRigidbody(rb);
+			if (TryGetComponent(out PooledObject pooledObject))
+			{
+				if (!pooledObject.IsPrewarmObject())
+				{
+					NetworkPhysicsSimulation.RemoveRigidbody(rb);
+				}
+			}
+			else
+			{
+				NetworkPhysicsSimulation.RemoveRigidbody(rb);
+			}
 		}
 
 		private Vector2 lookSensitivity;
