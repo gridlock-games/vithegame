@@ -146,13 +146,6 @@ namespace Vi.UI
         {
             textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
             textChatInputField.text = "";
-            StartCoroutine(ReselectInputField());
-        }
-
-        private IEnumerator ReselectInputField()
-        {
-            yield return new WaitUntil(() => EventSystem.current.currentSelectedGameObject != textChatInputField.gameObject);
-            yield return null;
             textChatInputField.Select();
         }
 
