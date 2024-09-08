@@ -101,6 +101,7 @@ namespace Vi.Player
             if (!GameModeManager.Singleton) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
+            if (textChatIsOpen) { return; }
 
             if (isOn)
             {
@@ -173,6 +174,7 @@ namespace Vi.Player
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
+            if (textChatIsOpen) { return; }
 
             if (inventoryInstance)
             {
@@ -201,6 +203,7 @@ namespace Vi.Player
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
+            if (inventoryInstance) { return; }
 
             if (playerUIInstance)
             {
