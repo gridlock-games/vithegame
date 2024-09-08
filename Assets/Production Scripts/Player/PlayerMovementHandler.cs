@@ -233,8 +233,11 @@ namespace Vi.Player
 
             if (!IsOwner & !IsServer)
             {
-                // Sync position here with latest server state
-                rb.MovePosition(latestServerState.Value.position);
+                if (latestServerState.Value.tick > 0)
+                {
+                    // Sync position here with latest server state
+                    rb.MovePosition(latestServerState.Value.position);
+                }
             }
 
             if (!IsClient)
@@ -258,7 +261,7 @@ namespace Vi.Player
                         HandleServerReconciliation();
                     }
                 }
-
+                
                 bool setMoveInputToZero = attributes.AnimationHandler.WaitingForActionClipToPlay | attributes.AnimationHandler.ShouldApplyRootMotion() | !CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death;
                 InputPayload inputPayload = new InputPayload(movementTick, setMoveInputToZero ? Vector2.zero : GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
@@ -269,6 +272,11 @@ namespace Vi.Player
 
                 StatePayload statePayload = Move(inputPayload);
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
+            }
+
+            if (latestServerState.Value.tick == 0 & !IsServer)
+            {
+                rb.Sleep();
             }
         }
 
@@ -524,6 +532,11 @@ namespace Vi.Player
             if (!IsClient)
             {
                 inputBuffer.OnListChanged += OnInputBufferChanged;
+            }
+
+            if (IsServer)
+            {
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation), rb, transform.rotation, false);
             }
         }
 
