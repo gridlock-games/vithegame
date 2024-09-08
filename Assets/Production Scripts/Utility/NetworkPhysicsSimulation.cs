@@ -9,6 +9,32 @@ namespace Vi.Utility
     {
         private static List<Rigidbody> activeRigidbodies = new List<Rigidbody>();
 
+        private struct RigidbodyData
+        {
+            private Rigidbody rb;
+            private Vector3 position;
+            private Quaternion rotation;
+            private Vector3 velocity;
+            private Vector3 angularVelocity;
+
+            public RigidbodyData(Rigidbody rb)
+            {
+                this.rb = rb;
+                position = rb.position;
+                rotation = rb.rotation;
+                velocity = rb.velocity;
+                angularVelocity = rb.angularVelocity;
+            }
+
+            public void ApplyDataToBody()
+            {
+                rb.position = position;
+                rb.rotation = rotation;
+                rb.velocity = velocity;
+                rb.angularVelocity = angularVelocity;
+            }
+        }
+
         public static void AddRigidbody(Rigidbody rb)
         {
             if (activeRigidbodies.Contains(rb))
@@ -35,15 +61,25 @@ namespace Vi.Utility
 
         public static void SimulateOneRigidbody(Rigidbody rigidbodyToSimulate)
         {
+            List<RigidbodyData> rigidbodyDataBeforeSimulation = new List<RigidbodyData>();
             foreach (Rigidbody rb in activeRigidbodies)
             {
                 if (!rb) { Debug.LogWarning("There is a null rigidbody in the rigidbody list"); continue; }
-                if (rb != rigidbodyToSimulate) { rb.Sleep(); }
+                if (rb != rigidbodyToSimulate)
+                {
+                    rigidbodyDataBeforeSimulation.Add(new RigidbodyData(rb));
+                    rb.Sleep();
+                }
             }
 
             Physics.autoSimulation = false;
             Physics.Simulate(Time.fixedDeltaTime);
             Physics.autoSimulation = true;
+
+            foreach (RigidbodyData rigidbodyData in rigidbodyDataBeforeSimulation)
+            {
+                rigidbodyData.ApplyDataToBody();
+            }
         }
     }
 }
