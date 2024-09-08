@@ -206,8 +206,9 @@ namespace Vi.UI
         public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
 
         private Attributes attributes;
-        private PlayerInput playerInput;
         private PlayerMovementHandler playerMovementHandler;
+        private TextChat textChat;
+        private PlayerInput playerInput;
 
         [SerializeField] private Canvas[] aliveUIChildCanvases;
         [SerializeField] private Canvas[] deathUIChildCanvases;
@@ -216,6 +217,7 @@ namespace Vi.UI
         {
             attributes = GetComponentInParent<Attributes>();
             playerMovementHandler = attributes.GetComponent<PlayerMovementHandler>();
+            textChat = attributes.GetComponent<TextChat>();
 
             playerInput = attributes.GetComponent<PlayerInput>();
             pauseMenuAction = playerInput.actions.FindAction("Pause");
