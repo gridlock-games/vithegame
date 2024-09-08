@@ -276,6 +276,8 @@ namespace Vi.Player
 
                 StatePayload statePayload = Move(inputPayload);
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
+
+                if (IsServer) { latestServerState.Value = statePayload; }
             }
 
             if (latestServerState.Value.tick == 0 & !IsServer)
