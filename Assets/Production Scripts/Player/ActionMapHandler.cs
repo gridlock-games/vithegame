@@ -136,6 +136,11 @@ namespace Vi.Player
                 ExternalUI.SendMessage("OnPause");
                 return;
             }
+            if (textChatIsOpen)
+            {
+                OnTextChat();
+                return;
+            }
             if (scoreboardInstance) { return; }
             if (inventoryInstance) { return; }
 
@@ -189,6 +194,37 @@ namespace Vi.Player
                 inventoryInstance = Instantiate(inventoryPrefab, transform);
                 playerInput.SwitchCurrentActionMap("UI");
             }
+        }
+
+        private void OnTextChat()
+        {
+            if (ExternalUI) { return; }
+            if (scoreboardInstance) { return; }
+            if (pauseInstance) { return; }
+
+            if (playerUIInstance)
+            {
+                playerUIInstance.SendMessage("OnTextChat");
+            }
+            else if (spectatorUIInstance)
+            {
+                spectatorUIInstance.SendMessage("OnTextChat");
+            }
+        }
+
+        private bool textChatIsOpen;
+        public void OnTextChatOpen()
+        {
+            textChatIsOpen = true;
+            Cursor.lockState = CursorLockMode.None;
+            playerInput.SwitchCurrentActionMap("UI");
+        }
+
+        public void OnTextChatClose()
+        {
+            textChatIsOpen = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
     }
 }

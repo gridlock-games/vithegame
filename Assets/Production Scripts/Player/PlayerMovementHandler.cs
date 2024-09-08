@@ -669,7 +669,7 @@ namespace Vi.Player
             }
 #endif
             UpdateTransform();
-            if (cameraController) { cameraController.UpdateCamera(); }
+            if (IsLocalPlayer) { cameraController.UpdateCamera(); }
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
             AutoAim();

@@ -11,6 +11,7 @@ using Vi.Player;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
+using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
@@ -87,6 +88,12 @@ namespace Vi.UI
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private Image mobileDodgeCooldownImage;
+        [Header("Text Chat")]
+        [SerializeField] private Canvas textChatParentCanvas;
+        [SerializeField] private Scrollbar chatScrollbar;
+        [SerializeField] private RectTransform textChatElementParent;
+        [SerializeField] private InputField textChatInputField;
+        [SerializeField] private GameObject textChatElementPrefab;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -94,21 +101,51 @@ namespace Vi.UI
         public void OpenPauseMenu()
         {
             if (!pauseMenuAction.enabled) { return; }
-            attributes.GetComponent<ActionMapHandler>().OnPause();
+            actionMapHandler.OnPause();
         }
 
         private InputAction inventoryAction;
         public void OpenInventoryMenu()
         {
             if (!inventoryAction.enabled) { return; }
-            attributes.GetComponent<ActionMapHandler>().OnInventory();
+            actionMapHandler.OnInventory();
         }
 
         private InputAction scoreboardAction;
         public void OpenScoreboard()
         {
             if (!scoreboardAction.enabled) { return; }
-            attributes.GetComponent<ActionMapHandler>().OpenScoreboard();
+            actionMapHandler.OpenScoreboard();
+        }
+
+        private InputAction textChatAction;
+        private void OnTextChat()
+        {
+            if (!textChatAction.enabled & playerInput.currentActionMap.name == playerInput.defaultActionMap) { return; }
+
+            textChatParentCanvas.enabled = !textChatParentCanvas.enabled;
+            if (textChatParentCanvas.enabled)
+            {
+                ScrollToBottomOfTextChat();
+                actionMapHandler.OnTextChatOpen();
+                EventSystem.current.SetSelectedGameObject(textChatInputField.gameObject);
+            }
+            else
+            {
+                actionMapHandler.OnTextChatClose();
+            }
+        }
+
+        public void CloseTextChat()
+        {
+            textChatParentCanvas.enabled = false;
+            actionMapHandler.OnTextChatClose();
+        }
+
+        public void SendTextChat()
+        {
+            textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
+            textChatInputField.text = "";
         }
 
         private InputAction switchWeaponAction;
@@ -208,6 +245,7 @@ namespace Vi.UI
         private Attributes attributes;
         private PlayerMovementHandler playerMovementHandler;
         private TextChat textChat;
+        private ActionMapHandler actionMapHandler;
         private PlayerInput playerInput;
 
         [SerializeField] private Canvas[] aliveUIChildCanvases;
@@ -217,12 +255,14 @@ namespace Vi.UI
         {
             attributes = GetComponentInParent<Attributes>();
             playerMovementHandler = attributes.GetComponent<PlayerMovementHandler>();
+            actionMapHandler = attributes.GetComponent<ActionMapHandler>();
             textChat = attributes.GetComponent<TextChat>();
 
             playerInput = attributes.GetComponent<PlayerInput>();
             pauseMenuAction = playerInput.actions.FindAction("Pause");
             inventoryAction = playerInput.actions.FindAction("Inventory");
             scoreboardAction = playerInput.actions.FindAction("Scoreboard");
+            textChatAction = playerInput.actions.FindAction("TextChat");
             switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             lightAttackAction = playerInput.actions.FindAction("LightAttack");
             heavyAttackAction = playerInput.actions.FindAction("HeavyAttack");
@@ -464,6 +504,30 @@ namespace Vi.UI
                     statusIcon.SetActive(false);
                 }
             }
+        }
+
+        public void ScrollToBottomOfTextChat()
+        {
+            chatScrollbar.value = 0;
+            StartCoroutine(ScrollToBottomOfTextChatAfterOneFrame());
+        }
+
+        private IEnumerator ScrollToBottomOfTextChatAfterOneFrame()
+        {
+            yield return null;
+            yield return null;
+            chatScrollbar.value = 0;
+        }
+
+        public void ScrollToTopOfTextChat() { chatScrollbar.value = 1; }
+        public void ScrollALittleDownTextChat() { chatScrollbar.value -= 0.1f; }
+        public void ScrollALittleUpTextChat() { chatScrollbar.value += 0.1f; }
+
+        public void DisplayNextTextElement(TextChat.TextChatElement textChatElement)
+        {
+            Text text = Instantiate(textChatElementPrefab, textChatElementParent).GetComponent<Text>();
+            text.text = textChatElement.GetMessageUIValue();
+            ScrollToBottomOfTextChat();
         }
 
         List<CombatAgent> teammateAttributes = new List<CombatAgent>();
