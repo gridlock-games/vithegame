@@ -147,6 +147,10 @@ namespace Vi.Player
         private const float isGroundedSphereCheckRadius = 0.6f;
         private bool IsGrounded()
         {
+            if (latestServerState.Value.tick == 0)
+            {
+                return true;
+            }
             if (groundColliders.Count > 0)
             {
                 return true;
