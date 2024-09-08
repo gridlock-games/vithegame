@@ -89,7 +89,6 @@ GameObject:
   - component: {fileID: 7507916505894408288}
   - component: {fileID: 3945128955595459579}
   - component: {fileID: 3945128955595459578}
-  - component: {fileID: 3945128955595459581}
   - component: {fileID: 3945128955595459580}
   - component: {fileID: 3945128955595459583}
   - component: {fileID: 1486683922734963072}
@@ -208,19 +207,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoppingDistance: 2
   cameraController: {fileID: 3945128956232022059}
---- !u!114 &3945128955595459581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3945128955595459076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0d70903c06c92a46b9bd24c5dc1be24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerObjectTeleportThreshold: 2
 --- !u!114 &3945128955595459580
 MonoBehaviour:
   m_ObjectHideFlags: 0
