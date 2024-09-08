@@ -450,7 +450,6 @@ namespace Vi.Core.GameModeManagers
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
-            overtime.Value = false;
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {
@@ -484,7 +483,14 @@ namespace Vi.Core.GameModeManagers
                 }
             }
 
-            if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
+            if (shouldEndGame)
+            {
+                OnGameEnd(winningPlayersDataIds);
+            }
+            else
+            {
+                overtime.Value = false;
+            }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 

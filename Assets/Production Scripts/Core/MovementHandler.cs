@@ -23,7 +23,11 @@ namespace Vi.Core
 		{
 			transform.position = newPosition;
 			transform.rotation = newRotation;
-			if (rb) { rb.velocity = Vector3.zero; }
+			if (rb)
+			{
+				rb.position = newPosition;
+				rb.velocity = Vector3.zero;
+			}
 		}
 
         public override void OnNetworkSpawn()
