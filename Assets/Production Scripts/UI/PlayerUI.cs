@@ -132,7 +132,6 @@ namespace Vi.UI
             if (!textChatAction.enabled & playerInput.currentActionMap.name == playerInput.defaultActionMap) { return; }
 
             textChatParentCanvas.enabled = !textChatParentCanvas.enabled;
-            textChatButtonCanvas.enabled = !textChatParentCanvas.enabled;
             if (textChatParentCanvas.enabled)
             {
                 ScrollToBottomOfTextChat();
@@ -145,12 +144,20 @@ namespace Vi.UI
             {
                 actionMapHandler.OnTextChatClose();
             }
+            textChatButtonCanvas.enabled = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
         }
 
         public void CloseTextChat()
         {
             textChatParentCanvas.enabled = false;
-            textChatButtonCanvas.enabled = true;
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                textChatButtonCanvas.enabled = true;
+            }
+            else
+            {
+                textChatButtonCanvas.enabled = unreadMessageCount > 0;
+            }
             actionMapHandler.OnTextChatClose();
         }
 
@@ -289,6 +296,16 @@ namespace Vi.UI
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
+
+            textChatParentCanvas.enabled = false;
+            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                textChatButtonCanvas.enabled = true;
+            }
+            else
+            {
+                textChatButtonCanvas.enabled = unreadMessageCount > 0;
+            }
         }
 
         private Vector2 equippedWeaponCardTargetAnchoredPosition;
@@ -551,13 +568,18 @@ namespace Vi.UI
                 {
                     textChatMessageNumberText.text = "";
                 }
-                else if (unreadMessageCount > 999)
+                else if (unreadMessageCount > 99)
                 {
-                    textChatMessageNumberText.text = "999+";
+                    textChatMessageNumberText.text = "99+";
                 }
                 else
                 {
                     textChatMessageNumberText.text = unreadMessageCount.ToString();
+                }
+
+                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+                {
+                    textChatButtonCanvas.enabled = unreadMessageCount > 0;
                 }
             }
         }
