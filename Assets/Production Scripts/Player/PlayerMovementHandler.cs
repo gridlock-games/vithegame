@@ -259,7 +259,8 @@ namespace Vi.Player
                     }
                 }
 
-                InputPayload inputPayload = new InputPayload(movementTick, attributes.AnimationHandler.WaitingForActionClipToPlay | attributes.AnimationHandler.ShouldApplyRootMotion() ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+                bool setMoveInputToZero = attributes.AnimationHandler.WaitingForActionClipToPlay | attributes.AnimationHandler.ShouldApplyRootMotion() | !CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death;
+                InputPayload inputPayload = new InputPayload(movementTick, setMoveInputToZero ? Vector2.zero : GetMoveInput(), EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
