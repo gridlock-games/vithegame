@@ -397,7 +397,7 @@ namespace Vi.Core
                     CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                     if (grabAssailant)
                     {
-                        Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward * 1.2f);
+                        Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
                         curveAdjustedLocalRootMotion = victimNewPosition - combatAgent.MovementHandler.GetRigidbody().position;
                     }
                     else

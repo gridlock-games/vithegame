@@ -578,7 +578,7 @@ namespace Vi.Core.CombatAgents
                     attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
 
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
+                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward);
                     MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
