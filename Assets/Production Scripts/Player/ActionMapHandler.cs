@@ -198,7 +198,7 @@ namespace Vi.Player
             }
         }
 
-        private void OnTextChat()
+        public void OnTextChat()
         {
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
@@ -219,14 +219,14 @@ namespace Vi.Player
         public void OnTextChatOpen()
         {
             textChatIsOpen = true;
-            Cursor.lockState = CursorLockMode.None;
+            if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.None; }
             playerInput.SwitchCurrentActionMap("UI");
         }
 
         public void OnTextChatClose()
         {
             textChatIsOpen = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
     }

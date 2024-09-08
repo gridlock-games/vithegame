@@ -11,7 +11,6 @@ using Vi.Player;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
-using UnityEngine.EventSystems;
 
 namespace Vi.UI
 {
@@ -89,11 +88,14 @@ namespace Vi.UI
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private Image mobileDodgeCooldownImage;
         [Header("Text Chat")]
+        [SerializeField] private Canvas textChatButtonCanvas;
         [SerializeField] private Canvas textChatParentCanvas;
         [SerializeField] private Scrollbar chatScrollbar;
         [SerializeField] private RectTransform textChatElementParent;
         [SerializeField] private InputField textChatInputField;
         [SerializeField] private GameObject textChatElementPrefab;
+        [SerializeField] private Button openTextChatButton;
+        [SerializeField] private Text textChatMessageNumberText;
 
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -118,17 +120,26 @@ namespace Vi.UI
             actionMapHandler.OpenScoreboard();
         }
 
+        public void OpenTextChat()
+        {
+            actionMapHandler.OnTextChat();
+        }
+
         private InputAction textChatAction;
+        private int unreadMessageCount;
         private void OnTextChat()
         {
             if (!textChatAction.enabled & playerInput.currentActionMap.name == playerInput.defaultActionMap) { return; }
 
             textChatParentCanvas.enabled = !textChatParentCanvas.enabled;
+            textChatButtonCanvas.enabled = !textChatParentCanvas.enabled;
             if (textChatParentCanvas.enabled)
             {
                 ScrollToBottomOfTextChat();
                 actionMapHandler.OnTextChatOpen();
                 textChatInputField.Select();
+                unreadMessageCount = 0;
+                textChatMessageNumberText.text = "";
             }
             else
             {
@@ -139,6 +150,7 @@ namespace Vi.UI
         public void CloseTextChat()
         {
             textChatParentCanvas.enabled = false;
+            textChatButtonCanvas.enabled = true;
             actionMapHandler.OnTextChatClose();
         }
 
@@ -528,7 +540,26 @@ namespace Vi.UI
         {
             Text text = Instantiate(textChatElementPrefab, textChatElementParent).GetComponent<Text>();
             text.text = textChatElement.GetMessageUIValue();
-            ScrollToBottomOfTextChat();
+            if (textChatParentCanvas.enabled)
+            {
+                ScrollToBottomOfTextChat();
+            }
+            else
+            {
+                unreadMessageCount++;
+                if (unreadMessageCount == 0)
+                {
+                    textChatMessageNumberText.text = "";
+                }
+                else if (unreadMessageCount > 999)
+                {
+                    textChatMessageNumberText.text = "999+";
+                }
+                else
+                {
+                    textChatMessageNumberText.text = unreadMessageCount.ToString();
+                }
+            }
         }
 
         List<CombatAgent> teammateAttributes = new List<CombatAgent>();
