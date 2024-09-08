@@ -251,22 +251,9 @@ namespace Vi.Core
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
 
             float durationLeft = AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
-            CombatAgent attacker = GetGrabAssailant();
             while (true)
             {
                 durationLeft -= Time.deltaTime;
-                if (attacker)
-                {
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    if (Vector3.Distance(victimNewPosition, MovementHandler.GetPosition()) > 1)
-                    {
-                        MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
-                    }
-                }
-                else
-                {
-                    attacker = GetGrabAssailant();
-                }
                 yield return null;
                 if (durationLeft <= 0) { break; }
             }

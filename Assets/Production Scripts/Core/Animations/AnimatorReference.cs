@@ -394,11 +394,19 @@ namespace Vi.Core
                 Vector3 curveAdjustedLocalRootMotion;
                 if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
                 {
-                    curveAdjustedLocalRootMotion = Vector3.zero;
+                    CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
+                    if (grabAssailant)
+                    {
+                        Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward * 1.2f);
+                        curveAdjustedLocalRootMotion = victimNewPosition - combatAgent.MovementHandler.GetRigidbody().position;
+                    }
+                    else
+                    {
+                        curveAdjustedLocalRootMotion = Vector3.zero;
+                    }
                 }
                 else if (combatAgent.IsPulled())
                 {
-                    //movementHandler.AddForce(Vector3.ClampMagnitude(attributes.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude));
                     curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(combatAgent.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
                 }
                 else

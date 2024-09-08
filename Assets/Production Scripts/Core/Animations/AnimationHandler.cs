@@ -39,7 +39,20 @@ namespace Vi.Core
         public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
         {
             if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
-            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(GetActionClipAnimationStateNameWithoutLayer(actionClip));
+
+            List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+            combatAgent.WeaponHandler.AnimatorOverrideControllerInstance.GetOverrides(overrides);
+            string stateName = GetActionClipAnimationStateNameWithoutLayer(actionClip);
+            foreach (KeyValuePair<AnimationClip, AnimationClip> @override in overrides)
+            {
+                if (!@override.Key | !@override.Value) { continue; }
+                if (@override.Key.name == stateName)
+                {
+                    return @override.Value.length + actionClip.transitionTime;
+                }
+            }
+
+            AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(stateName);
             if (clip) { return clip.length; }
             Debug.LogError("Couldn't find an animation clip for action clip " + actionClip.name + " with weapon " + combatAgent.WeaponHandler.GetWeapon());
             return 2;
