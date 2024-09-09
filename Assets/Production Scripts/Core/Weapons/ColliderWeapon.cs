@@ -11,8 +11,6 @@ namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
-
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
@@ -35,6 +33,7 @@ namespace Vi.Core
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 
+        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void ProcessTriggerEvent(Collider other)
         {
             if (isStowed) { return; }
