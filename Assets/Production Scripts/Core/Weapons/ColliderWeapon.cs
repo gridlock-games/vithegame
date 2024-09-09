@@ -4,8 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using UnityEngine.VFX;
-using Vi.Core.GameModeManagers;
-using Vi.Core.VFX;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -14,6 +13,7 @@ namespace Vi.Core
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
+
         private void Update()
         {
             if (!weaponTrailVFX) { return; }
@@ -45,7 +45,7 @@ namespace Vi.Core
             if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
             // Don't evaluate grab attacks here, it's evaluated in the animation handler script
-            if (parentCombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { return; }
 
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {

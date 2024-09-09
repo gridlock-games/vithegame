@@ -155,6 +155,7 @@ namespace Vi.Core
                         }
 
                         instance.SetWeaponBone(modelData.weaponBone);
+                        instance.SetIsStowed(false);
                         weaponInstances.Add(modelData.weaponBone, instance);
                         //instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
