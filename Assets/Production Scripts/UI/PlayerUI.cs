@@ -584,6 +584,16 @@ namespace Vi.UI
             }
         }
 
+        public void DisplayConnectionMessage(string connectionMessage)
+        {
+            Text text = Instantiate(textChatElementPrefab, textChatElementParent).GetComponent<Text>();
+            text.text = connectionMessage;
+            if (textChatParentCanvas.enabled)
+            {
+                ScrollToBottomOfTextChat();
+            }
+        }
+
         List<CombatAgent> teammateAttributes = new List<CombatAgent>();
         private string lastControlScheme;
         private int moveTouchId;
