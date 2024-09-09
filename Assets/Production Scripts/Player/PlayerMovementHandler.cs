@@ -365,7 +365,7 @@ namespace Vi.Player
                 //if (!IsServer) { rb.MovePosition(latestServerState.Value.position); }
                 return new StatePayload(inputPayload, rb, newRotation, false);
             }
-            else if (attributes.IsGrabbed())
+            else if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
             {
                 CombatAgent grabAssailant = attributes.GetGrabAssailant();
                 if (grabAssailant)

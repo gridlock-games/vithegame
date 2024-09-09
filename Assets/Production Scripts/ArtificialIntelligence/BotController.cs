@@ -431,7 +431,7 @@ namespace Vi.ArtificialIntelligence
                 rb.isKinematic = true;
                 return;
             }
-            else if (attributes.IsGrabbed())
+            else if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
             {
                 CombatAgent grabAssailant = attributes.GetGrabAssailant();
                 if (grabAssailant)
