@@ -338,9 +338,13 @@ namespace Vi.Player
                 return new StatePayload(inputPayload, rb, inputPayload.rotation, false);
             }
 
-            if (IsAffectedByExternalForce)
+            if (IsAffectedByExternalForce & !attributes.IsGrabbed())
             {
-                if (!IsServer)
+                if (IsServer)
+                {
+                    rb.isKinematic = false;
+                }
+                else
                 {
                     rb.isKinematic = true;
                     rb.MovePosition(latestServerState.Value.position);
@@ -365,7 +369,12 @@ namespace Vi.Player
                 if (grabAssailant)
                 {
                     Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
-                    movement = victimNewPosition - GetPosition();
+                    //movement = victimNewPosition - GetPosition();
+
+                    rb.isKinematic = true;
+                    rb.MovePosition(victimNewPosition);
+
+                    return new StatePayload(inputPayload, rb, newRotation, false);
                 }
             }
             else if (attributes.IsPulled())

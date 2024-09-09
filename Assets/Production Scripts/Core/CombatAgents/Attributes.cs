@@ -441,7 +441,11 @@ namespace Vi.Core.CombatAgents
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (IsGrabbed())
+            {
+                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+                if (attacker != GetGrabAssailant()) { return false; }
+            }
             if (AnimationHandler.IsGrabAttacking()) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed

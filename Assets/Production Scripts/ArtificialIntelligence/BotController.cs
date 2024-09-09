@@ -438,7 +438,7 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (IsAffectedByExternalForce) { return; }
+            if (IsAffectedByExternalForce & !attributes.IsGrabbed()) { rb.isKinematic = false; return; }
 
             CalculatePath(rb.position, NavMesh.AllAreas);
 
@@ -457,7 +457,12 @@ namespace Vi.ArtificialIntelligence
                 if (grabAssailant)
                 {
                     Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
-                    movement = victimNewPosition - GetPosition();
+                    //movement = victimNewPosition - GetPosition();
+
+                    rb.isKinematic = true;
+                    rb.MovePosition(victimNewPosition);
+
+                    return;
                 }
             }
             else if (attributes.IsPulled())
@@ -486,6 +491,8 @@ namespace Vi.ArtificialIntelligence
                 targetDirection *= GetRunSpeed();
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
+
+            rb.isKinematic = false;
 
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
