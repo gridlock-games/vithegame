@@ -49,11 +49,6 @@ namespace Vi.Core
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
 
-		public void SetImmovable(bool isImmovable)
-        {
-			rb.constraints = isImmovable ? RigidbodyConstraints.FreezeAll : originalRigidbodyConstraints;
-		}
-
 		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get { return destination.Value; } }
 		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();
@@ -240,7 +235,6 @@ namespace Vi.Core
 		protected InputAction moveAction;
 		protected InputAction lookAction;
 		protected Rigidbody rb;
-		private RigidbodyConstraints originalRigidbodyConstraints;
 
         protected void Awake()
 		{
@@ -254,7 +248,6 @@ namespace Vi.Core
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
-			if (rb) { originalRigidbodyConstraints = rb.constraints; }
         }
 
         protected void OnEnable()

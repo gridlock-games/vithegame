@@ -198,10 +198,15 @@ namespace Vi.Core
         protected NetworkVariable<ulong> grabVictimDataId = new NetworkVariable<ulong>();
         protected NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         protected NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
+        protected NetworkVariable<bool> isGrabbing = new NetworkVariable<bool>();
 
         public void SetGrabVictim(ulong grabVictimNetworkObjectId) { grabVictimDataId.Value = grabVictimNetworkObjectId; }
 
         public bool IsGrabbed() { return isGrabbed.Value; }
+
+        public bool IsGrabbing() { return isGrabbing.Value; }
+
+        public void SetIsGrabbingToTrue() { isGrabbing.Value = true; }
 
         public CombatAgent GetGrabAssailant()
         {
@@ -230,10 +235,11 @@ namespace Vi.Core
 
         public void CancelGrab()
         {
-            if (IsGrabbed())
+            if (IsGrabbed() | IsGrabbing())
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
+                isGrabbing.Value = false;
                 grabAssailantDataId.Value = default;
                 grabVictimDataId.Value = default;
             }
@@ -257,9 +263,8 @@ namespace Vi.Core
                 yield return null;
                 if (durationLeft <= 0) { break; }
             }
-            isGrabbed.Value = false;
-            grabAssailantDataId.Value = default;
-            grabVictimDataId.Value = default;
+            if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+            CancelGrab();
         }
 
         protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();

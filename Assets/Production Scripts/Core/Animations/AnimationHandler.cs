@@ -620,6 +620,7 @@ namespace Vi.Core
         private Coroutine evaluateGrabAttackHitsCoroutine;
         private IEnumerator EvaluateGrabAttackHits(ActionClip grabAttackClip)
         {
+            Debug.Log("Evaluating grab attack hits");
             if (!grabAttackClip) { Debug.LogError("Calling EvaluateGrabAttackHits with a null action clip! " + name); yield break; }
             if (grabAttackClip.GetClipType() != ActionClip.ClipType.GrabAttack) { Debug.LogError("AnimationHandler.EvaluateGrabAttackHits() should only be called with a grab attack action clip!"); yield break; }
 
