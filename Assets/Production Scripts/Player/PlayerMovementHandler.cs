@@ -324,6 +324,7 @@ namespace Vi.Player
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         private StatePayload Move(InputPayload inputPayload)
         {
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (IsServer)
@@ -358,7 +359,6 @@ namespace Vi.Player
             // Apply movement
             bool shouldApplyRootMotion = attributes.AnimationHandler.ShouldApplyRootMotion();
             Vector3 movement = Vector3.zero;
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
             if (attributes.IsGrabbing())
             {
                 rb.isKinematic = true;

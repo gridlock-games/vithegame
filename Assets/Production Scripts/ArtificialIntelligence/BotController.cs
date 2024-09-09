@@ -408,6 +408,8 @@ namespace Vi.ArtificialIntelligence
 
         private void Move()
         {
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -461,7 +463,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
+                    movement = newRotation * rootMotion * GetRootMotionSpeed();
                 }
             }
             else if (attributes.AnimationHandler.IsAtRest())
