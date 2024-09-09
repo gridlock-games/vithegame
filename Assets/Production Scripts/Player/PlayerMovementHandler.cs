@@ -287,6 +287,7 @@ namespace Vi.Player
         }
 
         private int movementTick;
+        RaycastHit[] rootMotionHits = new RaycastHit[10];
         private StatePayload Move(InputPayload inputPayload)
         {
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
@@ -349,6 +350,45 @@ namespace Vi.Player
                     if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
                     {
                         movement = Vector3.zero;
+                    }
+                    else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
+                    {
+                        movement = newRotation * rootMotion * GetRootMotionSpeed();
+
+#if UNITY_EDITOR
+                        ExtDebug.DrawBoxCastBox(GetPosition() + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
+#endif
+
+                        int rootMotionHitCount = Physics.BoxCastNonAlloc(GetPosition() + ActionClip.boxCastOriginPositionOffset,
+                            ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
+                            newRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
+                        List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+
+                        for (int i = 0; i < rootMotionHitCount; i++)
+                        {
+                            if (rootMotionHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                            {
+                                if (PlayerDataManager.Singleton.CanHit(attributes, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                                {
+                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - GetPosition(), Vector3.up);
+                                    angleList.Add((networkCollider,
+                                        Mathf.Abs(targetRot.eulerAngles.y - newRotation.eulerAngles.y),
+                                        rootMotionHits[i]));
+                                }
+                            }
+                        }
+
+                        angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                        foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                        {
+                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - GetPosition(), Vector3.up);
+                            if (angle < ActionClip.maximumRootMotionLimitRotationAngle)
+                            {
+                                movement = Vector3.ClampMagnitude(movement, hit.distance / Time.fixedDeltaTime);
+                                break;
+                            }
+                        }
                     }
                     else
                     {
