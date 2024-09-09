@@ -245,12 +245,12 @@ namespace Vi.Core
         }
 
         protected Coroutine grabResetCoroutine;
-        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
+        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip attack, ActionClip hitReaction)
         {
             if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
 
-            float durationLeft = AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
+            float durationLeft = attack.grabVictimClip.length + hitReaction.transitionTime;
             while (true)
             {
                 durationLeft -= Time.deltaTime;

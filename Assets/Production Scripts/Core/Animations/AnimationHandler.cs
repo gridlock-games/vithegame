@@ -14,7 +14,6 @@ namespace Vi.Core
     {
         public bool WaitingForActionClipToPlay { get; private set; }
 
-        // This method plays an action based on the provided ActionClip parameter
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
         {
             if (!actionClip) { Debug.LogError("Trying to play a null action clip! " + name); return; }
