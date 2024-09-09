@@ -177,7 +177,7 @@ namespace Vi.Player
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
                 return;
             }
-            if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            if (latestServerState.Value.usedRootMotion)
             {
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
                 return;
@@ -287,6 +287,7 @@ namespace Vi.Player
         }
 
         private int movementTick;
+        private int lastEvaluatedServerRootMotionTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         private StatePayload Move(InputPayload inputPayload)
         {
@@ -319,7 +320,6 @@ namespace Vi.Player
 
             // Apply movement
             bool shouldApplyRootMotion = attributes.AnimationHandler.ShouldApplyRootMotion();
-            bool kinematicWasSet = false;
             Vector3 movement = Vector3.zero;
             Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
             if (attributes.ShouldPlayHitStop())
@@ -354,11 +354,9 @@ namespace Vi.Player
                     else if (weaponHandler.CurrentActionClip.limitAttackMotionBasedOnTarget & (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking) | attributes.AnimationHandler.IsLunging())
                     {
                         movement = newRotation * rootMotion * GetRootMotionSpeed();
-
 #if UNITY_EDITOR
                         ExtDebug.DrawBoxCastBox(GetPosition() + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
 #endif
-
                         int rootMotionHitCount = Physics.BoxCastNonAlloc(GetPosition() + ActionClip.boxCastOriginPositionOffset,
                             ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
                             newRotation, ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
@@ -397,9 +395,15 @@ namespace Vi.Player
                 }
                 else if (latestServerState.Value.usedRootMotion)
                 {
-                    rb.isKinematic = true;
-                    kinematicWasSet = true;
-                    rb.MovePosition(latestServerState.Value.position);
+                    if (latestServerState.Value.tick == lastEvaluatedServerRootMotionTick)
+                    {
+                        movement = newRotation * rootMotion * GetRootMotionSpeed();
+                    }
+                    else
+                    {
+                        movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                    }
+                    lastEvaluatedServerRootMotionTick = latestServerState.Value.tick;
                 }
             }
             else if (attributes.AnimationHandler.IsAtRest())
@@ -410,7 +414,7 @@ namespace Vi.Player
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
-            rb.isKinematic = kinematicWasSet;
+            rb.isKinematic = false;
 
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
