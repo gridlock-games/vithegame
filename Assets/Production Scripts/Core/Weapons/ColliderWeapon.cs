@@ -37,6 +37,7 @@ namespace Vi.Core
 
         private void ProcessTriggerEvent(Collider other)
         {
+            if (isStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }

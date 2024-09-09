@@ -70,6 +70,7 @@ namespace Vi.Core
         private RaycastHit[] projectileRotationRaycastingResults = new RaycastHit[10];
         private void LateUpdate()
         {
+            if (isStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }
