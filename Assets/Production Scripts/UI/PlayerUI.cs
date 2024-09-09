@@ -136,7 +136,7 @@ namespace Vi.UI
             {
                 ScrollToBottomOfTextChat();
                 actionMapHandler.OnTextChatOpen();
-                textChatInputField.ActivateInputField();
+                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
                 unreadMessageCount = 0;
                 textChatMessageNumberText.text = "";
             }
@@ -165,7 +165,7 @@ namespace Vi.UI
         {
             textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
             textChatInputField.text = "";
-            textChatInputField.ActivateInputField();
+            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
         }
 
         private InputAction switchWeaponAction;
