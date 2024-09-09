@@ -725,8 +725,9 @@ namespace Vi.Core
         {
             while (true)
             {
-                yield return null;
                 ExecuteLightAttack(true);
+                yield return null;
+                yield return null;
             }
         }
 
@@ -1167,6 +1168,7 @@ namespace Vi.Core
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return null; }
             if (combatAgent.AnimationHandler.IsReloading()) { return null; }
 
             // If we are in recovery
@@ -1266,10 +1268,7 @@ namespace Vi.Core
             }
         }
 
-        private void ResetComboSystem()
-        {
-            inputHistory.Clear();
-        }
+        private void ResetComboSystem() { inputHistory.Clear(); }
 
         private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
