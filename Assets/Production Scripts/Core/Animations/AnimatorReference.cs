@@ -390,30 +390,7 @@ namespace Vi.Core
                         worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                 }
-
-                Vector3 curveAdjustedLocalRootMotion;
-                if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
-                {
-                    CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
-                    if (grabAssailant)
-                    {
-                        Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
-                        curveAdjustedLocalRootMotion = victimNewPosition - combatAgent.MovementHandler.GetRigidbody().position;
-                    }
-                    else
-                    {
-                        curveAdjustedLocalRootMotion = Vector3.zero;
-                    }
-                }
-                else if (combatAgent.IsPulled())
-                {
-                    curveAdjustedLocalRootMotion = Vector3.ClampMagnitude(combatAgent.GetPullAssailant().transform.position - transform.root.position, worldSpaceRootMotion.magnitude);
-                }
-                else
-                {
-                    curveAdjustedLocalRootMotion = worldSpaceRootMotion;
-                }
-                accumulatedRootMotion += curveAdjustedLocalRootMotion / Time.fixedDeltaTime;
+                accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
         }
     }

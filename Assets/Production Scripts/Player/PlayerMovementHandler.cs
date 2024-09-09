@@ -324,6 +324,23 @@ namespace Vi.Player
             {
                 movement = Vector3.zero;
             }
+            else if (attributes.IsGrabbed())
+            {
+                CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                if (grabAssailant)
+                {
+                    Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
+                    movement = victimNewPosition - GetPosition();
+                }
+            }
+            else if (attributes.IsPulled())
+            {
+                CombatAgent pullAssailant = attributes.GetPullAssailant();
+                if (pullAssailant)
+                {
+                    movement = pullAssailant.MovementHandler.GetPosition() - GetPosition();
+                }
+            }
             else if (shouldApplyRootMotion)
             {
                 if (IsServer)
@@ -452,6 +469,16 @@ namespace Vi.Player
 
                 if (attributes.ShouldApplyAilmentRotation())
                     rot = attributes.GetAilmentRotation();
+                else if (attributes.IsGrabbed())
+                {
+                    CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                    if (grabAssailant)
+                    {
+                        Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                        Quaternion.LookRotation(rel, Vector3.up);
+                    }
+                }
                 else if (attributes.AnimationHandler.IsGrabAttacking())
                 {
                     CombatAgent grabVictim = attributes.GetGrabVictim();
