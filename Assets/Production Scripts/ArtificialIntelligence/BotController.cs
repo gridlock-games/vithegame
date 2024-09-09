@@ -16,6 +16,8 @@ namespace Vi.ArtificialIntelligence
         {
             if (!IsServer) { Debug.LogError("BotController.SetOrientation() should only be called on the server!"); return; }
             rb.position = newPosition;
+            rb.velocity = Vector3.zero;
+            transform.position = newPosition;
             transform.rotation = newRotation;
         }
 

@@ -21,13 +21,13 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
-			transform.position = newPosition;
-			transform.rotation = newRotation;
 			if (rb)
 			{
 				rb.position = newPosition;
 				rb.velocity = Vector3.zero;
 			}
+			transform.position = newPosition;
+			transform.rotation = newRotation;
 		}
 
         public override void OnNetworkSpawn()

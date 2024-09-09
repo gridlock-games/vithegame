@@ -21,6 +21,7 @@ namespace Vi.Player
 
             rb.position = newPosition;
             rb.velocity = Vector3.zero;
+            transform.position = newPosition;
 
             SetRotationClientRpc(newRotation);
         }
