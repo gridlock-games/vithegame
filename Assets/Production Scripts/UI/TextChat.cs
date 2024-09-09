@@ -11,9 +11,9 @@ namespace Vi.UI
     {
         public struct TextChatElement : INetworkSerializable
         {
-            public FixedString32Bytes username;
+            public FixedString64Bytes username;
             public PlayerDataManager.Team userTeam;
-            public FixedString32Bytes content;
+            public FixedString64Bytes content;
 
             private const string saidColor = "7D7D7D";
 
