@@ -60,7 +60,6 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
-
             if (winningPlayersDataIds.Length == 0) // Mobs killed all players
             {
                 roundResultMessage.Value = "The Corruption Consumes You. ";
