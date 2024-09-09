@@ -63,6 +63,8 @@ namespace Vi.Core
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
 
+            NetworkPhysicsSimulation.AddRigidbody(rb);
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (soundToPlayOnSpawn.Length > 0)
@@ -178,6 +180,8 @@ namespace Vi.Core
             rb.velocity = Vector3.zero;
 
             nearbyWhooshPlayed = false;
+
+            NetworkPhysicsSimulation.RemoveRigidbody(rb);
 
             if (pooledObject.IsPrewarmObject()) { return; }
 

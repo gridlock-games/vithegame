@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -254,33 +255,13 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-			if (TryGetComponent(out PooledObject pooledObject))
-            {
-				if (!pooledObject.IsPrewarmObject())
-                {
-					NetworkPhysicsSimulation.AddRigidbody(rb);
-				}
-            }
-			else
-            {
-				NetworkPhysicsSimulation.AddRigidbody(rb);
-			}
+			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.AddRigidbody(rb); }
 		}
 
 		private void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-			if (TryGetComponent(out PooledObject pooledObject))
-			{
-				if (!pooledObject.IsPrewarmObject())
-				{
-					NetworkPhysicsSimulation.RemoveRigidbody(rb);
-				}
-			}
-			else
-			{
-				NetworkPhysicsSimulation.RemoveRigidbody(rb);
-			}
+			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
 		}
 
 		private Vector2 lookSensitivity;

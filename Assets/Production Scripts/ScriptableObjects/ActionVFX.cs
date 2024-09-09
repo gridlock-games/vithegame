@@ -5,7 +5,6 @@ using Vi.Utility;
 using Unity.Netcode;
 using UnityEngine.VFX;
 using Unity.Netcode.Components;
-using Vi.Utility;
 
 namespace Vi.ScriptableObjects
 {
@@ -81,15 +80,15 @@ namespace Vi.ScriptableObjects
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
 
-            if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
-            if (pooledObject.IsPrewarmObject()) { return; }
-
-            if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
-
             if (TryGetComponent(out Rigidbody rb))
             {
                 NetworkPhysicsSimulation.AddRigidbody(rb);
             }
+
+            if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
+            if (pooledObject.IsPrewarmObject()) { return; }
+
+            if (audioClipToPlayOnAwake) { StartCoroutine(PlayAwakeAudioClip()); }
         }
 
         protected Collider[] colliders = new Collider[0];
@@ -168,6 +167,11 @@ namespace Vi.ScriptableObjects
 
         protected void OnDisable()
         {
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                NetworkPhysicsSimulation.RemoveRigidbody(rb);
+            }
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }
@@ -175,11 +179,6 @@ namespace Vi.ScriptableObjects
             foreach (PooledObject prefab in VFXToPlayOnDestroy)
             {
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
-            }
-
-            if (TryGetComponent(out Rigidbody rb))
-            {
-                NetworkPhysicsSimulation.RemoveRigidbody(rb);
             }
         }
     }
