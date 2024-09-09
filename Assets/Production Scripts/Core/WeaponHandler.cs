@@ -453,8 +453,15 @@ namespace Vi.Core
             if (vfxInstance)
             {
                 if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
-                NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
-                netObj.Spawn(true);
+                if (vfxInstance.TryGetComponent(out NetworkObject netObj))
+                {
+                    netObj.Spawn(true);
+                }
+                else
+                {
+                    Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
+                }
+
                 if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                 {
                     gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
