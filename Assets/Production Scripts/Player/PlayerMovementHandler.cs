@@ -182,7 +182,7 @@ namespace Vi.Player
                 if (rb.isKinematic) { rb.MovePosition(latestServerState.Value.position); }
                 return;
             }
-            
+
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
@@ -265,9 +265,42 @@ namespace Vi.Player
                         HandleServerReconciliation();
                     }
                 }
-                
-                bool setMoveInputToZero = attributes.AnimationHandler.WaitingForActionClipToPlay | attributes.AnimationHandler.ShouldApplyRootMotion() | !CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death;
-                InputPayload inputPayload = new InputPayload(movementTick, setMoveInputToZero ? Vector2.zero : GetMoveInput(), EvaluateRotation());
+
+                Vector2 moveInput = GetMoveInput();
+                if (weaponHandler.WaitingForReloadToPlay)
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (attributes.AnimationHandler.WaitingForActionClipToPlay)
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (latestServerState.Value.usedRootMotion)
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (!CanMove())
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (attributes.AnimationHandler.ShouldApplyRootMotion())
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (attributes.StatusAgent.IsRooted())
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (attributes.AnimationHandler.IsReloading())
+                {
+                    moveInput = Vector2.zero;
+                }
+
+                InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else

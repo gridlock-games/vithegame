@@ -1057,6 +1057,7 @@ namespace Vi.Core
 
         void OnReload()
         {
+            if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (IsServer)
             {
                 ReloadOnServer();
@@ -1064,10 +1065,20 @@ namespace Vi.Core
             else
             {
                 ReloadServerRpc();
+                WaitingForReloadToPlay = true;
             }
         }
 
-        [Rpc(SendTo.Server)] private void ReloadServerRpc() { ReloadOnServer(); }
+        public bool WaitingForReloadToPlay { get; private set; }
+
+        [Rpc(SendTo.Server)]
+        private void ReloadServerRpc()
+        {
+            ReloadOnServer();
+            ResetWaitingForReloadRpc();
+        }
+
+        [Rpc(SendTo.Owner)] private void ResetWaitingForReloadRpc() { WaitingForReloadToPlay = false; }
 
         private void ReloadOnServer()
         {
