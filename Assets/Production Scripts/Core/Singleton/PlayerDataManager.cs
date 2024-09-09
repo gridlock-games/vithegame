@@ -175,6 +175,7 @@ namespace Vi.Core
 
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
         {
+            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Competitor, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Red, Color.red },
             { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255, 1) },
@@ -182,7 +183,6 @@ namespace Vi.Core
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
             { Team.Purple, Color.magenta },
-            { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },
             { Team.Light, new Color(1, 215 / 255f, 0, 1) },
             { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
         };
@@ -196,6 +196,30 @@ namespace Vi.Core
             else
             {
                 return Color.black;
+            }
+        }
+
+        private readonly static Dictionary<Team, Color> teamTextChatColors = new Dictionary<Team, Color>()
+        {
+            { Team.Red, Color.red },
+            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255, 1) },
+            { Team.Yellow, Color.yellow },
+            { Team.Green, Color.green },
+            { Team.Blue, Color.blue },
+            { Team.Purple, Color.magenta },
+            { Team.Light, new Color(1, 215 / 255f, 0, 1) },
+            { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
+        };
+
+        public static Color GetTeamTextChatColor(Team team)
+        {
+            if (teamTextChatColors.ContainsKey(team))
+            {
+                return teamTextChatColors[team];
+            }
+            else
+            {
+                return new Color(237 / 255f, 234 / 255f, 232 / 255f, 1);
             }
         }
 

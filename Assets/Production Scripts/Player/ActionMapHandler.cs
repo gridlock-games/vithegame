@@ -101,6 +101,7 @@ namespace Vi.Player
             if (!GameModeManager.Singleton) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
+            if (textChatIsOpen) { return; }
 
             if (isOn)
             {
@@ -136,6 +137,11 @@ namespace Vi.Player
                 ExternalUI.SendMessage("OnPause");
                 return;
             }
+            if (textChatIsOpen)
+            {
+                OnTextChat();
+                return;
+            }
             if (scoreboardInstance) { return; }
             if (inventoryInstance) { return; }
 
@@ -168,6 +174,7 @@ namespace Vi.Player
             if (ExternalUI) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
+            if (textChatIsOpen) { return; }
 
             if (inventoryInstance)
             {
@@ -189,6 +196,38 @@ namespace Vi.Player
                 inventoryInstance = Instantiate(inventoryPrefab, transform);
                 playerInput.SwitchCurrentActionMap("UI");
             }
+        }
+
+        public void OnTextChat()
+        {
+            if (ExternalUI) { return; }
+            if (scoreboardInstance) { return; }
+            if (pauseInstance) { return; }
+            if (inventoryInstance) { return; }
+
+            if (playerUIInstance)
+            {
+                playerUIInstance.SendMessage("OnTextChat");
+            }
+            else if (spectatorUIInstance)
+            {
+                spectatorUIInstance.SendMessage("OnTextChat");
+            }
+        }
+
+        private bool textChatIsOpen;
+        public void OnTextChatOpen()
+        {
+            textChatIsOpen = true;
+            if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.None; }
+            playerInput.SwitchCurrentActionMap("UI");
+        }
+
+        public void OnTextChatClose()
+        {
+            textChatIsOpen = false;
+            if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+            playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
     }
 }

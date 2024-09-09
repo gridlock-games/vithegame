@@ -441,7 +441,11 @@ namespace Vi.Core.CombatAgents
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (IsGrabbed())
+            {
+                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+                if (attacker != GetGrabAssailant()) { return false; }
+            }
             if (AnimationHandler.IsGrabAttacking()) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed
@@ -577,9 +581,6 @@ namespace Vi.Core.CombatAgents
                     grabAssailantDataId.Value = attacker.NetworkObjectId;
                     attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
-
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
@@ -735,7 +736,7 @@ namespace Vi.Core.CombatAgents
                     }
 
                     if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
-                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(hitReaction)); }
+                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
                 }
             }
 

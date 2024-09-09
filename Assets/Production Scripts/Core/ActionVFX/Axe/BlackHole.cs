@@ -87,7 +87,7 @@ namespace Vi.Core.VFX.Axe
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position, sphereCollider.radius, -1, ForceMode.VelocityChange);
+                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position + Vector3.up, sphereCollider.radius, -1, ForceMode.VelocityChange);
 
                         if (NetworkManager.Singleton.IsServer)
                         {

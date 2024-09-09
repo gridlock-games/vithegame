@@ -159,6 +159,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "TextChat",
+                    "type": "Button",
+                    "id": "fb07bda3-2ac6-4e49-a16c-29b52291bfcb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Weapon1",
                     "type": "Button",
                     "id": "34cd7cb1-fda2-4428-8e12-d488a8d59177",
@@ -832,6 +841,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "DisableBots",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b73a796-bdee-4177-a229-e19299840357",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "TextChat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

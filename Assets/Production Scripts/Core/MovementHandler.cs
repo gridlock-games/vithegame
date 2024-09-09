@@ -21,9 +21,13 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
+			if (rb)
+			{
+				rb.position = newPosition;
+				rb.velocity = Vector3.zero;
+			}
 			transform.position = newPosition;
 			transform.rotation = newRotation;
-			if (rb) { rb.velocity = Vector3.zero; }
 		}
 
         public override void OnNetworkSpawn()
@@ -35,6 +39,8 @@ namespace Vi.Core
         public virtual Vector3 GetPosition() { return rb.position; }
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
+
+		public virtual void OnServerActionClipPlayed() { }
 
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
@@ -107,10 +113,7 @@ namespace Vi.Core
 			IsAffectedByExternalForce = false;
         }
 
-        private void OnDisable()
-        {
-			IsAffectedByExternalForce = false;
-        }
+        
 
         private NavMeshPath path;
 		protected Vector3 NextPosition { get { return nextPosition.Value; } }
@@ -258,9 +261,36 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
+			if (TryGetComponent(out PooledObject pooledObject))
+            {
+				if (!pooledObject.IsPrewarmObject())
+                {
+					NetworkPhysicsSimulation.AddRigidbody(rb);
+				}
+            }
+			else
+            {
+				NetworkPhysicsSimulation.AddRigidbody(rb);
+			}
 		}
 
-        private Vector2 lookSensitivity;
+		private void OnDisable()
+		{
+			IsAffectedByExternalForce = false;
+			if (TryGetComponent(out PooledObject pooledObject))
+			{
+				if (!pooledObject.IsPrewarmObject())
+				{
+					NetworkPhysicsSimulation.RemoveRigidbody(rb);
+				}
+			}
+			else
+			{
+				NetworkPhysicsSimulation.RemoveRigidbody(rb);
+			}
+		}
+
+		private Vector2 lookSensitivity;
 		private void RefreshStatus()
 		{
 			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (FasterPlayerPrefs.Singleton.GetBool("InvertMouse") ? -1 : 1);
