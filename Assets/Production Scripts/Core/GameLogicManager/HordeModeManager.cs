@@ -87,9 +87,14 @@ namespace Vi.Core.GameModeManagers
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
+                    PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+
                     PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendHordeModeLeaderboardResult(
+                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                        roundTimer.Value, GetWavesCompleted()));
+                        PlayerDataManager.Singleton.GetGameMode(),
+                        roundTimer.Value, GetWavesCompleted(),
+                        localPlayerScore.cumulativeDamageDealt));
                 }
             }
         }
