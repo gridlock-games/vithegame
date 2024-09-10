@@ -134,7 +134,7 @@ namespace Vi.UI
             }
             else
             {
-                healthFillImage.color = PlayerDataManager.GetTeamColor(team);
+                healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : PlayerDataManager.GetTeamColor(team);
             }
         }
 

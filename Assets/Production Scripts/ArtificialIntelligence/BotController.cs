@@ -66,15 +66,6 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned) { return; }
 
-            if (weaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
-            {
-                SetImmovable(attributes.AnimationHandler.IsGrabAttacking());
-            }
-            else
-            {
-                SetImmovable(attributes.IsGrabbed());
-            }
-
             if (IsServer)
             {
                 if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
@@ -178,6 +169,8 @@ namespace Vi.ArtificialIntelligence
 
                 if (attributes.ShouldApplyAilmentRotation())
                     rot = attributes.GetAilmentRotation();
+                else if (attributes.IsGrabbing())
+                    return rot;
                 else if (attributes.IsGrabbed())
                 {
                     CombatAgent grabAssailant = attributes.GetGrabAssailant();
@@ -186,20 +179,6 @@ namespace Vi.ArtificialIntelligence
                         Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
                         rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
                         Quaternion.LookRotation(rel, Vector3.up);
-                    }
-                }
-                else if (attributes.AnimationHandler.IsGrabAttacking())
-                {
-                    CombatAgent grabVictim = attributes.GetGrabVictim();
-                    if (grabVictim)
-                    {
-                        Vector3 rel = grabVictim.MovementHandler.GetPosition() - GetPosition();
-                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                        rot = Quaternion.LookRotation(rel, Vector3.up);
-                    }
-                    else
-                    {
-                        rot = Quaternion.LookRotation(camDirection);
                     }
                 }
                 else if (!attributes.ShouldPlayHitStop())
@@ -429,8 +408,12 @@ namespace Vi.ArtificialIntelligence
 
         private void Move()
         {
+            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
+
+            CalculatePath(rb.position, NavMesh.AllAreas);
 
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -438,32 +421,31 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (IsAffectedByExternalForce & !attributes.IsGrabbed()) { rb.isKinematic = false; return; }
-
-            CalculatePath(rb.position, NavMesh.AllAreas);
+            if (IsAffectedByExternalForce & !attributes.IsGrabbed() & !attributes.IsGrabbing()) { rb.isKinematic = false; return; }
 
             Vector2 moveInput = GetPathMoveInput();
             Quaternion newRotation = transform.rotation;
 
             // Apply movement
             Vector3 movement = Vector3.zero;
-            if (attributes.ShouldPlayHitStop())
+            if (attributes.IsGrabbing())
             {
-                movement = Vector3.zero;
+                rb.isKinematic = true;
+                return;
             }
-            else if (attributes.IsGrabbed())
+            else if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
             {
                 CombatAgent grabAssailant = attributes.GetGrabAssailant();
                 if (grabAssailant)
                 {
-                    Vector3 victimNewPosition = grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward);
-                    //movement = victimNewPosition - GetPosition();
-
                     rb.isKinematic = true;
-                    rb.MovePosition(victimNewPosition);
-
+                    rb.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
                     return;
                 }
+            }
+            else if (attributes.ShouldPlayHitStop())
+            {
+                movement = Vector3.zero;
             }
             else if (attributes.IsPulled())
             {
@@ -481,7 +463,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = newRotation * attributes.AnimationHandler.ApplyRootMotion() * GetRootMotionSpeed();
+                    movement = newRotation * rootMotion * GetRootMotionSpeed();
                 }
             }
             else if (attributes.AnimationHandler.IsAtRest())

@@ -63,6 +63,8 @@ namespace Vi.Core
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
 
+            NetworkPhysicsSimulation.AddRigidbody(rb);
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (soundToPlayOnSpawn.Length > 0)
@@ -123,8 +125,12 @@ namespace Vi.Core
             }
         }
 
+        private bool clearListNextUpdate;
         private void FixedUpdate()
         {
+            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
+            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
+
             if (!initialized) { return; }
             if (!IsServer) { return; }
             transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
@@ -132,6 +138,7 @@ namespace Vi.Core
 
         [HideInInspector] public bool canHitPlayers = true;
 
+        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
@@ -143,14 +150,30 @@ namespace Vi.Core
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.CombatAgent == attacker) { return; }
+
+                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
+
                 bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
                 if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+
+                if (hitSuccess)
+                {
+                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
+                }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
                 if ((Object)hittable == attacker) { return; }
+
+                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
+
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                bool hitSuccess = hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                
+                if (hitSuccess)
+                {
+                    hitsOnThisPhysicsUpdate.Add(hittable);
+                }
             }
             else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
             {
@@ -178,6 +201,8 @@ namespace Vi.Core
             rb.velocity = Vector3.zero;
 
             nearbyWhooshPlayed = false;
+
+            NetworkPhysicsSimulation.RemoveRigidbody(rb);
 
             if (pooledObject.IsPrewarmObject()) { return; }
 

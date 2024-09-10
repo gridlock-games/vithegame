@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
@@ -48,11 +49,6 @@ namespace Vi.Core
 
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
-
-		public void SetImmovable(bool isImmovable)
-        {
-			rb.constraints = isImmovable ? RigidbodyConstraints.FreezeAll : originalRigidbodyConstraints;
-		}
 
 		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get { return destination.Value; } }
@@ -240,7 +236,6 @@ namespace Vi.Core
 		protected InputAction moveAction;
 		protected InputAction lookAction;
 		protected Rigidbody rb;
-		private RigidbodyConstraints originalRigidbodyConstraints;
 
         protected void Awake()
 		{
@@ -254,40 +249,19 @@ namespace Vi.Core
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
-			if (rb) { originalRigidbodyConstraints = rb.constraints; }
         }
 
         protected void OnEnable()
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-			if (TryGetComponent(out PooledObject pooledObject))
-            {
-				if (!pooledObject.IsPrewarmObject())
-                {
-					NetworkPhysicsSimulation.AddRigidbody(rb);
-				}
-            }
-			else
-            {
-				NetworkPhysicsSimulation.AddRigidbody(rb);
-			}
+			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.AddRigidbody(rb); }
 		}
 
 		private void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-			if (TryGetComponent(out PooledObject pooledObject))
-			{
-				if (!pooledObject.IsPrewarmObject())
-				{
-					NetworkPhysicsSimulation.RemoveRigidbody(rb);
-				}
-			}
-			else
-			{
-				NetworkPhysicsSimulation.RemoveRigidbody(rb);
-			}
+			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
 		}
 
 		private Vector2 lookSensitivity;

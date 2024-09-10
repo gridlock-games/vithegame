@@ -155,6 +155,7 @@ namespace Vi.Core
                         }
 
                         instance.SetWeaponBone(modelData.weaponBone);
+                        instance.SetIsStowed(false);
                         weaponInstances.Add(modelData.weaponBone, instance);
                         //instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
@@ -453,8 +454,15 @@ namespace Vi.Core
             if (vfxInstance)
             {
                 if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
-                NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
-                netObj.Spawn(true);
+                if (vfxInstance.TryGetComponent(out NetworkObject netObj))
+                {
+                    netObj.Spawn(true);
+                }
+                else
+                {
+                    Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
+                }
+
                 if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                 {
                     gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
@@ -718,8 +726,9 @@ namespace Vi.Core
         {
             while (true)
             {
-                yield return null;
                 ExecuteLightAttack(true);
+                yield return null;
+                yield return null;
             }
         }
 
@@ -1160,6 +1169,7 @@ namespace Vi.Core
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return null; }
             if (combatAgent.AnimationHandler.IsReloading()) { return null; }
 
             // If we are in recovery
@@ -1259,10 +1269,7 @@ namespace Vi.Core
             }
         }
 
-        private void ResetComboSystem()
-        {
-            inputHistory.Clear();
-        }
+        private void ResetComboSystem() { inputHistory.Clear(); }
 
         private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {

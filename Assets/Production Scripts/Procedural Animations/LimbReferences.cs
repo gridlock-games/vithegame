@@ -177,6 +177,7 @@ namespace Vi.ProceduralAnimations
         {
             foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
             {
+                if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.AddRigidbody(rigidbody);
             }
         }
@@ -185,6 +186,7 @@ namespace Vi.ProceduralAnimations
         {
             foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
             {
+                if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
             }
         }

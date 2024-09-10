@@ -566,7 +566,7 @@ namespace Vi.Core.CombatAgents
 
                 if (IsGrabbed())
                 {
-                    GetGrabAssailant().CancelGrab();
+                    if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
                     CancelGrab();
                 }
 
@@ -581,6 +581,7 @@ namespace Vi.Core.CombatAgents
                     grabAssailantDataId.Value = attacker.NetworkObjectId;
                     attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
+                    attacker.SetIsGrabbingToTrue();
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 

@@ -23,6 +23,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
+            if (gameOver.Value) { return; }
             if (killer is Attributes killerAttributes)
             {
                 int killerIndex = scoreList.IndexOf(new PlayerScore(killerAttributes.GetPlayerDataId()));
