@@ -310,6 +310,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
+            if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
                 if (killer is Attributes killerAttributes)
@@ -355,6 +356,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {
+            if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
                 if (victim is Attributes victimAttributes)
@@ -372,7 +374,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnStructureKill(CombatAgent killer, Structure structure)
         {
-
+            if (gameOver.Value) { return; }
         }
 
         public PlayerScore GetMVPScore() { return MVPScore.Value; }

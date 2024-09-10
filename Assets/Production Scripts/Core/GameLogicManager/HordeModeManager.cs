@@ -97,6 +97,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
+            if (gameOver.Value) { return; }
             List<CombatAgent> killerTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam());
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -114,6 +115,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
+            if (gameOver.Value) { return; }
             PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Light ? PlayerDataManager.Team.Corruption : PlayerDataManager.Team.Light;
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -131,6 +133,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnStructureKill(CombatAgent killer, Structure structure)
         {
             base.OnStructureKill(killer, structure);
+            if (gameOver.Value) { return; }
             PlayerDataManager.Team opposingTeam = PlayerDataManager.Team.Corruption;
             List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
             List<int> winningPlayerIds = new List<int>();
