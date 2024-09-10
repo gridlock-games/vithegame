@@ -66,7 +66,30 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                mapIndex.Value = 0;
+                if (gameModeInfos.Exists(item => item.gameMode == prev))
+                {
+                    var prevGameModeInfo = gameModeInfos.Find(item => item.gameMode == prev);
+                    if (mapIndex.Value < prevGameModeInfo.possibleMapSceneGroupNames.Length)
+                    {
+                        string oldMapName = prevGameModeInfo.possibleMapSceneGroupNames[mapIndex.Value];
+                        if (GetGameModeInfo().possibleMapSceneGroupNames.Contains(oldMapName))
+                        {
+                            mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().possibleMapSceneGroupNames, oldMapName);
+                        }
+                        else
+                        {
+                            mapIndex.Value = 0;
+                        }
+                    }
+                    else
+                    {
+                        mapIndex.Value = 0;
+                    }
+                }
+                else
+                {
+                    mapIndex.Value = 0;
+                }
             }
         }
 
@@ -74,6 +97,11 @@ namespace Vi.Core
         public string GetMapName()
         {
             return GetGameModeInfo().possibleMapSceneGroupNames[mapIndex.Value];
+        }
+
+        public int GetMapIndex()
+        {
+            return mapIndex.Value;
         }
 
         public int GetMaxPlayersForMap()

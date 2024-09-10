@@ -202,23 +202,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            bool first = true;
             foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
                 StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
-
-                if (!PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames.Contains(PlayerDataManager.Singleton.GetMapName()))
-                {
-                    if (first)
-                    {
-                        first = false;
-                        if (PlayerDataManager.Singleton.IsLobbyLeader())
-                        {
-                            PlayerDataManager.Singleton.SetMap(mapName);
-                        }
-                    }
-                }
             }
         }
 
@@ -339,6 +326,8 @@ namespace Vi.UI
                     }
                 }
             }
+
+            RefreshPlayerCards();
         }
 
         private IEnumerator Init()
