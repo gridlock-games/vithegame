@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using Proyecto26;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,54 +10,101 @@ public class BugReportFormJSON
   public string osVersion;
   public string deviceName;
   public string userName;
+  public string characterName;
+  public string characterID;
   public string captureDateTime;
   public string deviceProcessor;
   public string deviceVideoCard;
+
+  public string matchMapName;
+  public string matchModeName;
 
   public string briefDescription;
   public string reproductionStep;
   public string additionalReport;
 }
+
+public class BugReportFormServerData
+{
+  public string username;
+  public string generationdate;
+  public string userDetails;
+  public string matchInformation;
+  public string systemspecData;
+  public string userreportA;
+  public string userreportB;
+  public string userreportC;
+  public string debuglog;
+  public string reportScreenshotBytes;
+}
+
 public class BugReportSystem : MonoBehaviour
 {
-  Texture2D captureTexture;
-  RawImage screenshotUI;
+  private string reportServerAPI = "http://localhost:1337";
+  private Texture2D captureTexture;
+  string imageBase64;
+  private byte[] reportScreenshotbyte;
+  private BugReportFormJSON bugReportFormJSON;
 
-  BugReportFormJSON bugReportFormJSON;
+  private string screenshotFileName;
+  private string bugreportFileFolderLocation;
+  private string compiledStringData;
+
+  private bool uploadScreenshot = false;
 
   //UI
-  [SerializeField] InputField briefDescriptionIF;
-  [SerializeField] InputField reproductionStepIF;
-  [SerializeField] InputField additionalReportIF;
+  [SerializeField] private GameObject reportUiWindow;
 
-  [SerializeField] Toggle doSendScreenShot;
+  [SerializeField] private InputField briefDescriptionIF;
+  [SerializeField] private InputField reproductionStepIF;
+  [SerializeField] private InputField additionalReportIF;
 
+  [SerializeField] private Text usernameTextBox;
+  [SerializeField] private Text characterNameTextBox;
+  [SerializeField] private Text captureDateTimeTextBox;
+  [SerializeField] private Text osVersionTextBox;
+  [SerializeField] private Text deviceNameTextBox;
 
+  [SerializeField] private Toggle doSendScreenShot;
+  [SerializeField] private RawImage screenshotUI;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    bugReportFormJSON = new BugReportFormJSON();
-    }
+  // Start is called before the first frame update
+  private void Start()
+  {//Take quick second screenshot
+    StartCoroutine(TakeScreenShot());
+  }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-  void TakeScreenShot()
+  // Update is called once per frame
+  private void Update()
   {
+  }
+
+  private IEnumerator TakeScreenShot()
+  {
+    yield return new WaitForEndOfFrame();
     Texture2D screenImage = new Texture2D(Screen.width, Screen.height);
-    //Take a screenshot from Screen
     screenImage.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
     screenImage.Apply();
     captureTexture = screenImage;
     //Show screenshot to UI
     screenshotUI.texture = captureTexture;
+    yield return new WaitForEndOfFrame();
+    bugReportFormJSON = new BugReportFormJSON();
+
+    //Hide device name text for non-mobile user
+
+    //Gather User Data
+    GatherUserData();
+    //Open form window
+    reportUiWindow.SetActive(true);
   }
 
-  void GatherUserData()
+  //Save screenshot in user folder after upload for reference
+  private void SaveScreenShot()
+  {
+  }
+
+  private void GatherUserData()
   {
     //Capture Date and time
     bugReportFormJSON.captureDateTime = System.DateTime.UtcNow.ToString();
@@ -70,64 +119,136 @@ public class BugReportSystem : MonoBehaviour
     bugReportFormJSON.deviceProcessor = $"{SystemInfo.processorType}";
 
     //Prints out the data on user UI for transpaency
-
+    ShowUserinfo();
   }
 
-  void SendReportToServer()
+  private void ShowUserinfo()
+  {
+    if (bugReportFormJSON.userName != null)
+      usernameTextBox.text = bugReportFormJSON.userName;
+    if (bugReportFormJSON.characterName != null)
+      characterNameTextBox.text = bugReportFormJSON.characterName;
+    captureDateTimeTextBox.text = bugReportFormJSON.captureDateTime;
+    osVersionTextBox.text = bugReportFormJSON.osVersion;
+    deviceNameTextBox.text = bugReportFormJSON.deviceName;
+  }
+
+  public void SendReportToServer()
   {
     //Gather all the details provided by the user store them as sendable data
     bugReportFormJSON.briefDescription = briefDescriptionIF.text;
     bugReportFormJSON.reproductionStep = reproductionStepIF.text;
     bugReportFormJSON.additionalReport = additionalReportIF.text;
 
-    //Save as human readable file as a backup
+    string generatedFolderName;
+    string generatedFileName;
+    //generate text file content
     CompileToTxtFile();
 
-    //Save as a JSON file for easier file conversion purposes
+    //generate report files
+    string compiledData = CompileToTxtFile();
+    uploadScreenshot = doSendScreenShot.enabled;
+    //prep files for backup
+    if (uploadScreenshot)
+    {
+      reportScreenshotbyte = captureTexture.EncodeToPNG();
+      imageBase64 = System.Convert.ToBase64String(reportScreenshotbyte);
+      Debug.Log(reportScreenshotbyte);
+      //Save screenshot if applicable
+      SaveScreenShot();
+    }
 
-    //prep data for transfer
+    //Save the data to user PC
 
-    //Transfer String Data
+    //Generate a server friendly data
+    BugReportFormServerData bugReportFormServerData = new BugReportFormServerData()
+    {
+      username = "TestingUsername",
+      generationdate = bugReportFormJSON.captureDateTime,
+      userDetails = $"reporter username: [tba] \nreporter Character Name: [TBA]",
+      matchInformation = $"Map Name: {bugReportFormJSON.matchMapName} \n Stage Name: {bugReportFormJSON.matchModeName}",
+      systemspecData = $"os: {bugReportFormJSON.osVersion} \n" +
+      $"device: {bugReportFormJSON.deviceName} \n" +
+      $"Processor: {bugReportFormJSON.deviceProcessor} \n" +
+      $"VideoCard: {bugReportFormJSON.deviceVideoCard} \n" +
+      $"<Match Info>" +
+      $"Map Name: {bugReportFormJSON.matchMapName} \n" +
+      $"Stage Name: {bugReportFormJSON.matchModeName} \n",
+      userreportA = bugReportFormJSON.briefDescription,
+      userreportB = bugReportFormJSON.reproductionStep,
+      userreportC = bugReportFormJSON.additionalReport,
+      debuglog = "TO BE ADDED",
+      reportScreenshotBytes = imageBase64
+    };
 
-    //Transfer Image Data
+
+    //Upload to Server
+    StartCoroutine(BeginServerUpload(bugReportFormServerData));
   }
 
-  void CompiletoJSONFile()
+  private void CompiletoJSONFile()
   {
-
   }
 
-  private void CompileToTxtFile()
+  private string CompileToTxtFile(string Debuglogcontents = "(NO DEBUG CONTENTS)")
   {
     //Compile and combine all the data into one stringable object.
-    string compiledStringData = $"Vi Bug Report data \n" +
+    compiledStringData = $"Vi Bug Report data - USER COPY \n" +
       $"generation date: {bugReportFormJSON.captureDateTime} \n" +
       $"reporter username: [tba]" +
+      $"reporter Character Name: [tba]" +
       $"<System Information> \n" +
       $"os: {bugReportFormJSON.osVersion} \n" +
       $"device: {bugReportFormJSON.deviceName} \n" +
       $"Processor: {bugReportFormJSON.deviceProcessor} \n" +
       $"VideoCard: {bugReportFormJSON.deviceVideoCard} \n" +
-      $"<REPORT INFO> \n" +
+      $"<Match Info>" +
+      $"Map Name: {bugReportFormJSON.matchMapName} \n" +
+      $"Stage Name: {bugReportFormJSON.matchModeName} \n" +
+      $"<Report Info> \n" +
       $"brief Description: \n" +
       $"{bugReportFormJSON.briefDescription} \n" +
       $"Reproduction Step: \n" +
       $"{bugReportFormJSON.reproductionStep} \n" +
       $"Additional Infotmation: \n" +
       $"{bugReportFormJSON.additionalReport} \n" +
-      $"screenshot attached: {doSendScreenShot}";
+      $"<Debug Data> \n" +
+      $"{Debuglogcontents} \n" +
+      $"---END OF FILE---";
 
-    //Save to bug report folder
-    SaveFileTextContent(compiledStringData);
+    return compiledStringData;
   }
 
-  public void SaveFileTextContent(string content)
+  private IEnumerator SaveDataContent(string dataToTxt, string fileName, string FolderName)
   {
-
+    yield return new WaitForSeconds(1);
   }
 
-  public void SaveFileImageContent()
+  private IEnumerator SaveScreenshotContent(string dataToTxt, string fileName, string FolderName)
   {
+    yield return new WaitForSeconds(1);
+  }
 
+  private IEnumerator BeginServerUpload(BugReportFormServerData bfsd)
+  {
+    yield return new WaitForSeconds(1);
+    string convertedBody = JsonConvert.SerializeObject(bfsd);
+    Debug.Log(convertedBody);
+    RestClient.Request(new RequestHelper
+    {
+      Method = "POST",
+      Uri = $"{reportServerAPI}/uploadbugreport",
+      ContentType = "application/json",
+      Body = bfsd
+    }).Then(
+                response =>
+                {
+                  //getting long code
+                  Debug.Log(response.Text);
+                }).Catch(errorMessage =>
+                {
+                  Debug.LogError(errorMessage);
+                });
+    //Destroy the report window
   }
 }
