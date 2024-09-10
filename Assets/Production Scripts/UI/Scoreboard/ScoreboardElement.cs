@@ -40,8 +40,11 @@ namespace Vi.UI
 
         public void HideRoundWinsColumn()
         {
-            playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x + roundWinsParent.sizeDelta.x);
-            roundWinsParent.gameObject.SetActive(false);
+            if (roundWinsParent.gameObject.activeSelf)
+            {
+                playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x + roundWinsParent.sizeDelta.x);
+                roundWinsParent.gameObject.SetActive(false);
+            }
         }
 
         public PlayerDataManager.Team GetTeam()
