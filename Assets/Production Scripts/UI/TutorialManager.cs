@@ -46,6 +46,7 @@ namespace Vi.UI
                 animationHandler = localPlayer.AnimationHandler;
                 loadoutManager = localPlayer.GetComponent<LoadoutManager>();
                 playerUI = localPlayer.GetComponentInChildren<PlayerUI>();
+                playerUI.GetTextButtonCanvas().gameObject.SetActive(false);
 
                 foreach (RuntimeWeaponCard weaponCard in playerUI.GetWeaponCards())
                 {

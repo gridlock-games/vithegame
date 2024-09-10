@@ -935,15 +935,15 @@ namespace Vi.Core
 
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
-            if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
-            {
-                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
-            }
-
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
-
-            //if (IsActionClipPlaying(actionClip)) { yield break; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            {
+                if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
+                {
+                    yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
+                }
+            }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
