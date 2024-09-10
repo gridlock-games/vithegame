@@ -165,7 +165,7 @@ namespace Vi.Core
             {
                 if ((Object)hittable == attacker) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
+                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
                 bool hitSuccess = hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
