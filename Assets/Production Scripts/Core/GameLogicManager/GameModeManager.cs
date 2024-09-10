@@ -414,8 +414,8 @@ namespace Vi.Core.GameModeManagers
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
 
                     PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendKillsLeaderboardResult(
-                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.GetGameMode(),
                         localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
                 }
