@@ -44,6 +44,13 @@ namespace Vi.UI
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
         [SerializeField] private GameModeInfoUI gameModeInfoUI;
         [SerializeField] private CustomSettingsParent[] customSettingsParents;
+        [SerializeField] private PauseMenu pauseMenu;
+
+        private GameObject pauseInstance;
+        public void OpenSettingsMenu()
+        {
+            pauseInstance = Instantiate(pauseMenu.gameObject);
+        }
 
         [System.Serializable]
         private struct CustomSettingsParent
@@ -802,6 +809,7 @@ namespace Vi.UI
         {
             base.OnDestroy();
             if (previewObject) { Destroy(previewObject); }
+            if (pauseInstance) { Destroy(pauseInstance); }
         }
 
         public void OpenRoomSettings()
