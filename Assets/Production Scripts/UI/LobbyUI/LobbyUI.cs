@@ -208,7 +208,17 @@ namespace Vi.UI
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
                 StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
 
-                if (first) { PlayerDataManager.Singleton.SetMap(mapName); first = false; }
+                if (!PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames.Contains(PlayerDataManager.Singleton.GetMapName()))
+                {
+                    if (first)
+                    {
+                        first = false;
+                        if (PlayerDataManager.Singleton.IsLobbyLeader())
+                        {
+                            PlayerDataManager.Singleton.SetMap(mapName);
+                        }
+                    }
+                }
             }
         }
 
