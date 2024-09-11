@@ -11,14 +11,16 @@ namespace Vi.UI
     {
         public struct TextChatElement : INetworkSerializable
         {
+            public ulong senderClientId;
             public FixedString64Bytes username;
             public PlayerDataManager.Team userTeam;
             public FixedString64Bytes content;
 
             private const string saidColor = "7D7D7D";
 
-            public TextChatElement(string username, PlayerDataManager.Team userTeam, string content)
+            public TextChatElement(ulong senderClientId, string username, PlayerDataManager.Team userTeam, string content)
             {
+                this.senderClientId = senderClientId;
                 this.username = username ?? "";
                 this.userTeam = userTeam;
                 this.content = content ?? "";
@@ -26,11 +28,13 @@ namespace Vi.UI
 
             public string GetMessageUIValue()
             {
-                return "<b><color=#" + ColorUtility.ToHtmlStringRGBA(PlayerDataManager.Singleton.GetRelativeTeamColor(userTeam)) + ">" + username + "</color></b> " + "<color=#" + saidColor + ">said:</color> " + content;
+                return "<b><color=#" + ColorUtility.ToHtmlStringRGBA(NetworkManager.Singleton.LocalClientId == senderClientId ? PlayerDataManager.Singleton.LocalPlayerColor : PlayerDataManager.Singleton.GetRelativeTeamColor(userTeam))
+                    + ">" + username + "</color></b> " + "<color=#" + saidColor + ">said:</color> " + content;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
+                serializer.SerializeValue(ref senderClientId);
                 serializer.SerializeValue(ref username);
                 serializer.SerializeValue(ref userTeam);
                 serializer.SerializeValue(ref content);
@@ -40,7 +44,7 @@ namespace Vi.UI
         public void SendTextChat(string username, PlayerDataManager.Team userTeam, string content)
         {
             if (string.IsNullOrWhiteSpace(content)) { return; }
-            TextChatElement textChatElement = new TextChatElement(username, userTeam, content);
+            TextChatElement textChatElement = new TextChatElement(NetworkManager.LocalClientId, username, userTeam, content);
             SendTextChatRpc(textChatElement);
         }
 

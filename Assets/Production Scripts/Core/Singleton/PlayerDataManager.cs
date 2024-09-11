@@ -265,6 +265,7 @@ namespace Vi.Core
         private Color enemyColor = Color.red;
         private Color teammateColor = Color.cyan;
         public Color LocalPlayerColor { get; private set; } = Color.white;
+        public static readonly Color LocalPlayerBackgroundColor = new Color(65 / 255f, 65 / 255f, 65 / 255f, 1);
         protected virtual void RefreshStatus()
         {
             enemyColor = FasterPlayerPrefs.Singleton.GetColor("EnemyColor");

@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -85,7 +86,7 @@ namespace Vi.UI
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
-                    backgroundImagesToColor[i].color = PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
+                    backgroundImagesToColor[i].color = (int)NetworkManager.Singleton.LocalClientId == playerDataId ? PlayerDataManager.LocalPlayerBackgroundColor : PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
                     if (player)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death)
@@ -112,7 +113,7 @@ namespace Vi.UI
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
-                    backgroundImagesToColor[i].color = PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
+                    backgroundImagesToColor[i].color = (int)NetworkManager.Singleton.LocalClientId == playerDataId ? PlayerDataManager.LocalPlayerBackgroundColor : PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
                     backgroundImagesToColor[i].color += Color.black;
                     backgroundImagesToColor[i].color /= 2;
                 }
