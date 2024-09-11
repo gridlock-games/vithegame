@@ -80,6 +80,11 @@ namespace Vi.ScriptableObjects
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
 
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                NetworkPhysicsSimulation.AddRigidbody(rb);
+            }
+
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
             if (pooledObject.IsPrewarmObject()) { return; }
 
@@ -162,6 +167,11 @@ namespace Vi.ScriptableObjects
 
         protected void OnDisable()
         {
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                NetworkPhysicsSimulation.RemoveRigidbody(rb);
+            }
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }

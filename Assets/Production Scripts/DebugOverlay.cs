@@ -95,7 +95,7 @@ public class DebugOverlay : MonoBehaviour
         output = logString;
         stack = stackTrace;
 
-        if (type.ToString() == LogType.Error.ToString())
+        if (type.ToString() == LogType.Error.ToString() | logString.Contains("Exception") | type.ToString() == "Exception")
         {
             myLog = type.ToString() + ": " + output + "\n" + stack + "\n" + myLog;
         }

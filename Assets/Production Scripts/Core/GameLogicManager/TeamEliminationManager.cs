@@ -36,7 +36,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
-
+            if (gameOver.Value) { return; }
             PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Light ? PlayerDataManager.Team.Corruption : PlayerDataManager.Team.Light;
             List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -81,6 +81,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
+            if (gameOver.Value) { return; }
             List<Attributes> killerTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(killer.GetTeam());
             List<Attributes> victimTeam = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -131,6 +132,7 @@ namespace Vi.Core.GameModeManagers
 
         private bool CanSpawnViEssence()
         {
+            if (PlayerDataManager.Singleton.GetGameItemSpawnPoints().Length == 0) { return false; }
             if (IsViEssenceSpawned()) { return false; }
             return CanSpawnViEssenceGameLogicCondition();
         }

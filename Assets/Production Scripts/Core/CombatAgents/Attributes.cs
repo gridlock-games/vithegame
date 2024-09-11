@@ -26,18 +26,6 @@ namespace Vi.Core.CombatAgents
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
-        public override Color GetRelativeTeamColor()
-        {
-            if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
-
-            if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (IsLocalPlayer) { return LocalPlayerColor; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return EnemyColor; }
-            else { return TeammateColor; }
-        }
-
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
 
         public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
@@ -347,7 +335,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
@@ -375,7 +363,7 @@ namespace Vi.Core.CombatAgents
                 }
                 else
                 {
-                    killerNetObjId.Value = attackingNetworkObject.NetworkObjectId;
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
@@ -441,7 +429,11 @@ namespace Vi.Core.CombatAgents
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (IsGrabbed())
+            {
+                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+                if (attacker != GetGrabAssailant()) { return false; }
+            }
             if (AnimationHandler.IsGrabAttacking()) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed
@@ -465,7 +457,7 @@ namespace Vi.Core.CombatAgents
             if (IsInvincible()) { return false; }
             if (isMeleeHit)
             {
-                if (attacker.wasStaggeredThisFrame) { Debug.Log(attacker + " was staggered"); return false; }
+                if (attacker.wasStaggeredThisFrame) { return false; }
 
                 if (!IsUninterruptable())
                 {
@@ -562,7 +554,7 @@ namespace Vi.Core.CombatAgents
 
                 if (IsGrabbed())
                 {
-                    GetGrabAssailant().CancelGrab();
+                    if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
                     CancelGrab();
                 }
 
@@ -577,9 +569,7 @@ namespace Vi.Core.CombatAgents
                     grabAssailantDataId.Value = attacker.NetworkObjectId;
                     attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
-
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    attacker.SetIsGrabbingToTrue();
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
@@ -735,7 +725,7 @@ namespace Vi.Core.CombatAgents
                     }
 
                     if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
-                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(hitReaction)); }
+                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
                 }
             }
 
@@ -785,9 +775,8 @@ namespace Vi.Core.CombatAgents
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        protected override void RefreshStatus()
+        protected void RefreshStatus()
         {
-            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");

@@ -37,7 +37,7 @@ namespace Vi.ArtificialIntelligence
         HittableAgent targetObject;
         private void EvaluateBotLogic()
         {
-            if (IsOwner)
+            if (IsServer)
             {
                 targetObject = null;
                 float distanceToStructure = 100;

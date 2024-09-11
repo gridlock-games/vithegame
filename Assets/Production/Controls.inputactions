@@ -159,6 +159,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "TextChat",
+                    "type": "Button",
+                    "id": "fb07bda3-2ac6-4e49-a16c-29b52291bfcb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Weapon1",
                     "type": "Button",
                     "id": "34cd7cb1-fda2-4428-8e12-d488a8d59177",
@@ -234,15 +243,6 @@
                     "name": "AddForce",
                     "type": "Button",
                     "id": "c17c26bf-db90-4a59-90cc-91f1870a38a6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "HandleServerReconciliation",
-                    "type": "Button",
-                    "id": "e147a039-adb9-4820-b907-88613b7fd55d",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -846,12 +846,12 @@
                 },
                 {
                     "name": "",
-                    "id": "4fce1421-c56c-4b63-9de3-6548c542e981",
-                    "path": "<Keyboard>/l",
+                    "id": "4b73a796-bdee-4177-a229-e19299840357",
+                    "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
-                    "action": "HandleServerReconciliation",
+                    "action": "TextChat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

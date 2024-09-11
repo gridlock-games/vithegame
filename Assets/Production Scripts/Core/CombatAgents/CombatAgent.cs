@@ -110,7 +110,6 @@ namespace Vi.Core
             MovementHandler = GetComponent<MovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
-            RefreshStatus();
         }
 
         public GlowRenderer GlowRenderer { get; private set; }
@@ -129,11 +128,6 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
-
-            if (IsOwner)
-            {
-                RefreshStatus();
-            }
         }
 
         public override void OnNetworkDespawn()
@@ -157,7 +151,6 @@ namespace Vi.Core
         protected void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
-            RefreshStatus();
         }
 
         protected void OnDisable()
@@ -165,17 +158,6 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
-        public Color EnemyColor { get; private set; } = Color.red;
-        public Color TeammateColor { get; private set; } = Color.cyan;
-        public Color LocalPlayerColor { get; private set; } = Color.white;
-        protected virtual void RefreshStatus()
-        {
-            EnemyColor = FasterPlayerPrefs.Singleton.GetColor("EnemyColor");
-            TeammateColor = FasterPlayerPrefs.Singleton.GetColor("TeammateColor");
-            LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
-        }
-
-        public abstract Color GetRelativeTeamColor();
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
 
         public NetworkCollider NetworkCollider { get; private set; }
@@ -198,10 +180,15 @@ namespace Vi.Core
         protected NetworkVariable<ulong> grabVictimDataId = new NetworkVariable<ulong>();
         protected NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         protected NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
+        protected NetworkVariable<bool> isGrabbing = new NetworkVariable<bool>();
 
         public void SetGrabVictim(ulong grabVictimNetworkObjectId) { grabVictimDataId.Value = grabVictimNetworkObjectId; }
 
         public bool IsGrabbed() { return isGrabbed.Value; }
+
+        public bool IsGrabbing() { return isGrabbing.Value; }
+
+        public void SetIsGrabbingToTrue() { isGrabbing.Value = true; }
 
         public CombatAgent GetGrabAssailant()
         {
@@ -230,10 +217,11 @@ namespace Vi.Core
 
         public void CancelGrab()
         {
-            if (IsGrabbed())
+            if (IsGrabbed() | IsGrabbing())
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
+                isGrabbing.Value = false;
                 grabAssailantDataId.Value = default;
                 grabVictimDataId.Value = default;
             }
@@ -245,34 +233,20 @@ namespace Vi.Core
         }
 
         protected Coroutine grabResetCoroutine;
-        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
+        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip attack, ActionClip hitReaction)
         {
             if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
 
-            float durationLeft = AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
-            CombatAgent attacker = GetGrabAssailant();
+            float durationLeft = attack.grabVictimClip.length + hitReaction.transitionTime;
             while (true)
             {
                 durationLeft -= Time.deltaTime;
-                if (attacker)
-                {
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    if (Vector3.Distance(victimNewPosition, MovementHandler.GetPosition()) > 1)
-                    {
-                        MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
-                    }
-                }
-                else
-                {
-                    attacker = GetGrabAssailant();
-                }
                 yield return null;
                 if (durationLeft <= 0) { break; }
             }
-            isGrabbed.Value = false;
-            grabAssailantDataId.Value = default;
-            grabVictimDataId.Value = default;
+            if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+            CancelGrab();
         }
 
         protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
@@ -289,8 +263,6 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             if (IsServer)
             {
                 bool evaluateInvinicibility = true;
@@ -538,7 +510,7 @@ namespace Vi.Core
             }
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void StartHitStopClientRpc(ulong attackerNetObjId)
         {
             CombatAgent attacker = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
@@ -550,7 +522,7 @@ namespace Vi.Core
             attacker.hitFreezeStartTime = Time.time;
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void StartHitStopClientRpc()
         {
             shouldShake = true;
@@ -575,7 +547,7 @@ namespace Vi.Core
             RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
@@ -594,7 +566,7 @@ namespace Vi.Core
             RenderHitGlowOnlyClientRpc();
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitGlowOnlyClientRpc()
         {
             GlowRenderer.RenderHit();
@@ -611,7 +583,7 @@ namespace Vi.Core
             RenderBlockClientRpc(impactPosition, attackingWeaponMaterial);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             GlowRenderer.RenderBlock();

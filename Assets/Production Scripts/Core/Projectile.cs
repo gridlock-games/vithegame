@@ -63,6 +63,8 @@ namespace Vi.Core
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
 
+            NetworkPhysicsSimulation.AddRigidbody(rb);
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (soundToPlayOnSpawn.Length > 0)
@@ -131,7 +133,6 @@ namespace Vi.Core
         }
 
         [HideInInspector] public bool canHitPlayers = true;
-
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
@@ -142,13 +143,16 @@ namespace Vi.Core
             bool shouldDestroy = false;
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (other.isTrigger) { return; }
                 if (networkCollider.CombatAgent == attacker) { return; }
+
                 bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
                 if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
                 if ((Object)hittable == attacker) { return; }
+
                 shouldDestroy = hittable.ShouldBlockProjectiles();
                 hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }
@@ -178,6 +182,8 @@ namespace Vi.Core
             rb.velocity = Vector3.zero;
 
             nearbyWhooshPlayed = false;
+
+            NetworkPhysicsSimulation.RemoveRigidbody(rb);
 
             if (pooledObject.IsPrewarmObject()) { return; }
 

@@ -42,19 +42,6 @@ namespace Vi.Core.CombatAgents
 
         public override string GetName() { return name.Replace("(Clone)", ""); }
 
-        public override Color GetRelativeTeamColor()
-        {
-            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
-            if (localTeam == PlayerDataManager.Team.Spectator)
-            {
-                return PlayerDataManager.GetTeamColor(GetTeam());
-            }
-            else
-            {
-                return PlayerDataManager.CanHit(localTeam, GetTeam()) ? EnemyColor : TeammateColor;
-            }
-        }
-
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Mob.ProcessMeleeHit() should only be called on the server!"); return false; }

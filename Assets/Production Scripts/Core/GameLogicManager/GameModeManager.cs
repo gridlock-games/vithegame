@@ -310,6 +310,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
+            if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
                 if (killer is Attributes killerAttributes)
@@ -355,6 +356,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {
+            if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
                 if (victim is Attributes victimAttributes)
@@ -372,7 +374,7 @@ namespace Vi.Core.GameModeManagers
 
         public virtual void OnStructureKill(CombatAgent killer, Structure structure)
         {
-
+            if (gameOver.Value) { return; }
         }
 
         public PlayerScore GetMVPScore() { return MVPScore.Value; }
@@ -399,6 +401,23 @@ namespace Vi.Core.GameModeManagers
                 else
                 {
                     Debug.LogError("Couldn't find an MVP!");
+                }
+            }
+        }
+
+        protected virtual void OnGameOverChanged(bool prev, bool current)
+        {
+            if (current & IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendKillsLeaderboardResult(
+                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                        PlayerDataManager.Singleton.GetGameMode(),
+                        localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
                 }
             }
         }
@@ -435,7 +454,6 @@ namespace Vi.Core.GameModeManagers
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
-            overtime.Value = false;
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {
@@ -469,7 +487,14 @@ namespace Vi.Core.GameModeManagers
                 }
             }
 
-            if (shouldEndGame) { OnGameEnd(winningPlayersDataIds); }
+            if (shouldEndGame)
+            {
+                OnGameEnd(winningPlayersDataIds);
+            }
+            else
+            {
+                overtime.Value = false;
+            }
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
@@ -516,6 +541,7 @@ namespace Vi.Core.GameModeManagers
                 //roundTimer.Value = roundDuration;
                 nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
+            gameOver.OnValueChanged += OnGameOverChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -526,6 +552,7 @@ namespace Vi.Core.GameModeManagers
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
                 nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
+            gameOver.OnValueChanged -= OnGameOverChanged;
         }
 
         public void AddPlayerScore(int id, FixedString64Bytes characterId)

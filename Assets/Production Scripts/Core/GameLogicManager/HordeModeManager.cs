@@ -60,7 +60,6 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
-
             if (winningPlayersDataIds.Length == 0) // Mobs killed all players
             {
                 roundResultMessage.Value = "The Corruption Consumes You. ";
@@ -82,9 +81,28 @@ namespace Vi.Core.GameModeManagers
             gameEndMessage.Value = "Game Over! ";
         }
 
+        protected override void OnGameOverChanged(bool prev, bool current)
+        {
+            if (current & IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendHordeModeLeaderboardResult(
+                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                        PlayerDataManager.Singleton.GetGameMode(),
+                        roundTimer.Value, GetWavesCompleted(),
+                        localPlayerScore.cumulativeDamageDealt));
+                }
+            }
+        }
+
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
+            if (gameOver.Value) { return; }
             List<CombatAgent> killerTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam());
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -102,6 +120,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
+            if (gameOver.Value) { return; }
             PlayerDataManager.Team opposingTeam = victim.GetTeam() == PlayerDataManager.Team.Light ? PlayerDataManager.Team.Corruption : PlayerDataManager.Team.Light;
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))
@@ -119,6 +138,7 @@ namespace Vi.Core.GameModeManagers
         public override void OnStructureKill(CombatAgent killer, Structure structure)
         {
             base.OnStructureKill(killer, structure);
+            if (gameOver.Value) { return; }
             PlayerDataManager.Team opposingTeam = PlayerDataManager.Team.Corruption;
             List<Attributes> opposingTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(opposingTeam);
             List<int> winningPlayerIds = new List<int>();

@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.ProceduralAnimations;
 using UnityEngine.Animations.Rigging;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.ProceduralAnimations
 {
@@ -170,6 +170,24 @@ namespace Vi.ProceduralAnimations
                     continue;
                 }
                 weaponBoneMapping.Add(keys[i], values[i]);
+            }
+        }
+
+        private void OnEnable()
+        {
+            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
+            {
+                if (rigidbody.transform.root == rigidbody.transform) { continue; }
+                NetworkPhysicsSimulation.AddRigidbody(rigidbody);
+            }
+        }
+
+        private void OnDisable()
+        {
+            foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
+            {
+                if (rigidbody.transform.root == rigidbody.transform) { continue; }
+                NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
             }
         }
 

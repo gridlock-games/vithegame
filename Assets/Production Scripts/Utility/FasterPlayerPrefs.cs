@@ -78,8 +78,8 @@ namespace Vi.Utility
 
         private static readonly Dictionary<string, Color> defaultColorPrefs = new Dictionary<string, Color>()
         {
-            { "EnemyColor", Color.red },
-            { "TeammateColor", Color.cyan },
+            { "EnemyColor", new Color(237f / 255, 85f / 255, 84f / 255, 1) },
+            { "TeammateColor", new Color(5f / 255, 159f / 255, 242f / 255, 1) },
             { "LocalPlayerColor", Color.white }
         };
 

@@ -807,7 +807,6 @@ namespace Vi.ScriptableObjects
             {
                 if (weaponOption.weapon == this)
                 {
-                    Dictionary<string, ActionClip> actionClipLookup = GetActionClipLookup();
                     animationClipLookupKeys.Clear();
                     animationClipLookupValues.Clear();
                     string path = AssetDatabase.GetAssetPath(weaponOption.animationController.runtimeAnimatorController);
@@ -818,7 +817,7 @@ namespace Vi.ScriptableObjects
                     AnimatorController animatorController = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
                     foreach (AnimatorControllerLayer layer in animatorController.layers)
                     {
-                        if (layer.name != "Actions") { continue; }
+                        if (layer.name != "Actions" & layer.name != "Flinch") { continue; }
                         foreach (ChildAnimatorState state in layer.stateMachine.states)
                         {
                             if (state.state.motion is AnimationClip animationClip)

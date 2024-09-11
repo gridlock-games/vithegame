@@ -37,10 +37,14 @@ namespace Vi.Core.VFX.Axe
 
         private const float pullStrength = 6;
 
+        List<NetworkCollider> networkCollidersEvaluatedThisPhysicsUpdate = new List<NetworkCollider>();
         private void OnTriggerStay(Collider other)
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (networkCollidersEvaluatedThisPhysicsUpdate.Contains(networkCollider)) { return; }
+                networkCollidersEvaluatedThisPhysicsUpdate.Add(networkCollider);
+
                 if (ShouldAffect(networkCollider.CombatAgent))
                 {
                     MovementHandler movementHandler = networkCollider.MovementHandler;
@@ -58,20 +62,32 @@ namespace Vi.Core.VFX.Axe
             }
         }
 
+        private bool clearListNextUpdate;
+        private void FixedUpdate()
+        {
+            if (clearListNextUpdate) { networkCollidersEvaluatedThisPhysicsUpdate.Clear(); }
+            clearListNextUpdate = networkCollidersEvaluatedThisPhysicsUpdate.Count > 0;
+        }
+
         private const float explosionForce = 50;
 
         private Collider[] overlapSphereColliders = new Collider[20];
-        private new void OnDisable()
+
+        public override void OnNetworkDespawn()
         {
             int count = Physics.OverlapSphereNonAlloc(transform.position, sphereCollider.radius, overlapSphereColliders, LayerMask.GetMask(new string[] { "NetworkPrediction" }), QueryTriggerInteraction.Collide);
+            List<NetworkCollider> networkCollidersEvaluated = new List<NetworkCollider>();
             for (int i = 0; i < count; i++)
             {
                 if (overlapSphereColliders[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
+                    if (networkCollidersEvaluated.Contains(networkCollider)) { continue; }
+                    networkCollidersEvaluated.Add(networkCollider);
+
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
                         MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, transform.position, sphereCollider.radius, -1, ForceMode.VelocityChange);
+                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, new Vector3(transform.position.x, movementHandler.GetPosition().y + 2, transform.position.z), sphereCollider.radius, -1, ForceMode.VelocityChange);
 
                         if (NetworkManager.Singleton.IsServer)
                         {
@@ -92,7 +108,7 @@ namespace Vi.Core.VFX.Axe
                     }
                 }
             }
-            base.OnDisable();
+            base.OnNetworkDespawn();
         }
     }
 }

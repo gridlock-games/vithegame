@@ -1,50 +1,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Vi.Core;
 
 namespace Vi.UI
 {
-  public class SceneLoadingInfoUI : MonoBehaviour
-  {
-    [SerializeField] private List<Sprite> imageList;
-    [SerializeField] private Image backgroundImage;
-    private bool ongoingEvent;
-    // Start is called before the first frame update
-
-    // Update is called once per frame
-    private void Awake()
+    public class SceneLoadingInfoUI : MonoBehaviour
     {
-      ChangeBackground();
-    }
+        [SerializeField] private List<Sprite> imageList;
+        [SerializeField] private Image backgroundImage;
+        [SerializeField] private Image viLogoImage;
+        [SerializeField] private Image gridlockLogoImage;
+        [SerializeField] private Text mapNameText;
 
-    private void ChangeBackground()
-    {
-      if (backgroundImage != null)
-      {
-        Sprite sprite = imageList[0];
-        if (!NetworkCheck())
+        private void Awake()
         {
-          int selectedImage = Random.Range(0, imageList.Count);
-          sprite = imageList[selectedImage];
+            ChangeBackground();
         }
-        else
-        {
-          Debug.Log("Retreving Image");
-        }
-        //Load Image from selected
-        backgroundImage.sprite = sprite;
-        //End loading
-      }
-    }
 
-    private bool NetworkCheck()
-    {
-      if (!ongoingEvent)
-      {
-        //Check API
-        return false;
-      }
-      return false;
+        public void ChangeBackground()
+        {
+            backgroundImage.sprite = imageList[Random.Range(0, imageList.Count)];
+            viLogoImage.enabled = false;
+            gridlockLogoImage.enabled = false;
+            mapNameText.text = "";
+            if (PlayerDataManager.DoesExist())
+            {
+                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+                {
+                    backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
+                    viLogoImage.enabled = true;
+                    gridlockLogoImage.enabled = true;
+                    //mapNameText.text = "<b>" + PlayerDataManager.Singleton.GetMapName() + "</b>";
+                }
+            }
+        }
     }
-  }
 }

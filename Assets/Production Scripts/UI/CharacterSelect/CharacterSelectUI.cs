@@ -860,13 +860,14 @@ namespace Vi.UI
 
         public void GoToTrainingRoom()
         {
+            goToTrainingRoomButton.interactable = false;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             if (NetworkManager.Singleton.StartHost())
             {
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
                     NetSceneManager.Singleton.LoadScene("Training Room");
-                    NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
                 }
                 else
                 {
@@ -877,11 +878,13 @@ namespace Vi.UI
             else
             {
                 Debug.LogError("Error trying to start host to go to training room");
+                goToTrainingRoomButton.interactable = true;
             }
         }
 
         private void GoToTutorial()
         {
+            goToTrainingRoomButton.interactable = false;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             if (NetworkManager.Singleton.StartHost())
             {
@@ -890,6 +893,7 @@ namespace Vi.UI
             }
             else
             {
+                goToTrainingRoomButton.interactable = true;
                 Debug.LogError("Error trying to start host to go to tutorial");
             }
         }
@@ -932,6 +936,7 @@ namespace Vi.UI
         private IEnumerator AutoConnectToHubServer()
         {
             selectCharacterButton.interactable = false;
+            goToTrainingRoomButton.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
@@ -962,6 +967,7 @@ namespace Vi.UI
             }
 
             selectCharacterButton.interactable = true;
+            goToTrainingRoomButton.interactable = true;
         }
 
         [SerializeField] private GameObject codeInputBoxParent;
@@ -976,7 +982,7 @@ namespace Vi.UI
 
         public void OpenViDiscord()
         {
-            Application.OpenURL("https://discord.gg/Ze2B8s5Ey3");
+            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
         }
 
         public void OpenServerBrowser()

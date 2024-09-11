@@ -53,18 +53,10 @@ namespace Vi.Core.VFX
 
         public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
-            if (!IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
             this.attacker = attacker;
             this.attack = attack;
             attackerNetworkObjectId.Value = attacker.NetworkObjectId;
-        }
-
-        protected new void OnDisable()
-        {
-            base.OnDisable();
-            attacker = null;
-            attack = null;
-            if (NetworkManager.Singleton.IsServer) { attackerNetworkObjectId.Value = default; }
         }
 
         public override void OnNetworkDespawn()
@@ -79,6 +71,10 @@ namespace Vi.Core.VFX
                     if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
                 }
             }
+
+            attacker = null;
+            attack = null;
+            if (IsServer) { attackerNetworkObjectId.Value = default; }
         }
 
         protected virtual bool OnHit(CombatAgent attacker)

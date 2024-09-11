@@ -132,6 +132,7 @@ namespace Vi.Core.VFX
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
+                if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     foreach (ParticleSystem ps in particleSystems)
@@ -155,6 +156,7 @@ namespace Vi.Core.VFX
             }
             else if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
+                if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent)
@@ -175,6 +177,7 @@ namespace Vi.Core.VFX
 
             if (particleSystemType == ParticleSystemType.GenericCollisions)
             {
+                if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
                     if (networkCollider.CombatAgent)
