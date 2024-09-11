@@ -159,41 +159,9 @@ namespace Vi.ArtificialIntelligence
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
-        private Quaternion EvaluateRotation()
-        {
-            Quaternion rot = transform.rotation;
-            if (IsServer)
-            {
-                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
-                camDirection.Scale(HORIZONTAL_PLANE);
-
-                if (attributes.ShouldApplyAilmentRotation())
-                    rot = attributes.GetAilmentRotation();
-                else if (attributes.IsGrabbing())
-                    return rot;
-                else if (attributes.IsGrabbed())
-                {
-                    CombatAgent grabAssailant = attributes.GetGrabAssailant();
-                    if (grabAssailant)
-                    {
-                        Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                        Quaternion.LookRotation(rel, Vector3.up);
-                    }
-                }
-                else if (!attributes.ShouldPlayHitStop())
-                    rot = Quaternion.LookRotation(camDirection);
-            }
-            return rot;
-        }
-
         private void LateUpdate()
         {
-            transform.position = rb.transform.position;
-
             if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
-
-            transform.rotation = Quaternion.Lerp(transform.rotation, EvaluateRotation(), Time.deltaTime * 15);
         }
 
         private void EvaluateBotLogic()
@@ -404,6 +372,36 @@ namespace Vi.ArtificialIntelligence
         void FixedUpdate()
         {
             Move();
+            Rotate();
+        }
+
+        [SerializeField] private float rotationSpeed = 1;
+        private void Rotate()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
+            camDirection.Scale(HORIZONTAL_PLANE);
+
+            if (attributes.ShouldApplyAilmentRotation())
+                rb.rotation = attributes.GetAilmentRotation();
+            else if (attributes.IsGrabbing())
+                rb.angularVelocity = Vector3.zero;
+            else if (attributes.IsGrabbed())
+            {
+                CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                if (grabAssailant)
+                {
+                    Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                    rb.rotation = Quaternion.LookRotation(rel, Vector3.up);
+                }
+            }
+            else if (!attributes.ShouldPlayHitStop())
+                rb.rotation = Quaternion.LookRotation(camDirection);
+            else
+                rb.angularVelocity = Vector3.zero;
         }
 
         private void Move()
