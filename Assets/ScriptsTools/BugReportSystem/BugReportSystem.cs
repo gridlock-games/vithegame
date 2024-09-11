@@ -44,7 +44,7 @@ public class BugReportFormServerData
 
 public class BugReportSystem : MonoBehaviour
 {
-  private string reportServerAPI = "http://localhost:1337";
+  private string reportServerAPI = "http://38.54.25.140:7752";
   private Texture2D captureTexture;
   private string imageBase64;
   private byte[] reportScreenshotbyte;
