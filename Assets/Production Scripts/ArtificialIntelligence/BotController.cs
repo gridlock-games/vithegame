@@ -78,6 +78,7 @@ namespace Vi.ArtificialIntelligence
 
             transform.position = rb.transform.position;
             transform.rotation = EvaluateRotation();
+            if (IsServer) { currentRotation.Value = transform.rotation; }
         }
 
         private Quaternion EvaluateRotation()
@@ -423,7 +424,6 @@ namespace Vi.ArtificialIntelligence
             else
             {
                 rb.MovePosition(currentPosition.Value);
-                rb.MoveRotation(currentRotation.Value);
             }
         }
 
