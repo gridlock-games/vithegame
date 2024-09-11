@@ -64,6 +64,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasString("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
+            if (!FasterPlayerPrefs.Singleton.HasFloat("FieldOfView")) { FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", 60); }
+
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
             FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
 

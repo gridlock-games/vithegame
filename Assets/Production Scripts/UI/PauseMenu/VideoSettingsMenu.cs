@@ -20,6 +20,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
         [SerializeField] private Slider dpiScaleSlider;
+        [SerializeField] private Slider fieldOfViewSlider;
         [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
@@ -136,6 +137,9 @@ namespace Vi.UI
             int fsModeIndex = Array.IndexOf(fsModes, Screen.fullScreenMode);
             fullscreenModeDropdown.value = fsModeIndex;
 
+            fieldOfViewSlider.value = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
+            fieldOfViewSlider.onValueChanged.AddListener(SetFieldOfView);
+
             dpiScaleSlider.value = QualitySettings.resolutionScalingFixedDPIFactor;
             dpiScaleSlider.GetComponent<SliderEndEditEvent>().EndDrag += SetDPIScale;
 
@@ -179,6 +183,11 @@ namespace Vi.UI
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
 
             SetOriginalVariables();
+        }
+
+        private void SetFieldOfView(float value)
+        {
+            FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", value);
         }
 
         private void SetDPIScale(float sliderValue)
