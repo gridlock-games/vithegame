@@ -87,7 +87,7 @@ namespace Vi.UI
 
 #if UNITY_STANDALONE_OSX
                 Debug.Log("Will Use OSX Option");
-                serverConfig =  @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/ServerConfig.txt";
+                serverConfig =  @"/Users/odaleroxas/Documents/Builds/mac/headless/ServerConfig.txt";
 #endif
 
             startServerCalled = true;
@@ -150,7 +150,7 @@ namespace Vi.UI
 
 #if UNITY_STANDALONE_OSX
                 Debug.Log("MACOSX");
-                serverConfig = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/ServerConfig.txt";
+                serverConfig = @"/Users/odaleroxas/Documents/Builds/mac/headless/ServerConfig.txt";
 #endif
 
             Debug.Log(serverConfig);
