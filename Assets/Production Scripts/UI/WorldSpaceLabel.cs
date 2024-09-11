@@ -128,14 +128,7 @@ namespace Vi.UI
             nameDisplay.color = Color.white;
             team = combatAgent.GetTeam();
 
-            if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Contains(PlayerDataManager.Singleton.LocalPlayerData.team))
-            {
-                healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
-            }
-            else
-            {
-                healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : PlayerDataManager.GetTeamColor(team);
-            }
+            healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
         }
 
         private void RefreshRendererToFollow()

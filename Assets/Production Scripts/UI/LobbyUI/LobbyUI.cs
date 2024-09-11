@@ -44,6 +44,13 @@ namespace Vi.UI
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
         [SerializeField] private GameModeInfoUI gameModeInfoUI;
         [SerializeField] private CustomSettingsParent[] customSettingsParents;
+        [SerializeField] private PauseMenu pauseMenu;
+
+        private GameObject pauseInstance;
+        public void OpenSettingsMenu()
+        {
+            pauseInstance = Instantiate(pauseMenu.gameObject);
+        }
 
         [System.Serializable]
         private struct CustomSettingsParent
@@ -202,13 +209,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            bool first = true;
             foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
                 StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
-
-                if (first) { PlayerDataManager.Singleton.SetMap(mapName); first = false; }
             }
         }
 
@@ -329,6 +333,8 @@ namespace Vi.UI
                     }
                 }
             }
+
+            RefreshPlayerCards();
         }
 
         private IEnumerator Init()
@@ -803,6 +809,17 @@ namespace Vi.UI
         {
             base.OnDestroy();
             if (previewObject) { Destroy(previewObject); }
+            if (pauseInstance)
+            {
+                if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))
+                {
+                    pauseMenu.DestroyAllMenus();
+                }
+                else
+                {
+                    Destroy(pauseInstance);
+                }
+            }
         }
 
         public void OpenRoomSettings()

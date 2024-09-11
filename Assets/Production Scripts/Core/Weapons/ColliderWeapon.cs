@@ -49,6 +49,7 @@ namespace Vi.Core
 
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (other.isTrigger) { return; }
                 if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 

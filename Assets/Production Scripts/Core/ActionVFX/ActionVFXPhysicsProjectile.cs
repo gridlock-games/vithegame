@@ -85,6 +85,7 @@ namespace Vi.Core.VFX
             bool shouldDestroy = false;
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (other.isTrigger) { return; }
                 if (networkCollider.CombatAgent == GetAttacker()) { return; }
 
                 bool canHit = true;

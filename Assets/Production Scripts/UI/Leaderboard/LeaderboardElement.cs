@@ -24,8 +24,8 @@ namespace Vi.UI
         {
             playerNameText.text = hordeLeaderboardEntry.record.playerName;
             wavesClearedText.text = hordeLeaderboardEntry.record.wave.ToString();
-            clearTimeText.text = hordeLeaderboardEntry.record.clearTime.ToString();
-            damageDealtText.text = hordeLeaderboardEntry.record.damageDealt.ToString();
+            clearTimeText.text = hordeLeaderboardEntry.record.clearTime.ToString("F2");
+            damageDealtText.text = hordeLeaderboardEntry.record.damageDealt.ToString("F2");
         }
 
         public void Initialize(WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry)

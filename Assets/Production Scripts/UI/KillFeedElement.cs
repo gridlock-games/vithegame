@@ -56,20 +56,9 @@ namespace Vi.UI
             transform.SetAsFirstSibling();
 
             // Evaluate colors
-            KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-            if (localPlayerKvp.Value)
-            {
-                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.killerTeam ? Color.cyan : Color.red;
-                assistText.color = killHistoryElement.assistTeam == PlayerDataManager.Team.Competitor | killHistoryElement.assistTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.assistTeam ? Color.cyan : Color.red;
-                victimText.color = killHistoryElement.victimTeam == PlayerDataManager.Team.Competitor | killHistoryElement.victimTeam == PlayerDataManager.Team.Peaceful ? Color.white : localPlayerKvp.Value.GetTeam() == killHistoryElement.victimTeam ? Color.cyan : Color.red;
-            }
-            else // We are a spectator or the server
-            {
-                // TODO Set this to be the team color
-                killerText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.killerTeam);
-                assistText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.assistTeam);
-                victimText.color = killHistoryElement.killerTeam == PlayerDataManager.Team.Competitor | killHistoryElement.killerTeam == PlayerDataManager.Team.Peaceful ? Color.white : PlayerDataManager.GetTeamColor(killHistoryElement.victimTeam);
-            }
+            killerText.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(killHistoryElement.killerTeam);
+            assistText.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(killHistoryElement.assistTeam);
+            victimText.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(killHistoryElement.victimTeam);
 
             localPlayerBackgroundImage.enabled = false;
             backgroundImage.color = nonLocalDeathBackgroundColor;

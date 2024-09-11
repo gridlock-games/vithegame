@@ -125,20 +125,14 @@ namespace Vi.Core
             }
         }
 
-        private bool clearListNextUpdate;
         private void FixedUpdate()
         {
-            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
-            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
-
             if (!initialized) { return; }
             if (!IsServer) { return; }
             transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
         }
 
         [HideInInspector] public bool canHitPlayers = true;
-
-        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
@@ -149,31 +143,18 @@ namespace Vi.Core
             bool shouldDestroy = false;
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (other.isTrigger) { return; }
                 if (networkCollider.CombatAgent == attacker) { return; }
-
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
 
                 bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
                 if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
-
-                if (hitSuccess)
-                {
-                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
-                }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
                 if ((Object)hittable == attacker) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
-
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                bool hitSuccess = hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
-                
-                if (hitSuccess)
-                {
-                    hitsOnThisPhysicsUpdate.Add(hittable);
-                }
+                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
             }
             else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
             {
