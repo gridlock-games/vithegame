@@ -2,7 +2,9 @@ using Newtonsoft.Json;
 using Proyecto26;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class BugReportFormJSON
@@ -34,7 +36,9 @@ public class BugReportFormServerData
   public string userreportA;
   public string userreportB;
   public string userreportC;
+  public bool hasDebugLogs;
   public string debuglog;
+  public bool hasScreenshot;
   public string reportScreenshotBytes;
 }
 
@@ -42,7 +46,7 @@ public class BugReportSystem : MonoBehaviour
 {
   private string reportServerAPI = "http://localhost:1337";
   private Texture2D captureTexture;
-  string imageBase64;
+  private string imageBase64;
   private byte[] reportScreenshotbyte;
   private BugReportFormJSON bugReportFormJSON;
 
@@ -67,6 +71,11 @@ public class BugReportSystem : MonoBehaviour
 
   [SerializeField] private Toggle doSendScreenShot;
   [SerializeField] private RawImage screenshotUI;
+
+  [SerializeField] private Button sendButton;
+  [SerializeField] private Button exitButton;
+  [SerializeField] private GameObject BugReportStatusWindow;
+  [SerializeField] private Text BugReportStatus;
 
   // Start is called before the first frame update
   private void Start()
@@ -97,11 +106,6 @@ public class BugReportSystem : MonoBehaviour
     GatherUserData();
     //Open form window
     reportUiWindow.SetActive(true);
-  }
-
-  //Save screenshot in user folder after upload for reference
-  private void SaveScreenShot()
-  {
   }
 
   private void GatherUserData()
@@ -135,31 +139,43 @@ public class BugReportSystem : MonoBehaviour
 
   public void SendReportToServer()
   {
+    //Show the status window and disable all controls
+    sendButton.interactable = false;
+    exitButton.interactable = false;
+    briefDescriptionIF.interactable = false;
+    reproductionStepIF.interactable= false;
+    additionalReportIF.interactable = false;  
+    BugReportStatusWindow.SetActive(true);
+    BugReportStatus.text = "gathering information";
     //Gather all the details provided by the user store them as sendable data
     bugReportFormJSON.briefDescription = briefDescriptionIF.text;
     bugReportFormJSON.reproductionStep = reproductionStepIF.text;
     bugReportFormJSON.additionalReport = additionalReportIF.text;
 
-    string generatedFolderName;
-    string generatedFileName;
-    //generate text file content
-    CompileToTxtFile();
-
     //generate report files
-    string compiledData = CompileToTxtFile();
-    uploadScreenshot = doSendScreenShot.enabled;
-    //prep files for backup
+    
+    uploadScreenshot = doSendScreenShot.isOn;
+    string compiledData = CompileToTxtFile(uploadScreenshot);
+    //Generate Folders
+    BugReportStatus.text = "saving report files";
+    string removesymbolDateTime = bugReportFormJSON.captureDateTime.Replace("/", string.Empty).Replace("\\", string.Empty).Replace(":", string.Empty).Replace(" ", string.Empty).ToString();
+    string userReportFolder = $"{bugReportFormJSON.userName}_{removesymbolDateTime}";
+    string reportFolderLocation = createDebugFolder(userReportFolder);
+
+    string generatedUserReportFile = userReportFolder + "_userreport";
+    string generatedDebugReportFile = userReportFolder + "_debugreport";
+    //Save text files
+    StartCoroutine(SaveDataContent(compiledData, generatedUserReportFile, reportFolderLocation));
+    //Save screenshot to user folder
     if (uploadScreenshot)
     {
+      string generatedImageReportFile = userReportFolder + "_screenshot";
       reportScreenshotbyte = captureTexture.EncodeToPNG();
       imageBase64 = System.Convert.ToBase64String(reportScreenshotbyte);
       Debug.Log(reportScreenshotbyte);
       //Save screenshot if applicable
-      SaveScreenShot();
+      StartCoroutine(SaveScreenshotContent(reportScreenshotbyte, generatedImageReportFile, reportFolderLocation));
     }
-
-    //Save the data to user PC
-
     //Generate a server friendly data
     BugReportFormServerData bugReportFormServerData = new BugReportFormServerData()
     {
@@ -177,21 +193,48 @@ public class BugReportSystem : MonoBehaviour
       userreportA = bugReportFormJSON.briefDescription,
       userreportB = bugReportFormJSON.reproductionStep,
       userreportC = bugReportFormJSON.additionalReport,
+      hasDebugLogs = true,
       debuglog = "TO BE ADDED",
+      hasScreenshot = uploadScreenshot,
       reportScreenshotBytes = imageBase64
     };
 
-
     //Upload to Server
     StartCoroutine(BeginServerUpload(bugReportFormServerData));
+  }
+
+  private string createDebugFolder(string generatedUserFolder)
+  {
+    //Create a debug folder if not yet created
+    var userFolder = Application.persistentDataPath + "/bugreport";
+    if (!Directory.Exists(userFolder))
+    {
+      Directory.CreateDirectory(userFolder);
+      Debug.Log("Bug report Folder Created at: " + userFolder);
+    }
+
+    var currentReportFolder = userFolder + $"/{generatedUserFolder}";
+    if (!Directory.Exists(currentReportFolder))
+    {
+      Directory.CreateDirectory(currentReportFolder);
+      Debug.Log("Bug report Folder Created at: " + currentReportFolder);
+    }
+
+    return currentReportFolder;
   }
 
   private void CompiletoJSONFile()
   {
   }
 
-  private string CompileToTxtFile(string Debuglogcontents = "(NO DEBUG CONTENTS)")
+  private string CompileToTxtFile(bool hasScreenshot, string Debuglogcontents = "(NO DEBUG CONTENTS)")
   {
+    BugReportStatus.text = "compiling report";
+    string screenShotStatus = "";
+    if(!hasScreenshot)
+    {
+      screenShotStatus = "---No Screenshot Generated---\n";
+    }
     //Compile and combine all the data into one stringable object.
     compiledStringData = $"Vi Bug Report data - USER COPY \n" +
       $"generation date: {bugReportFormJSON.captureDateTime} \n" +
@@ -214,6 +257,7 @@ public class BugReportSystem : MonoBehaviour
       $"{bugReportFormJSON.additionalReport} \n" +
       $"<Debug Data> \n" +
       $"{Debuglogcontents} \n" +
+      $"{screenShotStatus}" +
       $"---END OF FILE---";
 
     return compiledStringData;
@@ -222,19 +266,45 @@ public class BugReportSystem : MonoBehaviour
   private IEnumerator SaveDataContent(string dataToTxt, string fileName, string FolderName)
   {
     yield return new WaitForSeconds(1);
+    string filePath = FolderName + $"/{fileName}.txt";
+
+    if (!File.Exists(filePath))
+    {
+      File.WriteAllText(filePath, dataToTxt);
+      Debug.Log("User Report File Created: " + filePath);
+    }
+    else
+    {
+      Debug.Log("File already exists");
+    }
   }
 
-  private IEnumerator SaveScreenshotContent(string dataToTxt, string fileName, string FolderName)
+  private IEnumerator SaveScreenshotContent(byte[] dataToTxt, string fileName, string FolderName)
   {
+    BugReportStatus.text = "saving screenshot";
     yield return new WaitForSeconds(1);
+
+    string filePath = FolderName + $"/{fileName}.png";
+
+    if (!File.Exists(filePath))
+    {
+      File.WriteAllBytes(filePath, dataToTxt);
+      Debug.Log("Image File Created: " + filePath);
+    }
+    else
+    {
+      Debug.Log("File already exists");
+    }
   }
 
   private IEnumerator BeginServerUpload(BugReportFormServerData bfsd)
   {
+    bool successfulUpload = false;
+    BugReportStatus.text = "uploading files to server";
     yield return new WaitForSeconds(1);
     string convertedBody = JsonConvert.SerializeObject(bfsd);
     Debug.Log(convertedBody);
-    RestClient.Request(new RequestHelper
+    yield return RestClient.Request(new RequestHelper
     {
       Method = "POST",
       Uri = $"{reportServerAPI}/uploadbugreport",
@@ -243,12 +313,28 @@ public class BugReportSystem : MonoBehaviour
     }).Then(
                 response =>
                 {
-                  //getting long code
+                  BugReportStatus.text = "upload successful.\nClosing Report Window";
                   Debug.Log(response.Text);
+                  //Destroy the report window
+                  successfulUpload = true;
                 }).Catch(errorMessage =>
                 {
+                  BugReportStatus.text = "upload Failed. Please try again";
+                  sendButton.interactable = true;
+                  exitButton.interactable = true;
                   Debug.LogError(errorMessage);
                 });
-    //Destroy the report window
+
+    exitButton.interactable = enabled;
+    if (successfulUpload)
+    {
+      yield return new WaitForSeconds(3);
+      CloseReportWindow();
+    }
+  }
+
+  public void CloseReportWindow()
+  {
+    Destroy(this.gameObject);
   }
 }

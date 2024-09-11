@@ -1479,7 +1479,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 947217663207046099}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 947217663340811721}
+        m_TargetAssemblyTypeName: BugReportSystem, Assembly-CSharp
+        m_MethodName: CloseReportWindow
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &947217663222520705
 GameObject:
   m_ObjectHideFlags: 0
@@ -1973,6 +1985,10 @@ MonoBehaviour:
   deviceNameTextBox: {fileID: 947217663674949853}
   doSendScreenShot: {fileID: 947217663155292903}
   screenshotUI: {fileID: 947217663348712861}
+  sendButton: {fileID: 947217664053669919}
+  exitButton: {fileID: 947217663207046098}
+  BugReportStatusWindow: {fileID: 947217662500448826}
+  BugReportStatus: {fileID: 947217662533339782}
 --- !u!1 &947217663348712860
 GameObject:
   m_ObjectHideFlags: 0
