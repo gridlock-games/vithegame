@@ -809,7 +809,17 @@ namespace Vi.UI
         {
             base.OnDestroy();
             if (previewObject) { Destroy(previewObject); }
-            if (pauseInstance) { Destroy(pauseInstance); }
+            if (pauseInstance)
+            {
+                if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))
+                {
+                    pauseMenu.DestroyAllMenus();
+                }
+                else
+                {
+                    Destroy(pauseInstance);
+                }
+            }
         }
 
         public void OpenRoomSettings()
