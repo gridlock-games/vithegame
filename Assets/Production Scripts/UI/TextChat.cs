@@ -26,7 +26,7 @@ namespace Vi.UI
 
             public string GetMessageUIValue()
             {
-                return "<b><color=#" + ColorUtility.ToHtmlStringRGBA(PlayerDataManager.GetTeamTextChatColor(userTeam)) + ">" + username + "</color></b> " + "<color=#" + saidColor + ">said:</color> " + content;
+                return "<b><color=#" + ColorUtility.ToHtmlStringRGBA(PlayerDataManager.Singleton.GetRelativeTeamColor(userTeam)) + ">" + username + "</color></b> " + "<color=#" + saidColor + ">said:</color> " + content;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

@@ -96,7 +96,7 @@ namespace Vi.UI
             {
                 structure = structures[0];
                 structureHealthBarParent.SetActive(true);
-                structureHPImage.color = PlayerDataManager.GetTeamColor(structure.GetTeam());
+                structureHPImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(structure.GetTeam());
             }
         }
     }

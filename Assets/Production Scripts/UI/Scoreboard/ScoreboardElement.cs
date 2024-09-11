@@ -85,7 +85,7 @@ namespace Vi.UI
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
-                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                    backgroundImagesToColor[i].color = PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
                     if (player)
                     {
                         if (player.GetAilment() == ActionClip.Ailment.Death)
@@ -112,7 +112,7 @@ namespace Vi.UI
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
-                    backgroundImagesToColor[i].color = PlayerDataManager.GetTeamColor(playerData.team);
+                    backgroundImagesToColor[i].color = PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
                     backgroundImagesToColor[i].color += Color.black;
                     backgroundImagesToColor[i].color /= 2;
                 }

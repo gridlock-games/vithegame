@@ -211,8 +211,8 @@ namespace Vi.Core
             { Team.Green, Color.green },
             { Team.Blue, Color.blue },
             { Team.Purple, Color.magenta },
-            { Team.Light, new Color(239 / (float)255, 130 / (float)255, 37 / (float)255, 1) },
-            { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
+            { Team.Light, new Color(5f / 255, 159f / 255, 242f / 255, 1) },
+            { Team.Corruption, new Color(237f / 255, 85f / 255, 84f / 255, 1) }
         };
 
         public static Color GetTeamColor(Team team)
@@ -227,28 +227,49 @@ namespace Vi.Core
             }
         }
 
-        private readonly static Dictionary<Team, Color> teamTextChatColors = new Dictionary<Team, Color>()
+        public Color GetRelativeTeamColor(Team team)
         {
-            { Team.Red, Color.red },
-            { Team.Orange, new Color(239 / (float)255, 91 / (float)255, 37 / (float)255, 1) },
-            { Team.Yellow, Color.yellow },
-            { Team.Green, Color.green },
-            { Team.Blue, Color.blue },
-            { Team.Purple, Color.magenta },
-            { Team.Light, new Color(239 / (float)255, 130 / (float)255, 37 / (float)255, 1) },
-            { Team.Corruption, new Color(217 / 255f, 0, 1, 1) }
-        };
-
-        public static Color GetTeamTextChatColor(Team team)
-        {
-            if (teamTextChatColors.ContainsKey(team))
+            if (LocalPlayerData.team == Team.Spectator)
             {
-                return teamTextChatColors[team];
+                return GetTeamColor(team);
             }
             else
             {
-                return new Color(237 / 255f, 234 / 255f, 232 / 255f, 1);
+                return CanHit(team, LocalPlayerData.team) ? enemyColor : teammateColor;
             }
+        }
+
+        public Color GetRelativeHealthBarColor(Team team)
+        {
+            if (LocalPlayerData.team == Team.Spectator)
+            {
+                if (team == Team.Peaceful)
+                {
+                    return teammateColor;
+                }
+                else if (team == Team.Competitor | team == Team.Environment)
+                {
+                    return enemyColor;
+                }
+                else
+                {
+                    return GetTeamColor(team);
+                }
+            }
+            else
+            {
+                return CanHit(team, LocalPlayerData.team) ? enemyColor : teammateColor;
+            }
+        }
+
+        private Color enemyColor = Color.red;
+        private Color teammateColor = Color.cyan;
+        public Color LocalPlayerColor { get; private set; } = Color.white;
+        protected virtual void RefreshStatus()
+        {
+            enemyColor = FasterPlayerPrefs.Singleton.GetColor("EnemyColor");
+            teammateColor = FasterPlayerPrefs.Singleton.GetColor("TeammateColor");
+            LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
         }
 
         private NetworkVariable<FixedString512Bytes> teamNameOverridesJson = new NetworkVariable<FixedString512Bytes>();
@@ -870,6 +891,7 @@ namespace Vi.Core
         private static PlayerDataManager _singleton;
         private void Awake()
         {
+            RefreshStatus();
             _singleton = this;
             playerDataList = new NetworkList<PlayerData>();
             disconnectedPlayerDataList = new NetworkList<DisconnectedPlayerData>();
@@ -885,6 +907,8 @@ namespace Vi.Core
 
         private void OnEnable()
         {
+            RefreshStatus();
+
             EventDelegateManager.sceneLoaded += OnSceneLoad;
             EventDelegateManager.sceneUnloaded += OnSceneUnload;
 
@@ -1058,6 +1082,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!playerSpawnPoints)
             {
                 if (NetSceneManager.Singleton.IsEnvironmentLoaded())
@@ -1079,6 +1105,11 @@ namespace Vi.Core
                 playerDataList.Clear();
             }
             SyncCachedPlayerDataList();
+
+            if (IsOwner)
+            {
+                RefreshStatus();
+            }
         }
 
         public override void OnNetworkDespawn()

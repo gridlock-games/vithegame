@@ -26,18 +26,6 @@ namespace Vi.Core.CombatAgents
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
-        public override Color GetRelativeTeamColor()
-        {
-            if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
-
-            if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (IsLocalPlayer) { return LocalPlayerColor; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return EnemyColor; }
-            else { return TeammateColor; }
-        }
-
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
 
         public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
@@ -787,9 +775,8 @@ namespace Vi.Core.CombatAgents
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        protected override void RefreshStatus()
+        protected void RefreshStatus()
         {
-            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
