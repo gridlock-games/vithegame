@@ -255,13 +255,13 @@ namespace Vi.Core
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.AddRigidbody(rb); }
+			if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
 		}
 
 		private void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-			if (!GetComponent<ActionVFX>()) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+			if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
 		}
 
 		private Vector2 lookSensitivity;
