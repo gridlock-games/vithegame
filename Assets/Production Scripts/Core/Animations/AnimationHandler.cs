@@ -937,7 +937,7 @@ namespace Vi.Core
         {
             // Retrieve the ActionClip based on the actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
-            if (actionClip.GetClipType() == ActionClip.ClipType.FlashAttack)
+            if (actionClip.IsAttack())
             {
                 if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
                 {

@@ -31,6 +31,7 @@ namespace Vi.ArtificialIntelligence
 
         private void Start()
         {
+            rb.transform.SetParent(null, true);
             UpdateActivePlayersList();
         }
 
@@ -74,6 +75,41 @@ namespace Vi.ArtificialIntelligence
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
             EvaluateBotLogic();
+
+            transform.position = rb.transform.position;
+            transform.rotation = EvaluateRotation();
+        }
+
+        private Quaternion EvaluateRotation()
+        {
+            if (IsServer)
+            {
+                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
+                camDirection.Scale(HORIZONTAL_PLANE);
+
+                if (attributes.ShouldApplyAilmentRotation())
+                    return attributes.GetAilmentRotation();
+                else if (attributes.IsGrabbing())
+                    return transform.rotation;
+                else if (attributes.IsGrabbed())
+                {
+                    CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                    if (grabAssailant)
+                    {
+                        Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                        return Quaternion.LookRotation(rel, Vector3.up);
+                    }
+                }
+                else if (!attributes.ShouldPlayHitStop())
+                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * Random.Range(0.1f, 5));
+
+                return transform.rotation;
+            }
+            else
+            {
+                return Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
+            }
         }
 
         private void UpdateAnimatorParameters()
@@ -369,39 +405,26 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        void FixedUpdate()
+        public override void OnNetworkSpawn()
         {
-            Move();
-            Rotate();
+            rb.isKinematic = !IsServer & !IsOwner;
         }
 
-        [SerializeField] private float rotationSpeed = 1;
-        private void Rotate()
+        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
+        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
+
+        void FixedUpdate()
         {
-            if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
-
-            Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
-            camDirection.Scale(HORIZONTAL_PLANE);
-
-            if (attributes.ShouldApplyAilmentRotation())
-                rb.rotation = attributes.GetAilmentRotation();
-            else if (attributes.IsGrabbing())
-                rb.angularVelocity = Vector3.zero;
-            else if (attributes.IsGrabbed())
+            if (IsServer)
             {
-                CombatAgent grabAssailant = attributes.GetGrabAssailant();
-                if (grabAssailant)
-                {
-                    Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                    rb.rotation = Quaternion.LookRotation(rel, Vector3.up);
-                }
+                Move();
+                currentPosition.Value = rb.position;
             }
-            else if (!attributes.ShouldPlayHitStop())
-                rb.rotation = Quaternion.LookRotation(camDirection);
             else
-                rb.angularVelocity = Vector3.zero;
+            {
+                rb.MovePosition(currentPosition.Value);
+                rb.MoveRotation(currentRotation.Value);
+            }
         }
 
         private void Move()
@@ -409,7 +432,6 @@ namespace Vi.ArtificialIntelligence
             Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
 
             if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
 
             CalculatePath(rb.position, NavMesh.AllAreas);
 
