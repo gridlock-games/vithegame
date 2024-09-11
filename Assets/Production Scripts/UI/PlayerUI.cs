@@ -16,6 +16,8 @@ namespace Vi.UI
 {
     public class PlayerUI : MonoBehaviour
     {
+        public Canvas GetTextButtonCanvas() { return textChatButtonCanvas; }
+
         public List<AbilityCard> GetAbilityCards() { return new List<AbilityCard>() { ability1, ability2, ability3, ability4 }; }
 
         public Image GetHeavyAttackButton() { return heavyAttackButton; }

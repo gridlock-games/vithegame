@@ -19,7 +19,7 @@ namespace Vi.UI
         public void Initialize(PlayerDataManager.Team team)
         {
             this.team = team;
-            backgroundImage.color = PlayerDataManager.GetTeamColor(team);
+            backgroundImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(team);
             UpdateUI();
             initialized = true;
         }
