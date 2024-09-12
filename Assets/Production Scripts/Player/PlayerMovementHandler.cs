@@ -668,7 +668,6 @@ namespace Vi.Player
         {
             base.Awake();
             Rigidbody.isKinematic = true;
-            RefreshStatus();
 
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
@@ -697,7 +696,6 @@ namespace Vi.Player
         private new void Update()
         {
             base.Update();
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             FindMainCamera();
 
@@ -762,8 +760,9 @@ namespace Vi.Player
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
         }
 

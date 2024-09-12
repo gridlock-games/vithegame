@@ -22,6 +22,7 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }

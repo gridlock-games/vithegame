@@ -226,7 +226,6 @@ namespace Vi.Core
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
-			RefreshStatus();
 			if (playerInput)
             {
 				moveAction = playerInput.actions.FindAction("Move");
@@ -235,18 +234,24 @@ namespace Vi.Core
         }
 
         protected virtual void OnEnable()
-        {
+		{
+			RefreshStatus();
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
 		}
 
-		protected virtual void OnDisable()
+        public override void OnNetworkSpawn()
+        {
+			RefreshStatus();
+		}
+
+        protected virtual void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
 		}
 
 		private Vector2 lookSensitivity;
-		private void RefreshStatus()
+		protected virtual void RefreshStatus()
 		{
 			lookSensitivity = new Vector2(FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity"), FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity")) * (FasterPlayerPrefs.Singleton.GetBool("InvertMouse") ? -1 : 1);
 			zoomSensitivityMultiplier = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier");
@@ -254,7 +259,6 @@ namespace Vi.Core
 
 		protected void Update()
         {
-			if (!IsLocalPlayer) { return; }
 			if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 		}
 

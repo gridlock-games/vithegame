@@ -12,12 +12,6 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotController : PhysicsMovementHandler
     {
-        protected override void Awake()
-        {
-            base.Awake();
-            RefreshStatus();
-        }
-
         private void Start()
         {
             Rigidbody.transform.SetParent(null, true);
@@ -39,8 +33,6 @@ namespace Vi.ArtificialIntelligence
         private new void Update()
         {
             base.Update();
-
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
@@ -169,8 +161,9 @@ namespace Vi.ArtificialIntelligence
 
         private bool disableBots;
         private bool canOnlyLightAttack;
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
