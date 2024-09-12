@@ -28,10 +28,12 @@ namespace Vi.Core
 
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
+        protected CombatAgent combatAgent;
         protected override void Awake()
         {
             base.Awake();
             rb = GetComponentInChildren<Rigidbody>();
+            combatAgent = GetComponent<CombatAgent>();
         }
 
         protected override void OnEnable()
@@ -42,6 +44,26 @@ namespace Vi.Core
         protected override void OnDisable()
         {
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+        }
+
+        protected float GetTickRateDeltaTime()
+        {
+            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
+        }
+
+        protected float GetRootMotionSpeed()
+        {
+            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount() + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount());
+        }
+
+        public float GetRunSpeed()
+        {
+            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount();
+        }
+
+        protected float GetAnimatorSpeed()
+        {
+            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
     }
 }

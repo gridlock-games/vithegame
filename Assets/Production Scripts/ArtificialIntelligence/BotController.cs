@@ -32,16 +32,6 @@ namespace Vi.ArtificialIntelligence
             if (Rigidbody) { Destroy(Rigidbody.gameObject); }
         }
 
-        private float GetTickRateDeltaTime()
-        {
-            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
-        }
-
-        private float GetRootMotionSpeed()
-        {
-            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
-        }
-
         private List<CombatAgent> activePlayers = new List<CombatAgent>();
         private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes); }
 
@@ -573,16 +563,6 @@ namespace Vi.ArtificialIntelligence
         private const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
 
         private const float gravityScale = 2;
-
-        private float GetRunSpeed()
-        {
-            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
-        }
-
-        private float GetAnimatorSpeed()
-        {
-            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
-        }
 
         void OnDodge()
         {

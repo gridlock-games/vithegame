@@ -13,12 +13,10 @@ namespace Vi.ArtificialIntelligence
     public class CaveCrasherController : PhysicsMovementHandler
     {
         private Animator animator;
-        private CombatAgent combatAgent;
         private new void Awake()
         {
             base.Awake();
             animator = GetComponent<Animator>();
-            combatAgent = GetComponent<CombatAgent>();
             GetComponent<PooledObject>().OnSpawnFromPool += OnSpawnFromPool;
         }
 

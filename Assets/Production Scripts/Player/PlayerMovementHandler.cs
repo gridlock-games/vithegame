@@ -26,40 +26,14 @@ namespace Vi.Player
             SetRotationClientRpc(newRotation);
         }
 
-        [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { SetCameraRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
+        [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
         public Transform TargetToLockOn { get; private set; }
-        public void LockOnTarget(Transform target)
-        {
-            TargetToLockOn = target;
-        }
+        public void LockOnTarget(Transform target) { TargetToLockOn = target; }
 
-        public void SetCameraRotation(float rotationX, float rotationY)
-        {
-            cameraController.SetRotation(rotationX, rotationY);
-        }
-
-        public override void Flinch(Vector2 flinchAmount)
-        {
-            cameraController.AddRotation(flinchAmount.x, flinchAmount.y);
-        }
-
-        private float GetTickRateDeltaTime()
-        {
-            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime;
-        }
-
-        private float GetRootMotionSpeed()
-        {
-            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
-        }
-
-        public float GetRunSpeed()
-        {
-            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
-        }
+        public override void Flinch(Vector2 flinchAmount) { cameraController.AddRotation(flinchAmount.x, flinchAmount.y); }
 
         public struct InputPayload : INetworkSerializable, System.IEquatable<InputPayload>
         {
@@ -793,11 +767,6 @@ namespace Vi.Player
         private void RefreshStatus()
         {
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
-        }
-
-        private float GetAnimatorSpeed()
-        {
-            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
         private Vector2 GetWalkCycleAnimationParameters()
