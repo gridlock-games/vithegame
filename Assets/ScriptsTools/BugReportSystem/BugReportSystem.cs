@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using WebSocketSharp;
 
 public class BugReportFormJSON
 {
@@ -59,7 +60,7 @@ public class BugReportSystem : MonoBehaviour
   private string compiledStringData;
 
   private bool uploadScreenshot = false;
-
+  private bool recordDebug = false;
   //UI
   [SerializeField] private GameObject reportUiWindow;
 
@@ -96,10 +97,19 @@ public class BugReportSystem : MonoBehaviour
 
   private void GetDebugLogs()
   {
-    //DebugOverlay debugOverlay = GameObject.FindFirstObjectByType(typeof(DebugOverlay)).GetComponent<DebugOverlay>();
-    //debugLogContent = debugOverlay.RetreveDebugLog();
-    debugLogContent = "To be added";
-  }
+    DebugOverlay debugOverlay = GameObject.FindFirstObjectByType(typeof(DebugOverlay)).GetComponent<DebugOverlay>();
+    debugLogContent = debugOverlay.RetreveDebugLog();
+        if (debugLogContent.IsNullOrEmpty())
+        {
+      recordDebug = false;
+      debugLogContent = "--- No Logs recorded ---";
+        }
+        else
+    {
+      recordDebug = true;
+      debugLogContent += "--- END OF LOGS ---";
+    }
+    }
     
   
   private IEnumerator TakeScreenShot()
@@ -170,7 +180,7 @@ public class BugReportSystem : MonoBehaviour
     //generate report files
     
     uploadScreenshot = doSendScreenShot.isOn;
-    string compiledData = CompileToTxtFile(uploadScreenshot);
+    string compiledData = CompileToTxtFile(uploadScreenshot, debugLogContent);
     //Generate Folders
     BugReportStatus.text = "saving report files";
     string removesymbolDateTime = bugReportFormJSON.captureDateTime.Replace("/", string.Empty).Replace("\\", string.Empty).Replace(":", string.Empty).Replace(" ", string.Empty).ToString();
@@ -208,7 +218,7 @@ public class BugReportSystem : MonoBehaviour
       userreportA = bugReportFormJSON.briefDescription,
       userreportB = bugReportFormJSON.reproductionStep,
       userreportC = bugReportFormJSON.additionalReport,
-      hasDebugLogs = true,
+      hasDebugLogs = recordDebug,
       debuglog = debugLogContent,
       hasScreenshot = uploadScreenshot,
       reportScreenshotBytes = imageBase64

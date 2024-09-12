@@ -155,6 +155,11 @@ public class DebugOverlay : MonoBehaviour
     private bool fpsEnabled;
     private bool pingEnabled;
 
+  //UNfortunately this is pretty much the easier way to get the logs.
+    public string RetreveDebugLog()
+  {
+    return consoleLogText.text;
+  }
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
