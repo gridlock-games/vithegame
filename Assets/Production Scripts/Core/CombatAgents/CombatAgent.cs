@@ -148,12 +148,12 @@ namespace Vi.Core
             }
         }
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
         }
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }

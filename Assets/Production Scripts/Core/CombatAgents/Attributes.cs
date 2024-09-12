@@ -302,9 +302,17 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private PooledObject teamIndicatorPrefab;
         private PooledObject teamIndicatorInstance;
-        private void Start()
+        
+        protected override void OnEnable()
         {
+            base.OnEnable();
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
