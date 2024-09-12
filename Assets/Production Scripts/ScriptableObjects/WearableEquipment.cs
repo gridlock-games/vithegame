@@ -41,7 +41,6 @@ namespace Vi.ScriptableObjects
         private void OnReturnToPool()
         {
             transform.SetParent(null, true);
-            //SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
         }
 
         private void OnEnable()

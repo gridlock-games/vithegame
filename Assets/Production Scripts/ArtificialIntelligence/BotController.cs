@@ -25,7 +25,6 @@ namespace Vi.ArtificialIntelligence
             if (Rigidbody) { Destroy(Rigidbody.gameObject); }
         }
 
-        private CombatAgent targetAttributes;
         protected override void Update()
         {
             base.Update();
@@ -49,7 +48,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
+                Vector3 camDirection = targetFinder.target ? (targetFinder.target.transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (combatAgent.ShouldApplyAilmentRotation())
@@ -97,12 +96,12 @@ namespace Vi.ArtificialIntelligence
             {
                 targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
-                targetAttributes = null;
+                targetFinder.target = null;
                 foreach (CombatAgent player in targetFinder.ActiveCombatAgents)
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
-                    if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
+                    if (SetDestination(player.transform.position, true)) { targetFinder.target = player; }
                     break;
                 }
 
@@ -112,7 +111,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    if (!targetAttributes)
+                    if (!targetFinder.target)
                     {
                         if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
                         {
@@ -164,7 +163,7 @@ namespace Vi.ArtificialIntelligence
                 lastWeaponSwapTime = Time.time;
             }
 
-            if (targetAttributes)
+            if (targetFinder.target)
             {
                 if (weaponHandler.CanADS)
                 {

@@ -25,6 +25,8 @@ namespace Vi.Core
             if (PlayerDataManager.Singleton.StructuresListWasUpdatedThisFrame) { UpdateStructureList(); }
         }
 
+        [HideInInspector] public HittableAgent target;
+
         public List<CombatAgent> ActiveCombatAgents { get; private set; } = new List<CombatAgent>();
         private void UpdateActivePlayersList() { ActiveCombatAgents = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
 

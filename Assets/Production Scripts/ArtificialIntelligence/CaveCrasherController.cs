@@ -20,19 +20,18 @@ namespace Vi.ArtificialIntelligence
             animator = GetComponent<Animator>();
             targetFinder = GetComponent<GameplayTargetFinder>();
         }
-
-        HittableAgent targetObject;
+        
         private void EvaluateBotLogic()
         {
             if (IsServer)
             {
-                targetObject = null;
+                targetFinder.target = null;
                 float distanceToStructure = 100;
                 foreach (Structure structure in targetFinder.ActiveStructures)
                 {
                     if (!structure) { Debug.LogError("There is a null strcture in the structures list!"); continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                    targetObject = structure;
+                    targetFinder.target = structure;
                     distanceToStructure = Vector3.Distance(transform.position, structure.transform.position);
                     break;
                 }
@@ -46,14 +45,14 @@ namespace Vi.ArtificialIntelligence
                     float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
                     if (distanceToPlayer < 11 & distanceToPlayer < distanceToStructure)
                     {
-                        targetObject = player;
+                        targetFinder.target = player;
                     }
                     break;
                 }
 
-                if (targetObject)
+                if (targetFinder.target)
                 {
-                    SetDestination(targetObject.transform.position, false);
+                    SetDestination(targetFinder.target.transform.position, false);
                 }
                 else
                 {
@@ -78,7 +77,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (targetObject)
+            if (targetFinder.target)
             {
                 float dist = Vector3.Distance(Destination, transform.position);
                 if (dist < lightAttackDistance)
@@ -113,8 +112,8 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (!targetObject) { return; }
-            Transform target = targetObject.transform;
+            if (!targetFinder.target) { return; }
+            Transform target = targetFinder.target.transform;
             if (target)
             {
                 SetDestination(target.position, false);
