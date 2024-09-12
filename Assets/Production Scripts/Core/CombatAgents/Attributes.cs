@@ -293,7 +293,7 @@ namespace Vi.Core.CombatAgents
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -844,8 +844,6 @@ namespace Vi.Core.CombatAgents
             AddRage(WeaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
-        private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
-
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             base.OnAilmentChanged(prev, current);
@@ -916,9 +914,6 @@ namespace Vi.Core.CombatAgents
             yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
         }
-
-        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
-        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)

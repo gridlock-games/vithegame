@@ -102,7 +102,7 @@ namespace Vi.Core
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
-        protected void Awake()
+        protected virtual void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
@@ -374,7 +374,11 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
-        
+
+        protected NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
+        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
+        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
+
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
