@@ -91,47 +91,15 @@ namespace Vi.Player
             }
         }
 
-        List<Collider> groundColliders = new List<Collider>();
-        ContactPoint[] stayContacts = new ContactPoint[3];
-        public override void ReceiveOnCollisionStayMessage(Collision collision)
-        {
-            int contactCount = collision.GetContacts(stayContacts);
-            for (int i = 0; i < contactCount; i++)
-            {
-                if (stayContacts[i].normal.y >= 0.9f)
-                {
-                    if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
-                    break;
-                }
-                else // Normal is not pointing up
-                {
-                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
-                }
-            }
-        }
-
-        public override void ReceiveOnCollisionExitMessage(Collision collision)
-        {
-            if (groundColliders.Contains(collision.collider))
-            {
-                groundColliders.Remove(collision.collider);
-            }
-        }
-
-        private const float isGroundedSphereCheckRadius = 0.6f;
-        private bool IsGrounded()
+        protected override bool IsGrounded()
         {
             if (latestServerState.Value.tick == 0)
             {
                 return true;
             }
-            if (groundColliders.Count > 0)
-            {
-                return true;
-            }
             else
             {
-                return Physics.CheckSphere(Rigidbody.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                return base.IsGrounded();
             }
         }
 
@@ -690,10 +658,9 @@ namespace Vi.Player
             mainCamera = Camera.main;
         }
 
-        private const float runAnimationTransitionSpeed = 5;
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         RaycastHit[] interactableHits = new RaycastHit[10];
-        private new void Update()
+        protected override void Update()
         {
             base.Update();
 
@@ -755,7 +722,6 @@ namespace Vi.Player
             UpdateTransform();
             if (IsLocalPlayer) { cameraController.UpdateCamera(); }
             UpdateAnimatorParameters();
-            UpdateAnimatorSpeed();
             AutoAim();
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
@@ -800,44 +766,6 @@ namespace Vi.Player
                     }
                 }
                 return animDir;
-            }
-        }
-
-        private void UpdateAnimatorParameters()
-        {
-            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
-            combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
-            combatAgent.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
-            combatAgent.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
-            combatAgent.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.velocity.y);
-        }
-
-        private void UpdateAnimatorSpeed()
-        {
-            if (weaponHandler.CurrentActionClip != null)
-            {
-                if (combatAgent.ShouldPlayHitStop())
-                {
-                    combatAgent.AnimationHandler.Animator.speed = 0;
-                }
-                else
-                {
-                    if (combatAgent.IsGrabbed())
-                    {
-                        CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
-                        if (grabAssailant)
-                        {
-                            if (grabAssailant.AnimationHandler)
-                            {
-                                combatAgent.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        combatAgent.AnimationHandler.Animator.speed = GetAnimatorSpeed();
-                    }
-                }
             }
         }
 

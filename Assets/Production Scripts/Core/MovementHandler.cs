@@ -257,7 +257,7 @@ namespace Vi.Core
 			zoomSensitivityMultiplier = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier");
 		}
 
-		protected void Update()
+		protected virtual void Update()
         {
 			if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 		}

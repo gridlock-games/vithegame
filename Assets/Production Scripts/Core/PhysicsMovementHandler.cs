@@ -66,5 +66,130 @@ namespace Vi.Core
         {
             return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            UpdateAnimatorSpeed();
+            UpdateAnimatorParameters();
+        }
+
+        protected void UpdateAnimatorSpeed()
+        {
+            if (weaponHandler.CurrentActionClip != null)
+            {
+                if (combatAgent.ShouldPlayHitStop())
+                {
+                    combatAgent.AnimationHandler.Animator.speed = 0;
+                }
+                else
+                {
+                    if (combatAgent.IsGrabbed())
+                    {
+                        CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            if (grabAssailant.AnimationHandler)
+                            {
+                                combatAgent.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        combatAgent.AnimationHandler.Animator.speed = GetAnimatorSpeed();
+                    }
+                }
+            }
+        }
+
+        [Header("Physics Movement Handler")]
+        [SerializeField] private float runAnimationTransitionSpeed = 5;
+
+        protected void UpdateAnimatorParameters()
+        {
+            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
+            combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
+            combatAgent.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
+            combatAgent.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
+            combatAgent.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.velocity.y);
+        }
+
+        private Vector2 GetWalkCycleAnimationParameters()
+        {
+            if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+            {
+                return Vector2.zero;
+            }
+            else if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
+                Vector2 animDir = new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
+                animDir = Vector2.ClampMagnitude(animDir, 1);
+
+                if (combatAgent.WeaponHandler.IsBlocking)
+                {
+                    switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
+                    {
+                        case Weapon.BlockingLocomotion.NoMovement:
+                            animDir = Vector2.zero;
+                            break;
+                        case Weapon.BlockingLocomotion.CanWalk:
+                            animDir /= 2;
+                            break;
+                        case Weapon.BlockingLocomotion.CanRun:
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle blocking locomotion type: " + combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion());
+                            break;
+                    }
+                }
+                return animDir;
+            }
+        }
+
+        List<Collider> groundColliders = new List<Collider>();
+        ContactPoint[] stayContacts = new ContactPoint[3];
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            int contactCount = collision.GetContacts(stayContacts);
+            for (int i = 0; i < contactCount; i++)
+            {
+                if (stayContacts[i].normal.y >= 0.9f)
+                {
+                    if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
+                    break;
+                }
+                else // Normal is not pointing up
+                {
+                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
+                }
+            }
+        }
+
+        public override void ReceiveOnCollisionExitMessage(Collision collision)
+        {
+            if (groundColliders.Contains(collision.collider))
+            {
+                groundColliders.Remove(collision.collider);
+            }
+        }
+
+        [SerializeField] private float isGroundedSphereCheckRadius = 0.6f;
+        protected virtual bool IsGrounded()
+        {
+            if (groundColliders.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return Physics.CheckSphere(Rigidbody.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+            }
+        }
     }
 }
