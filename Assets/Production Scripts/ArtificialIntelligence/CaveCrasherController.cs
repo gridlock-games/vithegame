@@ -10,7 +10,7 @@ using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class CaveCrasherController : MovementHandler
+    public class CaveCrasherController : PhysicsMovementHandler
     {
         private Animator animator;
         private CombatAgent combatAgent;
@@ -209,7 +209,7 @@ namespace Vi.ArtificialIntelligence
             moveForwardTarget.Value = animDir.z;
             moveSidesTarget.Value = animDir.x;
 
-            if (rb.velocity.magnitude <= 1)
+            if (Rigidbody.velocity.magnitude <= 1)
             {
                 transform.position += movement;
             }

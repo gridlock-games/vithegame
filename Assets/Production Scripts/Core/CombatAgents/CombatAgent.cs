@@ -99,7 +99,7 @@ namespace Vi.Core
 
         public StatusAgent StatusAgent { get; private set; }
         public AnimationHandler AnimationHandler { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
+        public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
         protected void Awake()
@@ -107,7 +107,7 @@ namespace Vi.Core
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
             GlowRenderer = GetComponent<GlowRenderer>();
-            MovementHandler = GetComponent<MovementHandler>();
+            MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
         }

@@ -22,22 +22,11 @@ namespace Vi.Core
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
-			if (rb)
-			{
-				rb.position = newPosition;
-				rb.velocity = Vector3.zero;
-			}
 			transform.position = newPosition;
 			transform.rotation = newRotation;
 		}
 
-        public override void OnNetworkSpawn()
-        {
-			rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-			rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
-		}
-
-        public virtual Vector3 GetPosition() { return rb.position; }
+        public virtual Vector3 GetPosition() { return transform.position; }
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
@@ -108,8 +97,6 @@ namespace Vi.Core
 			yield return new WaitForFixedUpdate();
 			IsAffectedByExternalForce = false;
         }
-
-        
 
         private NavMeshPath path;
 		protected Vector3 NextPosition { get { return nextPosition.Value; } }
@@ -229,20 +216,16 @@ namespace Vi.Core
             Gizmos.DrawSphere(Destination, 0.3f);
         }
 
-		public Rigidbody GetRigidbody() { return rb; }
-
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
-		protected Rigidbody rb;
 
-        protected void Awake()
+        protected virtual void Awake()
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
-			rb = GetComponentInChildren<Rigidbody>();
 			RefreshStatus();
 			if (playerInput)
             {
@@ -251,17 +234,15 @@ namespace Vi.Core
             }
         }
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
 			SetDestination(transform.position, true);
 			CalculatePath(transform.position, NavMesh.AllAreas);
-			if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
 		}
 
-		private void OnDisable()
+		protected virtual void OnDisable()
 		{
 			IsAffectedByExternalForce = false;
-			if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
 		}
 
 		private Vector2 lookSensitivity;

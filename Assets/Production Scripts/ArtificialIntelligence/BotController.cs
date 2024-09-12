@@ -10,17 +10,8 @@ using Vi.Core.CombatAgents;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class BotController : MovementHandler
+    public class BotController : PhysicsMovementHandler
     {
-        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
-        {
-            if (!IsServer) { Debug.LogError("BotController.SetOrientation() should only be called on the server!"); return; }
-            rb.position = newPosition;
-            rb.velocity = Vector3.zero;
-            transform.position = newPosition;
-            transform.rotation = newRotation;
-        }
-
         private Attributes attributes;
         private new void Awake()
         {
@@ -31,14 +22,14 @@ namespace Vi.ArtificialIntelligence
 
         private void Start()
         {
-            rb.transform.SetParent(null, true);
+            Rigidbody.transform.SetParent(null, true);
             UpdateActivePlayersList();
         }
 
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (rb) { Destroy(rb.gameObject); }
+            if (Rigidbody) { Destroy(Rigidbody.gameObject); }
         }
 
         private float GetTickRateDeltaTime()
@@ -69,14 +60,14 @@ namespace Vi.ArtificialIntelligence
 
             if (IsServer)
             {
-                if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+                if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position, true); }
             }
 
             UpdateAnimatorParameters();
             UpdateAnimatorSpeed();
             EvaluateBotLogic();
 
-            transform.position = rb.transform.position;
+            transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
             if (IsServer) { currentRotation.Value = transform.rotation; }
         }
@@ -85,7 +76,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
+                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (attributes.ShouldApplyAilmentRotation())
@@ -119,7 +110,7 @@ namespace Vi.ArtificialIntelligence
             attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
             attributes.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
-            attributes.AnimationHandler.Animator.SetFloat("VerticalSpeed", rb.velocity.y);
+            attributes.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.velocity.y);
         }
 
         private Vector2 GetWalkCycleAnimationParameters()
@@ -205,7 +196,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, rb.position).CompareTo(Vector3.Distance(y.transform.position, rb.position)));
+                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
                 targetAttributes = null;
                 foreach (CombatAgent player in activePlayers)
@@ -218,7 +209,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (disableBots)
                 {
-                    SetDestination(rb.position, true);
+                    SetDestination(Rigidbody.position, true);
                 }
                 else
                 {
@@ -402,13 +393,13 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                return Physics.CheckSphere(rb.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                return Physics.CheckSphere(Rigidbody.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             }
         }
 
         public override void OnNetworkSpawn()
         {
-            rb.isKinematic = !IsServer & !IsOwner;
+            Rigidbody.isKinematic = !IsServer & !IsOwner;
         }
 
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
@@ -419,11 +410,11 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Move();
-                currentPosition.Value = rb.position;
+                currentPosition.Value = Rigidbody.position;
             }
             else
             {
-                rb.MovePosition(currentPosition.Value);
+                Rigidbody.MovePosition(currentPosition.Value);
             }
         }
 
@@ -433,15 +424,15 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned) { return; }
 
-            CalculatePath(rb.position, NavMesh.AllAreas);
+            CalculatePath(Rigidbody.position, NavMesh.AllAreas);
 
             if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
             {
-                rb.velocity = Vector3.zero;
+                Rigidbody.velocity = Vector3.zero;
                 return;
             }
 
-            if (IsAffectedByExternalForce & !attributes.IsGrabbed() & !attributes.IsGrabbing()) { rb.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !attributes.IsGrabbed() & !attributes.IsGrabbing()) { Rigidbody.isKinematic = false; return; }
 
             Vector2 moveInput = GetPathMoveInput();
             Quaternion newRotation = transform.rotation;
@@ -450,7 +441,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 movement = Vector3.zero;
             if (attributes.IsGrabbing())
             {
-                rb.isKinematic = true;
+                Rigidbody.isKinematic = true;
                 return;
             }
             else if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
@@ -458,8 +449,8 @@ namespace Vi.ArtificialIntelligence
                 CombatAgent grabAssailant = attributes.GetGrabAssailant();
                 if (grabAssailant)
                 {
-                    rb.isKinematic = true;
-                    rb.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    Rigidbody.isKinematic = true;
+                    Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
                     return;
                 }
             }
@@ -494,12 +485,12 @@ namespace Vi.ArtificialIntelligence
                 movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
-            rb.isKinematic = false;
+            Rigidbody.isKinematic = false;
 
             if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            Vector3 startPos = rb.position;
+            Vector3 startPos = Rigidbody.position;
             startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
@@ -520,7 +511,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(rb.position, rb.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in attributes.NetworkCollider.Colliders)
@@ -534,7 +525,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (!collidersIgnoreEachOther)
                 {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - rb.position, Vector3.up);
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - Rigidbody.position, Vector3.up);
                     float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
                     if (angle > 180) { angle -= 360; }
@@ -551,7 +542,7 @@ namespace Vi.ArtificialIntelligence
             {
                 if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                    Rigidbody.AddForce(movement - Rigidbody.velocity, ForceMode.VelocityChange);
                     evaluateForce = false;
                 }
             }
@@ -560,26 +551,26 @@ namespace Vi.ArtificialIntelligence
             {
                 if (IsGrounded())
                 {
-                    rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
+                    if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
-                        rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
                     }
                 }
-                else // Decelerate horizontal movement while airborne
+                else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
-                    rb.AddForce(counterForce, ForceMode.VelocityChange);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
-            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
-            rb.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
+            Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
         private const float stairStepHeight = 0.01f;
         private const float maxStairStepHeight = 0.5f;
 
-        private const float airborneHorizontalDragMultiplier = 0.1f;
+        private const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
 
         private const float gravityScale = 2;
 

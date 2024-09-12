@@ -9,12 +9,12 @@ namespace Vi.Core
     public class NetworkCollider : MonoBehaviour
     {
         public CombatAgent CombatAgent { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
+        public PhysicsMovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
 
         private void Awake()
         {
-            MovementHandler = GetComponentInParent<MovementHandler>();
+            MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
             Colliders = GetComponentsInChildren<Collider>();
