@@ -304,7 +304,7 @@ namespace Vi.Player
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private UniversalAdditionalCameraData cameraData;
         public Camera cam;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -319,14 +319,14 @@ namespace Vi.Player
             targetPosition = transform.position;
         }
 
-        private new void OnEnable()
+        protected override void OnEnable()
         {
             base.OnEnable();
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
@@ -339,8 +339,6 @@ namespace Vi.Player
         private const float lerpSpeed = 8;
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
-
-        [SerializeField] private float collisionPositionOffset = -0.3f;
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
