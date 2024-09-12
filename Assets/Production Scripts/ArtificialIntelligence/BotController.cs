@@ -40,7 +40,7 @@ namespace Vi.ArtificialIntelligence
                 if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position, true); }
             }
 
-            UpdateAnimatorParameters();
+            SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
             EvaluateBotLogic();
 
             transform.position = Rigidbody.transform.position;

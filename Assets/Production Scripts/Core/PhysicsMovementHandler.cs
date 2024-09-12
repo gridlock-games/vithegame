@@ -121,7 +121,13 @@ namespace Vi.Core
         [Header("Physics Movement Handler")]
         [SerializeField] private float runAnimationTransitionSpeed = 5;
 
-        protected void UpdateAnimatorParameters()
+        Vector2 animationMoveInput;
+        protected void SetAnimationMoveInput(Vector2 moveInput)
+        {
+            animationMoveInput = moveInput;
+        }
+
+        private void UpdateAnimatorParameters()
         {
             Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
             combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
@@ -142,8 +148,7 @@ namespace Vi.Core
             }
             else
             {
-                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
-                Vector2 animDir = new Vector2(moveInput.x, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
+                Vector2 animDir = new Vector2(animationMoveInput.x, animationMoveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
                 if (combatAgent.WeaponHandler.IsBlocking)

@@ -1047,7 +1047,7 @@ namespace Vi.Core
                 {
                     if (GetAmmoCount() == 0)
                     {
-                        if (combatAgent.MovementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                        if (combatAgent.MovementHandler.GetPlayerMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
             }
@@ -1304,16 +1304,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");

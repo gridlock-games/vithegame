@@ -289,7 +289,7 @@ namespace Vi.Core
 
 		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput; }
 
-        public Vector2 GetMoveInput()
+        public Vector2 GetPlayerMoveInput()
 		{
 			if (moveAction != null)
 			{
