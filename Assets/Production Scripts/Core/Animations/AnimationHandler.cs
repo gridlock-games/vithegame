@@ -1088,6 +1088,17 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
+        private void OnDisable()
+        {
+            if (Animator)
+            {
+                if (Animator.transform != transform)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(Animator.GetComponent<PooledObject>());
+                }
+            }
+        }
+
         public void ChangeCharacter(WebRequestManager.Character character)
         {
             if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
