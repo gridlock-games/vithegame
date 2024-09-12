@@ -207,14 +207,11 @@ public class BugReportSystem : MonoBehaviour
       username = "TestingUsername",
       generationdate = bugReportFormJSON.captureDateTime,
       userDetails = $"reporter username: [tba] \nreporter Character Name: [TBA] \nGameVersion: {bugReportFormJSON.gameVersion}",
-      matchInformation = $"Map Name: {bugReportFormJSON.matchMapName} \n Stage Name: {bugReportFormJSON.matchModeName}",
+      matchInformation = $"Map Name: {bugReportFormJSON.matchMapName} \nStage Name: {bugReportFormJSON.matchModeName}",
       systemspecData = $"os: {bugReportFormJSON.osVersion} \n" +
       $"device: {bugReportFormJSON.deviceName} \n" +
       $"Processor: {bugReportFormJSON.deviceProcessor} \n" +
-      $"VideoCard: {bugReportFormJSON.deviceVideoCard} \n" +
-      $"<Match Info>" +
-      $"Map Name: {bugReportFormJSON.matchMapName} \n" +
-      $"Stage Name: {bugReportFormJSON.matchModeName} \n",
+      $"VideoCard: {bugReportFormJSON.deviceVideoCard} \n",
       userreportA = bugReportFormJSON.briefDescription,
       userreportB = bugReportFormJSON.reproductionStep,
       userreportC = bugReportFormJSON.additionalReport,
