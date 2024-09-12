@@ -5,6 +5,7 @@ using Vi.Core;
 using Unity.Netcode;
 using Vi.Core.VFX;
 using UnityEngine.AI;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {

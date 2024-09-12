@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Isolated
 {

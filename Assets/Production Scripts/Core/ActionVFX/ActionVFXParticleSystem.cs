@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core.VFX
 {

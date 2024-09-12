@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {

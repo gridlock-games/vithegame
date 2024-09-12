@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using Vi.Core;
 using Unity.Netcode;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {

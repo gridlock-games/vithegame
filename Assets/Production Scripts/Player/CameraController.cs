@@ -7,6 +7,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Player
 {

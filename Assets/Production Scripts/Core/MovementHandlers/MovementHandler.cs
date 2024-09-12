@@ -7,7 +7,7 @@ using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
 
-namespace Vi.Core
+namespace Vi.Core.MovementHandlers
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PooledObject))]

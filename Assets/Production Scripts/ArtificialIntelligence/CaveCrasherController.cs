@@ -6,7 +6,7 @@ using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Core.Structures;
-using Vi.Utility;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {
