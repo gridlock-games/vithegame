@@ -67,7 +67,6 @@ namespace jomarcentermjm.PlatformAPI
         response =>
         {
             //getting long code
-            Debug.Log(response.Text);
             SteamUserAccountData steamuseraccountdata = JsonUtility.FromJson<SteamUserAccountData>(response.Text);
             SignInWithFirebaseToken(steamuseraccountdata.firebaseToken, steamuseraccountdata);
 

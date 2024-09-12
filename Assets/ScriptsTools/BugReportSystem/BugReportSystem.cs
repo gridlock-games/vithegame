@@ -3,6 +3,7 @@ using Proyecto26;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public class BugReportFormJSON
   public string characterName;
   public string characterID;
   public string captureDateTime;
+  public string gameVersion;
   public string deviceProcessor;
   public string deviceVideoCard;
 
@@ -50,6 +52,8 @@ public class BugReportSystem : MonoBehaviour
   private byte[] reportScreenshotbyte;
   private BugReportFormJSON bugReportFormJSON;
 
+  private string debugLogContent;
+
   private string screenshotFileName;
   private string bugreportFileFolderLocation;
   private string compiledStringData;
@@ -81,6 +85,8 @@ public class BugReportSystem : MonoBehaviour
   private void Start()
   {//Take quick second screenshot
     StartCoroutine(TakeScreenShot());
+    //Get debug logs
+    GetDebugLogs();
   }
 
   // Update is called once per frame
@@ -88,6 +94,14 @@ public class BugReportSystem : MonoBehaviour
   {
   }
 
+  private void GetDebugLogs()
+  {
+    //DebugOverlay debugOverlay = GameObject.FindFirstObjectByType(typeof(DebugOverlay)).GetComponent<DebugOverlay>();
+    //debugLogContent = debugOverlay.RetreveDebugLog();
+    debugLogContent = "To be added";
+  }
+    
+  
   private IEnumerator TakeScreenShot()
   {
     yield return new WaitForEndOfFrame();
@@ -121,6 +135,7 @@ public class BugReportSystem : MonoBehaviour
     bugReportFormJSON.deviceName = $"{SystemInfo.deviceName} - {SystemInfo.deviceModel} - {SystemInfo.deviceType}";
     bugReportFormJSON.deviceVideoCard = $"{SystemInfo.graphicsDeviceVendor} - {SystemInfo.graphicsDeviceName} - {SystemInfo.graphicsDeviceVersion}";
     bugReportFormJSON.deviceProcessor = $"{SystemInfo.processorType}";
+    bugReportFormJSON.gameVersion = $"{Application.version.ToString()}";
 
     //Prints out the data on user UI for transpaency
     ShowUserinfo();
@@ -181,7 +196,7 @@ public class BugReportSystem : MonoBehaviour
     {
       username = "TestingUsername",
       generationdate = bugReportFormJSON.captureDateTime,
-      userDetails = $"reporter username: [tba] \nreporter Character Name: [TBA]",
+      userDetails = $"reporter username: [tba] \nreporter Character Name: [TBA] \nGameVersion: {bugReportFormJSON.gameVersion}",
       matchInformation = $"Map Name: {bugReportFormJSON.matchMapName} \n Stage Name: {bugReportFormJSON.matchModeName}",
       systemspecData = $"os: {bugReportFormJSON.osVersion} \n" +
       $"device: {bugReportFormJSON.deviceName} \n" +
@@ -194,7 +209,7 @@ public class BugReportSystem : MonoBehaviour
       userreportB = bugReportFormJSON.reproductionStep,
       userreportC = bugReportFormJSON.additionalReport,
       hasDebugLogs = true,
-      debuglog = "TO BE ADDED",
+      debuglog = debugLogContent,
       hasScreenshot = uploadScreenshot,
       reportScreenshotBytes = imageBase64
     };
@@ -238,8 +253,9 @@ public class BugReportSystem : MonoBehaviour
     //Compile and combine all the data into one stringable object.
     compiledStringData = $"Vi Bug Report data - USER COPY \n" +
       $"generation date: {bugReportFormJSON.captureDateTime} \n" +
-      $"reporter username: [tba]" +
-      $"reporter Character Name: [tba]" +
+      $"reporter username: [tba]\n" +
+      $"reporter Character Name: [tba]\n" +
+      $"Game Version: {bugReportFormJSON.gameVersion}"+
       $"<System Information> \n" +
       $"os: {bugReportFormJSON.osVersion} \n" +
       $"device: {bugReportFormJSON.deviceName} \n" +
@@ -257,7 +273,7 @@ public class BugReportSystem : MonoBehaviour
       $"{bugReportFormJSON.additionalReport} \n" +
       $"<Debug Data> \n" +
       $"{Debuglogcontents} \n" +
-      $"{screenShotStatus}" +
+      $"screenshot generated: {screenShotStatus}" +
       $"---END OF FILE---";
 
     return compiledStringData;
