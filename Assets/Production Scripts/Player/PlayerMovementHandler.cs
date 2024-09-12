@@ -622,11 +622,12 @@ namespace Vi.Player
             }
         }
 
-        private new void OnDestroy()
+        protected override void OnReturnToPool()
         {
-            base.OnDestroy();
-            if (cameraController) { Destroy(cameraController.gameObject); }
-            if (Rigidbody) { Destroy(Rigidbody.gameObject); }
+            base.OnReturnToPool();
+            cameraController.transform.SetParent(transform);
+            cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
+            cameraController.transform.localRotation = Quaternion.identity;
         }
 
         private const int BUFFER_SIZE = 1024;
@@ -649,7 +650,6 @@ namespace Vi.Player
 
         private void Start()
         {
-            Rigidbody.transform.SetParent(null, true);
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room"))
             {
                 cameraController.PlayAnimation("TutorialIntro");

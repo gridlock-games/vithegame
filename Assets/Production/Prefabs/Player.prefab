@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 3476549382923866366}
   - component: {fileID: 5225764695714038895}
   - component: {fileID: 1238877169349753619}
+  - component: {fileID: 9160700264388968167}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -185,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 891803348
+  GlobalObjectIdHash: 1977550921
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -207,6 +208,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoppingDistance: 2
+  runAnimationTransitionSpeed: 5
+  isGroundedSphereCheckRadius: 0.6
   cameraController: {fileID: 3945128956232022059}
 --- !u!114 &3945128955595459580
 MonoBehaviour:
@@ -299,6 +302,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232db3e2d816d914895487cc95460f92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9160700264388968167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3945128955595459076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 170
+  isPrewarmObject: 1
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0

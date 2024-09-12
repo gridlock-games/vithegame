@@ -35,6 +35,21 @@ namespace Vi.Core
             base.Awake();
             rb = GetComponentInChildren<Rigidbody>();
             combatAgent = GetComponent<CombatAgent>();
+            PooledObject pooledObject = GetComponent<PooledObject>();
+            pooledObject.OnSpawnFromPool += OnSpawnFromPool;
+            pooledObject.OnReturnToPool += OnReturnToPool;
+        }
+
+        protected virtual void OnSpawnFromPool()
+        {
+            rb.transform.SetParent(null, true);
+        }
+        
+        protected virtual void OnReturnToPool()
+        {
+            rb.transform.SetParent(transform);
+            rb.transform.localPosition = Vector3.zero;
+            rb.transform.localRotation = Quaternion.identity;
         }
 
         protected override void OnEnable()

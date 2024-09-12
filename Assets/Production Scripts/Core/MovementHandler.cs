@@ -6,10 +6,11 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
-using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
+	[DisallowMultipleComponent]
+	[RequireComponent(typeof(PooledObject))]
 	public abstract class MovementHandler : NetworkBehaviour
 	{
 		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);

@@ -1416,9 +1416,9 @@ namespace Vi.Core
             else
             {
                 if (playerData.id >= 0)
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
                 else
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
 
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }

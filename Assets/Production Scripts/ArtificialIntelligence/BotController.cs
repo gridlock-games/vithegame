@@ -14,7 +14,6 @@ namespace Vi.ArtificialIntelligence
     {
         private void Start()
         {
-            Rigidbody.transform.SetParent(null, true);
             UpdateActivePlayersList();
         }
 
