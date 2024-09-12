@@ -144,6 +144,7 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
+            RefreshStatus();
         }
 
         public void UpdateNetworkVisiblity()
@@ -788,6 +789,9 @@ namespace Vi.Core.CombatAgents
         protected override void Update()
         {
             base.Update();
+
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 

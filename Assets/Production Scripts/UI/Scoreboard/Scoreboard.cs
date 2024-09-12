@@ -24,9 +24,9 @@ namespace Vi.UI
         [Header("2 Teams")]
         [SerializeField] private ScoreboardElement scoreboardElementPrefabHalf;
         [SerializeField] private GameObject doubleTeamParent;
-        [SerializeField] private Transform teamDividerParentLeft;
+        [SerializeField] private ScoreboardTeamDividerElement leftParentHeader;
         [SerializeField] private Transform scoreboardElementParentLeft;
-        [SerializeField] private Transform teamDividerParentRight;
+        [SerializeField] private ScoreboardTeamDividerElement rightParentHeader;
         [SerializeField] private Transform scoreboardElementParentRight;
 
         public void CloseSelf()
@@ -151,7 +151,6 @@ namespace Vi.UI
                 elementList[i].transform.SetSiblingIndex(i);
             }
 
-            int dividerCounter = 0;
             PlayerDataManager.Team lastTeam = PlayerDataManager.Team.Environment;
             for (int i = 0; i < elementList.Count; i++)
             {
@@ -163,17 +162,18 @@ namespace Vi.UI
                         int teamIndex = System.Array.IndexOf(teams, team);
                         if (teamIndex == -1) { Debug.LogError(team + " scoreboard team header's team isn't in the possible teams list!"); continue; }
 
-                        PooledObject instance = ObjectPoolingManager.SpawnObject(teamDividerScoreboardLine.GetComponent<PooledObject>(), teamIndex == 0 ? teamDividerParentLeft : teamDividerParentRight);
-                        instance.transform.localScale = Vector3.one;
-                        pooledChildObjects.Add(instance);
-                        ScoreboardTeamDividerElement dividerElement = instance.GetComponent<ScoreboardTeamDividerElement>();
-                        dividerElement.Initialize(team);
-                        dividerElement.transform.SetSiblingIndex(i + dividerCounter);
-                        dividerCounter++;
+                        if (teamIndex == 0)
+                        {
+                            leftParentHeader.Initialize(team);
+                        }
+                        else
+                        {
+                            rightParentHeader.Initialize(team);
+                        }
                         lastTeam = team;
                     }
                 }
-                elementList[i].transform.SetSiblingIndex(i + dividerCounter);
+                elementList[i].transform.SetSiblingIndex(i);
             }
         }
 
