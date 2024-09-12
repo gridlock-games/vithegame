@@ -354,6 +354,7 @@ namespace Vi.Player
             }
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             cam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            cam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);

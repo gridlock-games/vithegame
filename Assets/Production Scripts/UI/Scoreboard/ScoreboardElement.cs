@@ -36,7 +36,7 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
             UpdateUI();
             initialized = true;
-            player = PlayerDataManager.Singleton.GetPlayerObjectById(playerDataId);
+            player = PlayerDataManager.Singleton.ContainsId(playerDataId) ? PlayerDataManager.Singleton.GetPlayerObjectById(playerDataId) : null;
         }
 
         public void HideRoundWinsColumn()
@@ -50,7 +50,15 @@ namespace Vi.UI
 
         public PlayerDataManager.Team GetTeam()
         {
-            return PlayerDataManager.Singleton.GetPlayerData(playerDataId).team;
+            if (PlayerDataManager.Singleton.ContainsId(playerDataId))
+            {
+                return PlayerDataManager.Singleton.GetPlayerData(playerDataId).team;
+            }
+            else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
+            {
+                return PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId).team;
+            }
+            return default;
         }
 
         private void OnDisable()
