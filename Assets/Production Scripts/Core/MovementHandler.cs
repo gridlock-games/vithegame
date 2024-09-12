@@ -40,6 +40,7 @@ namespace Vi.Core
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
 
+		[Header("Movement Handler")]
 		[SerializeField] protected float stoppingDistance = 2;
 		protected Vector3 Destination { get { return destination.Value; } }
 		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();

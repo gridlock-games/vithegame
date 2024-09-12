@@ -13,24 +13,13 @@ namespace Vi.ArtificialIntelligence
     public class CaveCrasherController : PhysicsMovementHandler
     {
         private Animator animator;
+        private GameplayTargetFinder targetFinder;
         private new void Awake()
         {
             base.Awake();
             animator = GetComponent<Animator>();
-            GetComponent<PooledObject>().OnSpawnFromPool += OnSpawnFromPool;
+            targetFinder = GetComponent<GameplayTargetFinder>();
         }
-
-        private void OnSpawnFromPool()
-        {
-            UpdateActivePlayersList();
-            UpdateStructureList();
-        }
-
-        private List<CombatAgent> activePlayers = new List<CombatAgent>();
-        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
-
-        private Structure[] structures = new Structure[0];
-        private void UpdateStructureList() { structures = PlayerDataManager.Singleton.GetActiveStructures(); }
 
         HittableAgent targetObject;
         private void EvaluateBotLogic()
@@ -39,7 +28,7 @@ namespace Vi.ArtificialIntelligence
             {
                 targetObject = null;
                 float distanceToStructure = 100;
-                foreach (Structure structure in structures)
+                foreach (Structure structure in targetFinder.ActiveStructures)
                 {
                     if (!structure) { Debug.LogError("There is a null strcture in the structures list!"); continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
@@ -48,8 +37,8 @@ namespace Vi.ArtificialIntelligence
                     break;
                 }
 
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
-                foreach (CombatAgent player in activePlayers)
+                targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                foreach (CombatAgent player in targetFinder.ActiveCombatAgents)
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
@@ -216,8 +205,6 @@ namespace Vi.ArtificialIntelligence
         private new void Update()
         {
             base.Update();
-            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
-            if (PlayerDataManager.Singleton.StructuresListWasUpdatedThisFrame) { UpdateStructureList(); }
             ProcessMovement();
             EvaluateBotLogic();
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));

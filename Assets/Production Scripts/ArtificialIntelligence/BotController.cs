@@ -12,9 +12,11 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotController : PhysicsMovementHandler
     {
-        private void Start()
+        private GameplayTargetFinder targetFinder;
+        protected override void Awake()
         {
-            UpdateActivePlayersList();
+            base.Awake();
+            targetFinder = GetComponent<GameplayTargetFinder>();
         }
 
         private new void OnDestroy()
@@ -23,15 +25,10 @@ namespace Vi.ArtificialIntelligence
             if (Rigidbody) { Destroy(Rigidbody.gameObject); }
         }
 
-        private List<CombatAgent> activePlayers = new List<CombatAgent>();
-        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
-
         private CombatAgent targetAttributes;
         protected override void Update()
         {
             base.Update();
-
-            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
             if (!IsSpawned) { return; }
 
@@ -98,10 +95,10 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
+                targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
                 targetAttributes = null;
-                foreach (CombatAgent player in activePlayers)
+                foreach (CombatAgent player in targetFinder.ActiveCombatAgents)
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
