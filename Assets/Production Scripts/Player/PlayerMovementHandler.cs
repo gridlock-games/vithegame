@@ -163,6 +163,7 @@ namespace Vi.Player
 
         public override void OnServerActionClipPlayed()
         {
+            // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
                 StatePayload statePayload = Move(inputPayload);
@@ -208,7 +209,7 @@ namespace Vi.Player
                     }
                 }
 
-                Vector2 moveInput = GetMoveInput();
+                Vector2 moveInput;
                 if (weaponHandler.WaitingForReloadToPlay)
                 {
                     moveInput = Vector2.zero;
@@ -240,6 +241,10 @@ namespace Vi.Player
                 else if (combatAgent.AnimationHandler.IsReloading())
                 {
                     moveInput = Vector2.zero;
+                }
+                else
+                {
+                    moveInput = GetMoveInput();
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
