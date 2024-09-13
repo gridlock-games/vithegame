@@ -5,6 +5,7 @@ using Vi.Core.Structures;
 using Vi.ScriptableObjects;
 using UnityEngine.AI;
 using Unity.Netcode;
+using Vi.Utility;
 
 namespace Vi.Core.MovementHandlers
 {
@@ -24,6 +25,13 @@ namespace Vi.Core.MovementHandlers
             SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
+        }
+
+        private bool disableBots;
+        protected override void RefreshStatus()
+        {
+            base.RefreshStatus();
+            disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
         }
 
         private Quaternion EvaluateRotation()
@@ -143,7 +151,7 @@ namespace Vi.Core.MovementHandlers
                     break;
             }
 
-            if (targetFinder.target)
+            if (targetFinder.target & !disableBots)
             {
                 SetDestination(targetFinder.target.transform.position, useExactDestinationPosition);
             }
