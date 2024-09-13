@@ -1094,7 +1094,13 @@ namespace Vi.Core
             {
                 if (Animator.transform != transform)
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(Animator.GetComponent<PooledObject>());
+                    if (Animator.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        Animator = null;
+                        LimbReferences = null;
+                        animatorReference = null;
+                    }
                 }
             }
         }
@@ -1125,13 +1131,14 @@ namespace Vi.Core
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
             combatAgent = GetComponent<CombatAgent>();
 
-            if (TryGetComponent(out Animator animator))
+            AnimatorReference animatorReference = GetComponentInChildren<AnimatorReference>();
+            if (animatorReference)
             {
-                Animator = animator;
+                this.animatorReference = animatorReference;
+                LimbReferences = animatorReference.GetComponent<LimbReferences>();
+                Animator = animatorReference.GetComponent<Animator>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
-                LimbReferences = GetComponent<LimbReferences>();
-                animatorReference = GetComponent<AnimatorReference>();
             }
         }
 

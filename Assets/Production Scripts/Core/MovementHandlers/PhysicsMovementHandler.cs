@@ -25,6 +25,7 @@ namespace Vi.Core.MovementHandlers
             base.OnNetworkSpawn();
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+            rb.isKinematic = !IsServer & !IsOwner;
         }
 
         public Rigidbody Rigidbody { get { return rb; } }
@@ -211,5 +212,12 @@ namespace Vi.Core.MovementHandlers
                 return Physics.CheckSphere(Rigidbody.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             }
         }
+
+        protected const float stairStepHeight = 0.01f;
+        protected const float maxStairStepHeight = 0.5f;
+
+        protected const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
+
+        protected const float gravityScale = 2;
     }
 }

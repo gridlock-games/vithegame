@@ -488,13 +488,6 @@ namespace Vi.Player
             return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
         }
 
-        private const float stairStepHeight = 0.01f;
-        private const float maxStairStepHeight = 0.5f;
-
-        private const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
-
-        private const float gravityScale = 2;
-
         private Quaternion EvaluateRotation()
         {
             Quaternion rot = transform.rotation;
@@ -583,7 +576,6 @@ namespace Vi.Player
                 Destroy(cameraController.gameObject);
                 Destroy(playerInput);
             }
-            Rigidbody.isKinematic = !IsServer & !IsOwner;
 
             if (!IsClient)
             {

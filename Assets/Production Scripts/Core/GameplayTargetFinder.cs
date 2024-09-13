@@ -5,6 +5,7 @@ using Vi.Core.Structures;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     public class GameplayTargetFinder : MonoBehaviour
     {
         private CombatAgent combatAgent;

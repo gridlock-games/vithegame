@@ -8,7 +8,6 @@ using Vi.Utility;
 namespace Vi.ProceduralAnimations
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(PooledObject))]
     public class LimbReferences : MonoBehaviour
     {
         public enum Hand

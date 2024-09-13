@@ -19,12 +19,6 @@ namespace Vi.ArtificialIntelligence
             targetFinder = GetComponent<GameplayTargetFinder>();
         }
 
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            if (Rigidbody) { Destroy(Rigidbody.gameObject); }
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -255,13 +249,6 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        
-
-        public override void OnNetworkSpawn()
-        {
-            Rigidbody.isKinematic = !IsServer & !IsOwner;
-        }
-
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
 
@@ -426,13 +413,6 @@ namespace Vi.ArtificialIntelligence
             Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
-
-        private const float stairStepHeight = 0.01f;
-        private const float maxStairStepHeight = 0.5f;
-
-        private const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
-
-        private const float gravityScale = 2;
 
         void OnDodge()
         {

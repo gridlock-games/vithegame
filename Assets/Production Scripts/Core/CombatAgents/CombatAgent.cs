@@ -10,6 +10,8 @@ using Vi.Core.MovementHandlers;
 namespace Vi.Core
 {
     [RequireComponent(typeof(StatusAgent))]
+    [RequireComponent(typeof(AnimationHandler))]
+    [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();

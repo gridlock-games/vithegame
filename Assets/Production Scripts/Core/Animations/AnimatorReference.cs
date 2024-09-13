@@ -306,7 +306,10 @@ namespace Vi.Core
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
 
-            GetComponent<PooledObject>().OnReturnToPool += OnReturnToPool;
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
         private void Start()
