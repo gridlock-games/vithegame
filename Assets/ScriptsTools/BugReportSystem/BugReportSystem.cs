@@ -87,7 +87,7 @@ public class BugReportSystem : MonoBehaviour
   {//Take quick second screenshot
     StartCoroutine(TakeScreenShot());
     //Get debug logs
-    GetDebugLogs();
+    //GetDebugLogs();
   }
 
   // Update is called once per frame
@@ -95,21 +95,21 @@ public class BugReportSystem : MonoBehaviour
   {
   }
 
-  private void GetDebugLogs()
-  {
-    DebugOverlay debugOverlay = GameObject.FindFirstObjectByType(typeof(DebugOverlay)).GetComponent<DebugOverlay>();
-    debugLogContent = debugOverlay.RetreveDebugLog();
-        if (debugLogContent.IsNullOrEmpty())
-        {
-      recordDebug = false;
-      debugLogContent = "--- No Logs recorded ---";
-        }
-        else
-    {
-      recordDebug = true;
-      debugLogContent += "--- END OF LOGS ---";
-    }
-    }
+  //private void GetDebugLogs()
+  //{
+  //  DebugOverlay debugOverlay = GameObject.FindFirstObjectByType(typeof(DebugOverlay)).GetComponent<DebugOverlay>();
+  //  debugLogContent = debugOverlay.RetreveDebugLog();
+  //      if (debugLogContent.IsNullOrEmpty())
+  //      {
+  //    recordDebug = false;
+  //    debugLogContent = "--- No Logs recorded ---";
+  //      }
+  //      else
+  //  {
+  //    recordDebug = true;
+  //    debugLogContent += "--- END OF LOGS ---";
+  //  }
+  //  }
     
   
   private IEnumerator TakeScreenShot()
