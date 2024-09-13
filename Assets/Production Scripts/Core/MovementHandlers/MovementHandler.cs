@@ -351,6 +351,7 @@ namespace Vi.Core.MovementHandlers
 
 		public Vector2 GetPathMoveInput()
         {
+			if (Vector3.Distance(Destination, GetPosition()) < stoppingDistance) { return Vector2.zero; }
 			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition());
 			return new Vector2(moveInput.x, moveInput.z).normalized;
 		}
