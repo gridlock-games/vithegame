@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core.Structures;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
@@ -26,7 +27,27 @@ namespace Vi.Core
             if (PlayerDataManager.Singleton.StructuresListWasUpdatedThisFrame) { UpdateStructureList(); }
         }
 
-        [HideInInspector] public HittableAgent target;
+        private Structure targetStructure;
+        private CombatAgent targetCombatAgent;
+
+        public void SetTarget(Structure structure) { targetStructure = structure; targetCombatAgent = null; }
+        public void SetTarget(CombatAgent combatAgent) { targetCombatAgent = combatAgent; targetStructure = null; }
+        public void ClearTarget() { targetCombatAgent = null; targetStructure = null; }
+
+        public HittableAgent GetTarget()
+        {
+            if (targetStructure) { return targetStructure; }
+            if (targetCombatAgent) { return targetCombatAgent; }
+            return null;
+        }
+
+        public bool SetDestination(MovementHandler movementHandler)
+        {
+            if (targetStructure) { return movementHandler.SetDestination(targetStructure); }
+            if (targetCombatAgent) { return movementHandler.SetDestination(targetCombatAgent); }
+            Debug.LogError("No Target!");
+            return false;
+        }
 
         public List<CombatAgent> ActiveCombatAgents { get; private set; } = new List<CombatAgent>();
         private void UpdateActivePlayersList() { ActiveCombatAgents = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }

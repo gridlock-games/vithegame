@@ -36,7 +36,7 @@ namespace Vi.Core.MovementHandlers
 
         private Quaternion EvaluateRotation()
         {
-            Vector3 camDirection = targetFinder.target ? (targetFinder.target.transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
+            Vector3 camDirection = targetFinder.GetTarget() ? (targetFinder.GetTarget().transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
             camDirection.Scale(HORIZONTAL_PLANE);
 
             if (combatAgent.ShouldApplyAilmentRotation())
@@ -90,8 +90,7 @@ namespace Vi.Core.MovementHandlers
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
-            targetFinder.target = null;
-            bool useExactDestinationPosition = true;
+            targetFinder.ClearTarget();
             switch (targetingType)
             {
                 case TargetingType.Players:
@@ -99,7 +98,7 @@ namespace Vi.Core.MovementHandlers
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
-                        targetFinder.target = combatAgent;
+                        targetFinder.SetTarget(combatAgent);
                     }
                     break;
                 case TargetingType.Structures:
@@ -107,8 +106,7 @@ namespace Vi.Core.MovementHandlers
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        targetFinder.target = structure;
-                        useExactDestinationPosition = false;
+                        targetFinder.SetTarget(structure);
                         break;
                     }
                     break;
@@ -117,8 +115,7 @@ namespace Vi.Core.MovementHandlers
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        targetFinder.target = structure;
-                        useExactDestinationPosition = false;
+                        targetFinder.SetTarget(structure);
                         break;
                     }
 
@@ -126,7 +123,7 @@ namespace Vi.Core.MovementHandlers
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
-                        targetFinder.target = combatAgent;
+                        targetFinder.SetTarget(combatAgent);
                     }
                     break;
                 case TargetingType.PlayersThenStructures:
@@ -134,15 +131,14 @@ namespace Vi.Core.MovementHandlers
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
-                        targetFinder.target = combatAgent;
+                        targetFinder.SetTarget(combatAgent);
                     }
 
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        targetFinder.target = structure;
-                        useExactDestinationPosition = false;
+                        targetFinder.SetTarget(structure);
                         break;
                     }
                     break;
@@ -151,13 +147,13 @@ namespace Vi.Core.MovementHandlers
                     break;
             }
 
-            if (targetFinder.target & !disableBots)
+            if (targetFinder.GetTarget() & !disableBots)
             {
-                SetDestination(targetFinder.target.transform.position, useExactDestinationPosition);
+                targetFinder.SetDestination(this);
             }
             else
             {
-                SetDestination(GetPosition(), true);
+                SetDestination(GetPosition());
             }
         }
 

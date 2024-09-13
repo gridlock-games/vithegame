@@ -27,7 +27,7 @@ namespace Vi.ArtificialIntelligence
 
             if (IsServer)
             {
-                if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position, true); }
+                if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position); }
             }
 
             SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
@@ -42,7 +42,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                Vector3 camDirection = targetFinder.target ? (targetFinder.target.transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
+                Vector3 camDirection = targetFinder.GetTarget() ? (targetFinder.GetTarget().transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
                 camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (combatAgent.ShouldApplyAilmentRotation())
@@ -90,22 +90,22 @@ namespace Vi.ArtificialIntelligence
             {
                 targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
-                targetFinder.target = null;
+                targetFinder.ClearTarget();
                 foreach (CombatAgent player in targetFinder.ActiveCombatAgents)
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
-                    if (SetDestination(player.transform.position, true)) { targetFinder.target = player; }
+                    if (targetFinder.SetDestination(this)) { targetFinder.SetTarget(player); }
                     break;
                 }
 
                 if (disableBots)
                 {
-                    SetDestination(Rigidbody.position, true);
+                    SetDestination(Rigidbody.position);
                 }
                 else
                 {
-                    if (!targetFinder.target)
+                    if (!targetFinder.SetDestination(this))
                     {
                         if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
                         {
@@ -113,7 +113,7 @@ namespace Vi.ArtificialIntelligence
                             Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
                             randomDirection += transform.position;
                             NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            SetDestination(hit.position, true);
+                            SetDestination(hit.position);
                         }
                     }
                     EvaluteAction();
@@ -157,7 +157,7 @@ namespace Vi.ArtificialIntelligence
                 lastWeaponSwapTime = Time.time;
             }
 
-            if (targetFinder.target)
+            if (targetFinder.GetTarget())
             {
                 if (weaponHandler.CanADS)
                 {

@@ -13,6 +13,23 @@ namespace Vi.Core.Structures
         [SerializeField] private float maxHP = 100;
         [SerializeField] private PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
 
+        public Collider[] Colliders { get; private set; }
+
+        private void Awake()
+        {
+            Colliders = GetComponentsInChildren<Collider>();
+
+            List<Collider> networkPredictionLayerColliders = new List<Collider>();
+            foreach (Collider col in Colliders)
+            {
+                if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    networkPredictionLayerColliders.Add(col);
+                }
+            }
+            Colliders = networkPredictionLayerColliders.ToArray();
+        }
+
         private NetworkVariable<float> HP = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()

@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
+using Vi.Core.Structures;
 
 namespace Vi.Core.MovementHandlers
 {
@@ -46,40 +47,89 @@ namespace Vi.Core.MovementHandlers
 		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();
 
 		private const float destinationNavMeshDistanceThreshold = 20;
-		protected bool SetDestination(Vector3 destination, bool useExactDestination)
+		protected bool SetDestination(Vector3 destination)
         {
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
 
-			if (useExactDestination)
+			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			{
+				this.destination.Value = myNavHit.position;
+				return true;
+			}
+			else
+			{
+				Debug.LogError("Destination point is not on nav mesh! " + name);
+				this.destination.Value = destination;
+				return false;
+			}
+		}
+
+		public bool SetDestination(CombatAgent combatAgent)
+        {
+			if (!combatAgent) { Debug.LogError("Combat agent is null! " + combatAgent); return false; }
+            if (combatAgent.NetworkCollider)
             {
-				if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				float minDist = 0;
+				Vector3 destinationPoint = Vector3.zero;
+				for (int i = 0; i < combatAgent.NetworkCollider.Colliders.Length; i++)
+                {
+					Vector3 closestPoint = combatAgent.NetworkCollider.Colliders[i].ClosestPoint(GetPosition());
+					float dist = Vector3.Distance(GetPosition(), closestPoint);
+					if (dist < minDist | i == 0)
+					{
+						minDist = dist;
+						destinationPoint = closestPoint;
+					}
+				}
+				
+				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
 				{
-					this.destination.Value = myNavHit.position;
+					destination.Value = myNavHit.position;
 					return true;
 				}
 				else
 				{
-                    Debug.LogError("Destination point is not on nav mesh! " + name);
-                    this.destination.Value = destination;
+					Debug.LogError("Destination point is not on nav mesh! " + name);
+					destination.Value = destinationPoint;
 					return false;
 				}
 			}
 			else
             {
-				if (NavMesh.SamplePosition(destination - (destination - GetPosition()).normalized, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				Debug.LogError("Combat agent has no network collider! " + combatAgent);
+			}
+            return false;
+        }
+
+		public bool SetDestination(Structure structure)
+        {
+			if (!structure) { Debug.LogError("Combat agent is null! " + structure); return false; }
+			float minDist = 0;
+			Vector3 destinationPoint = Vector3.zero;
+			for (int i = 0; i < structure.Colliders.Length; i++)
+			{
+				Vector3 closestPoint = structure.Colliders[i].ClosestPoint(GetPosition());
+				float dist = Vector3.Distance(GetPosition(), closestPoint);
+				if (dist < minDist | i == 0)
 				{
-					this.destination.Value = myNavHit.position;
-					return true;
-				}
-				else
-				{
-                    Debug.LogError("Destination point is not on nav mesh! " + name);
-					this.destination.Value = destination;
-					return false;
+					minDist = dist;
+					destinationPoint = closestPoint;
 				}
 			}
-        }
+
+			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			{
+				destination.Value = myNavHit.position;
+				return true;
+			}
+			else
+			{
+				Debug.LogError("Destination point is not on nav mesh! " + name);
+				destination.Value = destinationPoint;
+				return false;
+			}
+		}
 
 		protected bool IsAffectedByExternalForce { get; private set; }
 		public void ExternalForceAffecting()
@@ -238,7 +288,7 @@ namespace Vi.Core.MovementHandlers
         protected virtual void OnEnable()
 		{
 			RefreshStatus();
-			SetDestination(transform.position, true);
+			SetDestination(transform.position);
 			CalculatePath(transform.position, NavMesh.AllAreas);
 		}
 
