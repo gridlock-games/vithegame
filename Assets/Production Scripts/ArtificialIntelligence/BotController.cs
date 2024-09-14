@@ -95,7 +95,8 @@ namespace Vi.ArtificialIntelligence
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
-                    if (targetFinder.SetDestination(this)) { targetFinder.SetTarget(player); }
+                    targetFinder.SetTarget(player);
+                    if (!targetFinder.SetDestination(this)) { targetFinder.ClearTarget(); }
                     break;
                 }
 
@@ -105,17 +106,6 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    if (!targetFinder.SetDestination(this))
-                    {
-                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
-                        {
-                            float walkRadius = 500;
-                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                            randomDirection += transform.position;
-                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            SetDestination(hit.position);
-                        }
-                    }
                     EvaluteAction();
                 }
             }

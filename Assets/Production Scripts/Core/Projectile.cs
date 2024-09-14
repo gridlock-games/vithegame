@@ -141,7 +141,6 @@ namespace Vi.Core
             if (!canHitPlayers) { return; }
 
             bool shouldDestroy = false;
-            Debug.Log(other);
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (other.isTrigger) { return; }
