@@ -25,7 +25,7 @@ namespace Vi.Core.MovementHandlers
             SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
-            EvaluteAction();
+            EvaluateAction();
         }
 
         private bool disableBots;
@@ -322,7 +322,7 @@ namespace Vi.Core.MovementHandlers
 
         private const float ability1DistanceMin = 8;
         private const float ability1Distance = 10;
-        private void EvaluteAction()
+        private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 

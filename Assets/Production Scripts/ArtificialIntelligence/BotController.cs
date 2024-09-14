@@ -106,7 +106,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    EvaluteAction();
+                    EvaluateAction();
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace Vi.ArtificialIntelligence
         private const float abilityWaitDuration = 3;
         private float lastAbilityTime;
 
-        private void EvaluteAction()
+        private void EvaluateAction()
         {
             if (canOnlyLightAttack)
             {
