@@ -24,6 +24,7 @@ namespace Vi.ArtificialIntelligence
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsServer)
             {
                 SetDestination(transform.position);

@@ -73,7 +73,7 @@ namespace Vi.Core.MovementHandlers
             return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount() + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount());
         }
 
-        public float GetRunSpeed()
+        protected float GetRunSpeed()
         {
             return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount();
         }
@@ -213,11 +213,12 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
-        protected const float stairStepHeight = 0.01f;
-        protected const float maxStairStepHeight = 0.5f;
+        [Header("Physics Locomotion Settings")]
+        [SerializeField] protected float stairStepHeight = 0.01f;
+        [SerializeField] protected float maxStairStepHeight = 0.5f;
 
-        protected const float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
+        [SerializeField] protected float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
 
-        protected const float gravityScale = 2;
+        [SerializeField] protected float gravityScale = 2;
     }
 }

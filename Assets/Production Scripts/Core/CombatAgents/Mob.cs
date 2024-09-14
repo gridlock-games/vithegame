@@ -293,7 +293,7 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        [SerializeField] private Weapon.ArmorType armorType;
+        [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Flesh;
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }

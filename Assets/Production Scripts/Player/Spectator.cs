@@ -22,6 +22,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
