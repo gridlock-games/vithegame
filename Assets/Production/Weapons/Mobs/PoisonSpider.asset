@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
-  m_Name: CaveCrasher
+  m_Name: PoisonSpider
   m_EditorClassIdentifier: 
   weaponClass: 0
-  runSpeed: 3
-  walkSpeed: 1.5
+  runSpeed: 7
+  walkSpeed: 3.5
   blockingLocomotion: 0
   maxHP: 100
   maxStamina: 100
@@ -162,21 +162,21 @@ MonoBehaviour:
     type: 3}
   reloadSoundEffects: []
   weaponModelData:
-  - skinPrefab: {fileID: 4567706115831328728, guid: 25fe1e5e8ca2ce74da34f55afc0f7938,
+  - skinPrefab: {fileID: 2786284938590557290, guid: f9c2fa18a500e6749bcb9c0ca5211619,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2001834763269464374, guid: e7dc8b706d0dbe049b3aba5972a7f496,
+    - weaponPrefab: {fileID: 4101847540811822813, guid: 50b6dbdbe8829404cb32578201c112f7,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: -25}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 2001834763269464374, guid: b2ec19bc844821646ace4c6bd0b1b281,
+    - weaponPrefab: {fileID: 4101847540811822813, guid: 50b6dbdbe8829404cb32578201c112f7,
         type: 3}
       weaponBone: 18
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: -25}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
@@ -234,7 +234,7 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
-  ability1: {fileID: 11400000, guid: f70ed881dda1fc84c993b15233afd035, type: 2}
+  ability1: {fileID: 0}
   ability2: {fileID: 0}
   ability3: {fileID: 0}
   ability4: {fileID: 0}
@@ -242,13 +242,13 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 9bd732a36e524244390f6cbc80199360, type: 2}
+    attackClip: {fileID: 11400000, guid: 22dc4f63ff6eb924fb122086a134ded5, type: 2}
   - inputs: 0000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: feb767303e70d6b4da9fe2f0c15c9e37, type: 2}
+    attackClip: {fileID: 11400000, guid: b4d183b35ec59be4ab566b4de18d5f17, type: 2}
   - inputs: 000000000000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 2683249dcbf808344871e73f4068c6b2, type: 2}
+    attackClip: {fileID: 11400000, guid: db1a5050c2389fd408e2ccf1f014a1ba, type: 2}
   grabAttackClipList: []
   dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}

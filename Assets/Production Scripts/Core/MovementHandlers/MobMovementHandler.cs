@@ -333,10 +333,10 @@ namespace Vi.Core.MovementHandlers
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (dist < ability1Distance & dist > ability1DistanceMin)
-                {
-                    weaponHandler.Ability1(true);
-                }
+                //else if (dist < ability1Distance & dist > ability1DistanceMin)
+                //{
+                //    weaponHandler.Ability1(true);
+                //}
             }
         }
     }
