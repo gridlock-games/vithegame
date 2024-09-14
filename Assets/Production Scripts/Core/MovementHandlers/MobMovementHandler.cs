@@ -110,6 +110,7 @@ namespace Vi.Core.MovementHandlers
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
+                        if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
@@ -119,6 +120,7 @@ namespace Vi.Core.MovementHandlers
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
+                        if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
@@ -146,6 +148,7 @@ namespace Vi.Core.MovementHandlers
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
+                        if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
                         targetFinder.SetTarget(structure);
                         break;

@@ -100,14 +100,20 @@ namespace Vi.Core.Structures
             return HP.Value;
         }
 
+        public bool IsDead { get; private set; }
         private void OnHPChanged(float prev, float current)
         {
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
+                IsDead = true;
                 foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 {
                     r.forceRenderingOff = true;
                 }
+            }
+            else if (prev <= 0 & current > 0)
+            {
+                IsDead = false;
             }
         }
 
