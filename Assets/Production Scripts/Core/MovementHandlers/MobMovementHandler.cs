@@ -25,6 +25,7 @@ namespace Vi.Core.MovementHandlers
             SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
+            EvaluteAction();
         }
 
         private bool disableBots;
@@ -56,7 +57,7 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop())
-                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * Random.Range(0.1f, 5));
+                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
             return transform.rotation;
         }
@@ -99,8 +100,10 @@ namespace Vi.Core.MovementHandlers
                     targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
+                        if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         targetFinder.SetTarget(combatAgent);
+                        break;
                     }
                     break;
                 case TargetingType.Structures:
@@ -124,16 +127,20 @@ namespace Vi.Core.MovementHandlers
                     targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
+                        if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         targetFinder.SetTarget(combatAgent);
+                        break;
                     }
                     break;
                 case TargetingType.PlayersThenStructures:
                     targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
+                        if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         targetFinder.SetTarget(combatAgent);
+                        break;
                     }
 
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
@@ -308,9 +315,26 @@ namespace Vi.Core.MovementHandlers
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
-        protected void EvaluateAction()
-        {
+        private const float lightAttackDistance = 2.5f;
 
+        private const float ability1DistanceMin = 8;
+        private const float ability1Distance = 10;
+        private void EvaluteAction()
+        {
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+
+            if (targetFinder.GetTarget())
+            {
+                float dist = Vector3.Distance(Destination, transform.position);
+                if (dist < lightAttackDistance)
+                {
+                    weaponHandler.LightAttack(true);
+                }
+                else if (dist < ability1Distance & dist > ability1DistanceMin)
+                {
+                    weaponHandler.Ability1(true);
+                }
+            }
         }
     }
 }

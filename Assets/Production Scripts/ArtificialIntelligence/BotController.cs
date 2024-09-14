@@ -60,7 +60,7 @@ namespace Vi.ArtificialIntelligence
                     }
                 }
                 else if (!combatAgent.ShouldPlayHitStop())
-                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * Random.Range(0.1f, 5));
+                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
                 return transform.rotation;
             }
