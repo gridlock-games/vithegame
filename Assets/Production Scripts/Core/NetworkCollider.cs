@@ -6,6 +6,7 @@ using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
     public class NetworkCollider : MonoBehaviour
     {
