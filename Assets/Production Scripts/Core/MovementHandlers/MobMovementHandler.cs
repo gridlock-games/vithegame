@@ -169,9 +169,9 @@ namespace Vi.Core.MovementHandlers
             {
                 targetFinder.SetDestination(this);
             }
-            else
+            else if (Vector3.Distance(GetPosition(), Destination) < stoppingDistance)
             {
-                SetDestination(GetPosition());
+                SetDestination(GetRandomDestination());
             }
         }
 

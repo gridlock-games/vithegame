@@ -55,11 +55,13 @@ namespace Vi.Core.MovementHandlers
 
         protected override void OnEnable()
         {
+            base.OnEnable();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
         }
 
         protected override void OnDisable()
         {
+            base.OnDisable();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
         }
 

@@ -41,6 +41,21 @@ namespace Vi.Core.MovementHandlers
 		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
 		protected const float bodyRadius = 0.5f;
 
+		protected Vector3 GetRandomDestination()
+        {
+			Vector3 randomDirection = Random.insideUnitSphere * Random.Range(1, destinationNavMeshDistanceThreshold);
+			randomDirection += GetPosition();
+			if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+            {
+				return hit.position;
+			}
+			else
+            {
+				Debug.LogError("Unable to get random destination! " + name);
+				return GetPosition();
+            }
+		}
+
 		[Header("Movement Handler")]
 		[SerializeField] protected float stoppingDistance = 1;
 		protected Vector3 Destination { get { return destination.Value; } }
@@ -255,13 +270,13 @@ namespace Vi.Core.MovementHandlers
         protected virtual void OnEnable()
 		{
 			RefreshStatus();
-			SetDestination(transform.position);
-			CalculatePath(transform.position, NavMesh.AllAreas);
 		}
 
         public override void OnNetworkSpawn()
         {
 			RefreshStatus();
+			SetDestination(transform.position);
+			CalculatePath(transform.position, NavMesh.AllAreas);
 		}
 
         protected virtual void OnDisable()
