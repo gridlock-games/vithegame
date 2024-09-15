@@ -102,41 +102,6 @@ namespace Vi.Core.MovementHandlers
             return false;
         }
 
-		public Vector3 GetPotentialDestination(CombatAgent combatAgent)
-        {
-			if (!combatAgent) { Debug.LogError("Combat agent is null! " + combatAgent); return Vector3.zero; }
-			if (combatAgent.NetworkCollider)
-			{
-				float minDist = 0;
-				Vector3 destinationPoint = Vector3.zero;
-				for (int i = 0; i < combatAgent.NetworkCollider.Colliders.Length; i++)
-				{
-					Vector3 closestPoint = combatAgent.NetworkCollider.Colliders[i].ClosestPoint(GetPosition());
-					float dist = Vector3.Distance(GetPosition(), closestPoint);
-					if (dist < minDist | i == 0)
-					{
-						minDist = dist;
-						destinationPoint = closestPoint;
-					}
-				}
-
-				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
-				{
-					return myNavHit.position;
-				}
-				else
-				{
-					Debug.LogError("Destination point is not on nav mesh! " + name);
-					return destinationPoint;
-				}
-			}
-			else
-			{
-				Debug.LogError("Combat agent has no network collider! " + combatAgent);
-			}
-			return Vector3.zero;
-		}
-
 		public bool SetDestination(Structure structure)
         {
 			if (!structure) { Debug.LogError("Combat agent is null! " + structure); return false; }
@@ -163,33 +128,6 @@ namespace Vi.Core.MovementHandlers
 				Debug.LogError("Destination point is not on nav mesh! " + name);
 				destination.Value = destinationPoint;
 				return false;
-			}
-		}
-
-		public Vector3 GetPotentialDestination(Structure structure)
-        {
-			if (!structure) { Debug.LogError("Combat agent is null! " + structure); return Vector3.zero; }
-			float minDist = 0;
-			Vector3 destinationPoint = Vector3.zero;
-			for (int i = 0; i < structure.Colliders.Length; i++)
-			{
-				Vector3 closestPoint = structure.Colliders[i].ClosestPoint(GetPosition());
-				float dist = Vector3.Distance(GetPosition(), closestPoint);
-				if (dist < minDist | i == 0)
-				{
-					minDist = dist;
-					destinationPoint = closestPoint;
-				}
-			}
-
-			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
-			{
-				return myNavHit.position;
-			}
-			else
-			{
-				Debug.LogError("Destination point is not on nav mesh! " + name);
-				return destinationPoint;
 			}
 		}
 

@@ -49,14 +49,6 @@ namespace Vi.Core
             return false;
         }
 
-        public Vector3 GetPotentialDestination(MovementHandler movementHandler)
-        {
-            if (targetStructure) { return movementHandler.GetPotentialDestination(targetStructure); }
-            if (targetCombatAgent) { return movementHandler.GetPotentialDestination(targetCombatAgent); }
-            Debug.LogError("No Target!");
-            return Vector3.zero;
-        }
-
         public List<CombatAgent> ActiveCombatAgents { get; private set; } = new List<CombatAgent>();
         private void UpdateActivePlayersList() { ActiveCombatAgents = PlayerDataManager.Singleton.GetActiveCombatAgents(combatAgent); }
 
