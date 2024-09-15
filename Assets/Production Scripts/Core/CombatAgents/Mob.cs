@@ -142,7 +142,7 @@ namespace Vi.Core.CombatAgents
 
             if (isMeleeHit)
             {
-                if (attackerCombatAgent.wasStaggeredThisFrame) { Debug.Log(attackerCombatAgent + " was staggered"); return false; }
+                if (attackerCombatAgent.wasStaggeredThisFrame) { return false; }
 
                 if (!IsUninterruptable())
                 {
