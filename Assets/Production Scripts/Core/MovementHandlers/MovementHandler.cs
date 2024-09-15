@@ -275,8 +275,11 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
 			RefreshStatus();
-			SetDestination(transform.position);
-			CalculatePath(transform.position, NavMesh.AllAreas);
+			if (!NetworkObject.IsPlayerObject)
+            {
+				SetDestination(transform.position);
+				CalculatePath(transform.position, NavMesh.AllAreas);
+			}
 		}
 
         protected virtual void OnDisable()
