@@ -106,7 +106,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    //EvaluateAction();
+                    EvaluateAction();
                 }
             }
         }

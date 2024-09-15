@@ -13,6 +13,7 @@ namespace Vi.Player
 {
     public class PlayerMovementHandler : PhysicsMovementHandler
     {
+        [Header("Player Movement Handler")]
         [SerializeField] private CameraController cameraController;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)

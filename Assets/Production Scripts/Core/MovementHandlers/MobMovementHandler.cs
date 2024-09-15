@@ -25,7 +25,7 @@ namespace Vi.Core.MovementHandlers
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
             SetAnimationMoveInput(GetPathMoveInput(true));
-            //EvaluateAction();
+            EvaluateAction();
         }
 
         private bool disableBots;
@@ -64,6 +64,7 @@ namespace Vi.Core.MovementHandlers
 
         [Header("Mob Movement Handler")]
         [SerializeField] private TargetingType targetingType = TargetingType.StructuresThenPlayers;
+        [SerializeField] private float targetingSwitchDistance = 11;
         private enum TargetingType
         {
             Players,
@@ -94,6 +95,9 @@ namespace Vi.Core.MovementHandlers
             if (!IsServer) { return; }
 
             targetFinder.ClearTarget();
+
+            if (disableBots) { SetDestination(GetPosition()); return; }
+
             switch (targetingType)
             {
                 case TargetingType.Players:
@@ -126,6 +130,8 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
+                    if (targetFinder.GetTarget()) { break; }
+
                     targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
@@ -145,6 +151,8 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
+                    if (targetFinder.GetTarget()) { break; }
+
                     System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
@@ -159,7 +167,7 @@ namespace Vi.Core.MovementHandlers
                     break;
             }
 
-            if (targetFinder.GetTarget() & !disableBots)
+            if (targetFinder.GetTarget())
             {
                 targetFinder.SetDestination(this);
             }
@@ -318,10 +326,11 @@ namespace Vi.Core.MovementHandlers
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
-        private const float lightAttackDistance = 2.5f;
+        [SerializeField] private float lightAttackDistance = 2.5f;
 
-        private const float ability1DistanceMin = 8;
-        private const float ability1Distance = 10;
+        [SerializeField] private bool canUseAbility1 = true;
+        [SerializeField] private float ability1DistanceMin = 8;
+        [SerializeField] private float ability1Distance = 10;
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -333,7 +342,7 @@ namespace Vi.Core.MovementHandlers
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (dist < ability1Distance & dist > ability1DistanceMin)
+                else if (dist < ability1Distance & dist > ability1DistanceMin & canUseAbility1)
                 {
                     weaponHandler.Ability1(true);
                 }
