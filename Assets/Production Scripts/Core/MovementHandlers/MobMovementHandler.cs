@@ -101,7 +101,7 @@ namespace Vi.Core.MovementHandlers
             switch (targetingType)
             {
                 case TargetingType.Players:
-                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.MovementHandler.GetPosition(), GetPosition()).CompareTo(Vector3.Distance(y.MovementHandler.GetPosition(), GetPosition())));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
@@ -111,7 +111,7 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.Structures:
-                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, GetPosition()).CompareTo(Vector3.Distance(y.transform.position, GetPosition())));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (structure.IsDead) { continue; }
@@ -121,7 +121,7 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.StructuresThenPlayers:
-                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, GetPosition()).CompareTo(Vector3.Distance(y.transform.position, GetPosition())));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (structure.IsDead) { continue; }
@@ -130,19 +130,18 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    if (targetFinder.GetTarget()) { break; }
-
-                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.MovementHandler.GetPosition(), GetPosition()).CompareTo(Vector3.Distance(y.MovementHandler.GetPosition(), GetPosition())));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
+                        if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > targetingSwitchDistance) { continue; }
                         targetFinder.SetTarget(combatAgent);
                         break;
                     }
                     break;
                 case TargetingType.PlayersThenStructures:
-                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.MovementHandler.GetPosition(), GetPosition()).CompareTo(Vector3.Distance(y.MovementHandler.GetPosition(), GetPosition())));
                     foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents)
                     {
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
@@ -151,13 +150,12 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    if (targetFinder.GetTarget()) { break; }
-
-                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, transform.position).CompareTo(Vector3.Distance(y.transform.position, transform.position)));
+                    System.Array.Sort(targetFinder.ActiveStructures, (x, y) => Vector3.Distance(x.transform.position, GetPosition()).CompareTo(Vector3.Distance(y.transform.position, GetPosition())));
                     foreach (Structure structure in targetFinder.ActiveStructures)
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
+                        if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > targetingSwitchDistance) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
                     }
