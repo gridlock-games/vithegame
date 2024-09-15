@@ -22,10 +22,10 @@ namespace Vi.Core.MovementHandlers
         protected override void Update()
         {
             base.Update();
-            SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
-            EvaluateAction();
+            SetAnimationMoveInput(GetPathMoveInput(true));
+            //EvaluateAction();
         }
 
         private bool disableBots;
@@ -185,7 +185,7 @@ namespace Vi.Core.MovementHandlers
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed() & !combatAgent.IsGrabbing()) { Rigidbody.isKinematic = false; return; }
 
-            Vector2 moveInput = GetPathMoveInput();
+            Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
 
             // Apply movement

@@ -74,9 +74,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba99df51c81a4b42a5c6f1011b84da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoppingDistance: 2
+  stoppingDistance: 1
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
+  stairStepHeight: 0.01
+  maxStairStepHeight: 0.5
+  aiRigidbodyorneHorizontalDragMultiplier: 0.1
+  gravityScale: 2
 --- !u!114 &1564116883212529234
 MonoBehaviour:
   m_ObjectHideFlags: 0

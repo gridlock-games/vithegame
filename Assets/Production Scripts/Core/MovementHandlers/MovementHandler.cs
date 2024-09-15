@@ -42,7 +42,7 @@ namespace Vi.Core.MovementHandlers
 		protected const float bodyRadius = 0.5f;
 
 		[Header("Movement Handler")]
-		[SerializeField] protected float stoppingDistance = 2;
+		[SerializeField] protected float stoppingDistance = 1;
 		protected Vector3 Destination { get { return destination.Value; } }
 		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();
 
@@ -316,9 +316,9 @@ namespace Vi.Core.MovementHandlers
 			return moveInput;
 		}
 
-		public Vector2 GetPathMoveInput()
+		public Vector2 GetPathMoveInput(bool useTransform)
         {
-			if (Vector3.Distance(Destination, GetPosition()) < stoppingDistance) { return Vector2.zero; }
+			if (Vector3.Distance(Destination, useTransform ? transform.position : GetPosition()) < stoppingDistance) { return Vector2.zero; }
 			Vector3 moveInput = transform.InverseTransformDirection(NextPosition - GetPosition());
 			return new Vector2(moveInput.x, moveInput.z).normalized;
 		}

@@ -30,11 +30,11 @@ namespace Vi.ArtificialIntelligence
                 if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position); }
             }
 
-            SetAnimationMoveInput(Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput());
-            EvaluateBotLogic();
-
             transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
+
+            SetAnimationMoveInput(GetPathMoveInput(true));
+            EvaluateBotLogic();
             if (IsServer) { currentRotation.Value = transform.rotation; }
         }
 
@@ -106,7 +106,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    EvaluateAction();
+                    //EvaluateAction();
                 }
             }
         }
@@ -271,7 +271,7 @@ namespace Vi.ArtificialIntelligence
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed() & !combatAgent.IsGrabbing()) { Rigidbody.isKinematic = false; return; }
 
-            Vector2 moveInput = GetPathMoveInput();
+            Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
 
             // Apply movement
@@ -406,7 +406,7 @@ namespace Vi.ArtificialIntelligence
 
         void OnDodge()
         {
-            Vector2 moveInput = GetPathMoveInput();
+            Vector2 moveInput = GetPathMoveInput(false);
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             combatAgent.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
