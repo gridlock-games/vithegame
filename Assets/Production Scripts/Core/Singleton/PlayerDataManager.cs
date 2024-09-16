@@ -1328,7 +1328,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    Destroy(playerObjectToSpawn);
+                    ObjectPoolingManager.ReturnObjectToPool(playerObjectToSpawn.GetComponent<PooledObject>());
                 }
             }
             
@@ -1411,14 +1411,14 @@ namespace Vi.Core
             bool isSpectator = playerData.team == Team.Spectator;
             if (isSpectator)
             {
-                playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+                playerObjectToSpawn = ObjectPoolingManager.SpawnObject(spectatorPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
             }
             else
             {
                 if (playerData.id >= 0)
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
                 else
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
 
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }

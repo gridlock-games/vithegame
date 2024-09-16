@@ -120,7 +120,7 @@ namespace Vi.Core
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", "") | data.skinPrefab.name == name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -1047,7 +1047,7 @@ namespace Vi.Core
                 {
                     if (GetAmmoCount() == 0)
                     {
-                        if (combatAgent.MovementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                        if (combatAgent.MovementHandler.GetPlayerMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
             }
@@ -1162,7 +1162,7 @@ namespace Vi.Core
 
         void OnAddForce()
         {
-            combatAgent.MovementHandler.GetRigidbody().AddForce((transform.forward + Vector3.up) * 50);
+            combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
 
@@ -1304,16 +1304,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");

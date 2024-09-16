@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.EnhancedTouch;
 using Vi.Core;
 using Vi.Utility;
 using Vi.Player;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.UI
 {
@@ -37,8 +38,6 @@ namespace Vi.UI
         private PlayerInput playerInput;
         private void Start()
         {
-            RefreshStatus();
-
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
 
@@ -61,6 +60,7 @@ namespace Vi.UI
 
         private void OnEnable()
         {
+            RefreshStatus();
             InputSystem.onBeforeUpdate += UpdateJoystick;
         }
 

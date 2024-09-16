@@ -319,7 +319,7 @@ namespace Vi.Core
                             {
                                 // Lunge mechanic
 #if UNITY_EDITOR
-                                ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
+                                DebugExtensions.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
 #endif
                                 int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
                                     ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
@@ -1088,6 +1088,23 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
+        private void OnDisable()
+        {
+            if (Animator)
+            {
+                if (Animator.transform != transform)
+                {
+                    if (Animator.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        Animator = null;
+                        LimbReferences = null;
+                        animatorReference = null;
+                    }
+                }
+            }
+        }
+
         public void ChangeCharacter(WebRequestManager.Character character)
         {
             if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
@@ -1114,13 +1131,14 @@ namespace Vi.Core
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
             combatAgent = GetComponent<CombatAgent>();
 
-            if (TryGetComponent(out Animator animator))
+            AnimatorReference animatorReference = GetComponentInChildren<AnimatorReference>();
+            if (animatorReference)
             {
-                Animator = animator;
+                this.animatorReference = animatorReference;
+                LimbReferences = animatorReference.GetComponent<LimbReferences>();
+                Animator = animatorReference.GetComponent<Animator>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
-                LimbReferences = GetComponent<LimbReferences>();
-                animatorReference = GetComponent<AnimatorReference>();
             }
         }
 

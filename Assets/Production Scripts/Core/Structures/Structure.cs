@@ -13,6 +13,23 @@ namespace Vi.Core.Structures
         [SerializeField] private float maxHP = 100;
         [SerializeField] private PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
 
+        public Collider[] Colliders { get; private set; }
+
+        private void Awake()
+        {
+            Colliders = GetComponentsInChildren<Collider>();
+
+            List<Collider> networkPredictionLayerColliders = new List<Collider>();
+            foreach (Collider col in Colliders)
+            {
+                if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    networkPredictionLayerColliders.Add(col);
+                }
+            }
+            Colliders = networkPredictionLayerColliders.ToArray();
+        }
+
         private NetworkVariable<float> HP = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()
@@ -83,14 +100,20 @@ namespace Vi.Core.Structures
             return HP.Value;
         }
 
+        public bool IsDead { get; private set; }
         private void OnHPChanged(float prev, float current)
         {
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
+                IsDead = true;
                 foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 {
                     r.forceRenderingOff = true;
                 }
+            }
+            else if (prev <= 0 & current > 0)
+            {
+                IsDead = false;
             }
         }
 

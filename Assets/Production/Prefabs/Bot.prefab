@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 1564116883212529237}
   - component: {fileID: -8539089533449040199}
   - component: {fileID: 1300232046518436515}
+  - component: {fileID: 2946962623116814342}
+  - component: {fileID: 7817989388711771855}
   m_Layer: 6
   m_Name: Bot
   m_TagString: Untagged
@@ -72,7 +74,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ba99df51c81a4b42a5c6f1011b84da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoppingDistance: 2
+  stoppingDistance: 1
+  runAnimationTransitionSpeed: 5
+  isGroundedSphereCheckRadius: 0.6
+  stairStepHeight: 0.01
+  maxStairStepHeight: 0.5
+  aiRigidbodyorneHorizontalDragMultiplier: 0.1
+  gravityScale: 2
 --- !u!114 &1564116883212529234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,6 +158,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2946962623116814342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564116883212529240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 171
+  isPrewarmObject: 1
+--- !u!114 &7817989388711771855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564116883212529240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73c5630fa30a17d4ca47204bc87d7d75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3752378237016651200

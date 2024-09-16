@@ -199,20 +199,23 @@ namespace Vi.Core
             }
         }
 
-        private void OnDestroy()
+        private void OnReturnToPool()
         {
             foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
             {
-                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
-                {
-                    kvp.Value.transform.SetParent(null, true);
-                    SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
-                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                    kvp.Value.enabled = true;
-                }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {
                     glowRenderer.UnregisterRenderer(smr);
+                }
+
+                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
+                    kvp.Value.enabled = true;
+                }
+                else
+                {
+                    Destroy(kvp.Value);
                 }
             }
         }
@@ -302,6 +305,11 @@ namespace Vi.Core
 
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
         private void Start()

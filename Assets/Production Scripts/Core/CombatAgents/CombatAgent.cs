@@ -5,10 +5,13 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(StatusAgent))]
+    [RequireComponent(typeof(AnimationHandler))]
+    [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
@@ -99,15 +102,15 @@ namespace Vi.Core
 
         public StatusAgent StatusAgent { get; private set; }
         public AnimationHandler AnimationHandler { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
+        public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
-        protected void Awake()
+        protected virtual void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
             GlowRenderer = GetComponent<GlowRenderer>();
-            MovementHandler = GetComponent<MovementHandler>();
+            MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
         }
@@ -148,12 +151,12 @@ namespace Vi.Core
             }
         }
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
         }
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
@@ -374,7 +377,11 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
-        
+
+        protected NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
+        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
+        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
+
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();

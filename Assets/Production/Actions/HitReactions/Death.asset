@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -314,6 +315,13 @@ MonoBehaviour:
   - raceAndGenders: 08000000
     audioClips:
     - {fileID: 8300000, guid: 28fe34a838ba847cf8e7d12f033883f7, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 0e000000
+    audioClips:
+    - {fileID: 8300000, guid: b1a200894b0794b019f105279073b0e1, type: 3}
+    - {fileID: 8300000, guid: 206689ff363b4455ebb703f99e85d592, type: 3}
+    - {fileID: 8300000, guid: 2ae41b540f35f49a88f75077246a1fa7, type: 3}
+    - {fileID: 8300000, guid: bde89078cd8754aa2a923a77104bc15b, type: 3}
     normalizedPlayTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []

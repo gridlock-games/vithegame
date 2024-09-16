@@ -6,78 +6,35 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using UnityEngine.AI;
 using Vi.Utility;
-using Vi.Core.CombatAgents;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {
-    public class BotController : MovementHandler
+    public class BotController : PhysicsMovementHandler
     {
-        public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
-        {
-            if (!IsServer) { Debug.LogError("BotController.SetOrientation() should only be called on the server!"); return; }
-            rb.position = newPosition;
-            rb.velocity = Vector3.zero;
-            transform.position = newPosition;
-            transform.rotation = newRotation;
-        }
-
-        private Attributes attributes;
-        private new void Awake()
+        private GameplayTargetFinder targetFinder;
+        protected override void Awake()
         {
             base.Awake();
-            attributes = GetComponent<Attributes>();
-            RefreshStatus();
+            targetFinder = GetComponent<GameplayTargetFinder>();
         }
 
-        private void Start()
-        {
-            rb.transform.SetParent(null, true);
-            UpdateActivePlayersList();
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            if (rb) { Destroy(rb.gameObject); }
-        }
-
-        private float GetTickRateDeltaTime()
-        {
-            return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
-        }
-
-        private float GetRootMotionSpeed()
-        {
-            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount() + attributes.StatusAgent.GetMovementSpeedIncreaseAmount());
-        }
-
-        private List<CombatAgent> activePlayers = new List<CombatAgent>();
-        private void UpdateActivePlayersList() { activePlayers = PlayerDataManager.Singleton.GetActiveCombatAgents(attributes); }
-
-        private CombatAgent targetAttributes;
-
-        private const float runAnimationTransitionSpeed = 5;
-        private new void Update()
+        protected override void Update()
         {
             base.Update();
-
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
-            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
 
             if (!IsSpawned) { return; }
 
             if (IsServer)
             {
-                if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetDestination(rb.position, true); }
+                if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position); }
             }
 
-            UpdateAnimatorParameters();
-            UpdateAnimatorSpeed();
-            EvaluateBotLogic();
-
-            transform.position = rb.transform.position;
+            transform.position = Rigidbody.transform.position;
             transform.rotation = EvaluateRotation();
+
+            SetAnimationMoveInput(GetPathMoveInput(true));
+            EvaluateBotLogic();
             if (IsServer) { currentRotation.Value = transform.rotation; }
         }
 
@@ -85,16 +42,16 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
-                Vector3 camDirection = targetAttributes ? (targetAttributes.transform.position - rb.position).normalized : (NextPosition - rb.position).normalized;
+                Vector3 camDirection = targetFinder.GetTarget() ? (targetFinder.GetTarget().transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
                 camDirection.Scale(HORIZONTAL_PLANE);
 
-                if (attributes.ShouldApplyAilmentRotation())
-                    return attributes.GetAilmentRotation();
-                else if (attributes.IsGrabbing())
+                if (combatAgent.ShouldApplyAilmentRotation())
+                    return combatAgent.GetAilmentRotation();
+                else if (combatAgent.IsGrabbing())
                     return transform.rotation;
-                else if (attributes.IsGrabbed())
+                else if (combatAgent.IsGrabbed())
                 {
-                    CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                    CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                     if (grabAssailant)
                     {
                         Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
@@ -102,8 +59,8 @@ namespace Vi.ArtificialIntelligence
                         return Quaternion.LookRotation(rel, Vector3.up);
                     }
                 }
-                else if (!attributes.ShouldPlayHitStop())
-                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * Random.Range(0.1f, 5));
+                else if (!combatAgent.ShouldPlayHitStop())
+                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
                 return transform.rotation;
             }
@@ -113,127 +70,43 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private void UpdateAnimatorParameters()
-        {
-            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
-            attributes.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(attributes.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
-            attributes.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
-            attributes.AnimationHandler.Animator.SetFloat("VerticalSpeed", rb.velocity.y);
-        }
-
-        private Vector2 GetWalkCycleAnimationParameters()
-        {
-            if (attributes.AnimationHandler.ShouldApplyRootMotion())
-            {
-                return Vector2.zero;
-            }
-            else if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
-            {
-                return Vector2.zero;
-            }
-            else
-            {
-                Vector2 moveInput = Vector3.Distance(Destination, GetPosition()) < 0.5f ? Vector2.zero : GetPathMoveInput();
-                Vector2 animDir = new Vector2(moveInput.x, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1);
-                animDir = Vector2.ClampMagnitude(animDir, 1);
-
-                if (attributes.WeaponHandler.IsBlocking)
-                {
-                    switch (attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion())
-                    {
-                        case Weapon.BlockingLocomotion.NoMovement:
-                            animDir = Vector2.zero;
-                            break;
-                        case Weapon.BlockingLocomotion.CanWalk:
-                            animDir /= 2;
-                            break;
-                        case Weapon.BlockingLocomotion.CanRun:
-                            break;
-                        default:
-                            Debug.LogError("Unsure how to handle blocking locomotion type: " + attributes.WeaponHandler.GetWeapon().GetBlockingLocomotion());
-                            break;
-                    }
-                }
-                return animDir;
-            }
-        }
-
-        private void UpdateAnimatorSpeed()
-        {
-            if (weaponHandler.CurrentActionClip != null)
-            {
-                if (attributes.ShouldPlayHitStop())
-                {
-                    attributes.AnimationHandler.Animator.speed = 0;
-                }
-                else
-                {
-                    if (attributes.IsGrabbed())
-                    {
-                        CombatAgent grabAssailant = attributes.GetGrabAssailant();
-                        if (grabAssailant)
-                        {
-                            if (grabAssailant.AnimationHandler)
-                            {
-                                attributes.AnimationHandler.Animator.speed = grabAssailant.AnimationHandler.Animator.speed;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        attributes.AnimationHandler.Animator.speed = GetAnimatorSpeed();
-                    }
-                }
-            }
-        }
-
         private bool disableBots;
         private bool canOnlyLightAttack;
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
         private void LateUpdate()
         {
-            if (attributes.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
+            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
         }
 
         private void EvaluateBotLogic()
         {
             if (IsServer)
             {
-                activePlayers.Sort((x, y) => Vector3.Distance(x.transform.position, rb.position).CompareTo(Vector3.Distance(y.transform.position, rb.position)));
+                targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
-                targetAttributes = null;
-                foreach (CombatAgent player in activePlayers)
+                targetFinder.ClearTarget();
+                foreach (CombatAgent player in targetFinder.ActiveCombatAgents)
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
-                    if (!PlayerDataManager.Singleton.CanHit(attributes, player)) { continue; }
-                    if (SetDestination(player.transform.position, true)) { targetAttributes = player; }
+                    if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
+                    targetFinder.SetTarget(player);
+                    if (!targetFinder.SetDestination(this)) { targetFinder.ClearTarget(); }
                     break;
                 }
 
                 if (disableBots)
                 {
-                    SetDestination(rb.position, true);
+                    SetDestination(Rigidbody.position);
                 }
                 else
                 {
-                    if (!targetAttributes)
-                    {
-                        if (Vector3.Distance(Destination, transform.position) <= stoppingDistance)
-                        {
-                            float walkRadius = 500;
-                            Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
-                            randomDirection += transform.position;
-                            NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, walkRadius, 1);
-                            SetDestination(hit.position, true);
-                        }
-                    }
-                    EvaluteAction();
+                    EvaluateAction();
                 }
             }
         }
@@ -254,7 +127,7 @@ namespace Vi.ArtificialIntelligence
         private const float abilityWaitDuration = 3;
         private float lastAbilityTime;
 
-        private void EvaluteAction()
+        private void EvaluateAction()
         {
             if (canOnlyLightAttack)
             {
@@ -268,13 +141,13 @@ namespace Vi.ArtificialIntelligence
                 return;
             }
 
-            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | attributes.LoadoutManager.WeaponNameThatCanFlashAttack != null)
+            if (Time.time - lastWeaponSwapTime > weaponSwapDuration | combatAgent.LoadoutManager.WeaponNameThatCanFlashAttack != null)
             {
-                attributes.LoadoutManager.SwitchWeapon();
+                combatAgent.LoadoutManager.SwitchWeapon();
                 lastWeaponSwapTime = Time.time;
             }
 
-            if (targetAttributes)
+            if (targetFinder.GetTarget())
             {
                 if (weaponHandler.CanADS)
                 {
@@ -334,9 +207,9 @@ namespace Vi.ArtificialIntelligence
         {
             if (Time.time - lastAbilityTime > abilityWaitDuration)
             {
-                if (attributes.GetRage() / attributes.GetMaxRage() >= 1)
+                if (combatAgent.GetRage() / combatAgent.GetMaxRage() >= 1)
                 {
-                    attributes.OnActivateRage();
+                    combatAgent.OnActivateRage();
                     lastAbilityTime = Time.time;
                     return;
                 }
@@ -366,51 +239,6 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        List<Collider> groundColliders = new List<Collider>();
-        ContactPoint[] stayContacts = new ContactPoint[3];
-        public override void ReceiveOnCollisionStayMessage(Collision collision)
-        {
-            int contactCount = collision.GetContacts(stayContacts);
-            for (int i = 0; i < contactCount; i++)
-            {
-                if (stayContacts[i].normal.y >= 0.9f)
-                {
-                    if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
-                    break;
-                }
-                else // Normal is not pointing up
-                {
-                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
-                }
-            }
-        }
-
-        public override void ReceiveOnCollisionExitMessage(Collision collision)
-        {
-            if (groundColliders.Contains(collision.collider))
-            {
-                groundColliders.Remove(collision.collider);
-            }
-        }
-
-        private const float isGroundedSphereCheckRadius = 0.6f;
-        private bool IsGrounded()
-        {
-            if (groundColliders.Count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return Physics.CheckSphere(rb.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
-            }
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            rb.isKinematic = !IsServer & !IsOwner;
-        }
-
         private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
 
@@ -419,65 +247,65 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Move();
-                currentPosition.Value = rb.position;
+                currentPosition.Value = Rigidbody.position;
             }
             else
             {
-                rb.MovePosition(currentPosition.Value);
+                Rigidbody.MovePosition(currentPosition.Value);
             }
         }
 
         private void Move()
         {
-            Vector3 rootMotion = attributes.AnimationHandler.ApplyRootMotion();
+            Vector3 rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
 
             if (!IsSpawned) { return; }
 
-            CalculatePath(rb.position, NavMesh.AllAreas);
+            CalculatePath(Rigidbody.position, NavMesh.AllAreas);
 
-            if (!CanMove() | attributes.GetAilment() == ActionClip.Ailment.Death)
+            if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
-                rb.velocity = Vector3.zero;
+                Rigidbody.velocity = Vector3.zero;
                 return;
             }
 
-            if (IsAffectedByExternalForce & !attributes.IsGrabbed() & !attributes.IsGrabbing()) { rb.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed() & !combatAgent.IsGrabbing()) { Rigidbody.isKinematic = false; return; }
 
-            Vector2 moveInput = GetPathMoveInput();
+            Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
 
             // Apply movement
             Vector3 movement = Vector3.zero;
-            if (attributes.IsGrabbing())
+            if (combatAgent.IsGrabbing())
             {
-                rb.isKinematic = true;
+                Rigidbody.isKinematic = true;
                 return;
             }
-            else if (attributes.IsGrabbed() & attributes.GetAilment() == ActionClip.Ailment.None)
+            else if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
             {
-                CombatAgent grabAssailant = attributes.GetGrabAssailant();
+                CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                 if (grabAssailant)
                 {
-                    rb.isKinematic = true;
-                    rb.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    Rigidbody.isKinematic = true;
+                    Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
                     return;
                 }
             }
-            else if (attributes.ShouldPlayHitStop())
+            else if (combatAgent.ShouldPlayHitStop())
             {
                 movement = Vector3.zero;
             }
-            else if (attributes.IsPulled())
+            else if (combatAgent.IsPulled())
             {
-                CombatAgent pullAssailant = attributes.GetPullAssailant();
+                CombatAgent pullAssailant = combatAgent.GetPullAssailant();
                 if (pullAssailant)
                 {
                     movement = pullAssailant.MovementHandler.GetPosition() - GetPosition();
                 }
             }
-            else if (attributes.AnimationHandler.ShouldApplyRootMotion())
+            else if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
             {
-                if (attributes.StatusAgent.IsRooted() & attributes.GetAilment() != ActionClip.Ailment.Knockup & attributes.GetAilment() != ActionClip.Ailment.Knockdown)
+                if (combatAgent.StatusAgent.IsRooted() & combatAgent.GetAilment() != ActionClip.Ailment.Knockup & combatAgent.GetAilment() != ActionClip.Ailment.Knockdown)
                 {
                     movement = Vector3.zero;
                 }
@@ -486,20 +314,20 @@ namespace Vi.ArtificialIntelligence
                     movement = newRotation * rootMotion * GetRootMotionSpeed();
                 }
             }
-            else if (attributes.AnimationHandler.IsAtRest())
+            else if (combatAgent.AnimationHandler.IsAtRest())
             {
-                Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1));
+                Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= GetRunSpeed();
-                movement = attributes.StatusAgent.IsRooted() | attributes.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
+                movement = combatAgent.StatusAgent.IsRooted() | combatAgent.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
-            rb.isKinematic = false;
+            Rigidbody.isKinematic = false;
 
-            if (attributes.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
+            if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            Vector3 startPos = rb.position;
+            Vector3 startPos = Rigidbody.position;
             startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
@@ -520,10 +348,10 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(rb.position, rb.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
-                foreach (Collider c in attributes.NetworkCollider.Colliders)
+                foreach (Collider c in combatAgent.NetworkCollider.Colliders)
                 {
                     if (Physics.GetIgnoreCollision(playerHit.collider, c))
                     {
@@ -534,7 +362,7 @@ namespace Vi.ArtificialIntelligence
 
                 if (!collidersIgnoreEachOther)
                 {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - rb.position, Vector3.up);
+                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - Rigidbody.position, Vector3.up);
                     float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
                     if (angle > 180) { angle -= 360; }
@@ -549,9 +377,9 @@ namespace Vi.ArtificialIntelligence
             bool evaluateForce = true;
             if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {
-                if (attributes.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+                if (combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    rb.AddForce(movement - rb.velocity, ForceMode.VelocityChange);
+                    Rigidbody.AddForce(movement - Rigidbody.velocity, ForceMode.VelocityChange);
                     evaluateForce = false;
                 }
             }
@@ -560,44 +388,27 @@ namespace Vi.ArtificialIntelligence
             {
                 if (IsGrounded())
                 {
-                    rb.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(rb.velocity.x, 0, rb.velocity.z), ForceMode.VelocityChange);
-                    if (rb.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
+                    if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
-                        rb.AddForce(new Vector3(0, -rb.velocity.y, 0), ForceMode.VelocityChange);
+                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
                     }
                 }
-                else // Decelerate horizontal movement while airborne
+                else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-rb.velocity.x, 0, -rb.velocity.z), airborneHorizontalDragMultiplier);
-                    rb.AddForce(counterForce, ForceMode.VelocityChange);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
-            rb.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
-            rb.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
-        }
-
-        private const float stairStepHeight = 0.01f;
-        private const float maxStairStepHeight = 0.5f;
-
-        private const float airborneHorizontalDragMultiplier = 0.1f;
-
-        private const float gravityScale = 2;
-
-        private float GetRunSpeed()
-        {
-            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking) - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount();
-        }
-
-        private float GetAnimatorSpeed()
-        {
-            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - attributes.StatusAgent.GetMovementSpeedDecreaseAmount()) + attributes.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (attributes.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+            Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
         void OnDodge()
         {
-            Vector2 moveInput = GetPathMoveInput();
-            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (attributes.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
-            attributes.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+            Vector2 moveInput = GetPathMoveInput(false);
+            float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
+            combatAgent.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
         }
     }
 }

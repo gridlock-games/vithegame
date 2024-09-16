@@ -60,13 +60,13 @@ namespace Vi.ScriptableObjects
             "ProjectileCollider"
         };
 
-        protected void Awake()
+        protected virtual void Awake()
         {
             colliders = GetComponentsInChildren<Collider>();
         }
 
         private PooledObject pooledObject;
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
 #if UNITY_EDITOR
             foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
@@ -165,7 +165,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (TryGetComponent(out Rigidbody rb))
             {

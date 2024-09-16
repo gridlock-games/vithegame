@@ -142,7 +142,7 @@ namespace Vi.Core.CombatAgents
 
             if (isMeleeHit)
             {
-                if (attackerCombatAgent.wasStaggeredThisFrame) { Debug.Log(attackerCombatAgent + " was staggered"); return false; }
+                if (attackerCombatAgent.wasStaggeredThisFrame) { return false; }
 
                 if (!IsUninterruptable())
                 {
@@ -293,7 +293,20 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        [SerializeField] private Weapon.ArmorType armorType;
+        protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        {
+            base.OnAilmentChanged(prev, current);
+            if (current == ActionClip.Ailment.Death)
+            {
+                AnimationHandler.Animator.enabled = false;
+            }
+            else if (prev == ActionClip.Ailment.Death)
+            {
+                AnimationHandler.Animator.enabled = true;
+            }
+        }
+
+        [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Flesh;
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
