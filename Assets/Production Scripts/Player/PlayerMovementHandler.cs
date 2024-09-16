@@ -501,7 +501,7 @@ namespace Vi.Player
         private Quaternion EvaluateRotation()
         {
             Quaternion rot = transform.rotation;
-            if (cameraController)
+            if (IsOwner)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
@@ -642,16 +642,9 @@ namespace Vi.Player
         protected override void OnReturnToPool()
         {
             base.OnReturnToPool();
-            if (cameraController)
-            {
-                cameraController.transform.SetParent(transform);
-                cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
-                cameraController.transform.localRotation = Quaternion.identity;
-            }
-            else
-            {
-                Debug.LogError("Camera controller has been destroyed!");
-            }
+            cameraController.transform.SetParent(transform);
+            cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
+            cameraController.transform.localRotation = Quaternion.identity;
         }
 
         private const int BUFFER_SIZE = 1024;
@@ -770,7 +763,8 @@ namespace Vi.Player
         private void AutoAim()
         {
             if (!autoAim) { return; }
-            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
+            if (!IsOwner) { return; }
+            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & !weaponHandler.CurrentActionClip.mustBeAiming)
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | combatAgent.AnimationHandler.IsLunging())
                 {
