@@ -302,7 +302,7 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private PooledObject teamIndicatorPrefab;
         private PooledObject teamIndicatorInstance;
-        
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -755,7 +755,22 @@ namespace Vi.Core.CombatAgents
             yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
             if (vfxInstance)
             {
-                if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                if (vfxInstance.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (networkObject.IsSpawned)
+                    {
+                        networkObject.Despawn(true);
+                    }
+                    else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(vfxInstance);
+                    }
+                }
+                else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
                 {
                     ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                 }
@@ -829,7 +844,7 @@ namespace Vi.Core.CombatAgents
                 // Regen for 50 seconds
                 if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
             }
-            
+
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
