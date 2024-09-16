@@ -158,7 +158,7 @@ namespace Vi.Core.MovementHandlers
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > targetingSwitchDistance) { continue; }
+                        if (Vector3.Distance(structure.transform.position, GetPosition()) > targetingSwitchDistance) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
                     }
