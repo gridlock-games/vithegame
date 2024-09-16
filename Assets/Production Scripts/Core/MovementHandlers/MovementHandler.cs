@@ -275,7 +275,7 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
 			RefreshStatus();
-			if (!NetworkObject.IsPlayerObject)
+			if (!NetworkObject.IsPlayerObject & IsServer)
             {
 				SetDestination(transform.position);
 				CalculatePath(transform.position, NavMesh.AllAreas);
