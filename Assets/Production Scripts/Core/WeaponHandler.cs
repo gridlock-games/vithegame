@@ -454,6 +454,12 @@ namespace Vi.Core
             if (vfxInstance)
             {
                 if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
+                
+                if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
+                {
+                    gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
+                }
+
                 if (vfxInstance.TryGetComponent(out NetworkObject netObj))
                 {
                     netObj.Spawn(true);
@@ -461,11 +467,6 @@ namespace Vi.Core
                 else
                 {
                     Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
-                }
-
-                if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
-                {
-                    gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
                 }
             }
             else if (actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
