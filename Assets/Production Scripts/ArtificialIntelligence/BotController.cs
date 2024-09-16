@@ -396,7 +396,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }

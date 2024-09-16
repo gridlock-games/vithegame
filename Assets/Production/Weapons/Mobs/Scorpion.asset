@@ -162,21 +162,28 @@ MonoBehaviour:
     type: 3}
   reloadSoundEffects: []
   weaponModelData:
-  - skinPrefab: {fileID: 4567706115831328728, guid: 25fe1e5e8ca2ce74da34f55afc0f7938,
+  - skinPrefab: {fileID: 6808365250734977039, guid: 4e5823de45e078a43852c1a9d2e67654,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 2001834763269464374, guid: e7dc8b706d0dbe049b3aba5972a7f496,
+    - weaponPrefab: {fileID: 9190221525397719812, guid: 6b51896ad763f1642ad0d84d79ce58cf,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: -25}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 2001834763269464374, guid: b2ec19bc844821646ace4c6bd0b1b281,
+    - weaponPrefab: {fileID: 7902326312778291725, guid: 68badc0419d4fbe41aeb303abe3c19b6,
         type: 3}
       weaponBone: 18
       weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: -25}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 7469013225173108545, guid: 8e4d50a9c8080044e9fa5926f3989617,
+        type: 3}
+      weaponBone: 6
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
@@ -234,7 +241,7 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
-  ability1: {fileID: 11400000, guid: f70ed881dda1fc84c993b15233afd035, type: 2}
+  ability1: {fileID: 0}
   ability2: {fileID: 0}
   ability3: {fileID: 0}
   ability4: {fileID: 0}
@@ -242,13 +249,16 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 9bd732a36e524244390f6cbc80199360, type: 2}
+    attackClip: {fileID: 11400000, guid: eaeab868c5e079c4b8315c84794c1ef3, type: 2}
   - inputs: 0000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: feb767303e70d6b4da9fe2f0c15c9e37, type: 2}
+    attackClip: {fileID: 11400000, guid: c7013f3440349ae49b205bc567223449, type: 2}
   - inputs: 000000000000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 2683249dcbf808344871e73f4068c6b2, type: 2}
+    attackClip: {fileID: 11400000, guid: 9b437302d06f5ea45b87e142178ca4dd, type: 2}
+  - inputs: 00000000000000000000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: cf0ecf8466a557b4cbf8536e8fe96af8, type: 2}
   grabAttackClipList: []
   dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
