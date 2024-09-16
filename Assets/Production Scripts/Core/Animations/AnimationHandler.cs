@@ -1197,13 +1197,8 @@ namespace Vi.Core
 
         public void SetRagdollActive(bool isActive)
         {
-            if (!Animator) { return; }
-            foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
-            {
-                rb.isKinematic = !isActive;
-                rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-            }
-            Animator.enabled = !isActive;
+            if (!animatorReference) { return; }
+            animatorReference.SetRagdollActive(isActive);
         }
     }
 }

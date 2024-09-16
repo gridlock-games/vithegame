@@ -310,6 +310,8 @@ namespace Vi.Core
             {
                 pooledObject.OnReturnToPool += OnReturnToPool;
             }
+
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
         }
 
         private void Start()
@@ -400,6 +402,18 @@ namespace Vi.Core
                 }
                 accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
+        }
+
+        private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!animator) { return; }
+            foreach (Rigidbody rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+                rb.interpolation = combatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            }
+            animator.enabled = !isActive;
         }
     }
 }
