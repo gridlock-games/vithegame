@@ -203,6 +203,8 @@ namespace Vi.Core
 
             foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
+                if (kvp.Key == CharacterReference.EquipmentType.Cape) { yield return null; }
+
                 if (!NetworkObject.IsSpawned) // This would happen if it's a preview object
                 {
                     CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;

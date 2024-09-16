@@ -123,8 +123,17 @@ namespace Vi.Core
             return normalizedTime;
         }
 
-        public bool IsAtRest() { return animatorReference.IsAtRest(); }
-        public bool IsAtRestIgnoringTransition() { return animatorReference.IsAtRestIgnoringTransition(); }
+        public bool IsAtRest()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRest();
+        }
+
+        public bool IsAtRestIgnoringTransition()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRestIgnoringTransition();
+        }
 
         public bool CanAim()
         {
@@ -1053,7 +1062,17 @@ namespace Vi.Core
             {
                 shouldCreateNewSkin = animatorReference.name.Replace("(Clone)", "") != character.model;
 
-                if (shouldCreateNewSkin) { Destroy(animatorReference.gameObject); }
+                if (shouldCreateNewSkin)
+                {
+                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(animatorReference.gameObject);
+                    }
+                }
             }
 
             if (shouldCreateNewSkin)

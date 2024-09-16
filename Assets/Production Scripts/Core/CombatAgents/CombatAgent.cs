@@ -266,7 +266,7 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
                 bool evaluateUninterruptability = true;

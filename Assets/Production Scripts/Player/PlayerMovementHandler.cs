@@ -267,6 +267,15 @@ namespace Vi.Player
             }
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            movementTick = default;
+            lastEvaluatedServerRootMotionTick = default;
+            TargetToLockOn = default;
+            CameraFollowTarget = default;
+        }
+
         private int movementTick;
         private int lastEvaluatedServerRootMotionTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
@@ -563,6 +572,7 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.Camera.enabled = true;
 
@@ -570,13 +580,16 @@ namespace Vi.Player
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
-                GetComponent<ActionMapHandler>().enabled = true;
+                actionMapHandler.enabled = true;
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
-                Destroy(cameraController.gameObject);
-                Destroy(playerInput);
+                cameraController.gameObject.SetActive(false);
+                cameraController.Camera.enabled = false;
+                playerInput.enabled = false;
+
+                actionMapHandler.enabled = false;
             }
 
             if (!IsClient)
@@ -597,6 +610,16 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
+
+            cameraController.gameObject.SetActive(false);
+            if (cameraController.gameObject.TryGetComponent(out AudioListener audioListener))
+            {
+                Destroy(audioListener);
+            }
+            cameraController.Camera.enabled = false;
+
+            playerInput.enabled = false;
+            actionMapHandler.enabled = false;
 
             if (!IsClient)
             {
@@ -619,9 +642,16 @@ namespace Vi.Player
         protected override void OnReturnToPool()
         {
             base.OnReturnToPool();
-            cameraController.transform.SetParent(transform);
-            cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
-            cameraController.transform.localRotation = Quaternion.identity;
+            if (cameraController)
+            {
+                cameraController.transform.SetParent(transform);
+                cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
+                cameraController.transform.localRotation = Quaternion.identity;
+            }
+            else
+            {
+                Debug.LogError("Camera controller has been destroyed!");
+            }
         }
 
         private const int BUFFER_SIZE = 1024;
@@ -632,6 +662,7 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
 
+        private ActionMapHandler actionMapHandler;
         protected override void Awake()
         {
             base.Awake();
@@ -640,6 +671,8 @@ namespace Vi.Player
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             serverInputQueue = new Queue<InputPayload>();
+
+            actionMapHandler = GetComponent<ActionMapHandler>();
         }
 
         private void Start()

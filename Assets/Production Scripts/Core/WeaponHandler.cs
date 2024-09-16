@@ -42,7 +42,7 @@ namespace Vi.Core
         public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
         public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
-            if (IsOwner) { aiming.Value = false; }
+            if (IsOwner & IsSpawned) { aiming.Value = false; }
 
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
@@ -103,6 +103,20 @@ namespace Vi.Core
         public void UseAmmo()
         {
             combatAgent.LoadoutManager.UseAmmo(weaponInstance);
+        }
+
+        private void OnDisable()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
+            }
+            weaponInstances.Clear();
+            foreach (PooledObject g in stowedWeaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(g);
+            }
+            stowedWeaponInstances.Clear();
         }
 
         private void EquipWeapon()
@@ -579,12 +593,12 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance " + weaponInstance.name);
                             }
                         }
                         else
                         {
-                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance " + weaponInstance.name);
                         }
                     }
                 }
@@ -1040,7 +1054,7 @@ namespace Vi.Core
 
             combatAgent.AnimationHandler.Animator.SetBool("Blocking", IsBlocking);
 
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 reloadingAnimParameterValue.Value = combatAgent.AnimationHandler.Animator.GetBool("Reloading");
 

@@ -345,8 +345,9 @@ namespace Vi.Player
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");

@@ -208,14 +208,17 @@ namespace Vi.Core
                     glowRenderer.UnregisterRenderer(smr);
                 }
 
-                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                if (kvp.Value)
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                    kvp.Value.enabled = true;
-                }
-                else
-                {
-                    Destroy(kvp.Value);
+                    if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
+                        kvp.Value.enabled = true;
+                    }
+                    else
+                    {
+                        Destroy(kvp.Value);
+                    }
                 }
             }
         }

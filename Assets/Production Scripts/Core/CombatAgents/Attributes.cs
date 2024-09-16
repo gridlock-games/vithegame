@@ -753,7 +753,17 @@ namespace Vi.Core.CombatAgents
         private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
         {
             yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
-            if (vfxInstance) { Destroy(vfxInstance); }
+            if (vfxInstance)
+            {
+                if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(vfxInstance);
+                }
+            }
         }
 
         [System.Serializable]
