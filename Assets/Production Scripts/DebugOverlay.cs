@@ -104,9 +104,9 @@ public class DebugOverlay : MonoBehaviour
             myLog = type.ToString() + ": " + output + "\n" + myLog;
         }
 
-        if (myLog.Length > 1000)
+        if (myLog.Length > 3000)
         {
-            myLog = myLog.Substring(0, 1000);
+            myLog = myLog.Substring(0, 3000);
         }
 
         consoleLogText.text = myLog;
