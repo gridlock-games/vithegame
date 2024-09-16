@@ -1201,6 +1201,7 @@ namespace Vi.Core
             foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
             {
                 rb.isKinematic = !isActive;
+                rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             }
             Animator.enabled = !isActive;
         }

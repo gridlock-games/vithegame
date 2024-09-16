@@ -528,6 +528,7 @@ namespace Vi.Player
         private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {

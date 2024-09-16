@@ -22,8 +22,11 @@ namespace Vi.Core.MovementHandlers
         protected override void Update()
         {
             base.Update();
-            transform.position = Rigidbody.transform.position;
-            transform.rotation = EvaluateRotation();
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
+            {
+                transform.position = Rigidbody.transform.position;
+                transform.rotation = EvaluateRotation();
+            }
             SetAnimationMoveInput(GetPathMoveInput(true));
             EvaluateAction();
         }

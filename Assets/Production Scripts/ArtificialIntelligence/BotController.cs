@@ -30,8 +30,11 @@ namespace Vi.ArtificialIntelligence
                 if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position); }
             }
 
-            transform.position = Rigidbody.transform.position;
-            transform.rotation = EvaluateRotation();
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
+            {
+                transform.position = Rigidbody.transform.position;
+                transform.rotation = EvaluateRotation();
+            }
 
             SetAnimationMoveInput(GetPathMoveInput(true));
             EvaluateBotLogic();
