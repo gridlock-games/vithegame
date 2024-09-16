@@ -1068,6 +1068,8 @@ namespace Vi.Core
 
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
+
+                SetRagdollActive(false);
             }
 
             yield return null;
@@ -1142,6 +1144,11 @@ namespace Vi.Core
             }
         }
 
+        private void OnEnable()
+        {
+            SetRagdollActive(false);
+        }
+
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -1186,6 +1193,16 @@ namespace Vi.Core
 
             LimbReferences.SetMeleeVerticalAimConstraintOffset(combatAgent.WeaponHandler.IsInAnticipation | combatAgent.WeaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
+        }
+
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!Animator) { return; }
+            foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = !isActive;
+            }
+            Animator.enabled = !isActive;
         }
     }
 }

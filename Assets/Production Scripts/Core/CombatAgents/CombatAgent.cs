@@ -401,11 +401,13 @@ namespace Vi.Core
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 if (IsServer) { isRaging.Value = false; }
+                AnimationHandler.SetRagdollActive(true);
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+                AnimationHandler.SetRagdollActive(false);
             }
         }
 

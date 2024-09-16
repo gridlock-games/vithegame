@@ -293,19 +293,6 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
-        {
-            base.OnAilmentChanged(prev, current);
-            if (current == ActionClip.Ailment.Death)
-            {
-                AnimationHandler.Animator.enabled = false;
-            }
-            else if (prev == ActionClip.Ailment.Death)
-            {
-                AnimationHandler.Animator.enabled = true;
-            }
-        }
-
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Flesh;
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
