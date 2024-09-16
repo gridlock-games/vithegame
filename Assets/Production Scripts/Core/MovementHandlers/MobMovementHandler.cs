@@ -331,7 +331,7 @@ namespace Vi.Core.MovementHandlers
 
         [SerializeField] private bool canUseAbility1 = true;
         [SerializeField] private float ability1DistanceMin = 8;
-        [SerializeField] private float ability1Distance = 10;
+        [SerializeField] private float ability1DistanceMax = 10;
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -343,7 +343,7 @@ namespace Vi.Core.MovementHandlers
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (dist < ability1Distance & dist > ability1DistanceMin & canUseAbility1)
+                else if (dist < ability1DistanceMax & dist > ability1DistanceMin & canUseAbility1)
                 {
                     weaponHandler.Ability1(true);
                 }
