@@ -416,7 +416,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 0
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -959,13 +959,13 @@ MonoBehaviour:
     m_RotationOrder: 4
   YAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.05
+  transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
-  effectedWeaponBones: 11000000
+  effectedWeaponBones: 12000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -977,7 +977,7 @@ MonoBehaviour:
   attackingNormalizedTime: 0.2
   recoveryNormalizedTime: 0.7
   isAffectedByRage: 1
-  damage: 1
+  damage: 10
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
@@ -990,7 +990,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
+  ailment: 3
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 
@@ -1005,12 +1005,7 @@ MonoBehaviour:
   abilityCooldownTime: 5
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit:
-  - status: 7
-    value: 0.02
-    duration: 2
-    delay: 0
-    associatedWithCurrentWeapon: 0
+  statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}

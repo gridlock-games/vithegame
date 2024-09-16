@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 6305487504955697137}
   - component: {fileID: 7433792095065490293}
   - component: {fileID: 6652972336080534085}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MobBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,7 +143,16 @@ MonoBehaviour:
   stoppingDistance: 2
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
+  stairStepHeight: 0.01
+  maxStairStepHeight: 0.5
+  aiRigidbodyorneHorizontalDragMultiplier: 0.1
+  gravityScale: 2
   targetingType: 2
+  targetingSwitchDistance: 11
+  lightAttackDistance: 2.5
+  canUseAbility1: 1
+  ability1DistanceMin: 8
+  ability1Distance: 10
 --- !u!114 &6305487504955697137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,7 +200,7 @@ GameObject:
   - component: {fileID: 7541128012661925881}
   - component: {fileID: 7807981826574486121}
   - component: {fileID: 7536394967600171154}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MobRigidbody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
