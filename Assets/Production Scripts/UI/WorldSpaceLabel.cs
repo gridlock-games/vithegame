@@ -128,26 +128,18 @@ namespace Vi.UI
             nameDisplay.color = Color.white;
             team = combatAgent.GetTeam();
 
-            if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Contains(PlayerDataManager.Singleton.LocalPlayerData.team))
-            {
-                healthFillImage.color = team == PlayerDataManager.Team.Competitor ? combatAgent.EnemyColor : combatAgent.GetRelativeTeamColor();
-            }
-            else
-            {
-                healthFillImage.color = PlayerDataManager.GetTeamColor(team);
-            }
+            healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
         }
 
         private void RefreshRendererToFollow()
         {
             if (!combatAgent) { return; }
-            Renderer[] renderers = combatAgent.GetComponentsInChildren<Renderer>();
+            SkinnedMeshRenderer[] renderers = combatAgent.GetComponentsInChildren<SkinnedMeshRenderer>();
             if (renderers.Length == 0) { return; }
             Vector3 highestPoint = renderers[0].bounds.center;
             rendererToFollow = renderers[0];
             foreach (Renderer renderer in renderers)
             {
-                if (renderer.GetType() != typeof(SkinnedMeshRenderer)) { continue; }
                 if (renderer.bounds.center.y > highestPoint.y)
                 {
                     rendererToFollow = renderer;

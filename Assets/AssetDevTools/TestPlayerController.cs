@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Vi.Core.MovementHandlers;
 
 namespace AssetDevTools
 {
@@ -62,14 +63,14 @@ namespace AssetDevTools
         private void ProcessMovement()
         {
             Vector3 camDirection = cameraInstance.transform.TransformDirection(Vector3.forward);
-            camDirection.Scale(Vi.Core.MovementHandler.HORIZONTAL_PLANE);
+            camDirection.Scale(MovementHandler.HORIZONTAL_PLANE);
             Quaternion newRotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(camDirection), Time.fixedDeltaTime * angularSpeed);
 
             // Handle gravity
             Vector3 gravity = Vector3.zero;
             RaycastHit[] allHits = Physics.SphereCastAll(transform.position + transform.rotation * gravitySphereCastPositionOffset,
                 gravitySphereCastRadius, Physics.gravity,
-                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
+                gravitySphereCastPositionOffset.magnitude, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             System.Array.Sort(allHits, (x, y) => x.distance.CompareTo(y.distance));
             bool bHit = false;
             foreach (RaycastHit gravityHit in allHits)
@@ -87,7 +88,7 @@ namespace AssetDevTools
             else // If no sphere cast hit
             {
                 if (Physics.Raycast(transform.position + transform.rotation * gravitySphereCastPositionOffset,
-                    Physics.gravity, 1, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                    Physics.gravity, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
                     isGrounded = true;
                 }
@@ -106,7 +107,7 @@ namespace AssetDevTools
             inputVector = inputVector.normalized;
 
             Vector3 targetDirection = newRotation * new Vector3(inputVector.x, 0, inputVector.y);
-            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, Vi.Core.MovementHandler.HORIZONTAL_PLANE), 1);
+            targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, MovementHandler.HORIZONTAL_PLANE), 1);
             targetDirection *= isGrounded ? 1 : 0;
             Vector3 movement = targetDirection * Time.fixedDeltaTime * movementSpeed;
             Vector3 animDir = new Vector3(targetDirection.x, 0, targetDirection.z);
@@ -115,7 +116,7 @@ namespace AssetDevTools
             float yOffset = 0.2f;
             Vector3 startPos = transform.position;
             startPos.y += yOffset;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(Vi.Core.MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
                 {

@@ -4,18 +4,16 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using UnityEngine.VFX;
-using Vi.Core.GameModeManagers;
-using Vi.Core.VFX;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core
 {
     public class ColliderWeapon : RuntimeWeapon
     {
-        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
-
         [SerializeField] private VisualEffect weaponTrailVFX;
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
+
         private void Update()
         {
             if (!weaponTrailVFX) { return; }
@@ -35,8 +33,10 @@ namespace Vi.Core
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 
+        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void ProcessTriggerEvent(Collider other)
         {
+            if (isStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }
@@ -45,10 +45,11 @@ namespace Vi.Core
             if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
 
             // Don't evaluate grab attacks here, it's evaluated in the animation handler script
-            if (parentCombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ScriptableObjects.ActionClip.ClipType.GrabAttack) { return; }
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { return; }
 
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
+                if (other.isTrigger) { return; }
                 if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 

@@ -43,7 +43,7 @@ namespace Vi.UI
                 {
                     if (combatAgent.IsSpawned)
                     {
-                        mat.color = combatAgent.GetRelativeTeamColor();
+                        mat.color = combatAgent.IsLocalPlayer ? PlayerDataManager.Singleton.LocalPlayerColor : PlayerDataManager.Singleton.GetRelativeTeamColor(combatAgent.GetTeam());
                         mat.SetFloat(_Transparency, combatAgent.GetTeam() == PlayerDataManager.Team.Competitor | combatAgent.GetTeam() == PlayerDataManager.Team.Peaceful ? 0 : 1);
                     }
                     else

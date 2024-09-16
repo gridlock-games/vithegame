@@ -187,6 +187,13 @@ MonoBehaviour:
     - {fileID: -7224327837022384469, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
+  - overrideActionName: Open Text Chat
+    actionGroup: 3
+    inputActionReferences:
+    - {fileID: -1439621383562849734, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
   - overrideActionName: Ascend
     actionGroup: 2
     inputActionReferences:

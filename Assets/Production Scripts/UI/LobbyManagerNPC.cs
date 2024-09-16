@@ -126,7 +126,7 @@ namespace Vi.UI
                 path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\VitheGame.exe";
 
                 #if UNITY_STANDALONE_OSX
-                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/VitheGame";
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/VitheGame";
                 #endif
             }
             else
@@ -136,7 +136,7 @@ namespace Vi.UI
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
 
                 #if UNITY_STANDALONE_OSX
-                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/headless/VitheGame";
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/VitheGame";
                 #endif
             }
 

@@ -44,6 +44,13 @@ namespace Vi.UI
         [SerializeField] private Text gameModeSpecificSettingsTitleText;
         [SerializeField] private GameModeInfoUI gameModeInfoUI;
         [SerializeField] private CustomSettingsParent[] customSettingsParents;
+        [SerializeField] private PauseMenu pauseMenu;
+
+        private GameObject pauseInstance;
+        public void OpenSettingsMenu()
+        {
+            pauseInstance = Instantiate(pauseMenu.gameObject);
+        }
 
         [System.Serializable]
         private struct CustomSettingsParent
@@ -202,13 +209,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            bool first = true;
             foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
                 StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
-
-                if (first) { PlayerDataManager.Singleton.SetMap(mapName); first = false; }
             }
         }
 
@@ -329,6 +333,8 @@ namespace Vi.UI
                     }
                 }
             }
+
+            RefreshPlayerCards();
         }
 
         private IEnumerator Init()
@@ -561,9 +567,9 @@ namespace Vi.UI
                 case PlayerDataManager.GameMode.TeamElimination:
                     List<PlayerDataManager.PlayerData> team1List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[0]);
                     List<PlayerDataManager.PlayerData> team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
-                    canCountDown = team1List.Count >= 3 & team2List.Count >= 3 & team1List.Count == team2List.Count;
+                    canCountDown = team1List.Count >= 2 & team2List.Count >= 2 & team1List.Count == team2List.Count;
 
-                    if (!(team1List.Count >= 3 & team2List.Count >= 3)) { cannotCountDownMessage = "Need 3 or more players on each team to play"; }
+                    if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 3 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
@@ -803,6 +809,17 @@ namespace Vi.UI
         {
             base.OnDestroy();
             if (previewObject) { Destroy(previewObject); }
+            if (pauseInstance)
+            {
+                if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))
+                {
+                    pauseMenu.DestroyAllMenus();
+                }
+                else
+                {
+                    Destroy(pauseInstance);
+                }
+            }
         }
 
         public void OpenRoomSettings()

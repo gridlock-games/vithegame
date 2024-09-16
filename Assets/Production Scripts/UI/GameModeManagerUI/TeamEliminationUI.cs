@@ -22,9 +22,9 @@ namespace Vi.UI
             originalViLogoSprite = viLogoImage.sprite;
 
             leftScoreTeamColorImage.enabled = true;
-            leftScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetLeftScoreTeam());
+            leftScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetLeftScoreTeam());
             rightScoreTeamColorImage.enabled = true;
-            rightScoreTeamColorImage.color = PlayerDataManager.GetTeamColor(teamEliminationManager.GetRightScoreTeam());
+            rightScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetRightScoreTeam());
         }
 
         private const float colorTransitionSpeed = 2;

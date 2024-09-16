@@ -120,7 +120,7 @@ namespace Vi.Core
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", "") | data.skinPrefab.name == name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -155,6 +155,7 @@ namespace Vi.Core
                         }
 
                         instance.SetWeaponBone(modelData.weaponBone);
+                        instance.SetIsStowed(false);
                         weaponInstances.Add(modelData.weaponBone, instance);
                         //instance.transform.localScale = modelData.weaponPrefab.transform.localScale;
 
@@ -453,8 +454,15 @@ namespace Vi.Core
             if (vfxInstance)
             {
                 if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
-                NetworkObject netObj = vfxInstance.GetComponent<NetworkObject>();
-                netObj.Spawn(true);
+                if (vfxInstance.TryGetComponent(out NetworkObject netObj))
+                {
+                    netObj.Spawn(true);
+                }
+                else
+                {
+                    Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
+                }
+
                 if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                 {
                     gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
@@ -718,8 +726,9 @@ namespace Vi.Core
         {
             while (true)
             {
-                yield return null;
                 ExecuteLightAttack(true);
+                yield return null;
+                yield return null;
             }
         }
 
@@ -1038,7 +1047,7 @@ namespace Vi.Core
                 {
                     if (GetAmmoCount() == 0)
                     {
-                        if (combatAgent.MovementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                        if (combatAgent.MovementHandler.GetPlayerMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
             }
@@ -1057,6 +1066,7 @@ namespace Vi.Core
 
         void OnReload()
         {
+            if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (IsServer)
             {
                 ReloadOnServer();
@@ -1064,10 +1074,20 @@ namespace Vi.Core
             else
             {
                 ReloadServerRpc();
+                WaitingForReloadToPlay = true;
             }
         }
 
-        [Rpc(SendTo.Server)] private void ReloadServerRpc() { ReloadOnServer(); }
+        public bool WaitingForReloadToPlay { get; private set; }
+
+        [Rpc(SendTo.Server)]
+        private void ReloadServerRpc()
+        {
+            ReloadOnServer();
+            ResetWaitingForReloadRpc();
+        }
+
+        [Rpc(SendTo.Owner)] private void ResetWaitingForReloadRpc() { WaitingForReloadToPlay = false; }
 
         private void ReloadOnServer()
         {
@@ -1142,13 +1162,14 @@ namespace Vi.Core
 
         void OnAddForce()
         {
-            combatAgent.MovementHandler.GetRigidbody().AddForce((transform.forward + Vector3.up) * 50);
+            combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
 
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return null; }
             if (combatAgent.AnimationHandler.IsReloading()) { return null; }
 
             // If we are in recovery
@@ -1248,10 +1269,7 @@ namespace Vi.Core
             }
         }
 
-        private void ResetComboSystem()
-        {
-            inputHistory.Clear();
-        }
+        private void ResetComboSystem() { inputHistory.Clear(); }
 
         private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
@@ -1286,16 +1304,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");

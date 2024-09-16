@@ -60,13 +60,13 @@ namespace Vi.ScriptableObjects
             "ProjectileCollider"
         };
 
-        protected void Awake()
+        protected virtual void Awake()
         {
             colliders = GetComponentsInChildren<Collider>();
         }
 
         private PooledObject pooledObject;
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
 #if UNITY_EDITOR
             foreach (AudioSource audioSource in GetComponentsInChildren<AudioSource>())
@@ -78,6 +78,11 @@ namespace Vi.ScriptableObjects
             {
                 ParticleSystem.MainModule main = ps.main;
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
+            }
+
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                NetworkPhysicsSimulation.AddRigidbody(rb);
             }
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
@@ -160,8 +165,13 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                NetworkPhysicsSimulation.RemoveRigidbody(rb);
+            }
+
             if (pooledObject.IsPrewarmObject()) { return; }
 
             if (audioClipToPlayOnDestroy) { AudioManager.Singleton.PlayClipAtPoint(null, audioClipToPlayOnDestroy, transform.position, actionVFXSoundEffectVolume); }

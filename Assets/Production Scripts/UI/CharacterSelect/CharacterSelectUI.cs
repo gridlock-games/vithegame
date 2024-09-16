@@ -867,7 +867,7 @@ namespace Vi.UI
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
                     NetSceneManager.Singleton.LoadScene("Training Room");
-                    NetSceneManager.Singleton.LoadScene("Eclipse Grove");
+                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
                 }
                 else
                 {
@@ -982,7 +982,7 @@ namespace Vi.UI
 
         public void OpenViDiscord()
         {
-            Application.OpenURL("https://discord.gg/Ze2B8s5Ey3");
+            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
         }
 
         public void OpenServerBrowser()

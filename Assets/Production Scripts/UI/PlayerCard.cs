@@ -50,8 +50,6 @@ namespace Vi.UI
         private CombatAgent combatAgent;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
-        private static readonly Color hpFillImageDefaultColor = new Color(241 / 255f, 87 / 255f, 67 / 255f, 1);
-
         public void Initialize(CombatAgent combatAgent, bool useTeamColor = false)
         {
             if ((combatAgent == this.combatAgent) & (combatAgent != null)) { return; }
@@ -60,9 +58,14 @@ namespace Vi.UI
             canvas.enabled = combatAgent != null;
 
             if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
-            if (combatAgent) { StartCoroutine(SetNameText()); }
-
-            if (combatAgent) { healthFillImage.color = useTeamColor & combatAgent.GetTeam() != PlayerDataManager.Team.Competitor ? PlayerDataManager.GetTeamColor(combatAgent.GetTeam()) : hpFillImageDefaultColor; }
+            if (combatAgent)
+            {
+                StartCoroutine(SetNameText());
+                if (useTeamColor)
+                {
+                    healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
+                }
+            }
         }
 
         private Coroutine setNameTextCoroutine;

@@ -5,10 +5,13 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
     [RequireComponent(typeof(StatusAgent))]
+    [RequireComponent(typeof(AnimationHandler))]
+    [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> HP = new NetworkVariable<float>();
@@ -99,18 +102,17 @@ namespace Vi.Core
 
         public StatusAgent StatusAgent { get; private set; }
         public AnimationHandler AnimationHandler { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
+        public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
-        protected void Awake()
+        protected virtual void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
             GlowRenderer = GetComponent<GlowRenderer>();
-            MovementHandler = GetComponent<MovementHandler>();
+            MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
-            RefreshStatus();
         }
 
         public GlowRenderer GlowRenderer { get; private set; }
@@ -129,11 +131,6 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
-
-            if (IsOwner)
-            {
-                RefreshStatus();
-            }
         }
 
         public override void OnNetworkDespawn()
@@ -154,28 +151,16 @@ namespace Vi.Core
             }
         }
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
-            RefreshStatus();
         }
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
         }
 
-        public Color EnemyColor { get; private set; } = Color.red;
-        public Color TeammateColor { get; private set; } = Color.cyan;
-        public Color LocalPlayerColor { get; private set; } = Color.white;
-        protected virtual void RefreshStatus()
-        {
-            EnemyColor = FasterPlayerPrefs.Singleton.GetColor("EnemyColor");
-            TeammateColor = FasterPlayerPrefs.Singleton.GetColor("TeammateColor");
-            LocalPlayerColor = FasterPlayerPrefs.Singleton.GetColor("LocalPlayerColor");
-        }
-
-        public abstract Color GetRelativeTeamColor();
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
 
         public NetworkCollider NetworkCollider { get; private set; }
@@ -198,10 +183,15 @@ namespace Vi.Core
         protected NetworkVariable<ulong> grabVictimDataId = new NetworkVariable<ulong>();
         protected NetworkVariable<FixedString64Bytes> grabAttackClipName = new NetworkVariable<FixedString64Bytes>();
         protected NetworkVariable<bool> isGrabbed = new NetworkVariable<bool>();
+        protected NetworkVariable<bool> isGrabbing = new NetworkVariable<bool>();
 
         public void SetGrabVictim(ulong grabVictimNetworkObjectId) { grabVictimDataId.Value = grabVictimNetworkObjectId; }
 
         public bool IsGrabbed() { return isGrabbed.Value; }
+
+        public bool IsGrabbing() { return isGrabbing.Value; }
+
+        public void SetIsGrabbingToTrue() { isGrabbing.Value = true; }
 
         public CombatAgent GetGrabAssailant()
         {
@@ -230,10 +220,11 @@ namespace Vi.Core
 
         public void CancelGrab()
         {
-            if (IsGrabbed())
+            if (IsGrabbed() | IsGrabbing())
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
+                isGrabbing.Value = false;
                 grabAssailantDataId.Value = default;
                 grabVictimDataId.Value = default;
             }
@@ -245,34 +236,20 @@ namespace Vi.Core
         }
 
         protected Coroutine grabResetCoroutine;
-        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip hitReaction)
+        protected IEnumerator ResetGrabAfterAnimationPlays(ActionClip attack, ActionClip hitReaction)
         {
             if (hitReaction.ailment != ActionClip.Ailment.Grab) { Debug.LogError("Attributes.ResetGrabAfterAnimationPlays() should only be called with a grab hit reaction clip!"); yield break; }
             if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
 
-            float durationLeft = AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction);
-            CombatAgent attacker = GetGrabAssailant();
+            float durationLeft = attack.grabVictimClip.length + hitReaction.transitionTime;
             while (true)
             {
                 durationLeft -= Time.deltaTime;
-                if (attacker)
-                {
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    if (Vector3.Distance(victimNewPosition, MovementHandler.GetPosition()) > 1)
-                    {
-                        MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
-                    }
-                }
-                else
-                {
-                    attacker = GetGrabAssailant();
-                }
                 yield return null;
                 if (durationLeft <= 0) { break; }
             }
-            isGrabbed.Value = false;
-            grabAssailantDataId.Value = default;
-            grabVictimDataId.Value = default;
+            if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+            CancelGrab();
         }
 
         protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
@@ -289,8 +266,6 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             if (IsServer)
             {
                 bool evaluateInvinicibility = true;
@@ -402,7 +377,11 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
-        
+
+        protected NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
+        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
+        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
+
         protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();

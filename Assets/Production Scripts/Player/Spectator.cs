@@ -5,8 +5,8 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Utility;
-using Vi.Core.CombatAgents;
 using UnityEngine.Rendering.Universal;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Player
 {
@@ -22,6 +22,7 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
@@ -304,7 +305,7 @@ namespace Vi.Player
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private UniversalAdditionalCameraData cameraData;
         public Camera cam;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -319,14 +320,14 @@ namespace Vi.Player
             targetPosition = transform.position;
         }
 
-        private new void OnEnable()
+        protected override void OnEnable()
         {
             base.OnEnable();
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
@@ -340,8 +341,6 @@ namespace Vi.Player
         private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
 
-        [SerializeField] private float collisionPositionOffset = -0.3f;
-
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
@@ -354,6 +353,7 @@ namespace Vi.Player
             }
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             cam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            cam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);

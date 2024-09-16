@@ -20,10 +20,12 @@ namespace Vi.UI
 
         private Canvas canvas;
         private CanvasGroup canvasGroup;
+        private SceneLoadingInfoUI backgroundImageSelector;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
             canvasGroup = GetComponent<CanvasGroup>();
+            backgroundImageSelector = GetComponent<SceneLoadingInfoUI>();
         }
 
         private const float alphaLerpSpeed = 8;
@@ -31,9 +33,14 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
+
+        private bool lastCanvasState;
         private void Update()
         {
             canvas.enabled = canvasGroup.alpha > 0.05f;
+            if (canvas.enabled & !lastCanvasState) { backgroundImageSelector.ChangeBackground(); }
+            lastCanvasState = canvas.enabled;
+
             if (!NetSceneManager.DoesExist())
             {
                 canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);

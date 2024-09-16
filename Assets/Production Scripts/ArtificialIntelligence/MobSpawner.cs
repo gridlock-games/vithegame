@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using Unity.Netcode;
 using Vi.Core.CombatAgents;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -25,7 +26,7 @@ namespace Vi.ArtificialIntelligence
             foreach (MobDefinition mobDefinition in mobDefinitions)
             {
                 SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobDefinition.mobPrefab);
-                GameObject g = Instantiate(mobDefinition.mobPrefab.gameObject, transformData.position, transformData.rotation);
+                PooledObject g = ObjectPoolingManager.SpawnObject(mobDefinition.mobPrefab.gameObject.GetComponent<PooledObject>(), transformData.position, transformData.rotation);
                 g.GetComponent<Mob>().SetTeam(mobDefinition.team);
                 g.GetComponent<NetworkObject>().Spawn(true);
             }

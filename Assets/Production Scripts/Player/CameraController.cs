@@ -7,6 +7,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Player
 {
@@ -100,6 +101,7 @@ namespace Vi.Player
         {
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             Camera.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            Camera.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
 
         private Vector3 GetCameraTargetPosition()

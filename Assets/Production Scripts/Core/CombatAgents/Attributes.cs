@@ -26,18 +26,6 @@ namespace Vi.Core.CombatAgents
         private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
 
-        public override Color GetRelativeTeamColor()
-        {
-            if (!PlayerDataManager.Singleton.ContainsId(GetPlayerDataId())) { return Color.black; }
-
-            if (!IsClient) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return Color.black; }
-            else if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator) { return PlayerDataManager.GetTeamColor(GetTeam()); }
-            else if (IsLocalPlayer) { return LocalPlayerColor; }
-            else if (PlayerDataManager.CanHit(PlayerDataManager.Singleton.LocalPlayerData.team, CachedPlayerData.team)) { return EnemyColor; }
-            else { return TeammateColor; }
-        }
-
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
 
         public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
@@ -156,6 +144,7 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
+            RefreshStatus();
         }
 
         public void UpdateNetworkVisiblity()
@@ -304,7 +293,7 @@ namespace Vi.Core.CombatAgents
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -313,9 +302,17 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private PooledObject teamIndicatorPrefab;
         private PooledObject teamIndicatorInstance;
-        private void Start()
+        
+        protected override void OnEnable()
         {
+            base.OnEnable();
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
@@ -441,7 +438,11 @@ namespace Vi.Core.CombatAgents
             if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed() & attacker != GetGrabAssailant()) { return false; }
+            if (IsGrabbed())
+            {
+                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+                if (attacker != GetGrabAssailant()) { return false; }
+            }
             if (AnimationHandler.IsGrabAttacking()) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed
@@ -562,7 +563,7 @@ namespace Vi.Core.CombatAgents
 
                 if (IsGrabbed())
                 {
-                    GetGrabAssailant().CancelGrab();
+                    if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
                     CancelGrab();
                 }
 
@@ -577,9 +578,7 @@ namespace Vi.Core.CombatAgents
                     grabAssailantDataId.Value = attacker.NetworkObjectId;
                     attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
-
-                    Vector3 victimNewPosition = attacker.MovementHandler.GetPosition() + (attacker.transform.forward * 1.2f);
-                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attacker.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    attacker.SetIsGrabbingToTrue();
                     attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
@@ -735,7 +734,7 @@ namespace Vi.Core.CombatAgents
                     }
 
                     if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
-                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(hitReaction)); }
+                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
                 }
             }
 
@@ -785,9 +784,8 @@ namespace Vi.Core.CombatAgents
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        protected override void RefreshStatus()
+        protected void RefreshStatus()
         {
-            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
@@ -799,6 +797,9 @@ namespace Vi.Core.CombatAgents
         protected override void Update()
         {
             base.Update();
+
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -850,8 +851,6 @@ namespace Vi.Core.CombatAgents
             if (rageDelayCooldown > 0) { return; }
             AddRage(WeaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
-
-        private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
 
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
@@ -923,9 +922,6 @@ namespace Vi.Core.CombatAgents
             yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
         }
-
-        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
-        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
