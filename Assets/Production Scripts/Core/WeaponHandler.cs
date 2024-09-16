@@ -476,7 +476,14 @@ namespace Vi.Core
 
                 if (vfxInstance.TryGetComponent(out NetworkObject netObj))
                 {
-                    netObj.Spawn(true);
+                    if (netObj.IsSpawned)
+                    {
+                        Debug.LogError("Trying to spawn an action VFX instance that is already spawned " + vfxInstance);
+                    }
+                    else
+                    {
+                        netObj.Spawn(true);
+                    }
                 }
                 else
                 {
@@ -593,12 +600,12 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance " + weaponInstance.name);
+                                Debug.LogError("Weapon instance was destroyed for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                             }
                         }
                         else
                         {
-                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance " + weaponInstance.name);
+                            Debug.LogError("No weapon instance for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                         }
                     }
                 }

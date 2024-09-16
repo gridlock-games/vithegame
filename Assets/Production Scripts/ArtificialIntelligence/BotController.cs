@@ -135,6 +135,8 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluateAction()
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return; }
+
             if (canOnlyLightAttack)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)

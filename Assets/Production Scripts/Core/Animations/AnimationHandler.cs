@@ -21,13 +21,14 @@ namespace Vi.Core
             if (IsServer)
             {
                 AddActionToServerQueue(actionClip.name, isFollowUpClip);
+                WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
             {
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
-                WaitingForActionClipToPlay = true;
                 PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                WaitingForActionClipToPlay = true;
             }
             else
             {
@@ -534,7 +535,18 @@ namespace Vi.Core
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
-            if (!canPlayActionClipResult.canPlay) { ResetWaitingForActionToPlayClientRpc(); return false; }
+            if (!canPlayActionClipResult.canPlay)
+            {
+                if (IsOwner)
+                {
+                    WaitingForActionClipToPlay = false;
+                }
+                else
+                {
+                    ResetWaitingForActionToPlayClientRpc();
+                }
+                return false;
+            }
 
             // Check stamina and rage requirements
             if (ShouldApplyStaminaCost(actionClip))
@@ -621,6 +633,7 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            WaitingForActionClipToPlay = false;
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
