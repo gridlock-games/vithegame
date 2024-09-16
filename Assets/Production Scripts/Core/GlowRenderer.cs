@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -52,7 +53,7 @@ namespace Vi.Core
 
         private void Start()
         {
-            if (transform.root == transform)
+            if (!GetComponent<PooledObject>())
             {
                 foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
                 {

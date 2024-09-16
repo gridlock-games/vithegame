@@ -109,7 +109,7 @@ namespace Vi.Core
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
-            GlowRenderer = GetComponent<GlowRenderer>();
+            GlowRenderer = GetComponentInChildren<GlowRenderer>();
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
