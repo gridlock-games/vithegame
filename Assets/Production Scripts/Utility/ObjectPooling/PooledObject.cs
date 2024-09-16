@@ -42,5 +42,10 @@ namespace Vi.Utility
         {
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
+
+        private void Awake()
+        {
+            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+        }
     }
 }

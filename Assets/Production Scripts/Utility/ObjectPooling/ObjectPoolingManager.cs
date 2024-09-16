@@ -12,7 +12,7 @@ namespace Vi.Utility
     {
         public const string cullingOverrideTag = "DoNotCull";
         public const string instantiationSceneName = "Base";
-        private const HideFlags hideFlagsForSpawnedObjects = HideFlags.None;
+        public const HideFlags hideFlagsForSpawnedObjects = HideFlags.HideInHierarchy;
 
         [SerializeField] private PooledObjectList pooledObjectList;
 
@@ -112,8 +112,6 @@ namespace Vi.Utility
             PooledObject spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
             if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
             
-            spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
-
             ReturnObjectToPool(spawnableObj);
         }
 
@@ -130,7 +128,6 @@ namespace Vi.Utility
                 objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
-                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
@@ -164,7 +161,6 @@ namespace Vi.Utility
                 objectToSpawn.SetIsPrewarmStatus(false);
                 spawnableObj = Instantiate(objectToSpawn.gameObject, spawnPosition, spawnRotation).GetComponent<PooledObject>();
                 if (spawnableObj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(spawnableObj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
-                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
@@ -203,7 +199,6 @@ namespace Vi.Utility
                         objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
                         objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
                 }
-                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
@@ -247,7 +242,6 @@ namespace Vi.Utility
                         objectToSpawn.transform.localScale.y / parentTransform.lossyScale.y,
                         objectToSpawn.transform.localScale.z / parentTransform.lossyScale.z);
                 }
-                spawnableObj.hideFlags = hideFlagsForSpawnedObjects;
             }
             else
             {
