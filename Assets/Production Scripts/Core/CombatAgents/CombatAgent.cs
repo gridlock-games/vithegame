@@ -109,7 +109,7 @@ namespace Vi.Core
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
-            GlowRenderer = GetComponent<GlowRenderer>();
+            GlowRenderer = GetComponentInChildren<GlowRenderer>();
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
@@ -266,7 +266,7 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
                 bool evaluateUninterruptability = true;
@@ -401,11 +401,13 @@ namespace Vi.Core
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 if (IsServer) { isRaging.Value = false; }
+                AnimationHandler.SetRagdollActive(true);
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+                AnimationHandler.SetRagdollActive(false);
             }
         }
 

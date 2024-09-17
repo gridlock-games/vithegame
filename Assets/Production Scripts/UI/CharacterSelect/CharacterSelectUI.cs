@@ -521,7 +521,17 @@ namespace Vi.UI
 
             if (characterIndex == -1)
             {
-                if (previewObject) { Destroy(previewObject); }
+                if (previewObject)
+                {
+                    if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(previewObject);
+                    }
+                }
                 selectedCharacter = default;
                 RefreshButtonInteractability();
                 return;
@@ -536,7 +546,7 @@ namespace Vi.UI
                 ClearMaterialsAndEquipmentOptions();
                 if (previewObject) { Destroy(previewObject); }
                 // Instantiate the player model
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
             }
 

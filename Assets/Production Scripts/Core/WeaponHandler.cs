@@ -42,7 +42,7 @@ namespace Vi.Core
         public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
         public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
-            if (IsOwner) { aiming.Value = false; }
+            if (IsOwner & IsSpawned) { aiming.Value = false; }
 
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
@@ -103,6 +103,20 @@ namespace Vi.Core
         public void UseAmmo()
         {
             combatAgent.LoadoutManager.UseAmmo(weaponInstance);
+        }
+
+        private void OnDisable()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
+            }
+            weaponInstances.Clear();
+            foreach (PooledObject g in stowedWeaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(g);
+            }
+            stowedWeaponInstances.Clear();
         }
 
         private void EquipWeapon()
@@ -454,18 +468,26 @@ namespace Vi.Core
             if (vfxInstance)
             {
                 if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
+                
+                if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
+                {
+                    gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
+                }
+
                 if (vfxInstance.TryGetComponent(out NetworkObject netObj))
                 {
-                    netObj.Spawn(true);
+                    if (netObj.IsSpawned)
+                    {
+                        Debug.LogError("Trying to spawn an action VFX instance that is already spawned " + vfxInstance);
+                    }
+                    else
+                    {
+                        netObj.Spawn(true);
+                    }
                 }
                 else
                 {
                     Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
-                }
-
-                if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
-                {
-                    gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
                 }
             }
             else if (actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
@@ -578,12 +600,12 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                                Debug.LogError("Weapon instance was destroyed for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                             }
                         }
                         else
                         {
-                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            Debug.LogError("No weapon instance for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                         }
                     }
                 }
@@ -1039,7 +1061,7 @@ namespace Vi.Core
 
             combatAgent.AnimationHandler.Animator.SetBool("Blocking", IsBlocking);
 
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 reloadingAnimParameterValue.Value = combatAgent.AnimationHandler.Animator.GetBool("Reloading");
 

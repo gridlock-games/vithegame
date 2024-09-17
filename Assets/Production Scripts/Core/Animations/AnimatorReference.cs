@@ -208,14 +208,17 @@ namespace Vi.Core
                     glowRenderer.UnregisterRenderer(smr);
                 }
 
-                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                if (kvp.Value)
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                    kvp.Value.enabled = true;
-                }
-                else
-                {
-                    Destroy(kvp.Value);
+                    if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
+                        kvp.Value.enabled = true;
+                    }
+                    else
+                    {
+                        Destroy(kvp.Value);
+                    }
                 }
             }
         }
@@ -310,6 +313,8 @@ namespace Vi.Core
             {
                 pooledObject.OnReturnToPool += OnReturnToPool;
             }
+
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
         }
 
         private void Start()
@@ -400,6 +405,18 @@ namespace Vi.Core
                 }
                 accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
+        }
+
+        private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!animator) { return; }
+            foreach (Rigidbody rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+                rb.interpolation = combatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            }
+            animator.enabled = !isActive;
         }
     }
 }

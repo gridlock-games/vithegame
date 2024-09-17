@@ -267,6 +267,9 @@ MonoBehaviour:
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  teamColorParticleSystems:
+  - {fileID: 8723014708127516046}
+  - {fileID: 7865164107599564033}
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
@@ -316,3 +319,15 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 88
   isPrewarmObject: 1
+--- !u!198 &7865164107599564033 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8821437785814293944, guid: 41a31a48c379e8a4fbb0a8d7a177da13,
+    type: 3}
+  m_PrefabInstance: {fileID: 1678338494779658425}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &8723014708127516046 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7945748669805253943, guid: 41a31a48c379e8a4fbb0a8d7a177da13,
+    type: 3}
+  m_PrefabInstance: {fileID: 1678338494779658425}
+  m_PrefabAsset: {fileID: 0}

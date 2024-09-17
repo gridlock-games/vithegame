@@ -185,7 +185,8 @@ namespace Vi.Core
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
-            if (attackerTeam == Team.Peaceful) { return false; }
+            if (attackerTeam == Team.Spectator | victimTeam == Team.Spectator) { return false; }
+            if (attackerTeam == Team.Peaceful | victimTeam == Team.Peaceful) { return false; }
 
             if (attackerTeam != Team.Competitor & victimTeam != Team.Competitor)
             {

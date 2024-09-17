@@ -85,6 +85,9 @@ namespace Vi.Core
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+
+            rb.interpolation = IsClient ? RigidbodyInterpolation.Extrapolate : RigidbodyInterpolation.None;
+            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         private bool nearbyWhooshPlayed;
@@ -129,7 +132,7 @@ namespace Vi.Core
         {
             if (!initialized) { return; }
             if (!IsServer) { return; }
-            transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
+            rb.MoveRotation(rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity));
         }
 
         [HideInInspector] public bool canHitPlayers = true;

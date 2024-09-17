@@ -302,7 +302,7 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private PooledObject teamIndicatorPrefab;
         private PooledObject teamIndicatorInstance;
-        
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -646,7 +646,6 @@ namespace Vi.Core.CombatAgents
             {
                 if (attack.shouldFlinch | IsRaging())
                 {
-                    MovementHandler.Flinch(attack.GetFlinchAmount());
                     if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
                 }
             }
@@ -753,7 +752,32 @@ namespace Vi.Core.CombatAgents
         private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
         {
             yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
-            if (vfxInstance) { Destroy(vfxInstance); }
+            if (vfxInstance)
+            {
+                if (vfxInstance.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (networkObject.IsSpawned)
+                    {
+                        networkObject.Despawn(true);
+                    }
+                    else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(vfxInstance);
+                    }
+                }
+                else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(vfxInstance);
+                }
+            }
         }
 
         [System.Serializable]
@@ -819,7 +843,7 @@ namespace Vi.Core.CombatAgents
                 // Regen for 50 seconds
                 if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
             }
-            
+
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
