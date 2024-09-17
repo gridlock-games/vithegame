@@ -44,6 +44,11 @@ namespace Vi.Utility
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
 
+        private void OnDestroy()
+        {
+            ObjectPoolingManager.OnPooledObjectDestroy(this);
+        }
+
 # if UNITY_EDITOR
         private NetworkObject networkObject;
         private void Awake()
@@ -56,10 +61,10 @@ namespace Vi.Utility
             gameObject.hideFlags = HideFlags.None;
         }
 
-        private void OnDisable()
-        {
-            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
-        }
+        //private void OnDisable()
+        //{
+        //    gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+        //}
 # endif
     }
 }
