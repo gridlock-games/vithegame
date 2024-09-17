@@ -296,25 +296,13 @@ namespace Vi.Utility
 
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
+            foreach (PooledObject pooledObject in obj.GetComponentsInChildren<PooledObject>(true))
+            {
+                if (pooledObject == obj) { continue; }
+                pooledObject.transform.SetParent(null, true);
+            }
+
             obj.gameObject.SetActive(false);
-
-            if (obj.transform.parent == null)
-            {
-                if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
-                objectPools[obj.GetPooledObjectIndex()].Add(obj);
-                obj.InvokeOnReturnToPoolEvent();
-            }
-            else
-            {
-                Singleton.StartCoroutine(UnparentPooledObject(obj));
-            }
-        }
-
-        private static IEnumerator UnparentPooledObject(PooledObject obj)
-        {
-            yield return null;
-            obj.transform.SetParent(null, true);
-            if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
         }
@@ -326,7 +314,6 @@ namespace Vi.Utility
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
             obj.gameObject.SetActive(false);
-            if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
             obj = null;

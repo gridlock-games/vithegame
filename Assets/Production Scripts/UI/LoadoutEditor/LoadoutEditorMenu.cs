@@ -107,7 +107,17 @@ namespace Vi.UI
 
         private void OnDisable()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private void Update()
