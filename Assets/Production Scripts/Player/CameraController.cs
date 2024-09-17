@@ -105,8 +105,8 @@ namespace Vi.Player
 
         private void OnDisable()
         {
-            cameraInterp.SetActive(false);
-            CameraPositionClone.SetActive(false);
+            if (cameraInterp) { cameraInterp.SetActive(false); }
+            if (CameraPositionClone) { CameraPositionClone.SetActive(false); }
         }
 
         private void OnDestroy()
