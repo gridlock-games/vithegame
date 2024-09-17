@@ -951,21 +951,20 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
-            StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+            if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
             WaitingForActionClipToPlay = false;
         }
 
+        private Coroutine playActionOnClientCoroutine;
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
             // Retrieve the ActionClip based on the actionStateName
-            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
-            if (actionClip.IsAttack())
+            if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
             {
-                if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
-                {
-                    yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
-                }
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
