@@ -1330,6 +1330,7 @@ namespace Vi.Core
                 else
                 {
                     ObjectPoolingManager.ReturnObjectToPool(playerObjectToSpawn.GetComponent<PooledObject>());
+                    playerObjectToSpawn = null;
                 }
             }
             

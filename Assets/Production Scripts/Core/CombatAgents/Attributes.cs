@@ -207,8 +207,6 @@ namespace Vi.Core.CombatAgents
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
-
-            name = "Uninitialized Player";
         }
 
         [SerializeField] private AudioClip heartbeatSoundEffect;
@@ -300,7 +298,6 @@ namespace Vi.Core.CombatAgents
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
-            name = "Uninitialized Player";
         }
 
         [SerializeField] private PooledObject teamIndicatorPrefab;

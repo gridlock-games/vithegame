@@ -181,20 +181,6 @@ namespace Vi.Utility
             return spawnableObj;
         }
 
-        private void Update()
-        {
-            foreach (var pool in objectPools)
-            {
-                foreach (PooledObject pooledObject in pool)
-                {
-                    if (pooledObject.gameObject.activeSelf)
-                    {
-                        Debug.LogError(pooledObject + " is already active! " + pooledObject.transform.parent);
-                    }
-                }
-            }
-        }
-
         public static PooledObject SpawnObject(PooledObject objectToSpawn, Transform parentTransform)
         {
             if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
@@ -216,7 +202,6 @@ namespace Vi.Utility
             }
             else
             {
-                if (spawnableObj.gameObject.activeSelf) { Debug.LogError("Object is already active but you're trying to spawn it! " + spawnableObj + " " + spawnableObj.transform.parent); }
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
                 if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
