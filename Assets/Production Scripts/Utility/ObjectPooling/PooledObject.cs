@@ -69,21 +69,15 @@ namespace Vi.Utility
         }
 
 # if UNITY_EDITOR
-        private NetworkObject networkObject;
-        private void Awake()
-        {
-            networkObject = GetComponent<NetworkObject>();
-        }
-
         private void OnEnable()
         {
             gameObject.hideFlags = HideFlags.None;
         }
 
-        //private void OnDisable()
-        //{
-        //    gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
-        //}
+        private void OnDisable()
+        {
+            //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+        }
 # endif
     }
 }

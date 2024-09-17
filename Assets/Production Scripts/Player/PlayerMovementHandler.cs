@@ -678,12 +678,6 @@ namespace Vi.Player
             }
         }
 
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            Debug.Log("PLAYER ON ENABLE");
-        }
-
         private Camera mainCamera;
         private void FindMainCamera()
         {
