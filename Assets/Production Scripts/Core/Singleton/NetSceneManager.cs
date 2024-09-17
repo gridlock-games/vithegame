@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -156,8 +157,7 @@ namespace Vi.Core
                     }
                 }
             }
-
-            if (NetworkManager.Singleton.IsClient)
+            else if (NetworkManager.Singleton.IsClient)
             {
                 foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
                 {
@@ -253,6 +253,38 @@ namespace Vi.Core
             {
                 AsyncOperationHandle<SceneInstance> loadedHandle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!loadedHandle.IsValid()) { continue; }
+                if (loadedHandle.IsDone)
+                {
+                    foreach (GameObject g in loadedHandle.Result.Scene.GetRootGameObjects())
+                    {
+                        if (g.TryGetComponent(out PooledObject pooledObject))
+                        {
+                            if (pooledObject.transform.parent == null)
+                            {
+                                SceneManager.MoveGameObjectToScene(pooledObject.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
+
+                                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                                {
+                                    if (networkObject.IsSpawned)
+                                    {
+                                        if (NetworkManager.Singleton.IsServer)
+                                        {
+                                            networkObject.Despawn(true);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError(pooledObject + " will be destroyed on scene unload! Parent: " + pooledObject.transform.parent);
+                            }
+                        }
+                    }
+                }
                 AsyncOperationHandle<SceneInstance> unloadHandle = Addressables.UnloadSceneAsync(loadedHandle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 unloadHandle.Completed += SceneHandleUnloaded;
                 PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, unloadHandle, AsyncOperationUI.LoadingType.Unloading));

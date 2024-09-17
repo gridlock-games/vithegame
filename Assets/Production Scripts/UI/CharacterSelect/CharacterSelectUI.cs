@@ -544,7 +544,17 @@ namespace Vi.UI
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
-                if (previewObject) { Destroy(previewObject); }
+                if (previewObject)
+                {
+                    if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(previewObject);
+                    }
+                }
                 // Instantiate the player model
                 previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);

@@ -238,7 +238,8 @@ namespace Vi.Core
 
         public CharacterReference.WearableEquipmentOption GetEquippedEquipmentOption(CharacterReference.EquipmentType equipmentType)
         {
-            return equippedEquipment[equipmentType];
+            equippedEquipment.TryGetValue(equipmentType, out CharacterReference.WearableEquipmentOption option);
+            return option;
         }
 
         public override void OnNetworkDespawn()
