@@ -298,7 +298,20 @@ namespace Vi.Utility
 
             foreach (PooledObject pooledObject in obj.ChildPooledObjects.ToList())
             {
-                pooledObject.transform.SetParent(null, true);
+                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (NetworkManager.Singleton.IsServer)
+                    {
+                        if (!networkObject.TryRemoveParent(true))
+                        {
+                            Debug.LogError("Unable to remove parent for pooled network object " + networkObject);
+                        }
+                    }
+                }
+                else
+                {
+                    pooledObject.transform.SetParent(null, true);
+                }
             }
 
             obj.gameObject.SetActive(false);
