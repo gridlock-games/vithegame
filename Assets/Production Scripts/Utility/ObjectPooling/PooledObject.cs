@@ -49,6 +49,25 @@ namespace Vi.Utility
             ObjectPoolingManager.OnPooledObjectDestroy(this);
         }
 
+        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
+        private void OnBeforeTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Remove(this);
+            }
+        }
+
+        private void OnTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Add(this);
+            }
+        }
+
 # if UNITY_EDITOR
         private NetworkObject networkObject;
         private void Awake()

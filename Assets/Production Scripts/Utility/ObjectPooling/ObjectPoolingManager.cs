@@ -296,9 +296,8 @@ namespace Vi.Utility
 
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
-            foreach (PooledObject pooledObject in obj.GetComponentsInChildren<PooledObject>(true))
+            foreach (PooledObject pooledObject in obj.ChildPooledObjects.ToList())
             {
-                if (pooledObject == obj) { continue; }
                 pooledObject.transform.SetParent(null, true);
             }
 
