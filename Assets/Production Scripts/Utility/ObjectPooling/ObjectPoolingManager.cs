@@ -380,7 +380,10 @@ namespace Vi.Utility
 
         public static void OnPooledObjectDestroy(PooledObject pooledObject)
         {
-            Debug.LogWarning(pooledObject + " was destroyed!");
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) { return; }
+#endif
+            Debug.LogError(pooledObject + " was destroyed!");
             objectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
         }
     }
