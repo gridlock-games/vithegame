@@ -572,6 +572,7 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                cameraController.gameObject.tag = "MainCamera";
                 cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.Camera.enabled = true;
@@ -620,6 +621,7 @@ namespace Vi.Player
 
             playerInput.enabled = false;
             actionMapHandler.enabled = false;
+            cameraController.gameObject.tag = "Untagged";
 
             if (!IsClient)
             {
@@ -679,7 +681,13 @@ namespace Vi.Player
         private Camera mainCamera;
         private void FindMainCamera()
         {
-            if (mainCamera) { return; }
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
             mainCamera = Camera.main;
         }
 
