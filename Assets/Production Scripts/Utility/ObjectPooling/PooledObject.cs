@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -43,9 +44,22 @@ namespace Vi.Utility
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
 
+# if UNITY_EDITOR
+        private NetworkObject networkObject;
         private void Awake()
+        {
+            networkObject = GetComponent<NetworkObject>();
+        }
+
+        private void OnEnable()
+        {
+            if (networkObject) { gameObject.hideFlags = HideFlags.None; }
+        }
+
+        private void OnDisable()
         {
             gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
+# endif
     }
 }
