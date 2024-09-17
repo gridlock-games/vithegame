@@ -284,6 +284,13 @@ namespace Vi.Utility
             obj.gameObject.SetActive(false);
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
+            Singleton.StartCoroutine(UnparentPooledObject(obj));
+        }
+
+        private static IEnumerator UnparentPooledObject(PooledObject obj)
+        {
+            yield return null;
+            obj.transform.SetParent(null, true);
         }
 
         public static void ReturnObjectToPool(ref PooledObject obj)

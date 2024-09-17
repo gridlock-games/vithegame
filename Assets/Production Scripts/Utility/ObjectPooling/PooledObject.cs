@@ -53,7 +53,7 @@ namespace Vi.Utility
 
         private void OnEnable()
         {
-            if (networkObject) { gameObject.hideFlags = HideFlags.None; }
+            gameObject.hideFlags = HideFlags.None;
         }
 
         private void OnDisable()

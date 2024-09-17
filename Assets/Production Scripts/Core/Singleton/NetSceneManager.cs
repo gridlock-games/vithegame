@@ -163,7 +163,17 @@ namespace Vi.Core
                 {
                     if (g.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (!networkObject.IsSpawned) { Destroy(g); }
+                        if (!networkObject.IsSpawned)
+                        {
+                            if (networkObject.TryGetComponent(out PooledObject pooledObject))
+                            {
+                                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                            }
+                            else
+                            {
+                                Destroy(g);
+                            }
+                        }
                     }
                 }
             }

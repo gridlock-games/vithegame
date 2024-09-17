@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -75,7 +76,17 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private void OnEnable()

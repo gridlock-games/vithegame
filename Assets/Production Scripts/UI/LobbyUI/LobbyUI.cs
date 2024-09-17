@@ -754,9 +754,17 @@ namespace Vi.UI
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
-
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
             // Instantiate the player model
             previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
 
@@ -808,7 +816,18 @@ namespace Vi.UI
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
+
             if (pauseInstance)
             {
                 if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))
