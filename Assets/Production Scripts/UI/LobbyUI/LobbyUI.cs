@@ -767,7 +767,14 @@ namespace Vi.UI
                 }
             }
             // Instantiate the player model
-            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pO))
+            {
+                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
