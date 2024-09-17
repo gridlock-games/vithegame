@@ -380,7 +380,7 @@ namespace Vi.Utility
 
         public static void OnPooledObjectDestroy(PooledObject pooledObject)
         {
-            Debug.LogError(pooledObject + " was destroyed!");
+            Debug.LogWarning(pooledObject + " was destroyed!");
             objectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
         }
     }
