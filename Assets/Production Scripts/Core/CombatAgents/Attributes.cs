@@ -646,7 +646,6 @@ namespace Vi.Core.CombatAgents
             {
                 if (attack.shouldFlinch | IsRaging())
                 {
-                    MovementHandler.Flinch(attack.GetFlinchAmount());
                     if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
                 }
             }
