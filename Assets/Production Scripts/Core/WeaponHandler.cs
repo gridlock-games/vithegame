@@ -28,13 +28,13 @@ namespace Vi.Core
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
-            weaponInstance = ScriptableObject.CreateInstance<Weapon>();
-            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             RefreshStatus();
         }
 
         private void OnEnable()
         {
+            weaponInstance = ScriptableObject.CreateInstance<Weapon>();
+            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             RefreshStatus();
         }
 

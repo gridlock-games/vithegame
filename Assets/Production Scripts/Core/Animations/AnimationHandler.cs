@@ -1091,7 +1091,7 @@ namespace Vi.Core
 
             if (shouldCreateNewSkin)
             {
-                if (characterIndex == -1) { Debug.LogWarning("Character Index is -1!"); yield break; }
+                if (characterIndex == -1) { Debug.LogError("Character Index is -1!"); yield break; }
                 CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
                 GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
 

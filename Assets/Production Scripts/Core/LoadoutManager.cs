@@ -81,15 +81,23 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             combatAgent = GetComponent<CombatAgent>();
 
-            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
-            {
-                equippedEquipment.Add(equipmentType, null);
-            }
-
             if (TryGetComponent(out PlayerInput playerInput))
             {
                 switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             }
+        }
+
+        private void OnEnable()
+        {
+            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
+            {
+                equippedEquipment.Add(equipmentType, null);
+            }
+        }
+
+        private void OnDisable()
+        {
+            equippedEquipment.Clear();
         }
 
         public override void OnNetworkSpawn()
