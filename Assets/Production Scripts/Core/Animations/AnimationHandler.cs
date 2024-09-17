@@ -960,7 +960,7 @@ namespace Vi.Core
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
             // Retrieve the ActionClip based on the actionStateName
-            if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
+            if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
             {
                 yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
