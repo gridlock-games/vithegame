@@ -388,9 +388,7 @@ namespace Vi.Utility
                         Debug.LogError(pooledObject + " is already active! " + pooledObject.GetInstanceID() + " " + pooledObject.transform.parent);
                     }
                 }
-                Debug.Log(pool.Count);
                 pool.RemoveAll(item => item.gameObject.activeSelf);
-                Debug.Log(pool.Count);
             }
         }
     }
