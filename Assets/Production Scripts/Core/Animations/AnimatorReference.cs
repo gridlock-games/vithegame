@@ -182,7 +182,7 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
-            StartCoroutine(SetRendererStatusForCharacterCosmetics());
+            if (gameObject.activeSelf) { StartCoroutine(SetRendererStatusForCharacterCosmetics()); }
         }
 
         private IEnumerator SetRendererStatusForCharacterCosmetics()
@@ -201,25 +201,26 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
-            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in new Dictionary<CharacterReference.EquipmentType, WearableEquipment>(wearableEquipmentInstances))
             {
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {
                     glowRenderer.UnregisterRenderer(smr);
                 }
 
-                if (kvp.Value)
-                {
-                    if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
-                    {
-                        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                        kvp.Value.enabled = true;
-                    }
-                    else
-                    {
-                        Destroy(kvp.Value);
-                    }
-                }
+                ClearWearableEquipment(kvp.Key);
+                //if (kvp.Value)
+                //{
+                //    if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
+                //    {
+                //        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
+                //        kvp.Value.enabled = true;
+                //    }
+                //    else
+                //    {
+                //        Destroy(kvp.Value);
+                //    }
+                //}
             }
         }
 

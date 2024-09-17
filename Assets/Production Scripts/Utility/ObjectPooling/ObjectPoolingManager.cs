@@ -181,6 +181,20 @@ namespace Vi.Utility
             return spawnableObj;
         }
 
+        private void Update()
+        {
+            foreach (var pool in objectPools)
+            {
+                foreach (PooledObject pooledObject in pool)
+                {
+                    if (pooledObject.gameObject.activeSelf)
+                    {
+                        Debug.LogError(pooledObject + " is already active! " + pooledObject.transform.parent);
+                    }
+                }
+            }
+        }
+
         public static PooledObject SpawnObject(PooledObject objectToSpawn, Transform parentTransform)
         {
             if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return null; }
@@ -202,6 +216,7 @@ namespace Vi.Utility
             }
             else
             {
+                if (spawnableObj.gameObject.activeSelf) { Debug.LogError("Object is already active but you're trying to spawn it! " + spawnableObj + " " + spawnableObj.transform.parent); }
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
                 if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
@@ -282,15 +297,26 @@ namespace Vi.Utility
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
             obj.gameObject.SetActive(false);
-            objectPools[obj.GetPooledObjectIndex()].Add(obj);
-            obj.InvokeOnReturnToPoolEvent();
-            Singleton.StartCoroutine(UnparentPooledObject(obj));
+
+            if (obj.transform.parent == null)
+            {
+                if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
+                objectPools[obj.GetPooledObjectIndex()].Add(obj);
+                obj.InvokeOnReturnToPoolEvent();
+            }
+            else
+            {
+                Singleton.StartCoroutine(UnparentPooledObject(obj));
+            }
         }
 
         private static IEnumerator UnparentPooledObject(PooledObject obj)
         {
             yield return null;
             obj.transform.SetParent(null, true);
+            if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
+            objectPools[obj.GetPooledObjectIndex()].Add(obj);
+            obj.InvokeOnReturnToPoolEvent();
         }
 
         public static void ReturnObjectToPool(ref PooledObject obj)
@@ -300,6 +326,7 @@ namespace Vi.Utility
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
 
             obj.gameObject.SetActive(false);
+            if (obj.gameObject.activeSelf) { Debug.LogError("Returning object to pool but it is still active! " + obj); }
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
             obj = null;
@@ -341,6 +368,11 @@ namespace Vi.Utility
             }
 
             ReturnObjectToPool(vfxInstance);
+        }
+
+        public static void OnPooledObjectDestroy(PooledObject pooledObject)
+        {
+            objectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
         }
     }
 }
