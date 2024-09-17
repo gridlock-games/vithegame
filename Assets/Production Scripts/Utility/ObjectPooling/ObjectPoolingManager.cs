@@ -144,6 +144,9 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            Debug.Log(spawnableObj);
+            CheckForObjectsActiveInPool();
+
             spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
@@ -176,6 +179,9 @@ namespace Vi.Utility
                 objectPools[objectToSpawn.GetPooledObjectIndex()].Remove(spawnableObj);
                 spawnableObj.gameObject.SetActive(true);
             }
+
+            Debug.Log(spawnableObj);
+            CheckForObjectsActiveInPool();
 
             spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
@@ -220,6 +226,9 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            Debug.Log(spawnableObj);
+            CheckForObjectsActiveInPool();
+
             spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
@@ -263,6 +272,9 @@ namespace Vi.Utility
                 spawnableObj.gameObject.SetActive(true);
             }
 
+            Debug.Log(spawnableObj);
+            CheckForObjectsActiveInPool();
+
             spawnableObj.InvokeOnSpawnFromPoolEvent();
             return spawnableObj;
         }
@@ -302,6 +314,9 @@ namespace Vi.Utility
             obj.gameObject.SetActive(false);
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
+
+            Debug.Log(obj);
+            CheckForObjectsActiveInPool();
         }
 
         public static void ReturnObjectToPool(ref PooledObject obj)
@@ -314,6 +329,9 @@ namespace Vi.Utility
             objectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
             obj = null;
+
+            Debug.Log(obj);
+            CheckForObjectsActiveInPool();
         }
 
         public static IEnumerator ReturnVFXToPoolWhenFinishedPlaying(PooledObject vfxInstance)
@@ -357,6 +375,23 @@ namespace Vi.Utility
         public static void OnPooledObjectDestroy(PooledObject pooledObject)
         {
             objectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
+        }
+
+        private static void CheckForObjectsActiveInPool()
+        {
+            foreach (List<PooledObject> pool in objectPools)
+            {
+                foreach (PooledObject pooledObject in pool)
+                {
+                    if (pooledObject.gameObject.activeSelf)
+                    {
+                        Debug.LogError(pooledObject + " is already active! " + pooledObject.GetInstanceID() + " " + pooledObject.transform.parent);
+                    }
+                }
+                Debug.Log(pool.Count);
+                pool.RemoveAll(item => item.gameObject.activeSelf);
+                Debug.Log(pool.Count);
+            }
         }
     }
 }
