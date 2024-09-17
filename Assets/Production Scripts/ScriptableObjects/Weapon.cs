@@ -209,7 +209,11 @@ namespace Vi.ScriptableObjects
         [SerializeField] private List<AudioClip> reloadSoundEffects = new List<AudioClip>();
 
         public const float reloadSoundEffectVolume = 0.1f;
-        public AudioClip GetReloadSoundEffect() { return reloadSoundEffects[Random.Range(0, reloadSoundEffects.Count)]; }
+        public AudioClip GetReloadSoundEffect()
+        {
+            if (reloadSoundEffects.Count == 0) { return null; }
+            return reloadSoundEffects[Random.Range(0, reloadSoundEffects.Count)];
+        }
 
         public enum WeaponBone
         {
