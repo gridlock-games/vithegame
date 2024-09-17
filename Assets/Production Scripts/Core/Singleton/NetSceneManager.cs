@@ -269,6 +269,7 @@ namespace Vi.Core
                     {
                         if (g.TryGetComponent(out PooledObject pooledObject))
                         {
+                            // This code needs to be refactored at a later date to also account for child objects that have their parents stripped when being returned to pool
                             if (pooledObject.transform.parent == null)
                             {
                                 SceneManager.MoveGameObjectToScene(pooledObject.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
@@ -277,12 +278,9 @@ namespace Vi.Core
                                 {
                                     if (networkObject.IsSpawned)
                                     {
-                                        if (NetworkManager.Singleton.IsServer)
-                                        {
-                                            networkObject.Despawn(true);
-                                        }
+                                        if (NetworkManager.Singleton.IsServer) { networkObject.Despawn(true); }
                                     }
-                                    else
+                                    else if (pooledObject.IsSpawned)
                                     {
                                         ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                                     }

@@ -68,7 +68,18 @@ namespace Vi.Utility
             }
         }
 
-# if UNITY_EDITOR
+        public bool IsSpawned { get { return isSpawned; } }
+        private bool isSpawned;
+
+        private void Awake()
+        {
+            OnSpawnFromPool += OnSpawn;
+            OnReturnToPool += OnReturn;
+        }
+
+        private void OnSpawn() { isSpawned = true; }
+        private void OnReturn() { isSpawned = false; }
+
         private void OnEnable()
         {
             gameObject.hideFlags = HideFlags.None;
@@ -78,6 +89,5 @@ namespace Vi.Utility
         {
             //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
-# endif
     }
 }

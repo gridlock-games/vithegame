@@ -207,20 +207,7 @@ namespace Vi.Core
                 {
                     glowRenderer.UnregisterRenderer(smr);
                 }
-
                 ClearWearableEquipment(kvp.Key);
-                //if (kvp.Value)
-                //{
-                //    if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
-                //    {
-                //        ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                //        kvp.Value.enabled = true;
-                //    }
-                //    else
-                //    {
-                //        Destroy(kvp.Value);
-                //    }
-                //}
             }
         }
 
@@ -303,7 +290,6 @@ namespace Vi.Core
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
 
-            combatAgent = GetComponentInParent<CombatAgent>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
 
@@ -316,6 +302,11 @@ namespace Vi.Core
             }
 
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
+        }
+
+        private void OnEnable()
+        {
+            combatAgent = GetComponentInParent<CombatAgent>();
         }
 
         private void Start()
@@ -411,7 +402,7 @@ namespace Vi.Core
         private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
         public void SetRagdollActive(bool isActive)
         {
-            if (!animator) { return; }
+            if (!combatAgent) { return; }
             foreach (Rigidbody rb in ragdollRigidbodies)
             {
                 rb.isKinematic = !isActive;
