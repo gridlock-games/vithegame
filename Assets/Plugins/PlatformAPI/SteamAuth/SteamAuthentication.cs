@@ -107,8 +107,8 @@ namespace jomarcentermjm.PlatformAPI
                     }
                 });
             }
-#endif
-#if UNITY_SERVER && UNITY_ANDROID && UNITY_IOS
+
+#elif UNITY_SERVER || UNITY_ANDROID || UNITY_IOS
         _callback(false, "Steam login is not available on non-steam platform", null, null, null);
 #endif
     }
