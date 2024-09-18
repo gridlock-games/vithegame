@@ -34,6 +34,20 @@ namespace Vi.UI
 
         private void FindPlayerInput()
         {
+            if (playerInput)
+            {
+                if (!playerInput.gameObject.activeInHierarchy)
+                {
+                    playerInput = null;
+                    playerMovementHandler = null;
+                    attributes = null;
+                    weaponHandler = null;
+                    animationHandler = null;
+                    loadoutManager = null;
+                    playerUI = null;
+                }
+            }
+
             if (playerInput) { return; }
             if (!PlayerDataManager.DoesExist()) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;

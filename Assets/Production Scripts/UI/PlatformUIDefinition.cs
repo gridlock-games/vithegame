@@ -100,6 +100,11 @@ namespace Vi.UI
         PlayerInput playerInput;
         private void FindPlayerInput()
         {
+            if (playerInput)
+            {
+                if (!playerInput.gameObject.activeInHierarchy) { playerInput = null; }
+            }
+
             if (playerInput) { return; }
             if (!PlayerDataManager.DoesExist()) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;

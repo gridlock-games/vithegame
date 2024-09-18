@@ -64,15 +64,30 @@ namespace Vi.Player
             attributes = movementHandler.GetComponent<Attributes>();
         }
 
-        private void Start()
+        private void OnEnable()
         {
             targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
             transform.SetParent(null, true);
 
-            cameraInterp = new GameObject("Camera Interp");
-            CameraPositionClone = new GameObject("Empty Camera Position Clone");
+            if (cameraInterp)
+            {
+                cameraInterp.SetActive(true);
+            }
+            else
+            {
+                cameraInterp = new GameObject("Camera Interp");
+            }
+            
+            if (CameraPositionClone)
+            {
+                CameraPositionClone.SetActive(true);
+            }
+            else
+            {
+                CameraPositionClone = new GameObject("Empty Camera Position Clone");
+            }
             
             currentPositionOffset = positionOffset;
             RefreshStatus();
@@ -86,6 +101,12 @@ namespace Vi.Player
             transform.rotation = CameraPositionClone.transform.rotation;
 
             UpdateCamera();
+        }
+
+        private void OnDisable()
+        {
+            if (cameraInterp) { cameraInterp.SetActive(false); }
+            if (CameraPositionClone) { CameraPositionClone.SetActive(false); }
         }
 
         private void OnDestroy()

@@ -26,7 +26,13 @@ namespace Vi.UI
         private Camera mainCamera;
         private void FindMainCamera()
         {
-            if (mainCamera) { return; }
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
             mainCamera = Camera.main;
         }
 

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
@@ -215,12 +214,11 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
+        protected const float stairStepHeight = 0.01f;
+
         [Header("Physics Locomotion Settings")]
-        [SerializeField] protected float stairStepHeight = 0.01f;
         [SerializeField] protected float maxStairStepHeight = 0.5f;
-
-        [SerializeField] protected float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
-
+        [SerializeField] protected float airborneHorizontalDragMultiplier = 0.1f;
         [SerializeField] protected float gravityScale = 2;
     }
 }

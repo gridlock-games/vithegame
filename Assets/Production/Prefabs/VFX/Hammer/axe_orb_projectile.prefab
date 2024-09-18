@@ -14708,9 +14708,12 @@ MonoBehaviour:
   - {fileID: 2654175274349702557, guid: 1bf608eaa8ac3b144974fd6af172ca17, type: 3}
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  teamColorParticleSystems:
+  - {fileID: 4514755523061157347}
   projectileForce: {x: 0, y: 0, z: 10}
   timeToActivateGravity: -1
   killDistance: 10
+  whooshNearbySound: []
 --- !u!114 &3825614338620220301
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -41,6 +42,52 @@ namespace Vi.Utility
         public void InvokeOnReturnToPoolEvent()
         {
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
+        }
+
+        private void OnDestroy()
+        {
+            ObjectPoolingManager.OnPooledObjectDestroy(this);
+        }
+
+        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
+        private void OnBeforeTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Remove(this);
+            }
+        }
+
+        private void OnTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Add(this);
+            }
+        }
+
+        public bool IsSpawned { get { return isSpawned; } }
+        private bool isSpawned;
+
+        private void Awake()
+        {
+            OnSpawnFromPool += OnSpawn;
+            OnReturnToPool += OnReturn;
+        }
+
+        private void OnSpawn() { isSpawned = true; }
+        private void OnReturn() { isSpawned = false; }
+
+        private void OnEnable()
+        {
+            gameObject.hideFlags = HideFlags.None;
+        }
+
+        private void OnDisable()
+        {
+            //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }
 }
