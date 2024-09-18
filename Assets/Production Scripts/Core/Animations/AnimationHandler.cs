@@ -635,7 +635,7 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             WaitingForActionClipToPlay = false;
             // Update the lastClipType to the current action clip type
-            if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
             else { SetLastActionClip(actionClip); }
             return true;
         }
@@ -1022,7 +1022,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
             else { SetLastActionClip(actionClip); }
         }
 
@@ -1091,9 +1091,18 @@ namespace Vi.Core
 
             if (shouldCreateNewSkin)
             {
-                if (characterIndex == -1) { Debug.LogWarning("Character Index is -1!"); yield break; }
+                if (characterIndex == -1) { Debug.LogError("Character Index is -1! " + name); yield break; }
                 CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-                GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+
+                GameObject modelInstance;
+                if (modelOption.skinOptions[skinIndex].TryGetComponent(out PooledObject pooledObject))
+                {
+                    modelInstance = ObjectPoolingManager.SpawnObject(modelOption.skinOptions[skinIndex].GetComponent<PooledObject>(), transform).gameObject;
+                }
+                else
+                {
+                    modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+                }
 
                 Animator = modelInstance.GetComponent<Animator>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
@@ -1125,16 +1134,19 @@ namespace Vi.Core
 
         private void OnDisable()
         {
-            if (Animator)
+            if (animatorReference)
             {
-                if (Animator.transform != transform)
+                if (animatorReference.transform != transform)
                 {
-                    if (Animator.TryGetComponent(out PooledObject pooledObject))
+                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                     {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                        Animator = null;
-                        LimbReferences = null;
-                        animatorReference = null;
+                        if (pooledObject.IsSpawned)
+                        {
+                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                            Animator = null;
+                            LimbReferences = null;
+                            animatorReference = null;
+                        }
                     }
                 }
             }

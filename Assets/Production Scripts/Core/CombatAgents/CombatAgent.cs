@@ -105,20 +105,14 @@ namespace Vi.Core
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
+        public GlowRenderer GlowRenderer { get; private set; }
         protected virtual void Awake()
         {
             StatusAgent = GetComponent<StatusAgent>();
             AnimationHandler = GetComponent<AnimationHandler>();
-            GlowRenderer = GetComponentInChildren<GlowRenderer>();
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
-        }
-
-        public GlowRenderer GlowRenderer { get; private set; }
-        protected void OnTransformChildrenChanged()
-        {
-            if (!GlowRenderer) { GlowRenderer = GetComponentInChildren<GlowRenderer>(); }
         }
 
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
@@ -154,11 +148,13 @@ namespace Vi.Core
         protected virtual void OnEnable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
+            GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
         protected virtual void OnDisable()
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+            GlowRenderer = null;
         }
 
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
@@ -300,8 +296,13 @@ namespace Vi.Core
                 }
             }
 
-            GlowRenderer.RenderInvincible(isInvincibleThisFrame);
-            GlowRenderer.RenderUninterruptable(IsUninterruptable());
+            if (!GlowRenderer) { GlowRenderer = GetComponentInChildren<GlowRenderer>(); }
+
+            if (GlowRenderer)
+            {
+                GlowRenderer.RenderInvincible(isInvincibleThisFrame);
+                GlowRenderer.RenderUninterruptable(IsUninterruptable());
+            }
         }
 
         public void OnActivateRage()

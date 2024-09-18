@@ -119,6 +119,16 @@ public class DebugOverlay : MonoBehaviour
     private Spectator localSpectator;
     private void FindLocalPlayer()
     {
+        if (localPlayer)
+        {
+            if (!localPlayer.gameObject.activeInHierarchy) { localPlayer = null; }
+        }
+
+        if (localSpectator)
+        {
+            if (!localSpectator.gameObject.activeInHierarchy) { localSpectator = null; }
+        }
+
         if (localPlayer) { return; }
         if (localSpectator) { return; }
         if (!PlayerDataManager.DoesExist()) { return; }

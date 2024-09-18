@@ -44,22 +44,50 @@ namespace Vi.Utility
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
 
-# if UNITY_EDITOR
-        private NetworkObject networkObject;
+        private void OnDestroy()
+        {
+            ObjectPoolingManager.OnPooledObjectDestroy(this);
+        }
+
+        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
+        private void OnBeforeTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Remove(this);
+            }
+        }
+
+        private void OnTransformParentChanged()
+        {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
+            if (parentPooledObject)
+            {
+                parentPooledObject.ChildPooledObjects.Add(this);
+            }
+        }
+
+        public bool IsSpawned { get { return isSpawned; } }
+        private bool isSpawned;
+
         private void Awake()
         {
-            networkObject = GetComponent<NetworkObject>();
+            OnSpawnFromPool += OnSpawn;
+            OnReturnToPool += OnReturn;
         }
+
+        private void OnSpawn() { isSpawned = true; }
+        private void OnReturn() { isSpawned = false; }
 
         private void OnEnable()
         {
-            if (networkObject) { gameObject.hideFlags = HideFlags.None; }
+            gameObject.hideFlags = HideFlags.None;
         }
 
         private void OnDisable()
         {
-            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+            //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
-# endif
     }
 }

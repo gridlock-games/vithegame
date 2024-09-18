@@ -754,11 +754,27 @@ namespace Vi.UI
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
-
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
             // Instantiate the player model
-            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pO))
+            {
+                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
@@ -808,7 +824,19 @@ namespace Vi.UI
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
+
             if (pauseInstance)
             {
                 if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))

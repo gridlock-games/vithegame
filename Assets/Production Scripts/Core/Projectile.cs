@@ -121,10 +121,6 @@ namespace Vi.Core
                 {
                     NetworkObject.Despawn(true);
                 }
-                else
-                {
-                    Destroy(gameObject);
-                }
             }
         }
 

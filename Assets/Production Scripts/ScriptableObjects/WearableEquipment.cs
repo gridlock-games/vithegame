@@ -32,15 +32,6 @@ namespace Vi.ScriptableObjects
             {
                 originalRenderData.Add((srenderer.rootBone, srenderer.bones));
             }
-            if (TryGetComponent(out PooledObject pooledObject))
-            {
-                pooledObject.OnReturnToPool += OnReturnToPool;
-            }
-        }
-
-        private void OnReturnToPool()
-        {
-            transform.SetParent(null, true);
         }
 
         private void OnEnable()

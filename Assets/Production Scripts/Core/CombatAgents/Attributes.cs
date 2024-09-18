@@ -111,6 +111,9 @@ namespace Vi.Core.CombatAgents
             }
         }
 
+        [SerializeField] private PooledObject teamIndicatorPrefab;
+        private PooledObject teamIndicatorInstance;
+
         public override void OnNetworkSpawn()
         {
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
@@ -145,6 +148,8 @@ namespace Vi.Core.CombatAgents
                 }
             }
             RefreshStatus();
+
+            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
         public void UpdateNetworkVisiblity()
@@ -207,6 +212,8 @@ namespace Vi.Core.CombatAgents
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
+
+            ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
         [SerializeField] private AudioClip heartbeatSoundEffect;
@@ -298,21 +305,6 @@ namespace Vi.Core.CombatAgents
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
-        }
-
-        [SerializeField] private PooledObject teamIndicatorPrefab;
-        private PooledObject teamIndicatorInstance;
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
