@@ -44,9 +44,12 @@ namespace Vi.Utility
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
 
+        private bool markedForDestruction;
+        public void MarkForDestruction() { markedForDestruction = true; }
+
         private void OnDestroy()
         {
-            ObjectPoolingManager.OnPooledObjectDestroy(this);
+            if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
         }
 
         public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
@@ -77,8 +80,17 @@ namespace Vi.Utility
             OnReturnToPool += OnReturn;
         }
 
-        private void OnSpawn() { isSpawned = true; }
-        private void OnReturn() { isSpawned = false; }
+        private void OnSpawn()
+        {
+            isSpawned = true;
+            ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
+        }
+
+        private void OnReturn()
+        {
+            ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
+            isSpawned = false;
+        }
 
         private void OnEnable()
         {
