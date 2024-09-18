@@ -7,8 +7,8 @@ using System.Text;
 #if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
 using Steamworks;
 #endif
-
-namespace jomarcentermjm.PlatformAPI
+ 
+namespace jomarcentermjm.steamauthentication
 {
     [Serializable]
     public class SteamUserAccountData
@@ -29,7 +29,9 @@ namespace jomarcentermjm.PlatformAPI
         public static void Auth(Action<bool, string, FirebaseUser, SteamUserAccountData, string> callback)
         {
             _callback = callback;
+
 #if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
+
             if (!SteamAPI.Init())
             {
                 Debug.LogError("SteamAPI does not work on non-steam versions.");
@@ -105,10 +107,13 @@ namespace jomarcentermjm.PlatformAPI
                     }
                 });
             }
-#endif
-        }
 
-        private static string webpageHTML()
+#elif UNITY_SERVER || UNITY_ANDROID || UNITY_IOS
+        _callback(false, "Steam login is not available on non-steam platform", null, null, null);
+#endif
+    }
+
+    private static string webpageHTML()
         {
             string htmlStuff = "<!--Vi authentication page MJM-->\r\n<!--DO NOT ADD THE AUTHENTICATION JAVASCRIPT ON THIS PAGE - USED FOR THE LOCALHOST BASED AUTHENTICATION-->\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n\r\n<head>\r\n    <title>Vi Content Server</title>\r\n    <link rel=\"stylesheet\" href=\"https://unpkg.com/plain-css@latest/dist/plain.min.css\">\r\n\r\n    <style>\r\n        body {\r\n            background-image: url(\"https://authentication.vi-assets.com/vibackground.png\");\r\n            background-size: cover;\r\n        }\r\n\r\n        .centerizedA {\r\n            height: auto;\r\n            width: auto;\r\n            position: relative;\r\n        }\r\n\r\n        .centerizedB {\r\n            background-image: url(\"https://authentication.vi-assets.com/LoginWindow.png\");\r\n            background-position: center;\r\n            border: 2px solid gray;\r\n            border-radius: 5px;\r\n            text-align: center;\r\n            padding-right: 15px;\r\n            padding-left: 15px;\r\n            margin-right: auto;\r\n            margin-left: auto;\r\n            position: relative;\r\n            background-color: white;\r\n            padding-bottom: 15px;\r\n            padding-top: 15px;\r\n            width: 50%;\r\n            color: white;\r\n\r\n            top: 50%;\r\n            transform: translate(0, -50%);\r\n        }\r\n    </style>\r\n\r\n</head>\r\n\r\n<body>\r\n    <div class=\"centerizedB\">\r\n        <img src=\"https://authentication.vi-assets.com/vilogo.png\" alt=\"Vi Game Logo\" style=\"width:184px;height:184px;\" class=\"floating_element\" />\r\n        <h1 id=\"titleText\" class=\" display:inline;\">Authentication Credentials transferred!</h1>\r\n        <p id=\"subtitleText\">your authentication credentials have been send to the game, You may close this tab</p>\r\n    </div>\r\n</body>\r\n\r\n\r\n</html>";
 
