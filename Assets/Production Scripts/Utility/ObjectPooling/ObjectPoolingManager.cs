@@ -312,7 +312,7 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            foreach (PooledObject childPooledObject in obj.GetChildPooledObjects())
+            foreach (PooledObject childPooledObject in obj.ChildPooledObjects.ToList())
             {
                 if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
                 if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
@@ -343,7 +343,7 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            foreach (PooledObject childPooledObject in obj.GetChildPooledObjects())
+            foreach (PooledObject childPooledObject in obj.ChildPooledObjects.ToList())
             {
                 if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
                 if (childPooledObject.TryGetComponent(out NetworkObject networkObject))

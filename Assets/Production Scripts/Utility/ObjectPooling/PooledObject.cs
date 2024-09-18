@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Linq;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -50,35 +50,24 @@ namespace Vi.Utility
         private void OnDestroy()
         {
             if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
-            if (parentPooledObject)
-            {
-                parentPooledObject.childPooledObjects.Remove(this);
-            }
         }
 
-        public List<PooledObject> GetChildPooledObjects()
-        {
-            int nullCount = childPooledObjects.RemoveAll(item => !item);
-            if (nullCount > 0) { Debug.LogWarning(nullCount + " null pooled child objects found in list " + this); }
-            return childPooledObjects.ToList();
-        }
-
-        private List<PooledObject> childPooledObjects = new List<PooledObject>();
+        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
         private void OnBeforeTransformParentChanged()
         {
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
             if (parentPooledObject)
             {
-                parentPooledObject.childPooledObjects.Remove(this);
+                parentPooledObject.ChildPooledObjects.Remove(this);
             }
         }
 
-        private PooledObject parentPooledObject;
         private void OnTransformParentChanged()
         {
-            parentPooledObject = GetComponentInParent<PooledObject>();
+            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
             if (parentPooledObject)
             {
-                parentPooledObject.childPooledObjects.Add(this);
+                parentPooledObject.ChildPooledObjects.Add(this);
             }
         }
 
@@ -95,18 +84,12 @@ namespace Vi.Utility
         {
             isSpawned = true;
             ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
-            parentPooledObject = GetComponentInParent<PooledObject>();
         }
 
         private void OnReturn()
         {
             ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
             isSpawned = false;
-            if (parentPooledObject)
-            {
-                parentPooledObject.childPooledObjects.Remove(this);
-            }
-            parentPooledObject = null;
         }
 
         private void OnEnable()
