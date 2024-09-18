@@ -307,10 +307,7 @@ namespace Vi.Core
         private void OnEnable()
         {
             combatAgent = GetComponentInParent<CombatAgent>();
-        }
 
-        private void Start()
-        {
             SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
             {
