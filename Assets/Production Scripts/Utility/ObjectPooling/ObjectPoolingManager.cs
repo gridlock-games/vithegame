@@ -309,7 +309,7 @@ namespace Vi.Utility
         {
             if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
-            if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
+            if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool! Was it returned by the scene manager?"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
             foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())
@@ -340,7 +340,7 @@ namespace Vi.Utility
         {
             if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
             if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
-            if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
+            if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool! Was it returned by the scene manager?"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
             foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())

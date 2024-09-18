@@ -178,7 +178,7 @@ namespace Vi.Core
             originalRotation = default;
             initialized = false;
 
-            rb.velocity = Vector3.zero;
+            rb.Sleep();
 
             nearbyWhooshPlayed = false;
 

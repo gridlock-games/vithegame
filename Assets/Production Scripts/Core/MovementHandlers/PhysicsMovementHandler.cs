@@ -50,6 +50,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.SetParent(transform);
             rb.transform.localPosition = Vector3.zero;
             rb.transform.localRotation = Quaternion.identity;
+            rb.Sleep();
         }
 
         protected override void OnEnable()

@@ -1215,6 +1215,10 @@ namespace Vi.Core
         private void Update()
         {
             RefreshAimPoint();
+        }
+
+        public void ProcessNextActionClip()
+        {
             if (serverActionQueue.TryDequeue(out (string, bool) result)) { PlayActionOnServer(result.Item1, result.Item2); }
         }
 

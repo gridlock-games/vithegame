@@ -828,7 +828,10 @@ namespace Vi.UI
             {
                 if (previewObject.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
                     previewObject = null;
                 }
                 else

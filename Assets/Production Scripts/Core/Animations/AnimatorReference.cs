@@ -209,6 +209,15 @@ namespace Vi.Core
                 }
                 ClearWearableEquipment(kvp.Key);
             }
+
+            armorType = Weapon.ArmorType.Flesh;
+            accumulatedRootMotion = Vector3.zero;
+            combatAgent = null;
+            animationHandler = null;
+            CurrentActionsAnimatorStateInfo = default;
+            NextActionsAnimatorStateInfo = default;
+            CurrentFlinchAnimatorStateInfo = default;
+            NextFlinchAnimatorStateInfo = default;
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -281,7 +290,6 @@ namespace Vi.Core
         private int flinchLayerIndex;
 
         Animator animator;
-        CombatAgent combatAgent;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
 
@@ -304,9 +312,12 @@ namespace Vi.Core
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
         }
 
+        CombatAgent combatAgent;
+        AnimationHandler animationHandler;
         private void OnEnable()
         {
             combatAgent = GetComponentInParent<CombatAgent>();
+            if (combatAgent) { animationHandler = combatAgent.GetComponent<AnimationHandler>(); }
 
             SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
@@ -394,6 +405,8 @@ namespace Vi.Core
                 }
                 accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
+
+            if (animationHandler) { animationHandler.ProcessNextActionClip(); }
         }
 
         private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
