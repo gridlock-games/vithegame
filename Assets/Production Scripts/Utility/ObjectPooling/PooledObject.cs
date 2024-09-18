@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.Utility
 {
@@ -52,13 +52,20 @@ namespace Vi.Utility
             if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
         }
 
-        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
+        public List<PooledObject> GetChildPooledObjects()
+        {
+            int nullCount = childPooledObjects.RemoveAll(item => !item);
+            if (nullCount > 0) { Debug.LogWarning(nullCount + " null objects were present in child pooled objects list " + this); }
+            return childPooledObjects.ToList();
+        }
+
+        private List<PooledObject> childPooledObjects = new List<PooledObject>();
         private void OnBeforeTransformParentChanged()
         {
             PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
             if (parentPooledObject)
             {
-                parentPooledObject.ChildPooledObjects.Remove(this);
+                parentPooledObject.childPooledObjects.Remove(this);
             }
         }
 
@@ -67,7 +74,7 @@ namespace Vi.Utility
             PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
             if (parentPooledObject)
             {
-                parentPooledObject.ChildPooledObjects.Add(this);
+                parentPooledObject.childPooledObjects.Add(this);
             }
         }
 

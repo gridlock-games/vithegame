@@ -758,7 +758,10 @@ namespace Vi.Core.CombatAgents
                     }
                     else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
                     {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        if (pooledObject.IsSpawned)
+                        {
+                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        }
                     }
                     else
                     {
@@ -767,7 +770,10 @@ namespace Vi.Core.CombatAgents
                 }
                 else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
                 }
                 else
                 {

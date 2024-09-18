@@ -16,7 +16,11 @@ namespace Vi.ProceduralAnimations
         private Rig rig;
         private Animator animator;
 
-        public Rig GetRig() { return rig; }
+        public Rig GetRig()
+        {
+            if (!rig) { rig = GetComponent<Rig>(); }
+            return rig;
+        }
 
         private void Awake()
         {
