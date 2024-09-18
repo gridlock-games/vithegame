@@ -7,8 +7,8 @@ using System.Text;
 #if !UNITY_SERVER && !UNITY_ANDROID && !UNITY_IOS
 using Steamworks;
 #endif
-
-namespace jomarcentermjm.PlatformAPI
+ 
+namespace jomarcentermjm.steamauthentication
 {
     [Serializable]
     public class SteamUserAccountData

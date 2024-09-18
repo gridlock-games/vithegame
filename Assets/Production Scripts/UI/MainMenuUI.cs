@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
+using jomarcentermjm.steamauthentication;
 
 namespace Vi.UI
 {
