@@ -68,6 +68,7 @@ namespace Vi.Utility
 
             void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
             {
+                networkObject.AutoObjectParentSync = false;
                 ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
             }
         }
@@ -299,6 +300,7 @@ namespace Vi.Utility
 
         private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
         {
+            networkObject.AutoObjectParentSync = true;
             if (!NetworkManager.Singleton.IsServer) { yield break; }
             if (networkObject.transform.parent == parent) { yield break; }
             yield return new WaitUntil(() => networkObject.IsSpawned);
@@ -315,20 +317,7 @@ namespace Vi.Utility
             foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())
             {
                 if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
-                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
-                {
-                    if (NetworkManager.Singleton.IsServer)
-                    {
-                        if (!networkObject.TryRemoveParent(true))
-                        {
-                            Debug.LogError("Unable to remove parent for pooled network object " + networkObject);
-                        }
-                    }
-                }
-                else
-                {
-                    childPooledObject.transform.SetParent(null, true);
-                }
+                childPooledObject.transform.SetParent(null, true);
             }
 
             obj.gameObject.SetActive(false);
@@ -346,20 +335,7 @@ namespace Vi.Utility
             foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())
             {
                 if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
-                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
-                {
-                    if (NetworkManager.Singleton.IsServer)
-                    {
-                        if (!networkObject.TryRemoveParent(true))
-                        {
-                            Debug.LogError("Unable to remove parent for pooled network object " + networkObject);
-                        }
-                    }
-                }
-                else
-                {
-                    childPooledObject.transform.SetParent(null, true);
-                }
+                childPooledObject.transform.SetParent(null, true);
             }
 
             obj.gameObject.SetActive(false);

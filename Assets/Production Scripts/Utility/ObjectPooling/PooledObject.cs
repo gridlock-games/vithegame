@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -84,6 +85,7 @@ namespace Vi.Utility
 
         private void OnDisable()
         {
+            if (GetComponent<NetworkObject>()) { return; }
             gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }
