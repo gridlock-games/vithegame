@@ -60,9 +60,18 @@ namespace Vi.UI
             if (!previewObject)
             {
                 // Instantiate the player model
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+                }
+                else
+                {
+                    previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                }
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
