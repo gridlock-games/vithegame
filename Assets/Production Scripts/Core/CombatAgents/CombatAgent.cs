@@ -156,8 +156,6 @@ namespace Vi.Core
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
             GlowRenderer = null;
 
-            NetworkCollider = default;
-
             invincibilityEndTime = default;
             uninterruptableEndTime = default;
 
