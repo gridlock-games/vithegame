@@ -77,6 +77,7 @@ namespace Vi.Core.VFX
             base.OnDisable();
             nearbyWhooshPlayed = false;
             originalRotation = default;
+            rb.Sleep();
         }
 
         private bool nearbyWhooshPlayed;
