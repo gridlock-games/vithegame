@@ -635,8 +635,7 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             WaitingForActionClipToPlay = false;
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
-            else { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
         }
 
@@ -1022,8 +1021,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
-            else { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         // Coroutine for setting invincibility status during a dodge
