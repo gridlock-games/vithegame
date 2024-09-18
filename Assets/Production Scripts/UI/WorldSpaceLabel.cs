@@ -157,6 +157,11 @@ namespace Vi.UI
         private WeaponHandler localWeaponHandler;
         private void FindLocalWeaponHandler()
         {
+            if (localWeaponHandler)
+            {
+                if (localWeaponHandler.gameObject.activeInHierarchy) { localWeaponHandler = null; }
+            }
+
             if (localWeaponHandler) { return; }
 
             if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
