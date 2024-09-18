@@ -60,7 +60,10 @@ namespace Vi.UI
             {
                 if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
                     MVPPreviewObject = null;
                 }
                 else
