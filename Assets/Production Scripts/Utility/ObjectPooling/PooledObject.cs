@@ -71,8 +71,7 @@ namespace Vi.Utility
             }
         }
 
-        public bool IsSpawned { get { return isSpawned; } }
-        private bool isSpawned;
+        public bool IsSpawned { get; private set; }
 
         private void Awake()
         {
@@ -82,14 +81,14 @@ namespace Vi.Utility
 
         private void OnSpawn()
         {
-            isSpawned = true;
+            IsSpawned = true;
             ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
         }
 
         private void OnReturn()
         {
             ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
-            isSpawned = false;
+            IsSpawned = false;
         }
 
         private void OnEnable()
