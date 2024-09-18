@@ -1130,21 +1130,18 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
-        private void OnDisable()
+        private void OnReturnToPool()
         {
             if (animatorReference)
             {
-                if (animatorReference.transform != transform)
+                if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                 {
-                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                    if (pooledObject.IsSpawned)
                     {
-                        if (pooledObject.IsSpawned)
-                        {
-                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                            Animator = null;
-                            LimbReferences = null;
-                            animatorReference = null;
-                        }
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        Animator = null;
+                        LimbReferences = null;
+                        animatorReference = null;
                     }
                 }
             }
@@ -1185,6 +1182,7 @@ namespace Vi.Core
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
+            GetComponent<PooledObject>().OnReturnToPool += OnReturnToPool;
         }
 
         private void OnEnable()

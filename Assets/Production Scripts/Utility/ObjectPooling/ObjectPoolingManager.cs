@@ -312,9 +312,10 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            foreach (PooledObject pooledObject in obj.ChildPooledObjects.ToList())
+            foreach (PooledObject childPooledObject in obj.ChildPooledObjects.ToList())
             {
-                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
+                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
                 {
                     if (NetworkManager.Singleton.IsServer)
                     {
@@ -326,7 +327,7 @@ namespace Vi.Utility
                 }
                 else
                 {
-                    pooledObject.transform.SetParent(null, true);
+                    childPooledObject.transform.SetParent(null, true);
                 }
             }
 
@@ -342,9 +343,10 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool!"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            foreach (PooledObject pooledObject in obj.ChildPooledObjects.ToList())
+            foreach (PooledObject childPooledObject in obj.ChildPooledObjects.ToList())
             {
-                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
+                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
                 {
                     if (NetworkManager.Singleton.IsServer)
                     {
@@ -356,7 +358,7 @@ namespace Vi.Utility
                 }
                 else
                 {
-                    pooledObject.transform.SetParent(null, true);
+                    childPooledObject.transform.SetParent(null, true);
                 }
             }
 
