@@ -87,7 +87,7 @@ namespace Vi.Utility
 
         private void OnDisable()
         {
-            //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }
 }
