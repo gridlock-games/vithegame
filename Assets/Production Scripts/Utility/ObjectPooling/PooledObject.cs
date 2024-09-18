@@ -52,30 +52,9 @@ namespace Vi.Utility
             if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
         }
 
-        public List<PooledObject> GetChildPooledObjects()
+        public PooledObject[] GetChildPooledObjects()
         {
-            int nullCount = childPooledObjects.RemoveAll(item => !item);
-            if (nullCount > 0) { Debug.LogWarning(nullCount + " null objects were present in child pooled objects list " + this); }
-            return childPooledObjects.ToList();
-        }
-
-        private List<PooledObject> childPooledObjects = new List<PooledObject>();
-        private void OnBeforeTransformParentChanged()
-        {
-            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
-            if (parentPooledObject)
-            {
-                parentPooledObject.childPooledObjects.Remove(this);
-            }
-        }
-
-        private void OnTransformParentChanged()
-        {
-            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
-            if (parentPooledObject)
-            {
-                parentPooledObject.childPooledObjects.Add(this);
-            }
+            return GetComponentsInChildren<PooledObject>();
         }
 
         public bool IsSpawned { get; private set; }
