@@ -95,25 +95,48 @@ namespace Vi.Core
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
+        private void Awake()
+        {
+            renderers = GetComponentsInChildren<Renderer>(true);
+            colliders = GetComponentsInChildren<Collider>(true);
+        }
+
         protected void OnEnable()
         {
-            parentCombatAgent = GetComponentInParent<CombatAgent>();
+            parentCombatAgent = transform.root.GetComponent<CombatAgent>();
             if (!parentCombatAgent) { return; }
 
-            colliders = GetComponentsInChildren<Collider>(true);
             foreach (Collider col in colliders)
             {
                 col.enabled = parentCombatAgent.IsServer;
             }
 
-            renderers = GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 if (renderer is SkinnedMeshRenderer smr)
                 {
                     smr.updateWhenOffscreen = parentCombatAgent.IsServer;
                 }
+                renderer.forceRenderingOff = true;
             }
+            StartCoroutine(EnableRenderersAfterOneFrame());
+        }
+
+        private IEnumerator EnableRenderersAfterOneFrame()
+        {
+            yield return null;
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = false;
+            }
+        }
+
+        protected void OnDisable()
+        {
+            parentCombatAgent = null;
+            isStowed = false;
+            associatedRuntimeWeapons.Clear();
+            hitCounter.Clear();
         }
 
         private bool lastIsActiveCall = true;
@@ -138,11 +161,6 @@ namespace Vi.Core
         public void SetIsStowed(bool isStowed)
         {
             this.isStowed = isStowed;
-        }
-
-        protected void OnDisable()
-        {
-            isStowed = false;
         }
     }
 }
