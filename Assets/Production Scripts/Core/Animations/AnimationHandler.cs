@@ -635,8 +635,7 @@ namespace Vi.Core
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
             WaitingForActionClipToPlay = false;
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
-            else { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
         }
 
@@ -1022,8 +1021,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { combatAgent.MovementHandler.Flinch(actionClip.GetFlinchAmount()); }
-            else { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1132,21 +1130,18 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
-        private void OnDisable()
+        private void OnReturnToPool()
         {
             if (animatorReference)
             {
-                if (animatorReference.transform != transform)
+                if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                 {
-                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                    if (pooledObject.IsSpawned)
                     {
-                        if (pooledObject.IsSpawned)
-                        {
-                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                            Animator = null;
-                            LimbReferences = null;
-                            animatorReference = null;
-                        }
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        Animator = null;
+                        LimbReferences = null;
+                        animatorReference = null;
                     }
                 }
             }
@@ -1187,6 +1182,7 @@ namespace Vi.Core
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
+            GetComponent<PooledObject>().OnReturnToPool += OnReturnToPool;
         }
 
         private void OnEnable()

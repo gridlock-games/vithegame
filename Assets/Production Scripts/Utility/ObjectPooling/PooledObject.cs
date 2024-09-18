@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Unity.Netcode;
+using System.Linq;
 
 namespace Vi.Utility
 {
@@ -44,32 +44,20 @@ namespace Vi.Utility
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
         }
 
+        private bool markedForDestruction;
+        public void MarkForDestruction() { markedForDestruction = true; }
+
         private void OnDestroy()
         {
-            ObjectPoolingManager.OnPooledObjectDestroy(this);
+            if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
         }
 
-        public List<PooledObject> ChildPooledObjects { get; private set; } = new List<PooledObject>();
-        private void OnBeforeTransformParentChanged()
+        public PooledObject[] GetChildPooledObjects()
         {
-            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
-            if (parentPooledObject)
-            {
-                parentPooledObject.ChildPooledObjects.Remove(this);
-            }
+            return GetComponentsInChildren<PooledObject>();
         }
 
-        private void OnTransformParentChanged()
-        {
-            PooledObject parentPooledObject = GetComponentInParent<PooledObject>();
-            if (parentPooledObject)
-            {
-                parentPooledObject.ChildPooledObjects.Add(this);
-            }
-        }
-
-        public bool IsSpawned { get { return isSpawned; } }
-        private bool isSpawned;
+        public bool IsSpawned { get; private set; }
 
         private void Awake()
         {
@@ -77,8 +65,17 @@ namespace Vi.Utility
             OnReturnToPool += OnReturn;
         }
 
-        private void OnSpawn() { isSpawned = true; }
-        private void OnReturn() { isSpawned = false; }
+        private void OnSpawn()
+        {
+            IsSpawned = true;
+            ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
+        }
+
+        private void OnReturn()
+        {
+            ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
+            IsSpawned = false;
+        }
 
         private void OnEnable()
         {
@@ -87,7 +84,7 @@ namespace Vi.Utility
 
         private void OnDisable()
         {
-            //gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }
 }

@@ -34,7 +34,13 @@ namespace Vi.Player
         public Transform TargetToLockOn { get; private set; }
         public void LockOnTarget(Transform target) { TargetToLockOn = target; }
 
-        public override void Flinch(Vector2 flinchAmount) { cameraController.AddRotation(flinchAmount.x, flinchAmount.y); }
+        public override void Flinch(Vector2 flinchAmount)
+        {
+            if (!IsServer) { Debug.LogError("PlayerMovementHandler.Flinch() should only be called on the server!"); return; }
+            FlinchRpc(flinchAmount);
+        }
+
+        [Rpc(SendTo.Owner)] private void FlinchRpc(Vector2 flinchAmount) { cameraController.AddRotation(flinchAmount.x, flinchAmount.y); }
 
         public struct InputPayload : INetworkSerializable, System.IEquatable<InputPayload>
         {

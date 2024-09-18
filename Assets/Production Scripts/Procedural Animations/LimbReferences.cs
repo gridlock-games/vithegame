@@ -152,16 +152,6 @@ namespace Vi.ProceduralAnimations
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
 
-            if (rightHandAimRig) rightHandAimRig.weight = 0;
-            if (rightHandAimBodyConstraint) rightHandAimBodyConstraint.weight = 0;
-            if (rightHandAimBodyInvertedConstraint) rightHandAimBodyInvertedConstraint.weight = 0;
-            if (leftHandAimRig) leftHandAimRig.weight = 0;
-            if (leftHandAimBodyConstraint) leftHandAimBodyConstraint.weight = 0;
-            if (leftHandAimBodyInvertedConstraint) leftHandAimBodyInvertedConstraint.weight = 0;
-            if (rightHandReachRig) rightHandReachRig.weight = 0;
-            if (leftHandReachRig) leftHandReachRig.weight = 0;
-            if (meleeVerticalAimRig) meleeVerticalAimRig.weight = 0;
-
             for (int i = 0; i < keys.Length; i++)
             {
                 if (weaponBoneMapping.ContainsKey(keys[i]))
@@ -180,6 +170,19 @@ namespace Vi.ProceduralAnimations
                 if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.AddRigidbody(rigidbody);
             }
+
+            if (rightHandAimRig) { rightHandAimRig.weight = 0; rightHandAimRig.GetRig().weight = 0; }
+            if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = 0; }
+            if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.weight = 0; }
+            if (leftHandAimRig) { leftHandAimRig.weight = 0; leftHandAimRig.GetRig().weight = 0; }
+            if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = 0; }
+            if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.weight = 0; }
+            if (rightHandReachRig) { rightHandReachRig.weight = 0; rightHandReachRig.GetRig().weight = 0; }
+            if (leftHandReachRig) { leftHandReachRig.weight = 0; leftHandReachRig.GetRig().weight = 0; }
+            if (meleeVerticalAimRig) { meleeVerticalAimRig.weight = 0; meleeVerticalAimRig.GetRig().weight = 0; }
+
+            aimingDictionary[Hand.RightHand] = false;
+            aimingDictionary[Hand.LeftHand] = false;
         }
 
         private void OnDisable()
@@ -189,6 +192,19 @@ namespace Vi.ProceduralAnimations
                 if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
             }
+
+            if (rightHandAimRig) { rightHandAimRig.weight = 0; rightHandAimRig.GetRig().weight = 0; }
+            if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = 0; }
+            if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.weight = 0; }
+            if (leftHandAimRig) { leftHandAimRig.weight = 0; leftHandAimRig.GetRig().weight = 0; }
+            if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = 0; }
+            if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.weight = 0; }
+            if (rightHandReachRig) { rightHandReachRig.weight = 0; rightHandReachRig.GetRig().weight = 0; }
+            if (leftHandReachRig) { leftHandReachRig.weight = 0; leftHandReachRig.GetRig().weight = 0; }
+            if (meleeVerticalAimRig) { meleeVerticalAimRig.weight = 0; meleeVerticalAimRig.GetRig().weight = 0; }
+
+            aimingDictionary[Hand.RightHand] = false;
+            aimingDictionary[Hand.LeftHand] = false;
         }
 
         private Dictionary<Weapon.WeaponBone, Transform> weaponBoneMapping = new Dictionary<Weapon.WeaponBone, Transform>();

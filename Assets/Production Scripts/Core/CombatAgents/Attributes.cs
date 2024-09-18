@@ -638,7 +638,11 @@ namespace Vi.Core.CombatAgents
             {
                 if (attack.shouldFlinch | IsRaging())
                 {
-                    if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                    if (!hitReactionWasPlayed & !IsGrabbed())
+                    {
+                        AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle));
+                        MovementHandler.Flinch(attack.GetFlinchAmount());
+                    }
                 }
             }
 
@@ -754,7 +758,10 @@ namespace Vi.Core.CombatAgents
                     }
                     else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
                     {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        if (pooledObject.IsSpawned)
+                        {
+                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        }
                     }
                     else
                     {
@@ -763,7 +770,10 @@ namespace Vi.Core.CombatAgents
                 }
                 else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
                 }
                 else
                 {
