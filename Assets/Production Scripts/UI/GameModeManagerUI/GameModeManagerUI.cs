@@ -149,6 +149,25 @@ namespace Vi.UI
                             PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
                         }
                     }
+
+                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
+                    {
+                        if (MVPPreviewObject)
+                        {
+                            if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                            {
+                                if (pooledObject.IsSpawned)
+                                {
+                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                }
+                                MVPPreviewObject = null;
+                            }
+                            else
+                            {
+                                Destroy(MVPPreviewObject);
+                            }
+                        }
+                    }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
