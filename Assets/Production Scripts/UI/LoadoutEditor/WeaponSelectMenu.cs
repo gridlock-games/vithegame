@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using Vi.Player;
 using UnityEngine.Video;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -37,7 +38,16 @@ namespace Vi.UI
                 // If this weapon option isn't in our inventory, continue
                 if (!WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
 
-                LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                LoadoutOptionElement ele;
+                if (loadoutOptionPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ele = ObjectPoolingManager.SpawnObject(pooledObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                }
+                else
+                {
+                    ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                }
+                
                 ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
@@ -78,7 +88,22 @@ namespace Vi.UI
                     break;
             }
 
-            if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
+            if (weaponPreviewObject)
+            {
+                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    weaponPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(weaponPreviewObject);
+                }
+            }
+
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
@@ -166,7 +191,21 @@ namespace Vi.UI
         private GameObject weaponPreviewObject;
         private void OnDestroy()
         {
-            Destroy(weaponPreviewObject);
+            if (weaponPreviewObject)
+            {
+                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    weaponPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(weaponPreviewObject);
+                }
+            }
         }
     }
 }
