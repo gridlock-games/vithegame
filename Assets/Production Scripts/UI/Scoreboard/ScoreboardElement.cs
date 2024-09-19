@@ -61,22 +61,21 @@ namespace Vi.UI
             return default;
         }
 
-        private void OnDisable()
-        {
-            initialized = false;
-            player = null;
-            playerDataId = default;
-        }
-
-        private void Start()
+        private void OnEnable()
         {
             disconnectedPlayerIcon.enabled = false;
 
             if (isPreviewObject)
             {
                 if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
-                enabled = false;
             }
+        }
+
+        private void OnDisable()
+        {
+            initialized = false;
+            player = null;
+            playerDataId = default;
         }
 
         private void Update()
