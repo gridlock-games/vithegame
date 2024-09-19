@@ -141,7 +141,6 @@ namespace Vi.Core
                 SetInviniciblity(0);
                 SetUninterruptable(0);
                 ResetAilment();
-                StatusAgent.RemoveAllStatuses();
             }
         }
 
