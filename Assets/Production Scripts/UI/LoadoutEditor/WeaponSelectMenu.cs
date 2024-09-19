@@ -120,6 +120,7 @@ namespace Vi.UI
                 abilityImages[i].sprite = ability.abilityImageIcon;
                 if (abilityImages[i].TryGetComponent(out Button previewButton))
                 {
+                    previewButton.onClick.RemoveAllListeners();
                     previewButton.onClick.AddListener(() => StartCoroutine(ShowAbilityPreviewVideo(abilityPreviewVideos.Find(item => item.ability == ability))));
                 }
                 else
