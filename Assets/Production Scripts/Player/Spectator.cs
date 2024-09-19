@@ -25,6 +25,8 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                gameObject.tag = "MainCamera";
+
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
                 RefreshStatus();
@@ -64,6 +66,8 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
+
+            gameObject.tag = "Untagged";
         }
 
         void OnLook(InputValue value)

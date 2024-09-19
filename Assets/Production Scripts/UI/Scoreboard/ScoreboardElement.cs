@@ -33,18 +33,28 @@ namespace Vi.UI
         public void Initialize(int playerDataId)
         {
             this.playerDataId = playerDataId;
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
             UpdateUI();
             initialized = true;
             player = PlayerDataManager.Singleton.ContainsId(playerDataId) ? PlayerDataManager.Singleton.GetPlayerObjectById(playerDataId) : null;
         }
 
-        public void HideRoundWinsColumn()
+        private void SetRoundWinsColumnActive(bool isActive)
         {
-            if (roundWinsParent.gameObject.activeSelf)
+            if (isActive)
             {
-                playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x + roundWinsParent.sizeDelta.x);
-                roundWinsParent.gameObject.SetActive(false);
+                if (!roundWinsParent.gameObject.activeSelf)
+                {
+                    playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x - roundWinsParent.sizeDelta.x);
+                    roundWinsParent.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                if (roundWinsParent.gameObject.activeSelf)
+                {
+                    playerNameParent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, playerNameParent.sizeDelta.x + roundWinsParent.sizeDelta.x);
+                    roundWinsParent.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -64,11 +74,7 @@ namespace Vi.UI
         private void OnEnable()
         {
             disconnectedPlayerIcon.enabled = false;
-
-            if (isPreviewObject)
-            {
-                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.FreeForAll) { HideRoundWinsColumn(); }
-            }
+            SetRoundWinsColumnActive(PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.FreeForAll);
         }
 
         private void OnDisable()
