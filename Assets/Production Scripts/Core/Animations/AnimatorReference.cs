@@ -357,6 +357,7 @@ namespace Vi.Core
 
         public bool ShouldApplyRootMotion()
         {
+            if (!combatAgent) { return false; }
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
             return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();

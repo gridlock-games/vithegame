@@ -611,7 +611,7 @@ namespace Vi.Core
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -1004,7 +1004,7 @@ namespace Vi.Core
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -1145,6 +1145,8 @@ namespace Vi.Core
                     }
                 }
             }
+
+            WaitingForActionClipToPlay = false;
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)
@@ -1197,7 +1199,7 @@ namespace Vi.Core
         public Vector3 GetCameraForwardDirection() { return NetworkObject.IsPlayerObject ? cameraForwardDir.Value : transform.forward; }
         private NetworkVariable<Vector3> cameraForwardDir = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        private readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
+        private static readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
 
         private Camera mainCamera;
         private void FindMainCamera()

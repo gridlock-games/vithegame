@@ -312,59 +312,31 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool! Was it returned by the scene manager?"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())
+            if (obj.transform.parent)
             {
-                if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
-                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
+                if (obj.TryGetComponent(out NetworkObject networkObject))
                 {
-                    if (NetworkManager.Singleton.IsServer)
-                    {
-                        if (!networkObject.TryRemoveParent(true))
-                        {
-                            Debug.LogError("Unable to remove parent for pooled network object " + networkObject);
-                        }
-                    }
+                    networkObject.AutoObjectParentSync = false;
+                    // We can't use TryRemoveParent here because that requires auto object parent sync to be enabled
+                    networkObject.transform.SetParent(null, true);
+                    networkObject.AutoObjectParentSync = true;
                 }
                 else
                 {
-                    childPooledObject.transform.SetParent(null, true);
+                    obj.transform.SetParent(null, true);
                 }
             }
 
-            obj.gameObject.SetActive(false);
-            despawnedObjectPools[obj.GetPooledObjectIndex()].Add(obj);
             obj.InvokeOnReturnToPoolEvent();
+
+            obj.gameObject.SetActive(false);
+            if (obj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(obj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
+            despawnedObjectPools[obj.GetPooledObjectIndex()].Add(obj);
         }
 
         public static void ReturnObjectToPool(ref PooledObject obj)
         {
-            if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
-            if (obj.GetPooledObjectIndex() == -1) { Debug.LogError(obj + " isn't registered in the pooled object list!"); return; }
-            if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool! Was it returned by the scene manager?"); return; }
-            if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
-
-            foreach (PooledObject childPooledObject in obj.GetChildPooledObjects().ToList())
-            {
-                if (!childPooledObject) { Debug.LogWarning("Null object in child pooled objects " + obj); continue; }
-                if (childPooledObject.TryGetComponent(out NetworkObject networkObject))
-                {
-                    if (NetworkManager.Singleton.IsServer)
-                    {
-                        if (!networkObject.TryRemoveParent(true))
-                        {
-                            Debug.LogError("Unable to remove parent for pooled network object " + networkObject);
-                        }
-                    }
-                }
-                else
-                {
-                    childPooledObject.transform.SetParent(null, true);
-                }
-            }
-
-            obj.gameObject.SetActive(false);
-            despawnedObjectPools[obj.GetPooledObjectIndex()].Add(obj);
-            obj.InvokeOnReturnToPoolEvent();
+            ReturnObjectToPool(obj);
             obj = null;
         }
 
@@ -411,6 +383,7 @@ namespace Vi.Utility
 #if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) { return; }
 #endif
+            Debug.LogError(pooledObject + " was destroyed unexpectedly! Please use pooledobject.markfordestruction() before destroying");
             despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
             spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
         }

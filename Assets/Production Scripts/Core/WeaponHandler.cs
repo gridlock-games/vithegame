@@ -117,6 +117,30 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
+
+            inputHistory.Clear();
+
+            CanAim = false;
+            CanADS = false;
+
+            currentActionClipWeapon = default;
+
+            actionSoundEffectIdTracker.Clear();
+
+            actionVFXTracker.Clear();
+
+            IsInAnticipation = false;
+            isAboutToAttack = false;
+            IsAttacking = false;
+            IsInRecovery = false;
+
+            ClearPreviewActionVFXInstances();
+
+            WaitingForReloadToPlay = false;
+
+            reloadRunning = false;
+
+            IsBlocking = false;
         }
 
         private void EquipWeapon()

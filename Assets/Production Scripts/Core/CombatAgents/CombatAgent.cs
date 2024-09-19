@@ -155,6 +155,19 @@ namespace Vi.Core
         {
             if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
             GlowRenderer = null;
+
+            invincibilityEndTime = default;
+            uninterruptableEndTime = default;
+
+            damageMappingThisLife.Clear();
+
+            knockupHitCounter = default;
+            lastAttackingCombatAgent = default;
+
+            wasStaggeredThisFrame = default;
+
+            shouldShake = default;
+            hitFreezeStartTime = Mathf.NegativeInfinity;
         }
 
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
