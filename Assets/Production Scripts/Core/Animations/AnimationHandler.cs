@@ -628,10 +628,16 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
-            WaitingForActionClipToPlay = false;
+            StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
+        }
+
+        private IEnumerator ResetWaitingForActionClipToPlayAfterOneFrame()
+        {
+            yield return null;
+            WaitingForActionClipToPlay = false;
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;

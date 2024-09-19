@@ -795,7 +795,6 @@ namespace Vi.Core
             {
                 ExecuteLightAttack(true);
                 yield return null;
-                yield return null;
             }
         }
 
