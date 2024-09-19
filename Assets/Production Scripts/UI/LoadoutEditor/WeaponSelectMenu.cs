@@ -105,7 +105,9 @@ namespace Vi.UI
         }
 
         [SerializeField] private GameObject abilityPreviewParent;
+        [SerializeField] private Text videoOverlayText;
         [SerializeField] private VideoPlayer abilityPreviewVideoPlayer;
+        [SerializeField] private RawImage abilityPreviewRawImage;
 
         private void ShowAbilityPreviewVideo(AbilityPreviewVideo abilityPreviewVideo)
         {
@@ -114,16 +116,22 @@ namespace Vi.UI
             {
                 if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
                 abilityPreviewVideoPlayer.clip = null;
+                videoOverlayText.text = "No Preview Video For This Ability";
+                abilityPreviewRawImage.enabled = false;
             }
             else if (abilityPreviewVideo.video)
             {
                 abilityPreviewVideoPlayer.clip = abilityPreviewVideo.video;
                 abilityPreviewVideoPlayer.Play();
+                videoOverlayText.text = "";
+                abilityPreviewRawImage.enabled = true;
             }
             else // Show "no preview video"
             {
                 if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
                 abilityPreviewVideoPlayer.clip = null;
+                videoOverlayText.text = "No Preview Video For This Ability";
+                abilityPreviewRawImage.enabled = false;
             }
         }
 
@@ -132,6 +140,8 @@ namespace Vi.UI
             abilityPreviewParent.SetActive(false);
             if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
             abilityPreviewVideoPlayer.clip = null;
+            videoOverlayText.text = "";
+            abilityPreviewRawImage.enabled = false;
         }
 
         private GameObject weaponPreviewObject;
