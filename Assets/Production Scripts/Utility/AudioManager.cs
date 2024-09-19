@@ -82,6 +82,7 @@ namespace Vi.Utility
             while (true)
             {
                 if (!invoker) { break; }
+                if (!invoker.activeInHierarchy) { break; }
                 if (!audioSource) { break; }
                 if (!audioSource.isPlaying) { break; }
                 yield return null;
@@ -190,6 +191,7 @@ namespace Vi.Utility
             while (true)
             {
                 if (!invoker) { break; }
+                if (!invoker.activeInHierarchy) { break; }
                 if (!audioSource) { break; }
                 if (!audioSource.isPlaying) { break; }
                 yield return null;
