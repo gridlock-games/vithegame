@@ -305,7 +305,7 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError(pooledObject + " " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
+                                Debug.LogError(pooledObject + " in scene " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! ");
                             }
                         }
                     }
