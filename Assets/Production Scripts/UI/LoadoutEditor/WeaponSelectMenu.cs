@@ -5,6 +5,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using Vi.Player;
+using UnityEngine.Video;
 
 namespace Vi.UI
 {
@@ -13,6 +14,14 @@ namespace Vi.UI
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
         [SerializeField] private Image[] abilityImages;
+        [SerializeField] private List<AbilityPreviewVideo> abilityPreviewVideos = new List<AbilityPreviewVideo>();
+
+        [System.Serializable]
+        private class AbilityPreviewVideo
+        {
+            public ActionClip ability;
+            public VideoClip video;
+        }
 
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
@@ -82,8 +91,47 @@ namespace Vi.UI
             
             for (int i = 0; i < abilityImages.Length; i++)
             {
-                abilityImages[i].sprite = weaponOption.weapon.GetAbilities()[i].abilityImageIcon;
+                ActionClip ability = weaponOption.weapon.GetAbilities()[i];
+                abilityImages[i].sprite = ability.abilityImageIcon;
+                if (abilityImages[i].TryGetComponent(out Button previewButton))
+                {
+                    previewButton.onClick.AddListener(() => ShowAbilityPreviewVideo(abilityPreviewVideos.Find(item => item.ability == ability)));
+                }
+                else
+                {
+                    Debug.LogError(i + " doesn't have a button component for preview ability video!");
+                }
             }
+        }
+
+        [SerializeField] private GameObject abilityPreviewParent;
+        [SerializeField] private VideoPlayer abilityPreviewVideoPlayer;
+
+        private void ShowAbilityPreviewVideo(AbilityPreviewVideo abilityPreviewVideo)
+        {
+            abilityPreviewParent.SetActive(true);
+            if (abilityPreviewVideo == null) // Show "no preview video"
+            {
+                if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
+                abilityPreviewVideoPlayer.clip = null;
+            }
+            else if (abilityPreviewVideo.video)
+            {
+                abilityPreviewVideoPlayer.clip = abilityPreviewVideo.video;
+                abilityPreviewVideoPlayer.Play();
+            }
+            else // Show "no preview video"
+            {
+                if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
+                abilityPreviewVideoPlayer.clip = null;
+            }
+        }
+
+        public void CloseAbilityPreviewWindow()
+        {
+            abilityPreviewParent.SetActive(false);
+            if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
+            abilityPreviewVideoPlayer.clip = null;
         }
 
         private GameObject weaponPreviewObject;
