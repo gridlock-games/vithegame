@@ -212,10 +212,20 @@ namespace Vi.UI
                     Destroy(MVPPreviewObject);
                 }
             }
+
             // Instantiate the player model
-            MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledPrefab))
+            {
+                MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            }
 
             AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
             animationHandler.ChangeCharacter(character);
