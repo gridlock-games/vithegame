@@ -156,12 +156,9 @@ namespace Vi.Core
 
         public bool IsReloading()
         {
-            return Animator.GetBool("Reloading") | Animator.IsInTransition(Animator.GetLayerIndex("Reload")) | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
-        }
-
-        public bool IsFinishingReload()
-        {
-            return Animator.IsInTransition(Animator.GetLayerIndex("Reload")) & !Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Reload) { return false; }
+            return !IsAtRest();
         }
 
         public bool IsDodging()
@@ -425,6 +422,7 @@ namespace Vi.Core
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.FlashAttack:
+                    case ActionClip.ClipType.Reload:
                         if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             if (IsDodging())
@@ -563,7 +561,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                SetInvincibleStatusOnDodge(actionClipName);
+                SetInvincibleStatusOnDodge(actionClip);
             }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
@@ -601,6 +599,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
@@ -721,6 +720,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
                 case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -752,6 +752,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.Dodge:
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -994,6 +995,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
@@ -1021,9 +1023,9 @@ namespace Vi.Core
         }
 
         // Coroutine for setting invincibility status during a dodge
-        private void SetInvincibleStatusOnDodge(string actionStateName)
+        private void SetInvincibleStatusOnDodge(ActionClip actionClip)
         {
-            combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
+            combatAgent.SetInviniciblity(GetTotalActionClipLengthInSeconds(actionClip) * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }

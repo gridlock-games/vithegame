@@ -217,11 +217,7 @@ namespace Vi.Player
                 }
 
                 Vector2 moveInput;
-                if (weaponHandler.WaitingForReloadToPlay)
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
+                if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
                     moveInput = Vector2.zero;
                 }
@@ -242,10 +238,6 @@ namespace Vi.Player
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.StatusAgent.IsRooted())
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (combatAgent.AnimationHandler.IsReloading())
                 {
                     moveInput = Vector2.zero;
                 }
