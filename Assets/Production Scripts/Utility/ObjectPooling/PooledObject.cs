@@ -53,11 +53,6 @@ namespace Vi.Utility
             if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
         }
 
-        public PooledObject[] GetChildPooledObjects()
-        {
-            return GetComponentsInChildren<PooledObject>();
-        }
-
         public bool IsSpawned { get; private set; }
 
         private void Awake()
@@ -85,7 +80,6 @@ namespace Vi.Utility
 
         private void OnDisable()
         {
-            if (GetComponent<NetworkObject>()) { return; }
             gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }

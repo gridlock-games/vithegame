@@ -267,28 +267,45 @@ namespace Vi.Core
                 {
                     foreach (GameObject g in loadedHandle.Result.Scene.GetRootGameObjects())
                     {
-                        if (g.TryGetComponent(out PooledObject pooledObject))
+                        foreach (PooledObject pooledObject in g.GetComponents<PooledObject>())
                         {
-                            // This code needs to be refactored at a later date to also account for child objects that have their parents stripped when being returned to pool
-                            if (pooledObject.transform.parent == null)
+                            if (pooledObject.IsSpawned)
                             {
-                                SceneManager.MoveGameObjectToScene(pooledObject.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
-
                                 if (pooledObject.TryGetComponent(out NetworkObject networkObject))
                                 {
-                                    if (networkObject.IsSpawned)
+                                    if (networkObject.transform.parent)
                                     {
-                                        if (NetworkManager.Singleton.IsServer) { networkObject.Despawn(true); }
+                                        Debug.LogError(networkObject + " pooled network object that isn't a root object will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
                                     }
-                                    else if (pooledObject.IsSpawned)
+                                    else
                                     {
-                                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                        SceneManager.MoveGameObjectToScene(networkObject.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
                                     }
+
+                                    if (NetworkManager.Singleton.IsServer)
+                                    {
+                                        if (networkObject.IsSpawned)
+                                        {
+                                            networkObject.Despawn(true);
+                                        }
+                                        else
+                                        {
+                                            Debug.LogError(networkObject + " is despawned and will be destroyed on scene unload! Why wasn't it moved to the base scene when it was despawned?");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                    }
+                                }
+                                else
+                                {
+                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                                 }
                             }
                             else
                             {
-                                Debug.LogError(pooledObject + " will be destroyed on scene unload! Parent: " + pooledObject.transform.parent);
+                                Debug.LogError(pooledObject + " " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
                             }
                         }
                     }
