@@ -834,7 +834,7 @@ namespace Vi.Core.CombatAgents
 
         protected void RefreshStatus()
         {
-            if (IsOwner)
+            if (IsSpawned & IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }
