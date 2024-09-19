@@ -569,7 +569,7 @@ namespace Vi.Core
                 // Action sound effect logic here
                 foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
                     {
                         AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
                         actionSoundEffectIdTracker.Add(actionSoundEffect.id);

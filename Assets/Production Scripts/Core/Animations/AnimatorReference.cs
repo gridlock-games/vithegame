@@ -365,6 +365,11 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (animationHandler)
+            {
+                if (!animator.enabled) { animationHandler.ProcessNextActionClip(); }
+            }
+
             limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
         }
 
