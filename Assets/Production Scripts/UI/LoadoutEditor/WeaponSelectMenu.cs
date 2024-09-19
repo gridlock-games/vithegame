@@ -95,7 +95,7 @@ namespace Vi.UI
                 abilityImages[i].sprite = ability.abilityImageIcon;
                 if (abilityImages[i].TryGetComponent(out Button previewButton))
                 {
-                    previewButton.onClick.AddListener(() => ShowAbilityPreviewVideo(abilityPreviewVideos.Find(item => item.ability == ability)));
+                    previewButton.onClick.AddListener(() => StartCoroutine(ShowAbilityPreviewVideo(abilityPreviewVideos.Find(item => item.ability == ability))));
                 }
                 else
                 {
@@ -109,9 +109,11 @@ namespace Vi.UI
         [SerializeField] private VideoPlayer abilityPreviewVideoPlayer;
         [SerializeField] private RawImage abilityPreviewRawImage;
 
-        private void ShowAbilityPreviewVideo(AbilityPreviewVideo abilityPreviewVideo)
+        private bool videoRunning;
+        private IEnumerator ShowAbilityPreviewVideo(AbilityPreviewVideo abilityPreviewVideo)
         {
-            abilityPreviewParent.SetActive(true);
+            if (videoRunning) { yield break; }
+            videoRunning = true;
             if (abilityPreviewVideo == null) // Show "no preview video"
             {
                 if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
@@ -121,9 +123,12 @@ namespace Vi.UI
             }
             else if (abilityPreviewVideo.video)
             {
-                abilityPreviewVideoPlayer.clip = abilityPreviewVideo.video;
-                abilityPreviewVideoPlayer.Play();
                 videoOverlayText.text = "";
+                abilityPreviewRawImage.enabled = false;
+                abilityPreviewVideoPlayer.clip = abilityPreviewVideo.video;
+                abilityPreviewVideoPlayer.Prepare();
+                yield return new WaitUntil(() => abilityPreviewVideoPlayer.isPrepared);
+                abilityPreviewVideoPlayer.Play();
                 abilityPreviewRawImage.enabled = true;
             }
             else // Show "no preview video"
@@ -135,13 +140,27 @@ namespace Vi.UI
             }
         }
 
+        private void OnEnable()
+        {
+            abilityPreviewParent.transform.localScale = Vector3.zero;
+        }
+
+        private const float videoUIAnimationSpeed = 3;
+        private void Update()
+        {
+            abilityPreviewParent.transform.localScale = Vector3.MoveTowards(abilityPreviewParent.transform.localScale, videoRunning ? Vector3.one : Vector3.zero, Time.deltaTime * videoUIAnimationSpeed);
+        }
+
         public void CloseAbilityPreviewWindow()
         {
-            abilityPreviewParent.SetActive(false);
+            StartCoroutine(StopVideoPlayer());
+            videoRunning = false;
+        }
+
+        private IEnumerator StopVideoPlayer()
+        {
+            yield return new WaitUntil(() => abilityPreviewParent.transform.localScale == Vector3.zero);
             if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
-            abilityPreviewVideoPlayer.clip = null;
-            videoOverlayText.text = "";
-            abilityPreviewRawImage.enabled = false;
         }
 
         private GameObject weaponPreviewObject;
