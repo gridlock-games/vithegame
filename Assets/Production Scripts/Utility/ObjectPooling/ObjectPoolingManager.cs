@@ -326,11 +326,12 @@ namespace Vi.Utility
                     obj.transform.SetParent(null, true);
                 }
             }
-            
+
+            obj.InvokeOnReturnToPoolEvent();
+
             obj.gameObject.SetActive(false);
             if (obj.gameObject.scene.name != instantiationSceneName) { SceneManager.MoveGameObjectToScene(obj.gameObject, SceneManager.GetSceneByName(instantiationSceneName)); }
             despawnedObjectPools[obj.GetPooledObjectIndex()].Add(obj);
-            obj.InvokeOnReturnToPoolEvent();
         }
 
         public static void ReturnObjectToPool(ref PooledObject obj)
