@@ -5,6 +5,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -17,6 +18,22 @@ namespace Vi.UI
         private void Start()
         {
             CreatePreview();
+        }
+
+        private void OnDestroy()
+        {
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private GameObject previewObject;
@@ -32,10 +49,18 @@ namespace Vi.UI
             if (!previewObject)
             {
                 // Instantiate the player model
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(SpawnPoints.previewCharacterRotation),
-                    transform);
+                if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+                }
+                else
+                {
+                    previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                }
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);

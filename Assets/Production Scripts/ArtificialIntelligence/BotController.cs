@@ -30,8 +30,11 @@ namespace Vi.ArtificialIntelligence
                 if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { SetDestination(Rigidbody.position); }
             }
 
-            transform.position = Rigidbody.transform.position;
-            transform.rotation = EvaluateRotation();
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
+            {
+                transform.position = Rigidbody.transform.position;
+                transform.rotation = EvaluateRotation();
+            }
 
             SetAnimationMoveInput(GetPathMoveInput(true));
             EvaluateBotLogic();
@@ -60,7 +63,7 @@ namespace Vi.ArtificialIntelligence
                     }
                 }
                 else if (!combatAgent.ShouldPlayHitStop())
-                    return Quaternion.LerpUnclamped(transform.rotation, Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                    return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
                 return transform.rotation;
             }
@@ -88,6 +91,8 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
+                if (disableBots) { SetDestination(Rigidbody.position); return; }
+
                 targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));
 
                 targetFinder.ClearTarget();
@@ -95,18 +100,19 @@ namespace Vi.ArtificialIntelligence
                 {
                     if (player.GetAilment() == ActionClip.Ailment.Death) { continue; }
                     if (!PlayerDataManager.Singleton.CanHit(combatAgent, player)) { continue; }
+
                     targetFinder.SetTarget(player);
-                    if (!targetFinder.SetDestination(this)) { targetFinder.ClearTarget(); }
                     break;
                 }
 
-                if (disableBots)
+                if (targetFinder.GetTarget())
                 {
-                    SetDestination(Rigidbody.position);
-                }
-                else
-                {
+                    targetFinder.SetDestination(this);
                     EvaluateAction();
+                }
+                else if (Vector3.Distance(GetPosition(), Destination) < stoppingDistance)
+                {
+                    SetDestination(GetRandomDestination());
                 }
             }
         }
@@ -129,6 +135,8 @@ namespace Vi.ArtificialIntelligence
 
         private void EvaluateAction()
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return; }
+
             if (canOnlyLightAttack)
             {
                 if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
@@ -396,7 +404,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }

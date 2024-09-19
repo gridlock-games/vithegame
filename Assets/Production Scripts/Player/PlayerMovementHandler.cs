@@ -34,7 +34,13 @@ namespace Vi.Player
         public Transform TargetToLockOn { get; private set; }
         public void LockOnTarget(Transform target) { TargetToLockOn = target; }
 
-        public override void Flinch(Vector2 flinchAmount) { cameraController.AddRotation(flinchAmount.x, flinchAmount.y); }
+        public override void Flinch(Vector2 flinchAmount)
+        {
+            if (!IsServer) { Debug.LogError("PlayerMovementHandler.Flinch() should only be called on the server!"); return; }
+            FlinchRpc(flinchAmount);
+        }
+
+        [Rpc(SendTo.Owner)] private void FlinchRpc(Vector2 flinchAmount) { cameraController.AddRotation(flinchAmount.x, flinchAmount.y); }
 
         public struct InputPayload : INetworkSerializable, System.IEquatable<InputPayload>
         {
@@ -267,6 +273,15 @@ namespace Vi.Player
             }
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            movementTick = default;
+            lastEvaluatedServerRootMotionTick = default;
+            TargetToLockOn = default;
+            CameraFollowTarget = default;
+        }
+
         private int movementTick;
         private int lastEvaluatedServerRootMotionTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
@@ -480,7 +495,7 @@ namespace Vi.Player
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
@@ -492,7 +507,7 @@ namespace Vi.Player
         private Quaternion EvaluateRotation()
         {
             Quaternion rot = transform.rotation;
-            if (cameraController)
+            if (IsOwner)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
@@ -528,6 +543,7 @@ namespace Vi.Player
         private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
+            if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
@@ -562,6 +578,8 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                cameraController.gameObject.tag = "MainCamera";
+                cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
                 cameraController.Camera.enabled = true;
 
@@ -569,13 +587,16 @@ namespace Vi.Player
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
-                GetComponent<ActionMapHandler>().enabled = true;
+                actionMapHandler.enabled = true;
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
-                Destroy(cameraController.gameObject);
-                Destroy(playerInput);
+                cameraController.gameObject.SetActive(false);
+                cameraController.Camera.enabled = false;
+                playerInput.enabled = false;
+
+                actionMapHandler.enabled = false;
             }
 
             if (!IsClient)
@@ -596,6 +617,17 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
+
+            cameraController.gameObject.SetActive(false);
+            if (cameraController.gameObject.TryGetComponent(out AudioListener audioListener))
+            {
+                Destroy(audioListener);
+            }
+            cameraController.Camera.enabled = false;
+
+            playerInput.enabled = false;
+            actionMapHandler.enabled = false;
+            cameraController.gameObject.tag = "Untagged";
 
             if (!IsClient)
             {
@@ -631,6 +663,7 @@ namespace Vi.Player
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
 
+        private ActionMapHandler actionMapHandler;
         protected override void Awake()
         {
             base.Awake();
@@ -639,6 +672,8 @@ namespace Vi.Player
             stateBuffer = new StatePayload[BUFFER_SIZE];
             inputBuffer = new NetworkList<InputPayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             serverInputQueue = new Queue<InputPayload>();
+
+            actionMapHandler = GetComponent<ActionMapHandler>();
         }
 
         private void Start()
@@ -652,7 +687,13 @@ namespace Vi.Player
         private Camera mainCamera;
         private void FindMainCamera()
         {
-            if (mainCamera) { return; }
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
             mainCamera = Camera.main;
         }
 
@@ -736,7 +777,8 @@ namespace Vi.Player
         private void AutoAim()
         {
             if (!autoAim) { return; }
-            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & cameraController & !weaponHandler.CurrentActionClip.mustBeAiming)
+            if (!IsOwner) { return; }
+            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & !weaponHandler.CurrentActionClip.mustBeAiming)
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | combatAgent.AnimationHandler.IsLunging())
                 {

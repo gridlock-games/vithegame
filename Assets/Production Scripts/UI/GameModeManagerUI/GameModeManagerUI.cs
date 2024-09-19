@@ -56,7 +56,21 @@ namespace Vi.UI
         private void OnDestroy()
         {
             gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
-            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
+            }
         }
 
         protected void OnScoreListChanged()
@@ -167,7 +181,18 @@ namespace Vi.UI
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
+            }
             // Instantiate the player model
             MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
                 PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,

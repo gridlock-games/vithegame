@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace Vi.Utility
 {
@@ -41,6 +42,49 @@ namespace Vi.Utility
         public void InvokeOnReturnToPoolEvent()
         {
             if (OnReturnToPool != null) { OnReturnToPool.Invoke(); }
+        }
+
+        private bool markedForDestruction;
+        public void MarkForDestruction() { markedForDestruction = true; }
+
+        private void OnDestroy()
+        {
+            if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
+        }
+
+        public PooledObject[] GetChildPooledObjects()
+        {
+            return GetComponentsInChildren<PooledObject>();
+        }
+
+        public bool IsSpawned { get; private set; }
+
+        private void Awake()
+        {
+            OnSpawnFromPool += OnSpawn;
+            OnReturnToPool += OnReturn;
+        }
+
+        private void OnSpawn()
+        {
+            IsSpawned = true;
+            ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
+        }
+
+        private void OnReturn()
+        {
+            ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
+            IsSpawned = false;
+        }
+
+        private void OnEnable()
+        {
+            gameObject.hideFlags = HideFlags.None;
+        }
+
+        private void OnDisable()
+        {
+            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
     }
 }

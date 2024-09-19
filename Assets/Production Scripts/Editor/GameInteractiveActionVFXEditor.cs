@@ -15,6 +15,7 @@ namespace Vi.Editor
         private SerializedProperty spFollowUpVFXToPlayOnDestroy;
         private SerializedProperty spShouldBlockProjectiles;
         private SerializedProperty spShouldDestroyOnEnemyHit;
+        private SerializedProperty spTeamColorParticleSystems;
 
         protected new void OnEnable()
         {
@@ -23,6 +24,7 @@ namespace Vi.Editor
             spFollowUpVFXToPlayOnDestroy = serializedObject.FindProperty("followUpVFXToPlayOnDestroy");
             spShouldBlockProjectiles = serializedObject.FindProperty("shouldBlockProjectiles");
             spShouldDestroyOnEnemyHit = serializedObject.FindProperty("shouldDestroyOnEnemyHit");
+            spTeamColorParticleSystems = serializedObject.FindProperty("teamColorParticleSystems");
         }
 
         public override void OnInspectorGUI()
@@ -33,6 +35,7 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spFollowUpVFXToPlayOnDestroy);
             EditorGUILayout.PropertyField(spShouldBlockProjectiles);
             EditorGUILayout.PropertyField(spShouldDestroyOnEnemyHit);
+            EditorGUILayout.PropertyField(spTeamColorParticleSystems);
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
         }

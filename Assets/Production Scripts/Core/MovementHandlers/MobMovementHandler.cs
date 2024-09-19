@@ -22,8 +22,11 @@ namespace Vi.Core.MovementHandlers
         protected override void Update()
         {
             base.Update();
-            transform.position = Rigidbody.transform.position;
-            transform.rotation = EvaluateRotation();
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
+            {
+                transform.position = Rigidbody.transform.position;
+                transform.rotation = EvaluateRotation();
+            }
             SetAnimationMoveInput(GetPathMoveInput(true));
             EvaluateAction();
         }
@@ -155,7 +158,7 @@ namespace Vi.Core.MovementHandlers
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > targetingSwitchDistance) { continue; }
+                        if (Vector3.Distance(structure.transform.position, GetPosition()) > targetingSwitchDistance) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
                     }
@@ -316,7 +319,7 @@ namespace Vi.Core.MovementHandlers
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), aiRigidbodyorneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
@@ -328,7 +331,7 @@ namespace Vi.Core.MovementHandlers
 
         [SerializeField] private bool canUseAbility1 = true;
         [SerializeField] private float ability1DistanceMin = 8;
-        [SerializeField] private float ability1Distance = 10;
+        [SerializeField] private float ability1DistanceMax = 10;
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
@@ -340,7 +343,7 @@ namespace Vi.Core.MovementHandlers
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (dist < ability1Distance & dist > ability1DistanceMin & canUseAbility1)
+                else if (dist < ability1DistanceMax & dist > ability1DistanceMin & canUseAbility1)
                 {
                     weaponHandler.Ability1(true);
                 }

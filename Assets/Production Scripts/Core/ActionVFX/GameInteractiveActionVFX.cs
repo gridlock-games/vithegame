@@ -51,12 +51,37 @@ namespace Vi.Core.VFX
             return attack;
         }
 
+        [SerializeField] private ParticleSystem[] teamColorParticleSystems = new ParticleSystem[0];
+
         public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
             this.attacker = attacker;
             this.attack = attack;
             attackerNetworkObjectId.Value = attacker.NetworkObjectId;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            CombatAgent attacker = GetAttacker();
+            if (attacker)
+            {
+                if (!attacker.IsLocalPlayer)
+                {
+                    if (PlayerDataManager.CanHit(attacker.GetTeam(), PlayerDataManager.Singleton.LocalPlayerData.team))
+                    {
+                        foreach (ParticleSystem ps in teamColorParticleSystems)
+                        {
+                            if (attacker)
+                            {
+                                var main = ps.main;
+                                main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -66,9 +91,9 @@ namespace Vi.Core.VFX
             {
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
-                    NetworkObject netObj = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.Spawn(true);
-                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
+                    PooledObject pooledObject = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation);
+                    if (pooledObject.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
+                    if (pooledObject.TryGetComponent(out NetworkObject netObj)) { netObj.Spawn(true); }
                 }
             }
 

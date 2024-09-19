@@ -21,13 +21,14 @@ namespace Vi.Core
             if (IsServer)
             {
                 AddActionToServerQueue(actionClip.name, isFollowUpClip);
+                WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
             {
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
-                WaitingForActionClipToPlay = true;
                 PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                WaitingForActionClipToPlay = true;
             }
             else
             {
@@ -123,8 +124,17 @@ namespace Vi.Core
             return normalizedTime;
         }
 
-        public bool IsAtRest() { return animatorReference.IsAtRest(); }
-        public bool IsAtRestIgnoringTransition() { return animatorReference.IsAtRestIgnoringTransition(); }
+        public bool IsAtRest()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRest();
+        }
+
+        public bool IsAtRestIgnoringTransition()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRestIgnoringTransition();
+        }
 
         public bool CanAim()
         {
@@ -525,7 +535,18 @@ namespace Vi.Core
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
-            if (!canPlayActionClipResult.canPlay) { ResetWaitingForActionToPlayClientRpc(); return false; }
+            if (!canPlayActionClipResult.canPlay)
+            {
+                if (IsOwner)
+                {
+                    WaitingForActionClipToPlay = false;
+                }
+                else
+                {
+                    ResetWaitingForActionToPlayClientRpc();
+                }
+                return false;
+            }
 
             // Check stamina and rage requirements
             if (ShouldApplyStaminaCost(actionClip))
@@ -612,6 +633,7 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            WaitingForActionClipToPlay = false;
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
@@ -929,21 +951,20 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
-            StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+            if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
             WaitingForActionClipToPlay = false;
         }
 
+        private Coroutine playActionOnClientCoroutine;
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
             // Retrieve the ActionClip based on the actionStateName
-            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
-            if (actionClip.IsAttack())
+            if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
             {
-                if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
-                {
-                    yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
-                }
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
@@ -1000,7 +1021,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1053,14 +1074,33 @@ namespace Vi.Core
             {
                 shouldCreateNewSkin = animatorReference.name.Replace("(Clone)", "") != character.model;
 
-                if (shouldCreateNewSkin) { Destroy(animatorReference.gameObject); }
+                if (shouldCreateNewSkin)
+                {
+                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(animatorReference.gameObject);
+                    }
+                }
             }
 
             if (shouldCreateNewSkin)
             {
-                if (characterIndex == -1) { Debug.LogWarning("Character Index is -1!"); yield break; }
+                if (characterIndex == -1) { Debug.LogError("Character Index is -1! " + name); yield break; }
                 CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-                GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+
+                GameObject modelInstance;
+                if (modelOption.skinOptions[skinIndex].TryGetComponent(out PooledObject pooledObject))
+                {
+                    modelInstance = ObjectPoolingManager.SpawnObject(modelOption.skinOptions[skinIndex].GetComponent<PooledObject>(), transform).gameObject;
+                }
+                else
+                {
+                    modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+                }
 
                 Animator = modelInstance.GetComponent<Animator>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
@@ -1068,6 +1108,8 @@ namespace Vi.Core
 
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
+
+                SetRagdollActive(false);
             }
 
             yield return null;
@@ -1088,13 +1130,13 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
-        private void OnDisable()
+        private void OnReturnToPool()
         {
-            if (Animator)
+            if (animatorReference)
             {
-                if (Animator.transform != transform)
+                if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                 {
-                    if (Animator.TryGetComponent(out PooledObject pooledObject))
+                    if (pooledObject.IsSpawned)
                     {
                         ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                         Animator = null;
@@ -1140,6 +1182,12 @@ namespace Vi.Core
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
+            GetComponent<PooledObject>().OnReturnToPool += OnReturnToPool;
+        }
+
+        private void OnEnable()
+        {
+            SetRagdollActive(false);
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
@@ -1154,13 +1202,23 @@ namespace Vi.Core
         private Camera mainCamera;
         private void FindMainCamera()
         {
-            if (mainCamera) { return; }
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
             mainCamera = Camera.main;
         }
 
         private void Update()
         {
             RefreshAimPoint();
+        }
+
+        public void ProcessNextActionClip()
+        {
             if (serverActionQueue.TryDequeue(out (string, bool) result)) { PlayActionOnServer(result.Item1, result.Item2); }
         }
 
@@ -1186,6 +1244,12 @@ namespace Vi.Core
 
             LimbReferences.SetMeleeVerticalAimConstraintOffset(combatAgent.WeaponHandler.IsInAnticipation | combatAgent.WeaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
+        }
+
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!animatorReference) { return; }
+            animatorReference.SetRagdollActive(isActive);
         }
     }
 }

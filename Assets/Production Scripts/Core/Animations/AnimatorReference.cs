@@ -182,7 +182,7 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
-            StartCoroutine(SetRendererStatusForCharacterCosmetics());
+            if (gameObject.activeSelf) { StartCoroutine(SetRendererStatusForCharacterCosmetics()); }
         }
 
         private IEnumerator SetRendererStatusForCharacterCosmetics()
@@ -201,23 +201,23 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
-            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in new Dictionary<CharacterReference.EquipmentType, WearableEquipment>(wearableEquipmentInstances))
             {
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {
                     glowRenderer.UnregisterRenderer(smr);
                 }
-
-                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
-                {
-                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                    kvp.Value.enabled = true;
-                }
-                else
-                {
-                    Destroy(kvp.Value);
-                }
+                ClearWearableEquipment(kvp.Key);
             }
+
+            armorType = Weapon.ArmorType.Flesh;
+            accumulatedRootMotion = Vector3.zero;
+            combatAgent = null;
+            animationHandler = null;
+            CurrentActionsAnimatorStateInfo = default;
+            NextActionsAnimatorStateInfo = default;
+            CurrentFlinchAnimatorStateInfo = default;
+            NextFlinchAnimatorStateInfo = default;
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -290,7 +290,6 @@ namespace Vi.Core
         private int flinchLayerIndex;
 
         Animator animator;
-        CombatAgent combatAgent;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
 
@@ -299,7 +298,6 @@ namespace Vi.Core
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
 
-            combatAgent = GetComponentInParent<CombatAgent>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
 
@@ -310,10 +308,17 @@ namespace Vi.Core
             {
                 pooledObject.OnReturnToPool += OnReturnToPool;
             }
+
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
         }
 
-        private void Start()
+        CombatAgent combatAgent;
+        AnimationHandler animationHandler;
+        private void OnEnable()
         {
+            combatAgent = GetComponentInParent<CombatAgent>();
+            if (combatAgent) { animationHandler = combatAgent.GetComponent<AnimationHandler>(); }
+
             SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
             {
@@ -400,6 +405,20 @@ namespace Vi.Core
                 }
                 accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
+
+            if (animationHandler) { animationHandler.ProcessNextActionClip(); }
+        }
+
+        private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!combatAgent) { return; }
+            foreach (Rigidbody rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+                rb.interpolation = combatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            }
+            animator.enabled = !isActive;
         }
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -59,9 +60,18 @@ namespace Vi.UI
             if (!previewObject)
             {
                 // Instantiate the player model
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+                }
+                else
+                {
+                    previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                }
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
@@ -75,7 +85,18 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private void OnEnable()
@@ -96,7 +117,18 @@ namespace Vi.UI
 
         private void OnDisable()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private void Update()

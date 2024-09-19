@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
@@ -51,6 +50,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.SetParent(transform);
             rb.transform.localPosition = Vector3.zero;
             rb.transform.localRotation = Quaternion.identity;
+            rb.Sleep();
         }
 
         protected override void OnEnable()
@@ -132,10 +132,10 @@ namespace Vi.Core.MovementHandlers
 
         private void UpdateAnimatorParameters()
         {
-            Vector2 walkCycleAnims = GetWalkCycleAnimationParameters();
+            Vector2 walkCycleAnims = IsSpawned ? GetWalkCycleAnimationParameters() : Vector2.zero;
             combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             combatAgent.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
-            combatAgent.AnimationHandler.Animator.SetBool("IsGrounded", IsGrounded());
+            combatAgent.AnimationHandler.Animator.SetBool("IsGrounded", IsSpawned ? IsGrounded() : true);
             combatAgent.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.velocity.y);
         }
 
@@ -215,12 +215,11 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
+        protected const float stairStepHeight = 0.01f;
+
         [Header("Physics Locomotion Settings")]
-        [SerializeField] protected float stairStepHeight = 0.01f;
         [SerializeField] protected float maxStairStepHeight = 0.5f;
-
-        [SerializeField] protected float aiRigidbodyorneHorizontalDragMultiplier = 0.1f;
-
+        [SerializeField] protected float airborneHorizontalDragMultiplier = 0.1f;
         [SerializeField] protected float gravityScale = 2;
     }
 }
