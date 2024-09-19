@@ -295,7 +295,14 @@ namespace Vi.Core
                                     }
                                     else
                                     {
-                                        Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                        if (networkObject.IsSpawned)
+                                        {
+                                            Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                        }
+                                        else
+                                        {
+                                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                        }
                                     }
                                 }
                                 else
