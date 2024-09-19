@@ -20,7 +20,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                AddActionToServerQueue(actionClip.name, isFollowUpClip);
+                AddActionToServerQueue(actionClip.name, isFollowUpClip, false);
                 WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
@@ -519,32 +519,28 @@ namespace Vi.Core
             return new CanPlayActionClipResult(true, shouldUseDodgeCancelTransitionTime);
         }
 
-        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip); }
+        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip, true); }
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
-        private Queue<(string, bool)> serverActionQueue = new Queue<(string, bool)>();
-        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip)
+        private Queue<(string, bool, bool)> serverActionQueue = new Queue<(string, bool, bool)>();
+        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
-            serverActionQueue.Enqueue((actionClipName, isFollowUpClip));
+            serverActionQueue.Enqueue((actionClipName, isFollowUpClip, wasCalledFromServerRpc));
         }
 
-        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
+            if (!IsServer) { Debug.LogError("AnimationHandler.PlayActionOnServer() should only be called on the server! " + actionClipName); return false; }
+
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
             if (!canPlayActionClipResult.canPlay)
             {
-                if (IsOwner)
-                {
-                    WaitingForActionClipToPlay = false;
-                }
-                else
-                {
-                    ResetWaitingForActionToPlayClientRpc();
-                }
+                WaitingForActionClipToPlay = false;
+                if (wasCalledFromServerRpc) { ResetWaitingForActionToPlayClientRpc(); }
                 return false;
             }
 
@@ -1221,7 +1217,7 @@ namespace Vi.Core
 
         public void ProcessNextActionClip()
         {
-            if (serverActionQueue.TryDequeue(out (string, bool) result)) { PlayActionOnServer(result.Item1, result.Item2); }
+            if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
         private void RefreshAimPoint()
