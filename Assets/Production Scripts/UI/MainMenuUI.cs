@@ -756,6 +756,7 @@ namespace Vi.UI
             yield return WaitForFacebookAuth(JsonUtility.FromJson<FacebookAuth.FacebookIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("FacebookIdTokenResponse")));
             break;
           case "Steam":
+            //added steam
             LoginWithSteam();
             break;
 
