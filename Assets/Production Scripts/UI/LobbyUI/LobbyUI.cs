@@ -216,7 +216,7 @@ namespace Vi.UI
             }
         }
 
-        private void RefreshGameMode()
+        private void RefreshGameMode(bool calledFromInit)
         {
             // Player account card display logic
             teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -298,7 +298,7 @@ namespace Vi.UI
             RefreshMapOptions();
 
             // Even out teams
-            if (IsServer)
+            if (IsServer & !calledFromInit)
             {
                 Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
                 foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
@@ -381,7 +381,7 @@ namespace Vi.UI
             lockCharacterButton.onClick.AddListener(LockCharacter);
             lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
 
-            RefreshGameMode();
+            RefreshGameMode(true);
 
             RefreshPlayerCards();
 
@@ -731,7 +731,7 @@ namespace Vi.UI
 
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
-                RefreshGameMode();
+                RefreshGameMode(false);
             }
 
             gameModeText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());

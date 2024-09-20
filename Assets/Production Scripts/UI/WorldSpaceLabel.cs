@@ -8,6 +8,8 @@ using Vi.Utility;
 using UnityEngine.SceneManagement;
 using Vi.Core.CombatAgents;
 using System.Linq;
+using Unity.Netcode;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -101,6 +103,7 @@ namespace Vi.UI
         {
             team = default;
             localWeaponHandler = null;
+            localSpectator = null;
             combatAgent = null;
             rendererToFollow = null;
         }
@@ -155,17 +158,30 @@ namespace Vi.UI
         }
 
         private WeaponHandler localWeaponHandler;
-        private void FindLocalWeaponHandler()
+        private NetworkObject localSpectator;
+        private void FindLocalWeaponHandlerOrSpectator()
         {
-            if (localWeaponHandler)
+            if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
             {
-                if (localWeaponHandler.gameObject.activeInHierarchy) { localWeaponHandler = null; }
+                if (localSpectator)
+                {
+                    if (localSpectator.gameObject.activeInHierarchy) { localSpectator = null; }
+                }
+
+                if (localSpectator) { return; }
+
+                KeyValuePair<ulong, NetworkObject> kvp = PlayerDataManager.Singleton.GetLocalSpectatorObject();
+                localSpectator = kvp.Value;
             }
-
-            if (localWeaponHandler) { return; }
-
-            if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+            else
             {
+                if (localWeaponHandler)
+                {
+                    if (localWeaponHandler.gameObject.activeInHierarchy) { localWeaponHandler = null; }
+                }
+
+                if (localWeaponHandler) { return; }
+
                 KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
                 if (kvp.Value)
                 {
@@ -178,7 +194,7 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
-            FindLocalWeaponHandler();
+            FindLocalWeaponHandlerOrSpectator();
         }
 
         private void LateUpdate()
@@ -240,7 +256,11 @@ namespace Vi.UI
 
             if (healthBarLocalScaleTarget == Vector3.zero)
             {
-                if (localWeaponHandler)
+                if (localSpectator)
+                {
+                    healthBarLocalScaleTarget = Vector3.one;
+                }
+                else if(localWeaponHandler)
                 {
                     if (localWeaponHandler.CanAim) { healthBarLocalScaleTarget = Vector3.one; }
                 }

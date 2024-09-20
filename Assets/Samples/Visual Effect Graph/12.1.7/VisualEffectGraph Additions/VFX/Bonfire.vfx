@@ -274,11 +274,11 @@ MonoBehaviour:
     enumValues: []
     descendantCount: 0
   m_ImportDependencies: []
-  m_GraphVersion: 9
+  m_GraphVersion: 12
   m_ResourceVersion: 1
   m_SubgraphDependencies:
   - {fileID: 8926484042661614526, guid: 7bd183dba260d48499f98eb7980dbe78, type: 3}
-  - {fileID: 5371698748595113096, guid: a2130c5e66415864eb87d77596ecb008, type: 3}
+  - {fileID: 0}
   - {fileID: 8926484042661614526, guid: 80b43ce65143a8240bcdc7cc368e7261, type: 3}
   - {fileID: 5371698745253816930, guid: bfbffac5b9e601347ae9feb5d51931eb, type: 3}
   - {fileID: 8926484042661614526, guid: 1194657162895cf41a278fe3576dbb4a, type: 3}
@@ -305,6 +305,8 @@ VisualEffectResource:
     m_PreWarmDeltaTime: 0.2
     m_PreWarmStepCount: 10
     m_InitialEventName: OnPlay
+    m_InstancingMode: -1
+    m_InstancingCapacity: 64
 --- !u!114 &8926484042661614528
 MonoBehaviour:
   m_ObjectHideFlags: 0

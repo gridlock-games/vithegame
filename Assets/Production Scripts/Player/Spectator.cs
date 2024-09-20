@@ -25,6 +25,8 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                gameObject.tag = "MainCamera";
+
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
                 RefreshStatus();
@@ -64,6 +66,8 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
+
+            gameObject.tag = "Untagged";
         }
 
         void OnLook(InputValue value)
@@ -323,6 +327,7 @@ namespace Vi.Player
         protected override void OnEnable()
         {
             base.OnEnable();
+            followTargetOffset = defaultFollowTargetOffset;
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
@@ -338,8 +343,27 @@ namespace Vi.Player
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
 
         private const float lerpSpeed = 8;
-        private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
+        private static readonly Vector3 defaultFollowTargetOffset = new Vector3(0, 3, -3);
         private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
+
+        private Vector3 followTargetOffset;
+
+        private const float zoomSensitivity = 0.2f;
+        void OnZoom(InputValue value)
+        {
+            Vector2 scrollVal = value.Get<Vector2>();
+            if (scrollVal.y > 0)
+            {
+                followTargetOffset.z += zoomSensitivity;
+            }
+            else if (scrollVal.y < 0)
+            {
+                followTargetOffset.z -= zoomSensitivity;
+            }
+
+            // Limit how much you can zoom in
+            if (followTargetOffset.z > 1) { followTargetOffset.z = 1; }
+        }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
@@ -415,6 +439,8 @@ namespace Vi.Player
 
             if (shouldViewEnvironment)
             {
+                followTargetOffset = defaultFollowTargetOffset;
+
                 transform.position = Vector3.Lerp(transform.position, environmentViewPosition, Time.deltaTime * lerpSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, environmentViewRotation, Time.deltaTime * lerpSpeed);
 
@@ -434,6 +460,8 @@ namespace Vi.Player
             }
             else
             {
+                followTargetOffset = defaultFollowTargetOffset;
+
                 float verticalSpeed = 0;
                 if (isAscending) { verticalSpeed = 1; }
                 if (isDescending) { verticalSpeed = -1; }

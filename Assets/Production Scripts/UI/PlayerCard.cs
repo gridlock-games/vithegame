@@ -60,11 +60,26 @@ namespace Vi.UI
             if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
             if (combatAgent)
             {
-                StartCoroutine(SetNameText());
                 if (useTeamColor)
                 {
                     healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
                 }
+
+                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
+                }
+
+                StartCoroutine(SetNameText());
             }
         }
 
@@ -134,7 +149,27 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
+            if (!IsMainCard())
+            {
+                DisableStaminaAndSpiritDisplay();
+
+                if (combatAgent)
+                {
+                    List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
+                    foreach (StatusIcon statusIcon in statusIcons)
+                    {
+                        if (activeStatuses.Contains(statusIcon.Status))
+                        {
+                            statusIcon.SetActive(true);
+                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        }
+                        else
+                        {
+                            statusIcon.SetActive(false);
+                        }
+                    }
+                }
+            }
         }
 
         [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
@@ -254,7 +289,7 @@ namespace Vi.UI
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, rage / maxRage, Time.deltaTime * fillSpeed);
 
-            if (!playerUI)
+            if (!playerUI | staminaAndSpiritAreDisabled)
             {
                 if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
                 {

@@ -72,9 +72,9 @@ namespace Vi.Utility
                 }
             }
 
-            Physics.autoSimulation = false;
+            Physics.simulationMode = SimulationMode.Script;
             Physics.Simulate(Time.fixedDeltaTime);
-            Physics.autoSimulation = true;
+            Physics.simulationMode = SimulationMode.FixedUpdate;
 
             foreach (RigidbodyData rigidbodyData in rigidbodyDataBeforeSimulation)
             {

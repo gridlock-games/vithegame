@@ -295,7 +295,14 @@ namespace Vi.Core
                                     }
                                     else
                                     {
-                                        Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                        if (networkObject.IsSpawned)
+                                        {
+                                            Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                        }
+                                        else
+                                        {
+                                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                        }
                                     }
                                 }
                                 else
@@ -305,7 +312,7 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError(pooledObject + " " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
+                                Debug.LogError(pooledObject + " in scene " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! ");
                             }
                         }
                     }

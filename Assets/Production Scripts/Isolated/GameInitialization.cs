@@ -51,7 +51,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("TargetFrameRate"))
             {
-                int targetFrameRate = Screen.currentResolution.refreshRate + 60;
+                int targetFrameRate = Mathf.CeilToInt((float)Screen.currentResolution.refreshRateRatio.value + 60);
                 if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 60; }
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }

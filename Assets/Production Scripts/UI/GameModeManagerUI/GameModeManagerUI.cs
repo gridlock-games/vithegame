@@ -149,6 +149,25 @@ namespace Vi.UI
                             PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
                         }
                     }
+
+                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
+                    {
+                        if (MVPPreviewObject)
+                        {
+                            if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                            {
+                                if (pooledObject.IsSpawned)
+                                {
+                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                }
+                                MVPPreviewObject = null;
+                            }
+                            else
+                            {
+                                Destroy(MVPPreviewObject);
+                            }
+                        }
+                    }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
@@ -193,10 +212,20 @@ namespace Vi.UI
                     Destroy(MVPPreviewObject);
                 }
             }
+
             // Instantiate the player model
-            MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledPrefab))
+            {
+                MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            }
 
             AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
             animationHandler.ChangeCharacter(character);

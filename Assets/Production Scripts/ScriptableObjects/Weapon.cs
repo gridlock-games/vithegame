@@ -98,6 +98,9 @@ namespace Vi.ScriptableObjects
         [Header("Shooter Weapon Settings")]
         [SerializeField] private bool shouldUseAmmo;
         [SerializeField] private int maxAmmoCount;
+        [SerializeField] private ActionClip reloadClip;
+
+        public ActionClip GetReloadClip() { return reloadClip; }
 
         public bool ShouldUseAmmo() { return shouldUseAmmo; }
         public int GetMaxAmmoCount() { return maxAmmoCount; }
@@ -606,6 +609,8 @@ namespace Vi.ScriptableObjects
         private Dictionary<string, ActionClip> GetActionClipLookup()
         {
             Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
+
+            if (reloadClip) { actionClipLookup.TryAdd(reloadClip.name, reloadClip); }
 
             if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
             if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }

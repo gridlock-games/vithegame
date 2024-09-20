@@ -62,7 +62,7 @@ namespace Vi.ArtificialIntelligence
                         return Quaternion.LookRotation(rel, Vector3.up);
                     }
                 }
-                else if (!combatAgent.ShouldPlayHitStop())
+                else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
                     return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
                 return transform.rotation;
