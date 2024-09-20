@@ -10,11 +10,9 @@ namespace Vi.UI
     {
         private const float glowAmount = 2.46f;
 
-        private CombatAgent combatAgent;
         private Renderer[] renderers;
         private void Start()
         {
-            combatAgent = GetComponentInParent<CombatAgent>();
             renderers = GetComponentsInChildren<Renderer>();
 
             for (int i = 0; i < renderers.Length; i++)
@@ -26,6 +24,12 @@ namespace Vi.UI
             }
 
             Update();
+        }
+
+        private CombatAgent combatAgent;
+        private void OnEnable()
+        {
+            combatAgent = GetComponentInParent<CombatAgent>();
         }
 
         private readonly int _Glow = Shader.PropertyToID("_Glow");

@@ -145,7 +145,7 @@ namespace Vi.Player
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
-                Physics.autoSimulation = false;
+                Physics.simulationMode = SimulationMode.Script;
                 Rigidbody.position = latestServerState.Value.position;
                 Rigidbody.velocity = latestServerState.Value.velocity;
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
@@ -164,7 +164,7 @@ namespace Vi.Player
 
                     tickToProcess++;
                 }
-                Physics.autoSimulation = true;
+                Physics.simulationMode = SimulationMode.FixedUpdate;
             }
         }
 
@@ -217,11 +217,7 @@ namespace Vi.Player
                 }
 
                 Vector2 moveInput;
-                if (weaponHandler.WaitingForReloadToPlay)
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
+                if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
                     moveInput = Vector2.zero;
                 }
@@ -242,10 +238,6 @@ namespace Vi.Player
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.StatusAgent.IsRooted())
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (combatAgent.AnimationHandler.IsReloading())
                 {
                     moveInput = Vector2.zero;
                 }

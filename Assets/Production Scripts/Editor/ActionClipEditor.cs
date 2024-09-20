@@ -118,6 +118,7 @@ namespace Vi.Editor
         private SerializedProperty spAimDuringRecovery;
         private SerializedProperty spRequireAmmo;
         private SerializedProperty spRequiredAmmoAmount;
+        private SerializedProperty spReloadNormalizedTime;
 
         private void OnEnable()
         {
@@ -226,6 +227,8 @@ namespace Vi.Editor
             spDebugForwardMotion = serializedObject.FindProperty("debugForwardMotion");
             spDebugSidesMotion = serializedObject.FindProperty("debugSidesMotion");
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
+
+            spReloadNormalizedTime = serializedObject.FindProperty("reloadNormalizedTime");
         }
 
         private readonly List<ActionClip.ClipType> actionClipAttackTypes = new List<ActionClip.ClipType>()
@@ -360,6 +363,12 @@ namespace Vi.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Statuses", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spStatusesToApplyToSelfOnActivate);
+            if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Reload)
+            {
+                EditorGUILayout.PropertyField(spReloadNormalizedTime);
+                serializedObject.ApplyModifiedProperties();
+                return;
+            }
             EditorGUILayout.PropertyField(spStatusesToApplyToTargetOnHit);
             EditorGUILayout.PropertyField(spStatusesToApplyToTeammateOnHit);
             EditorGUILayout.Space();

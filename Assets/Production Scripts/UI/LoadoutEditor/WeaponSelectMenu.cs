@@ -5,6 +5,8 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using UnityEngine.UI;
 using Vi.Player;
+using UnityEngine.Video;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -13,6 +15,14 @@ namespace Vi.UI
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
         [SerializeField] private Image[] abilityImages;
+        [SerializeField] private List<AbilityPreviewVideo> abilityPreviewVideos = new List<AbilityPreviewVideo>();
+
+        [System.Serializable]
+        private class AbilityPreviewVideo
+        {
+            public ActionClip ability;
+            public VideoClip video;
+        }
 
         private List<Button> buttonList = new List<Button>();
         private LoadoutManager.WeaponSlotType weaponType;
@@ -28,7 +38,16 @@ namespace Vi.UI
                 // If this weapon option isn't in our inventory, continue
                 if (!WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
 
-                LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                LoadoutOptionElement ele;
+                if (loadoutOptionPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ele = ObjectPoolingManager.SpawnObject(pooledObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                }
+                else
+                {
+                    ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
+                }
+                
                 ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
                 button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
@@ -69,7 +88,22 @@ namespace Vi.UI
                     break;
             }
 
-            if (weaponPreviewObject) { Destroy(weaponPreviewObject); }
+            if (weaponPreviewObject)
+            {
+                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    weaponPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(weaponPreviewObject);
+                }
+            }
+
             if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
@@ -82,14 +116,97 @@ namespace Vi.UI
             
             for (int i = 0; i < abilityImages.Length; i++)
             {
-                abilityImages[i].sprite = weaponOption.weapon.GetAbilities()[i].abilityImageIcon;
+                ActionClip ability = weaponOption.weapon.GetAbilities()[i];
+                abilityImages[i].sprite = ability.abilityImageIcon;
+                if (abilityImages[i].TryGetComponent(out Button previewButton))
+                {
+                    previewButton.onClick.RemoveAllListeners();
+                    previewButton.onClick.AddListener(() => StartCoroutine(ShowAbilityPreviewVideo(abilityPreviewVideos.Find(item => item.ability == ability))));
+                }
+                else
+                {
+                    Debug.LogError(i + " doesn't have a button component for preview ability video!");
+                }
             }
+        }
+
+        [SerializeField] private GameObject abilityPreviewParent;
+        [SerializeField] private Text videoOverlayText;
+        [SerializeField] private VideoPlayer abilityPreviewVideoPlayer;
+        [SerializeField] private RawImage abilityPreviewRawImage;
+
+        private bool videoRunning;
+        private IEnumerator ShowAbilityPreviewVideo(AbilityPreviewVideo abilityPreviewVideo)
+        {
+            if (videoRunning) { yield break; }
+            videoRunning = true;
+            if (abilityPreviewVideo == null) // Show "no preview video"
+            {
+                if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
+                abilityPreviewVideoPlayer.clip = null;
+                videoOverlayText.text = "No Preview Video For This Ability";
+                abilityPreviewRawImage.enabled = false;
+            }
+            else if (abilityPreviewVideo.video)
+            {
+                videoOverlayText.text = "";
+                abilityPreviewRawImage.enabled = false;
+                abilityPreviewVideoPlayer.clip = abilityPreviewVideo.video;
+                abilityPreviewVideoPlayer.Prepare();
+                yield return new WaitUntil(() => abilityPreviewVideoPlayer.isPrepared);
+                abilityPreviewVideoPlayer.Play();
+                abilityPreviewRawImage.enabled = true;
+            }
+            else // Show "no preview video"
+            {
+                if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
+                abilityPreviewVideoPlayer.clip = null;
+                videoOverlayText.text = "No Preview Video For This Ability";
+                abilityPreviewRawImage.enabled = false;
+            }
+        }
+
+        private void OnEnable()
+        {
+            abilityPreviewParent.transform.localScale = Vector3.zero;
+        }
+
+        private const float videoUIAnimationSpeed = 3;
+        private void Update()
+        {
+            abilityPreviewParent.transform.localScale = Vector3.MoveTowards(abilityPreviewParent.transform.localScale, videoRunning ? Vector3.one : Vector3.zero, Time.deltaTime * videoUIAnimationSpeed);
+        }
+
+        public void CloseAbilityPreviewWindow()
+        {
+            StartCoroutine(StopVideoPlayer());
+            videoRunning = false;
+        }
+
+        private IEnumerator StopVideoPlayer()
+        {
+            yield return new WaitUntil(() => abilityPreviewParent.transform.localScale == Vector3.zero);
+            if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
         }
 
         private GameObject weaponPreviewObject;
         private void OnDestroy()
         {
-            Destroy(weaponPreviewObject);
+            if (weaponPreviewObject)
+            {
+                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    weaponPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(weaponPreviewObject);
+                }
+            }
         }
     }
 }

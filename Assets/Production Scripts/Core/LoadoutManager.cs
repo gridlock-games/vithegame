@@ -28,6 +28,7 @@ namespace Vi.Core
 
         public void Reload(Weapon weapon)
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.Reload() should only be called on the server!"); return; }
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
             if (weapon == secondaryWeaponInstance) { secondaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
             Debug.LogError("Unknown weapon to reload " + weapon);
@@ -35,12 +36,14 @@ namespace Vi.Core
 
         public void ReloadAllWeapons()
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.ReloadAllWeapons() should only be called on the server!"); return; }
             if (primaryWeaponInstance) { primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount(); }
             if (secondaryWeaponInstance) { secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount(); }
         }
 
         public void UseAmmo(Weapon weapon)
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.UseAmmo() should only be called on the server!"); return; }
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value--; return; }
             if (weapon == secondaryWeaponInstance) { secondaryAmmo.Value--; return; }
             Debug.LogError("Unknown weapon to fire " + weapon);

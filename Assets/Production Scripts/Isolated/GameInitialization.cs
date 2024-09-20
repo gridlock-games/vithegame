@@ -51,7 +51,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("TargetFrameRate"))
             {
-                int targetFrameRate = Screen.currentResolution.refreshRate + 60;
+                int targetFrameRate = Mathf.CeilToInt((float)Screen.currentResolution.refreshRateRatio.value + 60);
                 if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 60; }
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
@@ -104,10 +104,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 200); }
 
-            if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", Application.platform == RuntimePlatform.WindowsPlayer
-                | Application.platform == RuntimePlatform.OSXPlayer | Application.platform == RuntimePlatform.LinuxPlayer
-                | Application.platform == RuntimePlatform.WindowsEditor | Application.platform == RuntimePlatform.OSXEditor
-                | Application.platform == RuntimePlatform.LinuxEditor ? "PRESS" : "HOLD"); }
+            if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", "HOLD"); }
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);

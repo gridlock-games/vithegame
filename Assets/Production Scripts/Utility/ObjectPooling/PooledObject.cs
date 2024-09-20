@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using Unity.Netcode;
 
 namespace Vi.Utility
 {
@@ -50,11 +51,6 @@ namespace Vi.Utility
         private void OnDestroy()
         {
             if (!markedForDestruction) { ObjectPoolingManager.OnPooledObjectDestroy(this); }
-        }
-
-        public PooledObject[] GetChildPooledObjects()
-        {
-            return GetComponentsInChildren<PooledObject>();
         }
 
         public bool IsSpawned { get; private set; }

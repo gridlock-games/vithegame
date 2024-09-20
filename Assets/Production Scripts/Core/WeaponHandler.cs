@@ -117,6 +117,28 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
+
+            inputHistory.Clear();
+
+            CanAim = false;
+            CanADS = false;
+
+            currentActionClipWeapon = default;
+
+            actionSoundEffectIdTracker.Clear();
+
+            actionVFXTracker.Clear();
+
+            IsInAnticipation = false;
+            isAboutToAttack = false;
+            IsAttacking = false;
+            IsInRecovery = false;
+
+            ClearPreviewActionVFXInstances();
+
+            reloadFinished = false;
+
+            IsBlocking = false;
         }
 
         private void EquipWeapon()
@@ -268,7 +290,14 @@ namespace Vi.Core
                 }
             }
 
-            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Reload)
+            {
+                ResetComboSystem();
+                reloadFinished = false;
+                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
+                if (reloadSoundEffect) { AudioManager.Singleton.PlayClipOnTransform(transform, reloadSoundEffect, false, Weapon.reloadSoundEffectVolume); }
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
                 ResetComboSystem();
             }
@@ -505,6 +534,8 @@ namespace Vi.Core
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
 
+        private bool reloadFinished;
+
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -538,7 +569,7 @@ namespace Vi.Core
                 // Action sound effect logic here
                 foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
                     {
                         AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
                         actionSoundEffectIdTracker.Add(actionSoundEffect.id);
@@ -552,6 +583,22 @@ namespace Vi.Core
                 isAboutToAttack = false;
                 IsAttacking = false;
                 IsInRecovery = false;
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Reload)
+            {
+                IsInAnticipation = false;
+                isAboutToAttack = false;
+                IsAttacking = false;
+                IsInRecovery = false;
+
+                if (IsServer)
+                {
+                    if (!reloadFinished)
+                    {
+                        float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                        if (normalizedTime >= CurrentActionClip.reloadNormalizedTime) { combatAgent.LoadoutManager.Reload(weaponInstance); reloadFinished = true; }
+                    }
+                }
             }
             else if (CurrentActionClip.IsAttack())
             {
@@ -682,13 +729,11 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
-            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterChange;
         }
 
         public override void OnNetworkDespawn()
         {
             lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
-            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterChange;
         }
 
         public void LightAttack(bool isPressed)
@@ -749,28 +794,6 @@ namespace Vi.Core
             while (true)
             {
                 ExecuteLightAttack(true);
-                yield return null;
-                yield return null;
-            }
-        }
-
-        private void OnReloadAnimParameterChange(bool prev, bool current)
-        {
-            if (current)
-            {
-                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
-                if (reloadSoundEffect) { StartCoroutine(PlayReloadSoundEffect(reloadSoundEffect)); }
-            }
-        }
-
-        private IEnumerator PlayReloadSoundEffect(AudioClip reloadSoundEffect)
-        {
-            AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(gameObject, reloadSoundEffect, transform.position, Weapon.reloadSoundEffectVolume);
-            while (true)
-            {
-                if (!reloadingAnimParameterValue.Value) { break; }
-                if (!audioSource) { break; }
-                if (!audioSource.isPlaying) { break; }
                 yield return null;
             }
         }
@@ -1052,7 +1075,6 @@ namespace Vi.Core
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
         }
 
-        private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -1063,8 +1085,6 @@ namespace Vi.Core
 
             if (IsServer & IsSpawned)
             {
-                reloadingAnimParameterValue.Value = combatAgent.AnimationHandler.Animator.GetBool("Reloading");
-
                 if (ShouldUseAmmo())
                 {
                     if (GetAmmoCount() == 0)
@@ -1072,10 +1092,6 @@ namespace Vi.Core
                         if (combatAgent.MovementHandler.GetPlayerMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
-            }
-            else
-            {
-                combatAgent.AnimationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
 
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
@@ -1089,51 +1105,11 @@ namespace Vi.Core
         void OnReload()
         {
             if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
-            if (IsServer)
-            {
-                ReloadOnServer();
-            }
-            else
-            {
-                ReloadServerRpc();
-                WaitingForReloadToPlay = true;
-            }
-        }
-
-        public bool WaitingForReloadToPlay { get; private set; }
-
-        [Rpc(SendTo.Server)]
-        private void ReloadServerRpc()
-        {
-            ReloadOnServer();
-            ResetWaitingForReloadRpc();
-        }
-
-        [Rpc(SendTo.Owner)] private void ResetWaitingForReloadRpc() { WaitingForReloadToPlay = false; }
-
-        private void ReloadOnServer()
-        {
-            if (reloadRunning) { return; }
             if (combatAgent.AnimationHandler.IsReloading()) { return; }
-            if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (!combatAgent.AnimationHandler.IsAtRest()) { return; }
 
-            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
-            {
-                StartCoroutine(Reload(shooterWeapon));
-                break;
-            }
-        }
-
-        private bool reloadRunning;
-        private IEnumerator Reload(ShooterWeapon shooterWeapon)
-        {
-            reloadRunning = true;
-            combatAgent.AnimationHandler.Animator.SetBool("Reloading", true);
-            yield return new WaitUntil(() => combatAgent.AnimationHandler.IsFinishingReload());
-            combatAgent.AnimationHandler.Animator.SetBool("Reloading", false);
-            combatAgent.LoadoutManager.Reload(weaponInstance);
-            reloadRunning = false;
+            ActionClip reloadClip = GetWeapon().GetReloadClip();
+            if (reloadClip) { combatAgent.AnimationHandler.PlayAction(reloadClip); }
         }
 
         public bool IsBlocking { get; private set; }

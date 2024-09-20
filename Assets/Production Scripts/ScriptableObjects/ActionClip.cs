@@ -20,7 +20,8 @@ namespace Vi.ScriptableObjects
             FlashAttack,
             GrabAttack,
             Lunge,
-            Flinch
+            Flinch,
+            Reload
         }
 
         public enum HitReactionType
@@ -321,5 +322,6 @@ namespace Vi.ScriptableObjects
         public bool shouldAimOffHand = true;
         public bool requireAmmo;
         public int requiredAmmoAmount = 1;
+        public float reloadNormalizedTime = 0.5f;
     }
 }

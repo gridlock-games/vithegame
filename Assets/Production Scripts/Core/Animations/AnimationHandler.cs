@@ -20,7 +20,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                AddActionToServerQueue(actionClip.name, isFollowUpClip);
+                AddActionToServerQueue(actionClip.name, isFollowUpClip, false);
                 WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
@@ -156,12 +156,9 @@ namespace Vi.Core
 
         public bool IsReloading()
         {
-            return Animator.GetBool("Reloading") | Animator.IsInTransition(Animator.GetLayerIndex("Reload")) | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
-        }
-
-        public bool IsFinishingReload()
-        {
-            return Animator.IsInTransition(Animator.GetLayerIndex("Reload")) & !Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Reload) { return false; }
+            return !IsAtRest();
         }
 
         public bool IsDodging()
@@ -425,6 +422,7 @@ namespace Vi.Core
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.FlashAttack:
+                    case ActionClip.ClipType.Reload:
                         if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             if (IsDodging())
@@ -519,32 +517,28 @@ namespace Vi.Core
             return new CanPlayActionClipResult(true, shouldUseDodgeCancelTransitionTime);
         }
 
-        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip); }
+        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip, true); }
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
-        private Queue<(string, bool)> serverActionQueue = new Queue<(string, bool)>();
-        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip)
+        private Queue<(string, bool, bool)> serverActionQueue = new Queue<(string, bool, bool)>();
+        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
-            serverActionQueue.Enqueue((actionClipName, isFollowUpClip));
+            serverActionQueue.Enqueue((actionClipName, isFollowUpClip, wasCalledFromServerRpc));
         }
 
-        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
+            if (!IsServer) { Debug.LogError("AnimationHandler.PlayActionOnServer() should only be called on the server! " + actionClipName); return false; }
+
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
             if (!canPlayActionClipResult.canPlay)
             {
-                if (IsOwner)
-                {
-                    WaitingForActionClipToPlay = false;
-                }
-                else
-                {
-                    ResetWaitingForActionToPlayClientRpc();
-                }
+                WaitingForActionClipToPlay = false;
+                if (wasCalledFromServerRpc) { ResetWaitingForActionToPlayClientRpc(); }
                 return false;
             }
 
@@ -567,7 +561,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                SetInvincibleStatusOnDodge(actionClipName);
+                SetInvincibleStatusOnDodge(actionClip);
             }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
@@ -605,13 +599,14 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -633,10 +628,16 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
-            WaitingForActionClipToPlay = false;
+            StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
+        }
+
+        private IEnumerator ResetWaitingForActionClipToPlayAfterOneFrame()
+        {
+            yield return null;
+            WaitingForActionClipToPlay = false;
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
@@ -725,6 +726,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
                 case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -756,6 +758,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.Dodge:
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -998,13 +1001,14 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -1025,9 +1029,9 @@ namespace Vi.Core
         }
 
         // Coroutine for setting invincibility status during a dodge
-        private void SetInvincibleStatusOnDodge(string actionStateName)
+        private void SetInvincibleStatusOnDodge(ActionClip actionClip)
         {
-            combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
+            combatAgent.SetInviniciblity(GetTotalActionClipLengthInSeconds(actionClip) * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
@@ -1145,6 +1149,8 @@ namespace Vi.Core
                     }
                 }
             }
+
+            WaitingForActionClipToPlay = false;
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)
@@ -1197,7 +1203,7 @@ namespace Vi.Core
         public Vector3 GetCameraForwardDirection() { return NetworkObject.IsPlayerObject ? cameraForwardDir.Value : transform.forward; }
         private NetworkVariable<Vector3> cameraForwardDir = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        private readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
+        private static readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
 
         private Camera mainCamera;
         private void FindMainCamera()
@@ -1219,7 +1225,7 @@ namespace Vi.Core
 
         public void ProcessNextActionClip()
         {
-            if (serverActionQueue.TryDequeue(out (string, bool) result)) { PlayActionOnServer(result.Item1, result.Item2); }
+            if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
         private void RefreshAimPoint()

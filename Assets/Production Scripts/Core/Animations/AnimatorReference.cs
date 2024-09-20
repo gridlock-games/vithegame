@@ -357,6 +357,7 @@ namespace Vi.Core
 
         public bool ShouldApplyRootMotion()
         {
+            if (!combatAgent) { return false; }
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
             return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
@@ -364,6 +365,11 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (animationHandler)
+            {
+                if (!animator.enabled) { animationHandler.ProcessNextActionClip(); }
+            }
+
             limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
         }
 

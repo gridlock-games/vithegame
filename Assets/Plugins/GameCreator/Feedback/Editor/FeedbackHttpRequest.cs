@@ -58,7 +58,7 @@
 
             string post = string.Format(FMT, EditorJsonUtility.ToJson(data));
 
-            UnityWebRequest request = UnityWebRequest.Post(URL, string.Empty);
+            UnityWebRequest request = UnityWebRequest.PostWwwForm(URL, string.Empty);
             request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(post));
             request.uploadHandler.contentType = "application/json";
 

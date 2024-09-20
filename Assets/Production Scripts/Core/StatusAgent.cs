@@ -16,6 +16,21 @@ namespace Vi.Core
             attributes = GetComponent<CombatAgent>();
         }
 
+        private void OnDisable()
+        {
+            stopAllStatuses = default;
+            stopAllStatusesAssociatedWithWeapon = default;
+
+            DamageMultiplier = 1;
+            DamageReductionMultiplier = 1;
+            DamageReceivedMultiplier = 1;
+            HealingMultiplier = 1;
+            SpiritIncreaseMultiplier = 1;
+            SpiritReductionMultiplier = 1;
+
+            ActiveStatusesWasUpdatedThisFrame = default;
+        }
+
         public override void OnNetworkSpawn()
         {
             statuses.OnListChanged += OnStatusChange;
@@ -60,6 +75,10 @@ namespace Vi.Core
             {
                 stopAllStatuses = true;
                 stopAllStatusesCoroutine = StartCoroutine(ResetStopAllStatusesBool());
+            }
+            else
+            {
+                Debug.LogWarning("Why are you calling StatusAgent.RemoveAllStatuses() when the object is inactive in hierarchy");
             }
         }
 

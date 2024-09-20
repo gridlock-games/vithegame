@@ -43,6 +43,8 @@ namespace Vi.Core.MovementHandlers
         protected virtual void OnSpawnFromPool()
         {
             rb.transform.SetParent(null, true);
+            rb.rotation = Quaternion.identity;
+            rb.transform.rotation = Quaternion.identity;
         }
         
         protected virtual void OnReturnToPool()

@@ -307,6 +307,28 @@ namespace Vi.Core.CombatAgents
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            CachedPlayerData = default;
+
+            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
+            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+
+            lastComboCounterChangeTime = default;
+            lastBlockTime = Mathf.NegativeInfinity;
+
+            staminaDelayCooldown = default;
+
+            spiritRegenActivateTime = Mathf.NegativeInfinity;
+
+            rageDelayCooldown = default;
+
+            IsRespawning = false;
+            isWaitingForSpawnPoint = false;
+            respawnSelfCalledTime = default;
+        }
+
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
@@ -812,7 +834,7 @@ namespace Vi.Core.CombatAgents
 
         protected void RefreshStatus()
         {
-            if (IsOwner)
+            if (IsSpawned & IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }

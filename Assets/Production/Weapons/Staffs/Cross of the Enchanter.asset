@@ -25,6 +25,7 @@ MonoBehaviour:
   rageRecoveryRate: 0
   shouldUseAmmo: 0
   maxAmmoCount: 0
+  reloadClip: {fileID: 0}
   attackSoundEffects:
   - weaponBone: 5
     attackSoundEffects:
@@ -187,8 +188,8 @@ MonoBehaviour:
       weaponBone: 17
       weaponPositionOffset: {x: -0.000735, y: 0.000402, z: 0.000669}
       weaponRotationOffset: {x: 1.01, y: -157.973, z: -29.615}
-      stowedWeaponPositionOffset: {x: 0.00006, y: 0.0019, z: 0.00002}
-      stowedWeaponRotationOffset: {x: -2.675, y: 293.37, z: 89.899}
+      stowedWeaponPositionOffset: {x: 0.0004566598, y: 0.0018784364, z: 0.000023840017}
+      stowedWeaponRotationOffset: {x: 2.675, y: -256.975, z: 89.672}
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -211,8 +212,8 @@ MonoBehaviour:
       weaponBone: 17
       weaponPositionOffset: {x: -0.076, y: 0.053, z: 0.038}
       weaponRotationOffset: {x: 1.01, y: -157.973, z: -29.615}
-      stowedWeaponPositionOffset: {x: 0.018, y: 0.18, z: -0.003}
-      stowedWeaponRotationOffset: {x: -2.675, y: 293.37, z: 89.899}
+      stowedWeaponPositionOffset: {x: 0.04984804, y: 0.17719577, z: -0.011091444}
+      stowedWeaponRotationOffset: {x: 7.231, y: 109.042, z: 91.106}
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
