@@ -145,7 +145,7 @@ namespace Vi.Player
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
-                Physics.autoSimulation = false;
+                Physics.simulationMode = SimulationMode.Script;
                 Rigidbody.position = latestServerState.Value.position;
                 Rigidbody.velocity = latestServerState.Value.velocity;
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
@@ -164,7 +164,7 @@ namespace Vi.Player
 
                     tickToProcess++;
                 }
-                Physics.autoSimulation = true;
+                Physics.simulationMode = SimulationMode.FixedUpdate;
             }
         }
 
