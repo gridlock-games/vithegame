@@ -1205,7 +1205,10 @@ namespace Vi.Core
 
                         foreach (Attributes player in localPlayers.Values)
                         {
-                            if (player) { player.UpdateNetworkVisiblity(); }
+                            if (player)
+                            {
+                                player.UpdateNetworkVisiblity();
+                            }
                         }
                     }
                     break;
@@ -1220,7 +1223,7 @@ namespace Vi.Core
                             kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         // If there is a local player for this id, despawn it
-                        //if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+                        if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
 
                         channelCounts[networkListEvent.Value.channel]--;
 

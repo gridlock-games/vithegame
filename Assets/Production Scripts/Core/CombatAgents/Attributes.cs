@@ -155,6 +155,7 @@ namespace Vi.Core.CombatAgents
         public void UpdateNetworkVisiblity()
         {
             if (!IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            if (!gameObject.activeInHierarchy) { return; }
             StartCoroutine(SetNetworkVisibilityAfterSpawn());
         }
 
