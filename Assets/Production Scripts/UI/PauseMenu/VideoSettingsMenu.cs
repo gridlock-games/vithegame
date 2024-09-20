@@ -99,7 +99,7 @@ namespace Vi.UI
             {
                 // If the resolution is 16:9
                 // (Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & 
-                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                if (Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                 {
                     resolutionOptions.Add(Screen.resolutions[i].ToString());
                     supportedResolutions.Add(Screen.resolutions[i]);
@@ -108,7 +108,7 @@ namespace Vi.UI
                 if (Screen.fullScreenMode == FullScreenMode.Windowed)
                 {
                     if (Screen.resolutions[i].width == Screen.width & Screen.resolutions[i].height == Screen.height
-                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                       & Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                     {
                         currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
                     }
@@ -116,7 +116,7 @@ namespace Vi.UI
                 else
                 {
                     if (Screen.resolutions[i].width == Screen.currentResolution.width & Screen.resolutions[i].height == Screen.currentResolution.height
-                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                       & Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                     {
                         currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
                     }
@@ -209,7 +209,7 @@ namespace Vi.UI
             bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
                 | originalResolution.width != supportedResolutions[resolutionDropdown.value].width
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
-                | originalResolution.refreshRate != supportedResolutions[resolutionDropdown.value].refreshRate
+                | originalResolution.refreshRateRatio.value != supportedResolutions[resolutionDropdown.value].refreshRateRatio.value
                 | originalGraphicsPreset != graphicsPresetDropdown.value
                 | originalRenderScaleValue != renderScaleSlider.value
                 | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
@@ -258,7 +258,7 @@ namespace Vi.UI
             if (supportedResolutions.Count > 1)
             {
                 Resolution res = supportedResolutions[resolutionDropdown.value];
-                Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
+                Screen.SetResolution(res.width, res.height, fsMode, res.refreshRateRatio);
             }
 
             // Graphics settings
@@ -286,7 +286,7 @@ namespace Vi.UI
             List<string> resolutionOptions = new List<string>();
             for (int i = 0; i < Screen.resolutions.Length; i++)
             {
-                if (Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                if (Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                 {
                     resolutionOptions.Add(Screen.resolutions[i].ToString());
                     supportedResolutions.Add(Screen.resolutions[i]);
@@ -295,7 +295,7 @@ namespace Vi.UI
                 if (Screen.fullScreenMode == FullScreenMode.Windowed)
                 {
                     if (Screen.resolutions[i].width == Screen.width & Screen.resolutions[i].height == Screen.height
-                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                       & Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                     {
                         currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
                     }
@@ -303,7 +303,7 @@ namespace Vi.UI
                 else
                 {
                     if (Screen.resolutions[i].width == Screen.currentResolution.width & Screen.resolutions[i].height == Screen.currentResolution.height
-                       & Mathf.Abs(Screen.currentResolution.refreshRate - Screen.resolutions[i].refreshRate) < 3)
+                       & Mathf.Abs((float)Screen.currentResolution.refreshRateRatio.value - (float)Screen.resolutions[i].refreshRateRatio.value) < 3)
                     {
                         currentResIndex = resolutionOptions.IndexOf(Screen.resolutions[i].ToString());
                     }
