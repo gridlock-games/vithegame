@@ -163,10 +163,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
-                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
-                else
-                    spawnableObj.transform.SetParent(null);
+                spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = Vector3.zero;
                 spawnableObj.transform.rotation = Quaternion.identity;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -196,10 +193,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
-                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, null));
-                else
-                    spawnableObj.transform.SetParent(null);
+                spawnableObj.transform.SetParent(null);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 spawnableObj.transform.localScale = objectToSpawn.transform.localScale;
@@ -234,10 +228,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
-                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
-                else
-                    spawnableObj.transform.SetParent(parentTransform);
+                spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.localPosition = objectToSpawn.transform.localPosition;
                 spawnableObj.transform.localRotation = objectToSpawn.transform.localRotation;
                 if (parentTransform)
@@ -277,10 +268,7 @@ namespace Vi.Utility
             {
                 // If there is an inactive object, reactivate it
                 spawnableObj.SetIsPrewarmStatus(false);
-                if (spawnableObj.TryGetComponent(out NetworkObject networkObject))
-                    Singleton.StartCoroutine(SetParentAfterSpawn(networkObject, parentTransform));
-                else
-                    spawnableObj.transform.SetParent(parentTransform);
+                spawnableObj.transform.SetParent(parentTransform);
                 spawnableObj.transform.position = spawnPosition;
                 spawnableObj.transform.rotation = spawnRotation;
                 if (parentTransform)
@@ -297,14 +285,6 @@ namespace Vi.Utility
             return spawnableObj;
         }
 
-        private static IEnumerator SetParentAfterSpawn(NetworkObject networkObject, Transform parent)
-        {
-            if (!NetworkManager.Singleton.IsServer) { yield break; }
-            if (networkObject.transform.parent == parent) { yield break; }
-            yield return new WaitUntil(() => networkObject.IsSpawned);
-            if (!networkObject.TrySetParent(parent)) { Debug.LogError("Error while setting parent for networ object " + networkObject + " to parent " + parent); }
-        }
-
         public static void ReturnObjectToPool(PooledObject obj)
         {
             if (obj == null) { Debug.LogWarning("Trying to return a null gameobject to pool"); return; }
@@ -312,20 +292,7 @@ namespace Vi.Utility
             if (despawnedObjectPools[obj.GetPooledObjectIndex()].Contains(obj)) { Debug.LogError(obj + " Trying to return an object to pool that is already in the pool! Was it returned by the scene manager?"); return; }
             if (!obj.IsSpawned) { Debug.LogError(obj + " isn't spawned but you're trying to return it to a pool! Did you create it with Instantiate?"); return; }
 
-            if (obj.transform.parent)
-            {
-                if (obj.TryGetComponent(out NetworkObject networkObject))
-                {
-                    networkObject.AutoObjectParentSync = false;
-                    // We can't use TryRemoveParent here because that requires auto object parent sync to be enabled
-                    networkObject.transform.SetParent(null, true);
-                    networkObject.AutoObjectParentSync = true;
-                }
-                else
-                {
-                    obj.transform.SetParent(null, true);
-                }
-            }
+            obj.transform.SetParent(null, true);
 
             obj.InvokeOnReturnToPoolEvent();
 

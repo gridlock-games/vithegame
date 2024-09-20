@@ -192,11 +192,11 @@ public class DebugOverlay : MonoBehaviour
             }
             else
             {
-                if (fpsValue >= Screen.currentResolution.refreshRate)
+                if (fpsValue >= Screen.currentResolution.refreshRateRatio.value)
                 {
                     fpsTextColor = Color.green;
                 }
-                else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
+                else if (fpsValue >= Screen.currentResolution.refreshRateRatio.value / 2)
                 {
                     fpsTextColor = Color.yellow;
                 }

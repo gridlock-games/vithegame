@@ -21,7 +21,7 @@ namespace Vi.Player
             if (!IsServer) { Debug.LogError("PlayerMovementHandler.SetOrientation() should only be called on the server!"); return; }
 
             Rigidbody.position = newPosition;
-            Rigidbody.velocity = Vector3.zero;
+            Rigidbody.Sleep();
             transform.position = newPosition;
 
             SetRotationClientRpc(newRotation);
@@ -284,7 +284,7 @@ namespace Vi.Player
             {
                 if (IsServer)
                 {
-                    Rigidbody.velocity = Vector3.zero;
+                    Rigidbody.Sleep();
                 }
                 else
                 {

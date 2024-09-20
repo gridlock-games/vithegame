@@ -30,8 +30,11 @@ namespace Vi.Utility
             {
                 rb.position = position;
                 rb.rotation = rotation;
-                rb.velocity = velocity;
-                rb.angularVelocity = angularVelocity;
+                if (!rb.isKinematic)
+                {
+                    rb.velocity = velocity;
+                    rb.angularVelocity = angularVelocity;
+                }
             }
         }
 

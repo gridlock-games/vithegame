@@ -1,18 +1,3 @@
-// Android Resolver Repos Start
-([rootProject] + (rootProject.subprojects as List)).each { project ->
-    project.repositories {
-        def unityProjectPath = $/file:///**DIR_UNITYPROJECT**/$.replace("\\", "/")
-        maven {
-            url "https://maven.google.com"
-        }
-        maven {
-            url (unityProjectPath + "/Assets/GeneratedLocalRepo/Firebase/m2repository") // Assets/Firebase/Editor/AnalyticsDependencies.xml:18, Assets/Firebase/Editor/AppDependencies.xml:22, Assets/Firebase/Editor/AuthDependencies.xml:20
-        }
-        mavenLocal()
-        mavenCentral()
-    }
-}
-// Android Resolver Repos End
 apply plugin: 'com.android.library'
 **APPLY_PLUGINS**
 

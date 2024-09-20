@@ -461,7 +461,7 @@ namespace Vi.Core
 
         public void RemovePlayerObject(int clientId)
         {
-            localPlayers.Remove(clientId);
+            if (!localPlayers.Remove(clientId) & !NetworkManager.ShutdownInProgress) { Debug.LogError("Could not remove client id local player " + clientId); }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
@@ -1047,12 +1047,20 @@ namespace Vi.Core
                 {
                     foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
-                        combatAgent.NetworkObject.Despawn(true);
+                        if (combatAgent.IsSpawned) { combatAgent.NetworkObject.Despawn(true); }
+                        else
+                        {
+                            Debug.LogError("Unsure how to handle despawned combat agent on scene unload " + combatAgent);
+                        }
                     }
 
                     foreach (NetworkObject spectator in localSpectators.Values.ToList())
                     {
-                        spectator.Despawn(true);
+                        if (spectator.IsSpawned) { spectator.Despawn(true); }
+                        else
+                        {
+                            Debug.LogError("Unsure how to handle despawned spectator on scene unload " + spectator);
+                        }
                     }
                 }
             }
@@ -1212,7 +1220,7 @@ namespace Vi.Core
                             kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         // If there is a local player for this id, despawn it
-                        if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+                        //if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
 
                         channelCounts[networkListEvent.Value.channel]--;
 
@@ -1436,6 +1444,8 @@ namespace Vi.Core
             }
 
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            playerObjectToSpawn = null;
+            playerIdThatIsBeingSpawned = default;
             spawnPlayerRunning = false;
         }
 

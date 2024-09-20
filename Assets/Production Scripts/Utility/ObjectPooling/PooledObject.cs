@@ -82,5 +82,13 @@ namespace Vi.Utility
         {
             gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
+
+        private void OnValidate()
+        {
+            if (TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.AutoObjectParentSync = false;
+            }
+        }
     }
 }

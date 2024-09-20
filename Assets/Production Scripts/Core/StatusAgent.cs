@@ -96,8 +96,16 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatusesAssociatedWithWeapon() should only be called on the server"); return; }
 
             if (stopAllStatusesAssociatedWithWeaponCoroutine != null) { StopCoroutine(stopAllStatusesAssociatedWithWeaponCoroutine); }
-            stopAllStatusesAssociatedWithWeapon = true;
-            stopAllStatusesAssociatedWithWeaponCoroutine = StartCoroutine(ResetStopAllStatusesAssociatedWithWeaponBool());
+
+            if (gameObject.activeInHierarchy)
+            {
+                stopAllStatusesAssociatedWithWeapon = true;
+                stopAllStatusesAssociatedWithWeaponCoroutine = StartCoroutine(ResetStopAllStatusesAssociatedWithWeaponBool());
+            }
+            else
+            {
+                Debug.LogWarning("Why are you calling StatusAgent.RemoveAllStatusesAssociatedWithWeapon() when the object is inactive in hierarchy");
+            }
         }
 
         private Coroutine stopAllStatusesAssociatedWithWeaponCoroutine;
