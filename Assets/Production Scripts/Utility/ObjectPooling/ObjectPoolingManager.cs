@@ -63,12 +63,15 @@ namespace Vi.Utility
 
             NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
             {
-                return SpawnObject(m_Prefab.GetComponent<PooledObject>(), position, rotation).GetComponent<NetworkObject>();
+                return SpawnObject(m_Prefab, position, rotation).GetComponent<NetworkObject>();
             }
 
             void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
             {
-                ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
+                if (networkObject.GetComponent<PooledObject>().IsSpawned)
+                {
+                    ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
+                }
             }
         }
 
