@@ -461,7 +461,7 @@ namespace Vi.Core
 
         public void RemovePlayerObject(int clientId)
         {
-            localPlayers.Remove(clientId);
+            if (!localPlayers.Remove(clientId) & !NetworkManager.ShutdownInProgress) { Debug.LogError("Could not remove client id local player " + clientId); }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
@@ -1436,6 +1436,8 @@ namespace Vi.Core
             }
 
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            playerObjectToSpawn = null;
+            playerIdThatIsBeingSpawned = default;
             spawnPlayerRunning = false;
         }
 

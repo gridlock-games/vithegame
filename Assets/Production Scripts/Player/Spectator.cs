@@ -344,7 +344,7 @@ namespace Vi.Player
 
         private const float lerpSpeed = 8;
         private static readonly Vector3 defaultFollowTargetOffset = new Vector3(0, 3, -3);
-        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
+        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.75f, 0);
 
         private Vector3 followTargetOffset;
 
