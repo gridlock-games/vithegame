@@ -188,7 +188,7 @@ namespace Vi.Core.MovementHandlers
 
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
-                Rigidbody.velocity = Vector3.zero;
+                Rigidbody.Sleep();
                 return;
             }
 

@@ -12,7 +12,7 @@ namespace Vi.Core.MovementHandlers
             if (rb)
             {
                 rb.position = newPosition;
-                rb.velocity = Vector3.zero;
+                rb.Sleep();
             }
             base.SetOrientation(newPosition, newRotation);
         }

@@ -39,7 +39,7 @@ namespace Vi.Core
         }
 
         //private string APIURL = "154.90.35.191/";
-        private string APIURL = "154.90.35.191/";
+        private string APIURL = "http://154.90.35.191/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
