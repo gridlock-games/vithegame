@@ -147,7 +147,7 @@ namespace Vi.Player
                 // Now re-simulate the rest of the ticks up to the current tick on the client
                 Physics.simulationMode = SimulationMode.Script;
                 Rigidbody.position = latestServerState.Value.position;
-                Rigidbody.velocity = latestServerState.Value.velocity;
+                if (!Rigidbody.isKinematic) { Rigidbody.velocity = latestServerState.Value.velocity; }
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
