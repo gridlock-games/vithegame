@@ -1066,6 +1066,12 @@ namespace Vi.Core
 
         public Weapon.ArmorType GetArmorType() { return animatorReference.GetArmorType(); }
 
+        public AnimatorReference.WorldSpaceLabelTransformInfo GetWorldSpaceLabelTransformInfo()
+        {
+            if (!animatorReference) { return AnimatorReference.WorldSpaceLabelTransformInfo.GetDefaultWorldSpaceLabelTransformInfo(); }
+            return animatorReference.GetWorldSpaceLabelTransformInfo();
+        }
+
         AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {

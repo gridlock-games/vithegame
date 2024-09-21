@@ -48,7 +48,7 @@ namespace Vi.Core
                 skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
             }
         }
-        
+
         private Dictionary<CharacterReference.EquipmentType, WearableEquipment> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, WearableEquipment>();
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
@@ -169,7 +169,7 @@ namespace Vi.Core
                 {
                     Destroy(wearableEquipmentInstances[equipmentType].gameObject);
                 }
-                
+
                 wearableEquipmentInstances.Remove(equipmentType);
             }
 
@@ -425,6 +425,46 @@ namespace Vi.Core
                 rb.interpolation = combatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             }
             animator.enabled = !isActive;
+        }
+
+        [System.Serializable]
+        public struct WorldSpaceLabelTransformInfo
+        {
+            public Vector3 positionOffsetFromRenderer;
+            public float scaleMultiplier;
+
+            public WorldSpaceLabelTransformInfo(Vector3 positionOffsetFromRenderer, float scaleMultiplier)
+            {
+                this.positionOffsetFromRenderer = positionOffsetFromRenderer;
+                this.scaleMultiplier = scaleMultiplier;
+            }
+
+            public static WorldSpaceLabelTransformInfo GetDefaultWorldSpaceLabelTransformInfo()
+            {
+                return new WorldSpaceLabelTransformInfo(new Vector3(0, 0, -0.25f), 1);
+            }
+        }
+
+        public WorldSpaceLabelTransformInfo GetWorldSpaceLabelTransformInfo() { return worldSpaceLabelTransformInfo; }
+        [SerializeField] private WorldSpaceLabelTransformInfo worldSpaceLabelTransformInfo = WorldSpaceLabelTransformInfo.GetDefaultWorldSpaceLabelTransformInfo();
+
+        private void OnDrawGizmos()
+        {
+            if (Application.isPlaying) { return; }
+            SkinnedMeshRenderer[] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (renderers.Length == 0) { return; }
+            Vector3 highestPoint = renderers[0].bounds.center;
+            Renderer rendererToFollow = renderers[0];
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.bounds.center.y > highestPoint.y)
+                {
+                    rendererToFollow = renderer;
+                    highestPoint = renderer.bounds.center;
+                }
+            }
+            Gizmos.color = Color.blue;
+            Gizmos.DrawCube(rendererToFollow.bounds.center + rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer, new Vector3(worldSpaceLabelTransformInfo.scaleMultiplier, 0.1f, 0.1f));
         }
     }
 }

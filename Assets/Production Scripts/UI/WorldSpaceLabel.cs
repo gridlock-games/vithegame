@@ -242,15 +242,17 @@ namespace Vi.UI
                     if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
 
-                Vector3 pos = rendererToFollow.bounds.center;
-                pos.y += rendererToFollow.bounds.extents.y;
+                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
+                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
                 //pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
+                //Vector3 pos = rendererToFollow.bounds.center;
+                //pos.y += rendererToFollow.bounds.extents.y;
                 transform.position = pos;
             }
-            else
-            {
-                //Debug.LogWarning("Can't find a main camera for world space labels!");
-            }
+            //else
+            //{
+            //    Debug.LogWarning("Can't find a main camera for world space labels!");
+            //}
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
             canvas.enabled = transform.localScale.magnitude > 0.01f;
 
