@@ -96,7 +96,10 @@ namespace Vi.Core
             }
             else if (current > prev)
             {
-                GlowRenderer.RenderHeal();
+                if (GlowRenderer)
+                {
+                    GlowRenderer.RenderHeal();
+                }
             }
         }
 
