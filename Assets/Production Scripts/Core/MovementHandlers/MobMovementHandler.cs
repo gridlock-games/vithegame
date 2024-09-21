@@ -60,7 +60,7 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3 * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
             return transform.rotation;
         }
@@ -335,6 +335,7 @@ namespace Vi.Core.MovementHandlers
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+            if (combatAgent.StatusAgent.IsFeared()) { return; }
 
             if (targetFinder.GetTarget())
             {

@@ -415,6 +415,7 @@ namespace Vi.Core
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
+                OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 if (IsServer) { isRaging.Value = false; }
                 AnimationHandler.SetRagdollActive(true);
@@ -426,6 +427,8 @@ namespace Vi.Core
                 AnimationHandler.SetRagdollActive(false);
             }
         }
+
+        protected virtual void OnDeath() { }
 
         private IEnumerator ClearDamageMappingAfter1Frame()
         {

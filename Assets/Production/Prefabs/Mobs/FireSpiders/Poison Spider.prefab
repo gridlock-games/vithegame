@@ -15,9 +15,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: deathVFX
+      value: 
+      objectReference: {fileID: 7835766634743670649, guid: 0dca3657b957a9442b75391f7d8421e2,
+        type: 3}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: deathBehavior
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: raceAndGender
       value: 14
       objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: deathVFXAttack
+      value: 
+      objectReference: {fileID: 11400000, guid: 8ecbdd2a065a2f04c8f04a8bc69ea716,
+        type: 2}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: weaponOption.weapon

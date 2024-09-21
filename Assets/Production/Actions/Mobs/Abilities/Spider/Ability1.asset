@@ -1565,8 +1565,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 7
-    value: 0.5
-    duration: 5
+    value: 0.25
+    duration: 3
     delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
@@ -1590,3 +1590,4 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5

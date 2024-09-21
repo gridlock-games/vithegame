@@ -25,6 +25,7 @@ namespace Vi.ArtificialIntelligence
             yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer);
             foreach (MobDefinition mobDefinition in mobDefinitions)
             {
+                if (!mobDefinition.enabled) { continue; }
                 SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobDefinition.mobPrefab);
                 PooledObject g = ObjectPoolingManager.SpawnObject(mobDefinition.mobPrefab.gameObject.GetComponent<PooledObject>(), transformData.position, transformData.rotation);
                 g.GetComponent<Mob>().SetTeam(mobDefinition.team);
@@ -37,6 +38,7 @@ namespace Vi.ArtificialIntelligence
         {
             public PlayerDataManager.Team team;
             public Mob mobPrefab;
+            public bool enabled;
         }
     }
 }
