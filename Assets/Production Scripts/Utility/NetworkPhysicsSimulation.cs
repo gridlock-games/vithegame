@@ -52,11 +52,7 @@ namespace Vi.Utility
 
         public static void RemoveRigidbody(Rigidbody rb)
         {
-            if (activeRigidbodies.Contains(rb))
-            {
-                activeRigidbodies.Remove(rb);
-            }
-            else
+            if (!activeRigidbodies.Remove(rb))
             {
                 Debug.LogWarning("Trying to remove a rigidbody " + rb.name + " but it is not present in list");
             }

@@ -1195,13 +1195,6 @@ namespace Vi.Core
         private void OnEnable()
         {
             SetRagdollActive(false);
-            if (IsSpawned)
-            {
-                if (combatAgent is Attributes attributes)
-                {
-                    StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
-                }
-            }
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }

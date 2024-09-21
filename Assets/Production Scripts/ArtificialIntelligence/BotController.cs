@@ -19,6 +19,11 @@ namespace Vi.ArtificialIntelligence
             targetFinder = GetComponent<GameplayTargetFinder>();
         }
 
+        protected override void OnDisable()
+        {
+            isHeavyAttacking = default;
+        }
+
         protected override void Update()
         {
             base.Update();

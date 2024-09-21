@@ -103,15 +103,6 @@ namespace Vi.Core
             {
                 equippedEquipment.Add(equipmentType, null);
             }
-
-            if (combatAgent is Attributes attributes)
-            {
-                if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
-                {
-                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-                    ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
-                }
-            }
         }
 
         private void OnReturnToPool()

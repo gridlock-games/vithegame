@@ -119,6 +119,14 @@ namespace Vi.Core.CombatAgents
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
             base.OnNetworkSpawn();
 
+            if (NetworkManager.Singleton.IsServer)
+            {
+                UpdateNetworkVisiblity();
+                StartCoroutine(InitStats());
+            }
+
+            StartCoroutine(AddPlayerObjectToPlayerDataManager());
+
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
@@ -142,17 +150,6 @@ namespace Vi.Core.CombatAgents
             RefreshStatus();
 
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (NetworkManager.Singleton.IsServer)
-            {
-                UpdateNetworkVisiblity();
-                StartCoroutine(InitStats());
-            }
-            StartCoroutine(AddPlayerObjectToPlayerDataManager());
         }
 
         public void UpdateNetworkVisiblity()
@@ -196,7 +193,7 @@ namespace Vi.Core.CombatAgents
 
         private IEnumerator InitStats()
         {
-            if (!NetworkManager.Singleton.IsServer) { yield break; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("You should onyl call Attributes.InitStats() on the server!"); yield break; }
             yield return new WaitUntil(() => IsSpawned);
             yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = WeaponHandler.GetWeapon().GetMaxHP();
