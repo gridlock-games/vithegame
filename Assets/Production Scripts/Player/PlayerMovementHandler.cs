@@ -309,7 +309,7 @@ namespace Vi.Player
             }
 
             Vector2 moveInput = inputPayload.moveInput;
-            Quaternion newRotation = inputPayload.rotation;
+            Quaternion newRotation = combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation;
 
             // Apply movement
             bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
