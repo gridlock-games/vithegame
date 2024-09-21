@@ -628,7 +628,6 @@ namespace Vi.Core.CombatAgents
 
             StartHitStop(attacker, isMeleeHit);
 
-            Debug.Log(HPDamage);
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
