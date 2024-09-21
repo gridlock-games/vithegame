@@ -29,12 +29,10 @@ namespace Vi.Core.MovementHandlers
 
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
-        protected CombatAgent combatAgent;
         protected override void Awake()
         {
             base.Awake();
             rb = GetComponentInChildren<Rigidbody>();
-            combatAgent = GetComponent<CombatAgent>();
             PooledObject pooledObject = GetComponent<PooledObject>();
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
