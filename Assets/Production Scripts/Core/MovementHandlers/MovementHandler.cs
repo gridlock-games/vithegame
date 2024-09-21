@@ -251,6 +251,7 @@ namespace Vi.Core.MovementHandlers
 		}
 
 		protected WeaponHandler weaponHandler;
+		protected CombatAgent combatAgent;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
@@ -259,6 +260,7 @@ namespace Vi.Core.MovementHandlers
 		{
 			path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
+			combatAgent = GetComponent<CombatAgent>();
 			playerInput = GetComponent<PlayerInput>();
 			if (playerInput)
             {
@@ -323,7 +325,7 @@ namespace Vi.Core.MovementHandlers
 			}
         }
 
-		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput; }
+		public void SetLookInput(Vector2 lookInput) { this.lookInput += lookInput * (combatAgent.StatusAgent.IsFeared() ? -1 : 1); }
 
         public Vector2 GetPlayerMoveInput()
 		{

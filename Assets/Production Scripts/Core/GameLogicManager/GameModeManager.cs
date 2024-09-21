@@ -33,7 +33,8 @@ namespace Vi.Core.GameModeManagers
             Respawn,
             DontRespawn,
             ResetStats,
-            ResetHP
+            ResetHP,
+            ResetHPAndRegenSpirit
         }
 
         [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
@@ -716,6 +717,21 @@ namespace Vi.Core.GameModeManagers
                                     {
                                         attributes.ResetStats(1, false, false, false);
                                         attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    }
+                                }
+                                break;
+                            case RespawnType.ResetHPAndRegenSpirit:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, false, false, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                        attributes.StartSpiritRegen();
                                     }
                                 }
                                 break;

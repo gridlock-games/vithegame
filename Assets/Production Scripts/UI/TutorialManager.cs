@@ -76,8 +76,10 @@ namespace Vi.UI
                 playerUI.GetBlockingButton().gameObject.SetActive(false);
                 playerUI.GetDodgeButton().gameObject.SetActive(false);
                 playerUI.GetMainPlayerCard().gameObject.SetActive(false);
-                playerUI.GetOnScreenReloadButton().gameObject.SetActive(false);
-                playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+                if (!weaponHandler.CanADS)
+                {
+                    playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+                }
 
                 playerUI.GetPauseMenuButton().gameObject.SetActive(false);
                 playerUI.GetScoreboardButton().gameObject.SetActive(false);

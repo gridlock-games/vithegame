@@ -151,6 +151,7 @@ namespace Vi.Core
 
         public bool IsAiming()
         {
+            if (!Animator) { return false; }
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
         }
 

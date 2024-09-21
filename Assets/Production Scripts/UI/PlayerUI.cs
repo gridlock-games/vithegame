@@ -471,7 +471,7 @@ namespace Vi.UI
                 attributes.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary ? attributes.LoadoutManager.PrimaryWeaponOption.weapon : attributes.LoadoutManager.SecondaryWeaponOption.weapon,
                 attributes.LoadoutManager.GetEquippedSlotType(), playerInput, controlsAsset); }
 
-            onScreenReloadButton.gameObject.SetActive(attributes.WeaponHandler.CanADS);
+            onScreenReloadButton.gameObject.SetActive(attributes.WeaponHandler.ShouldUseAmmo());
         }
 
         private void UpdateActiveUIElements()

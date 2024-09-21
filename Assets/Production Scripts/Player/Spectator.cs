@@ -401,26 +401,28 @@ namespace Vi.Player
             if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
-                PlayerInput playerInput = GetComponent<PlayerInput>();
-                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+                if (playerInput.currentActionMap != null)
                 {
-                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                    if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                     {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
-
-                        bool isTouchingJoystick = false;
-                        foreach (UIDeadZoneElement joystick in joysticks)
+                        foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
+
+                            bool isTouchingJoystick = false;
+                            foreach (UIDeadZoneElement joystick in joysticks)
                             {
-                                isTouchingJoystick = true;
-                                break;
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                {
+                                    isTouchingJoystick = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
-                        {
-                            lookInputToAdd += touch.delta;
+                            if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                            {
+                                lookInputToAdd += touch.delta;
+                            }
                         }
                     }
                 }
