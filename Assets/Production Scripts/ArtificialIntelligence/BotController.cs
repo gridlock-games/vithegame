@@ -82,11 +82,6 @@ namespace Vi.ArtificialIntelligence
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
         }
 
-        private void LateUpdate()
-        {
-            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
-        }
-
         private void EvaluateBotLogic()
         {
             if (IsServer)

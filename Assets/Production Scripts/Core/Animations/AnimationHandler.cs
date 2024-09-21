@@ -955,7 +955,7 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
-            if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
+            if (playActionOnClientCoroutine != null) { Debug.Log("Stopping action on client coroutine " + actionClipName + " " + weaponName + " " + name); StopCoroutine(playActionOnClientCoroutine); }
             playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
             WaitingForActionClipToPlay = false;
         }

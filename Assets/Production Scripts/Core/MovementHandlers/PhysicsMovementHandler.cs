@@ -94,6 +94,11 @@ namespace Vi.Core.MovementHandlers
             UpdateAnimatorParameters();
         }
 
+        protected virtual void LateUpdate()
+        {
+            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
+        }
+
         protected void UpdateAnimatorSpeed()
         {
             if (weaponHandler.CurrentActionClip != null)

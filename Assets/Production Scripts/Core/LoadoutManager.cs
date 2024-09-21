@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Unity.Collections;
 using Vi.Core.CombatAgents;
 using UnityEngine.InputSystem;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -88,9 +89,15 @@ namespace Vi.Core
             {
                 switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             }
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnSpawnFromPool += OnSpawnFromPool;
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
-        private void OnEnable()
+        private void OnSpawnFromPool()
         {
             foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
             {
@@ -107,7 +114,7 @@ namespace Vi.Core
             }
         }
 
-        private void OnDisable()
+        private void OnReturnToPool()
         {
             equippedEquipment.Clear();
         }
@@ -216,7 +223,7 @@ namespace Vi.Core
             primaryWeaponInstance = Instantiate(PrimaryWeaponOption.weapon);
             secondaryWeaponInstance = Instantiate(SecondaryWeaponOption.weapon);
 
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;
                 secondaryAmmo.Value = secondaryWeaponInstance.ShouldUseAmmo() ? secondaryWeaponInstance.GetMaxAmmoCount() : 0;
@@ -275,12 +282,12 @@ namespace Vi.Core
                 case 1:
                     combatAgent.WeaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     combatAgent.WeaponHandler.SetStowedWeapon(secondaryWeaponInstance);
-                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer & IsSpawned) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
                     combatAgent.WeaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     combatAgent.WeaponHandler.SetStowedWeapon(primaryWeaponInstance);
-                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer & IsSpawned) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");

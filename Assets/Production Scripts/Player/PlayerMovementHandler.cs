@@ -560,8 +560,6 @@ namespace Vi.Player
                 transform.position = Rigidbody.transform.position;
             }
 
-            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
-
             transform.rotation = EvaluateRotation();
         }
 
