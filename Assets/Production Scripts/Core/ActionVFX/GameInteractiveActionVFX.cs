@@ -61,9 +61,21 @@ namespace Vi.Core.VFX
             attackerNetworkObjectId.Value = attacker.NetworkObjectId;
         }
 
+        private List<ParticleSystem.MinMaxGradient> originalColors = new List<ParticleSystem.MinMaxGradient>();
+        protected override void Awake()
+        {
+            base.Awake();
+            foreach (ParticleSystem ps in teamColorParticleSystems)
+            {
+                var main = ps.main;
+                originalColors.Add(main.startColor);
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            bool displayingEnemyColors = false;
             CombatAgent attacker = GetAttacker();
             if (attacker)
             {
@@ -71,15 +83,22 @@ namespace Vi.Core.VFX
                 {
                     if (PlayerDataManager.CanHit(attacker.GetTeam(), PlayerDataManager.Singleton.LocalPlayerData.team))
                     {
-                        foreach (ParticleSystem ps in teamColorParticleSystems)
+                        for (int i = 0; i < teamColorParticleSystems.Length; i++)
                         {
-                            if (attacker)
-                            {
-                                var main = ps.main;
-                                main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
-                            }
+                            var main = teamColorParticleSystems[i].main;
+                            main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
+                            displayingEnemyColors = true;
                         }
                     }
+                }
+            }
+
+            if (!displayingEnemyColors)
+            {
+                for (int i = 0; i < teamColorParticleSystems.Length; i++)
+                {
+                    var main = teamColorParticleSystems[i].main;
+                    main.startColor = originalColors[i];
                 }
             }
         }

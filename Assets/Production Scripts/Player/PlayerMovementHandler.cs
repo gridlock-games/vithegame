@@ -147,7 +147,7 @@ namespace Vi.Player
                 // Now re-simulate the rest of the ticks up to the current tick on the client
                 Physics.simulationMode = SimulationMode.Script;
                 Rigidbody.position = latestServerState.Value.position;
-                Rigidbody.velocity = latestServerState.Value.velocity;
+                if (!Rigidbody.isKinematic) { Rigidbody.velocity = latestServerState.Value.velocity; }
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
@@ -309,7 +309,7 @@ namespace Vi.Player
             }
 
             Vector2 moveInput = inputPayload.moveInput;
-            Quaternion newRotation = inputPayload.rotation;
+            Quaternion newRotation = combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation;
 
             // Apply movement
             bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
@@ -537,7 +537,7 @@ namespace Vi.Player
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
+            if ((Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming()))
             {
                 float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
                 if (dist > serverReconciliationTeleportThreshold)
@@ -559,8 +559,6 @@ namespace Vi.Player
             {
                 transform.position = Rigidbody.transform.position;
             }
-
-            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
 
             transform.rotation = EvaluateRotation();
         }
@@ -747,7 +745,7 @@ namespace Vi.Player
                         }
                     }
                 }
-            lookInput += lookInputToAdd;
+            lookInput += lookInputToAdd * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
             }
 #endif
             UpdateTransform();

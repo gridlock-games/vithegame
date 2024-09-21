@@ -450,7 +450,14 @@ namespace Vi.Core
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
         public void AddPlayerObject(int clientId, Attributes playerObject)
         {
-            localPlayers.Add(clientId, playerObject);
+            if (localPlayers.ContainsKey(clientId))
+            {
+                Debug.LogError("Trying to add a local player that is already present. Client Id: " + clientId);
+            }
+            else
+            {
+                localPlayers.Add(clientId, playerObject);
+            }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
@@ -1205,7 +1212,10 @@ namespace Vi.Core
 
                         foreach (Attributes player in localPlayers.Values)
                         {
-                            if (player) { player.UpdateNetworkVisiblity(); }
+                            if (player)
+                            {
+                                player.UpdateNetworkVisiblity();
+                            }
                         }
                     }
                     break;
@@ -1220,7 +1230,7 @@ namespace Vi.Core
                             kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
 
                         // If there is a local player for this id, despawn it
-                        //if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
+                        if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
 
                         channelCounts[networkListEvent.Value.channel]--;
 

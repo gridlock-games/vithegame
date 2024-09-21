@@ -29,12 +29,10 @@ namespace Vi.Core.MovementHandlers
 
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
-        protected CombatAgent combatAgent;
         protected override void Awake()
         {
             base.Awake();
             rb = GetComponentInChildren<Rigidbody>();
-            combatAgent = GetComponent<CombatAgent>();
             PooledObject pooledObject = GetComponent<PooledObject>();
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
@@ -45,6 +43,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.SetParent(null, true);
             rb.rotation = Quaternion.identity;
             rb.transform.rotation = Quaternion.identity;
+            if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
         }
         
         protected virtual void OnReturnToPool()
@@ -53,17 +52,6 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localPosition = Vector3.zero;
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
         }
 
@@ -92,6 +80,11 @@ namespace Vi.Core.MovementHandlers
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
+        }
+
+        protected virtual void LateUpdate()
+        {
+            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
         }
 
         protected void UpdateAnimatorSpeed()

@@ -19,6 +19,11 @@ namespace Vi.ArtificialIntelligence
             targetFinder = GetComponent<GameplayTargetFinder>();
         }
 
+        protected override void OnDisable()
+        {
+            isHeavyAttacking = default;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -63,7 +68,7 @@ namespace Vi.ArtificialIntelligence
                     }
                 }
                 else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                    return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                    return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3 * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
 
                 return transform.rotation;
             }
@@ -80,11 +85,6 @@ namespace Vi.ArtificialIntelligence
             base.RefreshStatus();
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
             canOnlyLightAttack = FasterPlayerPrefs.Singleton.GetBool("BotsCanOnlyLightAttack");
-        }
-
-        private void LateUpdate()
-        {
-            if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
         }
 
         private void EvaluateBotLogic()

@@ -46,12 +46,28 @@ namespace Vi.Core
 
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
-            StartCoroutine(SwapAnimatorController());
+
+            if (combatAgent.AnimationHandler.IsAiming())
+            {
+                if (gameObject.activeInHierarchy)
+                {
+                    StartCoroutine(SwapAnimatorControllerAfterNotAiming());
+                }
+                else
+                {
+                    Debug.LogError("Cannot swap animator controller in coroutine because object is inactive");
+                }
+            }
+            else
+            {
+                combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
+            }
+            
             EquipWeapon();
             WeaponInitialized = true;
         }
 
-        private IEnumerator SwapAnimatorController()
+        private IEnumerator SwapAnimatorControllerAfterNotAiming()
         {
             yield return new WaitUntil(() => !combatAgent.AnimationHandler.IsAiming());
             combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;

@@ -96,7 +96,10 @@ namespace Vi.Core
             }
             else if (current > prev)
             {
-                GlowRenderer.RenderHeal();
+                if (GlowRenderer)
+                {
+                    GlowRenderer.RenderHeal();
+                }
             }
         }
 
@@ -583,22 +586,43 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
 
-            GlowRenderer.RenderHit();
-
+            if (GlowRenderer)
+            {
+                GlowRenderer.RenderHit();
+            }
+            else
+            {
+                Debug.LogError("No Glow Renderer! " + this);
+                return;
+            }
             RenderHitGlowOnlyClientRpc();
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitGlowOnlyClientRpc()
         {
-            GlowRenderer.RenderHit();
+            if (GlowRenderer)
+            {
+                GlowRenderer.RenderHit();
+            }
+            else
+            {
+                Debug.LogError("No Glow Renderer! " + this);
+            }
         }
 
         protected void RenderBlock(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderBlock() should only be called from the server"); return; }
 
-            GlowRenderer.RenderBlock();
+            if (GlowRenderer)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                Debug.LogError("No Glow Renderer! " + this);
+            }
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
 
@@ -608,7 +632,14 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderBlockClientRpc(Vector3 impactPosition, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
-            GlowRenderer.RenderBlock();
+            if (GlowRenderer)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                Debug.LogError("No Glow Renderer! " + this);
+            }
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
             AudioManager.Singleton.PlayClipAtPoint(gameObject, GetBlockingHitSoundEffect(attackingWeaponMaterial), impactPosition, Weapon.hitSoundEffectVolume);
         }

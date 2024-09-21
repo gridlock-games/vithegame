@@ -65,21 +65,13 @@ namespace Vi.Utility
         {
             IsSpawned = true;
             ObjectPoolingManager.AddSpawnedObjectToActivePool(this);
+            gameObject.hideFlags = HideFlags.None;
         }
 
         private void OnReturn()
         {
             ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
             IsSpawned = false;
-        }
-
-        private void OnEnable()
-        {
-            gameObject.hideFlags = HideFlags.None;
-        }
-
-        private void OnDisable()
-        {
             gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
         }
 
