@@ -745,7 +745,7 @@ namespace Vi.Player
                         }
                     }
                 }
-            lookInput += lookInputToAdd;
+            lookInput += lookInputToAdd * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
             }
 #endif
             UpdateTransform();
