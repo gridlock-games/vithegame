@@ -450,7 +450,14 @@ namespace Vi.Core
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
         public void AddPlayerObject(int clientId, Attributes playerObject)
         {
-            localPlayers.Add(clientId, playerObject);
+            if (localPlayers.ContainsKey(clientId))
+            {
+                Debug.LogError("Trying to add a local player that is already present. Client Id: " + clientId);
+            }
+            else
+            {
+                localPlayers.Add(clientId, playerObject);
+            }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }

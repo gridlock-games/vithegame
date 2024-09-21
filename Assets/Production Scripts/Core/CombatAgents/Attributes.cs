@@ -119,18 +119,10 @@ namespace Vi.Core.CombatAgents
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
             base.OnNetworkSpawn();
 
-            if (IsServer)
-            {
-                StartCoroutine(InitStats());
-                StartCoroutine(SetNetworkVisibilityAfterSpawn());
-            }
-
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             isRaging.OnValueChanged += OnIsRagingChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
-
-            StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
 
@@ -152,16 +144,27 @@ namespace Vi.Core.CombatAgents
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (NetworkManager.Singleton.IsServer)
+            {
+                UpdateNetworkVisiblity();
+                StartCoroutine(InitStats());
+            }
+            StartCoroutine(AddPlayerObjectToPlayerDataManager());
+        }
+
         public void UpdateNetworkVisiblity()
         {
-            if (!IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
             if (!gameObject.activeInHierarchy) { return; }
             StartCoroutine(SetNetworkVisibilityAfterSpawn());
         }
 
         private IEnumerator SetNetworkVisibilityAfterSpawn()
         {
-            if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
             yield return null;
             if (!IsSpawned) { yield return new WaitUntil(() => IsSpawned); }
 
@@ -193,13 +196,16 @@ namespace Vi.Core.CombatAgents
 
         private IEnumerator InitStats()
         {
-            yield return new WaitUntil(() => WeaponHandler.GetWeapon() != null);
+            if (!NetworkManager.Singleton.IsServer) { yield break; }
+            yield return new WaitUntil(() => IsSpawned);
+            yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = WeaponHandler.GetWeapon().GetMaxHP();
             spirit.Value = WeaponHandler.GetWeapon().GetMaxSpirit();
         }
 
         private IEnumerator AddPlayerObjectToPlayerDataManager()
         {
+            yield return new WaitUntil(() => IsSpawned);
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
             PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
@@ -911,7 +917,7 @@ namespace Vi.Core.CombatAgents
                     if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
                         GameObject instance = WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
-                        StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
+                        PersistentLocalObjects.Singleton.StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
                     }
                 }
             }

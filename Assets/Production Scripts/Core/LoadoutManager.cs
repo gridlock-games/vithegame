@@ -96,6 +96,15 @@ namespace Vi.Core
             {
                 equippedEquipment.Add(equipmentType, null);
             }
+
+            if (combatAgent is Attributes attributes)
+            {
+                if (PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId()))
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                    ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetActiveLoadout(), playerData.character._id.ToString());
+                }
+            }
         }
 
         private void OnDisable()
@@ -130,7 +139,14 @@ namespace Vi.Core
         public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn = false)
         {
             if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
-            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
+            if (gameObject.activeInHierarchy)
+            {
+                applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
+            }
+            else
+            {
+                Debug.LogError("Trying to apply a loadout to an inactive object " + this);
+            }
         }
 
         private bool canApplyLoadoutThisFrame;
@@ -205,6 +221,8 @@ namespace Vi.Core
                 primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;
                 secondaryAmmo.Value = secondaryWeaponInstance.ShouldUseAmmo() ? secondaryWeaponInstance.GetMaxAmmoCount() : 0;
             }
+
+            if (!animationHandler.Animator) { yield return new WaitUntil(() => animationHandler.Animator); }
 
             OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
 

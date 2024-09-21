@@ -151,6 +151,7 @@ namespace Vi.Core
 
         public bool IsAiming()
         {
+            if (!Animator) { return false; }
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
         }
 
@@ -1194,6 +1195,13 @@ namespace Vi.Core
         private void OnEnable()
         {
             SetRagdollActive(false);
+            if (IsSpawned)
+            {
+                if (combatAgent is Attributes attributes)
+                {
+                    StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
+                }
+            }
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }

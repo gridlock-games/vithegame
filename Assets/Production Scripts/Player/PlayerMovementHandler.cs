@@ -537,7 +537,7 @@ namespace Vi.Player
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
+            if ((Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming()) | combatAgent.AnimationHandler.ShouldApplyRootMotion())
             {
                 float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
                 if (dist > serverReconciliationTeleportThreshold)
