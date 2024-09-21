@@ -263,6 +263,12 @@ namespace Vi.Core.CombatAgents
             }
         }
 
+        public void StartSpiritRegen()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.StartSpiritRegen() should only be called on the server!"); return; }
+            spiritRegenActivateTime = Time.time;
+        }
+
         private const float rageEndPercent = 0.01f;
 
         [SerializeField] private PooledObject rageAtMaxVFXPrefab;
