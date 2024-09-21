@@ -108,6 +108,14 @@ namespace Vi.Core
         private void OnReturnToPool()
         {
             equippedEquipment.Clear();
+
+            PrimaryWeaponOption = default;
+            primaryWeaponInstance = default;
+            
+            SecondaryWeaponOption = default;
+            secondaryWeaponInstance = default;
+
+            WeaponNameThatCanFlashAttack = default;
         }
 
         public override void OnNetworkSpawn()
@@ -175,8 +183,6 @@ namespace Vi.Core
         {
             if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
-            //CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
             if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
@@ -186,12 +192,20 @@ namespace Vi.Core
                 {
                     PrimaryWeaponOption = weaponOption;
                 }
+                else
+                {
+                    Debug.LogError("Could not find primary weapon option for inventory id: " + loadout.weapon1ItemId + " for character id: " + characterId);
+                }
             }
             if (PrimaryWeaponOption == null)
             {
                 if (weaponOptions.TryGetValue(loadout.weapon1ItemId.ToString(), out CharacterReference.WeaponOption weaponOption))
                 {
                     PrimaryWeaponOption = weaponOption;
+                }
+                else
+                {
+                    Debug.LogError("Could not find primary weapon option for generic item id: " + loadout.weapon1ItemId + " for character id: " + characterId);
                 }
             }
 
@@ -202,12 +216,20 @@ namespace Vi.Core
                 {
                     SecondaryWeaponOption = weaponOption;
                 }
+                else
+                {
+                    Debug.LogError("Could not find secondary weapon option for inventory id: " + loadout.weapon1ItemId + " for character id: " + characterId);
+                }
             }
             if (SecondaryWeaponOption == null)
             {
                 if (weaponOptions.TryGetValue(loadout.weapon2ItemId.ToString(), out CharacterReference.WeaponOption weaponOption))
                 {
                     SecondaryWeaponOption = weaponOption;
+                }
+                else
+                {
+                    Debug.LogError("Could not find secondary weapon option for generic item id: " + loadout.weapon1ItemId + " for character id: " + characterId);
                 }
             }
 

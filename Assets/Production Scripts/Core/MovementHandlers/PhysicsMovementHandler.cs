@@ -45,6 +45,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.SetParent(null, true);
             rb.rotation = Quaternion.identity;
             rb.transform.rotation = Quaternion.identity;
+            if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
         }
         
         protected virtual void OnReturnToPool()
@@ -53,17 +54,6 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localPosition = Vector3.zero;
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
         }
 
