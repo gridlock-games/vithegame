@@ -130,7 +130,7 @@ namespace Vi.UI
             }
         }
 
-        [SerializeField] private GameObject abilityPreviewParent;
+        [SerializeField] private Image abilityPreviewBackground;
         [SerializeField] private Text videoOverlayText;
         [SerializeField] private VideoPlayer abilityPreviewVideoPlayer;
         [SerializeField] private RawImage abilityPreviewRawImage;
@@ -140,6 +140,7 @@ namespace Vi.UI
         {
             if (videoRunning) { yield break; }
             videoRunning = true;
+            abilityPreviewBackground.enabled = true;
             if (abilityPreviewVideo == null) // Show "no preview video"
             {
                 if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
@@ -168,24 +169,32 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            abilityPreviewParent.transform.localScale = Vector3.zero;
+            abilityPreviewVideoPlayer.transform.localScale = Vector3.zero;
         }
 
         private const float videoUIAnimationSpeed = 3;
         private void Update()
         {
-            abilityPreviewParent.transform.localScale = Vector3.MoveTowards(abilityPreviewParent.transform.localScale, videoRunning ? Vector3.one : Vector3.zero, Time.deltaTime * videoUIAnimationSpeed);
+            abilityPreviewVideoPlayer.transform.localScale = Vector3.MoveTowards(abilityPreviewVideoPlayer.transform.localScale, videoRunning ? Vector3.one : Vector3.zero, Time.deltaTime * videoUIAnimationSpeed);
         }
 
         public void CloseAbilityPreviewWindow()
         {
-            StartCoroutine(StopVideoPlayer());
-            videoRunning = false;
+            if (videoRunning)
+            {
+                StartCoroutine(StopVideoPlayer());
+                abilityPreviewBackground.enabled = false;
+                videoRunning = false;
+            }
+            else
+            {
+                GoBackToLastMenu();
+            }
         }
 
         private IEnumerator StopVideoPlayer()
         {
-            yield return new WaitUntil(() => abilityPreviewParent.transform.localScale == Vector3.zero);
+            yield return new WaitUntil(() => abilityPreviewVideoPlayer.transform.localScale == Vector3.zero);
             if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
         }
 
