@@ -15,8 +15,9 @@ namespace Vi.Core.Structures
 
         public Collider[] Colliders { get; private set; }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             Colliders = GetComponentsInChildren<Collider>();
 
             List<Collider> networkPredictionLayerColliders = new List<Collider>();
@@ -57,6 +58,9 @@ namespace Vi.Core.Structures
 
         public void AddHP(float amount)
         {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
             if (amount > 0)
             {
                 if (HP.Value < GetMaxHP())
@@ -79,6 +83,9 @@ namespace Vi.Core.Structures
 
         protected float AddHPWithoutApply(float amount)
         {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
             if (amount > 0)
             {
                 if (HP.Value < GetMaxHP())

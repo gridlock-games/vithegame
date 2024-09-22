@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 namespace Vi.Core
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(StatusAgent))]
     public abstract class HittableAgent : NetworkBehaviour, IHittable
     {
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
@@ -16,5 +17,11 @@ namespace Vi.Core
 
         public abstract string GetName();
         public abstract PlayerDataManager.Team GetTeam();
+
+        public StatusAgent StatusAgent { get; private set; }
+        protected virtual void Awake()
+        {
+            StatusAgent = GetComponent<StatusAgent>();
+        }
     }
 }

@@ -10,7 +10,6 @@ using Vi.Core.VFX;
 
 namespace Vi.Core
 {
-    [RequireComponent(typeof(StatusAgent))]
     [RequireComponent(typeof(AnimationHandler))]
     [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
@@ -104,15 +103,14 @@ namespace Vi.Core
             }
         }
 
-        public StatusAgent StatusAgent { get; private set; }
         public AnimationHandler AnimationHandler { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
         public GlowRenderer GlowRenderer { get; private set; }
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            StatusAgent = GetComponent<StatusAgent>();
+            base.Awake();
             AnimationHandler = GetComponent<AnimationHandler>();
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
