@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -1657,7 +1658,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.2
+  attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 0.7
   isAffectedByRage: 1
   damage: 10
@@ -1667,16 +1668,16 @@ MonoBehaviour:
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 2
-  timeBetweenHits: 0.05
+  timeBetweenHits: 0.2
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
+  ailment: 5
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
-  ailmentHitDefinition: 
+  ailmentHitDefinition: 0100
   dodgeLock: 2
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -1708,3 +1709,4 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
