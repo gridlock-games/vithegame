@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core
 {
@@ -1263,6 +1264,54 @@ namespace Vi.Core
         {
             if (!animatorReference) { return; }
             animatorReference.SetRagdollActive(isActive);
+        }
+
+        public void Explode()
+        {
+            SkinnedMeshRenderer skinnedMeshRenderer = Animator.GetComponentInChildren<SkinnedMeshRenderer>();
+            skinnedMeshRenderer.forceRenderingOff = true;
+            foreach (GameObject slice in Slice(skinnedMeshRenderer.gameObject, skinnedMeshRenderer, skinnedMeshRenderer.sharedMesh))
+            {
+                foreach (GameObject slice2 in Slice(slice, slice.GetComponent<MeshRenderer>(), slice.GetComponent<MeshFilter>().mesh))
+                {
+                    Slice(slice2, slice2.GetComponent<MeshRenderer>(), slice2.GetComponent<MeshFilter>().mesh);
+                }
+            }
+        }
+
+        private GameObject[] Slice(GameObject target, Renderer renderer, Mesh mesh)
+        {
+            Vector3 enterTipPosition = target.transform.position + target.transform.forward;
+            Vector3 enterBasePosition = enterTipPosition + target.transform.up;
+            Vector3 exitPosition = target.transform.position + target.transform.forward * -1;
+
+            //Create a triangle between the tip and base so that we can get the normal
+            Vector3 side1 = exitPosition - enterTipPosition;
+            Vector3 side2 = exitPosition - enterBasePosition;
+
+            //Get the point perpendicular to the triangle above which is the normal
+            //https://docs.unity3d.com/Manual/ComputingNormalPerpendicularVector.html
+            Vector3 normal = Vector3.Cross(side1, side2).normalized;
+
+            //Transform the normal so that it is aligned with the object we are slicing's transform.
+            Vector3 transformedNormal = ((Vector3)(target.transform.localToWorldMatrix.transpose * normal)).normalized;
+
+            //Get the enter position relative to the object we're cutting's local transform
+            Vector3 transformedStartingPoint = target.transform.InverseTransformPoint(enterTipPosition);
+
+            Plane plane = new Plane();
+            plane.SetNormalAndPosition(transformedNormal, transformedStartingPoint);
+
+            var direction = Vector3.Dot(Vector3.up, transformedNormal);
+
+            //Flip the plane so that we always know which side the positive mesh is on
+            if (direction < 0)
+            {
+                plane = plane.flipped;
+            }
+
+            GameObject[] gameObjects = Slicer.Slice(plane, mesh, target.GetComponent<Sliceable>(), renderer);
+            return gameObjects;
         }
     }
 }

@@ -460,6 +460,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6521274172253471834}
+    - targetCorrespondingSourceObject: {fileID: 5049981188894308399, guid: a98ac1638982bbe42ad2022c946124e7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 736387510213238538}
     - targetCorrespondingSourceObject: {fileID: 7895900965132361373, guid: a98ac1638982bbe42ad2022c946124e7,
         type: 3}
       insertIndex: -1
@@ -741,6 +745,29 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5709689796492806037}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &660278434006794170 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5049981188894308399, guid: a98ac1638982bbe42ad2022c946124e7,
+    type: 3}
+  m_PrefabInstance: {fileID: 5709689796492806037}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &736387510213238538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 660278434006794170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bdf33838d7ef2246bd877b8583359df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSolid: 1
+  _reverseWindTriangles: 0
+  _useGravity: 1
+  _shareVertices: 0
+  _smoothVertices: 0
 --- !u!4 &1211589420604469407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6912052045706983178, guid: a98ac1638982bbe42ad2022c946124e7,

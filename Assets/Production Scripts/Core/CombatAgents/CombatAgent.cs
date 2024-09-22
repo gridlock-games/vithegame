@@ -490,6 +490,7 @@ namespace Vi.Core
                 case DeathBehavior.Ragdoll:
                     break;
                 case DeathBehavior.Explode:
+                    AnimationHandler.Explode();
                     break;
                 default:
                     Debug.LogError("Unsure how to handle death behavior " + deathBehavior + " " + this);
