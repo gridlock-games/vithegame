@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.MovementHandlers;
+using Vi.Core.VFX;
 
 namespace Vi.Core
 {
@@ -428,7 +429,73 @@ namespace Vi.Core
             }
         }
 
-        protected virtual void OnDeath() { }
+        private enum DeathBehavior
+        {
+            Ragdoll,
+            Explode
+        }
+
+        [SerializeField] private DeathBehavior deathBehavior = DeathBehavior.Ragdoll;
+        [SerializeField] private ActionVFX deathVFX;
+        [SerializeField] private ActionClip deathVFXAttack;
+        protected virtual void OnDeath()
+        {
+            if (deathVFX)
+            {
+                GameObject vfxInstance;
+                (SpawnPoints.TransformData orientation, Transform parent) = WeaponHandler.GetActionVFXOrientation(deathVFXAttack, deathVFX, false, transform);
+                if (deathVFX.TryGetComponent(out PooledObject pooledObject))
+                {
+                    vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, orientation.position, orientation.rotation, parent).gameObject;
+                }
+                else
+                {
+                    vfxInstance = Instantiate(pooledObject, orientation.position, orientation.rotation, parent).gameObject;
+                    Debug.LogError("ActionVFX doesn't have a pooled object! " + deathVFX);
+                }
+
+                if (vfxInstance)
+                {
+                    if (!IsServer) { Debug.LogError("You can only spawn action VFX on server!"); return; }
+
+                    if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
+                    {
+                        gameInteractiveActionVFX.InitializeVFX(this, deathVFXAttack);
+                    }
+
+                    if (vfxInstance.TryGetComponent(out NetworkObject netObj))
+                    {
+                        if (netObj.IsSpawned)
+                        {
+                            Debug.LogError("Trying to spawn an action VFX instance that is already spawned " + vfxInstance);
+                        }
+                        else
+                        {
+                            netObj.Spawn(true);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
+                    }
+                }
+                else if (deathVFX.transformType != ActionVFX.TransformType.ConformToGround)
+                {
+                    Debug.LogError("No vfx instance spawned for this prefab! " + deathVFX);
+                }
+            }
+
+            switch (deathBehavior)
+            {
+                case DeathBehavior.Ragdoll:
+                    break;
+                case DeathBehavior.Explode:
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle death behavior " + deathBehavior + " " + this);
+                    break;
+            }
+        }
 
         private IEnumerator ClearDamageMappingAfter1Frame()
         {
