@@ -14,71 +14,17 @@ namespace Vi.Core
     [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
     {
-        protected NetworkVariable<float> HP = new NetworkVariable<float>();
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
         protected NetworkVariable<float> spirit = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
-        public float GetHP() { return HP.Value; }
         public float GetStamina() { return stamina.Value; }
         public float GetSpirit() { return spirit.Value; }
         public float GetRage() { return rage.Value; }
 
-        public abstract float GetMaxHP();
         public abstract float GetMaxStamina();
         public abstract float GetMaxSpirit();
         public abstract float GetMaxRage();
-
-        public void AddHP(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    HP.Value += amount;
-                }
-                else
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-        }
-
-        protected float AddHPWithoutApply(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    return HP.Value + amount;
-                }
-                else
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            return HP.Value;
-        }
 
         public virtual void AddStamina(float amount, bool activateCooldown = true) { }
 

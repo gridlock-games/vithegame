@@ -11,23 +11,23 @@ namespace Vi.Core.VFX
         [SerializeField] private bool shouldAffectTeammates;
         [SerializeField] private bool shouldAffectEnemies = true;
 
-        protected bool ShouldAffect(CombatAgent combatAgent)
+        protected bool ShouldAffect(HittableAgent hittableAgent)
         {
             bool shouldAffect = false;
-            if (combatAgent == GetAttacker())
+            if (hittableAgent == GetAttacker())
             {
                 if (shouldAffectSelf) { shouldAffect = true; }
             }
             else
             {
-                bool canHit = PlayerDataManager.Singleton.CanHit(combatAgent, GetAttacker());
+                bool canHit = PlayerDataManager.Singleton.CanHit(hittableAgent, GetAttacker());
                 if (shouldAffectEnemies & canHit) { shouldAffect = true; }
                 if (shouldAffectTeammates & !canHit) { shouldAffect = true; }
             }
 
             if (spellType == SpellType.GroundSpell)
             {
-                if (combatAgent.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
+                if (hittableAgent.StatusAgent.IsImmuneToGroundSpells()) { shouldAffect = false; }
             }
             return shouldAffect;
         }

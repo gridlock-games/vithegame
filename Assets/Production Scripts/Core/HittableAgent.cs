@@ -23,5 +23,61 @@ namespace Vi.Core
         {
             StatusAgent = GetComponent<StatusAgent>();
         }
+
+        protected NetworkVariable<float> HP = new NetworkVariable<float>();
+        public float GetHP() { return HP.Value; }
+
+        public abstract float GetMaxHP();
+
+        public void AddHP(float amount)
+        {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
+            if (amount > 0)
+            {
+                if (HP.Value < GetMaxHP())
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > GetMaxHP())
+                {
+                    HP.Value += amount;
+                }
+                else
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+        }
+
+        protected float AddHPWithoutApply(float amount)
+        {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
+            if (amount > 0)
+            {
+                if (HP.Value < GetMaxHP())
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > GetMaxHP())
+                {
+                    return HP.Value + amount;
+                }
+                else
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            return HP.Value;
+        }
     }
 }
