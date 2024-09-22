@@ -292,6 +292,7 @@ namespace Vi.Core
         Animator animator;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
+        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; }
 
         private void Awake()
         {
@@ -310,6 +311,7 @@ namespace Vi.Core
             }
 
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
+            SkinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
         }
 
         CombatAgent combatAgent;
@@ -319,8 +321,7 @@ namespace Vi.Core
             combatAgent = GetComponentInParent<CombatAgent>();
             if (combatAgent) { animationHandler = combatAgent.GetComponent<AnimationHandler>(); }
 
-            SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
             }
@@ -330,7 +331,7 @@ namespace Vi.Core
         private IEnumerator TurnRenderersBackOn()
         {
             yield return null;
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
             }

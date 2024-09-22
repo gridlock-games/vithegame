@@ -1266,16 +1266,37 @@ namespace Vi.Core
             animatorReference.SetRagdollActive(isActive);
         }
 
-        public void Explode()
+        private Coroutine explosionCoroutine;
+        public void Explode(float explosionDelay)
         {
-            SkinnedMeshRenderer skinnedMeshRenderer = Animator.GetComponentInChildren<SkinnedMeshRenderer>();
-            skinnedMeshRenderer.forceRenderingOff = true;
-            foreach (GameObject slice in Slice(skinnedMeshRenderer.gameObject, skinnedMeshRenderer, skinnedMeshRenderer.sharedMesh))
+            if (explosionCoroutine != null) { RemoveExplosion(); }
+            explosionCoroutine = StartCoroutine(ExplosionDelay(explosionDelay));
+
+            //foreach (GameObject slice in Slice(skinnedMeshRenderer.gameObject, skinnedMeshRenderer, skinnedMeshRenderer.sharedMesh))
+            //{
+            //    foreach (GameObject slice2 in Slice(slice, slice.GetComponent<MeshRenderer>(), slice.GetComponent<MeshFilter>().mesh))
+            //    {
+            //        Slice(slice2, slice2.GetComponent<MeshRenderer>(), slice2.GetComponent<MeshFilter>().mesh);
+            //    }
+            //}
+        }
+
+        private IEnumerator ExplosionDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
-                foreach (GameObject slice2 in Slice(slice, slice.GetComponent<MeshRenderer>(), slice.GetComponent<MeshFilter>().mesh))
-                {
-                    Slice(slice2, slice2.GetComponent<MeshRenderer>(), slice2.GetComponent<MeshFilter>().mesh);
-                }
+                skinnedMeshRenderer.forceRenderingOff = true;
+            }
+        }
+
+        public void RemoveExplosion()
+        {
+            if (explosionCoroutine != null) { StopCoroutine(explosionCoroutine); }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = false;
             }
         }
 

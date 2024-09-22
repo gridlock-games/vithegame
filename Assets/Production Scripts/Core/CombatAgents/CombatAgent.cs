@@ -416,16 +416,15 @@ namespace Vi.Core
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
-                OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 if (IsServer) { isRaging.Value = false; }
-                AnimationHandler.SetRagdollActive(true);
+                OnDeath();
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
-                AnimationHandler.SetRagdollActive(false);
+                OnAlive();
             }
         }
 
@@ -435,7 +434,24 @@ namespace Vi.Core
             Explode
         }
 
+        protected virtual void OnAlive()
+        {
+            switch (deathBehavior)
+            {
+                case DeathBehavior.Ragdoll:
+                    AnimationHandler.SetRagdollActive(false);
+                    break;
+                case DeathBehavior.Explode:
+                    AnimationHandler.RemoveExplosion();
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle death behavior in OnAlive() " + deathBehavior + " " + this);
+                    break;
+            }
+        }
+
         [SerializeField] private DeathBehavior deathBehavior = DeathBehavior.Ragdoll;
+        [SerializeField] private float deathExplosionDelay;
         [SerializeField] private ActionVFX deathVFX;
         [SerializeField] private ActionClip deathVFXAttack;
         protected virtual void OnDeath()
@@ -488,12 +504,13 @@ namespace Vi.Core
             switch (deathBehavior)
             {
                 case DeathBehavior.Ragdoll:
+                    AnimationHandler.SetRagdollActive(true);
                     break;
                 case DeathBehavior.Explode:
-                    AnimationHandler.Explode();
+                    AnimationHandler.Explode(deathExplosionDelay);
                     break;
                 default:
-                    Debug.LogError("Unsure how to handle death behavior " + deathBehavior + " " + this);
+                    Debug.LogError("Unsure how to handle death behavior in OnDeath() " + deathBehavior + " " + this);
                     break;
             }
         }
