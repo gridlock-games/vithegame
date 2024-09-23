@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using UnityEngine.AI;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.MovementHandlers
 {
@@ -60,7 +61,7 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3 * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
             return transform.rotation;
         }
@@ -327,19 +328,31 @@ namespace Vi.Core.MovementHandlers
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
+        [Header("Light Attack")]
         [SerializeField] private float lightAttackDistance = 2.5f;
 
+        [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
         [SerializeField] private float ability1DistanceMin = 8;
         [SerializeField] private float ability1DistanceMax = 10;
+
+        [Header("Suicide")]
+        [SerializeField] private bool canSuicide;
+        [SerializeField] private float suicideDistance;
+
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+            if (combatAgent.StatusAgent.IsFeared()) { return; }
 
             if (targetFinder.GetTarget())
             {
                 float dist = Vector3.Distance(Destination, transform.position);
-                if (dist < lightAttackDistance)
+                if (dist < suicideDistance & canSuicide)
+                {
+                    combatAgent.ProcessEnvironmentDamage(-combatAgent.GetHP(), NetworkObject);
+                }
+                else if (dist < lightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
                 }

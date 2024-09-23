@@ -382,7 +382,7 @@ namespace Vi.Core
             return previewInstance.gameObject;
         }
 
-        private (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, bool isPreviewVFX, Transform attackerTransform, Transform victimTransform = null)
+        public (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, bool isPreviewVFX, Transform attackerTransform, Transform victimTransform = null)
         {
             SpawnPoints.TransformData orientation = new SpawnPoints.TransformData();
             Transform parent = null;
@@ -512,7 +512,7 @@ namespace Vi.Core
 
             if (vfxInstance)
             {
-                if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
+                if (!IsServer) { Debug.LogError("You can only spawn action VFX on server!"); return null; }
                 
                 if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
                 {

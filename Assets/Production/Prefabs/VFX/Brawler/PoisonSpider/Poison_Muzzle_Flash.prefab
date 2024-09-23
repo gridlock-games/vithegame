@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
@@ -68,6 +69,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1780119480876967913}
+    - targetCorrespondingSourceObject: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 912351942762333782}
+    - targetCorrespondingSourceObject: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2917092877677769101}
+    - targetCorrespondingSourceObject: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4627992225257090974}
   m_SourcePrefab: {fileID: 100100000, guid: 0b6dcd10faba2cc43aedfca95317d904, type: 3}
 --- !u!1 &3598318320124570937 stripped
 GameObject:
@@ -95,7 +115,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
 --- !u!114 &912351942762333782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,10 +159,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40f51036a5153ef4fac80bddfac2e177, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 2}
+  vfxPositionOffset: {x: 0, y: 1, z: 1.2}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 2
+  transformType: 0
   onActivateVFXSpawnNormalizedTime: 0.7
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}

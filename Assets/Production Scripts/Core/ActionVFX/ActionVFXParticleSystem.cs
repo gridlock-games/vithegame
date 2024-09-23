@@ -84,31 +84,31 @@ namespace Vi.Core.VFX
             }
         }
 
-        private bool CanHit(CombatAgent combatAgent)
+        private bool CanHit(HittableAgent hittableAgent)
         {
             if (!IsSpawned) { return false; }
             if (!IsServer) { Debug.LogError("ActionVFXParticleSystem.CanHit() should only be called on the server!"); return false; }
 
-            if (!ShouldAffect(combatAgent)) { return false; }
+            if (!ShouldAffect(hittableAgent)) { return false; }
 
             bool canHit = true;
-            if (hitCounter.ContainsKey(combatAgent))
+            if (hitCounter.ContainsKey(hittableAgent))
             {
-                if (hitCounter[combatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : GetAttack().maxHitLimit)) { canHit = false; }
-                if (Time.time - hitCounter[combatAgent].timeOfHit < GetAttack().GetTimeBetweenHits(1)) { canHit = false; }
+                if (hitCounter[hittableAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : GetAttack().maxHitLimit)) { canHit = false; }
+                if (Time.time - hitCounter[hittableAgent].timeOfHit < GetAttack().GetTimeBetweenHits(1)) { canHit = false; }
             }
 
             if (spellType == SpellType.GroundSpell)
             {
-                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), combatAgent))
+                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), hittableAgent))
                 {
-                    if (combatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                    if (hittableAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                 }
             }
             return canHit;
         }
 
-        private void ProcessHit(IHittable hittable, Vector3 impactPosition)
+        private void ProcessHit(HittableAgent hittable, Vector3 impactPosition)
         {
             if (hittable.ProcessProjectileHit(GetAttacker(), null, hitCounter, GetAttack(), impactPosition, shouldUseAttackerPositionForHitAngles ? GetAttacker().transform.position : transform.position))
             {
@@ -133,7 +133,7 @@ namespace Vi.Core.VFX
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
                 if (other.isTrigger) { return; }
-                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider) | other.transform.root.TryGetComponent(out IHittable hittable))
                 {
                     foreach (ParticleSystem ps in particleSystems)
                     {
@@ -167,6 +167,13 @@ namespace Vi.Core.VFX
                         }
                     }
                 }
+                else if (other.transform.root.TryGetComponent(out HittableAgent hittable))
+                {
+                    if (CanHit(hittable))
+                    {
+                        ProcessHit(hittable, other.ClosestPointOnBounds(transform.position));
+                    }
+                }
             }
         }
 
@@ -186,6 +193,13 @@ namespace Vi.Core.VFX
                         {
                             ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
                         }
+                    }
+                }
+                else if (other.transform.root.TryGetComponent(out HittableAgent hittable))
+                {
+                    if (CanHit(hittable))
+                    {
+                        ProcessHit(hittable, other.ClosestPointOnBounds(transform.position));
                     }
                 }
             }
@@ -239,6 +253,13 @@ namespace Vi.Core.VFX
                             }
                         }
                     }
+                    else if (col.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+                    {
+                        if (CanHit(hittableAgent))
+                        {
+                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
+                        }
+                    }
                 }
             }
 
@@ -258,6 +279,13 @@ namespace Vi.Core.VFX
                             {
                                 ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(inside[particleIndex].position));
                             }
+                        }
+                    }
+                    else if (col.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+                    {
+                        if (CanHit(hittableAgent))
+                        {
+                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
                         }
                     }
                 }

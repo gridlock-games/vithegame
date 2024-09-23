@@ -6,11 +6,78 @@ using System.IO;
 using Unity.Netcode;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using Vi.Core.MeshSlicing;
+using System.Linq;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Generate Exploded Meshes")]
+        static void GenerateExplodedMeshes()
+        {
+            Mesh mesh = (Mesh)Selection.activeObject;
+            if (!mesh) { Debug.LogError("Please select a mesh to explode"); return; }
+
+            GameObject root = new GameObject("Root");
+
+            SkinnedMeshRenderer skinnedMeshRenderer = root.AddComponent<SkinnedMeshRenderer>();
+            skinnedMeshRenderer.sharedMesh = mesh;
+            root.AddComponent<Sliceable>();
+
+            List<GameObject> objectsToSlice = Slicer.RandomSlice(root).ToList();
+            DestroyImmediate(root);
+
+            bool canceled = false;
+            int sliceCount = 5;
+            for (int i = 0; i < sliceCount; i++)
+            {
+                GameObject[] copy = objectsToSlice.ToArray();
+                objectsToSlice.Clear();
+                int j = 0;
+                foreach (GameObject slice in copy)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar((i + 1).ToString() + " slices out of " + sliceCount, j.ToString() + " meshes out of " + copy.Length, j / (float)copy.Length))
+                    {
+                        canceled = true;
+                        break;
+                    }
+
+                    objectsToSlice.AddRange(Slicer.RandomSlice(slice));
+                    DestroyImmediate(slice);
+                    j++;
+                }
+
+                if (canceled) { break; }
+
+                foreach (GameObject slice in objectsToSlice)
+                {
+                    slice.name = mesh.name + "_Slice";
+                }
+            }
+
+            EditorUtility.ClearProgressBar();
+
+            GameObject parent = new GameObject("Delete Me");
+            foreach (GameObject slice in objectsToSlice)
+            {
+                slice.transform.SetParent(parent.transform);
+            }
+
+            if (canceled) { return; }
+
+            string meshPath = AssetDatabase.GetAssetPath(mesh);
+            meshPath = meshPath.Replace(".fbx", "_Explosion");
+            string resultFolderGUID = AssetDatabase.CreateFolder(meshPath.Substring(0, meshPath.LastIndexOf('/')), mesh.name + "_Explosion");
+
+            int counter = 0;
+            foreach (GameObject slice in objectsToSlice)
+            {
+                counter++;
+                AssetDatabase.CreateAsset(slice.GetComponent<MeshFilter>().sharedMesh, Path.Join(AssetDatabase.GUIDToAssetPath(resultFolderGUID), slice.name + "_" + counter.ToString() + ".asset"));
+            }
+        }
+
         [MenuItem("Tools/Find Objects Not In Network Prefabs List")]
         static void FindObjectsNotInNetworkPrefabsList()
         {

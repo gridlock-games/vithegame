@@ -6,79 +6,25 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.MovementHandlers;
+using Vi.Core.VFX;
 
 namespace Vi.Core
 {
-    [RequireComponent(typeof(StatusAgent))]
     [RequireComponent(typeof(AnimationHandler))]
     [RequireComponent(typeof(LoadoutManager))]
     public abstract class CombatAgent : HittableAgent
     {
-        protected NetworkVariable<float> HP = new NetworkVariable<float>();
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
         protected NetworkVariable<float> spirit = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
-        public float GetHP() { return HP.Value; }
         public float GetStamina() { return stamina.Value; }
         public float GetSpirit() { return spirit.Value; }
         public float GetRage() { return rage.Value; }
 
-        public abstract float GetMaxHP();
         public abstract float GetMaxStamina();
         public abstract float GetMaxSpirit();
         public abstract float GetMaxRage();
-
-        public void AddHP(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    HP.Value += amount;
-                }
-                else
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-        }
-
-        protected float AddHPWithoutApply(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
-
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    return HP.Value + amount;
-                }
-                else
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            return HP.Value;
-        }
 
         public virtual void AddStamina(float amount, bool activateCooldown = true) { }
 
@@ -103,15 +49,14 @@ namespace Vi.Core
             }
         }
 
-        public StatusAgent StatusAgent { get; private set; }
         public AnimationHandler AnimationHandler { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
         public GlowRenderer GlowRenderer { get; private set; }
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            StatusAgent = GetComponent<StatusAgent>();
+            base.Awake();
             AnimationHandler = GetComponent<AnimationHandler>();
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
@@ -417,13 +362,100 @@ namespace Vi.Core
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
                 if (IsServer) { isRaging.Value = false; }
-                AnimationHandler.SetRagdollActive(true);
+                OnDeath();
             }
             else if (prev == ActionClip.Ailment.Death)
             {
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
-                AnimationHandler.SetRagdollActive(false);
+                OnAlive();
+            }
+        }
+
+        private enum DeathBehavior
+        {
+            Ragdoll,
+            Explode
+        }
+
+        protected virtual void OnAlive()
+        {
+            switch (deathBehavior)
+            {
+                case DeathBehavior.Ragdoll:
+                    AnimationHandler.SetRagdollActive(false);
+                    break;
+                case DeathBehavior.Explode:
+                    AnimationHandler.RemoveExplosion();
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle death behavior in OnAlive() " + deathBehavior + " " + this);
+                    break;
+            }
+        }
+
+        [SerializeField] private DeathBehavior deathBehavior = DeathBehavior.Ragdoll;
+        [SerializeField] private float deathExplosionDelay;
+        [SerializeField] private ActionVFX deathVFX;
+        [SerializeField] private ActionClip deathVFXAttack;
+        protected virtual void OnDeath()
+        {
+            if (deathVFX)
+            {
+                GameObject vfxInstance;
+                (SpawnPoints.TransformData orientation, Transform parent) = WeaponHandler.GetActionVFXOrientation(deathVFXAttack, deathVFX, false, transform);
+                if (deathVFX.TryGetComponent(out PooledObject pooledObject))
+                {
+                    vfxInstance = ObjectPoolingManager.SpawnObject(pooledObject, orientation.position, orientation.rotation, parent).gameObject;
+                }
+                else
+                {
+                    vfxInstance = Instantiate(pooledObject, orientation.position, orientation.rotation, parent).gameObject;
+                    Debug.LogError("ActionVFX doesn't have a pooled object! " + deathVFX);
+                }
+
+                if (vfxInstance)
+                {
+                    if (!IsServer) { Debug.LogError("You can only spawn action VFX on server!"); return; }
+
+                    if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
+                    {
+                        gameInteractiveActionVFX.InitializeVFX(this, deathVFXAttack);
+                    }
+
+                    if (vfxInstance.TryGetComponent(out NetworkObject netObj))
+                    {
+                        if (netObj.IsSpawned)
+                        {
+                            Debug.LogError("Trying to spawn an action VFX instance that is already spawned " + vfxInstance);
+                        }
+                        else
+                        {
+                            netObj.Spawn(true);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
+                    }
+                }
+                else if (deathVFX.transformType != ActionVFX.TransformType.ConformToGround)
+                {
+                    Debug.LogError("No vfx instance spawned for this prefab! " + deathVFX);
+                }
+            }
+
+            switch (deathBehavior)
+            {
+                case DeathBehavior.Ragdoll:
+                    AnimationHandler.SetRagdollActive(true);
+                    break;
+                case DeathBehavior.Explode:
+                    AnimationHandler.Explode(deathExplosionDelay);
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle death behavior in OnDeath() " + deathBehavior + " " + this);
+                    break;
             }
         }
 

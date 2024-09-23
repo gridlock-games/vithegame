@@ -54,6 +54,9 @@ namespace Vi.Core.VFX
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+
+            rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         private IEnumerator AddForceAfter1Frame()
@@ -111,7 +114,8 @@ namespace Vi.Core.VFX
 
         private void FixedUpdate()
         {
-            transform.rotation = rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity);
+            if (!IsServer) { return; }
+            rb.MoveRotation(rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity));
         }
 
         private void OnTriggerEnter(Collider other)

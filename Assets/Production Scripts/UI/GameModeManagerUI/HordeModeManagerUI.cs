@@ -5,6 +5,7 @@ using Vi.Core.GameModeManagers;
 using UnityEngine.UI;
 using Vi.Core.Structures;
 using Vi.Core;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
@@ -16,9 +17,14 @@ namespace Vi.UI
         [SerializeField] private Text structureHPText;
         [SerializeField] private Image structureHPImage;
         [SerializeField] private Image structureIntermHPImage;
+        [Header("Structure Status UI")]
+        [SerializeField] private Transform statusImageParent;
+        [SerializeField] private StatusIcon statusImagePrefab;
 
         private HordeModeManager hordeModeManager;
         private Structure structure;
+
+        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         private new void Start()
         {
@@ -26,6 +32,13 @@ namespace Vi.UI
             hordeModeManager = GameModeManager.Singleton.GetComponent<HordeModeManager>();
             EvaluateWavesText();
             structureHealthBarParent.SetActive(false);
+
+            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
+            {
+                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
+                statusIcon.InitializeStatusIcon(status);
+                statusIcons.Add(statusIcon);
+            }
         }
 
         private int lastRoundCount = -1;
@@ -73,6 +86,23 @@ namespace Vi.UI
                 lastMaxHP = maxHP;
 
                 structureIntermHPImage.fillAmount = Mathf.Lerp(structureIntermHPImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
+
+                if (structure.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
+                {
+                    List<ActionClip.Status> activeStatuses = structure.StatusAgent.GetActiveStatuses();
+                    foreach (StatusIcon statusIcon in statusIcons)
+                    {
+                        if (activeStatuses.Contains(statusIcon.Status))
+                        {
+                            statusIcon.SetActive(true);
+                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        }
+                        else
+                        {
+                            statusIcon.SetActive(false);
+                        }
+                    }
+                }
             }
             else
             {
@@ -97,6 +127,27 @@ namespace Vi.UI
                 structure = structures[0];
                 structureHealthBarParent.SetActive(true);
                 structureHPImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(structure.GetTeam());
+
+                float HP = structure.GetHP();
+                if (HP < 0.1f & HP > 0) { HP = 0.1f; }
+                float maxHP = structure.GetMaxHP();
+                structureHPText.text = structure.GetName() + " HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+                structureHPImage.fillAmount = HP / maxHP;
+                structureIntermHPImage.fillAmount = HP / maxHP;
+
+                List<ActionClip.Status> activeStatuses = structure.StatusAgent.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
+                }
             }
         }
     }

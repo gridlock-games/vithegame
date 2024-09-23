@@ -8,12 +8,12 @@ namespace Vi.Core
 {
     public class StatusAgent : NetworkBehaviour
     {
-        private CombatAgent attributes;
+        private HittableAgent hittableAgent;
         private void Awake()
         {
             statuses = new NetworkList<ActionClip.StatusPayload>();
             activeStatuses = new NetworkList<int>();
-            attributes = GetComponent<CombatAgent>();
+            hittableAgent = GetComponent<HittableAgent>();
         }
 
         private void OnDisable()
@@ -190,6 +190,8 @@ namespace Vi.Core
             ActiveStatusesWasUpdatedThisFrame = false;
         }
 
+        [SerializeField] private bool useConstantRateForHPDrainStatuses;
+        private const float HPDrainMultiplier = 10;
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);
@@ -302,7 +304,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        attributes.ProcessEnvironmentDamage(attributes.GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -316,7 +318,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        attributes.ProcessEnvironmentDamage(attributes.GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -330,7 +332,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        attributes.ProcessEnvironmentDamage(attributes.GetHP() * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -420,7 +422,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        attributes.AddHP(attributes.GetMaxHP() / attributes.GetHP() * 10 * statusPayload.value * Time.deltaTime);
+                        hittableAgent.AddHP(hittableAgent.GetMaxHP() / hittableAgent.GetHP() * 10 * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {

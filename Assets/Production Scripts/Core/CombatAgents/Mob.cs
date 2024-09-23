@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
+using Vi.Core.VFX;
 
 namespace Vi.Core.CombatAgents
 {
@@ -122,9 +123,8 @@ namespace Vi.Core.CombatAgents
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
+                if (GetAilment() == ActionClip.Ailment.Death | attackerCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return false; }
             }
-
-            if (GetAilment() == ActionClip.Ailment.Death | attackerCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attackerCombatAgent, this))
             {

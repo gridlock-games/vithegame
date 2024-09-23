@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core
 {
@@ -1120,6 +1121,8 @@ namespace Vi.Core
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
 
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
+
                 SetRagdollActive(false);
             }
 
@@ -1153,11 +1156,28 @@ namespace Vi.Core
                         Animator = null;
                         LimbReferences = null;
                         animatorReference = null;
+                        explodableMeshes = null;
                     }
                 }
             }
 
             WaitingForActionClipToPlay = false;
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)
@@ -1180,7 +1200,10 @@ namespace Vi.Core
         private int actionsLayerIndex;
         private int flinchLayerIndex;
 
-        CombatAgent combatAgent;
+        private CombatAgent combatAgent;
+
+        private ExplodableMesh[] explodableMeshes;
+
         private void Awake()
         {
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
@@ -1192,6 +1215,7 @@ namespace Vi.Core
                 this.animatorReference = animatorReference;
                 LimbReferences = animatorReference.GetComponent<LimbReferences>();
                 Animator = animatorReference.GetComponent<Animator>();
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
@@ -1263,6 +1287,44 @@ namespace Vi.Core
         {
             if (!animatorReference) { return; }
             animatorReference.SetRagdollActive(isActive);
+        }
+
+        private Coroutine explosionCoroutine;
+        public void Explode(float explosionDelay)
+        {
+            if (explosionCoroutine != null) { RemoveExplosion(); }
+            explosionCoroutine = StartCoroutine(ExplosionDelay(explosionDelay));
+        }
+
+        private List<PooledObject> sliceInstances = new List<PooledObject>();
+        private IEnumerator ExplosionDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = true;
+            }
+
+            foreach (ExplodableMesh explodableMesh in explodableMeshes)
+            {
+                sliceInstances.AddRange(explodableMesh.Explode());
+            }
+        }
+
+        public void RemoveExplosion()
+        {
+            if (explosionCoroutine != null) { StopCoroutine(explosionCoroutine); }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = false;
+            }
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
     }
 }

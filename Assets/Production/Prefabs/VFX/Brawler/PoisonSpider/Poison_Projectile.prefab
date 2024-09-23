@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 803107738701126885, guid: 082db2f7e42f95144babf5127866a2c1,
@@ -88,6 +89,37 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3263887925461621444}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8189718587493942982}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3753410675267290836}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1115275516682596691}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1617892724719306092}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2013742253100076137}
+    - targetCorrespondingSourceObject: {fileID: 3028762750161260589, guid: 082db2f7e42f95144babf5127866a2c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2898939182345544046}
   m_SourcePrefab: {fileID: 100100000, guid: 082db2f7e42f95144babf5127866a2c1, type: 3}
 --- !u!1 &5483962088925159636 stripped
 GameObject:
@@ -102,10 +134,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5483962088925159636}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -119,8 +162,17 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5483962088925159636}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 0.6
   m_Height: 2.5
   m_Direction: 2
@@ -145,7 +197,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
 --- !u!114 &1115275516682596691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,10 +253,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2740d5ab5aa0d49b40abf56cf7ddb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 2}
+  vfxPositionOffset: {x: 0, y: 1, z: 2.2}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 2
+  transformType: 0
   onActivateVFXSpawnNormalizedTime: 0.7
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -215,12 +267,13 @@ MonoBehaviour:
   awakeAudioClipDelay: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  spellType: 2
+  spellType: 1
   followUpVFXToPlayOnDestroy:
   - {fileID: 7790744079700720323, guid: a91197f08d503b74c9f8dc3fc78fd4f7, type: 3}
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
-  projectileForce: {x: 0, y: 0, z: 10}
+  teamColorParticleSystems: []
+  projectileForce: {x: 0, y: 3, z: 10}
   timeToActivateGravity: 0.1
   killDistance: 50
   whooshNearbySound: []
