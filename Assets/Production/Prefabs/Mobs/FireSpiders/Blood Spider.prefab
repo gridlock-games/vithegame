@@ -15,6 +15,17 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: c37958f93338eae448e36b1d14052b19, type: 2}
     - target: {fileID: 2053466941300927825, guid: f9c2fa18a500e6749bcb9c0ca5211619,
         type: 3}
+      propertyPath: deathVFX
+      value: 
+      objectReference: {fileID: 740529052960010407, guid: 638f119216d57cc4a824649f2b1c0958,
+        type: 3}
+    - target: {fileID: 2053466941300927825, guid: f9c2fa18a500e6749bcb9c0ca5211619,
+        type: 3}
+      propertyPath: deathVFXAttack
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2053466941300927825, guid: f9c2fa18a500e6749bcb9c0ca5211619,
+        type: 3}
       propertyPath: weaponOption.weapon
       value: 
       objectReference: {fileID: 11400000, guid: bbfca2c15ca0de4489025485f4551d65,
@@ -108,6 +119,11 @@ PrefabInstance:
         type: 3}
       propertyPath: canUseAbility1
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7104823722716183298, guid: f9c2fa18a500e6749bcb9c0ca5211619,
+        type: 3}
+      propertyPath: lightAttackDistance
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
