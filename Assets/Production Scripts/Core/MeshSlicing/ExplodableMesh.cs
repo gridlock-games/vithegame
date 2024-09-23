@@ -15,7 +15,6 @@ namespace Vi.Core.MeshSlicing
             skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
         }
 
-        private const int explosionPieceCountLimit = 100;
         public PooledObject[] Explode()
         {
             List<PooledObject> instances = new List<PooledObject>();
@@ -38,8 +37,6 @@ namespace Vi.Core.MeshSlicing
                 rb.AddExplosionForce(5, skinnedMeshRenderer.bounds.center, 10, 0, ForceMode.VelocityChange);
 
                 instances.Add(obj);
-
-                if (i > explosionPieceCountLimit) { break; }
             }
             return instances.ToArray();
         }
