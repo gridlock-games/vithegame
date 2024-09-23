@@ -108,7 +108,7 @@ namespace Vi.Isolated
         {
             if (playerDataQueue.Count > 0)
             {
-                if (!addPlayerDataRunning & !NetSceneManager.Singleton.IsBusyLoadingScenes())
+                if (!addPlayerDataRunning & !NetSceneManager.IsBusyLoadingScenes())
                 {
                     PlayerDataManager.Team clientTeam;
                     if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))

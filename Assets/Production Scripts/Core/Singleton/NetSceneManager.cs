@@ -359,7 +359,7 @@ namespace Vi.Core
 
         public bool ShouldSpawnPlayer { get; private set; }
 
-        private bool SetShouldSpawnPlayer()
+        private static bool SetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
@@ -373,7 +373,7 @@ namespace Vi.Core
             return gameplaySceneIsLoaded;
         }
 
-        public bool IsBusyLoadingScenes()
+        public static bool IsBusyLoadingScenes()
         {
             return PersistentLocalObjects.Singleton.LoadingOperations.Count > 0;
         }
@@ -388,7 +388,7 @@ namespace Vi.Core
             return true;
         }
 
-        private bool IsSceneGroupLoading(string sceneGroupName)
+        private static bool IsSceneGroupLoading(string sceneGroupName)
         {
             foreach (AsyncOperationUI asyncOperationUI in PersistentLocalObjects.Singleton.LoadingOperations.FindAll(item => item.sceneName == sceneGroupName))
             {
@@ -397,7 +397,7 @@ namespace Vi.Core
             return false;
         }
 
-        public bool IsEnvironmentLoaded()
+        public static bool IsEnvironmentLoaded()
         {
             return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Count(item => item.sceneType == SceneType.Environment) > 0;
         }
