@@ -1121,6 +1121,8 @@ namespace Vi.Core
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
 
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
+
                 SetRagdollActive(false);
             }
 
@@ -1154,11 +1156,28 @@ namespace Vi.Core
                         Animator = null;
                         LimbReferences = null;
                         animatorReference = null;
+                        explodableMeshes = null;
                     }
                 }
             }
 
             WaitingForActionClipToPlay = false;
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)
@@ -1181,7 +1200,10 @@ namespace Vi.Core
         private int actionsLayerIndex;
         private int flinchLayerIndex;
 
-        CombatAgent combatAgent;
+        private CombatAgent combatAgent;
+
+        private ExplodableMesh[] explodableMeshes;
+
         private void Awake()
         {
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
@@ -1193,6 +1215,7 @@ namespace Vi.Core
                 this.animatorReference = animatorReference;
                 LimbReferences = animatorReference.GetComponent<LimbReferences>();
                 Animator = animatorReference.GetComponent<Animator>();
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
@@ -1271,16 +1294,9 @@ namespace Vi.Core
         {
             if (explosionCoroutine != null) { RemoveExplosion(); }
             explosionCoroutine = StartCoroutine(ExplosionDelay(explosionDelay));
-
-            //foreach (GameObject slice in Slice(skinnedMeshRenderer.gameObject, skinnedMeshRenderer, skinnedMeshRenderer.sharedMesh))
-            //{
-            //    foreach (GameObject slice2 in Slice(slice, slice.GetComponent<MeshRenderer>(), slice.GetComponent<MeshFilter>().mesh))
-            //    {
-            //        Slice(slice2, slice2.GetComponent<MeshRenderer>(), slice2.GetComponent<MeshFilter>().mesh);
-            //    }
-            //}
         }
 
+        private List<PooledObject> sliceInstances = new List<PooledObject>();
         private IEnumerator ExplosionDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -1288,6 +1304,11 @@ namespace Vi.Core
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
+            }
+
+            foreach (ExplodableMesh explodableMesh in explodableMeshes)
+            {
+                sliceInstances.AddRange(explodableMesh.Explode());
             }
         }
 
@@ -1298,41 +1319,12 @@ namespace Vi.Core
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
             }
-        }
 
-        private GameObject[] Slice(GameObject target, Renderer renderer, Mesh mesh)
-        {
-            Vector3 enterTipPosition = target.transform.position + target.transform.forward;
-            Vector3 enterBasePosition = enterTipPosition + target.transform.up;
-            Vector3 exitPosition = target.transform.position + target.transform.forward * -1;
-
-            //Create a triangle between the tip and base so that we can get the normal
-            Vector3 side1 = exitPosition - enterTipPosition;
-            Vector3 side2 = exitPosition - enterBasePosition;
-
-            //Get the point perpendicular to the triangle above which is the normal
-            //https://docs.unity3d.com/Manual/ComputingNormalPerpendicularVector.html
-            Vector3 normal = Vector3.Cross(side1, side2).normalized;
-
-            //Transform the normal so that it is aligned with the object we are slicing's transform.
-            Vector3 transformedNormal = ((Vector3)(target.transform.localToWorldMatrix.transpose * normal)).normalized;
-
-            //Get the enter position relative to the object we're cutting's local transform
-            Vector3 transformedStartingPoint = target.transform.InverseTransformPoint(enterTipPosition);
-
-            Plane plane = new Plane();
-            plane.SetNormalAndPosition(transformedNormal, transformedStartingPoint);
-
-            var direction = Vector3.Dot(Vector3.up, transformedNormal);
-
-            //Flip the plane so that we always know which side the positive mesh is on
-            if (direction < 0)
+            foreach (PooledObject sliceInstance in sliceInstances)
             {
-                plane = plane.flipped;
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
             }
-
-            GameObject[] gameObjects = Slicer.Slice(plane, mesh, target.GetComponent<Sliceable>(), renderer);
-            return gameObjects;
+            sliceInstances.Clear();
         }
     }
 }

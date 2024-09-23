@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
