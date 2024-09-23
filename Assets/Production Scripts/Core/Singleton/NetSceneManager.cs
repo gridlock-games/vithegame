@@ -8,6 +8,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using System.Linq;
 using Vi.Utility;
+using UnityEngine.Events;
 
 namespace Vi.Core
 {
@@ -342,6 +343,7 @@ namespace Vi.Core
             }
         }
 
+        public static UnityAction OnNetSceneManagerDespawn;
         public override void OnNetworkDespawn()
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
@@ -349,6 +351,8 @@ namespace Vi.Core
             UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
             UnloadAllScenePayloadsOfType(SceneType.Gameplay);
             UnloadAllScenePayloadsOfType(SceneType.Environment);
+
+            if (OnNetSceneManagerDespawn != null) { OnNetSceneManagerDespawn.Invoke(); }
         }
 
         private void Awake()
