@@ -24,46 +24,44 @@ namespace Vi.Editor
 
             AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
 
-            if (!groupToOrganize) { Debug.LogError("No duplicate asset group found!"); return; }
-
-            // Organize the duplicate asset isolation group into different groups based on asset path
-            int entryIndex = 0;
-            foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
+            if (groupToOrganize)
             {
-                Debug.Log(entryIndex);
-                string[] directories = entry.AssetPath.Split('/');
-                string targetGroupName = "";
-                for (int i = 0; i < directories.Length-1; i++)
+                // Organize the duplicate asset isolation group into different groups based on asset path
+                int entryIndex = 0;
+                foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
                 {
-                    targetGroupName += directories[i] + " ";
-                }
-                targetGroupName.Trim();
+                    string[] directories = entry.AssetPath.Split('/');
+                    string targetGroupName = "";
+                    for (int i = 0; i < directories.Length - 1; i++)
+                    {
+                        targetGroupName += directories[i] + " ";
+                    }
+                    targetGroupName.Trim();
 
-                AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == targetGroupName);
+                    AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == targetGroupName);
 
-                if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + targetGroupName,
-                        (entryIndex + 1).ToString() + " out of " + groupToOrganize.entries.Count.ToString() + " assets " + entry.TargetAsset.name,
-                        entryIndex / groupToOrganize.entries.Count))
-                { break; }
+                    if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + targetGroupName,
+                            (entryIndex + 1).ToString() + " out of " + groupToOrganize.entries.Count.ToString() + " assets " + entry.TargetAsset.name,
+                            entryIndex / groupToOrganize.entries.Count))
+                    { break; }
 
-                try
-                {
-                    //if (!groupToModify)
-                    //{
-                    //    groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
-                    //}
-                    //settings.MoveEntry(entry, groupToModify);
+                    try
+                    {
+                        if (!groupToModify)
+                        {
+                            groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
+                        }
+                        settings.MoveEntry(entry, groupToModify);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError(e);
+                        EditorUtility.ClearProgressBar();
+                        return;
+                    }
                 }
-                catch (System.Exception e)
-                {
-                    Debug.LogError(e);
-                    EditorUtility.ClearProgressBar();
-                    return;
-                }
-                break;
+                EditorUtility.ClearProgressBar();
             }
-
-            EditorUtility.ClearProgressBar();
 
             // Remove groups with 0 entries in them
             foreach (AddressableAssetGroup group in settings.groups.ToArray())
