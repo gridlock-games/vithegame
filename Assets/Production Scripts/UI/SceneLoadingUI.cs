@@ -73,20 +73,13 @@ namespace Vi.UI
         {
             FindMainCamera();
 
-            if (!NetSceneManager.DoesExist())
-            {
-                canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
-                OnEndUpdateUI();
-                return;
-            }
-
             string topText = "";
             if (NetworkManager.Singleton.ShutdownInProgress)
             {
                 spawningPlayerObjectParent.SetActive(true);
                 topText = "Network Shutdown In Progress";
             }
-            else if (NetworkManager.Singleton.IsConnectedClient)
+            else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
             {
                 spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
 
@@ -109,7 +102,7 @@ namespace Vi.UI
                 spawningPlayerObjectParent.SetActive(false);
             }
 
-            progressBarParent.SetActive(NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
+            progressBarParent.SetActive(NetSceneManager.IsBusyLoadingScenes() | NetSceneManager.ChangingActiveScene | spawningPlayerObjectParent.activeSelf);
 
             if (spawningPlayerObjectParent.activeSelf)
             {
@@ -140,39 +133,54 @@ namespace Vi.UI
             canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
 
             scenesLeftText.text = "";
-            if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
+            if (NetSceneManager.ChangingActiveScene)
             {
-                progressBarText.text = "Scene Loading Complete";
-                progressBarImage.fillAmount = 1;
+                progressBarText.text = "Changing Active Scene";
+                progressBarImage.fillAmount = 0;
             }
-
-            for (int i = 0; i < PersistentLocalObjects.Singleton.LoadingOperations.Count; i++)
+            else if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
-                if (!PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.IsValid()) { continue; }
-
-                if (PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
+                if (NetworkManager.Singleton.ShutdownInProgress)
                 {
-                    progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName;
-                    scenesLeftText.text = (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                    progressBarText.text = "";
+                    progressBarImage.fillAmount = 0;
                 }
-                else // If this scene has not been downloaded
+                else
                 {
-                    float downloadRate = 0;
-                    float totalMB = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes * 0.000001f;
+                    progressBarText.text = "Scene Loading Complete";
+                    progressBarImage.fillAmount = 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < PersistentLocalObjects.Singleton.LoadingOperations.Count; i++)
+                {
+                    if (!PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.IsValid()) { continue; }
 
-                    float downloadedMB = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().DownloadedBytes * 0.000001f;
-
-                    if (Time.time - lastDownloadChangeTime >= 1)
+                    if (PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes >= 0)
                     {
-                        downloadRate = downloadedMB - lastBytesAmount;
-                        lastBytesAmount = downloadedMB;
-                        lastDownloadChangeTime = Time.time;
+                        progressBarText.text = (PersistentLocalObjects.Singleton.LoadingOperations[i].loadingType == NetSceneManager.AsyncOperationUI.LoadingType.Loading ? "Loading " : "Unloading ") + PersistentLocalObjects.Singleton.LoadingOperations[i].sceneName;
+                        scenesLeftText.text = (PersistentLocalObjects.Singleton.LoadingOperations.Count - i) + (PersistentLocalObjects.Singleton.LoadingOperations.Count - i > 1 ? " Scenes" : " Scene") + " Left";
+                    }
+                    else // If this scene has not been downloaded
+                    {
+                        float downloadRate = 0;
+                        float totalMB = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().TotalBytes * 0.000001f;
+
+                        float downloadedMB = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.GetDownloadStatus().DownloadedBytes * 0.000001f;
+
+                        if (Time.time - lastDownloadChangeTime >= 1)
+                        {
+                            downloadRate = downloadedMB - lastBytesAmount;
+                            lastBytesAmount = downloadedMB;
+                            lastDownloadChangeTime = Time.time;
+                        }
+
+                        progressBarText.text = downloadedMB.ToString("F2") + " MB / " + totalMB.ToString("F2") + " MB" + " (" + downloadRate.ToString("F2") + "Mbps)";
                     }
 
-                    progressBarText.text = downloadedMB.ToString("F2") + " MB / " + totalMB.ToString("F2") + " MB" + " (" + downloadRate.ToString("F2") + "Mbps)";
+                    progressBarImage.fillAmount = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.IsDone ? 1 : PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.PercentComplete;
                 }
-
-                progressBarImage.fillAmount = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.IsDone ? 1 : PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.PercentComplete;
             }
 
             OnEndUpdateUI();

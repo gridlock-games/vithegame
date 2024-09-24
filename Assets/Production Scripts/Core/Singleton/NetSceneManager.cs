@@ -198,7 +198,7 @@ namespace Vi.Core
                 case SceneType.LocalUI:
                     foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                     {
-                        UnloadScenePayload(scenePayload);
+                        PersistentLocalObjects.Singleton.StartCoroutine(UnloadScenePayload(scenePayload));
                     }
                     break;
                 case SceneType.SynchronizedUI:
@@ -214,7 +214,7 @@ namespace Vi.Core
                         }
                         else
                         {
-                            UnloadScenePayload(scenePayload);
+                            PersistentLocalObjects.Singleton.StartCoroutine(UnloadScenePayload(scenePayload));
                         }
                     }
                     break;
@@ -231,7 +231,7 @@ namespace Vi.Core
                         }
                         else
                         {
-                            UnloadScenePayload(scenePayload);
+                            PersistentLocalObjects.Singleton.StartCoroutine(UnloadScenePayload(scenePayload));
                         }
                     }
                     break;
@@ -248,7 +248,7 @@ namespace Vi.Core
                         }
                         else
                         {
-                            UnloadScenePayload(scenePayload);
+                            PersistentLocalObjects.Singleton.StartCoroutine(UnloadScenePayload(scenePayload));
                         }
                     }
                     break;
@@ -258,10 +258,28 @@ namespace Vi.Core
             }
         }
 
-        private void UnloadScenePayload(ScenePayload scenePayload)
+        public static bool ChangingActiveScene { get; private set; }
+
+        private IEnumerator UnloadScenePayload(ScenePayload scenePayload)
         {
             foreach (SceneReference scene in scenePayload.sceneReferences)
             {
+                yield return new WaitUntil(() => !ChangingActiveScene);
+                if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName(scene.SceneName))
+                {
+                    yield return new WaitUntil(() => !IsBusyLoadingScenes());
+                    ChangingActiveScene = true;
+                    if (SceneManager.SetActiveScene(SceneManager.GetSceneByName(defaultActiveSceneName)))
+                    {
+                        yield return new WaitUntil(() => SceneManager.GetActiveScene() == SceneManager.GetSceneByName(defaultActiveSceneName));
+                    }
+                    else
+                    {
+                        Debug.LogError("Unable to set active scene to scene name -> " + scene.SceneName);
+                    }
+                    ChangingActiveScene = false;
+                }
+
                 AsyncOperationHandle<SceneInstance> loadedHandle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!loadedHandle.IsValid()) { continue; }
                 if (loadedHandle.IsDone)
@@ -324,6 +342,7 @@ namespace Vi.Core
                 PersistentLocalObjects.Singleton.SceneHandles.Remove(loadedHandle);
             }
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Remove(scenePayload);
+            yield return null;
         }
 
         public override void OnNetworkSpawn()
@@ -355,6 +374,8 @@ namespace Vi.Core
             if (OnNetSceneManagerDespawn != null) { OnNetSceneManagerDespawn.Invoke(); }
         }
 
+        private const string defaultActiveSceneName = "Base";
+
         private void Awake()
         {
             _singleton = this;
@@ -379,7 +400,7 @@ namespace Vi.Core
 
         public static bool IsBusyLoadingScenes()
         {
-            return PersistentLocalObjects.Singleton.LoadingOperations.Count > 0;
+            return PersistentLocalObjects.Singleton.LoadingOperations.Count > 0 & !ChangingActiveScene;
         }
 
         public bool IsSceneGroupLoaded(string sceneGroupName)
@@ -415,7 +436,7 @@ namespace Vi.Core
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
-                UnloadScenePayload(scenePayloads[networkListEvent.Value]);
+                PersistentLocalObjects.Singleton.StartCoroutine(UnloadScenePayload(scenePayloads[networkListEvent.Value]));
                 if (IsServer) { StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
         }
