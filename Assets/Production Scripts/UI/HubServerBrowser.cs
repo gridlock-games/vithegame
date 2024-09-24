@@ -111,6 +111,7 @@ namespace Vi.UI
         {
             NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
             yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
             NetworkManager.Singleton.StartClient();
         }
     }

@@ -1103,7 +1103,7 @@ namespace Vi.Core
 
             if (!playerSpawnPoints)
             {
-                if (NetSceneManager.Singleton.IsEnvironmentLoaded())
+                if (NetSceneManager.IsEnvironmentLoaded())
                 {
                     playerSpawnPoints = FindFirstObjectByType<SpawnPoints>();
                 }
@@ -1482,9 +1482,10 @@ namespace Vi.Core
 
         private IEnumerator ReturnToCharacterSelectOnServerShutdown()
         {
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
             yield return null;
             if (NetworkManager.Singleton.IsListening) { yield break; }
-            yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
                 NetSceneManager.Singleton.LoadScene("Character Select");
