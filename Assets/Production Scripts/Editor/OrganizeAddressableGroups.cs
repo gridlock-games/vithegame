@@ -26,9 +26,11 @@ namespace Vi.Editor
 
             if (!groupToOrganize) { Debug.LogError("No duplicate asset group found!"); return; }
 
+            // Organize the duplicate asset isolation group into different groups based on asset path
             int entryIndex = 0;
             foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
             {
+                Debug.Log(entryIndex);
                 string[] directories = entry.AssetPath.Split('/');
                 string targetGroupName = "";
                 for (int i = 0; i < directories.Length-1; i++)
@@ -44,14 +46,33 @@ namespace Vi.Editor
                         entryIndex / groupToOrganize.entries.Count))
                 { break; }
 
-                if (!groupToModify)
+                try
                 {
-                    groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
+                    //if (!groupToModify)
+                    //{
+                    //    groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
+                    //}
+                    //settings.MoveEntry(entry, groupToModify);
                 }
-                settings.MoveEntry(entry, groupToModify);
+                catch (System.Exception e)
+                {
+                    Debug.LogError(e);
+                    EditorUtility.ClearProgressBar();
+                    return;
+                }
+                break;
             }
-            settings.RemoveGroup(groupToOrganize);
+
             EditorUtility.ClearProgressBar();
+
+            // Remove groups with 0 entries in them
+            foreach (AddressableAssetGroup group in settings.groups.ToArray())
+            {
+                List<AddressableAssetEntry> entries = new List<AddressableAssetEntry>();
+                group.GatherAllAssets(entries, true, true, true);
+
+                if (entries.Count == 0) { Debug.Log("Removing group " + group.name); settings.RemoveGroup(group); }
+            }
         }
     }
 }
