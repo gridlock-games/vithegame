@@ -45,20 +45,12 @@ namespace Vi.Editor
                             entryIndex / groupToOrganize.entries.Count))
                     { break; }
 
-                    try
+                    if (!groupToModify)
                     {
-                        if (!groupToModify)
-                        {
-                            groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
-                        }
-                        settings.MoveEntry(entry, groupToModify);
+                        groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas.ToList(), groupToOrganize.SchemaTypes.ToArray());
                     }
-                    catch (System.Exception e)
-                    {
-                        Debug.LogError(e);
-                        EditorUtility.ClearProgressBar();
-                        return;
-                    }
+                    settings.MoveEntry(entry, groupToModify);
+                    entryIndex++;
                 }
                 EditorUtility.ClearProgressBar();
             }
