@@ -488,7 +488,7 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
-                yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
+                yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
                 networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
                 networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
                 NetworkManager.Singleton.StartClient();

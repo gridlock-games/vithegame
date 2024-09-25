@@ -36,6 +36,7 @@ namespace Vi.UI
         private Vector2 joystickOriginalAnchoredPosition;
         private MovementHandler movementHandler;
         private PlayerInput playerInput;
+        private CombatAgent combatAgent;
         private void Start()
         {
             RectTransform rt = (RectTransform)transform.parent;
@@ -46,6 +47,7 @@ namespace Vi.UI
 
             movementHandler = transform.root.GetComponent<MovementHandler>();
             playerInput = movementHandler.GetComponent<PlayerInput>();
+            combatAgent = movementHandler.GetComponent<CombatAgent>();
         }
 
         private void RefreshStatus()
@@ -140,7 +142,7 @@ namespace Vi.UI
                             movementHandler.SetMoveInput(GetJoystickValue());
                             break;
                         case JoystickActionType.Look:
-                            movementHandler.SetLookInput(GetJoystickValue());
+                            movementHandler.SetLookInput(GetJoystickValue() * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
                             break;
                         default:
                             Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);

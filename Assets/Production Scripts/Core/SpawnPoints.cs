@@ -263,7 +263,7 @@ namespace Vi.Core
 
                 foreach (SpawnPointDefinition spawnPoint in spawnPoints)
                 {
-                    Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
+                    Gizmos.color = spawnPoint.teams[0] == PlayerDataManager.Team.Competitor ? Color.black : PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         Vector3 spawnPosition = spawnPoint.spawnPositions[i];

@@ -479,7 +479,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.right * 6, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 9) // Swap Weapons
