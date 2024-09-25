@@ -1157,6 +1157,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 199834525670062991}
   m_SourcePrefab: {fileID: 100100000, guid: aa42bed16f2c0ea4fb0569b26952ba5a, type: 3}
+--- !u!4 &664856926187055524 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8446121847015908746, guid: aa42bed16f2c0ea4fb0569b26952ba5a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8938709335599139886}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1263486649039297490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7891540893720991740, guid: aa42bed16f2c0ea4fb0569b26952ba5a,
@@ -1501,10 +1507,12 @@ MonoBehaviour:
   rotationOffsetConstraint: {fileID: 0}
   rotationOffsetAxis: 2
   stowedWeaponParent: {fileID: 0}
-  keys: 1200000011000000
+  keys: 12000000110000000600000005000000
   values:
   - {fileID: 1263486649039297490}
   - {fileID: 6931578649973241024}
+  - {fileID: 8093134166187398786}
+  - {fileID: 664856926187055524}
 --- !u!114 &7596644638737899235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2213,6 +2221,12 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!4 &8093134166187398786 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 890651066641128108, guid: aa42bed16f2c0ea4fb0569b26952ba5a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8938709335599139886}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &9209928986134213727 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 278257074800998513, guid: aa42bed16f2c0ea4fb0569b26952ba5a,

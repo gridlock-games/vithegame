@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: LightAttack1
+  m_Name: LightAttack5
   m_EditorClassIdentifier: 
   clipType: 1
   followUpActionClipsToPlay: []
@@ -416,7 +416,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 0
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -974,8 +974,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.4
-  recoveryNormalizedTime: 0.75
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.4
   isAffectedByRage: 1
   damage: 6
   healAmount: 0
@@ -990,7 +990,7 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
+  ailment: 2
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
   ailmentHitDefinition: 

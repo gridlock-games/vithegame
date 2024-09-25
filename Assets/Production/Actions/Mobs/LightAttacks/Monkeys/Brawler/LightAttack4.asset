@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: LightAttack1
+  m_Name: LightAttack4
   m_EditorClassIdentifier: 
   clipType: 1
   followUpActionClipsToPlay: []
@@ -965,7 +965,7 @@ MonoBehaviour:
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
-  effectedWeaponBones: 11000000
+  effectedWeaponBones: 12000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -974,8 +974,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.4
-  recoveryNormalizedTime: 0.75
+  attackingNormalizedTime: 0.2
+  recoveryNormalizedTime: 0.4
   isAffectedByRage: 1
   damage: 6
   healAmount: 0

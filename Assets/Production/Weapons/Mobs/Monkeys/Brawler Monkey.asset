@@ -180,6 +180,20 @@ MonoBehaviour:
       weaponRotationOffset: {x: 0, y: 0, z: 0}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
+        type: 3}
+      weaponBone: 6
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+    - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
+        type: 3}
+      weaponBone: 5
+      weaponPositionOffset: {x: 0, y: 0, z: 0}
+      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
+      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -235,7 +249,7 @@ MonoBehaviour:
     reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
-  ability1: {fileID: 0}
+  ability1: {fileID: 11400000, guid: 95b486ea2f89f22478c2ef9c38acbf24, type: 2}
   ability2: {fileID: 0}
   ability3: {fileID: 0}
   ability4: {fileID: 0}
@@ -243,10 +257,19 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: c8eec8eef156b714aaae36f879fb382c, type: 2}
+    attackClip: {fileID: 11400000, guid: f27c0def87c517342a90b0ce19c7a083, type: 2}
   - inputs: 0000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: f27c0def87c517342a90b0ce19c7a083, type: 2}
+    attackClip: {fileID: 11400000, guid: c8eec8eef156b714aaae36f879fb382c, type: 2}
+  - inputs: 000000000000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 120181c2a617faa4daba329ab7e74bd5, type: 2}
+  - inputs: 00000000000000000000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 66e4cdfcb654312489a535b52b1730fc, type: 2}
+  - inputs: 0000000000000000000000000000000000000000
+    comboCondition: 0
+    attackClip: {fileID: 11400000, guid: 6b5fa918f2fb8ad488251f50bd95b96e, type: 2}
   grabAttackClipList: []
   dodgeCooldownDuration: 0
   dodgeF: {fileID: 0}
