@@ -26,10 +26,45 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: whitelistedAilments.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: weaponOption.animationController
       value: 
-      objectReference: {fileID: 22100000, guid: 6b5dfd06dd945b04e9da69c02b19dbd8,
+      objectReference: {fileID: 22100000, guid: 411f507fd54dad74e8137f598294c8cf,
         type: 2}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[3]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[4]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[5]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[6]
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[7]
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -835,7 +870,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 22100000, guid: 6b5dfd06dd945b04e9da69c02b19dbd8,
+      objectReference: {fileID: 22100000, guid: 411f507fd54dad74e8137f598294c8cf,
         type: 2}
     - target: {fileID: 7208365962503013090, guid: aa42bed16f2c0ea4fb0569b26952ba5a,
         type: 3}

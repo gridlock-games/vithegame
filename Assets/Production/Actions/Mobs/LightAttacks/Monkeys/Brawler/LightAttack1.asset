@@ -16,7 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
-  shouldIgnoreGravity: 0
+  shouldIgnoreGravity: 1
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -974,8 +974,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.3
-  recoveryNormalizedTime: 0.5
+  attackingNormalizedTime: 0.4
+  recoveryNormalizedTime: 0.75
   isAffectedByRage: 1
   damage: 6
   healAmount: 0

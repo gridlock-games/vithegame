@@ -156,6 +156,8 @@ namespace Vi.Core.CombatAgents
 
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 
+            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attackerCombatAgent.MovementHandler.GetPosition(); }
+
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
@@ -201,9 +203,7 @@ namespace Vi.Core.CombatAgents
                     grabAssailantDataId.Value = attackerCombatAgent.NetworkObjectId;
                     attackerCombatAgent.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
-
-                    Vector3 victimNewPosition = attackerCombatAgent.MovementHandler.GetPosition() + (attackerCombatAgent.transform.forward * 1.2f);
-                    MovementHandler.SetOrientation(victimNewPosition, Quaternion.LookRotation(attackerCombatAgent.MovementHandler.GetPosition() - victimNewPosition, Vector3.up));
+                    attackerCombatAgent.SetIsGrabbingToTrue();
                     attackerCombatAgent.AnimationHandler.PlayAction(attackerCombatAgent.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
@@ -276,21 +276,6 @@ namespace Vi.Core.CombatAgents
 
             lastAttackingCombatAgent = attackerCombatAgent;
             return true;
-        }
-
-        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
-        {
-            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
-            {
-                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
-            }
-
-            ailment.Value = attackAilment;
-
-            if (ailment.Value == ActionClip.Ailment.Death)
-            {
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-            }
         }
 
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Flesh;

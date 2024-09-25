@@ -87,7 +87,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 22100000, guid: 9a528b8619ee8164aa2864d147ddd41f,
+      objectReference: {fileID: 22100000, guid: 49c56a36afdd5b04bbacf45c09d61e41,
         type: 2}
     - target: {fileID: 3839195980448276846, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
@@ -102,19 +102,54 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
+      propertyPath: whitelistedAilments.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
       propertyPath: weaponOption.animationController
       value: 
-      objectReference: {fileID: 22100000, guid: 9a528b8619ee8164aa2864d147ddd41f,
+      objectReference: {fileID: 22100000, guid: 49c56a36afdd5b04bbacf45c09d61e41,
         type: 2}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[3]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[4]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[5]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[6]
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[7]
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4982500891764130072, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
       propertyPath: stoppingDistance
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4982500891764130072, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
       propertyPath: lightAttackDistance
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5190570493382777317, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}

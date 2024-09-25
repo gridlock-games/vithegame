@@ -117,7 +117,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 22100000, guid: c0db345b8976c4e40a5e55fc0c7f7c35,
+      objectReference: {fileID: 22100000, guid: f83a82df9d3a54642bd9817cc4eaa06e,
         type: 2}
     - target: {fileID: 3229902074398980651, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
@@ -147,10 +147,45 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
+      propertyPath: whitelistedAilments.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
       propertyPath: weaponOption.animationController
       value: 
-      objectReference: {fileID: 22100000, guid: c0db345b8976c4e40a5e55fc0c7f7c35,
+      objectReference: {fileID: 22100000, guid: f83a82df9d3a54642bd9817cc4eaa06e,
         type: 2}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[3]
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[4]
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[5]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[6]
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: whitelistedAilments.Array.data[7]
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4430361310015081936, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
       propertyPath: m_IsActive
