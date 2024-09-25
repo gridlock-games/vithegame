@@ -170,21 +170,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 2
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 2
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -194,21 +194,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 2
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 2
+      value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -339,6 +339,13 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 2afdf7f70346843bfa0c5ecbdffc9f28, type: 3}
     - {fileID: 8300000, guid: f969d3d104e1141c8a5ecae8b8018012, type: 3}
     normalizedPlayTime: 0
+  - raceAndGenders: 09000000
+    audioClips:
+    - {fileID: 8300000, guid: 7652adc92c0ee43209db3cfde8f80004, type: 3}
+    - {fileID: 8300000, guid: 1b35e4b0c03244981a2a2127d5139da7, type: 3}
+    - {fileID: 8300000, guid: bf432881989c944a0a45f539d22fd16a, type: 3}
+    - {fileID: 8300000, guid: 68c3d6ce26afe4474853f75206bf1577, type: 3}
+    normalizedPlayTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
@@ -360,3 +367,4 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5

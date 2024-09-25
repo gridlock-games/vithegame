@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e7e51f50a0f4cf43b1d636c019f1cb9, type: 3}
-  m_Name: Dagger Monkey
+  m_Name: Sword Monkey
   m_EditorClassIdentifier: 
   weaponClass: 0
-  runSpeed: 7
-  walkSpeed: 3.5
+  runSpeed: 4
+  walkSpeed: 2
   blockingLocomotion: 0
   maxHP: 100
   maxStamina: 100
@@ -25,6 +25,7 @@ MonoBehaviour:
   rageRecoveryRate: 0
   shouldUseAmmo: 0
   maxAmmoCount: 0
+  reloadClip: {fileID: 0}
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffects:
@@ -162,21 +163,14 @@ MonoBehaviour:
     type: 3}
   reloadSoundEffects: []
   weaponModelData:
-  - skinPrefab: {fileID: 1347664652460357468, guid: 65644c4b1a1914045a35c2abf2c36b8d,
+  - skinPrefab: {fileID: 78494970165145200, guid: 49757a30e0ac3b84cad006ba7998e0d4,
       type: 3}
     data:
-    - weaponPrefab: {fileID: 4101847540811822813, guid: 50b6dbdbe8829404cb32578201c112f7,
-        type: 3}
-      weaponBone: 17
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
-      stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-    - weaponPrefab: {fileID: 4101847540811822813, guid: 50b6dbdbe8829404cb32578201c112f7,
+    - weaponPrefab: {fileID: 4449151116452040266, guid: 46192e2d2c2bd554eb697ea9e2bb5c2c,
         type: 3}
       weaponBone: 18
-      weaponPositionOffset: {x: 0, y: 0, z: 0}
-      weaponRotationOffset: {x: 0, y: 0, z: 0}
+      weaponPositionOffset: {x: 0.1312, y: -0.0817, z: -0.016}
+      weaponRotationOffset: {x: 0, y: 0, z: 59.426}
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
   hitReactions:
@@ -242,13 +236,7 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 22dc4f63ff6eb924fb122086a134ded5, type: 2}
-  - inputs: 0000000000000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: b4d183b35ec59be4ab566b4de18d5f17, type: 2}
-  - inputs: 000000000000000000000000
-    comboCondition: 0
-    attackClip: {fileID: 11400000, guid: db1a5050c2389fd408e2ccf1f014a1ba, type: 2}
+    attackClip: {fileID: 11400000, guid: d8fd75213868adb4cb57a26f74ec140e, type: 2}
   grabAttackClipList: []
   dodgeCooldownDuration: 0
   dodgeF: {fileID: 0}

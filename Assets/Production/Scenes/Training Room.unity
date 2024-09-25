@@ -161,7 +161,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1104213920}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf98c2b17b3b5e041958e916eccd4123, type: 3}
   m_Name: 
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999649726}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d64645981f8b7d548898dcfe6a7b149e, type: 3}
   m_Name: 
@@ -206,15 +206,15 @@ MonoBehaviour:
   - team: 2
     mobPrefab: {fileID: 2911124102250368615, guid: 65644c4b1a1914045a35c2abf2c36b8d,
       type: 3}
-    enabled: 1
+    enabled: 0
   - team: 2
     mobPrefab: {fileID: 1931859760333804867, guid: 03169f44115a1504fa99d6d9ab3cd918,
       type: 3}
-    enabled: 1
+    enabled: 0
   - team: 2
     mobPrefab: {fileID: 2053466941300927825, guid: f9c2fa18a500e6749bcb9c0ca5211619,
       type: 3}
-    enabled: 1
+    enabled: 0
   - team: 2
     mobPrefab: {fileID: 411655697261434595, guid: 25fe1e5e8ca2ce74da34f55afc0f7938,
       type: 3}
@@ -223,6 +223,22 @@ MonoBehaviour:
     mobPrefab: {fileID: 7253489416199604532, guid: 4e5823de45e078a43852c1a9d2e67654,
       type: 3}
     enabled: 0
+  - team: 2
+    mobPrefab: {fileID: 4306392237049173835, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+      type: 3}
+    enabled: 1
+  - team: 2
+    mobPrefab: {fileID: 2081370497330741320, guid: 388c5f4bfe0f77b4fb57a1ee23b61344,
+      type: 3}
+    enabled: 1
+  - team: 2
+    mobPrefab: {fileID: 2986844882264079281, guid: 2ed20856e95d72f45af43e7d9073486e,
+      type: 3}
+    enabled: 1
+  - team: 2
+    mobPrefab: {fileID: 4068560761044700051, guid: 18311718d9b6b504e942cedb210c501e,
+      type: 3}
+    enabled: 1
 --- !u!4 &1999649728
 Transform:
   m_ObjectHideFlags: 0
