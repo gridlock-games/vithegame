@@ -291,7 +291,7 @@ namespace Vi.Core
         Animator animator;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
-        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; }
+        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; } = new SkinnedMeshRenderer[0];
 
         private void Awake()
         {

@@ -291,7 +291,7 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
-        private struct CanPlayActionClipResult
+        public struct CanPlayActionClipResult
         {
             public bool canPlay;
             public bool shouldUseDodgeCancelTransitionTime;
@@ -301,10 +301,12 @@ namespace Vi.Core
                 this.canPlay = canPlay;
                 this.shouldUseDodgeCancelTransitionTime = shouldUseDodgeCancelTransitionTime;
             }
+
+            public static implicit operator bool(CanPlayActionClipResult result) => result.canPlay;
         }
 
         RaycastHit[] allHits = new RaycastHit[10];
-        private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
+        public CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
@@ -1165,6 +1167,11 @@ namespace Vi.Core
         {
             if (animatorReference)
             {
+                foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+                {
+                    skinnedMeshRenderer.forceRenderingOff = false;
+                }
+
                 if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                 {
                     if (pooledObject.IsSpawned)
@@ -1185,11 +1192,6 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
             }
             sliceInstances.Clear();
-
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
-            {
-                skinnedMeshRenderer.forceRenderingOff = false;
-            }
         }
 
         private new void OnDestroy()

@@ -337,6 +337,12 @@ namespace Vi.Core.MovementHandlers
         [SerializeField] private float ability1DistanceMin = 8;
         [SerializeField] private float ability1DistanceMax = 10;
 
+        [Header("Ability2")]
+        [SerializeField] private bool canUseAbility2 = false;
+        [SerializeField] private bool ability2IsConstrainedByDistance = true;
+        [SerializeField] private float ability2DistanceMin = 2;
+        [SerializeField] private float ability2DistanceMax = 4;
+
         [Header("Suicide")]
         [SerializeField] private bool canSuicide;
         [SerializeField] private float suicideDistance;
@@ -352,21 +358,47 @@ namespace Vi.Core.MovementHandlers
                 if (dist < suicideDistance & canSuicide)
                 {
                     combatAgent.ProcessEnvironmentDamage(-combatAgent.GetHP(), NetworkObject);
+                    return;
                 }
-                else if (dist < lightAttackDistance)
+
+                if (canUseAbility1)
+                {
+                    if (combatAgent.AnimationHandler.CanPlayActionClip(weaponHandler.GetWeapon().GetAbility1(), false))
+                    {
+                        if (!ability1IsConstrainedByDistance)
+                        {
+                            weaponHandler.Ability1(true);
+                            return;
+                        }
+                        else if (dist < ability1DistanceMax & dist > ability1DistanceMin)
+                        {
+                            weaponHandler.Ability1(true);
+                            return;
+                        }
+                    }
+                }
+
+                if (canUseAbility2)
+                {
+                    if (combatAgent.AnimationHandler.CanPlayActionClip(weaponHandler.GetWeapon().GetAbility2(), false))
+                    {
+                        if (!ability2IsConstrainedByDistance)
+                        {
+                            weaponHandler.Ability2(true);
+                            return;
+                        }
+                        else if (dist < ability2DistanceMax & dist > ability2DistanceMin)
+                        {
+                            weaponHandler.Ability2(true);
+                            return;
+                        }
+                    }
+                }
+
+                if (dist < lightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
-                }
-                else if (canUseAbility1)
-                {
-                    if (!ability1IsConstrainedByDistance)
-                    {
-                        weaponHandler.Ability1(true);
-                    }
-                    else if (dist < ability1DistanceMax & dist > ability1DistanceMin)
-                    {
-                        weaponHandler.Ability1(true);
-                    }
+                    return;
                 }
             }
         }
