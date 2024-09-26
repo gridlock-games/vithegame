@@ -269,6 +269,7 @@ namespace Vi.Core
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
 
+            summonablesCount = 0;
             if (IsInAnticipation)
             {
                 if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -552,6 +553,8 @@ namespace Vi.Core
 
         private bool reloadFinished;
 
+        private int summonablesCount;
+
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -578,6 +581,20 @@ namespace Vi.Core
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {
                             SpawnActionVFX(CurrentActionClip, actionVFX, transform);
+                        }
+                    }
+
+                    if (summonablesCount < CurrentActionClip.summonableCount)
+                    {
+                        if (CurrentActionClip.summonables.Length > 0)
+                        {
+                            if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                            {
+                                PooledObject g = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation());
+                                g.GetComponent<Mob>().SetTeam(combatAgent.GetTeam());
+                                g.GetComponent<NetworkObject>().Spawn(true);
+                                summonablesCount++;
+                            }
                         }
                     }
                 }

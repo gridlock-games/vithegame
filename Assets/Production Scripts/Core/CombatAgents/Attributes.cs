@@ -411,20 +411,6 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        private NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
-
-        private void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
-
-        public NetworkObject GetKiller()
-        {
-            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
-
-            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
-                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
-            else
-                return null;
-        }
-
         public void AddHitToComboCounter() { comboCounter.Value++; }
 
         private const float comboCounterResetTime = 3;
@@ -501,6 +487,8 @@ namespace Vi.Core.CombatAgents
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
 
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
+
+            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
 
             AddStamina(-attack.staminaDamage);
             if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
@@ -679,101 +667,6 @@ namespace Vi.Core.CombatAgents
 
             lastAttackingCombatAgent = attacker;
             return true;
-        }
-
-        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
-        {
-            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
-            {
-                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
-            }
-
-            // Ailments
-            if (attackAilment != ailment.Value | applyAilmentRegardless)
-            {
-                bool shouldApplyAilment = false;
-                if (attackAilment != ActionClip.Ailment.None)
-                {
-                    Vector3 startPos = transform.position;
-                    Vector3 endPos = hitSourcePosition;
-                    startPos.y = 0;
-                    endPos.y = 0;
-                    Vector3 rel = endPos - startPos;
-                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
-
-                    shouldApplyAilment = true;
-
-                    if (attackAilment == ActionClip.Ailment.Pull)
-                    {
-                        pullAssailantDataId.Value = attacker.NetworkObjectId;
-                        isPulled.Value = true;
-                    }
-                    else if (attackAilment == ActionClip.Ailment.Grab)
-                    {
-                        if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                        ailment.Value = ActionClip.Ailment.None;
-                    }
-                    else
-                    {
-                        ailment.Value = attackAilment;
-                        if (ailment.Value == ActionClip.Ailment.Death)
-                        {
-                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-                            SetKiller(attacker);
-                        }
-                    }
-                }
-                else // If this attack's ailment is none
-                {
-                    if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
-                    {
-                        ailment.Value = ActionClip.Ailment.None;
-                    }
-                }
-
-                // If we started a new ailment on this attack, we want to start a reset coroutine
-                if (shouldApplyAilment)
-                {
-                    switch (ailment.Value)
-                    {
-                        case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
-                            break;
-                        case ActionClip.Ailment.Knockup:
-                            knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
-                            break;
-                        case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
-                            break;
-                        case ActionClip.Ailment.Stagger:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
-                            break;
-                        case ActionClip.Ailment.Pull:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
-                            break;
-                        case ActionClip.Ailment.Death:
-                            break;
-                        default:
-                            if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
-                            break;
-                    }
-
-                    if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
-                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
-                }
-            }
-
-            if (ailment.Value == ActionClip.Ailment.Knockup)
-            {
-                knockupHitCounter++;
-                if (knockupHitCounter >= knockupHitLimit)
-                {
-                    if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
-                    ailment.Value = ActionClip.Ailment.None;
-                }
-            }
         }
 
         private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
@@ -978,30 +871,6 @@ namespace Vi.Core.CombatAgents
             }
             yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
-        }
-
-        private const float recoveryTimeInvincibilityBuffer = 1;
-        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
-        {
-            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
-            yield return new WaitForSeconds(duration);
-            SetInviniciblity(recoveryTimeInvincibilityBuffer);
-            ailment.Value = ActionClip.Ailment.None;
-        }
-
-        private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
-        {
-            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
-            ailment.Value = ActionClip.Ailment.None;
-        }
-
-        private Coroutine pullResetCoroutine;
-        private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
-        {
-            if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
-            isPulled.Value = false;
         }
     }
 }
