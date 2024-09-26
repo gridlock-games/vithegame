@@ -56,6 +56,7 @@ namespace Vi.UI
                 statusIcons.Add(statusIcon);
             }
 
+            pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
         }
 
@@ -95,8 +96,27 @@ namespace Vi.UI
                     }
                 }
                 transform.position = combatAgent.transform.position;
+                transform.rotation = combatAgent.transform.rotation;
+                transform.localScale = Vector3.zero;
+                healthBarParent.localScale = Vector3.zero;
             }
             RefreshStatus();
+        }
+
+        private void OnSpawnFromPool()
+        {
+            if (combatAgent)
+            {
+                transform.position = combatAgent.transform.position;
+                transform.rotation = combatAgent.transform.rotation;
+            }
+            else
+            {
+                transform.position = Vector3.zero;
+                transform.rotation = Quaternion.identity;
+            }
+            transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
         }
 
         private void OnReturnToPool()
@@ -106,6 +126,11 @@ namespace Vi.UI
             localSpectator = null;
             combatAgent = null;
             rendererToFollow = null;
+
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
         }
 
         private void RefreshStatus()
@@ -218,6 +243,10 @@ namespace Vi.UI
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
             if (mainCamera)
             {
+                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
+                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
+                transform.position = pos;
+
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
 
                 float camDistance = Vector3.Distance(mainCamera.transform.position, transform.position);
@@ -241,19 +270,18 @@ namespace Vi.UI
 
                     if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
-
-                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
-                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
-                //pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
-                //Vector3 pos = rendererToFollow.bounds.center;
-                //pos.y += rendererToFollow.bounds.extents.y;
-                transform.position = pos;
             }
             //else
             //{
             //    Debug.LogWarning("Can't find a main camera for world space labels!");
             //}
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
+
+            if (transform.localScale.magnitude > new Vector3(0.05f, 0.05f, 0.05f).magnitude)
+            {
+                Debug.Log(combatAgent + " " + transform.localScale + " " + localScaleTarget);
+            }
+
             canvas.enabled = transform.localScale.magnitude > 0.01f;
 
             if (healthBarLocalScaleTarget == Vector3.zero)

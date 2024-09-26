@@ -333,6 +333,7 @@ namespace Vi.Core.MovementHandlers
 
         [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
+        [SerializeField] private bool ability1IsConstrainedByDistance = true;
         [SerializeField] private float ability1DistanceMin = 8;
         [SerializeField] private float ability1DistanceMax = 10;
 
@@ -356,9 +357,16 @@ namespace Vi.Core.MovementHandlers
                 {
                     weaponHandler.LightAttack(true);
                 }
-                else if (dist < ability1DistanceMax & dist > ability1DistanceMin & canUseAbility1)
+                else if (canUseAbility1)
                 {
-                    weaponHandler.Ability1(true);
+                    if (!ability1IsConstrainedByDistance)
+                    {
+                        weaponHandler.Ability1(true);
+                    }
+                    else if (dist < ability1DistanceMax & dist > ability1DistanceMin)
+                    {
+                        weaponHandler.Ability1(true);
+                    }
                 }
             }
         }
