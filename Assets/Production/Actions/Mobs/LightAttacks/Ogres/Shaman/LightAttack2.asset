@@ -1645,8 +1645,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  animationSpeed: 0.9
+  recoveryAnimationSpeed: 0.9
   agentStaminaCost: 20
   agentRageCost: 50
   effectedWeaponBones: 11000000
@@ -1691,7 +1691,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 9
-    value: 1
+    value: 2
     duration: 3
     delay: 1
     associatedWithCurrentWeapon: 0

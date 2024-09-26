@@ -1569,7 +1569,12 @@ MonoBehaviour:
     duration: 2
     delay: 1
     associatedWithCurrentWeapon: 0
-  statusesToApplyToTeammateOnHit: []
+  statusesToApplyToTeammateOnHit:
+  - status: 1
+    value: 0.7
+    duration: 4
+    delay: 0
+    associatedWithCurrentWeapon: 0
   actionVFXList:
   - {fileID: 6420672105542109404, guid: 2ad5b39d8ac381d4faff904df722df00, type: 3}
   previewActionVFX: {fileID: 0}
