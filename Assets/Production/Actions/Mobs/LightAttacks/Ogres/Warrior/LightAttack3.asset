@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: LightAttack2
+  m_Name: LightAttack3
   m_EditorClassIdentifier: 
   clipType: 1
   followUpActionClipsToPlay: []
@@ -1649,7 +1649,7 @@ MonoBehaviour:
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
-  effectedWeaponBones: 1200000011000000
+  effectedWeaponBones: 12000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -1658,8 +1658,8 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.3
-  recoveryNormalizedTime: 0.6
+  attackingNormalizedTime: 0.15
+  recoveryNormalizedTime: 0.3
   isAffectedByRage: 1
   damage: 10
   healAmount: 0
@@ -1674,10 +1674,10 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 3
+  ailment: 0
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
-  ailmentHitDefinition: 0001
+  ailmentHitDefinition: 
   dodgeLock: 2
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -1696,8 +1696,8 @@ MonoBehaviour:
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
-  useRotationalTargetingSystem: 1
-  limitAttackMotionBasedOnTarget: 1
+  useRotationalTargetingSystem: 0
+  limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 60
   canLunge: 0
   minLungeDistance: 2.5
