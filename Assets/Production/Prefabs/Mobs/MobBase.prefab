@@ -32,6 +32,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3438530920036325063}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -39,7 +40,6 @@ Transform:
   m_Children:
   - {fileID: 7541128012661925881}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2620220826113739033
 MonoBehaviour:
@@ -61,7 +61,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
 --- !u!114 &9209220024426139386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74,6 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useConstantRateForHPDrainStatuses: 0
 --- !u!114 &1544070057548558332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,6 +89,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
+  ailmentOnHitActionVFXList:
+  - ailment: 3
+    actionVFX: {fileID: 3922548515315126405, guid: 92e09002586d112498d7f92d499e563b,
+      type: 3}
+  - ailment: 2
+    actionVFX: {fileID: -7875032226876358665, guid: 8362a2c4a1d1d431ea2bd66cacb72c41,
+      type: 3}
+  deathBehavior: 0
+  deathExplosionDelay: 0
+  deathVFX: {fileID: 0}
+  deathVFXAttack: {fileID: 0}
   wasStaggeredThisFrame: 0
   maxHP: 100
   weaponOption:
@@ -98,7 +110,7 @@ MonoBehaviour:
     weapon: {fileID: 0}
     weaponPreviewPrefab: {fileID: 0}
     itemWebId: 
-  whitelistedAilments: 0000000006000000
+  whitelistedAilments: 000000000600000003000000
   armorType: 0
   raceAndGender: 0
 --- !u!114 &5918456826789320621
@@ -143,16 +155,18 @@ MonoBehaviour:
   stoppingDistance: 2
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
-  stairStepHeight: 0.01
   maxStairStepHeight: 0.5
-  aiRigidbodyorneHorizontalDragMultiplier: 0.1
+  airborneHorizontalDragMultiplier: 0.1
   gravityScale: 2
   targetingType: 2
   targetingSwitchDistance: 11
   lightAttackDistance: 2.5
   canUseAbility1: 1
+  ability1IsConstrainedByDistance: 1
   ability1DistanceMin: 8
-  ability1Distance: 10
+  ability1DistanceMax: 10
+  canSuicide: 0
+  suicideDistance: 0
 --- !u!114 &6305487504955697137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,13 +228,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7880380624370242607}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3724913792320258764}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &7807981826574486121
 Rigidbody:
@@ -229,10 +243,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7880380624370242607}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0

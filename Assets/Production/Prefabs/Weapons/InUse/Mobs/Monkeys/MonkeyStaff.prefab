@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8384221770227796736}
   - component: {fileID: 154801820968417853}
   - component: {fileID: 889750417588414471}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MonkeyStaff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -170,10 +170,40 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 4fa85779a52604b4ea0e29ed2f677156, type: 2}
+    - target: {fileID: -5151492872390713093, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -2513430485362492190, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b377d7121bc1a754f8256a1398f4960d,
         type: 3}
       propertyPath: m_Name
       value: Staff_2HL_Monkey
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1895465655865684912, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5633663749308264157, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6758342989766038977, guid: b377d7121bc1a754f8256a1398f4960d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

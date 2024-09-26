@@ -152,7 +152,17 @@ namespace Vi.Core.CombatAgents
             }
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
-            if (!whitelistedAilments.Contains(attack.ailment)) { attackAilment = ActionClip.Ailment.None; }
+            if (!whitelistedAilments.Contains(attackAilment))
+            {
+                if (attackAilment != ActionClip.Ailment.None & whitelistedAilments.Contains(ActionClip.Ailment.Stun))
+                {
+                    attackAilment = ActionClip.Ailment.Stun;
+                }
+                else
+                {
+                    attackAilment = ActionClip.Ailment.None;
+                }
+            }
 
             if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
 

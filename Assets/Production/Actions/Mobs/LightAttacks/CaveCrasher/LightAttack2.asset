@@ -1674,10 +1674,10 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 5
+  ailment: 3
   grabAttackClip: {fileID: 0}
   grabVictimClip: {fileID: 0}
-  ailmentHitDefinition: 0100
+  ailmentHitDefinition: 0001
   dodgeLock: 2
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -1710,3 +1710,7 @@ MonoBehaviour:
   requireAmmo: 0
   requiredAmmoAmount: 1
   reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0

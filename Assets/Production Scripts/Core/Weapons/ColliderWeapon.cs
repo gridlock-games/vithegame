@@ -14,8 +14,9 @@ namespace Vi.Core
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
             if (!weaponTrailVFX) { return; }
             if (!parentCombatAgent) { return; }
 
@@ -40,6 +41,7 @@ namespace Vi.Core
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }
+            if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
             if (!parentCombatAgent.WeaponHandler.IsAttacking) { return; }
             if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
             if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
