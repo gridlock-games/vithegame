@@ -8,6 +8,7 @@ using Unity.Collections;
 using Vi.Core.MovementHandlers;
 using Vi.Core.VFX;
 using Vi.Core.GameModeManagers;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -500,6 +501,79 @@ namespace Vi.Core
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 OnAlive();
+            }
+
+            if (IsServer)
+            {
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == current))
+                {
+                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        GameObject instance = WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                        PersistentLocalObjects.Singleton.StartCoroutine(DestroyVFXAfterAilmentIsDone(current, instance));
+                    }
+                }
+            }
+        }
+
+        private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
+        {
+            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
+            if (vfxInstance)
+            {
+                if (vfxInstance.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (networkObject.IsSpawned)
+                    {
+                        networkObject.Despawn(true);
+                    }
+                    else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        if (pooledObject.IsSpawned)
+                        {
+                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        }
+                    }
+                    else
+                    {
+                        Destroy(vfxInstance);
+                    }
+                }
+                else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                }
+                else
+                {
+                    Destroy(vfxInstance);
+                }
+            }
+        }
+
+        [System.Serializable]
+        private struct OnHitActionVFX
+        {
+            public ActionClip.Ailment ailment;
+            public ActionVFX actionVFX;
+        }
+
+        [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
+
+        private void OnValidate()
+        {
+            List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
+            {
+                if (!onHitActionVFX.actionVFX) { continue; }
+                if (onHitActionVFX.actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { actionVFXToRemove.Add(onHitActionVFX.actionVFX); }
+            }
+
+            foreach (ActionVFX actionVFX in actionVFXToRemove)
+            {
+                ailmentOnHitActionVFXList.RemoveAll(item => item.actionVFX == actionVFX);
             }
         }
 

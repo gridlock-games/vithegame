@@ -669,67 +669,6 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
-        {
-            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
-            if (vfxInstance)
-            {
-                if (vfxInstance.TryGetComponent(out NetworkObject networkObject))
-                {
-                    if (networkObject.IsSpawned)
-                    {
-                        networkObject.Despawn(true);
-                    }
-                    else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
-                    {
-                        if (pooledObject.IsSpawned)
-                        {
-                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                        }
-                    }
-                    else
-                    {
-                        Destroy(vfxInstance);
-                    }
-                }
-                else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (pooledObject.IsSpawned)
-                    {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    }
-                }
-                else
-                {
-                    Destroy(vfxInstance);
-                }
-            }
-        }
-
-        [System.Serializable]
-        private struct OnHitActionVFX
-        {
-            public ActionClip.Ailment ailment;
-            public ActionVFX actionVFX;
-        }
-
-        [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
-
-        private void OnValidate()
-        {
-            List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
-            {
-                if (!onHitActionVFX.actionVFX) { continue; }
-                if (onHitActionVFX.actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { actionVFXToRemove.Add(onHitActionVFX.actionVFX); }
-            }
-
-            foreach (ActionVFX actionVFX in actionVFXToRemove)
-            {
-                ailmentOnHitActionVFXList.RemoveAll(item => item.actionVFX == actionVFX);
-            }
-        }
-
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
@@ -805,18 +744,6 @@ namespace Vi.Core.CombatAgents
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             base.OnAilmentChanged(prev, current);
-            if (IsServer)
-            {
-                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == ailment.Value))
-                {
-                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                    {
-                        GameObject instance = WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
-                        PersistentLocalObjects.Singleton.StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
-                    }
-                }
-            }
-
             if (current == ActionClip.Ailment.Death)
             {
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
