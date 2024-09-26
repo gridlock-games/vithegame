@@ -141,20 +141,6 @@ namespace Vi.UI
             }
         }
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-            canvas.worldCamera = mainCamera;
-        }
-
         private PlayerDataManager.Team team;
         private void UpdateNameTextAndColors()
         {
@@ -237,23 +223,31 @@ namespace Vi.UI
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
-            FindMainCamera();
-
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
-            if (mainCamera)
+            if (localWeaponHandler | localSpectator)
             {
+                Transform source = null;
+                if (localWeaponHandler)
+                {
+                    source = localWeaponHandler.transform;
+                }
+                else if (localSpectator)
+                {
+                    source = localSpectator.transform;
+                }
+
                 Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
                 transform.position = pos;
 
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(source.transform.position - transform.position), Time.deltaTime * rotationSpeed);
 
-                float camDistance = Vector3.Distance(mainCamera.transform.position, transform.position);
+                float camDistance = Vector3.Distance(source.transform.position, combatAgent.transform.position);
                 if (camDistance > viewDistance)
                 {
-                    Quaternion mouseOverRotation = Quaternion.LookRotation(mainCamera.transform.position - rendererToFollow.bounds.center);
-                    float upAngle = Vector3.SignedAngle(mainCamera.transform.up, mouseOverRotation * Vector3.up, mainCamera.transform.right);
-                    float horizontalAngle = Quaternion.Angle(mainCamera.transform.rotation, mouseOverRotation);
+                    Quaternion mouseOverRotation = Quaternion.LookRotation(source.transform.position - combatAgent.transform.position);
+                    float upAngle = Vector3.SignedAngle(source.transform.up, mouseOverRotation * Vector3.up, source.transform.right);
+                    float horizontalAngle = Quaternion.Angle(source.transform.rotation, mouseOverRotation);
 
                     if (shouldUseFixedScale)
                         localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue) : Vector3.zero;

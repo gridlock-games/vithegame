@@ -409,7 +409,7 @@ namespace Vi.Core
                         worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                 }
-                accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
+                accumulatedRootMotion += new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z) / Time.fixedDeltaTime;
             }
 
             if (animationHandler) { animationHandler.ProcessNextActionClip(); }
