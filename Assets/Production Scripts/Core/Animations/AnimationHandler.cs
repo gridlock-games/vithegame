@@ -217,13 +217,17 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(0);
             combatAgent.SetUninterruptable(0);
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
-
-            StartCoroutine(HideRenderers());
         }
 
-        private IEnumerator HideRenderers()
+        public void HideRenderers()
         {
-            yield return new WaitForSeconds(5);
+            StartCoroutine(HideRenderersAfterDuration());
+        }
+
+        private const float deadRendererDisplayTime = 5;
+        private IEnumerator HideRenderersAfterDuration()
+        {
+            yield return new WaitForSeconds(deadRendererDisplayTime);
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
@@ -1334,6 +1338,14 @@ namespace Vi.Core
             {
                 sliceInstances.AddRange(explodableMesh.Explode());
             }
+
+            yield return new WaitForSeconds(deadRendererDisplayTime);
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
 
         public void RemoveExplosion()

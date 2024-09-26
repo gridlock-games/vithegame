@@ -16,10 +16,15 @@ namespace Vi.Core.MovementHandlers
     public class MobMovementHandler : PhysicsMovementHandler
     {
         private GameplayTargetFinder targetFinder;
+        private Mob mob;
         protected override void Awake()
         {
             base.Awake();
             targetFinder = GetComponent<GameplayTargetFinder>();
+            mob = GetComponent<Mob>();
+
+            if (!mob.GetWeaponOption().weapon.GetAbility1()) { canUseAbility1 = false; }
+            if (!mob.GetWeaponOption().weapon.GetAbility2()) { canUseAbility2 = false; }
         }
 
         protected override void Update()
@@ -108,8 +113,9 @@ namespace Vi.Core.MovementHandlers
             switch (targetingType)
             {
                 case TargetingType.Players:
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderByDescending(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
                     {
+                        if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         targetFinder.SetTarget(combatAgent);
@@ -117,7 +123,7 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.Structures:
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderByDescending(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
@@ -127,7 +133,7 @@ namespace Vi.Core.MovementHandlers
                     break;
                 case TargetingType.StructuresThenPlayers:
                     float distanceToStructure = Mathf.Infinity;
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderByDescending(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
@@ -136,8 +142,9 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderByDescending(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
                     {
+                        if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         float dist = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
@@ -148,8 +155,9 @@ namespace Vi.Core.MovementHandlers
                     break;
                 case TargetingType.PlayersThenStructures:
                     float distanceToAgent = Mathf.Infinity;
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderByDescending(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
                     {
+                        if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         distanceToAgent = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
@@ -157,7 +165,7 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderByDescending(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
@@ -170,6 +178,7 @@ namespace Vi.Core.MovementHandlers
                 case TargetingType.HighestKillPlayer:
                     foreach (Attributes attributes in targetFinder.ActivePlayers.OrderByDescending(item => GameModeManager.Singleton.GetPlayerScore(item.GetPlayerDataId()).killsThisRound))
                     {
+                        if (attributes == combatAgent) { continue; }
                         if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, attributes)) { continue; }
                         targetFinder.SetTarget(attributes);
