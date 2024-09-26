@@ -307,7 +307,8 @@ namespace Vi.Core.MovementHandlers
 
                 if (!collidersIgnoreEachOther)
                 {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - Rigidbody.position, Vector3.up);
+                    Vector3 rel = playerHit.transform.root.position - Rigidbody.position;
+                    Quaternion targetRot = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
                     float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
 
                     if (angle > 180) { angle -= 360; }

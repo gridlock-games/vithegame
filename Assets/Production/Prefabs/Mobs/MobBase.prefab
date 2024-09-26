@@ -152,6 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c1f543056ae09949afebc06a0990d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodyHeightOffset: 2
+  bodyRadius: 0.5
   stoppingDistance: 2
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
@@ -165,6 +167,10 @@ MonoBehaviour:
   ability1IsConstrainedByDistance: 1
   ability1DistanceMin: 8
   ability1DistanceMax: 10
+  canUseAbility2: 0
+  ability2IsConstrainedByDistance: 1
+  ability2DistanceMin: 2
+  ability2DistanceMax: 4
   canSuicide: 0
   suicideDistance: 0
 --- !u!114 &6305487504955697137
@@ -275,3 +281,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 664bc6ed4af86e64f8574f38134c8a9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  physicMaterial: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
