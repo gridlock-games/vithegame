@@ -7,6 +7,7 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(PooledObject))]
+    [RequireComponent(typeof(Rigidbody))]
     public class RuntimeWeapon : MonoBehaviour
     {
         [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
@@ -95,20 +96,84 @@ namespace Vi.Core
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
+        private Rigidbody rb;
+
         private void Awake()
         {
+            rb = GetComponent<Rigidbody>();
+            rb.isKinematic = true;
             renderers = GetComponentsInChildren<Renderer>(true);
             colliders = GetComponentsInChildren<Collider>(true);
+
+            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            {
+                if (child.gameObject.layer != LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    Debug.LogError(this + " runtime weapons should be in the network prediction layer!");
+                }
+            }
         }
 
+        private ActionClip.Ailment lastAilment = ActionClip.Ailment.None;
+        protected virtual void Update()
+        {
+            if (!parentCombatAgent) { return; }
+
+            if (parentCombatAgent.GetAilment() != lastAilment)
+            {
+                if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    rb.isKinematic = false;
+                    rb.interpolation = parentCombatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+
+                    transform.SetParent(null, true);
+
+                    foreach (Collider c in colliders)
+                    {
+                        c.enabled = parentCombatAgent.IsServer;
+                        c.isTrigger = false;
+                        c.gameObject.layer = LayerMask.NameToLayer("Character");
+                    }
+                }
+                else
+                {
+                    rb.isKinematic = true;
+
+                    transform.SetParent(weaponParent, true);
+
+                    foreach (Collider c in colliders)
+                    {
+                        c.enabled = true;
+                        c.isTrigger = true;
+                        c.gameObject.layer = LayerMask.NameToLayer("NetworkPrediction");
+                    }
+                }
+            }
+            lastAilment = parentCombatAgent.GetAilment();
+        }
+
+        private void OnTransformParentChanged()
+        {
+            if (transform.parent == weaponParent)
+            {
+                transform.localPosition = weaponLocalPosition;
+                transform.localRotation = weaponLocalRotation;
+            }
+        }
+
+        private Transform weaponParent;
+        private Vector3 weaponLocalPosition;
+        private Quaternion weaponLocalRotation;
         protected void OnEnable()
         {
+            NetworkPhysicsSimulation.AddRigidbody(rb);
+
             parentCombatAgent = transform.root.GetComponent<CombatAgent>();
             if (!parentCombatAgent) { return; }
 
-            foreach (Collider col in colliders)
+            foreach (Collider c in colliders)
             {
-                col.enabled = parentCombatAgent.IsServer;
+                c.enabled = parentCombatAgent.IsServer;
             }
 
             foreach (Renderer renderer in renderers)
@@ -129,14 +194,34 @@ namespace Vi.Core
             {
                 renderer.forceRenderingOff = false;
             }
+
+            weaponParent = transform.parent;
+            weaponLocalPosition = transform.localPosition;
+            weaponLocalRotation = transform.localRotation;
         }
 
         protected void OnDisable()
         {
+            NetworkPhysicsSimulation.RemoveRigidbody(rb);
+
             parentCombatAgent = null;
             isStowed = false;
             associatedRuntimeWeapons.Clear();
             hitCounter.Clear();
+
+            weaponParent = null;
+            lastAilment = ActionClip.Ailment.None;
+
+            rb.isKinematic = true;
+            rb.interpolation = RigidbodyInterpolation.None;
+            foreach (Collider c in colliders)
+            {
+                c.isTrigger = true;
+                c.gameObject.layer = LayerMask.NameToLayer("NetworkPrediction");
+            }
+
+            weaponLocalPosition = Vector3.zero;
+            weaponLocalRotation = Quaternion.identity;
         }
 
         private bool lastIsActiveCall = true;
