@@ -961,8 +961,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  animationSpeed: 0.9
+  recoveryAnimationSpeed: 0.9
   agentStaminaCost: 20
   agentRageCost: 50
   effectedWeaponBones: 12000000
@@ -975,9 +975,9 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.3
-  recoveryNormalizedTime: 0.5
+  recoveryNormalizedTime: 0.55
   isAffectedByRage: 1
-  damage: 12
+  damage: 5
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
