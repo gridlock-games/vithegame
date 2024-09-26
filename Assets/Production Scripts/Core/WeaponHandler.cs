@@ -464,14 +464,14 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.ParentToVictim:
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFX); break; }
-                    orientation.position = victimTransform.position;
+                    orientation.position = victimTransform.position + combatAgent.MovementHandler.BodyHeightOffset;
                     orientation.rotation = victimTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
                     orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                     parent = victimTransform;
                     break;
                 case ActionVFX.TransformType.StationaryOnVictim:
                     if (!victimTransform) { Debug.LogError("VFX has transform type Parent To Victim, but there was no victim transform provided!" + actionVFX); break; }
-                    orientation.position = victimTransform.position;
+                    orientation.position = victimTransform.position + combatAgent.MovementHandler.BodyHeightOffset;
                     orientation.rotation = victimTransform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
                     orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                     parent = null;

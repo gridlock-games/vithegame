@@ -463,7 +463,7 @@ namespace Vi.Core
                     highestPoint = renderer.bounds.center;
                 }
             }
-            Gizmos.color = Color.blue;
+            Gizmos.color = Color.magenta;
             Gizmos.DrawCube(rendererToFollow.bounds.center + rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer, new Vector3(worldSpaceLabelTransformInfo.scaleMultiplier, 0.1f, 0.1f));
         }
     }

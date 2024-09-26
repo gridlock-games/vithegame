@@ -38,8 +38,10 @@ namespace Vi.Core.MovementHandlers
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionExitMessage(Collision collision) { }
 
-		protected static readonly Vector3 bodyHeightOffset = new Vector3(0, 1, 0);
-		protected const float bodyRadius = 0.5f;
+		public Vector3 BodyHeightOffset { get { return new Vector3(0, bodyHeightOffset, 0); } }
+		[SerializeField] private float bodyHeightOffset = 2;
+		public float BodyRadius { get { return bodyRadius; } }
+		[SerializeField] private float bodyRadius = 0.5f;
 
 		protected Vector3 GetRandomDestination()
         {
@@ -372,7 +374,14 @@ namespace Vi.Core.MovementHandlers
 			return true;
 		}
 
-		protected virtual void OnDrawGizmosSelected()
+        protected virtual void OnDrawGizmos()
+        {
+            if (Application.isPlaying) { return; }
+			Gizmos.color = Color.blue;
+			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset - bodyRadius, 0), bodyRadius);
+        }
+
+        protected virtual void OnDrawGizmosSelected()
 		{
 			if (!Application.isPlaying) { return; }
 

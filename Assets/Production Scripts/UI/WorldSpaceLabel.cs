@@ -243,7 +243,6 @@ namespace Vi.UI
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
             if (mainCamera)
             {
-                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
                 Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
                 transform.position = pos;
 
@@ -270,17 +269,13 @@ namespace Vi.UI
 
                     if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
+                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
             }
             //else
             //{
             //    Debug.LogWarning("Can't find a main camera for world space labels!");
             //}
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
-
-            if (transform.localScale.magnitude > new Vector3(0.05f, 0.05f, 0.05f).magnitude)
-            {
-                Debug.Log(combatAgent + " " + transform.localScale + " " + localScaleTarget);
-            }
 
             canvas.enabled = transform.localScale.magnitude > 0.01f;
 
