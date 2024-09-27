@@ -69,6 +69,8 @@ namespace Vi.UI
                 EvaluateWavesText();
             }
 
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { FindStructure(); }
+
             if (structure)
             {
                 float HP = structure.GetHP();
