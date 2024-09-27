@@ -104,7 +104,6 @@ namespace Vi.UI
             FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot.ToString();
             if (originalActiveLoadoutSlot != activeLoadoutSlot)
             {
-                Debug.Log("Using character loadout " + activeLoadoutSlot + " original " + originalActiveLoadoutSlot);
                 PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(attributes.CachedPlayerData.character._id.ToString(), activeLoadoutSlot.ToString()));
             }
         }
