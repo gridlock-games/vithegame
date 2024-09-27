@@ -13,6 +13,26 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Remove Components From Weapon Previews")]
+        static void RemoveComponentsFromWeaponPreviews()
+        {
+            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
+            foreach (var weaponOption in characterReference.GetWeaponOptions())
+            {
+                foreach (Component component in weaponOption.weaponPreviewPrefab.GetComponentsInChildren<Component>())
+                {
+                    if (component is not Transform
+                        & component is not Camera
+                        & component is not UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+                        & component is not Renderer)
+                    {
+                        DestroyImmediate(component, true);
+                    }
+                }
+                EditorUtility.SetDirty(weaponOption.weaponPreviewPrefab);
+            }
+        }
+
         [MenuItem("Tools/Generate Exploded Meshes")]
         static void GenerateExplodedMeshes()
         {
