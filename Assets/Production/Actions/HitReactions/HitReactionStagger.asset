@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: HitReactionStagger
   m_EditorClassIdentifier: 
   clipType: 3
+  followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -87,6 +89,154 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  attackRootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  attackRootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  attackRootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  shouldFlinch: 0
+  flinchAmountMin: {x: -10, y: -10}
+  flinchAmountMax: {x: 10, y: 10}
+  shouldPlayHitReaction: 1
+  hitReactionRootMotionForwardMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1.75
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1.75
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hitReactionRootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hitReactionRootMotionVerticalMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   debugForwardMotion:
     serializedVersion: 2
     m_Curve: []
@@ -108,21 +258,28 @@ MonoBehaviour:
   YAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
+  dodgeCancelTransitionTime: 0.15
   animationSpeed: 1
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 20
-  agentDefenseCost: 0
   agentRageCost: 50
   effectedWeaponBones: 
+  weaponBonesToHide: 
   mustBeAiming: 0
+  chargeAttackHasEndAnimation: 0
+  chargeAttackStateLoopCount: 1
+  canEnhance: 1
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
+  chargePenaltyDamage: 10
   attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.75
+  isAffectedByRage: 1
   damage: 20
   healAmount: 0
   staminaDamage: 0
-  defenseDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
-  defensePenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
   maxHitLimit: 1
   timeBetweenHits: 1
@@ -130,9 +287,11 @@ MonoBehaviour:
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
+  isFollowUpAttack: 0
   ailment: 4
-  ailmentDuration: 2
-  grabDistance: 3
+  grabAttackClip: {fileID: 0}
+  grabVictimClip: {fileID: 0}
+  ailmentHitDefinition: 
   dodgeLock: 0
   canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
@@ -142,12 +301,98 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  actionClipSoundEffects:
+  - raceAndGenders: 00000000
+    audioClips:
+    - {fileID: 8300000, guid: 5579f9998575d3347af8b38b89754167, type: 3}
+    - {fileID: 8300000, guid: b2ce82596c1d15e429579c52c19a6a76, type: 3}
+    - {fileID: 8300000, guid: 055790c077663b14ea5df3f6353b1c01, type: 3}
+    - {fileID: 8300000, guid: 4f9da1bcab81cf74699e6444a293c6d0, type: 3}
+    - {fileID: 8300000, guid: 547d8f07d309dc34cbcdf3f9f66a6232, type: 3}
+    - {fileID: 8300000, guid: a375084829bd93045855877527e3baeb, type: 3}
+    - {fileID: 8300000, guid: 22a394aa269732b43854770c38cd2946, type: 3}
+    - {fileID: 8300000, guid: ecb98b55640b3d4489a173453eb3db63, type: 3}
+    - {fileID: 8300000, guid: ad9926cf79632ff4dbbe3eeaa625f126, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 01000000
+    audioClips:
+    - {fileID: 8300000, guid: 6eaaaeb0df840b949a06c88f383c0df5, type: 3}
+    - {fileID: 8300000, guid: 709eb8b2a49e4594ba4d61c56040c5e7, type: 3}
+    - {fileID: 8300000, guid: 336e2ef20a2841947af0a7e273c68561, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 08000000
+    audioClips:
+    - {fileID: 8300000, guid: 290607b917d444520ab22e754ebf0594, type: 3}
+    - {fileID: 8300000, guid: fde5c18418b104e18adafbaaf24947ef, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 0e000000
+    audioClips:
+    - {fileID: 8300000, guid: b83078c42be7543c39ef16bb0aedd607, type: 3}
+    - {fileID: 8300000, guid: 28e65c15ae4ae4be2bed129cc6feba73, type: 3}
+    - {fileID: 8300000, guid: e5de9c36baa344b518ad42a47895cdad, type: 3}
+    - {fileID: 8300000, guid: 92d9220383063459d96df8e5d626143b, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 0b000000
+    audioClips:
+    - {fileID: 8300000, guid: 2414a52dd2f274a819f7bcd3ddf8ab09, type: 3}
+    - {fileID: 8300000, guid: 0e78863c2bc6b4c59899887d4a31ceee, type: 3}
+    - {fileID: 8300000, guid: 2afdf7f70346843bfa0c5ecbdffc9f28, type: 3}
+    - {fileID: 8300000, guid: f969d3d104e1141c8a5ecae8b8018012, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 09000000
+    audioClips:
+    - {fileID: 8300000, guid: 7652adc92c0ee43209db3cfde8f80004, type: 3}
+    - {fileID: 8300000, guid: 1b35e4b0c03244981a2a2127d5139da7, type: 3}
+    - {fileID: 8300000, guid: bf432881989c944a0a45f539d22fd16a, type: 3}
+    - {fileID: 8300000, guid: 68c3d6ce26afe4474853f75206bf1577, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 0f000000
+    audioClips:
+    - {fileID: 8300000, guid: 1e2daa3f96dd44c7db13b7cbf81be1a8, type: 3}
+    - {fileID: 8300000, guid: 80069371fee4749839e4b945d6ef1d5e, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 07000000
+    audioClips:
+    - {fileID: 8300000, guid: 6b8ab5935fa70409f9cc3de5fd1b09c5, type: 3}
+    - {fileID: 8300000, guid: fd37ecddbbea64924ab54ff12d6e57f9, type: 3}
+    - {fileID: 8300000, guid: 592489353b2964ab2a688b051131fe70, type: 3}
+    - {fileID: 8300000, guid: 70f81f2482d18479d8bbc5655f3cf184, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 0a000000
+    audioClips:
+    - {fileID: 8300000, guid: 96a78ae6fd6494a42a652b923a063659, type: 3}
+    - {fileID: 8300000, guid: 80fbc30f16458432a92ab4c3cf3530fa, type: 3}
+    - {fileID: 8300000, guid: babd19495f2874371be5b82458a42eaf, type: 3}
+    - {fileID: 8300000, guid: 99d2c75db0f394dc09a7326a7187bea7, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 05000000
+    audioClips:
+    - {fileID: 8300000, guid: 041666c039b8148fdacf52824b49cc3d, type: 3}
+    - {fileID: 8300000, guid: 4d23d1de7bad34c78a7314cfe1112112, type: 3}
+    - {fileID: 8300000, guid: 3a6c27c96aaa34fb19403e600cb30ff5, type: 3}
+    - {fileID: 8300000, guid: b89d258fc70be431cbfb70da090c2c05, type: 3}
+    normalizedPlayTime: 0
+  - raceAndGenders: 06000000
+    audioClips:
+    - {fileID: 8300000, guid: 723b79fed4e794f52a2a77249ebbbd36, type: 3}
+    - {fileID: 8300000, guid: 6a182a08204dd47c1aed5c9caef57113, type: 3}
+    - {fileID: 8300000, guid: d19fcec20f6c14d978922ccf052ec3c3, type: 3}
+    - {fileID: 8300000, guid: c13b1355b561e4f998524719adf9028c, type: 3}
+    normalizedPlayTime: 0
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
   previewActionVFX: {fileID: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
+  useRotationalTargetingSystem: 1
+  limitAttackMotionBasedOnTarget: 1
+  maximumTargetingRotationAngle: 60
+  canLunge: 0
+  minLungeDistance: 2.5
+  maxLungeDistance: 5
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
@@ -155,3 +400,8 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0

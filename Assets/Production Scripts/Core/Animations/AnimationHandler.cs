@@ -219,6 +219,27 @@ namespace Vi.Core
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
         }
 
+        public void HideRenderers()
+        {
+            StartCoroutine(HideRenderersAfterDuration());
+        }
+
+        private const float deadRendererDisplayTime = 5;
+        private IEnumerator HideRenderersAfterDuration()
+        {
+            yield return new WaitForSeconds(deadRendererDisplayTime);
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = true;
+            }
+            yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = false;
+            }
+        }
+
         public void OnRevive()
         {
             Animator.Play("Empty", actionsLayerIndex);
@@ -274,7 +295,7 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
-        private struct CanPlayActionClipResult
+        public struct CanPlayActionClipResult
         {
             public bool canPlay;
             public bool shouldUseDodgeCancelTransitionTime;
@@ -284,10 +305,12 @@ namespace Vi.Core
                 this.canPlay = canPlay;
                 this.shouldUseDodgeCancelTransitionTime = shouldUseDodgeCancelTransitionTime;
             }
+
+            public static implicit operator bool(CanPlayActionClipResult result) => result.canPlay;
         }
 
         RaycastHit[] allHits = new RaycastHit[10];
-        private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
+        public CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
@@ -1148,6 +1171,11 @@ namespace Vi.Core
         {
             if (animatorReference)
             {
+                foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+                {
+                    skinnedMeshRenderer.forceRenderingOff = false;
+                }
+
                 if (animatorReference.TryGetComponent(out PooledObject pooledObject))
                 {
                     if (pooledObject.IsSpawned)
@@ -1310,6 +1338,14 @@ namespace Vi.Core
             {
                 sliceInstances.AddRange(explodableMesh.Explode());
             }
+
+            yield return new WaitForSeconds(deadRendererDisplayTime);
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
 
         public void RemoveExplosion()

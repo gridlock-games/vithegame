@@ -657,6 +657,7 @@ namespace Vi.Core
             {
                 case DeathBehavior.Ragdoll:
                     AnimationHandler.SetRagdollActive(true);
+                    AnimationHandler.HideRenderers();
                     break;
                 case DeathBehavior.Explode:
                     AnimationHandler.Explode(deathExplosionDelay);

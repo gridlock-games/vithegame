@@ -27,7 +27,7 @@ namespace Vi.Editor
             if (groupToOrganize)
             {
                 // Organize the duplicate asset isolation group into different groups based on asset path
-                int entryIndex = 0;
+                int originalCount = groupToOrganize.entries.Count;
                 foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
                 {
                     string[] directories = entry.AssetPath.Split('/');
@@ -41,24 +41,15 @@ namespace Vi.Editor
                     AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == targetGroupName);
 
                     if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + targetGroupName,
-                            (entryIndex + 1).ToString() + " out of " + groupToOrganize.entries.Count.ToString() + " assets " + entry.TargetAsset.name,
-                            entryIndex / groupToOrganize.entries.Count))
+                            groupToOrganize.entries.Count.ToString() + " assets left - " + entry.TargetAsset.name,
+                            groupToOrganize.entries.Count / (float)originalCount))
                     { break; }
 
-                    try
+                    if (!groupToModify)
                     {
-                        if (!groupToModify)
-                        {
-                            groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas, groupToOrganize.SchemaTypes.ToArray());
-                        }
-                        settings.MoveEntry(entry, groupToModify);
+                        groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas.ToList(), groupToOrganize.SchemaTypes.ToArray());
                     }
-                    catch (System.Exception e)
-                    {
-                        Debug.LogError(e);
-                        EditorUtility.ClearProgressBar();
-                        return;
-                    }
+                    settings.MoveEntry(entry, groupToModify);
                 }
                 EditorUtility.ClearProgressBar();
             }
