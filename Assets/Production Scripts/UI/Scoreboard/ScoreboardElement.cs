@@ -90,12 +90,13 @@ namespace Vi.UI
             UpdateUI();
         }
 
+        public GameModeManager.PlayerScore PlayerScore { get; private set; }
         void UpdateUI()
         {
             if (PlayerDataManager.Singleton.ContainsId(playerDataId))
             {
                 disconnectedPlayerIcon.enabled = false;
-                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(playerDataId);
+                PlayerScore = GameModeManager.Singleton.GetPlayerScore(playerDataId);
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
@@ -110,19 +111,19 @@ namespace Vi.UI
                     }
                 }
                 playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
-                roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.cumulativeKills.ToString();
-                assistsText.text = playerScore.cumulativeAssists.ToString();
-                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                roundWinsText.text = PlayerScore.roundWins.ToString();
+                killsText.text = PlayerScore.cumulativeKills.ToString();
+                assistsText.text = PlayerScore.cumulativeAssists.ToString();
+                deathsText.text = PlayerScore.cumulativeDeaths.ToString();
 
-                if (kdRatioText) kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
-                if (damageDealtText) damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
-                if (damageRecievedText) damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
+                if (kdRatioText) kdRatioText.text = PlayerScore.cumulativeDeaths == 0 ? PlayerScore.cumulativeKills.ToString("F2") : (PlayerScore.cumulativeKills / (float)PlayerScore.cumulativeDeaths).ToString("F2");
+                if (damageDealtText) damageDealtText.text = PlayerScore.cumulativeDamageDealt.ToString("F0");
+                if (damageRecievedText) damageRecievedText.text = PlayerScore.damageRecievedThisRound.ToString("F0");
             }
             else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
             {
                 disconnectedPlayerIcon.enabled = true;
-                GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetDisconnectedPlayerScore(playerDataId);
+                PlayerScore = GameModeManager.Singleton.GetDisconnectedPlayerScore(playerDataId);
                 PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId);
                 for (int i = 0; i < backgroundImagesToColor.Length; i++)
                 {
@@ -131,14 +132,14 @@ namespace Vi.UI
                     backgroundImagesToColor[i].color /= 2;
                 }
                 playerNameText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name;
-                roundWinsText.text = playerScore.roundWins.ToString();
-                killsText.text = playerScore.cumulativeKills.ToString();
-                assistsText.text = playerScore.cumulativeAssists.ToString();
-                deathsText.text = playerScore.cumulativeDeaths.ToString();
+                roundWinsText.text = PlayerScore.roundWins.ToString();
+                killsText.text = PlayerScore.cumulativeKills.ToString();
+                assistsText.text = PlayerScore.cumulativeAssists.ToString();
+                deathsText.text = PlayerScore.cumulativeDeaths.ToString();
 
-                if (kdRatioText) kdRatioText.text = playerScore.cumulativeDeaths == 0 ? playerScore.cumulativeKills.ToString("F2") : (playerScore.cumulativeKills / (float)playerScore.cumulativeDeaths).ToString("F2");
-                if (damageDealtText) damageDealtText.text = playerScore.cumulativeDamageDealt.ToString("F0");
-                if (damageRecievedText) damageRecievedText.text = playerScore.damageRecievedThisRound.ToString("F0");
+                if (kdRatioText) kdRatioText.text = PlayerScore.cumulativeDeaths == 0 ? PlayerScore.cumulativeKills.ToString("F2") : (PlayerScore.cumulativeKills / (float)PlayerScore.cumulativeDeaths).ToString("F2");
+                if (damageDealtText) damageDealtText.text = PlayerScore.cumulativeDamageDealt.ToString("F0");
+                if (damageRecievedText) damageRecievedText.text = PlayerScore.damageRecievedThisRound.ToString("F0");
             }
             else
             {

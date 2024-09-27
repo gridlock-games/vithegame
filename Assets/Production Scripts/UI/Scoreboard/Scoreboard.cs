@@ -145,7 +145,7 @@ namespace Vi.UI
                 }
             }
 
-            elementList.Sort((x, y) => x.GetTeam().CompareTo(y.GetTeam()));
+            elementList = elementList.OrderByDescending(item => item.GetTeam()).ThenByDescending(item => item.PlayerScore.cumulativeKills).ThenByDescending(item => item.PlayerScore.cumulativeAssists).ThenBy(item => item.PlayerScore.cumulativeDeaths).ToList();
             for (int i = 0; i < elementList.Count; i++)
             {
                 elementList[i].transform.SetSiblingIndex(i);
@@ -216,7 +216,7 @@ namespace Vi.UI
                 }
             }
 
-            elementList.Sort((x, y) => x.GetTeam().CompareTo(y.GetTeam()));
+            elementList = elementList.OrderByDescending(item => item.GetTeam()).ThenByDescending(item => item.PlayerScore.cumulativeKills).ThenByDescending(item => item.PlayerScore.cumulativeAssists).ThenBy(item => item.PlayerScore.cumulativeDeaths).ToList();
             for (int i = 0; i < elementList.Count; i++)
             {
                 elementList[i].transform.SetSiblingIndex(i);
