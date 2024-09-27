@@ -450,8 +450,8 @@ namespace Vi.Player
             }
             else if (followTarget)
             {
-                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
-                Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position + followTargetLookAtPositionOffset - transform.position);
+                Vector3 targetPosition = followTarget.NetworkCollider.transform.position + followTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
+                Quaternion targetRotation = Quaternion.LookRotation(followTarget.NetworkCollider.transform.position + followTargetLookAtPositionOffset - transform.position);
 
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lerpSpeed);
