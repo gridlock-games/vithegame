@@ -8,10 +8,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1592295603597467426, guid: 61cbba55629370346b7642acbb45183f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1836670016090135983, guid: 61cbba55629370346b7642acbb45183f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2001834763269464374, guid: 61cbba55629370346b7642acbb45183f,
         type: 3}
       propertyPath: m_Name
       value: OgreAxe_dropped
+      objectReference: {fileID: 0}
+    - target: {fileID: 2001834763269464374, guid: 61cbba55629370346b7642acbb45183f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2001834763269464394, guid: 61cbba55629370346b7642acbb45183f,
         type: 3}
@@ -62,6 +77,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3260176158298537989, guid: 61cbba55629370346b7642acbb45183f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8770708626720544352, guid: 61cbba55629370346b7642acbb45183f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6884212871457715500, guid: 61cbba55629370346b7642acbb45183f, type: 3}
