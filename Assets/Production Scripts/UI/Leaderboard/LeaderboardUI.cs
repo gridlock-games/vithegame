@@ -79,7 +79,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.killsLeaderboardEntries.OrderByDescending(item => item.record.kills).ThenByDescending(item => item.record.assists).ThenBy(item => item.record.deaths).Take(100))
+                foreach (WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.killsLeaderboardEntries)
                 {
                     if (killsLeaderboardEntry.record.gameMode == gameModeDropdown.options[gameModeDropdown.value].text)
                     {
@@ -98,7 +98,7 @@ namespace Vi.UI
         private IEnumerator RefreshLeaderboardCoroutine()
         {
             refreshButton.interactable = false;
-            yield return WebRequestManager.Singleton.GetLeaderboard(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
+            yield return WebRequestManager.Singleton.GetLeaderboard();
             refreshButton.interactable = true;
             OnGameModeChange();
         }
