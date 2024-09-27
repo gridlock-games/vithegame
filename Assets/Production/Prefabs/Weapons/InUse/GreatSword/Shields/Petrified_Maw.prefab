@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2175711673442429057, guid: db0a7040c757dec4c80d62a6a180e4da,
@@ -123,6 +124,21 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -2139034630885355068}
+    - targetCorrespondingSourceObject: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6868807613564413644}
+    - targetCorrespondingSourceObject: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8938107322807556597}
   m_SourcePrefab: {fileID: 100100000, guid: db0a7040c757dec4c80d62a6a180e4da, type: 3}
 --- !u!1 &5275617305407401058 stripped
 GameObject:
@@ -138,25 +154,19 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5275617305407401058}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 0.23659573, y: 0.9356718, z: 0.85613513}
   m_Center: {x: 0.12119475, y: -0.039096676, z: 0}
---- !u!114 &8938107322807556597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5275617305407401058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponMaterial: 0
-  weaponTrailVFX: {fileID: 0}
 --- !u!114 &6868807613564413644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,3 +182,19 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 161
   isPrewarmObject: 1
+--- !u!114 &8938107322807556597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5275617305407401058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e263244aefe0684fbe8ac75c031f23c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponMaterial: 0
+  dropWeaponPrefab: {fileID: 9118392115649297814, guid: 5fba720f9b8320343b8f2a57d45e74e5,
+    type: 3}
+  weaponTrailVFX: {fileID: 0}
