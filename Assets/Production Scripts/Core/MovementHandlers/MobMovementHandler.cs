@@ -176,7 +176,7 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.HighestKillPlayer:
-                    foreach (Attributes attributes in targetFinder.ActivePlayers.OrderByDescending(item => GameModeManager.Singleton.GetPlayerScore(item.GetPlayerDataId()).killsThisRound))
+                    foreach (Attributes attributes in targetFinder.ActivePlayers.OrderByDescending(item => GameModeManager.Singleton.GetPlayerScore(item.GetPlayerDataId()).killsThisRound).ThenBy(item => Vector3.Distance(item.transform.position, GetPosition())))
                     {
                         if (attributes == combatAgent) { continue; }
                         if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
