@@ -1021,6 +1021,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: canUseAbility2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: bodyHeightOffset
       value: 4
       objectReference: {fileID: 0}
@@ -1033,6 +1038,11 @@ PrefabInstance:
         type: 3}
       propertyPath: lightAttackDistance
       value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: ability2IsConstrainedByDistance
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7880380624370242607, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}

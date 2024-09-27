@@ -1245,7 +1245,7 @@ MonoBehaviour:
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
   attackingNormalizedTime: 0.2
-  recoveryNormalizedTime: 0.5
+  recoveryNormalizedTime: 0.4
   isAffectedByRage: 1
   damage: 10
   healAmount: 0
@@ -1296,3 +1296,7 @@ MonoBehaviour:
   requireAmmo: 0
   requiredAmmoAmount: 1
   reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0
