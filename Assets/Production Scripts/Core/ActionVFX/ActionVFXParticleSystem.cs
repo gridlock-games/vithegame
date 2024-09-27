@@ -285,7 +285,7 @@ namespace Vi.Core.VFX
                     {
                         if (CanHit(hittableAgent))
                         {
-                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
+                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(inside[particleIndex].position));
                         }
                     }
                 }

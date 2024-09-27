@@ -476,7 +476,7 @@ namespace Vi.Core
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
+            
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
@@ -491,7 +491,6 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
-
                 IsLoggedIn = false;
                 currentlyLoggedInUserId = "";
             }
@@ -533,7 +532,6 @@ namespace Vi.Core
 
         public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
         {
-      Debug.Log("attempt to login to firebase");
             IsLoggingIn = true;
             LogInErrorText = "";
             LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
