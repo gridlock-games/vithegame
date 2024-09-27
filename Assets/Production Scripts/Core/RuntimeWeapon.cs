@@ -7,7 +7,6 @@ using Vi.Utility;
 namespace Vi.Core
 {
     [RequireComponent(typeof(PooledObject))]
-    [RequireComponent(typeof(Rigidbody))]
     public class RuntimeWeapon : MonoBehaviour
     {
         [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
@@ -96,12 +95,8 @@ namespace Vi.Core
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
-        private Rigidbody rb;
-
         private void Awake()
         {
-            rb = GetComponent<Rigidbody>();
-            rb.isKinematic = true;
             renderers = GetComponentsInChildren<Renderer>(true);
             colliders = GetComponentsInChildren<Collider>(true);
 
@@ -114,6 +109,21 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private PooledObject dropWeaponPrefab;
+        private PooledObject dropWeaponInstance;
+        private void OnValidate()
+        {
+            //if (GetComponentInChildren<Renderer>())
+            //{
+            //    Debug.Log(this + " has a renderer but no drop weapon prefab");
+            //}
+
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                Debug.LogError(this + " shouldn't have a rigidbody!");
+            }
+        }
+
         private ActionClip.Ailment lastAilment = ActionClip.Ailment.None;
         protected virtual void Update()
         {
@@ -123,51 +133,18 @@ namespace Vi.Core
             {
                 if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death)
                 {
-                    rb.isKinematic = false;
-                    rb.interpolation = parentCombatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-
-                    transform.SetParent(null, true);
-
-                    foreach (Collider c in colliders)
-                    {
-                        c.enabled = parentCombatAgent.IsServer;
-                        c.isTrigger = false;
-                        c.gameObject.layer = LayerMask.NameToLayer("Character");
-                    }
+                    dropWeaponInstance = ObjectPoolingManager.SpawnObject(dropWeaponPrefab, transform.position, transform.rotation);
                 }
-                else
+                else // Alive
                 {
-                    rb.isKinematic = true;
-
-                    transform.SetParent(weaponParent, true);
-
-                    foreach (Collider c in colliders)
-                    {
-                        c.enabled = true;
-                        c.isTrigger = true;
-                        c.gameObject.layer = LayerMask.NameToLayer("NetworkPrediction");
-                    }
+                    if (dropWeaponInstance) { ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance); }
                 }
             }
             lastAilment = parentCombatAgent.GetAilment();
         }
 
-        private void OnTransformParentChanged()
-        {
-            if (transform.parent == weaponParent)
-            {
-                transform.localPosition = weaponLocalPosition;
-                transform.localRotation = weaponLocalRotation;
-            }
-        }
-
-        private Transform weaponParent;
-        private Vector3 weaponLocalPosition;
-        private Quaternion weaponLocalRotation;
         protected void OnEnable()
         {
-            NetworkPhysicsSimulation.AddRigidbody(rb);
-
             parentCombatAgent = transform.root.GetComponent<CombatAgent>();
             if (!parentCombatAgent) { return; }
 
@@ -194,34 +171,16 @@ namespace Vi.Core
             {
                 renderer.forceRenderingOff = false;
             }
-
-            weaponParent = transform.parent;
-            weaponLocalPosition = transform.localPosition;
-            weaponLocalRotation = transform.localRotation;
         }
 
         protected void OnDisable()
         {
-            NetworkPhysicsSimulation.RemoveRigidbody(rb);
-
             parentCombatAgent = null;
             isStowed = false;
             associatedRuntimeWeapons.Clear();
             hitCounter.Clear();
 
-            weaponParent = null;
-            lastAilment = ActionClip.Ailment.None;
-
-            rb.isKinematic = true;
-            rb.interpolation = RigidbodyInterpolation.None;
-            foreach (Collider c in colliders)
-            {
-                c.isTrigger = true;
-                c.gameObject.layer = LayerMask.NameToLayer("NetworkPrediction");
-            }
-
-            weaponLocalPosition = Vector3.zero;
-            weaponLocalRotation = Quaternion.identity;
+            if (dropWeaponInstance) { ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance); }
         }
 
         private bool lastIsActiveCall = true;
