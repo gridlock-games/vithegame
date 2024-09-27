@@ -133,11 +133,33 @@ namespace Vi.Core
             {
                 if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death)
                 {
-                    dropWeaponInstance = ObjectPoolingManager.SpawnObject(dropWeaponPrefab, transform.position, transform.rotation);
+                    if (dropWeaponPrefab)
+                    {
+                        dropWeaponInstance = ObjectPoolingManager.SpawnObject(dropWeaponPrefab, transform.position, transform.rotation);
+                        if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                        {
+                            rb.interpolation = parentCombatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+                            rb.collisionDetectionMode = parentCombatAgent.IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+                        }
+                        else
+                        {
+                            Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                        }
+
+                        foreach (Renderer renderer in renderers)
+                        {
+                            renderer.forceRenderingOff = true;
+                        }
+                    }
                 }
                 else // Alive
                 {
                     if (dropWeaponInstance) { ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance); }
+
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.forceRenderingOff = false;
+                    }
                 }
             }
             lastAilment = parentCombatAgent.GetAilment();
@@ -206,5 +228,45 @@ namespace Vi.Core
         {
             this.isStowed = isStowed;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Generate Drop Weapon Prefab Variant")]
+        public void CreateDropWeaponPrefabVariant()
+        {
+            if (!GetComponentInChildren<Renderer>()) { return; }
+
+            string variantAssetPath = UnityEditor.AssetDatabase.GetAssetPath(gameObject).Replace(".prefab", "") + "_dropped.prefab";
+            if (System.IO.File.Exists(variantAssetPath)) { return; }
+
+            GameObject objSource = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(gameObject);
+            foreach (Component component in objSource.GetComponentsInChildren<Component>())
+            {
+                if (component is not Transform
+                    & component is not Renderer)
+                {
+                    DestroyImmediate(component);
+                }
+            }
+
+            Renderer renderer = objSource.GetComponentInChildren<Renderer>();
+            if (!renderer) { return; }
+            objSource.AddComponent<Rigidbody>();
+            objSource.AddComponent<PooledObject>();
+            BoxCollider boxCollider = objSource.AddComponent<BoxCollider>();
+            boxCollider.center = renderer.localBounds.center;
+            boxCollider.size = renderer.localBounds.size;
+
+            foreach (Transform child in objSource.GetComponentsInChildren<Transform>())
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Character");
+            }
+
+            dropWeaponPrefab = UnityEditor.PrefabUtility.SaveAsPrefabAsset(objSource, variantAssetPath).GetComponent<PooledObject>();
+
+            DestroyImmediate(objSource);
+
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }

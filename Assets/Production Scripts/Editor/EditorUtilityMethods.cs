@@ -8,12 +8,69 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Core.MeshSlicing;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
-        [MenuItem("Tools/Remove Components From Weapon Previews")]
+        [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]
+        static void GenerateDroppedWeaponVariants()
+        {
+            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
+
+            foreach (var weaponOption in characterReference.GetWeaponOptions())
+            {
+                foreach (var weaponModelData in weaponOption.weapon.GetWeaponModelData())
+                {
+                    foreach (var data in weaponModelData.data)
+                    {
+                        if (data.weaponPrefab.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                        {
+                            runtimeWeapon.CreateDropWeaponPrefabVariant();
+                        }
+                        else
+                        {
+                            Debug.LogError(data.weaponPrefab + " doesn't have a runtime weapon");
+                        }
+                    }
+                }
+            }
+
+            string mobFolder = @"Assets/Production/Prefabs/Mobs";
+            foreach (string mobFilePath in Directory.GetFiles(mobFolder, "*.prefab", SearchOption.AllDirectories))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(mobFilePath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out Mob mob))
+                    {
+                        if (mob.GetWeaponOption() == null) { continue; }
+                        if (mob.GetWeaponOption().weapon == null) { continue; }
+                        foreach (var weaponModelData in mob.GetWeaponOption().weapon.GetWeaponModelData())
+                        {
+                            foreach (var data in weaponModelData.data)
+                            {
+                                if (data.weaponPrefab.TryGetComponent(out RuntimeWeapon runtimeWeapon))
+                                {
+                                    runtimeWeapon.CreateDropWeaponPrefabVariant();
+                                }
+                                else
+                                {
+                                    Debug.LogError(data.weaponPrefab + " doesn't have a runtime weapon");
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Unable to load prefab at path " + mobFilePath);
+                }
+            }
+        }
+
+        [MenuItem("Tools/Production/Remove Components From Weapon Previews")]
         static void RemoveComponentsFromWeaponPreviews()
         {
             CharacterReference characterReference = (CharacterReference)Selection.activeObject;
@@ -33,7 +90,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Generate Exploded Meshes")]
+        [MenuItem("Tools/Production/Generate Exploded Meshes")]
         static void GenerateExplodedMeshes()
         {
             Mesh mesh = (Mesh)Selection.activeObject;
@@ -98,7 +155,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Find Missing Network Prefabs")]
+        [MenuItem("Tools/Production/Find Missing Network Prefabs")]
         static void FindMissingNetworkPrefabs()
         {
             List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
@@ -132,7 +189,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Find VFX Not In Network Prefabs List")]
+        [MenuItem("Tools/Production/Find VFX Not In Network Prefabs List")]
         static void FindObjectsNotInNetworkPrefabsList()
         {
             NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
@@ -216,7 +273,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Set Texture Overrides for Android Platform")]
+        [MenuItem("Tools/Production/Set Texture Overrides for Android Platform")]
         static void SetTextureOverridesForAndroidPlatform()
         {
             string[] textures = AssetDatabase.FindAssets("t:Texture");
