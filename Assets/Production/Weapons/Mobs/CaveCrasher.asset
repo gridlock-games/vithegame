@@ -25,6 +25,7 @@ MonoBehaviour:
   rageRecoveryRate: 0
   shouldUseAmmo: 0
   maxAmmoCount: 0
+  reloadClip: {fileID: 0}
   attackSoundEffects:
   - weaponBone: 18
     attackSoundEffects:
@@ -235,7 +236,7 @@ MonoBehaviour:
   - hitLocation: 4
     reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
   ability1: {fileID: 11400000, guid: f70ed881dda1fc84c993b15233afd035, type: 2}
-  ability2: {fileID: 0}
+  ability2: {fileID: 11400000, guid: f91b3e4c0ec288444a1213f38ad36aad, type: 2}
   ability3: {fileID: 0}
   ability4: {fileID: 0}
   flashAttack: {fileID: 0}
