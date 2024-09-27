@@ -189,7 +189,7 @@ namespace Vi.Core
 
             if (AnimationHandler.IsGrabAttacking())
             {
-                AnimationHandler.CancelAllActions(0.15f);
+                AnimationHandler.CancelAllActions(0.15f, false);
             }
         }
 

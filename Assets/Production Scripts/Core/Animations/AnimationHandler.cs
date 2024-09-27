@@ -246,7 +246,7 @@ namespace Vi.Core
             Animator.Play("Empty", flinchLayerIndex);
         }
 
-        public void CancelAllActions(float transitionTime)
+        public void CancelAllActions(float transitionTime, bool resetGameplayVariables)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
@@ -259,11 +259,15 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
-            combatAgent.SetInviniciblity(0);
-            combatAgent.SetUninterruptable(0);
-            combatAgent.ResetAilment();
-            combatAgent.StatusAgent.RemoveAllStatuses();
-            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+
+            if (resetGameplayVariables)
+            {
+                combatAgent.SetInviniciblity(0);
+                combatAgent.SetUninterruptable(0);
+                combatAgent.ResetAilment();
+                combatAgent.StatusAgent.RemoveAllStatuses();
+                combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            }
             
             CancelAllActionsClientRpc(transitionTime);
         }
