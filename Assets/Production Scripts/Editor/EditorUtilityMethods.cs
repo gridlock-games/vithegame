@@ -273,6 +273,37 @@ namespace Vi.Editor
             }
         }
 
+        [MenuItem("Tools/Production/Set Video Overrides for Android Platform")]
+        static void SetVideoClipOverridesForAndroidPlatform()
+        {
+            string[] videoClips = AssetDatabase.FindAssets("t:VideoClip");
+            for (int i = 0; i < videoClips.Length; i++)
+            {
+                EditorUtility.DisplayProgressBar("Overriding video clips For Android",
+                    i.ToString() + " out of " + videoClips.Length.ToString() + " video clips completed",
+                    i / videoClips.Length);
+
+                string assetPath = AssetDatabase.GUIDToAssetPath(videoClips[i]);
+                if (assetPath.Contains("com.unity.")) { continue; }
+                if (assetPath.Length == 0) { Debug.LogError(videoClips[i] + " not found"); continue; }
+
+                VideoClipImporter importer = (VideoClipImporter)AssetImporter.GetAtPath(assetPath);
+                importer.importAudio = false;
+
+                VideoImporterTargetSettings defaultSettings = importer.defaultTargetSettings;
+                defaultSettings.enableTranscoding = true;
+
+                importer.defaultTargetSettings = defaultSettings;
+                VideoImporterTargetSettings androidSettings = defaultSettings;
+                androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+
+                importer.SetTargetSettings("Android", androidSettings);
+
+                importer.SaveAndReimport();
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
         [MenuItem("Tools/Production/Set Texture Overrides for Android Platform")]
         static void SetTextureOverridesForAndroidPlatform()
         {
@@ -306,6 +337,12 @@ namespace Vi.Editor
 
                 }
             }
+            EditorUtility.ClearProgressBar();
+        }
+
+        [MenuItem("Tools/Clear Progress Bar")]
+        static void ClearProgressBar()
+        {
             EditorUtility.ClearProgressBar();
         }
 
