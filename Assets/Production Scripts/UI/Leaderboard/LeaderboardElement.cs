@@ -9,6 +9,7 @@ namespace Vi.UI
 {
     public class LeaderboardElement : MonoBehaviour
     {
+        [SerializeField] private Text dateText;
         [SerializeField] private Text playerNameText;
         [Header("Kills Element")]
         [SerializeField] private Text killsText;
@@ -22,6 +23,7 @@ namespace Vi.UI
 
         public void Initialize(WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry)
         {
+            dateText.text = hordeLeaderboardEntry.dateCreated;
             playerNameText.text = hordeLeaderboardEntry.record.playerName;
             wavesClearedText.text = hordeLeaderboardEntry.record.wave.ToString();
             clearTimeText.text = hordeLeaderboardEntry.record.clearTime.ToString("F2");
@@ -30,6 +32,7 @@ namespace Vi.UI
 
         public void Initialize(WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry)
         {
+            dateText.text = killsLeaderboardEntry.dateCreated;
             playerNameText.text = killsLeaderboardEntry.record.playerName;
             killsText.text = killsLeaderboardEntry.record.kills.ToString();
             deathsText.text = killsLeaderboardEntry.record.deaths.ToString();
