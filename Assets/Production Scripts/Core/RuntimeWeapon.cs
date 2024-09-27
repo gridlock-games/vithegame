@@ -111,18 +111,6 @@ namespace Vi.Core
 
         [SerializeField] private PooledObject dropWeaponPrefab;
         private PooledObject dropWeaponInstance;
-        private void OnValidate()
-        {
-            //if (GetComponentInChildren<Renderer>())
-            //{
-            //    Debug.Log(this + " has a renderer but no drop weapon prefab");
-            //}
-
-            if (TryGetComponent(out Rigidbody rb))
-            {
-                Debug.LogError(this + " shouldn't have a rigidbody!");
-            }
-        }
 
         private ActionClip.Ailment lastAilment = ActionClip.Ailment.None;
         protected virtual void Update()
