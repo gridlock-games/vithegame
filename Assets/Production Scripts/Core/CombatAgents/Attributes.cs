@@ -447,7 +447,7 @@ namespace Vi.Core.CombatAgents
             }
 
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed())
+            if (IsGrabbed)
             {
                 if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
                 if (attacker != GetGrabAssailant()) { return false; }
@@ -472,12 +472,12 @@ namespace Vi.Core.CombatAgents
 
             if (attack.maxHitLimit == 0) { return false; }
 
-            if (IsInvincible()) { return false; }
+            if (IsInvincible) { return false; }
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { return false; }
 
-                if (!IsUninterruptable())
+                if (!IsUninterruptable)
                 {
                     wasStaggeredThisFrame = true;
                     StartCoroutine(ResetStaggerBool());
@@ -486,13 +486,13 @@ namespace Vi.Core.CombatAgents
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
 
-            if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
 
             AddStamina(-attack.staminaDamage);
-            if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
-            if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
+            if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
@@ -564,7 +564,7 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
+            if (IsRaging) { HPDamage *= rageDamageMultiplier; }
 
             bool hitReactionWasPlayed = false;
             if (AddHPWithoutApply(HPDamage) <= 0)
@@ -572,7 +572,7 @@ namespace Vi.Core.CombatAgents
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
 
-                if (IsGrabbed())
+                if (IsGrabbed)
                 {
                     if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
                     CancelGrab();
@@ -581,7 +581,7 @@ namespace Vi.Core.CombatAgents
                 AnimationHandler.PlayAction(hitReaction);
                 hitReactionWasPlayed = true;
             }
-            else if (!IsUninterruptable())
+            else if (!IsUninterruptable)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Grab)
                 {
@@ -595,7 +595,7 @@ namespace Vi.Core.CombatAgents
 
                 if (hitReaction.ailment == ActionClip.Ailment.None)
                 {
-                    if (!IsGrabbed() & !IsRaging())
+                    if (!IsGrabbed & !IsRaging)
                     {
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
@@ -653,11 +653,11 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            if (!IsUninterruptable())
+            if (!IsUninterruptable)
             {
-                if (attack.shouldFlinch | IsRaging())
+                if (attack.shouldFlinch | IsRaging)
                 {
-                    if (!hitReactionWasPlayed & !IsGrabbed())
+                    if (!hitReactionWasPlayed & !IsGrabbed)
                     {
                         AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle));
                         MovementHandler.Flinch(attack.GetFlinchAmount());
@@ -731,7 +731,7 @@ namespace Vi.Core.CombatAgents
         private float rageDelayCooldown;
         private void UpdateRage()
         {
-            if (IsRaging())
+            if (IsRaging)
             {
                 AddRage(-rageDepletionRate * Time.deltaTime);
             }

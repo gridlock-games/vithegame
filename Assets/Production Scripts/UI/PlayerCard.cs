@@ -322,7 +322,7 @@ namespace Vi.UI
             }
 
             RageStatus currentRageStatus;
-            if (combatAgent.IsRaging())
+            if (combatAgent.IsRaging)
             {
                 currentRageStatus = RageStatus.IsRaging;
             }

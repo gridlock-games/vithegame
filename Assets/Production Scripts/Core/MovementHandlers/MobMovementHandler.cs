@@ -55,9 +55,9 @@ namespace Vi.Core.MovementHandlers
 
             if (combatAgent.ShouldApplyAilmentRotation())
                 return combatAgent.GetAilmentRotation();
-            else if (combatAgent.IsGrabbing())
+            else if (combatAgent.IsGrabbing)
                 return transform.rotation;
-            else if (combatAgent.IsGrabbed())
+            else if (combatAgent.IsGrabbed)
             {
                 CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                 if (grabAssailant)
@@ -214,19 +214,19 @@ namespace Vi.Core.MovementHandlers
                 return;
             }
 
-            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed() & !combatAgent.IsGrabbing()) { Rigidbody.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing) { Rigidbody.isKinematic = false; return; }
 
             Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
 
             // Apply movement
             Vector3 movement = Vector3.zero;
-            if (combatAgent.IsGrabbing())
+            if (combatAgent.IsGrabbing)
             {
                 Rigidbody.isKinematic = true;
                 return;
             }
-            else if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
+            else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
             {
                 CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                 if (grabAssailant)
@@ -240,7 +240,7 @@ namespace Vi.Core.MovementHandlers
             {
                 movement = Vector3.zero;
             }
-            else if (combatAgent.IsPulled())
+            else if (combatAgent.IsPulled)
             {
                 CombatAgent pullAssailant = combatAgent.GetPullAssailant();
                 if (pullAssailant)
