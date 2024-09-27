@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Vi.Core;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -67,7 +68,7 @@ namespace Vi.UI
 
             if (gameModeValues[gameModeDropdown.value] == PlayerDataManager.GameMode.HordeMode)
             {
-                foreach (WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry in WebRequestManager.Singleton.hordeLeaderboardEntries)
+                foreach (WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry in WebRequestManager.Singleton.hordeLeaderboardEntries.OrderByDescending(item => item.record.wave).ThenByDescending(item => item.record.clearTime).ThenByDescending(item => item.record.damageDealt).Take(100))
                 {
                     if (hordeLeaderboardEntry.record.gameMode == gameModeDropdown.options[gameModeDropdown.value].text)
                     {
@@ -78,7 +79,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.killsLeaderboardEntries)
+                foreach (WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.killsLeaderboardEntries.OrderByDescending(item => item.record.kills).ThenByDescending(item => item.record.assists).ThenBy(item => item.record.deaths).Take(100))
                 {
                     if (killsLeaderboardEntry.record.gameMode == gameModeDropdown.options[gameModeDropdown.value].text)
                     {
