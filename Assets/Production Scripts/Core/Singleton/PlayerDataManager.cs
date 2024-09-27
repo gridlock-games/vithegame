@@ -1243,8 +1243,11 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
+                        bool waitForRespawn = GetGameMode() != GameMode.None;
+                        if (GameModeManager.Singleton) { waitForRespawn &= !GameModeManager.Singleton.ShouldDisplayNextGameAction(); }
+
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].LoadoutManager;
-                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
+                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), waitForRespawn);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
