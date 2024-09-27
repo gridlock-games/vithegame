@@ -15,6 +15,7 @@ namespace Vi.Player
     {
         [Header("Player Movement Handler")]
         [SerializeField] private CameraController cameraController;
+        [SerializeField] private Light previewCharLight;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
@@ -598,6 +599,8 @@ namespace Vi.Player
             {
                 latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation), Rigidbody, transform.rotation, false);
             }
+
+            previewCharLight.gameObject.SetActive(false);
         }
 
         public override void OnNetworkDespawn()
@@ -643,6 +646,8 @@ namespace Vi.Player
             cameraController.transform.SetParent(transform);
             cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
             cameraController.transform.localRotation = Quaternion.identity;
+
+            previewCharLight.gameObject.SetActive(false);
         }
 
         private const int BUFFER_SIZE = 1024;
@@ -672,6 +677,12 @@ namespace Vi.Player
             {
                 cameraController.PlayAnimation("TutorialIntro");
             }
+        }
+
+        protected override void OnSpawnFromPool()
+        {
+            base.OnSpawnFromPool();
+            previewCharLight.gameObject.SetActive(!IsSpawned);
         }
 
         private Camera mainCamera;

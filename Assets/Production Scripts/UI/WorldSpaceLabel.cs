@@ -122,7 +122,7 @@ namespace Vi.UI
         private void OnReturnToPool()
         {
             team = default;
-            localWeaponHandler = null;
+            localCombatAgent = null;
             localSpectator = null;
             combatAgent = null;
             rendererToFollow = null;
@@ -168,7 +168,20 @@ namespace Vi.UI
             }
         }
 
-        private WeaponHandler localWeaponHandler;
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
+            mainCamera = Camera.main;
+        }
+
+        private CombatAgent localCombatAgent;
         private NetworkObject localSpectator;
         private void FindLocalWeaponHandlerOrSpectator()
         {
@@ -186,17 +199,17 @@ namespace Vi.UI
             }
             else
             {
-                if (localWeaponHandler)
+                if (localCombatAgent)
                 {
-                    if (localWeaponHandler.gameObject.activeInHierarchy) { localWeaponHandler = null; }
+                    if (localCombatAgent.gameObject.activeInHierarchy) { localCombatAgent = null; }
                 }
 
-                if (localWeaponHandler) { return; }
+                if (localCombatAgent) { return; }
 
                 KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
                 if (kvp.Value)
                 {
-                    localWeaponHandler = kvp.Value.WeaponHandler;
+                    localCombatAgent = kvp.Value;
                 }
             }
         }
@@ -204,8 +217,8 @@ namespace Vi.UI
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             FindLocalWeaponHandlerOrSpectator();
+            FindMainCamera();
         }
 
         private void LateUpdate()
@@ -225,12 +238,12 @@ namespace Vi.UI
 
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
-            if (localWeaponHandler | localSpectator)
+            if ((localCombatAgent | localSpectator) & mainCamera)
             {
                 Transform source = null;
-                if (localWeaponHandler)
+                if (localCombatAgent)
                 {
-                    source = localWeaponHandler.transform;
+                    source = localCombatAgent.transform;
                 }
                 else if (localSpectator)
                 {
@@ -240,28 +253,30 @@ namespace Vi.UI
                 Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
                 transform.position = pos;
 
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(source.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
 
-                float camDistance = Vector3.Distance(source.transform.position, combatAgent.transform.position);
-                if (camDistance > viewDistance)
+                float playerDistance = Vector3.Distance(source.transform.position, combatAgent.transform.position);
+                if (playerDistance > viewDistance)
                 {
-                    Quaternion mouseOverRotation = Quaternion.LookRotation(source.transform.position - combatAgent.transform.position);
-                    float upAngle = Vector3.SignedAngle(source.transform.up, mouseOverRotation * Vector3.up, source.transform.right);
-                    float horizontalAngle = Quaternion.Angle(source.transform.rotation, mouseOverRotation);
-
-                    if (shouldUseFixedScale)
-                        localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue) : Vector3.zero;
-                    else
-                        localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? Vector3.one * (camDistance / scalingDistanceDivisor) : Vector3.zero;
+                    if (Physics.Raycast(mainCamera.transform.position + mainCamera.transform.forward * viewDistance, mainCamera.transform.forward, out RaycastHit hit, 100, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+                    {
+                        if (hit.transform.root == combatAgent.NetworkCollider.transform.root)
+                        {
+                            if (shouldUseFixedScale)
+                                localScaleTarget = new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue);
+                            else
+                                localScaleTarget = Vector3.one * (playerDistance / scalingDistanceDivisor);
+                        }
+                    }
                 }
                 else // Cam distance is less than view distance
                 {
                     if (shouldUseFixedScale)
                         localScaleTarget = new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue);
                     else
-                        localScaleTarget = Vector3.one * (camDistance / scalingDistanceDivisor);
+                        localScaleTarget = Vector3.one * (playerDistance / scalingDistanceDivisor);
 
-                    if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
+                    if (playerDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
                 localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
             }
@@ -279,9 +294,9 @@ namespace Vi.UI
                 {
                     healthBarLocalScaleTarget = Vector3.one;
                 }
-                else if(localWeaponHandler)
+                else if(localCombatAgent)
                 {
-                    if (localWeaponHandler.CanAim) { healthBarLocalScaleTarget = Vector3.one; }
+                    if (localCombatAgent.WeaponHandler.CanAim) { healthBarLocalScaleTarget = Vector3.one; }
                 }
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);

@@ -13,6 +13,26 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Remove Components From Weapon Previews")]
+        static void RemoveComponentsFromWeaponPreviews()
+        {
+            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
+            foreach (var weaponOption in characterReference.GetWeaponOptions())
+            {
+                foreach (Component component in weaponOption.weaponPreviewPrefab.GetComponentsInChildren<Component>())
+                {
+                    if (component is not Transform
+                        & component is not Camera
+                        & component is not UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+                        & component is not Renderer)
+                    {
+                        DestroyImmediate(component, true);
+                    }
+                }
+                EditorUtility.SetDirty(weaponOption.weaponPreviewPrefab);
+            }
+        }
+
         [MenuItem("Tools/Generate Exploded Meshes")]
         static void GenerateExplodedMeshes()
         {
@@ -78,7 +98,41 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Find Objects Not In Network Prefabs List")]
+        [MenuItem("Tools/Find Missing Network Prefabs")]
+        static void FindMissingNetworkPrefabs()
+        {
+            List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
+            foreach (Object obj in Selection.objects)
+            {
+                networkPrefabsLists.Add((NetworkPrefabsList)obj);
+            }
+
+            string baseFolder = @"Assets\Production\Prefabs";
+            foreach (string prefabFilePath in Directory.GetFiles(baseFolder, "*.prefab", SearchOption.AllDirectories))
+            {
+                if (prefabFilePath.Contains("VFX")) { continue; }
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        bool contains = false;
+                        foreach (NetworkPrefabsList networkPrefabsList in networkPrefabsLists)
+                        {
+                            if (networkPrefabsList.Contains(networkObject.gameObject))
+                            {
+                                contains = true;
+                                break;
+                            }
+                        }
+
+                        if (!contains) { Debug.Log(prefabFilePath); }
+                    }
+                }
+            }
+        }
+
+        [MenuItem("Tools/Find VFX Not In Network Prefabs List")]
         static void FindObjectsNotInNetworkPrefabsList()
         {
             NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
@@ -116,7 +170,6 @@ namespace Vi.Editor
                             if (!networkPrefabsList.Contains(prefab))
                             {
                                 // Add object here
-                                Debug.Log(prefab.name + " referenced in action clip, but not in the selected network prefabs list");
                                 Debug.Log(prefabFilePath);
                             }
                         }
@@ -151,7 +204,6 @@ namespace Vi.Editor
                             if (!networkPrefabsList.Contains(prefab))
                             {
                                 // Add object here
-                                Debug.Log(prefab.name + " referenced in action clip, but not in the selected network prefabs list");
                                 Debug.Log(prefabFilePath);
                             }
                         }
