@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -9,7 +10,7 @@ namespace Vi.UI
     {
         [SerializeField] private Image abilityIcon;
         [SerializeField] private Image inactiveAbilityIcon;
-        [SerializeField] private Image cooldownIcon;
+        [SerializeField] private Text cooldownText;
         [SerializeField] private Text keybindText;
         [SerializeField] private ActionClip previewAbility;
 
@@ -34,7 +35,7 @@ namespace Vi.UI
             abilityIcon.sprite = Ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = Ability.abilityImageIcon;
             keybindText.text = previewAbility.name.Replace("Ability", "");
-            cooldownIcon.fillAmount = 0;
+            cooldownText.text = "";
         }
 
         public void UpdateCard(ActionClip ability, string keybindText)
@@ -63,7 +64,9 @@ namespace Vi.UI
         private void Update()
         {
             if (Ability == null) { return; }
-            cooldownIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+
+            float timeLeft = weaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
+            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
             abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
 
             if (animationHandler.AreActionClipRequirementsMet(Ability))
