@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.Player;
 using Vi.Utility;
+using Unity.Collections;
 
 namespace Vi.UI
 {
@@ -42,9 +43,11 @@ namespace Vi.UI
         [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
+        private FixedString64Bytes originalActiveLoadoutSlot;
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
+            originalActiveLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
         }
 
         private GameObject previewObject;
@@ -96,6 +99,13 @@ namespace Vi.UI
                 {
                     Destroy(previewObject);
                 }
+            }
+
+            FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if (originalActiveLoadoutSlot != activeLoadoutSlot)
+            {
+                Debug.Log("Using character loadout " + activeLoadoutSlot + " original " + originalActiveLoadoutSlot);
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(attributes.CachedPlayerData.character._id.ToString(), activeLoadoutSlot.ToString()));
             }
         }
 
@@ -151,7 +161,6 @@ namespace Vi.UI
 
             if (!playerData.character.GetActiveLoadout().Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
-                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
                 playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
