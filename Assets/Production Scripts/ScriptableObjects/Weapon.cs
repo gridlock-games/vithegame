@@ -620,8 +620,24 @@ namespace Vi.ScriptableObjects
 
         [Header("Lunge Assignments")]
         [SerializeField] private ActionClip lunge;
+        [SerializeField] private ActionClip invinicbleLunge;
+        [SerializeField] private ActionClip uninterruptableLunge;
 
-        public ActionClip GetLungeClip() { return lunge; }
+        public ActionClip GetLungeClip(bool isUninterruptable, bool isInvincible)
+        {
+            if (isInvincible)
+            {
+                return invinicbleLunge;
+            }
+            else if (isUninterruptable)
+            {
+                return uninterruptableLunge;
+            }
+            else
+            {
+                return lunge;
+            }
+        }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
         private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
@@ -647,6 +663,8 @@ namespace Vi.ScriptableObjects
             if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
 
             if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
+            if (invinicbleLunge) { actionClipLookup.TryAdd(invinicbleLunge.name, invinicbleLunge); }
+            if (uninterruptableLunge) { actionClipLookup.TryAdd(uninterruptableLunge.name, uninterruptableLunge); }
 
             if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
             if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }

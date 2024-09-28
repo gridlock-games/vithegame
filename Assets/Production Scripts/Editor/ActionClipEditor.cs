@@ -724,6 +724,10 @@ namespace Vi.Editor
             else if ((ActionClip.ClipType)spClipType.enumValueIndex == ActionClip.ClipType.Lunge)
             {
                 EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(spIsInvincible);
+                EditorGUILayout.PropertyField(spIsUninterruptable);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spAgentRageCost);
 
