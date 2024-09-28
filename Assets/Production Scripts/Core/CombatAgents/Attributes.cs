@@ -748,7 +748,6 @@ namespace Vi.Core.CombatAgents
             {
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 respawnCoroutine = StartCoroutine(RespawnSelf());
-                AnimationHandler.Animator.enabled = false;
             }
             else if (prev == ActionClip.Ailment.Death)
             {
@@ -757,7 +756,6 @@ namespace Vi.Core.CombatAgents
                     IsRespawning = false;
                     StopCoroutine(respawnCoroutine);
                 }
-                AnimationHandler.Animator.enabled = true;
             }
         }
 
