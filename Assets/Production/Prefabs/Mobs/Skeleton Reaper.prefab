@@ -2734,11 +2734,6 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
-      propertyPath: whitelistedAilments.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
-        type: 3}
       propertyPath: weaponOption.animationController
       value: 
       objectReference: {fileID: 22100000, guid: 3294f575e61cf1849b8526f8d271dad9,
@@ -2825,6 +2820,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: gravityScale
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: targetingType
       value: 3
       objectReference: {fileID: 0}
@@ -2837,6 +2837,16 @@ PrefabInstance:
         type: 3}
       propertyPath: bodyHeightOffset
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: stoppingDistance
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: lightAttackDistance
+      value: 4.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
