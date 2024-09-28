@@ -170,6 +170,7 @@ namespace Vi.Core
                     smr.updateWhenOffscreen = parentCombatAgent.IsServer;
                 }
                 renderer.forceRenderingOff = true;
+                renderer.gameObject.layer = LayerMask.NameToLayer(parentCombatAgent.IsSpawned ? "NetworkPrediction" : "Preview");
             }
             StartCoroutine(EnableRenderersAfterOneFrame());
         }

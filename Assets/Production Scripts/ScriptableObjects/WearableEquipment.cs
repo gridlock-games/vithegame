@@ -87,6 +87,11 @@ namespace Vi.ScriptableObjects
                     srenderer.updateWhenOffscreen = networkObject ? networkObject.IsLocalPlayer : true;
                 }
             }
+
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in renderList)
+            {
+                skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(networkObject.IsSpawned ? "Character" : "Preview");
+            }
         }
 
         private void OnDisable()

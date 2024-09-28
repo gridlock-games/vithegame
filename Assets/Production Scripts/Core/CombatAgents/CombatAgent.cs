@@ -75,6 +75,11 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
+
+            foreach (Collider col in NetworkCollider.Colliders)
+            {
+                col.enabled = true;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -91,6 +96,11 @@ namespace Vi.Core
                 SetInviniciblity(0);
                 SetUninterruptable(0);
                 ResetAilment();
+            }
+
+            foreach (Collider col in NetworkCollider.Colliders)
+            {
+                col.enabled = false;
             }
         }
 

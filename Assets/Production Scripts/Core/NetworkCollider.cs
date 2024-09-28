@@ -31,6 +31,7 @@ namespace Vi.Core
                 {
                     networkPredictionLayerColliders.Add(col);
                 }
+                col.enabled = false;
             }
             Colliders = networkPredictionLayerColliders.ToArray();
         }

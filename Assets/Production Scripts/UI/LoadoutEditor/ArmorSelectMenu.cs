@@ -49,23 +49,24 @@ namespace Vi.UI
             if (!previewObject)
             {
                 // Instantiate the player model
+                Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerDataId);
                 if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
                 {
                     previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
-                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        basePos,
                         Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
                 }
                 else
                 {
                     previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                        PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                        basePos,
                         Quaternion.Euler(SpawnPoints.previewCharacterRotation));
                 }
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
 
-                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+                characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             }
             

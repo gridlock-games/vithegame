@@ -318,7 +318,14 @@ namespace Vi.Core
         private void OnEnable()
         {
             combatAgent = GetComponentInParent<CombatAgent>();
-            if (combatAgent) { animationHandler = combatAgent.GetComponent<AnimationHandler>(); }
+            if (combatAgent)
+            {
+                animationHandler = combatAgent.GetComponent<AnimationHandler>();
+                foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+                {
+                    skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
+                }
+            }
 
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {

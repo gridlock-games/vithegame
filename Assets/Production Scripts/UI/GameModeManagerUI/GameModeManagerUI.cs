@@ -214,16 +214,17 @@ namespace Vi.UI
             }
 
             // Instantiate the player model
+            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(gameModeManager.GetMVPScore().id);
             if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledPrefab))
             {
                 MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    basePos,
                     Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
             }
             else
             {
                 MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
+                    basePos,
                     Quaternion.Euler(SpawnPoints.previewCharacterRotation));
             }
 
@@ -231,7 +232,7 @@ namespace Vi.UI
             animationHandler.ChangeCharacter(character);
             MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
-            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
             MVPPresentationCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             MVPPresentationCamera.enabled = true;
 
