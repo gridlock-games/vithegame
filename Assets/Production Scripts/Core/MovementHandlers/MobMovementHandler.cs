@@ -68,7 +68,7 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
             return transform.rotation;
         }
