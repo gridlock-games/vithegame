@@ -50,7 +50,7 @@ namespace Vi.Core.MovementHandlers
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return transform.rotation; }
 
-            Vector3 camDirection = targetFinder.GetTarget() ? (targetFinder.GetTarget().transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
+            Vector3 camDirection = (NextPosition - Rigidbody.position).normalized;
             camDirection.Scale(HORIZONTAL_PLANE);
 
             if (combatAgent.ShouldApplyAilmentRotation())
