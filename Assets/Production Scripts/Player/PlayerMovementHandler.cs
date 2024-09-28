@@ -18,13 +18,11 @@ namespace Vi.Player
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            if (!IsServer) { Debug.LogError("PlayerMovementHandler.SetOrientation() should only be called on the server!"); return; }
-
-            Rigidbody.position = newPosition;
-            Rigidbody.Sleep();
-            transform.position = newPosition;
-
-            SetRotationClientRpc(newRotation);
+            base.SetOrientation(newPosition, newRotation);
+            if (IsSpawned)
+            {
+                SetRotationClientRpc(newRotation);
+            }
         }
 
         [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }

@@ -292,5 +292,37 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
+
+        // Uncomment to make mobs respawn automatically
+        //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        //{
+        //    base.OnAilmentChanged(prev, current);
+
+        //    if (current == ActionClip.Ailment.Death)
+        //    {
+        //        respawnCoroutine = StartCoroutine(RespawnSelf());
+        //    }
+        //    else if (prev == ActionClip.Ailment.Death)
+        //    {
+        //        if (respawnCoroutine != null)
+        //        {
+        //            IsRespawning = false;
+        //            StopCoroutine(respawnCoroutine);
+        //        }
+        //    }
+        //}
+
+        //public bool IsRespawning { get; private set; }
+        //[HideInInspector] public bool isWaitingForSpawnPoint;
+        //private Coroutine respawnCoroutine;
+        //private float respawnSelfCalledTime;
+        //private IEnumerator RespawnSelf()
+        //{
+        //    yield return new WaitForSeconds(5);
+        //    ResetStats(1, true, true, false);
+        //    AnimationHandler.CancelAllActions(0, true);
+        //    MovementHandler.SetOrientation(new Vector3(0, 5, 0), Quaternion.identity);
+        //    LoadoutManager.SwapLoadoutOnRespawn();
+        //}
     }
 }

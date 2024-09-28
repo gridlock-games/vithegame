@@ -17,6 +17,16 @@ namespace Vi.Core.MovementHandlers
             base.SetOrientation(newPosition, newRotation);
         }
 
+        protected override void TeleportPositionRpc(Vector3 newPosition)
+        {
+            if (rb)
+            {
+                rb.position = newPosition;
+                rb.Sleep();
+            }
+            base.TeleportPositionRpc(newPosition);
+        }
+
         public override Vector3 GetPosition() { return rb.position; }
 
         public override void OnNetworkSpawn()
