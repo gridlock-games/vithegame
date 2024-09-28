@@ -1224,6 +1224,11 @@ namespace Vi.Core
             {
                 StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
             }
+
+            if (animatorReference)
+            {
+                animatorReference.OnNetworkSpawn();
+            }
         }
 
         private const string actionsLayerName = "Actions";
