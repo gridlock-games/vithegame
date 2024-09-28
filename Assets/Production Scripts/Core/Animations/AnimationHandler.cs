@@ -33,7 +33,7 @@ namespace Vi.Core
             }
             else
             {
-                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip);
+                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip + " " + name);
             }
         }
 

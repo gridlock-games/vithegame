@@ -36,7 +36,11 @@ namespace Vi.Core.MovementHandlers
                 transform.rotation = EvaluateRotation();
             }
             SetAnimationMoveInput(GetPathMoveInput(true));
-            EvaluateAction();
+
+            if (IsServer & IsSpawned)
+            {
+                EvaluateAction();
+            }
         }
 
         private bool disableBots;
