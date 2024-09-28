@@ -445,6 +445,31 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public float GetAbilityCooldownTimeLeft(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return ability1.abilityCooldownTime - (Time.time - lastAbility1ActivateTime);
+            }
+            else if (ability == ability2)
+            {
+                return ability2.abilityCooldownTime - (Time.time - lastAbility2ActivateTime);
+            }
+            else if (ability == ability3)
+            {
+                return ability3.abilityCooldownTime - (Time.time - lastAbility3ActivateTime);
+            }
+            else if (ability == ability4)
+            {
+                return ability4.abilityCooldownTime - (Time.time - lastAbility4ActivateTime);
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
         public float GetAbilityCooldownProgress(ActionClip ability)
         {
             if (ability == ability1)

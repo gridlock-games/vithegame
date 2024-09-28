@@ -17,7 +17,7 @@ namespace Vi.Editor
             return entry != null;
         }
 
-        [MenuItem("Tools/Organize Addressable Groups")]
+        [MenuItem("Tools/Production/Organize Addressable Groups")]
         private static void OrganizeAddressables()
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;

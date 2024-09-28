@@ -1004,6 +1004,8 @@ namespace Vi.Core.GameModeManagers
         public bool IsWaitingForPlayers { get; private set; } = true;
         private bool AreAllPlayersConnected()
         {
+            if (Time.time - startTime > 15) { return true; }
+
             if (!PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().TrueForAll(item => PlayerDataManager.Singleton.IdHasLocalPlayer(item.id))) { return false; }
 
             List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
@@ -1018,6 +1020,12 @@ namespace Vi.Core.GameModeManagers
         }
 
         [SerializeField] private TimerMode timerMode = TimerMode.CountDown;
+
+        private float startTime;
+        protected void Start()
+        {
+            startTime = Time.time;
+        }
 
         protected void Update()
         {

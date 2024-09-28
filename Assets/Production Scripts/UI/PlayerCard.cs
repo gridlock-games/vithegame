@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -237,7 +238,7 @@ namespace Vi.UI
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
-                healthText.text = "HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+                healthText.text = "HP " + StringUtility.FormatDynamicFloatForUI(HP) + " / " + maxHP.ToString("F0");
                 healthFillImage.fillAmount = HP / maxHP;
             }
 
@@ -255,22 +256,20 @@ namespace Vi.UI
             if (!staminaAndSpiritAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                if (stamina < 0.1f & stamina > 0) { stamina = 0.1f; }
                 float spirit = combatAgent.GetSpirit();
-                if (spirit < 0.1f & spirit > 0) { spirit = 0.1f; }
 
                 float maxStamina = combatAgent.GetMaxStamina();
                 float maxSpirit = combatAgent.GetMaxSpirit();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
-                    staminaText.text = "ST " + (stamina < 10 & stamina > 0 ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+                    staminaText.text = "ST " + StringUtility.FormatDynamicFloatForUI(stamina) + " / " + maxStamina.ToString("F0");
                     staminaFillImage.fillAmount = stamina / maxStamina;
                 }
 
                 if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
                 {
-                    spiritText.text = "SP " + (spirit < 10 & spirit > 0 ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+                    spiritText.text = "SP " + StringUtility.FormatDynamicFloatForUI(spirit) + " / " + maxSpirit.ToString("F0");
                     spiritFillImage.fillAmount = spirit / maxSpirit;
                 }
 
@@ -323,7 +322,7 @@ namespace Vi.UI
             }
 
             RageStatus currentRageStatus;
-            if (combatAgent.IsRaging())
+            if (combatAgent.IsRaging)
             {
                 currentRageStatus = RageStatus.IsRaging;
             }

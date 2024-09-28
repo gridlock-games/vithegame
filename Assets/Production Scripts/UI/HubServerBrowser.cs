@@ -38,7 +38,8 @@ namespace Vi.UI
         private void Update()
         {
             refreshServersButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-            joinLobbyButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
+            createLobbyButton.interactable = refreshServersButton.interactable;
+            joinLobbyButton.interactable = refreshServersButton.interactable & serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
             
             if (!WebRequestManager.Singleton.IsRefreshingServers)
             {

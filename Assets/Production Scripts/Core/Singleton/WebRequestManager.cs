@@ -2576,10 +2576,10 @@ namespace Vi.Core
         public List<KillsLeaderboardEntry> killsLeaderboardEntries { get; private set; } = new List<KillsLeaderboardEntry>();
         public List<HordeLeaderboardEntry> hordeLeaderboardEntries { get; private set; } = new List<HordeLeaderboardEntry>();
 
-        public IEnumerator GetLeaderboard(string characterId)
+        public IEnumerator GetLeaderboard()
         {
             // Kills leaderboard
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderboard/kills");
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderBoardSummary/kills");
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
@@ -2616,7 +2616,6 @@ namespace Vi.Core
             public string boardType;
             public string charId;
             public KillsRecord record;
-            public string dateCreated;
         }
 
         public struct HordeLeaderboardEntry

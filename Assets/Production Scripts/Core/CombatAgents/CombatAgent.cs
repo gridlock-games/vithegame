@@ -125,13 +125,13 @@ namespace Vi.Core
 
         public void SetNetworkCollider(NetworkCollider networkCollider) { NetworkCollider = networkCollider; }
 
-        public virtual bool IsInvincible() { return isInvincible.Value; }
+        public virtual bool IsInvincible { get { return isInvincible.Value; } }
 
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
-        public bool IsUninterruptable() { return isUninterruptable.Value; }
+        public bool IsUninterruptable { get { return isUninterruptable.Value; }  }
 
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
@@ -145,9 +145,9 @@ namespace Vi.Core
 
         public void SetGrabVictim(ulong grabVictimNetworkObjectId) { grabVictimDataId.Value = grabVictimNetworkObjectId; }
 
-        public bool IsGrabbed() { return isGrabbed.Value; }
+        public bool IsGrabbed { get { return isGrabbed.Value; } }
 
-        public bool IsGrabbing() { return isGrabbing.Value; }
+        public bool IsGrabbing { get { return isGrabbing.Value; } }
 
         public void SetIsGrabbingToTrue() { isGrabbing.Value = true; }
 
@@ -178,7 +178,7 @@ namespace Vi.Core
 
         public void CancelGrab()
         {
-            if (IsGrabbed() | IsGrabbing())
+            if (IsGrabbed | IsGrabbing)
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
                 isGrabbed.Value = false;
@@ -189,7 +189,7 @@ namespace Vi.Core
 
             if (AnimationHandler.IsGrabAttacking())
             {
-                AnimationHandler.CancelAllActions(0.15f);
+                AnimationHandler.CancelAllActions(0.15f, false);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Vi.Core
         protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
         protected NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
 
-        public bool IsPulled() { return isPulled.Value; }
+        public bool IsPulled { get { return isPulled.Value; } }
 
         public CombatAgent GetPullAssailant()
         {
@@ -238,7 +238,7 @@ namespace Vi.Core
                 if (evaluateUninterruptability) { isUninterruptable.Value = Time.time <= uninterruptableEndTime; }
             }
 
-            bool isInvincibleThisFrame = IsInvincible();
+            bool isInvincibleThisFrame = IsInvincible;
             if (!isInvincibleThisFrame)
             {
                 if (!IsLocalPlayer)
@@ -247,7 +247,7 @@ namespace Vi.Core
                     {
                         isInvincibleThisFrame = true;
                     }
-                    else if (IsGrabbed())
+                    else if (IsGrabbed)
                     {
                         CombatAgent grabAssailant = GetGrabAssailant();
                         if (grabAssailant)
@@ -263,7 +263,7 @@ namespace Vi.Core
             if (GlowRenderer)
             {
                 GlowRenderer.RenderInvincible(isInvincibleThisFrame);
-                GlowRenderer.RenderUninterruptable(IsUninterruptable());
+                GlowRenderer.RenderUninterruptable(IsUninterruptable);
             }
         }
 
@@ -274,7 +274,7 @@ namespace Vi.Core
         }
 
         public const float ragingStaminaCostMultiplier = 1.25f;
-        public bool IsRaging() { return isRaging.Value; }
+        public bool IsRaging { get { return isRaging.Value; } }
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
         {
@@ -518,7 +518,7 @@ namespace Vi.Core
 
         private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
         {
-            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
+            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed | IsPulled);
             if (vfxInstance)
             {
                 if (vfxInstance.TryGetComponent(out NetworkObject networkObject))

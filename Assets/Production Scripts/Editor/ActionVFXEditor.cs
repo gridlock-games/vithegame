@@ -15,6 +15,7 @@ namespace Vi.Editor
 
         private SerializedProperty spVFXSpawnType;
         private SerializedProperty spTransformType;
+        private SerializedProperty spOffsetByTargetBodyHeight;
 
         private SerializedProperty spRaycastOffset;
         private SerializedProperty spFartherRaycastOffset;
@@ -38,6 +39,7 @@ namespace Vi.Editor
 
             spVFXSpawnType = serializedObject.FindProperty("vfxSpawnType");
             spTransformType = serializedObject.FindProperty("transformType");
+            spOffsetByTargetBodyHeight = serializedObject.FindProperty("offsetByTargetBodyHeight");
 
             spRaycastOffset = serializedObject.FindProperty("raycastOffset");
             spFartherRaycastOffset = serializedObject.FindProperty("fartherRaycastOffset");
@@ -68,6 +70,7 @@ namespace Vi.Editor
             }
 
             EditorGUILayout.PropertyField(spTransformType);
+            EditorGUILayout.PropertyField(spOffsetByTargetBodyHeight);
             if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.ConformToGround)
             {
                 EditorGUILayout.PropertyField(spRaycastOffset);

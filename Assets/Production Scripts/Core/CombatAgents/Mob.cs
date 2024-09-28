@@ -138,13 +138,13 @@ namespace Vi.Core.CombatAgents
 
             if (attack.maxHitLimit == 0) { return false; }
 
-            if (IsInvincible()) { return false; }
+            if (IsInvincible) { return false; }
 
             if (isMeleeHit)
             {
                 if (attackerCombatAgent.wasStaggeredThisFrame) { return false; }
 
-                if (!IsUninterruptable())
+                if (!IsUninterruptable)
                 {
                     wasStaggeredThisFrame = true;
                     StartCoroutine(ResetStaggerBool());
@@ -164,7 +164,7 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attackerCombatAgent.MovementHandler.GetPosition(); }
 
@@ -196,7 +196,7 @@ namespace Vi.Core.CombatAgents
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
 
-                if (IsGrabbed())
+                if (IsGrabbed)
                 {
                     GetGrabAssailant().CancelGrab();
                     CancelGrab();
@@ -205,7 +205,7 @@ namespace Vi.Core.CombatAgents
                 AnimationHandler.PlayAction(hitReaction);
                 hitReactionWasPlayed = true;
             }
-            else if (!IsUninterruptable())
+            else if (!IsUninterruptable)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Grab)
                 {
@@ -219,7 +219,7 @@ namespace Vi.Core.CombatAgents
 
                 if (hitReaction.ailment == ActionClip.Ailment.None)
                 {
-                    if (!IsGrabbed() & !IsRaging())
+                    if (!IsGrabbed & !IsRaging)
                     {
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
@@ -275,12 +275,12 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            if (!IsUninterruptable())
+            if (!IsUninterruptable)
             {
-                if (attack.shouldFlinch | IsRaging())
+                if (attack.shouldFlinch | IsRaging)
                 {
                     MovementHandler.Flinch(attack.GetFlinchAmount());
-                    if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                    if (!hitReactionWasPlayed & !IsGrabbed) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
                 }
             }
 

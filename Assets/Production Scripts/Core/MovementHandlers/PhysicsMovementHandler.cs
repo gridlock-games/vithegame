@@ -99,7 +99,7 @@ namespace Vi.Core.MovementHandlers
                 }
                 else
                 {
-                    if (combatAgent.IsGrabbed())
+                    if (combatAgent.IsGrabbed)
                     {
                         CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                         if (grabAssailant)

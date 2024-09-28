@@ -37,6 +37,7 @@ namespace Vi.ScriptableObjects
 
         public VFXSpawnType vfxSpawnType = VFXSpawnType.OnActivate;
         public TransformType transformType = TransformType.Stationary;
+        public bool offsetByTargetBodyHeight;
 
         // Only used for VFXSpawnType.OnActivate
         public float onActivateVFXSpawnNormalizedTime;

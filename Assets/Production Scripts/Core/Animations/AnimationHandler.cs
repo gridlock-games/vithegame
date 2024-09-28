@@ -246,7 +246,7 @@ namespace Vi.Core
             Animator.Play("Empty", flinchLayerIndex);
         }
 
-        public void CancelAllActions(float transitionTime)
+        public void CancelAllActions(float transitionTime, bool resetGameplayVariables)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
@@ -259,11 +259,15 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
-            combatAgent.SetInviniciblity(0);
-            combatAgent.SetUninterruptable(0);
-            combatAgent.ResetAilment();
-            combatAgent.StatusAgent.RemoveAllStatuses();
-            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+
+            if (resetGameplayVariables)
+            {
+                combatAgent.SetInviniciblity(0);
+                combatAgent.SetUninterruptable(0);
+                combatAgent.ResetAilment();
+                combatAgent.StatusAgent.RemoveAllStatuses();
+                combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            }
             
             CancelAllActionsClientRpc(transitionTime);
         }
@@ -331,7 +335,7 @@ namespace Vi.Core
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return default; }
+                if (combatAgent.IsGrabbed & actionClip.ailment != ActionClip.Ailment.Grab) { return default; }
             }
 
             if (!isFollowUpClip & IsServer)
@@ -362,7 +366,7 @@ namespace Vi.Core
                                 {
                                     if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                                     {
-                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
                                         {
                                             Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                                             angleList.Add((networkCollider,
@@ -741,13 +745,13 @@ namespace Vi.Core
             switch (actionClip.GetClipType())
             {
                 case ActionClip.ClipType.Dodge:
-                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * CombatAgent.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
+                    return combatAgent.IsRaging & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * CombatAgent.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
                 case ActionClip.ClipType.LightAttack:
                 case ActionClip.ClipType.HeavyAttack:
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.FlashAttack:
                 case ActionClip.ClipType.Lunge:
-                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * CombatAgent.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
+                    return combatAgent.IsRaging & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * CombatAgent.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
                 case ActionClip.ClipType.GrabAttack:

@@ -295,7 +295,7 @@ namespace Vi.Player
                 return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false);
             }
 
-            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed() & !combatAgent.IsGrabbing())
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
             {
                 if (IsServer)
                 {
@@ -315,13 +315,13 @@ namespace Vi.Player
             // Apply movement
             bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
             Vector3 movement = Vector3.zero;
-            if (combatAgent.IsGrabbing())
+            if (combatAgent.IsGrabbing)
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return new StatePayload(inputPayload, Rigidbody, newRotation, false);
             }
-            else if (combatAgent.IsGrabbed() & combatAgent.GetAilment() == ActionClip.Ailment.None)
+            else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
             {
                 CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                 if (grabAssailant)
@@ -335,7 +335,7 @@ namespace Vi.Player
             {
                 movement = Vector3.zero;
             }
-            else if (combatAgent.IsPulled())
+            else if (combatAgent.IsPulled)
             {
                 CombatAgent pullAssailant = combatAgent.GetPullAssailant();
                 if (pullAssailant)
@@ -367,7 +367,7 @@ namespace Vi.Player
                         {
                             if (rootMotionHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                             {
-                                if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                                if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
                                 {
                                     Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - GetPosition(), Vector3.up);
                                     angleList.Add((networkCollider,
@@ -507,9 +507,9 @@ namespace Vi.Player
 
                 if (combatAgent.ShouldApplyAilmentRotation())
                     rot = combatAgent.GetAilmentRotation();
-                else if (combatAgent.IsGrabbing())
+                else if (combatAgent.IsGrabbing)
                     return rot;
-                else if (combatAgent.IsGrabbed())
+                else if (combatAgent.IsGrabbed)
                 {
                     CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
                     if (grabAssailant)
@@ -794,7 +794,7 @@ namespace Vi.Player
                     {
                         if (cameraHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                            if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
                             {
                                 Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
                                 angleList.Add((networkCollider,

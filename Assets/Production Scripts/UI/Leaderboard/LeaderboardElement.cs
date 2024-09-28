@@ -16,12 +16,14 @@ namespace Vi.UI
         [SerializeField] private Text assistsText;
         [SerializeField] private Text KDAText;
         [Header("Horde Mode Element")]
+        [SerializeField] private Text dateText;
         [SerializeField] private Text wavesClearedText;
         [SerializeField] private Text clearTimeText;
         [SerializeField] private Text damageDealtText;
 
         public void Initialize(WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry)
         {
+            dateText.text = hordeLeaderboardEntry.dateCreated;
             playerNameText.text = hordeLeaderboardEntry.record.playerName;
             wavesClearedText.text = hordeLeaderboardEntry.record.wave.ToString();
             clearTimeText.text = hordeLeaderboardEntry.record.clearTime.ToString("F2");

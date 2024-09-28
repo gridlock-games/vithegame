@@ -1243,8 +1243,11 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
+                        bool waitForRespawn = GetGameMode() != GameMode.None;
+                        if (GameModeManager.Singleton) { waitForRespawn &= !GameModeManager.Singleton.ShouldDisplayNextGameAction(); }
+
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].LoadoutManager;
-                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
+                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), waitForRespawn);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
@@ -1313,7 +1316,7 @@ namespace Vi.Core
             Quaternion spawnRotation = transformData.rotation;
 
             attributesToRespawn.ResetStats(1, true, true, false);
-            attributesToRespawn.AnimationHandler.CancelAllActions(0);
+            attributesToRespawn.AnimationHandler.CancelAllActions(0, true);
             attributesToRespawn.MovementHandler.SetOrientation(spawnPosition, spawnRotation);
             attributesToRespawn.LoadoutManager.SwapLoadoutOnRespawn();
         }
@@ -1321,7 +1324,7 @@ namespace Vi.Core
         public void RevivePlayer(Attributes attributesToRevive)
         {
             attributesToRevive.ResetStats(0.5f, true, true, false);
-            attributesToRevive.AnimationHandler.CancelAllActions(0);
+            attributesToRevive.AnimationHandler.CancelAllActions(0, true);
         }
 
         public void RespawnAllPlayers()
