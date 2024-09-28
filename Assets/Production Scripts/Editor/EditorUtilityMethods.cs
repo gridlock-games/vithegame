@@ -273,8 +273,8 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Production/Set Video Overrides for Android Platform")]
-        static void SetVideoClipOverridesForAndroidPlatform()
+        [MenuItem("Tools/Production/Set Video Clip Import Overrides")]
+        static void SetVideoClipImportOverrides()
         {
             string[] videoClips = AssetDatabase.FindAssets("t:VideoClip");
             for (int i = 0; i < videoClips.Length; i++)
@@ -304,37 +304,43 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Set Texture Overrides for Android Platform")]
-        static void SetTextureOverridesForAndroidPlatform()
+        [MenuItem("Tools/Production/Set Texture Import Overrides")]
+        static void SetTextureImportOverrides()
         {
             string[] textures = AssetDatabase.FindAssets("t:Texture");
             for (int i = 0; i < textures.Length; i++)
             {
-                EditorUtility.DisplayProgressBar("Overriding Textures For Android",
+                if (EditorUtility.DisplayCancelableProgressBar("Overriding Textures For Android",
                     i.ToString() + " out of " + textures.Length.ToString() + " textures completed",
-                    i / textures.Length);
+                    i / textures.Length)) { break; }
 
                 string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
                 if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
 
-                try
+                if (AssetImporter.GetAtPath(assetPath) is TextureImporter importer)
                 {
-                    TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(assetPath);
-                    TextureImporterPlatformSettings existingSettings = importer.GetPlatformTextureSettings("Android");
-                    if (!existingSettings.overridden)
+                    bool shouldReimport = false;
+
+                    //TextureImporterPlatformSettings defaultSettings = importer.GetDefaultPlatformTextureSettings();
+                    //if (!defaultSettings.crunchedCompression)
+                    //{
+                    //    defaultSettings.crunchedCompression = true;
+                    //    importer.SetPlatformTextureSettings(defaultSettings);
+                    //    shouldReimport = true;
+                    //}
+
+                    if (!importer.GetPlatformTextureSettings("Android").overridden)
                     {
                         TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
                         androidSettings.name = "Android";
                         androidSettings.overridden = true;
                         androidSettings.maxTextureSize = 256;
                         importer.SetPlatformTextureSettings(androidSettings);
-                        importer.SaveAndReimport();
+                        shouldReimport = true;
                     }
-                }
-                catch // This happens on shit like font textures
-                {
 
+                    if (shouldReimport) { importer.SaveAndReimport(); }
                 }
             }
             EditorUtility.ClearProgressBar();
