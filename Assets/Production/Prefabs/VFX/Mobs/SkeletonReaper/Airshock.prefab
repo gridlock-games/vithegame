@@ -240,15 +240,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0.25, z: 15}
+  vfxPositionOffset: {x: 0, y: 0.25, z: 0}
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
-  transformType: 0
+  transformType: 4
   offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.5
-  raycastOffset: {x: 0, y: 2, z: 3}
-  fartherRaycastOffset: {x: 0, y: 4, z: 5}
-  raycastMaxDistance: 5
+  raycastOffset: {x: 0, y: 2, z: 15}
+  fartherRaycastOffset: {x: 0, y: 2, z: 15}
+  raycastMaxDistance: 50
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 8300000, guid: f8aae7e14415846f6b5a2c12550dc8ce,

@@ -2133,7 +2133,7 @@ MonoBehaviour:
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
     positionOffsetFromRenderer: {x: 0, y: -1, z: 0}
-    scaleMultiplier: 1.5
+    scaleMultiplier: 1.7
 --- !u!1 &3962346084501673846 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1401939351449797049, guid: 368e8c08dda2eb249b91026d905804fa,
@@ -3519,13 +3519,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: canFly
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: bodyRadius
       value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: gravityScale
-      value: 0.1
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -3545,7 +3550,7 @@ PrefabInstance:
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: bodyHeightOffset
-      value: 2.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -3570,6 +3575,46 @@ PrefabInstance:
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: ability1IsConstrainedByDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[1].value
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[0].inSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[0].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[0].tangentMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: flightMovement.m_Curve.Array.data[1].tangentMode
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3661,9 +3706,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2.5
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 1.25, z: 0}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!4 &5577028280097051478 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7541128012661925881, guid: 74547947c8c52264f9eba9178457359c,

@@ -80,6 +80,8 @@ namespace Vi.Core.MovementHandlers
         [Header("Mob Movement Handler")]
         [SerializeField] private TargetingType targetingType = TargetingType.StructuresThenPlayers;
         [SerializeField] private float targetingSwitchDistance = 11;
+        [SerializeField] private bool canFly;
+        [SerializeField] private AnimationCurve flightMovement = new AnimationCurve();
         private enum TargetingType
         {
             Players,
@@ -336,12 +338,22 @@ namespace Vi.Core.MovementHandlers
 
             if (evaluateForce)
             {
-                if (IsGrounded())
+                if (IsGrounded() | canFly)
                 {
                     Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
                     if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
                         Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
+                    }
+
+                    if (canFly)
+                    {
+                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > lightAttackDistance + 1)
+                        {
+                            Rigidbody.AddForce(new Vector3(0, Random.Range(0, flightMovement.EvaluateNormalizedTime(flightTime)), 0), ForceMode.VelocityChange);
+                            flightTime += Time.fixedDeltaTime;
+                            if (flightTime > 1) { flightTime = 0; }
+                        }
                     }
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
@@ -353,6 +365,8 @@ namespace Vi.Core.MovementHandlers
             Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
+
+        private float flightTime;
 
         [Header("Light Attack")]
         [SerializeField] private float lightAttackDistance = 2.5f;
