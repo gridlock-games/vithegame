@@ -11,7 +11,7 @@ namespace Vi.ProceduralAnimations
         [SerializeField] private bool lerp;
         [SerializeField] private float lerpSpeed = 5;
 
-        [HideInInspector] public Transform target;
+        public Transform target;
 
         private void LateUpdate()
         {

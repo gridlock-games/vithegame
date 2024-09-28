@@ -357,7 +357,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + bodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in combatAgent.NetworkCollider.Colliders)

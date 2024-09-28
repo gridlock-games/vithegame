@@ -56,6 +56,7 @@ namespace Vi.UI
                 statusIcons.Add(statusIcon);
             }
 
+            pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
         }
 
@@ -95,8 +96,27 @@ namespace Vi.UI
                     }
                 }
                 transform.position = combatAgent.transform.position;
+                transform.rotation = combatAgent.transform.rotation;
+                transform.localScale = Vector3.zero;
+                healthBarParent.localScale = Vector3.zero;
             }
             RefreshStatus();
+        }
+
+        private void OnSpawnFromPool()
+        {
+            if (combatAgent)
+            {
+                transform.position = combatAgent.transform.position;
+                transform.rotation = combatAgent.transform.rotation;
+            }
+            else
+            {
+                transform.position = Vector3.zero;
+                transform.rotation = Quaternion.identity;
+            }
+            transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
         }
 
         private void OnReturnToPool()
@@ -106,6 +126,11 @@ namespace Vi.UI
             localSpectator = null;
             combatAgent = null;
             rendererToFollow = null;
+
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            transform.localScale = Vector3.zero;
+            healthBarParent.localScale = Vector3.zero;
         }
 
         private void RefreshStatus()
@@ -114,20 +139,6 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
-        }
-
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-            canvas.worldCamera = mainCamera;
         }
 
         private PlayerDataManager.Team team;
@@ -212,20 +223,31 @@ namespace Vi.UI
             if (!rendererToFollow) { RefreshRendererToFollow(); }
             if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
 
-            FindMainCamera();
-
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
-            if (mainCamera)
+            if (localWeaponHandler | localSpectator)
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+                Transform source = null;
+                if (localWeaponHandler)
+                {
+                    source = localWeaponHandler.transform;
+                }
+                else if (localSpectator)
+                {
+                    source = localSpectator.transform;
+                }
 
-                float camDistance = Vector3.Distance(mainCamera.transform.position, transform.position);
+                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
+                transform.position = pos;
+
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(source.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+
+                float camDistance = Vector3.Distance(source.transform.position, combatAgent.transform.position);
                 if (camDistance > viewDistance)
                 {
-                    Quaternion mouseOverRotation = Quaternion.LookRotation(mainCamera.transform.position - rendererToFollow.bounds.center);
-                    float upAngle = Vector3.SignedAngle(mainCamera.transform.up, mouseOverRotation * Vector3.up, mainCamera.transform.right);
-                    float horizontalAngle = Quaternion.Angle(mainCamera.transform.rotation, mouseOverRotation);
+                    Quaternion mouseOverRotation = Quaternion.LookRotation(source.transform.position - combatAgent.transform.position);
+                    float upAngle = Vector3.SignedAngle(source.transform.up, mouseOverRotation * Vector3.up, source.transform.right);
+                    float horizontalAngle = Quaternion.Angle(source.transform.rotation, mouseOverRotation);
 
                     if (shouldUseFixedScale)
                         localScaleTarget = horizontalAngle > 178 & upAngle > -4 & upAngle <= 0 ? new Vector3(fixedScaleValue, fixedScaleValue, fixedScaleValue) : Vector3.zero;
@@ -241,19 +263,14 @@ namespace Vi.UI
 
                     if (camDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
-
                 localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
-                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
-                //pos.y += rendererToFollow.bounds.extents.y * transform.localScale.x * scalingDistanceDivisor * 2;
-                //Vector3 pos = rendererToFollow.bounds.center;
-                //pos.y += rendererToFollow.bounds.extents.y;
-                transform.position = pos;
             }
             //else
             //{
             //    Debug.LogWarning("Can't find a main camera for world space labels!");
             //}
             transform.localScale = Vector3.Lerp(transform.localScale, localScaleTarget, Time.deltaTime * scalingSpeed);
+
             canvas.enabled = transform.localScale.magnitude > 0.01f;
 
             if (healthBarLocalScaleTarget == Vector3.zero)

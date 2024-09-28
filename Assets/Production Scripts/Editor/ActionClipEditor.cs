@@ -120,6 +120,11 @@ namespace Vi.Editor
         private SerializedProperty spRequiredAmmoAmount;
         private SerializedProperty spReloadNormalizedTime;
 
+        private SerializedProperty spSummonables;
+        private SerializedProperty spNormalizedSummonTime;
+        private SerializedProperty spSummonPositionOffset;
+        private SerializedProperty spSummonableCount;
+
         private void OnEnable()
         {
             spClipType = serializedObject.FindProperty("clipType");
@@ -229,6 +234,11 @@ namespace Vi.Editor
             spDebugVerticalMotion = serializedObject.FindProperty("debugVerticalMotion");
 
             spReloadNormalizedTime = serializedObject.FindProperty("reloadNormalizedTime");
+
+            spSummonables = serializedObject.FindProperty("summonables");
+            spNormalizedSummonTime = serializedObject.FindProperty("normalizedSummonTime");
+            spSummonPositionOffset = serializedObject.FindProperty("summonPositionOffset");
+            spSummonableCount = serializedObject.FindProperty("summonableCount");
         }
 
         private readonly List<ActionClip.ClipType> actionClipAttackTypes = new List<ActionClip.ClipType>()
@@ -735,6 +745,10 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spPreviewActionVFXRotationOffset);
                 EditorGUILayout.PropertyField(spPreviewActionVFXScale);
             }
+            EditorGUILayout.PropertyField(spSummonables);
+            EditorGUILayout.PropertyField(spNormalizedSummonTime);
+            EditorGUILayout.PropertyField(spSummonPositionOffset);
+            EditorGUILayout.PropertyField(spSummonableCount);
 
             serializedObject.ApplyModifiedProperties();
         }

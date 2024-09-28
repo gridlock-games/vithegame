@@ -292,6 +292,14 @@ namespace Vi.Core
                                         else
                                         {
                                             Debug.LogError(networkObject + " is despawned and will be destroyed on scene unload! Why wasn't it moved to the base scene when it was despawned?");
+                                            if (pooledObject.IsSpawned)
+                                            {
+                                                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                            }
+                                            else
+                                            {
+                                                Debug.LogError(pooledObject + " isn't spawned!");
+                                            }
                                         }
                                     }
                                     else

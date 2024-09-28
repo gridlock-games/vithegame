@@ -7,6 +7,8 @@ using Vi.Utility;
 using Unity.Collections;
 using Vi.Core.MovementHandlers;
 using Vi.Core.VFX;
+using Vi.Core.GameModeManagers;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -338,12 +340,142 @@ namespace Vi.Core
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
+        protected NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
 
-        protected NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
-        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
+        protected void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
+
+        public NetworkObject GetKiller()
+        {
+            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
+
+            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
+                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
+            else
+                return null;
+        }
+
+        private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
+        public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
-        protected abstract void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction);
+        protected void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
+        {
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+            }
+
+            // Ailments
+            if (attackAilment != ailment.Value | applyAilmentRegardless)
+            {
+                bool shouldApplyAilment = false;
+                if (attackAilment != ActionClip.Ailment.None)
+                {
+                    Vector3 startPos = transform.position;
+                    Vector3 endPos = hitSourcePosition;
+                    startPos.y = 0;
+                    endPos.y = 0;
+                    Vector3 rel = endPos - startPos;
+                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
+
+                    shouldApplyAilment = true;
+
+                    if (attackAilment == ActionClip.Ailment.Pull)
+                    {
+                        pullAssailantDataId.Value = attacker.NetworkObjectId;
+                        isPulled.Value = true;
+                    }
+                    else if (attackAilment == ActionClip.Ailment.Grab)
+                    {
+                        if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+                        ailment.Value = ActionClip.Ailment.None;
+                    }
+                    else
+                    {
+                        ailment.Value = attackAilment;
+                        if (ailment.Value == ActionClip.Ailment.Death)
+                        {
+                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
+                            SetKiller(attacker);
+                        }
+                    }
+                }
+                else // If this attack's ailment is none
+                {
+                    if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
+                    {
+                        ailment.Value = ActionClip.Ailment.None;
+                    }
+                }
+
+                // If we started a new ailment on this attack, we want to start a reset coroutine
+                if (shouldApplyAilment)
+                {
+                    switch (ailment.Value)
+                    {
+                        case ActionClip.Ailment.Knockdown:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
+                            break;
+                        case ActionClip.Ailment.Knockup:
+                            knockupHitCounter = 0;
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
+                            break;
+                        case ActionClip.Ailment.Stun:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
+                            break;
+                        case ActionClip.Ailment.Stagger:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
+                            break;
+                        case ActionClip.Ailment.Pull:
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
+                            break;
+                        case ActionClip.Ailment.Death:
+                            break;
+                        default:
+                            if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
+                            break;
+                    }
+
+                    if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
+                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
+                }
+            }
+
+            if (ailment.Value == ActionClip.Ailment.Knockup)
+            {
+                knockupHitCounter++;
+                if (knockupHitCounter >= knockupHitLimit)
+                {
+                    if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
+                    ailment.Value = ActionClip.Ailment.None;
+                }
+            }
+        }
+
+        private const float recoveryTimeInvincibilityBuffer = 1;
+        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
+        {
+            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
+            if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
+            yield return new WaitForSeconds(duration);
+            SetInviniciblity(recoveryTimeInvincibilityBuffer);
+            ailment.Value = ActionClip.Ailment.None;
+        }
+
+        private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
+        {
+            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
+            ailment.Value = ActionClip.Ailment.None;
+        }
+
+        private Coroutine pullResetCoroutine;
+        private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
+        {
+            if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
+            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
+            isPulled.Value = false;
+        }
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
@@ -369,6 +501,79 @@ namespace Vi.Core
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 OnAlive();
+            }
+
+            if (IsServer)
+            {
+                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == current))
+                {
+                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
+                    {
+                        GameObject instance = WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
+                        PersistentLocalObjects.Singleton.StartCoroutine(DestroyVFXAfterAilmentIsDone(current, instance));
+                    }
+                }
+            }
+        }
+
+        private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
+        {
+            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
+            if (vfxInstance)
+            {
+                if (vfxInstance.TryGetComponent(out NetworkObject networkObject))
+                {
+                    if (networkObject.IsSpawned)
+                    {
+                        networkObject.Despawn(true);
+                    }
+                    else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        if (pooledObject.IsSpawned)
+                        {
+                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        }
+                    }
+                    else
+                    {
+                        Destroy(vfxInstance);
+                    }
+                }
+                else if (vfxInstance.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                }
+                else
+                {
+                    Destroy(vfxInstance);
+                }
+            }
+        }
+
+        [System.Serializable]
+        private struct OnHitActionVFX
+        {
+            public ActionClip.Ailment ailment;
+            public ActionVFX actionVFX;
+        }
+
+        [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
+
+        private void OnValidate()
+        {
+            List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
+            {
+                if (!onHitActionVFX.actionVFX) { continue; }
+                if (onHitActionVFX.actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { actionVFXToRemove.Add(onHitActionVFX.actionVFX); }
+            }
+
+            foreach (ActionVFX actionVFX in actionVFXToRemove)
+            {
+                ailmentOnHitActionVFXList.RemoveAll(item => item.actionVFX == actionVFX);
             }
         }
 
@@ -452,6 +657,7 @@ namespace Vi.Core
             {
                 case DeathBehavior.Ragdoll:
                     AnimationHandler.SetRagdollActive(true);
+                    AnimationHandler.HideRenderers();
                     break;
                 case DeathBehavior.Explode:
                     AnimationHandler.Explode(deathExplosionDelay);

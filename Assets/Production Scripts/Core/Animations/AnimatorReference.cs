@@ -291,7 +291,7 @@ namespace Vi.Core
         Animator animator;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
-        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; }
+        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; } = new SkinnedMeshRenderer[0];
 
         private void Awake()
         {
@@ -409,7 +409,7 @@ namespace Vi.Core
                         worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                 }
-                accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
+                accumulatedRootMotion += new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z) / Time.fixedDeltaTime;
             }
 
             if (animationHandler) { animationHandler.ProcessNextActionClip(); }
@@ -463,7 +463,7 @@ namespace Vi.Core
                     highestPoint = renderer.bounds.center;
                 }
             }
-            Gizmos.color = Color.blue;
+            Gizmos.color = Color.magenta;
             Gizmos.DrawCube(rendererToFollow.bounds.center + rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer, new Vector3(worldSpaceLabelTransformInfo.scaleMultiplier, 0.1f, 0.1f));
         }
     }

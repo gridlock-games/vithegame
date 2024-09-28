@@ -323,5 +323,10 @@ namespace Vi.ScriptableObjects
         public bool requireAmmo;
         public int requiredAmmoAmount = 1;
         public float reloadNormalizedTime = 0.5f;
+
+        public NetworkObject[] summonables = new NetworkObject[0];
+        public float normalizedSummonTime = 0.5f;
+        public Vector3 summonPositionOffset = new Vector3(0, 0, 2);
+        public int summonableCount = 0;
     }
 }
