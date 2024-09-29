@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7824715578891863556}
   - component: {fileID: 5465890439830040082}
   m_Layer: 6
-  m_Name: OgreAxe
+  m_Name: KingOgreAxe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2771306266426170047}
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 2
-  dropWeaponPrefab: {fileID: 6654799173532487747, guid: cc64910445dd1f34a9b17c50708cce4f,
+  dropWeaponPrefab: {fileID: 6654799173532487747, guid: a1c8620a07d39d24bb363022895acd68,
     type: 3}
   weaponTrailVFX: {fileID: 2390093941411187396}
 --- !u!114 &5465890439830040082
