@@ -1744,6 +1744,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 9184147279941664240}
   m_PrefabAsset: {fileID: 0}
+--- !u!137 &946024479108173221 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8238298725984497749, guid: a25419db5e9becb4abb8edc5d77f0428,
+    type: 3}
+  m_PrefabInstance: {fileID: 9184147279941664240}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963442885602882102 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8226514635901521862, guid: a25419db5e9becb4abb8edc5d77f0428,
@@ -1982,7 +1988,8 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
-    positionOffsetFromRenderer: {x: 0, y: 1, z: 1}
+    rendererToFollow: {fileID: 946024479108173221}
+    positionOffsetFromRenderer: {x: 0, y: 1.9, z: 1}
     scaleMultiplier: 2.5
 --- !u!114 &2529365683097883901
 MonoBehaviour:
@@ -2016,6 +2023,7 @@ MonoBehaviour:
   values:
   - {fileID: 6691996627277671765}
   - {fileID: 3271754203915534919}
+  hips: {fileID: 0}
 --- !u!1 &1384256498099383643 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7800648769690112171, guid: a25419db5e9becb4abb8edc5d77f0428,

@@ -445,23 +445,42 @@ namespace Vi.Core
         [System.Serializable]
         public struct WorldSpaceLabelTransformInfo
         {
+            public Renderer rendererToFollow;
             public Vector3 positionOffsetFromRenderer;
             public float scaleMultiplier;
 
-            public WorldSpaceLabelTransformInfo(Vector3 positionOffsetFromRenderer, float scaleMultiplier)
+            public WorldSpaceLabelTransformInfo(Renderer rendererToFollow, Vector3 positionOffsetFromRenderer, float scaleMultiplier)
             {
+                this.rendererToFollow = rendererToFollow;
                 this.positionOffsetFromRenderer = positionOffsetFromRenderer;
                 this.scaleMultiplier = scaleMultiplier;
             }
 
             public static WorldSpaceLabelTransformInfo GetDefaultWorldSpaceLabelTransformInfo()
             {
-                return new WorldSpaceLabelTransformInfo(new Vector3(0, 0, -0.25f), 1);
+                return new WorldSpaceLabelTransformInfo(null, new Vector3(0, 0, -0.25f), 1);
             }
         }
 
         public WorldSpaceLabelTransformInfo GetWorldSpaceLabelTransformInfo() { return worldSpaceLabelTransformInfo; }
         [SerializeField] private WorldSpaceLabelTransformInfo worldSpaceLabelTransformInfo = WorldSpaceLabelTransformInfo.GetDefaultWorldSpaceLabelTransformInfo();
+
+        private void OnValidate()
+        {
+            SkinnedMeshRenderer[] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (renderers.Length == 0) { return; }
+            Vector3 highestPoint = renderers[0].bounds.center;
+            Renderer rendererToFollow = renderers[0];
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.bounds.center.y > highestPoint.y)
+                {
+                    rendererToFollow = renderer;
+                    highestPoint = renderer.bounds.center;
+                }
+            }
+            worldSpaceLabelTransformInfo.rendererToFollow = rendererToFollow;
+        }
 
         private void OnDrawGizmos()
         {

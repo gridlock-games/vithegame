@@ -13,6 +13,16 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 556058274715314219, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+        type: 3}
+      propertyPath: worldSpaceLabelTransformInfo.rendererToFollow
+      value: 
+      objectReference: {fileID: 1876169597804061018}
+    - target: {fileID: 556058274715314219, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+        type: 3}
+      propertyPath: worldSpaceLabelTransformInfo.positionOffsetFromRenderer.y
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 1695238245737690716, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
       propertyPath: m_IsActive
@@ -196,3 +206,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b3d1bfdbe2f7bc34e80124acdafd119e, type: 3}
+--- !u!137 &1876169597804061018 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1032395209912463769, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1466682223831421123}
+  m_PrefabAsset: {fileID: 0}
