@@ -323,7 +323,7 @@ namespace Vi.Editor
                     bool shouldReimport = false;
 
                     TextureImporterPlatformSettings defaultSettings = importer.GetDefaultPlatformTextureSettings();
-                    if (!defaultSettings.crunchedCompression)
+                    if (!defaultSettings.crunchedCompression & !importer.isReadable)
                     {
                         defaultSettings.compressionQuality = 100;
                         defaultSettings.crunchedCompression = true;
