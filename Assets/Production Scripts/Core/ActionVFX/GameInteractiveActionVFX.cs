@@ -48,6 +48,7 @@ namespace Vi.Core.VFX
         public ActionClip GetAttack()
         {
             if (!IsServer) { Debug.LogError("GameInteractiveActionVFX.GetAttack() should only be called on the server!"); }
+            if (!attack) { Debug.LogError(this + " has no attack!"); }
             return attack;
         }
 
@@ -56,6 +57,7 @@ namespace Vi.Core.VFX
         public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
+            if (!attack.IsAttack()) { Debug.LogError("Initializing " + this + " without an attack! " + attack + " " + attack.GetClipType()); }
             this.attacker = attacker;
             this.attack = attack;
             attackerNetworkObjectId.Value = attacker.NetworkObjectId;

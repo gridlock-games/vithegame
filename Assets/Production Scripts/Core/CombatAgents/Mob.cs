@@ -129,6 +129,8 @@ namespace Vi.Core.CombatAgents
 
         private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -276,13 +278,24 @@ namespace Vi.Core.CombatAgents
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attackerCombatAgent, attack, hitReaction);
             }
 
-            if (IsServer)
+            if (IsServer & runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, actionVFX, attackerCombatAgent.transform, transform);
+                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attackerCombatAgent.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                        {
+                            if (!hitCounter.ContainsKey(this))
+                            {
+                                hitCounter.Add(this, new(1, Time.time));
+                            }
+                            else
+                            {
+                                hitCounter[this] = new(hitCounter[this].hitNumber + 1, Time.time);
+                            }
+                            actionVFXParticleSystem.AddToHitCounter(hitCounter);
+                        }
                     }
                 }
             }

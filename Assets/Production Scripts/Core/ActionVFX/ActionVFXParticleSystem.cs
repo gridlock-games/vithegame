@@ -207,6 +207,23 @@ namespace Vi.Core.VFX
 
         private Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<IHittable, RuntimeWeapon.HitCounterData>();
 
+        public void AddToHitCounter(Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounterToAdd)
+        {
+            if (!IsSpawned) { Debug.LogError("Trying to add to hit counter while not spawned " + this); }
+            if (!IsServer) { Debug.LogWarning("Trying to add to hit counter when we are not the server, this will have no effect " + this); }
+            foreach (KeyValuePair<IHittable, RuntimeWeapon.HitCounterData> kvp in hitCounterToAdd)
+            {
+                if (hitCounter.ContainsKey(kvp.Key))
+                {
+                    hitCounter[kvp.Key] = new RuntimeWeapon.HitCounterData(hitCounter[kvp.Key].hitNumber + kvp.Value.hitNumber, Time.time);
+                }
+                else
+                {
+                    hitCounter.Add(kvp.Key, new RuntimeWeapon.HitCounterData(1, Time.time));
+                }
+            }
+        }
+
         protected new void OnDisable()
         {
             base.OnDisable();
