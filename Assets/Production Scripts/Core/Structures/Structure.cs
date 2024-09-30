@@ -13,6 +13,7 @@ namespace Vi.Core.Structures
     {
         [SerializeField] private float maxHP = 100;
         [SerializeField] private PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
+        [SerializeField] private AudioClip deathSound;
 
         public Collider[] Colliders { get; private set; }
 
@@ -72,6 +73,11 @@ namespace Vi.Core.Structures
                 foreach (ExplodableMesh explodableMesh in explodableMeshes)
                 {
                     explodableMeshInstances.AddRange(explodableMesh.Explode());
+                }
+
+                if (deathSound)
+                {
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject, deathSound, transform.position, 1);
                 }
             }
             else if (prev <= 0 & current > 0)
