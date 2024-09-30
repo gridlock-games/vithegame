@@ -88,11 +88,6 @@ namespace Vi.Core
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
 
-            foreach (Collider col in NetworkCollider.Colliders)
-            {
-                col.enabled = true;
-            }
-
             isRaging.OnValueChanged += OnIsRagingChanged;
         }
 
@@ -110,11 +105,6 @@ namespace Vi.Core
                 SetInviniciblity(0);
                 SetUninterruptable(0);
                 ResetAilment();
-            }
-
-            foreach (Collider col in NetworkCollider.Colliders)
-            {
-                col.enabled = false;
             }
 
             isRaging.OnValueChanged -= OnIsRagingChanged;

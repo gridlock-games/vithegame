@@ -139,6 +139,11 @@ namespace Vi.Core
                         {
                             renderer.forceRenderingOff = true;
                         }
+                        
+                        foreach (Collider col in colliders)
+                        {
+                            col.enabled = parentCombatAgent.IsServer;
+                        }
                     }
                 }
                 else // Alive
@@ -159,6 +164,11 @@ namespace Vi.Core
                     foreach (Renderer renderer in renderers)
                     {
                         renderer.forceRenderingOff = false;
+                    }
+
+                    foreach (Collider col in colliders)
+                    {
+                        col.enabled = false;
                     }
                 }
             }
