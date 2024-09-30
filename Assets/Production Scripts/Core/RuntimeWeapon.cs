@@ -128,6 +128,7 @@ namespace Vi.Core
                         {
                             rb.interpolation = parentCombatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
                             rb.collisionDetectionMode = parentCombatAgent.IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+                            NetworkPhysicsSimulation.AddRigidbody(rb);
                         }
                         else
                         {
@@ -142,7 +143,18 @@ namespace Vi.Core
                 }
                 else // Alive
                 {
-                    if (dropWeaponInstance) { ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance); }
+                    if (dropWeaponInstance)
+                    {
+                        if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                        {
+                            NetworkPhysicsSimulation.RemoveRigidbody(rb);
+                        }
+                        else
+                        {
+                            Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                        }
+                        ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance);
+                    }
 
                     foreach (Renderer renderer in renderers)
                     {
@@ -191,7 +203,18 @@ namespace Vi.Core
             associatedRuntimeWeapons.Clear();
             hitCounter.Clear();
 
-            if (dropWeaponInstance) { ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance); }
+            if (dropWeaponInstance)
+            {
+                if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                {
+                    NetworkPhysicsSimulation.RemoveRigidbody(rb);
+                }
+                else
+                {
+                    Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                }
+                ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance);
+            }
         }
 
         private bool lastIsActiveCall = true;
