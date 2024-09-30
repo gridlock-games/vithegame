@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core.Structures
 {
@@ -15,10 +16,12 @@ namespace Vi.Core.Structures
 
         public Collider[] Colliders { get; private set; }
 
+        private ExplodableMesh[] explodableMeshes;
         protected override void Awake()
         {
             base.Awake();
             Colliders = GetComponentsInChildren<Collider>();
+            explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
 
             List<Collider> networkPredictionLayerColliders = new List<Collider>();
             foreach (Collider col in Colliders)
@@ -31,6 +34,7 @@ namespace Vi.Core.Structures
             Colliders = networkPredictionLayerColliders.ToArray();
         }
 
+        private List<PooledObject> explodableMeshInstances = new List<PooledObject>();
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -59,15 +63,35 @@ namespace Vi.Core.Structures
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
                 IsDead = true;
+
                 foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 {
                     r.forceRenderingOff = true;
+                }
+
+                foreach (ExplodableMesh explodableMesh in explodableMeshes)
+                {
+                    explodableMeshInstances.AddRange(explodableMesh.Explode());
                 }
             }
             else if (prev <= 0 & current > 0)
             {
                 IsDead = false;
+                foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
+                }
+                explodableMeshInstances.Clear();
             }
+        }
+
+        private void OnDisable()
+        {
+            foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
+            }
+            explodableMeshInstances.Clear();
         }
 
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Metal;
