@@ -322,13 +322,14 @@ namespace Vi.Editor
                 {
                     bool shouldReimport = false;
 
-                    //TextureImporterPlatformSettings defaultSettings = importer.GetDefaultPlatformTextureSettings();
-                    //if (!defaultSettings.crunchedCompression)
-                    //{
-                    //    defaultSettings.crunchedCompression = true;
-                    //    importer.SetPlatformTextureSettings(defaultSettings);
-                    //    shouldReimport = true;
-                    //}
+                    TextureImporterPlatformSettings defaultSettings = importer.GetDefaultPlatformTextureSettings();
+                    if (!defaultSettings.crunchedCompression)
+                    {
+                        defaultSettings.compressionQuality = 100;
+                        defaultSettings.crunchedCompression = true;
+                        importer.SetPlatformTextureSettings(defaultSettings);
+                        shouldReimport = true;
+                    }
 
                     if (!importer.GetPlatformTextureSettings("Android").overridden)
                     {
