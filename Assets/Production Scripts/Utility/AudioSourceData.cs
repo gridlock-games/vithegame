@@ -15,9 +15,9 @@ namespace Vi.Utility
             AudioSource = GetComponent<AudioSource>();
         }
 
-        public void Initialize(AudioSource audioSource)
+        public void Initialize()
         {
-            OriginalVolume = audioSource.volume;
+            OriginalVolume = AudioSource.volume;
         }
 
         private void OnDisable()
