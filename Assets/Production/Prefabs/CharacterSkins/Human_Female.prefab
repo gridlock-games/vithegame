@@ -2345,6 +2345,12 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 3703241483468787340}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2068208430141025843 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3447309931397767359, guid: 96f3edc01446cd9469a901690748f155,
+    type: 3}
+  m_PrefabInstance: {fileID: 3703241483468787340}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2203847780436848398 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5912894932395400830, guid: 96f3edc01446cd9469a901690748f155,
@@ -2927,6 +2933,7 @@ MonoBehaviour:
   stowedWeaponParent: {fileID: 3588491447230971887}
   keys: 
   values: []
+  hips: {fileID: 2068208430141025843}
 --- !u!1 &4597464965180968569 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8310842784339754763, guid: 96f3edc01446cd9469a901690748f155,

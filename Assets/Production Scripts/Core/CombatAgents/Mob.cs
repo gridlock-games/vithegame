@@ -177,6 +177,9 @@ namespace Vi.Core.CombatAgents
 
             if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attackerCombatAgent.MovementHandler.GetPosition(); }
 
+            if (!attackerCombatAgent.IsRaging) { attackerCombatAgent.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
+
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);

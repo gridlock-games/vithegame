@@ -69,7 +69,7 @@ namespace Vi.Core
         {
             if (current)
             {
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips); }
             }
             else
             {
@@ -305,7 +305,7 @@ namespace Vi.Core
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
         {
-            if (!IsSpawned) { Debug.LogError("Calling Attributes.ActivateRage() before this object is spawned!"); return; }
+            if (!IsSpawned) { Debug.LogError("Calling CombatAgent.ActivateRage() before this object is spawned!"); return; }
 
             if (IsServer)
             {
@@ -316,6 +316,13 @@ namespace Vi.Core
             {
                 ActivateRageServerRpc();
             }
+        }
+
+        public void ActivateRageWithoutCheckingRageParam()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { Debug.LogError("Calling CombatAgent.ActivateRageWithoutCheckingRageParam() when you're not the server!"); return; }
+            isRaging.Value = true;
         }
 
         public bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }

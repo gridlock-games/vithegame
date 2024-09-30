@@ -40,11 +40,17 @@ namespace Vi.Core.MovementHandlers
             if (IsServer & IsSpawned)
             {
                 EvaluateAction();
-            }
 
-            if (mob.GetHP() / mob.GetMaxHP() < 0.5f)
-            {
-
+                if (canRage)
+                {
+                    if (!mob.IsRaging)
+                    {
+                        if (mob.GetHP() / mob.GetMaxHP() < HPRagePercent)
+                        {
+                            mob.ActivateRageWithoutCheckingRageParam();
+                        }
+                    }
+                }
             }
         }
 

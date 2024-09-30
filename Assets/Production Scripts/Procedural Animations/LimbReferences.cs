@@ -302,5 +302,8 @@ namespace Vi.ProceduralAnimations
             }
             return null;
         }
+
+        public Transform Hips { get { return hips; } }
+        [SerializeField] private Transform hips;
     }
 }
