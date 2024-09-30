@@ -289,9 +289,16 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetDeathReaction() { return hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip; }
+        public ActionClip GetDeathReaction() { return CreateCopyOfActionClip(hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip); }
 
-        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip; }
+        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return CreateCopyOfActionClip(hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip); }
+
+        private ActionClip CreateCopyOfActionClip(ActionClip actionClip)
+        {
+            ActionClip instance = Instantiate(actionClip);
+            instance.name = actionClip.name;
+            return instance;
+        }
 
         public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
@@ -363,7 +370,7 @@ namespace Vi.ScriptableObjects
                 return null;
             }
 
-            return hitReaction.reactionClip;
+            return CreateCopyOfActionClip(hitReaction.reactionClip);
         }
 
         [System.Serializable]
