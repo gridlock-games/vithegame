@@ -269,16 +269,15 @@ namespace Vi.Utility
         private const float musicFadeSpeed = 0.5f;
 
         private float lastTimeScale = 1;
-        private int lastActiveAudioSourceCount;
         private float lastAudioListenerVolume = 1;
 
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
-            registeredAudioSources.RemoveAll(item => item == null);
             if (Time.timeScale != lastTimeScale)
             {
+                registeredAudioSources.RemoveAll(item => item == null);
                 foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
                     audioSourceData.AudioSource.pitch = Random.Range(-pitchVariationRangeMax, pitchVariationRangeMax) + Time.timeScale;
@@ -288,34 +287,11 @@ namespace Vi.Utility
             if (AudioListener.volume != lastAudioListenerVolume)
             {
                 defaultVolume = AudioListener.volume;
+                registeredAudioSources.RemoveAll(item => item == null);
                 foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
                     audioSourceData.AudioSource.volume = defaultVolume * (audioSourceData.OriginalVolume / lastAudioListenerVolume);
                 }
-            }
-
-            int activeAudioSourceCount = registeredAudioSources.Count(item => item.gameObject.activeInHierarchy);
-            if (activeAudioSourceCount > lastActiveAudioSourceCount)
-            {
-                //foreach (AudioSourceData audioSourceData in registeredAudioSources)
-                //{
-                //    audioSourceData.AudioSource.volume = audioSourceData.OriginalVolume * Mathf.Min(1, activeAudioSourceCount);
-                //    if (audioSourceData.gameObject.activeInHierarchy)
-                //    {
-                //        Debug.Log(audioSourceData.AudioSource.clip + " " + activeAudioSourceCount + " " + audioSourceData.OriginalVolume + " " + audioSourceData.AudioSource.volume);
-                //    }
-                //}
-            }
-            else if (activeAudioSourceCount < lastActiveAudioSourceCount)
-            {
-                //foreach (AudioSourceData audioSourceData in registeredAudioSources)
-                //{
-                //    audioSourceData.AudioSource.volume = audioSourceData.OriginalVolume / Mathf.Max(1, activeAudioSourceCount);
-                //    if (audioSourceData.gameObject.activeInHierarchy)
-                //    {
-                //        Debug.Log(audioSourceData.AudioSource.clip + " " + activeAudioSourceCount + " " + audioSourceData.OriginalVolume + " " + audioSourceData.AudioSource.volume);
-                //    }
-                //}
             }
 
             if (!musicSource.isPlaying & musicSource.clip) { musicSource.Play(); }
@@ -330,7 +306,6 @@ namespace Vi.Utility
             }
 
             lastTimeScale = Time.timeScale;
-            lastActiveAudioSourceCount = activeAudioSourceCount;
             lastAudioListenerVolume = AudioListener.volume;
         }
 
