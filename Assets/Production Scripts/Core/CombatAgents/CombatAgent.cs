@@ -65,6 +65,18 @@ namespace Vi.Core
             LoadoutManager = GetComponent<LoadoutManager>();
         }
 
+        protected virtual void OnIsRagingChanged(bool prev, bool current)
+        {
+            if (current)
+            {
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
+            }
+            else
+            {
+                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+            }
+        }
+
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
@@ -80,6 +92,8 @@ namespace Vi.Core
             {
                 col.enabled = true;
             }
+
+            isRaging.OnValueChanged += OnIsRagingChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -102,17 +116,20 @@ namespace Vi.Core
             {
                 col.enabled = false;
             }
+
+            isRaging.OnValueChanged -= OnIsRagingChanged;
         }
 
         protected virtual void OnEnable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
+        [SerializeField] private PooledObject ragingVFXPrefab;
+        private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             GlowRenderer = null;
 
             invincibilityEndTime = default;

@@ -169,7 +169,26 @@ namespace Vi.ScriptableObjects
                 inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);
                 if (inflictHitSoundEffect == null)
                 {
-                    return inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None).hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                    InflictHitSoundEffect soundEffect = inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None);
+                    if (soundEffect == null)
+                    {
+                        Debug.LogError(this + " doesn't have any inflict hit sound effects with ailment none!");
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds == null)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds.Length == 0)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else
+                    {
+                        return soundEffect.hitSounds[Random.Range(0, soundEffect.hitSounds.Length)];
+                    }
                 }
                 else // If armor effect isn't null
                 {

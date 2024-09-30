@@ -129,7 +129,6 @@ namespace Vi.Core.CombatAgents
 
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
-            isRaging.OnValueChanged += OnIsRagingChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
@@ -212,7 +211,6 @@ namespace Vi.Core.CombatAgents
             base.OnNetworkDespawn();
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
-            isRaging.OnValueChanged -= OnIsRagingChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
@@ -272,9 +270,7 @@ namespace Vi.Core.CombatAgents
         private const float rageEndPercent = 0.01f;
 
         [SerializeField] private PooledObject rageAtMaxVFXPrefab;
-        [SerializeField] private PooledObject ragingVFXPrefab;
         private PooledObject rageAtMaxVFXInstance;
-        private PooledObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
@@ -296,16 +292,12 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private void OnIsRagingChanged(bool prev, bool current)
+        protected override void OnIsRagingChanged(bool prev, bool current)
         {
+            base.OnIsRagingChanged(prev, current);
             if (current)
             {
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
-            }
-            else
-            {
-                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             }
         }
 
@@ -323,7 +315,6 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = default;
 
             if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
 
             lastComboCounterChangeTime = default;
             lastBlockTime = Mathf.NegativeInfinity;

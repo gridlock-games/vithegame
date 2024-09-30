@@ -41,6 +41,11 @@ namespace Vi.Core.MovementHandlers
             {
                 EvaluateAction();
             }
+
+            if (mob.GetHP() / mob.GetMaxHP() < 0.5f)
+            {
+
+            }
         }
 
         private bool disableBots;
@@ -396,6 +401,10 @@ namespace Vi.Core.MovementHandlers
         [Header("Suicide")]
         [SerializeField] private bool canSuicide;
         [SerializeField] private float suicideDistance;
+
+        [Header("Rage")]
+        [SerializeField] private bool canRage;
+        [SerializeField] private float HPRagePercent = 0.5f;
 
         private void EvaluateAction()
         {
