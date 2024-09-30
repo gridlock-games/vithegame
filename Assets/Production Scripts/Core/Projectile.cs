@@ -146,7 +146,7 @@ namespace Vi.Core
                 if (networkCollider.CombatAgent == attacker) { return; }
 
                 bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
-                if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
+                if (!hitSuccess) { return; }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
