@@ -595,9 +595,10 @@ namespace Vi.Core
                         {
                             if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
                             {
-                                PooledObject g = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation());
-                                g.GetComponent<Mob>().SetTeam(combatAgent.GetTeam());
-                                g.GetComponent<NetworkObject>().Spawn(true);
+                                Mob mob = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<Mob>();
+                                mob.SetTeam(combatAgent.GetTeam());
+                                mob.SetMaster(combatAgent);
+                                mob.NetworkObject.Spawn(true);
                                 summonablesCount++;
                             }
                         }

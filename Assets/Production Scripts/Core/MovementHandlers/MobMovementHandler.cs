@@ -116,6 +116,16 @@ namespace Vi.Core.MovementHandlers
 
             if (disableBots) { SetDestination(GetPosition()); return; }
 
+            if (mob.Master)
+            {
+                if (mob.Master.GetLastAttackingCombatAgent())
+                {
+                    targetFinder.SetTarget(mob.Master.GetLastAttackingCombatAgent());
+                    targetFinder.SetDestination(this);
+                    return;
+                }
+            }
+
             switch (targetingType)
             {
                 case TargetingType.Players:

@@ -352,6 +352,14 @@ namespace Vi.Core
         protected CombatAgent lastAttackingCombatAgent;
         protected NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
 
+        public CombatAgent GetLastAttackingCombatAgent()
+        {
+            if (!lastAttackingCombatAgent) { return null; }
+            if (!lastAttackingCombatAgent.IsSpawned) { return null; }
+            if (lastAttackingCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return null; }
+            return lastAttackingCombatAgent;
+        }
+
         protected void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
 
         public NetworkObject GetKiller()

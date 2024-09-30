@@ -15,6 +15,15 @@ namespace Vi.Core.CombatAgents
 
         public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
 
+        public CombatAgent Master { get; private set; }
+        public void SetMaster(CombatAgent master) { Master = master; }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            Master = null;
+        }
+
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;
         [SerializeField] private List<ActionClip.Ailment> whitelistedAilments = new List<ActionClip.Ailment>()
