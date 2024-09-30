@@ -14,7 +14,6 @@ namespace Vi.UI
         [Header("Horde Mode Specific")]
         [SerializeField] private Text wavesLeftText;
         [SerializeField] private GameObject structureHealthBarParent;
-        [SerializeField] private Text structureHPText;
         [SerializeField] private Image structureHPImage;
         [SerializeField] private Image structureIntermHPImage;
         [Header("Structure Status UI")]
@@ -80,7 +79,6 @@ namespace Vi.UI
 
                 if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
                 {
-                    structureHPText.text = structure.GetName() + " HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
                     structureHPImage.fillAmount = HP / maxHP;
                 }
 
@@ -133,7 +131,6 @@ namespace Vi.UI
                 float HP = structure.GetHP();
                 if (HP < 0.1f & HP > 0) { HP = 0.1f; }
                 float maxHP = structure.GetMaxHP();
-                structureHPText.text = structure.GetName() + " HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
                 structureHPImage.fillAmount = HP / maxHP;
                 structureIntermHPImage.fillAmount = HP / maxHP;
 
