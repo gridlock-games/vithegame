@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -4665,13 +4666,18 @@ MonoBehaviour:
     duration: 0.1
     delay: 0
     associatedWithCurrentWeapon: 0
+  - status: 5
+    value: 0.1
+    duration: 0.1
+    delay: 0
+    associatedWithCurrentWeapon: 0
   actionVFXList:
   - {fileID: 4391706194936514060, guid: b74cebbdbf7bd0443b39799b5da6da6b, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,
     type: 3}
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
-  previewActionVFXScale: {x: 0.4, y: 0.4, z: 0.4}
+  previewActionVFXScale: {x: 0.8, y: 0.8, z: 0.8}
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 60
@@ -4685,3 +4691,8 @@ MonoBehaviour:
   shouldAimOffHand: 0
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0

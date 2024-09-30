@@ -33,21 +33,30 @@ namespace Vi.Utility
             }
         }
 
-        List<AudioSource> registeredAudioSources = new List<AudioSource>();
+        List<AudioSourceData> registeredAudioSources = new List<AudioSourceData>();
         private void RegisterAudioSourceToBeAffectedByTimescale(AudioSource audioSource)
         {
-            if (!registeredAudioSources.Contains(audioSource)) { registeredAudioSources.Add(audioSource); }
+            if (audioSource.TryGetComponent(out AudioSourceData audioSourceData))
+            {
+                if (!registeredAudioSources.Contains(audioSourceData)) { registeredAudioSources.Add(audioSourceData); }
+            }
+            else
+            {
+                Debug.LogError("Trying to register an audio souce without an audio source data component!");
+            }
         }
 
-        private const float defaultVolume = 1;
+        private float defaultVolume = 1;
         private const float defaultPanning = 0;
         private const float defaultSpatialBlend = 1;
         private const float defaultMaxDistance = 100;
 
+        private const float pitchVariationRangeMax = 0.1f;
+
         private void ResetAudioSourceProperties(AudioSource audioSource)
         {
             audioSource.volume = defaultVolume;
-            audioSource.pitch = Time.timeScale;
+            audioSource.pitch = Random.Range(0, pitchVariationRangeMax) + Time.timeScale;
             audioSource.panStereo = defaultPanning;
             audioSource.spatialBlend = defaultSpatialBlend;
             audioSource.maxDistance = defaultMaxDistance;
@@ -258,6 +267,8 @@ namespace Vi.Utility
         private const float musicFadeSpeed = 0.5f;
 
         private float lastTimeScale = 1;
+        private float lastMasterVolume = 1;
+        private int lastAudioSourceCount;
 
         private void Update()
         {
@@ -266,9 +277,27 @@ namespace Vi.Utility
             if (Time.timeScale != lastTimeScale)
             {
                 registeredAudioSources.RemoveAll(item => item == null);
-                foreach (AudioSource audioSource in registeredAudioSources)
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
-                    audioSource.pitch = Time.timeScale;
+                    audioSourceData.AudioSource.pitch = Random.Range(0, pitchVariationRangeMax) + Time.timeScale;
+                }
+            }
+
+            if (AudioListener.volume != lastMasterVolume)
+            {
+                defaultVolume = AudioListener.volume;
+                registeredAudioSources.RemoveAll(item => item == null);
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
+                {
+                    audioSourceData.AudioSource.volume /= registeredAudioSources.Count;
+                }
+            }
+
+            if (registeredAudioSources.Count != lastAudioSourceCount)
+            {
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
+                {
+                    audioSourceData.AudioSource.volume = audioSourceData.OriginalVolume / registeredAudioSources.Count;
                 }
             }
 
@@ -284,6 +313,8 @@ namespace Vi.Utility
             }
 
             lastTimeScale = Time.timeScale;
+            lastMasterVolume = AudioListener.volume;
+            lastAudioSourceCount = registeredAudioSources.Count;
         }
 
         private void LateUpdate()

@@ -15,6 +15,15 @@ namespace Vi.Core.CombatAgents
 
         public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
 
+        public CombatAgent Master { get; private set; }
+        public void SetMaster(CombatAgent master) { Master = master; }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            Master = null;
+        }
+
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;
         [SerializeField] private List<ActionClip.Ailment> whitelistedAilments = new List<ActionClip.Ailment>()
@@ -120,6 +129,8 @@ namespace Vi.Core.CombatAgents
 
         private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -167,6 +178,9 @@ namespace Vi.Core.CombatAgents
             if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
 
             if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attackerCombatAgent.MovementHandler.GetPosition(); }
+
+            if (!attackerCombatAgent.IsRaging) { attackerCombatAgent.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
@@ -264,13 +278,24 @@ namespace Vi.Core.CombatAgents
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attackerCombatAgent, attack, hitReaction);
             }
 
-            if (IsServer)
+            if (IsServer & runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, actionVFX, attackerCombatAgent.transform, transform);
+                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attackerCombatAgent.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                        {
+                            if (!hitCounter.ContainsKey(this))
+                            {
+                                hitCounter.Add(this, new(1, Time.time));
+                            }
+                            else
+                            {
+                                hitCounter[this] = new(hitCounter[this].hitNumber + 1, Time.time);
+                            }
+                            actionVFXParticleSystem.AddToHitCounter(hitCounter);
+                        }
                     }
                 }
             }
@@ -292,5 +317,37 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
+
+        // Uncomment to make mobs respawn automatically
+        //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        //{
+        //    base.OnAilmentChanged(prev, current);
+
+        //    if (current == ActionClip.Ailment.Death)
+        //    {
+        //        respawnCoroutine = StartCoroutine(RespawnSelf());
+        //    }
+        //    else if (prev == ActionClip.Ailment.Death)
+        //    {
+        //        if (respawnCoroutine != null)
+        //        {
+        //            IsRespawning = false;
+        //            StopCoroutine(respawnCoroutine);
+        //        }
+        //    }
+        //}
+
+        //public bool IsRespawning { get; private set; }
+        //[HideInInspector] public bool isWaitingForSpawnPoint;
+        //private Coroutine respawnCoroutine;
+        //private float respawnSelfCalledTime;
+        //private IEnumerator RespawnSelf()
+        //{
+        //    yield return new WaitForSeconds(5);
+        //    ResetStats(1, true, true, false);
+        //    AnimationHandler.CancelAllActions(0, true);
+        //    MovementHandler.SetOrientation(new Vector3(0, 5, 0), Quaternion.identity);
+        //    LoadoutManager.SwapLoadoutOnRespawn();
+        //}
     }
 }

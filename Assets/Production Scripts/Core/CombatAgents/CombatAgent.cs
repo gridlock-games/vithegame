@@ -65,6 +65,18 @@ namespace Vi.Core
             LoadoutManager = GetComponent<LoadoutManager>();
         }
 
+        protected virtual void OnIsRagingChanged(bool prev, bool current)
+        {
+            if (current)
+            {
+                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips); }
+            }
+            else
+            {
+                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+            }
+        }
+
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
@@ -75,6 +87,8 @@ namespace Vi.Core
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
+
+            isRaging.OnValueChanged += OnIsRagingChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -92,17 +106,20 @@ namespace Vi.Core
                 SetUninterruptable(0);
                 ResetAilment();
             }
+
+            isRaging.OnValueChanged -= OnIsRagingChanged;
         }
 
         protected virtual void OnEnable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
         }
 
+        [SerializeField] private PooledObject ragingVFXPrefab;
+        private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
-            if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
+            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -278,7 +295,7 @@ namespace Vi.Core
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
         {
-            if (!IsSpawned) { Debug.LogError("Calling Attributes.ActivateRage() before this object is spawned!"); return; }
+            if (!IsSpawned) { Debug.LogError("Calling CombatAgent.ActivateRage() before this object is spawned!"); return; }
 
             if (IsServer)
             {
@@ -289,6 +306,13 @@ namespace Vi.Core
             {
                 ActivateRageServerRpc();
             }
+        }
+
+        public void ActivateRageWithoutCheckingRageParam()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { Debug.LogError("Calling CombatAgent.ActivateRageWithoutCheckingRageParam() when you're not the server!"); return; }
+            isRaging.Value = true;
         }
 
         public bool CanActivateRage() { return GetRage() / GetMaxRage() >= 1 & ailment.Value != ActionClip.Ailment.Death; }
@@ -341,6 +365,14 @@ namespace Vi.Core
 
         protected CombatAgent lastAttackingCombatAgent;
         protected NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
+
+        public CombatAgent GetLastAttackingCombatAgent()
+        {
+            if (!lastAttackingCombatAgent) { return null; }
+            if (!lastAttackingCombatAgent.IsSpawned) { return null; }
+            if (lastAttackingCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return null; }
+            return lastAttackingCombatAgent;
+        }
 
         protected void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
 

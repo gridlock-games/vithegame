@@ -31,21 +31,24 @@ namespace Vi.Core
                 {
                     networkPredictionLayerColliders.Add(col);
                 }
+                col.enabled = false;
             }
             Colliders = networkPredictionLayerColliders.ToArray();
         }
 
-        private ActionClip.Ailment lastAilmentEvaluated;
+        private ActionClip.Ailment lastAilmentEvaluated = ActionClip.Ailment.None;
+        private bool lastSpawnState;
         private void Update()
         {
-            if (CombatAgent.GetAilment() != lastAilmentEvaluated)
+            if (CombatAgent.GetAilment() != lastAilmentEvaluated | lastSpawnState != CombatAgent.IsSpawned)
             {
                 foreach (Collider c in Colliders)
                 {
-                    c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death;
+                    c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                 }
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
+            lastSpawnState = CombatAgent.IsSpawned;
         }
 
         private void OnCollisionEnter(Collision collision)

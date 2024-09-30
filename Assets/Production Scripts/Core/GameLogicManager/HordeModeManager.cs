@@ -103,6 +103,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnPlayerKill(killer, victim);
             if (gameOver.Value) { return; }
+            if (victim.GetTeam() != PlayerDataManager.Team.Corruption) { return; }
             List<CombatAgent> killerTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam());
             List<CombatAgent> victimTeam = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(victim.GetTeam());
             if (victimTeam.TrueForAll(item => item.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death))

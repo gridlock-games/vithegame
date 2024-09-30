@@ -24,9 +24,17 @@ namespace Vi.Core.MovementHandlers
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
+			if (!IsServer) { Debug.LogError(""); return; }
 			transform.position = newPosition;
 			transform.rotation = newRotation;
+
+			if (IsSpawned)
+            {
+				TeleportPositionRpc(newPosition);
+			}
 		}
+
+		[Rpc(SendTo.NotServer)] protected virtual void TeleportPositionRpc(Vector3 newPosition) { transform.position = newPosition; }
 
         public virtual Vector3 GetPosition() { return transform.position; }
 

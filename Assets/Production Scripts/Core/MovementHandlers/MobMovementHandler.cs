@@ -36,7 +36,22 @@ namespace Vi.Core.MovementHandlers
                 transform.rotation = EvaluateRotation();
             }
             SetAnimationMoveInput(GetPathMoveInput(true));
-            EvaluateAction();
+
+            if (IsServer & IsSpawned)
+            {
+                EvaluateAction();
+
+                if (canRage)
+                {
+                    if (!mob.IsRaging)
+                    {
+                        if (mob.GetHP() / mob.GetMaxHP() < HPRagePercent)
+                        {
+                            mob.ActivateRageWithoutCheckingRageParam();
+                        }
+                    }
+                }
+            }
         }
 
         private bool disableBots;
@@ -50,7 +65,7 @@ namespace Vi.Core.MovementHandlers
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return transform.rotation; }
 
-            Vector3 camDirection = targetFinder.GetTarget() ? (targetFinder.GetTarget().transform.position - Rigidbody.position).normalized : (NextPosition - Rigidbody.position).normalized;
+            Vector3 camDirection = (NextPosition - Rigidbody.position).normalized;
             camDirection.Scale(HORIZONTAL_PLANE);
 
             if (combatAgent.ShouldApplyAilmentRotation())
@@ -68,7 +83,7 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                return Quaternion.LerpUnclamped(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
 
             return transform.rotation;
         }
@@ -76,6 +91,8 @@ namespace Vi.Core.MovementHandlers
         [Header("Mob Movement Handler")]
         [SerializeField] private TargetingType targetingType = TargetingType.StructuresThenPlayers;
         [SerializeField] private float targetingSwitchDistance = 11;
+        [SerializeField] private bool canFly;
+        [SerializeField] private AnimationCurve flightMovement = new AnimationCurve();
         private enum TargetingType
         {
             Players,
@@ -109,6 +126,16 @@ namespace Vi.Core.MovementHandlers
             targetFinder.ClearTarget();
 
             if (disableBots) { SetDestination(GetPosition()); return; }
+
+            if (mob.Master)
+            {
+                if (mob.Master.GetLastAttackingCombatAgent())
+                {
+                    targetFinder.SetTarget(mob.Master.GetLastAttackingCombatAgent());
+                    targetFinder.SetDestination(this);
+                    return;
+                }
+            }
 
             switch (targetingType)
             {
@@ -332,12 +359,22 @@ namespace Vi.Core.MovementHandlers
 
             if (evaluateForce)
             {
-                if (IsGrounded())
+                if (IsGrounded() | canFly)
                 {
                     Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
                     if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
                         Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
+                    }
+
+                    if (canFly)
+                    {
+                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > lightAttackDistance + 1)
+                        {
+                            Rigidbody.AddForce(new Vector3(0, Random.Range(0, flightMovement.EvaluateNormalizedTime(flightTime)), 0), ForceMode.VelocityChange);
+                            flightTime += Time.fixedDeltaTime;
+                            if (flightTime > 1) { flightTime = 0; }
+                        }
                     }
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
@@ -349,6 +386,8 @@ namespace Vi.Core.MovementHandlers
             Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
+
+        private float flightTime;
 
         [Header("Light Attack")]
         [SerializeField] private float lightAttackDistance = 2.5f;
@@ -368,6 +407,10 @@ namespace Vi.Core.MovementHandlers
         [Header("Suicide")]
         [SerializeField] private bool canSuicide;
         [SerializeField] private float suicideDistance;
+
+        [Header("Rage")]
+        [SerializeField] private bool canRage;
+        [SerializeField] private float HPRagePercent = 0.5f;
 
         private void EvaluateAction()
         {

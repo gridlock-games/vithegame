@@ -170,6 +170,8 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            canHitPlayers = true;
+
             attacker = null;
             shooterWeapon = null;
             attack = null;

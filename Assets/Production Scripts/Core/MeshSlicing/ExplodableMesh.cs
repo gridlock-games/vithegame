@@ -9,10 +9,10 @@ namespace Vi.Core.MeshSlicing
 {
     public class ExplodableMesh : MonoBehaviour
     {
-        private SkinnedMeshRenderer skinnedMeshRenderer;
+        private Renderer thisRenderer;
         private void Awake()
         {
-            skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
+            thisRenderer = GetComponent<Renderer>();
         }
 
         public PooledObject[] Explode()
@@ -34,7 +34,7 @@ namespace Vi.Core.MeshSlicing
                 rb.useGravity = true;
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-                rb.AddExplosionForce(5, skinnedMeshRenderer.bounds.center, 10, 0, ForceMode.VelocityChange);
+                rb.AddExplosionForce(5, thisRenderer.bounds.center, 10, 0, ForceMode.VelocityChange);
 
                 instances.Add(obj);
             }
@@ -53,9 +53,13 @@ namespace Vi.Core.MeshSlicing
             {
                 rendererMaterials = skinnedMeshRenderer.sharedMaterials;
             }
+            else if (TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                rendererMaterials = meshRenderer.sharedMaterials;
+            }
             else
             {
-                Debug.LogError("Explodable mesh should only be on a skinned mesh renderer");
+                Debug.LogError("Explodable mesh should only be on a skinned mesh renderer or a mesh renderer");
             }
 
             string folderPath = AssetDatabase.GetAssetPath(Selection.activeObject);

@@ -6,7 +6,7 @@ using UnityEngine;
 using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Utility;
-using System.Linq;
+using Vi.Core.VFX;
 
 namespace Vi.Core.CombatAgents
 {
@@ -129,7 +129,6 @@ namespace Vi.Core.CombatAgents
 
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
-            isRaging.OnValueChanged += OnIsRagingChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
@@ -212,7 +211,6 @@ namespace Vi.Core.CombatAgents
             base.OnNetworkDespawn();
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
-            isRaging.OnValueChanged -= OnIsRagingChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
@@ -272,9 +270,7 @@ namespace Vi.Core.CombatAgents
         private const float rageEndPercent = 0.01f;
 
         [SerializeField] private PooledObject rageAtMaxVFXPrefab;
-        [SerializeField] private PooledObject ragingVFXPrefab;
         private PooledObject rageAtMaxVFXInstance;
-        private PooledObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
@@ -296,16 +292,12 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private void OnIsRagingChanged(bool prev, bool current)
+        protected override void OnIsRagingChanged(bool prev, bool current)
         {
+            base.OnIsRagingChanged(prev, current);
             if (current)
             {
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
-            }
-            else
-            {
-                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             }
         }
 
@@ -323,7 +315,6 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = default;
 
             if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
 
             lastComboCounterChangeTime = default;
             lastBlockTime = Mathf.NegativeInfinity;
@@ -440,6 +431,8 @@ namespace Vi.Core.CombatAgents
 
         private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
@@ -642,13 +635,24 @@ namespace Vi.Core.CombatAgents
 
             if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
 
-            if (IsServer)
+            if (IsServer & runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attacker.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                        {
+                            if (!hitCounter.ContainsKey(this))
+                            {
+                                hitCounter.Add(this, new(1, Time.time));
+                            }
+                            else
+                            {
+                                hitCounter[this] = new(hitCounter[this].hitNumber + 1, Time.time);
+                            }
+                            actionVFXParticleSystem.AddToHitCounter(hitCounter);
+                        }
                     }
                 }
             }
@@ -748,7 +752,6 @@ namespace Vi.Core.CombatAgents
             {
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 respawnCoroutine = StartCoroutine(RespawnSelf());
-                AnimationHandler.Animator.enabled = false;
             }
             else if (prev == ActionClip.Ailment.Death)
             {
@@ -757,7 +760,6 @@ namespace Vi.Core.CombatAgents
                     IsRespawning = false;
                     StopCoroutine(respawnCoroutine);
                 }
-                AnimationHandler.Animator.enabled = true;
             }
         }
 

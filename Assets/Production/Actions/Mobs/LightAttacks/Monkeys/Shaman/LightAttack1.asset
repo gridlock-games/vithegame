@@ -1006,10 +1006,10 @@ MonoBehaviour:
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
-  - status: 13
+  - status: 12
     value: 0
     duration: 2
-    delay: 2
+    delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList: []
@@ -1031,3 +1031,7 @@ MonoBehaviour:
   requireAmmo: 0
   requiredAmmoAmount: 1
   reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0

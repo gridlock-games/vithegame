@@ -721,9 +721,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.1439017
-  m_Height: 0.7195085
+  m_Height: 0.41067547
   m_Direction: 0
-  m_Center: {x: 0.35975426, y: 0, z: 0}
+  m_Center: {x: 0.20533322, y: -0.0000004841057, z: 0.0000007053903}
 --- !u!1 &8540540628075321217
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,9 +794,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.14390127
-  m_Height: 0.7195064
+  m_Height: 0.3999924
   m_Direction: 0
-  m_Center: {x: -0.3597532, y: 0, z: 0}
+  m_Center: {x: -0.199996, y: -0.0000016136976, z: 0.000002956315}
 --- !u!1001 &6543144536635323077
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -809,6 +809,11 @@ PrefabInstance:
         type: 3}
       propertyPath: maxHP
       value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: armorType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -1071,7 +1076,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.35
-  m_Height: 1.8
+  m_Height: 1.45
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0.1}
 --- !u!4 &7601062499363614729 stripped

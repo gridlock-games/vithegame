@@ -159,7 +159,7 @@ namespace Vi.ScriptableObjects
 
         public void SetHitReactionRootMotionMultipliers(ActionClip attackClip)
         {
-            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip!"); return; }
+            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip! " + attackClip + " " + attackClip.GetClipType()); return; }
             if (GetClipType() != ClipType.HitReaction) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called on a hit reaction!"); return; }
 
             hitReactionRootMotionForwardMultiplier = attackClip.attackRootMotionForwardMultiplier;

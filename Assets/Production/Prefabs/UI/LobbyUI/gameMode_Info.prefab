@@ -30,7 +30,6 @@ RectTransform:
   m_Children:
   - {fileID: 1527046974292986398}
   m_Father: {fileID: 5244708294289612914}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -68,7 +67,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1527046974292986398}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -150,7 +148,6 @@ RectTransform:
   m_Children:
   - {fileID: 8623902904804927249}
   m_Father: {fileID: 869510220272273497}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -285,7 +282,6 @@ RectTransform:
   - {fileID: 9099024258512509571}
   - {fileID: 9099024258817868835}
   m_Father: {fileID: 5244708294289612914}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -348,7 +344,6 @@ RectTransform:
   m_Children:
   - {fileID: 5244708294116467205}
   m_Father: {fileID: 5244708294289612914}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -386,7 +381,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5244708293124570319}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -470,7 +464,6 @@ RectTransform:
   - {fileID: 5244708292983601084}
   - {fileID: 869510220272273497}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -552,23 +545,24 @@ MonoBehaviour:
     gameModeMessages:
     - Objective is to eliminate all players of opposing team
     - Team with most players left standing wins
-    - Picking up the Vi Essence will revive a teammate at 50% HP. Attacking the Vi
-      Essence will close the zone of play.
+    - Picking up Vi Essence will revive a teammate at 50% HP. Attacking Vi Essence
+      will shrink the zone of play
   - gameMode: 6
     gameModeSprites:
     - {fileID: 21300000, guid: 220ea4518ebe07d4387a7629b02dbf8b, type: 3}
     - {fileID: 21300000, guid: 76a7fec2283e24c45b5d6780f76c0393, type: 3}
     cardHeaders:
     - Monsters
-    - Defend The Core
+    - Defend The Ancient
     gameModeMessages:
     - Defeat waves of corrupted monsters coming to destroy you and your team
-    - The monsters are trying to destroy the core at the center of the map
+    - The monsters are trying to destroy the ancient at the center of the map
 --- !u!1001 &5244708293017700290
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 5244708292983601084}
     m_Modifications:
     - target: {fileID: 3931299690911220705, guid: 326ce91fd89924ba7b1f4102a573b3ca,
@@ -682,6 +676,9 @@ PrefabInstance:
       value: card_Info (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 326ce91fd89924ba7b1f4102a573b3ca, type: 3}
 --- !u!224 &9099024258817868835 stripped
 RectTransform:
@@ -694,6 +691,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 5244708292983601084}
     m_Modifications:
     - target: {fileID: 3931299690911220705, guid: 326ce91fd89924ba7b1f4102a573b3ca,
@@ -807,6 +805,9 @@ PrefabInstance:
       value: card_Info
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 326ce91fd89924ba7b1f4102a573b3ca, type: 3}
 --- !u!224 &9099024258691627562 stripped
 RectTransform:
@@ -819,6 +820,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 5244708292983601084}
     m_Modifications:
     - target: {fileID: 3931299690911220705, guid: 326ce91fd89924ba7b1f4102a573b3ca,
@@ -932,6 +934,9 @@ PrefabInstance:
       value: card_Info (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 326ce91fd89924ba7b1f4102a573b3ca, type: 3}
 --- !u!224 &9099024258512509571 stripped
 RectTransform:

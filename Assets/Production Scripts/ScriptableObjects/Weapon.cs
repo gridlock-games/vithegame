@@ -169,7 +169,26 @@ namespace Vi.ScriptableObjects
                 inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);
                 if (inflictHitSoundEffect == null)
                 {
-                    return inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None).hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                    InflictHitSoundEffect soundEffect = inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None);
+                    if (soundEffect == null)
+                    {
+                        Debug.LogError(this + " doesn't have any inflict hit sound effects with ailment none!");
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds == null)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds.Length == 0)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else
+                    {
+                        return soundEffect.hitSounds[Random.Range(0, soundEffect.hitSounds.Length)];
+                    }
                 }
                 else // If armor effect isn't null
                 {
@@ -270,9 +289,16 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetDeathReaction() { return hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip; }
+        public ActionClip GetDeathReaction() { return CreateCopyOfActionClip(hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip); }
 
-        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip; }
+        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return CreateCopyOfActionClip(hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip); }
+
+        private ActionClip CreateCopyOfActionClip(ActionClip actionClip)
+        {
+            ActionClip instance = Instantiate(actionClip);
+            instance.name = actionClip.name;
+            return instance;
+        }
 
         public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
@@ -344,7 +370,7 @@ namespace Vi.ScriptableObjects
                 return null;
             }
 
-            return hitReaction.reactionClip;
+            return CreateCopyOfActionClip(hitReaction.reactionClip);
         }
 
         [System.Serializable]
@@ -620,8 +646,24 @@ namespace Vi.ScriptableObjects
 
         [Header("Lunge Assignments")]
         [SerializeField] private ActionClip lunge;
+        [SerializeField] private ActionClip invinicbleLunge;
+        [SerializeField] private ActionClip uninterruptableLunge;
 
-        public ActionClip GetLungeClip() { return lunge; }
+        public ActionClip GetLungeClip(bool isUninterruptable, bool isInvincible)
+        {
+            if (isInvincible)
+            {
+                return invinicbleLunge;
+            }
+            else if (isUninterruptable)
+            {
+                return uninterruptableLunge;
+            }
+            else
+            {
+                return lunge;
+            }
+        }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
         private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
@@ -647,6 +689,8 @@ namespace Vi.ScriptableObjects
             if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
 
             if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
+            if (invinicbleLunge) { actionClipLookup.TryAdd(invinicbleLunge.name, invinicbleLunge); }
+            if (uninterruptableLunge) { actionClipLookup.TryAdd(uninterruptableLunge.name, uninterruptableLunge); }
 
             if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
             if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }

@@ -33,7 +33,7 @@ namespace Vi.Core
             }
             else
             {
-                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip);
+                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip + " " + name);
             }
         }
 
@@ -92,6 +92,7 @@ namespace Vi.Core
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Lunge) { animationStateName = "LungeF"; }
             animationStateName = (actionClip.GetClipType() == ActionClip.ClipType.Flinch ? flinchLayerName : actionsLayerName) + "." + animationStateName;
             return animationStateName;
         }
@@ -102,6 +103,7 @@ namespace Vi.Core
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Lunge) { animationStateName = "LungeF"; }
             return animationStateName;
         }
 
@@ -346,14 +348,10 @@ namespace Vi.Core
                     {
                         if (!IsLunging())
                         {
-                            ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
-                            lungeClip.name = lungeClip.name.Replace("(Clone)", "");
-                            lungeClip.isInvincible = actionClip.isInvincible;
-                            lungeClip.isUninterruptable = actionClip.isUninterruptable;
+                            ActionClip lungeClip = combatAgent.WeaponHandler.GetWeapon().GetLungeClip(actionClip.isUninterruptable, actionClip.isInvincible);
 
                             if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                             {
-                                // Lunge mechanic
 #if UNITY_EDITOR
                                 DebugExtensions.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
 #endif
@@ -1223,6 +1221,11 @@ namespace Vi.Core
             if (combatAgent is Attributes attributes)
             {
                 StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
+            }
+
+            if (animatorReference)
+            {
+                animatorReference.OnNetworkSpawn();
             }
         }
 

@@ -15,17 +15,14 @@ namespace Vi.Player
     {
         [Header("Player Movement Handler")]
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private Light previewCharLight;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
-            if (!IsServer) { Debug.LogError("PlayerMovementHandler.SetOrientation() should only be called on the server!"); return; }
-
-            Rigidbody.position = newPosition;
-            Rigidbody.Sleep();
-            transform.position = newPosition;
-
-            SetRotationClientRpc(newRotation);
+            base.SetOrientation(newPosition, newRotation);
+            if (IsSpawned)
+            {
+                SetRotationClientRpc(newRotation);
+            }
         }
 
         [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
@@ -355,7 +352,7 @@ namespace Vi.Player
                     {
                         movement = newRotation * rootMotion * GetRootMotionSpeed();
 #if UNITY_EDITOR
-                        DebugExtensions.DrawBoxCastBox(GetPosition() + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
+                        if (drawCasts) DebugExtensions.DrawBoxCastBox(GetPosition() + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, newRotation * Vector3.forward, newRotation, ActionClip.boxCastDistance, Color.blue, GetTickRateDeltaTime());
 #endif
                         int rootMotionHitCount = Physics.BoxCastNonAlloc(GetPosition() + ActionClip.boxCastOriginPositionOffset,
                             ActionClip.boxCastHalfExtents, (newRotation * Vector3.forward).normalized, rootMotionHits,
@@ -428,7 +425,7 @@ namespace Vi.Player
                     break;
                 }
 #if UNITY_EDITOR
-                Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+                if (drawCasts) Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
 #endif
                 startPos.y += stairStepHeight;
                 stairMovement += stairStepHeight;
@@ -599,8 +596,6 @@ namespace Vi.Player
             {
                 latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation), Rigidbody, transform.rotation, false);
             }
-
-            previewCharLight.gameObject.SetActive(false);
         }
 
         public override void OnNetworkDespawn()
@@ -646,8 +641,6 @@ namespace Vi.Player
             cameraController.transform.SetParent(transform);
             cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
             cameraController.transform.localRotation = Quaternion.identity;
-
-            previewCharLight.gameObject.SetActive(false);
         }
 
         private const int BUFFER_SIZE = 1024;
@@ -677,12 +670,6 @@ namespace Vi.Player
             {
                 cameraController.PlayAnimation("TutorialIntro");
             }
-        }
-
-        protected override void OnSpawnFromPool()
-        {
-            base.OnSpawnFromPool();
-            previewCharLight.gameObject.SetActive(!IsSpawned);
         }
 
         private Camera mainCamera;
@@ -773,6 +760,10 @@ namespace Vi.Player
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
         }
 
+# if UNITY_EDITOR
+        private bool drawCasts;
+# endif
+
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];
         private void AutoAim()
@@ -783,7 +774,10 @@ namespace Vi.Player
             {
                 if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | combatAgent.AnimationHandler.IsLunging())
                 {
-                    DebugExtensions.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
+# if UNITY_EDITOR
+                    if (drawCasts) DebugExtensions.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
+# endif
+
                     int cameraHitsCount = Physics.BoxCastNonAlloc(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset,
                         ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward.normalized, cameraHits,
                         cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance,

@@ -89,6 +89,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
+  ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
+    type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3
     actionVFX: {fileID: 3922548515315126405, guid: 92e09002586d112498d7f92d499e563b,
@@ -162,6 +164,13 @@ MonoBehaviour:
   gravityScale: 2
   targetingType: 2
   targetingSwitchDistance: 11
+  canFly: 0
+  flightMovement:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   lightAttackDistance: 2.5
   canUseAbility1: 1
   ability1IsConstrainedByDistance: 1
@@ -173,6 +182,8 @@ MonoBehaviour:
   ability2DistanceMax: 4
   canSuicide: 0
   suicideDistance: 0
+  canRage: 0
+  HPRagePercent: 0.5
 --- !u!114 &6305487504955697137
 MonoBehaviour:
   m_ObjectHideFlags: 0
