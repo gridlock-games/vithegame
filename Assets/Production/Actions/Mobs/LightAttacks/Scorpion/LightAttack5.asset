@@ -806,7 +806,7 @@ MonoBehaviour:
   maxHitLimit: 1
   timeBetweenHits: 1
   isBlockable: 1
-  isUninterruptable: 1
+  isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
@@ -850,3 +850,8 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0
