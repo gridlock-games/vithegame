@@ -81,15 +81,15 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MasterVolume"))
             {
-                FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.75f);
-                AudioListener.volume = 0.75f;
+                FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.4f);
+                AudioListener.volume = 0.4f;
             }
             else
             {
                 AudioListener.volume = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0)); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }

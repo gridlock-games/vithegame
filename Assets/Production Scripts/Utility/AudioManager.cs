@@ -48,7 +48,6 @@ namespace Vi.Utility
             }
         }
 
-        private float defaultVolume = 1;
         private const float defaultPanning = 0;
         private const float defaultSpatialBlend = 1;
         private const float defaultMaxDistance = 100;
@@ -57,7 +56,7 @@ namespace Vi.Utility
 
         private void ResetAudioSourceProperties(AudioSource audioSource)
         {
-            audioSource.volume = defaultVolume;
+            audioSource.volume = AudioListener.volume;
             audioSource.pitch = Random.Range(-pitchVariationRangeMax, pitchVariationRangeMax) + Time.timeScale;
             audioSource.panStereo = defaultPanning;
             audioSource.spatialBlend = defaultSpatialBlend;
@@ -286,11 +285,10 @@ namespace Vi.Utility
 
             if (AudioListener.volume != lastAudioListenerVolume)
             {
-                defaultVolume = AudioListener.volume;
                 registeredAudioSources.RemoveAll(item => item == null);
                 foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
-                    audioSourceData.AudioSource.volume = defaultVolume * (audioSourceData.OriginalVolume / lastAudioListenerVolume);
+                    audioSourceData.AudioSource.volume = AudioListener.volume * (audioSourceData.OriginalVolume / lastAudioListenerVolume);
                 }
             }
 
