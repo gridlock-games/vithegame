@@ -33,10 +33,17 @@ namespace Vi.Utility
             }
         }
 
-        List<AudioSource> registeredAudioSources = new List<AudioSource>();
+        List<AudioSourceData> registeredAudioSources = new List<AudioSourceData>();
         private void RegisterAudioSourceToBeAffectedByTimescale(AudioSource audioSource)
         {
-            if (!registeredAudioSources.Contains(audioSource)) { registeredAudioSources.Add(audioSource); }
+            if (audioSource.TryGetComponent(out AudioSourceData audioSourceData))
+            {
+                if (!registeredAudioSources.Contains(audioSourceData)) { registeredAudioSources.Add(audioSourceData); }
+            }
+            else
+            {
+                Debug.LogError("Trying to register an audio souce without an audio source data component!");
+            }
         }
 
         private float defaultVolume = 1;
@@ -270,9 +277,9 @@ namespace Vi.Utility
             if (Time.timeScale != lastTimeScale)
             {
                 registeredAudioSources.RemoveAll(item => item == null);
-                foreach (AudioSource audioSource in registeredAudioSources)
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
-                    audioSource.pitch = Random.Range(0, pitchVariationRangeMax) + Time.timeScale;
+                    audioSourceData.AudioSource.pitch = Random.Range(0, pitchVariationRangeMax) + Time.timeScale;
                 }
             }
 
@@ -280,17 +287,17 @@ namespace Vi.Utility
             {
                 defaultVolume = AudioListener.volume;
                 registeredAudioSources.RemoveAll(item => item == null);
-                foreach (AudioSource audioSource in registeredAudioSources)
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
-                    audioSource.volume /= registeredAudioSources.Count;
+                    audioSourceData.AudioSource.volume /= registeredAudioSources.Count;
                 }
             }
 
             if (registeredAudioSources.Count != lastAudioSourceCount)
             {
-                foreach (AudioSource audioSource in registeredAudioSources)
+                foreach (AudioSourceData audioSourceData in registeredAudioSources)
                 {
-                    audioSource.volume /= registeredAudioSources.Count;
+                    audioSourceData.AudioSource.volume = audioSourceData.OriginalVolume / registeredAudioSources.Count;
                 }
             }
 
