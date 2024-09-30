@@ -24,6 +24,26 @@ namespace Vi.Core.CombatAgents
             Master = null;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            if (GetAilment() == ActionClip.Ailment.Death) { return; }
+
+            if (Master)
+            {
+                if (Master.IsSpawned)
+                {
+                    if (Master.GetAilment() == ActionClip.Ailment.Death)
+                    {
+                        ProcessEnvironmentDamage(-GetMaxHP(), null);
+                    }
+                }
+            }
+        }
+
         [SerializeField] private float maxHP = 100;
         [SerializeField] private CharacterReference.WeaponOption weaponOption;
         [SerializeField] private List<ActionClip.Ailment> whitelistedAilments = new List<ActionClip.Ailment>()
