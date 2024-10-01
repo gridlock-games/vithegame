@@ -101,6 +101,8 @@ namespace Vi.Core.MovementHandlers
 
         protected void UpdateAnimatorSpeed()
         {
+            if (!combatAgent.AnimationHandler.Animator) { return; }
+
             if (weaponHandler.CurrentActionClip != null)
             {
                 if (combatAgent.ShouldPlayHitStop())
@@ -139,6 +141,7 @@ namespace Vi.Core.MovementHandlers
 
         private void UpdateAnimatorParameters()
         {
+            if (!combatAgent.AnimationHandler.Animator) { return; }
             Vector2 walkCycleAnims = IsSpawned ? GetWalkCycleAnimationParameters() : Vector2.zero;
             combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             combatAgent.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
