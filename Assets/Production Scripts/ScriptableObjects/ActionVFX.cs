@@ -53,6 +53,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] protected AudioClip audioClipToPlayOnAwake;
         [SerializeField] protected float awakeAudioClipDelay;
+        [SerializeField] protected float awakeAudioClipStartTime;
         [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
         public static readonly string[] layersToAccountForInRaycasting = new string[]
@@ -161,7 +162,8 @@ namespace Vi.ScriptableObjects
         private IEnumerator PlayAwakeAudioClip()
         {
             yield return new WaitForSeconds(awakeAudioClipDelay);
-            AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
+            AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
+            audioSource.time = awakeAudioClipStartTime;
         }
 
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];
