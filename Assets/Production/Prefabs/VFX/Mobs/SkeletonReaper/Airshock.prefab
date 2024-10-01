@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1259470347879854242, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1901838467806203235, guid: 07022f066dee4ab42ad694c8dc3bfa12,
         type: 3}
       propertyPath: TriggerModule.enabled
@@ -28,10 +33,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Airshock
       objectReference: {fileID: 0}
+    - target: {fileID: 2245897706934489841, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3196173093749847347, guid: 07022f066dee4ab42ad694c8dc3bfa12,
         type: 3}
       propertyPath: looping
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3355813322438007384, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5097752659429814074, guid: 07022f066dee4ab42ad694c8dc3bfa12,
         type: 3}
@@ -82,6 +97,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5568637801616667185, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7204008521245390796, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8924374996011325717, guid: 07022f066dee4ab42ad694c8dc3bfa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -161,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1622583776
+  GlobalObjectIdHash: 550927392
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -254,6 +284,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: f8aae7e14415846f6b5a2c12550dc8ce,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 2

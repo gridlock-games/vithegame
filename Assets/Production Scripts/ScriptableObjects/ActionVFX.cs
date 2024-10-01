@@ -184,5 +184,21 @@ namespace Vi.ScriptableObjects
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
         }
+
+#if UNITY_EDITOR
+        public void SetLayers()
+        {
+            bool shouldDirty = false;
+            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            {
+                if (child.gameObject.layer != LayerMask.NameToLayer("Projectile"))
+                {
+                    shouldDirty = true;
+                    child.gameObject.layer = LayerMask.NameToLayer("Projectile");
+                }
+            }
+            if (shouldDirty) { UnityEditor.EditorUtility.SetDirty(this); }
+        }
+#endif
     }
 }

@@ -8,10 +8,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3466481671361338793, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3466481672143998810, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
         type: 3}
       propertyPath: m_Name
       value: Poison_Muzzle_Flash
+      objectReference: {fileID: 0}
+    - target: {fileID: 3663995649852042410, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3663995649852042413, guid: 0b6dcd10faba2cc43aedfca95317d904,
         type: 3}
@@ -68,6 +83,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3663995651355281296, guid: 0b6dcd10faba2cc43aedfca95317d904,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -107,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2329833251
+  GlobalObjectIdHash: 180314326
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -163,6 +183,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.7
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -171,6 +192,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &4627992225257090974

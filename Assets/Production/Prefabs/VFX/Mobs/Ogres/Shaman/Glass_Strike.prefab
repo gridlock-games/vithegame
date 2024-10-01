@@ -8,10 +8,35 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5529860186620552760, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922418312796574, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922418538468554, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922418748191947, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 9178922418790041123, guid: 13fcb20dc811930458f91f26269a6de0,
         type: 3}
       propertyPath: m_Name
       value: Glass_Strike
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922418790041123, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9178922418790041124, guid: 13fcb20dc811930458f91f26269a6de0,
         type: 3}
@@ -72,6 +97,21 @@ PrefabInstance:
         type: 3}
       propertyPath: TriggerModule.primitives.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922418833702740, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922419071786412, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9178922419163322207, guid: 13fcb20dc811930458f91f26269a6de0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -151,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 364084047
+  GlobalObjectIdHash: 3942062827
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -244,6 +284,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: b3182302987f84a73acd92ad18ee60bc,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1

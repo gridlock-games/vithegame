@@ -8,6 +8,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 230526383439644991, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 230526384075335933, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641077721593618821, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5621218388607376073, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 5621218388607376078, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
         type: 3}
       propertyPath: TriggerModule.enabled
@@ -17,6 +37,36 @@ PrefabInstance:
         type: 3}
       propertyPath: TriggerModule.primitives.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5621218389243736115, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5621218389815833132, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5621218390371565849, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5624875779707184795, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6501411048784171309, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6501411049935989168, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7475459639825081965, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
         type: 3}
@@ -32,6 +82,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Thunder_Strike
+      objectReference: {fileID: 0}
+    - target: {fileID: 7475459639825081966, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7475459639825081967, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
         type: 3}
@@ -82,6 +137,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7640441417456077076, guid: c98787e93d6b6fd4a94a48d60bb43a2d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -161,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1356285139
+  GlobalObjectIdHash: 1513691916
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

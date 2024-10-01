@@ -10,6 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2917385617707215443, guid: 86478485e09ab6944b1d333614a01004,
         type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2917385617707215443, guid: 86478485e09ab6944b1d333614a01004,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -93,6 +98,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: VFX_Knockup_F
       objectReference: {fileID: 0}
+    - target: {fileID: 2917385618030906396, guid: 86478485e09ab6944b1d333614a01004,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2917385618030906398, guid: 86478485e09ab6944b1d333614a01004,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -112,6 +122,11 @@ PrefabInstance:
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2917385618200138289, guid: 86478485e09ab6944b1d333614a01004,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2917385618200138290, guid: 86478485e09ab6944b1d333614a01004,
         type: 3}
@@ -140,8 +155,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2917385618239773718, guid: 86478485e09ab6944b1d333614a01004,
         type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2917385618239773718, guid: 86478485e09ab6944b1d333614a01004,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2917385618595134006, guid: 86478485e09ab6944b1d333614a01004,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2917385618595134006, guid: 86478485e09ab6944b1d333614a01004,
         type: 3}
@@ -189,7 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 106
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!114 &2111596508925813447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,7 +227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 251480258
+  GlobalObjectIdHash: 1482815962
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -258,6 +283,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 45, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 1
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.03
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -266,5 +292,6 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []

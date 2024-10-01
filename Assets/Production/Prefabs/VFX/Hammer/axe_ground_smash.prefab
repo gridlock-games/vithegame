@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1382488597128753586}
   - component: {fileID: 1382488597128753588}
   - component: {fileID: 1382488597128753587}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: center_energy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5043,7 +5043,7 @@ GameObject:
   - component: {fileID: 2034959681056108070}
   - component: {fileID: 429544265911649066}
   - component: {fileID: 7433761406714450970}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: axe_ground_smash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9950,7 +9950,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4098311525
+  GlobalObjectIdHash: 960463799
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -9985,6 +9985,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 3b9393cc1782d4583b46826cf56ebefc,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1
@@ -10086,7 +10087,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 93
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!135 &7433761406714450970
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -10119,7 +10120,7 @@ GameObject:
   - component: {fileID: 9157057456878649052}
   - component: {fileID: 9157057456878649050}
   - component: {fileID: 9157057456878649053}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: particle_splash_add
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15144,22 +15145,22 @@ PrefabInstance:
     - target: {fileID: 291820453495468076, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1359118487647338715, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3878187956172731273, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3878187956547478480, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3878187956673098388, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
@@ -15169,7 +15170,7 @@ PrefabInstance:
     - target: {fileID: 3878187956673098388, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3878187956673098393, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
@@ -15229,7 +15230,7 @@ PrefabInstance:
     - target: {fileID: 3878187956902400140, guid: 566424d09f5143c47988868eb8b8ed75,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

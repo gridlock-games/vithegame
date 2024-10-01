@@ -98,6 +98,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: VFX_Knockup_Start
       objectReference: {fileID: 0}
+    - target: {fileID: 4262073277265341210, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066950189393533980, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 9066950189393533983, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
         type: 3}
       propertyPath: looping
@@ -145,13 +155,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9066950189877931227, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
         type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066950189877931227, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9066950189925890751, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
         type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066950189925890751, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066950190877051914, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9066950190877051914, guid: 14edceaa62ca43c458a2e4b8d9ab1f80,
         type: 3}
@@ -222,6 +247,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 45, y: 0, z: 0}
   vfxSpawnType: 1
   transformType: 5
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -230,6 +256,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &1679157179728987807

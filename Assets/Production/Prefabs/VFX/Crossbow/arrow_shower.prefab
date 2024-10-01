@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2251393201144091470}
   - component: {fileID: 2251393201144091464}
   - component: {fileID: 2251393201144091471}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FX_splash_arrow_floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4906,7 +4906,7 @@ GameObject:
   - component: {fileID: 2251393201206512136}
   - component: {fileID: 2251393201206512142}
   - component: {fileID: 2251393201206512143}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9905,7 +9905,7 @@ GameObject:
   - component: {fileID: 2251393201266745710}
   - component: {fileID: 2251393201266745704}
   - component: {fileID: 2251393201266745711}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: up_line
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14805,7 +14805,7 @@ GameObject:
   - component: {fileID: 2251393201463833735}
   - component: {fileID: 2251393201463833733}
   - component: {fileID: 2251393201463833734}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: dust_spread
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19723,7 +19723,7 @@ GameObject:
   - component: {fileID: 2251393201635389229}
   - component: {fileID: 2251393201635389231}
   - component: {fileID: 2251393201635389230}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: impact_floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24690,7 +24690,7 @@ GameObject:
   - component: {fileID: 2251393201709489132}
   - component: {fileID: 2251393201709489134}
   - component: {fileID: 2251393201709489133}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: black_rain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29592,7 +29592,7 @@ GameObject:
   - component: {fileID: 8668259021753040006}
   - component: {fileID: 2597533346612711076}
   - component: {fileID: 3518117842429376088}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: arrow_shower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34550,7 +34550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 424681271
+  GlobalObjectIdHash: 3219760203
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -34585,6 +34585,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 1afddc9070ee1cc48890de3a2e898efc,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1
@@ -34707,7 +34708,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 78
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!1 &2251393202068444662
 GameObject:
   m_ObjectHideFlags: 0
@@ -34719,7 +34720,7 @@ GameObject:
   - component: {fileID: 2251393202068444657}
   - component: {fileID: 2251393202068444663}
   - component: {fileID: 2251393202068444656}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: dust_circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39637,7 +39638,7 @@ GameObject:
   - component: {fileID: 2251393202175964034}
   - component: {fileID: 2251393202175964060}
   - component: {fileID: 2251393202175964035}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: impact_front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44604,7 +44605,7 @@ GameObject:
   - component: {fileID: 2251393202614969663}
   - component: {fileID: 2251393202614969661}
   - component: {fileID: 2251393202614969662}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: dust_long
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49638,7 +49639,7 @@ GameObject:
   - component: {fileID: 7017208624811166353}
   - component: {fileID: 7017208624811166352}
   - component: {fileID: 7017208624811166367}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: helix
   m_TagString: Untagged
   m_Icon: {fileID: 0}

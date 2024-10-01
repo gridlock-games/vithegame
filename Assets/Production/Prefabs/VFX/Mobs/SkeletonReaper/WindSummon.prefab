@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1854519703856888889, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2068686731352237717, guid: 3f3c91c75da07684a8cc217816a7f708,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -62,6 +67,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WindSummon
+      objectReference: {fileID: 0}
+    - target: {fileID: 2267634614026608937, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028634768242035096, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4821003601559017467, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -183,5 +203,6 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: e547dc210cedf4dfa9fa9f8ead013b2e,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
