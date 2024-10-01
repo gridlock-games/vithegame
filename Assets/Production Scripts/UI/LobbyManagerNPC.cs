@@ -129,20 +129,20 @@ namespace Vi.UI
             string path = "";
             if (Application.isEditor)
             {
-                path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\VitheGame.exe";
+                path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\Vi The Game.exe";
 
                 #if UNITY_STANDALONE_OSX
-                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/VitheGame";
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/Vi The Game";
                 #endif
             }
             else
             {
                 path = Application.dataPath;
                 path = path.Substring(0, path.LastIndexOf('/'));
-                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "VitheGame.exe" : "VitheGame.x86_64");
+                path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "Vi The Game.exe" : "Vi The Game.x86_64");
 
                 #if UNITY_STANDALONE_OSX
-                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/VitheGame";
+                    path = @"/Users/odaleroxas/Documents/Builds/mac/headless/Vi The Game";
                 #endif
             }
 

@@ -372,7 +372,6 @@ namespace Vi.Core.MovementHandlers
                 }
 				else if (GameModeManager.Singleton.GetRespawnType() == GameModeManager.RespawnType.Respawn & GameModeManager.Singleton.ShouldDisplayNextGameAction())
                 {
-					Debug.Log("Waiting for next game action before I can move " + this);
 					return false;
                 }
 				else
