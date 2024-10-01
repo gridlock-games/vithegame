@@ -353,6 +353,7 @@ namespace Vi.Utility
 #if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) { return; }
 #endif
+            if (FasterPlayerPrefs.IsQuitting) { return; }
             Debug.LogError(pooledObject + " was destroyed unexpectedly! Please use pooledobject.markfordestruction() before destroying");
             despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);
             spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(pooledObject);

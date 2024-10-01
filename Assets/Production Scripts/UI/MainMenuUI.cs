@@ -423,7 +423,7 @@ namespace Vi.UI
 
         public void QuitGame()
         {
-            Application.Quit();
+            FasterPlayerPrefs.QuitGame();
         }
 
         public IEnumerator CreateAccount()

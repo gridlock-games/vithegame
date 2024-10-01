@@ -2723,7 +2723,7 @@ namespace Vi.Core
                         if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
                         {
                             Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            Application.Quit();
+                            FasterPlayerPrefs.QuitGame();
                         }
                     }
                     else if (thisServer.type == 1)
@@ -2731,7 +2731,7 @@ namespace Vi.Core
                         if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
                         {
                             Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            Application.Quit();
+                            FasterPlayerPrefs.QuitGame();
                         }
                     }
                     else

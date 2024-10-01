@@ -22,7 +22,7 @@ namespace Vi.Core
 
         public void ExitGame()
         {
-            Application.Quit();
+            FasterPlayerPrefs.QuitGame();
         }
 
         private void Start()
