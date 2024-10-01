@@ -39,7 +39,6 @@ namespace Vi.UI
         private PooledObject pooledObject;
         private Canvas canvas;
         private CombatAgent combatAgent;
-        private Renderer rendererToFollow;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private CanvasGroup[] canvasGroups;
 
@@ -71,15 +70,11 @@ namespace Vi.UI
 
                 transform.SetParent(null, true);
 
-                rendererToFollow = null;
-
                 SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
             }
 
             if (combatAgent)
             {
-                RefreshRendererToFollow();
-
                 UpdateNameTextAndColors();
 
                 List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
@@ -125,7 +120,6 @@ namespace Vi.UI
             localCombatAgent = null;
             localSpectator = null;
             combatAgent = null;
-            rendererToFollow = null;
 
             transform.position = Vector3.zero;
             transform.rotation = Quaternion.identity;
@@ -149,23 +143,6 @@ namespace Vi.UI
             team = combatAgent.GetTeam();
 
             healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
-        }
-
-        private void RefreshRendererToFollow()
-        {
-            if (!combatAgent) { return; }
-            SkinnedMeshRenderer[] renderers = combatAgent.GetComponentsInChildren<SkinnedMeshRenderer>();
-            if (renderers.Length == 0) { return; }
-            Vector3 highestPoint = renderers[0].bounds.center;
-            rendererToFollow = renderers[0];
-            foreach (Renderer renderer in renderers)
-            {
-                if (renderer.bounds.center.y > highestPoint.y)
-                {
-                    rendererToFollow = renderer;
-                    highestPoint = renderer.bounds.center;
-                }
-            }
         }
 
         private Camera mainCamera;
@@ -233,8 +210,8 @@ namespace Vi.UI
                 | FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame)
             { UpdateNameTextAndColors(); }
 
-            if (!rendererToFollow) { RefreshRendererToFollow(); }
-            if (!rendererToFollow) { Debug.LogWarning("No renderer to follow"); return; }
+            AnimatorReference.WorldSpaceLabelTransformInfo worldSpaceLabelTransformInfo = combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo();
+            if (!worldSpaceLabelTransformInfo.rendererToFollow) { Debug.LogWarning("No renderer to follow " + combatAgent); return; }
 
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
@@ -250,7 +227,7 @@ namespace Vi.UI
                     source = localSpectator.transform;
                 }
 
-                Vector3 pos = rendererToFollow.bounds.center + rendererToFollow.transform.rotation * combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().positionOffsetFromRenderer;
+                Vector3 pos = worldSpaceLabelTransformInfo.rendererToFollow.bounds.center + worldSpaceLabelTransformInfo.rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer;
                 transform.position = pos;
 
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
@@ -278,7 +255,7 @@ namespace Vi.UI
 
                     if (playerDistance < healthBarViewDistance) { healthBarLocalScaleTarget = Vector3.one; }
                 }
-                localScaleTarget *= combatAgent.AnimationHandler.GetWorldSpaceLabelTransformInfo().scaleMultiplier;
+                localScaleTarget *= worldSpaceLabelTransformInfo.scaleMultiplier;
             }
             //else
             //{

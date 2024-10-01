@@ -134,16 +134,16 @@ namespace Vi.Core
                         {
                             Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
                         }
+                    }
 
-                        foreach (Renderer renderer in renderers)
-                        {
-                            renderer.forceRenderingOff = true;
-                        }
-                        
-                        foreach (Collider col in colliders)
-                        {
-                            col.enabled = parentCombatAgent.IsServer;
-                        }
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.forceRenderingOff = true;
+                    }
+
+                    foreach (Collider col in colliders)
+                    {
+                        col.enabled = false;
                     }
                 }
                 else // Alive
@@ -168,7 +168,7 @@ namespace Vi.Core
 
                     foreach (Collider col in colliders)
                     {
-                        col.enabled = false;
+                        col.enabled = parentCombatAgent.IsServer;
                     }
                 }
             }

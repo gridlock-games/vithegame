@@ -697,53 +697,62 @@ namespace Vi.Player
 
 #if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
-            if (IsLocalPlayer & UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled & playerInput.currentActionMap != null)
+            if (playerInput)
             {
-                Vector2 lookInputToAdd = Vector2.zero;
-                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+                if (IsLocalPlayer)
                 {
-                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                    if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
                     {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
-
-                        bool isTouchingJoystick = false;
-                        foreach (UIDeadZoneElement joystick in joysticks)
+                        if (playerInput.currentActionMap != null)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                            Vector2 lookInputToAdd = Vector2.zero;
+                            if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                             {
-                                isTouchingJoystick = true;
-                                break;
-                            }
-                        }
-
-                        if (!isTouchingJoystick)
-                        {
-                            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-                            {
-                                int interactableHitCount = Physics.RaycastNonAlloc(mainCamera.ScreenPointToRay(touch.screenPosition),
-                                    interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
-
-                                float minDistance = 0;
-                                bool minDistanceInitialized = false;
-                                NetworkInteractable networkInteractable = null;
-                                for (int i = 0; i < interactableHitCount; i++)
+                                foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                                 {
-                                    if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                                    networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
-                                    minDistance = interactableHits[i].distance;
-                                    minDistanceInitialized = true;
+                                    if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
+
+                                    bool isTouchingJoystick = false;
+                                    foreach (UIDeadZoneElement joystick in joysticks)
+                                    {
+                                        if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                        {
+                                            isTouchingJoystick = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!isTouchingJoystick)
+                                    {
+                                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+                                        {
+                                            int interactableHitCount = Physics.RaycastNonAlloc(mainCamera.ScreenPointToRay(touch.screenPosition),
+                                                interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
+
+                                            float minDistance = 0;
+                                            bool minDistanceInitialized = false;
+                                            NetworkInteractable networkInteractable = null;
+                                            for (int i = 0; i < interactableHitCount; i++)
+                                            {
+                                                if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                                                networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
+                                                minDistance = interactableHits[i].distance;
+                                                minDistanceInitialized = true;
+                                            }
+                                            if (networkInteractable) { networkInteractable.Interact(gameObject); }
+                                        }
+                                    }
+
+                                    if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                                    {
+                                        lookInputToAdd += touch.delta;
+                                    }
                                 }
-                                if (networkInteractable) { networkInteractable.Interact(gameObject); }
                             }
-                        }
-                        
-                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
-                        {
-                            lookInputToAdd += touch.delta;
+                            lookInput += lookInputToAdd * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
                         }
                     }
                 }
-            lookInput += lookInputToAdd * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
             }
 #endif
             UpdateTransform();
@@ -770,43 +779,45 @@ namespace Vi.Player
         {
             if (!autoAim) { return; }
             if (!IsOwner) { return; }
-            if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & !weaponHandler.CurrentActionClip.mustBeAiming)
+            if (weaponHandler.CurrentActionClip)
             {
-                if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | combatAgent.AnimationHandler.IsLunging())
+                if (weaponHandler.CurrentActionClip.useRotationalTargetingSystem & !weaponHandler.CurrentActionClip.mustBeAiming)
                 {
-# if UNITY_EDITOR
-                    if (drawCasts) DebugExtensions.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
-# endif
-
-                    int cameraHitsCount = Physics.BoxCastNonAlloc(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset,
-                        ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward.normalized, cameraHits,
-                        cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance,
-                        LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-
-                    List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
-                    for (int i = 0; i < cameraHitsCount; i++)
+                    if (weaponHandler.IsInAnticipation | weaponHandler.IsAttacking | combatAgent.AnimationHandler.IsLunging())
                     {
-                        if (cameraHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
+#if UNITY_EDITOR
+                        if (drawCasts) DebugExtensions.DrawBoxCastBox(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward, cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance, Color.yellow, Time.deltaTime);
+#endif
+                        int cameraHitsCount = Physics.BoxCastNonAlloc(cameraController.CameraPositionClone.transform.position + ActionClip.boxCastOriginPositionOffset,
+                            ActionClip.boxCastHalfExtents, cameraController.CameraPositionClone.transform.forward.normalized, cameraHits,
+                            cameraController.CameraPositionClone.transform.rotation, ActionClip.boxCastDistance,
+                            LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
+                        List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                        for (int i = 0; i < cameraHitsCount; i++)
                         {
-                            if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
+                            if (cameraHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                             {
-                                Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                                angleList.Add((networkCollider,
-                                    Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
-                                    cameraHits[i]));
+                                if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
+                                {
+                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                                    angleList.Add((networkCollider,
+                                        Mathf.Abs(targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) + Mathf.Abs((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)),
+                                        cameraHits[i]));
+                                }
                             }
                         }
-                    }
 
-                    angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                    foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
-                    {
-                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
-                        if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                        angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+                        foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
                         {
-                            cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
-                                Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
-                            break;
+                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position + targetSystemOffset - cameraController.CameraPositionClone.transform.position, Vector3.up);
+                            if (angle < weaponHandler.CurrentActionClip.maximumTargetingRotationAngle)
+                            {
+                                cameraController.AddRotation(Mathf.Clamp(((targetRot.eulerAngles.x < 180 ? targetRot.eulerAngles.x : targetRot.eulerAngles.x - 360) - (cameraController.CameraPositionClone.transform.eulerAngles.x < 180 ? cameraController.CameraPositionClone.transform.eulerAngles.x : cameraController.CameraPositionClone.transform.eulerAngles.x - 360)) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed),
+                                    Mathf.Clamp((targetRot.eulerAngles.y - cameraController.CameraPositionClone.transform.eulerAngles.y) * Time.deltaTime * LimbReferences.rotationConstraintOffsetSpeed, -LimbReferences.rotationConstraintOffsetSpeed, LimbReferences.rotationConstraintOffsetSpeed));
+                                break;
+                            }
                         }
                     }
                 }

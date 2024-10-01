@@ -24,7 +24,7 @@ namespace Vi.Core.MovementHandlers
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
-			if (!IsServer) { Debug.LogError(""); return; }
+			if (!IsServer) { Debug.LogError("MovementHandler.SetOrientation should only be called on the server!"); return; }
 			transform.position = newPosition;
 			transform.rotation = newRotation;
 
@@ -372,6 +372,7 @@ namespace Vi.Core.MovementHandlers
                 }
 				else if (GameModeManager.Singleton.GetRespawnType() == GameModeManager.RespawnType.Respawn & GameModeManager.Singleton.ShouldDisplayNextGameAction())
                 {
+					Debug.Log("Waiting for next game action before I can move " + this);
 					return false;
                 }
 				else

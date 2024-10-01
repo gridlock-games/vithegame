@@ -1456,6 +1456,8 @@ namespace Vi.Core
                 netObj.Spawn(true);
             }
 
+            yield return null;
+
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;

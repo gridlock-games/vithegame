@@ -939,6 +939,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: bodyRadius
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: targetingType
       value: 0
       objectReference: {fileID: 0}
@@ -946,6 +951,11 @@ PrefabInstance:
         type: 3}
       propertyPath: canUseAbility1
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: bodyHeightOffset
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -2439,6 +2449,7 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 5208643616188347723}
     positionOffsetFromRenderer: {x: 0, y: 0.4, z: 0}
     scaleMultiplier: 1
 --- !u!1 &4783994931257921150 stripped
@@ -2543,6 +2554,12 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!137 &5208643616188347723 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3766272686168865125, guid: aa42bed16f2c0ea4fb0569b26952ba5a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8938709335599139886}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5289069517655780365 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3848924549209055267, guid: aa42bed16f2c0ea4fb0569b26952ba5a,

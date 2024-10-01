@@ -203,6 +203,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4982500891764130072, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
+      propertyPath: bodyHeightOffset
+      value: 2.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 4982500891764130072, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
       propertyPath: ability1IsConstrainedByDistance
       value: 0
       objectReference: {fileID: 0}
@@ -236,6 +241,11 @@ PrefabInstance:
       propertyPath: worldSpaceLabelTransformInfo.scaleMultiplier
       value: 1.3
       objectReference: {fileID: 0}
+    - target: {fileID: 7614552225496468812, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+        type: 3}
+      propertyPath: worldSpaceLabelTransformInfo.rendererToFollow
+      value: 
+      objectReference: {fileID: 1213485809717050420}
     - target: {fileID: 8231777540963173785, guid: 49757a30e0ac3b84cad006ba7998e0d4,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -246,3 +256,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49757a30e0ac3b84cad006ba7998e0d4, type: 3}
+--- !u!137 &1213485809717050420 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4032632028617321271, guid: 49757a30e0ac3b84cad006ba7998e0d4,
+    type: 3}
+  m_PrefabInstance: {fileID: 2819785104953464579}
+  m_PrefabAsset: {fileID: 0}
