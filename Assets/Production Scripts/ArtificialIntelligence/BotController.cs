@@ -42,7 +42,6 @@ namespace Vi.ArtificialIntelligence
             }
 
             SetAnimationMoveInput(GetPathMoveInput(true));
-            EvaluateBotLogic();
             if (IsServer) { currentRotation.Value = transform.rotation; }
         }
 
@@ -255,6 +254,7 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
+                EvaluateBotLogic();
                 Move();
                 currentPosition.Value = Rigidbody.position;
             }
