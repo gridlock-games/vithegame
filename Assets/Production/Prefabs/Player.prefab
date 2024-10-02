@@ -117,6 +117,7 @@ GameObject:
   - component: {fileID: 5225764695714038895}
   - component: {fileID: 1238877169349753619}
   - component: {fileID: 9160700264388968167}
+  - component: {fileID: 9172447631836445654}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -140,6 +141,7 @@ Transform:
   - {fileID: 3945128957587517370}
   - {fileID: 3945128956232022071}
   - {fileID: 4983990476171615703}
+  - {fileID: 1075128052173327298}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3945128955595459577
@@ -237,7 +239,6 @@ MonoBehaviour:
   airborneHorizontalDragMultiplier: 0.1
   gravityScale: 2
   cameraController: {fileID: 3945128956232022059}
-  previewCharLight: {fileID: 0}
 --- !u!114 &3945128955595459580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,6 +265,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldSpaceLabelPrefab: {fileID: 1504964273508476828, guid: 6664c48761e8b7445895e9053b8f9ada,
     type: 3}
+  ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
+    type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3
     actionVFX: {fileID: 3922548515315126405, guid: 92e09002586d112498d7f92d499e563b,
@@ -281,8 +284,6 @@ MonoBehaviour:
   heartbeatSoundEffect: {fileID: 8300000, guid: d22fc966ad7a64afd923f2e84ef54228,
     type: 3}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
-    type: 3}
-  ragingVFXPrefab: {fileID: -5507986320492826068, guid: 8839fe36b04824348a62634b0201a11c,
     type: 3}
   isWaitingForSpawnPoint: 0
 --- !u!114 &1486683922734963072
@@ -349,6 +350,20 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 170
   isPrewarmObject: 1
+--- !u!114 &9172447631836445654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3945128955595459076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c157a303bf719c74196ca260c56295ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelUpVisualEffect: {fileID: 3648217496154362164}
+  levelUpAudioClip: {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,3 +565,83 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3945128955595459079}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4010000447306822247
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3945128955595459079}
+    m_Modifications:
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309349999963013585, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_Name
+      value: LevelUpVFX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef98a2b66b6467e408e73cafdfc54c5b, type: 3}
+--- !u!4 &1075128052173327298 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+    type: 3}
+  m_PrefabInstance: {fileID: 4010000447306822247}
+  m_PrefabAsset: {fileID: 0}
+--- !u!2083052967 &3648217496154362164 stripped
+VisualEffect:
+  m_CorrespondingSourceObject: {fileID: 362381796329136979, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+    type: 3}
+  m_PrefabInstance: {fileID: 4010000447306822247}
+  m_PrefabAsset: {fileID: 0}

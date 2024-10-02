@@ -14,6 +14,7 @@ namespace Vi.Core
 {
     [RequireComponent(typeof(AnimationHandler))]
     [RequireComponent(typeof(LoadoutManager))]
+    [RequireComponent(typeof(SessionProgressionHandler))]
     public abstract class CombatAgent : HittableAgent
     {
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
@@ -29,6 +30,8 @@ namespace Vi.Core
         public abstract float GetMaxRage();
 
         public virtual void AddStamina(float amount, bool activateCooldown = true) { }
+
+        public virtual void AddSpirit(float amount) { }
 
         public virtual void AddRage(float amount) { }
 
@@ -56,6 +59,7 @@ namespace Vi.Core
         public WeaponHandler WeaponHandler { get; private set; }
         public LoadoutManager LoadoutManager { get; private set; }
         public GlowRenderer GlowRenderer { get; private set; }
+        public SessionProgressionHandler SessionProgressionHandler { get; private set; }
         protected override void Awake()
         {
             base.Awake();
@@ -63,6 +67,7 @@ namespace Vi.Core
             MovementHandler = GetComponent<PhysicsMovementHandler>();
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
+            SessionProgressionHandler = GetComponent<SessionProgressionHandler>();
         }
 
         protected virtual void OnIsRagingChanged(bool prev, bool current)

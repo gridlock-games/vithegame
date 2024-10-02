@@ -48,6 +48,10 @@ namespace Vi.UI
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
+        [Header("Experience UI")]
+        [SerializeField] private Image experienceProgressImage;
+        [SerializeField] private Text levelText;
+
         private CombatAgent combatAgent;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -144,6 +148,8 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
 
+            experienceProgressImage.fillAmount = 0;
+
             if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
             if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
         }
@@ -169,6 +175,8 @@ namespace Vi.UI
                             statusIcon.SetActive(false);
                         }
                     }
+                    experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
+                    levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
                 }
             }
         }
@@ -252,6 +260,9 @@ namespace Vi.UI
 
             lastMaxHP = maxHP;
             lastMaxRage = maxRage;
+
+            experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
+            levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
 
             if (!staminaAndSpiritAreDisabled)
             {

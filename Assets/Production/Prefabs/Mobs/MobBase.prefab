@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 6305487504955697137}
   - component: {fileID: 7433792095065490293}
   - component: {fileID: 6652972336080534085}
+  - component: {fileID: 534038283143993146}
   m_Layer: 6
   m_Name: MobBase
   m_TagString: Untagged
@@ -39,6 +40,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7541128012661925881}
+  - {fileID: 869782899613559998}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2620220826113739033
@@ -220,6 +222,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e02eeb6ad314904db188a3fa6204532, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &534038283143993146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3438530920036325063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c157a303bf719c74196ca260c56295ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelUpVisualEffect: {fileID: 3483705629146674760}
+  levelUpAudioClip: {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
 --- !u!1 &7880380624370242607
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,3 +309,83 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   physicMaterial: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
+--- !u!1001 &3846051666542777627
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3724913792320258764}
+    m_Modifications:
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7309349999963013585, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+        type: 3}
+      propertyPath: m_Name
+      value: LevelUpVFX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef98a2b66b6467e408e73cafdfc54c5b, type: 3}
+--- !u!4 &869782899613559998 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4129235079425178021, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3846051666542777627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!2083052967 &3483705629146674760 stripped
+VisualEffect:
+  m_CorrespondingSourceObject: {fileID: 362381796329136979, guid: ef98a2b66b6467e408e73cafdfc54c5b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3846051666542777627}
+  m_PrefabAsset: {fileID: 0}

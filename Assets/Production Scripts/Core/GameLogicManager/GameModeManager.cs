@@ -350,10 +350,17 @@ namespace Vi.Core.GameModeManagers
                 {
                     killHistory.Add(new KillHistoryElement(killer, victim));
                 }
+
+                foreach (KeyValuePair<CombatAgent, float> kvp in victim.GetDamageMappingThisLife())
+                {
+                    if (!kvp.Key) { continue; }
+                    kvp.Key.SessionProgressionHandler.AddExperience(kvp.Value * experienceDamageAwardMultiplier);
+                }
             }
         }
 
         private const float minAssistDamage = 30;
+        private const float experienceDamageAwardMultiplier = 0.5f;
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {

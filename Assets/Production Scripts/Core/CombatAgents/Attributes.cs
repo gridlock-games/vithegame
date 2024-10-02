@@ -31,9 +31,9 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = playerData;
         }
 
-        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP(); }
-        public override float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina(); }
-        public override float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit(); }
+        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
+        public override float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
+        public override float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit() + SessionProgressionHandler.MaxSpiritBonus; }
         public override float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public override void AddStamina(float amount, bool activateCooldown = true)
@@ -61,7 +61,7 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private void AddSpirit(float amount)
+        public override void AddSpirit(float amount)
         {
             if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
             if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
@@ -486,7 +486,7 @@ namespace Vi.Core.CombatAgents
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
-            float HPDamage = -attack.damage;
+            float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
