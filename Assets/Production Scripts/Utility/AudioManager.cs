@@ -39,8 +39,7 @@ namespace Vi.Utility
             if (audioSource.TryGetComponent(out AudioSourceData audioSourceData))
             {
                 audioSourceData.Initialize();
-                registeredAudioSources.RemoveAll(item => item == null);
-                audioSourceData.AudioSource.volume = audioSourceData.AudioSource.volume / registeredAudioSources.Count(item => item.gameObject.activeInHierarchy);
+                audioSourceData.AudioSource.volume = AudioListener.volume * audioSourceData.OriginalVolume;
                 if (!registeredAudioSources.Contains(audioSourceData)) { registeredAudioSources.Add(audioSourceData); }
             }
             else

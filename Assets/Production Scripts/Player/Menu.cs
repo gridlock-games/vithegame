@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -11,7 +12,7 @@ namespace Vi.Player
 
         public void QuitGame()
         {
-            Application.Quit();
+            FasterPlayerPrefs.QuitGame();
         }
 
         public void SetLastMenu(GameObject lm)

@@ -53,6 +53,7 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] protected AudioClip audioClipToPlayOnAwake;
         [SerializeField] protected float awakeAudioClipDelay;
+        [SerializeField] protected float awakeAudioClipStartTime;
         [SerializeField] protected AudioClip audioClipToPlayOnDestroy;
 
         public static readonly string[] layersToAccountForInRaycasting = new string[]
@@ -161,7 +162,8 @@ namespace Vi.ScriptableObjects
         private IEnumerator PlayAwakeAudioClip()
         {
             yield return new WaitForSeconds(awakeAudioClipDelay);
-            AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
+            AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
+            audioSource.time = awakeAudioClipStartTime;
         }
 
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];
@@ -182,5 +184,21 @@ namespace Vi.ScriptableObjects
                 FasterPlayerPrefs.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(prefab, transform.position, transform.rotation)));
             }
         }
+
+#if UNITY_EDITOR
+        public void SetLayers()
+        {
+            bool shouldDirty = false;
+            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            {
+                if (child.gameObject.layer != LayerMask.NameToLayer("Projectile"))
+                {
+                    shouldDirty = true;
+                    child.gameObject.layer = LayerMask.NameToLayer("Projectile");
+                }
+            }
+            if (shouldDirty) { UnityEditor.EditorUtility.SetDirty(this); }
+        }
+#endif
     }
 }

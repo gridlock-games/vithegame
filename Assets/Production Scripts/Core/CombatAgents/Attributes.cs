@@ -23,9 +23,6 @@ namespace Vi.Core.CombatAgents
 
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
-        private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
-
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
 
         public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
@@ -130,8 +127,6 @@ namespace Vi.Core.CombatAgents
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
-
-            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {

@@ -13,6 +13,17 @@ namespace Vi.Utility
 
         public const bool shouldDiscardMessageQueueOnNetworkShutdown = true;
 
+        public static bool IsQuitting { get; private set; }
+        public static void QuitGame()
+        {
+            IsQuitting = true;
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         private void Awake()
         {
             _singleton = this;

@@ -676,6 +676,11 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: armorType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: deathBehavior
       value: 1
       objectReference: {fileID: 0}
@@ -1421,6 +1426,7 @@ MonoBehaviour:
   values:
   - {fileID: 8307189383584622863}
   - {fileID: 1211589420604469407}
+  hips: {fileID: 0}
 --- !u!114 &1378656345672892948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1449,6 +1455,7 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 1259213474354779252}
     positionOffsetFromRenderer: {x: 0, y: 0, z: 0.5}
     scaleMultiplier: 1.25
 --- !u!4 &583124232046961804 stripped
@@ -1553,6 +1560,12 @@ Transform:
 --- !u!4 &1211589420604469407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6912052045706983178, guid: a98ac1638982bbe42ad2022c946124e7,
+    type: 3}
+  m_PrefabInstance: {fileID: 5709689796492806037}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1259213474354779252 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6792971290353144801, guid: a98ac1638982bbe42ad2022c946124e7,
     type: 3}
   m_PrefabInstance: {fileID: 5709689796492806037}
   m_PrefabAsset: {fileID: 0}

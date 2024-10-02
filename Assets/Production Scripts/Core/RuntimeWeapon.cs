@@ -260,6 +260,7 @@ namespace Vi.Core
             string variantAssetPath = UnityEditor.AssetDatabase.GetAssetPath(gameObject).Replace(".prefab", "") + "_dropped.prefab";
             if (System.IO.File.Exists(variantAssetPath)) { return; }
 
+            Debug.Log("Creating dropped weapon variant at path " + variantAssetPath);
             GameObject objSource = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(gameObject);
             foreach (Component component in objSource.GetComponentsInChildren<Component>())
             {

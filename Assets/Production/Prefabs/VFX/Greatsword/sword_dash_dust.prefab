@@ -5,8 +5,13 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1066653596, guid: 15a2a89b5459d534894b0f7b460682f4, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1066653596, guid: 15a2a89b5459d534894b0f7b460682f4, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -43,6 +48,11 @@ PrefabInstance:
       propertyPath: InitialModule.startColor.minColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4629116890782822246, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4629116890782822247, guid: 15a2a89b5459d534894b0f7b460682f4,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -62,6 +72,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891384550098, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4629116891384550098, guid: 15a2a89b5459d534894b0f7b460682f4,
         type: 3}
@@ -92,6 +107,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: sword_dash_dust
+      objectReference: {fileID: 0}
+    - target: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4629116891520832362, guid: 15a2a89b5459d534894b0f7b460682f4,
         type: 3}
@@ -189,6 +209,25 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2601060979130523026}
+    - targetCorrespondingSourceObject: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5278450329425237017}
+    - targetCorrespondingSourceObject: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5575609125080847161}
+    - targetCorrespondingSourceObject: {fileID: 4629116891520832361, guid: 15a2a89b5459d534894b0f7b460682f4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6466239402159247775}
   m_SourcePrefab: {fileID: 100100000, guid: 15a2a89b5459d534894b0f7b460682f4, type: 3}
 --- !u!1 &5556976136995777950 stripped
 GameObject:
@@ -216,7 +255,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
 --- !u!114 &5278450329425237017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,7 +270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 80
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!114 &5575609125080847161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +287,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -256,6 +296,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &6466239402159247775

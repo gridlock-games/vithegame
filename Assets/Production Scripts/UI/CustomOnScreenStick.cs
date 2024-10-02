@@ -142,7 +142,7 @@ namespace Vi.UI
                             movementHandler.SetMoveInput(GetJoystickValue());
                             break;
                         case JoystickActionType.Look:
-                            movementHandler.SetLookInput(GetJoystickValue() * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+                            movementHandler.SetLookInput(GetJoystickValue() * (combatAgent ? (combatAgent.StatusAgent.IsFeared() ? -1 : 1) : 1));
                             break;
                         default:
                             Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);

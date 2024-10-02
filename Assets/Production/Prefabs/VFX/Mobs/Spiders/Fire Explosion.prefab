@@ -8,10 +8,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 533152394, guid: 397091deff2eafc4c8c82945c3dc30f7, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 705138072, guid: 397091deff2eafc4c8c82945c3dc30f7, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735516206136297426, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838889716808579, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838890118211524, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3747838890388685933, guid: 397091deff2eafc4c8c82945c3dc30f7,
         type: 3}
       propertyPath: m_Name
       value: Fire Explosion
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838890388685933, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3747838890388685934, guid: 397091deff2eafc4c8c82945c3dc30f7,
         type: 3}
@@ -72,6 +100,31 @@ PrefabInstance:
         type: 3}
       propertyPath: TriggerModule.primitives.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838890821001956, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838890911007390, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838891098636797, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838891489263814, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747838891585689018, guid: 397091deff2eafc4c8c82945c3dc30f7,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -151,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1440708239
+  GlobalObjectIdHash: 385448226
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -234,6 +287,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -243,6 +297,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: d23710f1f02b743b4963d457fb54b83e,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1

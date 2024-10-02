@@ -148,7 +148,7 @@ public class DebugOverlay : MonoBehaviour
             myLog = "";
             consoleLogText.text = "";
         }
-        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
+        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
         debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
         consoleParent.enabled = consoleEnabled;
 

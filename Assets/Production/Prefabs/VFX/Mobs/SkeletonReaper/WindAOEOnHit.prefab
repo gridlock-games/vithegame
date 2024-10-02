@@ -23,6 +23,11 @@ PrefabInstance:
       propertyPath: TriggerModule.primitives.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1854519703856888889, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2068686731352237717, guid: 3f3c91c75da07684a8cc217816a7f708,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -77,6 +82,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WindAOEOnHit
+      objectReference: {fileID: 0}
+    - target: {fileID: 2267634614026608937, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028634768242035096, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4821003601559017467, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -222,7 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 245
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!114 &5100923509440687048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +268,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1

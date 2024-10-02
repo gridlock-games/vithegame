@@ -1006,11 +1006,10 @@ namespace Vi.Core.GameModeManagers
         {
             if (Time.time - startTime > 15) { return true; }
 
-            if (!PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().TrueForAll(item => PlayerDataManager.Singleton.IdHasLocalPlayer(item.id))) { Debug.Log("Not all players spawned"); return false; }
+            if (!PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().TrueForAll(item => PlayerDataManager.Singleton.IdHasLocalPlayer(item.id))) { return false; }
 
             List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
-            if (players.Count == 0) { Debug.Log("No players spawned"); return false; }
-            return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
+            return players.Count > 0;
         }
 
         protected enum TimerMode
@@ -1029,7 +1028,7 @@ namespace Vi.Core.GameModeManagers
 
         protected void Update()
         {
-            if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { Debug.Log("Not all players spawned on owner instance"); return; } }
+            if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
             IsWaitingForPlayers = false;
 
             if (!IsServer) { return; }

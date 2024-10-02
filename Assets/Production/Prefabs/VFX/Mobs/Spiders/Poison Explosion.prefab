@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5410213344870077633}
   - component: {fileID: 6139330520922069615}
   - component: {fileID: 2791278976545930362}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: dust_long
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5278,7 +5278,7 @@ GameObject:
   - component: {fileID: 2559498941626254160}
   - component: {fileID: 7835766634743670649}
   - component: {fileID: 7351941397689056887}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Poison Explosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10567,7 +10567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2674989692
+  GlobalObjectIdHash: 1703600260
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -10650,6 +10650,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -10659,6 +10660,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 31a72987464af4627aa8f34a5d7c03c8,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1

@@ -28,6 +28,7 @@ namespace Vi.Editor
 
         protected SerializedProperty spAudioClipToPlayOnAwake;
         protected SerializedProperty spAwakeAudioClipDelay;
+        protected SerializedProperty spAwakeAudioClipStartTime;
         protected SerializedProperty spAudioClipToPlayOnDestroy;
 
         private SerializedProperty spVFXToPlayOnDestroy;
@@ -52,6 +53,7 @@ namespace Vi.Editor
 
             spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
             spAwakeAudioClipDelay = serializedObject.FindProperty("awakeAudioClipDelay");
+            spAwakeAudioClipStartTime = serializedObject.FindProperty("awakeAudioClipStartTime");
             spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
 
             spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
@@ -86,6 +88,7 @@ namespace Vi.Editor
 
             EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
             EditorGUILayout.PropertyField(spAwakeAudioClipDelay);
+            EditorGUILayout.PropertyField(spAwakeAudioClipStartTime);
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
 
             EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);

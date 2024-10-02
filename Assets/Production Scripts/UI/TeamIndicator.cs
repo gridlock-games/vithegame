@@ -8,7 +8,7 @@ namespace Vi.UI
 {
     public class TeamIndicator : MonoBehaviour
     {
-        private const float glowAmount = 2.46f;
+        //private const float glowAmount = 2.46f;
 
         private Renderer[] renderers;
         private void Start()
@@ -55,7 +55,7 @@ namespace Vi.UI
                         mat.color = Color.black;
                         mat.SetFloat(_Transparency, 0);
                     }
-                    mat.SetFloat(_Glow, glowAmount);
+                    //mat.SetFloat(_Glow, glowAmount);
                 }
                 renderers[i].enabled = combatAgent.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
             }

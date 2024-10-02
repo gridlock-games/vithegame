@@ -34,7 +34,6 @@ namespace Vi.Core
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 
-        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void ProcessTriggerEvent(Collider other)
         {
             if (isStowed) { return; }
@@ -55,26 +54,17 @@ namespace Vi.Core
                 if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
-
                 bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     parentCombatAgent.transform.position
                 );
-
-                if (bHit)
-                {
-                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
-                }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
                 if ((Object)hittable == parentCombatAgent) { return; }
                 if (!CanHit(hittable)) { return; }
-
-                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
 
                 bool bHit = hittable.ProcessMeleeHit(parentCombatAgent,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
@@ -82,19 +72,7 @@ namespace Vi.Core
                     other.ClosestPointOnBounds(transform.position),
                     parentCombatAgent.transform.position
                 );
-
-                if (bHit)
-                {
-                    hitsOnThisPhysicsUpdate.Add(hittable);
-                }
             }
-        }
-
-        private bool clearListNextUpdate;
-        private void FixedUpdate()
-        {
-            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
-            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
         }
 
         private void OnDrawGizmos()

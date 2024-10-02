@@ -14,13 +14,65 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        private static string characterReferenceAssetPath = @"Assets\Production\CharacterReference.asset";
+        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
+
+        [MenuItem("Tools/Production/Perform Build Sanity Check")]
+        static void PerformBuildSanityCheck()
+        {
+            GenerateDroppedWeaponVariants();
+            RemoveComponentsFromWeaponPreviews();
+            FindMissingNetworkPrefabs();
+            FindVFXNotInNetworkPrefabsList();
+            SetTextureImportOverrides();
+            Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
+        }
+
+        static List<NetworkPrefabsList> GetNetworkPrefabsLists()
+        {
+            List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
+            foreach (string listPath in Directory.GetFiles(networkPrefabListFolderPath, "*.asset", SearchOption.AllDirectories))
+            {
+                var prefabsList = AssetDatabase.LoadAssetAtPath<NetworkPrefabsList>(listPath);
+                if (prefabsList) { networkPrefabsLists.Add(prefabsList); }
+            }
+            return networkPrefabsLists;
+        }
+
+        static CharacterReference GetCharacterReference()
+        {
+            return AssetDatabase.LoadAssetAtPath<CharacterReference>(characterReferenceAssetPath);
+        }
+
         [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]
         static void GenerateDroppedWeaponVariants()
         {
-            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
+            List<CharacterReference.WeaponOption> weaponOptions = new List<CharacterReference.WeaponOption>();
+            weaponOptions.AddRange(GetCharacterReference().GetWeaponOptions());
 
-            foreach (var weaponOption in characterReference.GetWeaponOptions())
+            string mobFolder = @"Assets/Production/Prefabs/Mobs";
+            foreach (string mobFilePath in Directory.GetFiles(mobFolder, "*.prefab", SearchOption.AllDirectories))
             {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(mobFilePath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out Mob mob))
+                    {
+                        if (mob.GetWeaponOption() == null) { continue; }
+                        if (mob.GetWeaponOption().weapon == null) { continue; }
+                        weaponOptions.Add(mob.GetWeaponOption());
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Unable to load prefab at path " + mobFilePath);
+                }
+            }
+
+            int counter = 0;
+            foreach (var weaponOption in weaponOptions)
+            {
+                EditorUtility.DisplayProgressBar("Creating dropped weapon variants", weaponOption.weapon.name + " | " + counter.ToString() + " out of " + weaponOptions.Count, counter / (float)weaponOptions.Count);
                 foreach (var weaponModelData in weaponOption.weapon.GetWeaponModelData())
                 {
                     foreach (var data in weaponModelData.data)
@@ -35,46 +87,15 @@ namespace Vi.Editor
                         }
                     }
                 }
+                counter++;
             }
-
-            string mobFolder = @"Assets/Production/Prefabs/Mobs";
-            foreach (string mobFilePath in Directory.GetFiles(mobFolder, "*.prefab", SearchOption.AllDirectories))
-            {
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(mobFilePath);
-                if (prefab)
-                {
-                    if (prefab.TryGetComponent(out Mob mob))
-                    {
-                        if (mob.GetWeaponOption() == null) { continue; }
-                        if (mob.GetWeaponOption().weapon == null) { continue; }
-                        foreach (var weaponModelData in mob.GetWeaponOption().weapon.GetWeaponModelData())
-                        {
-                            foreach (var data in weaponModelData.data)
-                            {
-                                if (data.weaponPrefab.TryGetComponent(out RuntimeWeapon runtimeWeapon))
-                                {
-                                    runtimeWeapon.CreateDropWeaponPrefabVariant();
-                                }
-                                else
-                                {
-                                    Debug.LogError(data.weaponPrefab + " doesn't have a runtime weapon");
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Unable to load prefab at path " + mobFilePath);
-                }
-            }
+            EditorUtility.ClearProgressBar();
         }
 
         [MenuItem("Tools/Production/Remove Components From Weapon Previews")]
         static void RemoveComponentsFromWeaponPreviews()
         {
-            CharacterReference characterReference = (CharacterReference)Selection.activeObject;
-            foreach (var weaponOption in characterReference.GetWeaponOptions())
+            foreach (var weaponOption in GetCharacterReference().GetWeaponOptions())
             {
                 foreach (Component component in weaponOption.weaponPreviewPrefab.GetComponentsInChildren<Component>())
                 {
@@ -83,6 +104,7 @@ namespace Vi.Editor
                         & component is not UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
                         & component is not Renderer)
                     {
+                        Debug.Log("Destroying " + component + " from weapon preview prefab " + weaponOption.weaponPreviewPrefab);
                         DestroyImmediate(component, true);
                     }
                 }
@@ -158,15 +180,14 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Find Missing Network Prefabs")]
         static void FindMissingNetworkPrefabs()
         {
-            List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
-            foreach (Object obj in Selection.objects)
-            {
-                networkPrefabsLists.Add((NetworkPrefabsList)obj);
-            }
-
             string baseFolder = @"Assets\Production\Prefabs";
-            foreach (string prefabFilePath in Directory.GetFiles(baseFolder, "*.prefab", SearchOption.AllDirectories))
+            string[] files = Directory.GetFiles(baseFolder, "*.prefab", SearchOption.AllDirectories);
+            int counter = 0;
+            foreach (string prefabFilePath in files)
             {
+                counter++;
+                EditorUtility.DisplayProgressBar("Looking for missing network prefabs (not VFX)", counter.ToString() + " out of " + files.Length.ToString(), counter / (float)files.Length);
+
                 if (prefabFilePath.Contains("VFX")) { continue; }
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (prefab)
@@ -174,7 +195,7 @@ namespace Vi.Editor
                     if (prefab.TryGetComponent(out NetworkObject networkObject))
                     {
                         bool contains = false;
-                        foreach (NetworkPrefabsList networkPrefabsList in networkPrefabsLists)
+                        foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
                         {
                             if (networkPrefabsList.Contains(networkObject.gameObject))
                             {
@@ -183,18 +204,16 @@ namespace Vi.Editor
                             }
                         }
 
-                        if (!contains) { Debug.Log(prefabFilePath); }
+                        if (!contains) { Debug.LogError("MISSING NETWORK PREFAB AT PATH - " + prefabFilePath); }
                     }
                 }
             }
+            EditorUtility.ClearProgressBar();
         }
 
         [MenuItem("Tools/Production/Find VFX Not In Network Prefabs List")]
-        static void FindObjectsNotInNetworkPrefabsList()
+        static void FindVFXNotInNetworkPrefabsList()
         {
-            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
-            if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
-
             List<ActionClip> actionClips = new List<ActionClip>();
 
             string actionClipFolder = @"Assets/Production/Actions";
@@ -204,48 +223,26 @@ namespace Vi.Editor
                 if (actionClip) { actionClips.Add(actionClip); }
             }
 
+            List<string> files = new List<string>();
             string VFXFolder = @"Assets\Production\Prefabs\VFX";
-            foreach (string prefabFilePath in Directory.GetFiles(VFXFolder, "*.prefab", SearchOption.AllDirectories))
-            {
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-                if (prefab)
-                {
-                    if (prefab.TryGetComponent(out ActionVFX actionVFX))
-                    {
-                        bool vfxReferencedInActionClip = false;
-                        foreach (ActionClip actionClip in actionClips)
-                        {
-                            if (actionClip.actionVFXList.Contains(actionVFX))
-                            {
-                                vfxReferencedInActionClip = true;
-                                break;
-                            }
-                        }
-
-                        if (vfxReferencedInActionClip)
-                        {
-                            if (!networkPrefabsList.Contains(prefab))
-                            {
-                                // Add object here
-                                Debug.Log(prefabFilePath);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Could not load prefab at path: " + prefabFilePath);
-                }
-            }
+            files.AddRange(Directory.GetFiles(VFXFolder, "*.prefab", SearchOption.AllDirectories));
 
             string packagedPrefabsFolder = @"Assets\PackagedPrefabs";
-            foreach (string prefabFilePath in Directory.GetFiles(packagedPrefabsFolder, "*.prefab", SearchOption.AllDirectories))
+            files.AddRange(Directory.GetFiles(packagedPrefabsFolder, "*.prefab", SearchOption.AllDirectories));
+
+            int counter = 0;
+            foreach (string prefabFilePath in files)
             {
+                counter++;
+                EditorUtility.DisplayProgressBar("Looking for missing VFX network prefabs", counter.ToString() + " out of " + files.Count.ToString(), counter / (float)files.Count);
+
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (prefab)
                 {
                     if (prefab.TryGetComponent(out ActionVFX actionVFX))
                     {
+                        actionVFX.SetLayers();
+
                         bool vfxReferencedInActionClip = false;
                         foreach (ActionClip actionClip in actionClips)
                         {
@@ -258,19 +255,29 @@ namespace Vi.Editor
 
                         if (vfxReferencedInActionClip)
                         {
-                            if (!networkPrefabsList.Contains(prefab))
+                            bool contains = false;
+                            foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
                             {
-                                // Add object here
-                                Debug.Log(prefabFilePath);
+                                if (networkPrefabsList.Contains(prefab))
+                                {
+                                    contains = true;
+                                    break;
+                                }
+                            }
+
+                            if (!contains)
+                            {
+                                Debug.LogError("MISSING VFX NETWORK PREFAB AT PATH - " + prefabFilePath);
                             }
                         }
                     }
                 }
                 else
                 {
-                    Debug.LogError("Could not load prefab at path: " + prefabFilePath);
+                    Debug.LogWarning("Could not load prefab at path: " + prefabFilePath);
                 }
             }
+            EditorUtility.ClearProgressBar();
         }
 
         [MenuItem("Tools/Production/Set Video Clip Import Overrides")]
@@ -352,61 +359,5 @@ namespace Vi.Editor
         {
             EditorUtility.ClearProgressBar();
         }
-
-        //[MenuItem("Tools/Set Objects In Network Prefab List To Not Spawn With Observers")]
-        //static void SetNotSpawnWithObservers()
-        //{
-        //    NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
-        //    if (!networkPrefabsList) { Debug.LogError("Please select a network prefabs list before running this!"); return; }
-
-        //    foreach (NetworkPrefab networkPrefab in networkPrefabsList.PrefabList)
-        //    {
-        //        if (networkPrefab.Prefab.TryGetComponent(out NetworkObject networkObject))
-        //        {
-        //            if (!networkPrefab.Prefab.GetComponent<ActionVFX>() & !networkPrefab.Prefab.GetComponent<Projectile>()) { continue; }
-        //            networkObject.SpawnWithObservers = true;
-        //            EditorUtility.SetDirty(networkObject);
-        //            Debug.Log(networkObject);
-        //        }
-        //    }
-        //}
-
-        //[MenuItem("Tools/Convert Projectile Layers To Colliders")]
-        //static void SelectGameObjectsInLayer()
-        //{
-        //    foreach (GameObject g in FindGameObjectsInLayer(LayerMask.NameToLayer("Projectile")))
-        //    {
-        //        Debug.Log(g);
-        //        g.layer = LayerMask.NameToLayer("ProjectileCollider");
-        //        EditorUtility.SetDirty(g);
-        //    }
-        //}
-
-        //private static GameObject[] FindGameObjectsInLayer(int layer)
-        //{
-        //    var goArray = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-        //    var goList = new List<GameObject>();
-        //    for (int i = 0; i < goArray.Length; i++)
-        //    {
-        //        if (goArray[i].layer == layer)
-        //        {
-        //            goList.Add(goArray[i]);
-        //        }
-        //    }
-        //    if (goList.Count == 0)
-        //    {
-        //        return null;
-        //    }
-        //    return goList.ToArray();
-        //}
-
-        //[MenuItem("Tools/Find Item By GUID")]
-        //static void FindItemByGUIDMethod()
-        //{
-        //    string guid = "56f1fae43c882434d94c645713a29ec6";
-        //    string p = AssetDatabase.GUIDToAssetPath(guid);
-        //    if (p.Length == 0) p = "not found";
-        //    Debug.Log(p);
-        //}
     }
 }

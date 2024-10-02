@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3922548515315126405}
   - component: {fileID: 3274325476200027930}
   - component: {fileID: 9200914873657226559}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: HCFX_Stun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4877,7 +4877,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 984316057
+  GlobalObjectIdHash: 1334559634
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4911,6 +4911,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &3274325476200027930
@@ -4958,7 +4959,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
   pooledObjectIndex: 105
-  isPrewarmObject: 0
+  isPrewarmObject: 1
 --- !u!1 &6403355468392384476
 GameObject:
   m_ObjectHideFlags: 0
@@ -4970,7 +4971,7 @@ GameObject:
   - component: {fileID: 28279936360081891}
   - component: {fileID: 503130782114398134}
   - component: {fileID: 694480822366486483}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: impact_circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

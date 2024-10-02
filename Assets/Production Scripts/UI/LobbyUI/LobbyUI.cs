@@ -898,6 +898,12 @@ namespace Vi.UI
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
+            Unity.Collections.FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if ((loadoutSlot + 1).ToString() != activeLoadoutSlot)
+            {
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+            }
+
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
 
             playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
@@ -1021,10 +1027,16 @@ namespace Vi.UI
         private void UnlockCharacterLocal()
         {
             spectateButton.interactable = true;
-            foreach (Button button in loadoutPresetButtons)
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
             {
-                button.interactable = true;
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
             }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
 
             lockCharacterButton.onClick.RemoveAllListeners();
             lockCharacterButton.onClick.AddListener(LockCharacter);

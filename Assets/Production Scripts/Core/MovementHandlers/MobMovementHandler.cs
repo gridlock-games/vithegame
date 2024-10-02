@@ -39,8 +39,6 @@ namespace Vi.Core.MovementHandlers
 
             if (IsServer & IsSpawned)
             {
-                EvaluateAction();
-
                 if (canRage)
                 {
                     if (!mob.IsRaging)
@@ -107,8 +105,9 @@ namespace Vi.Core.MovementHandlers
         private void FixedUpdate()
         {
             EvaluateTargetingLogic();
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
+                EvaluateAction();
                 Move();
                 currentPosition.Value = Rigidbody.position;
             }

@@ -270,6 +270,7 @@ namespace Vi.Player
             lastEvaluatedServerRootMotionTick = default;
             TargetToLockOn = default;
             CameraFollowTarget = default;
+            joysticks = new UIDeadZoneElement[0];
         }
 
         private int movementTick;

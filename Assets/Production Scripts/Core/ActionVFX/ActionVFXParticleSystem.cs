@@ -127,7 +127,8 @@ namespace Vi.Core.VFX
 
         protected void OnTriggerEnter(Collider other)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
@@ -179,7 +180,8 @@ namespace Vi.Core.VFX
 
         protected void OnTriggerStay(Collider other)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             if (particleSystemType == ParticleSystemType.GenericCollisions)
@@ -235,22 +237,12 @@ namespace Vi.Core.VFX
                     ps.trigger.RemoveCollider(i);
                 }
             }
-
-            particleEnterCalledThisFrame = false;
-        }
-
-        private bool particleEnterCalledThisFrame;
-        protected void LateUpdate()
-        {
-            particleEnterCalledThisFrame = false;
         }
 
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
-
-            if (particleEnterCalledThisFrame) { return; }
-            particleEnterCalledThisFrame = true;
+            if (!IsSpawned)
+            if (!IsServer) { return; }
 
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
