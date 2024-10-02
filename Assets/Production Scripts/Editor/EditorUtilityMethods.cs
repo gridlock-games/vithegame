@@ -185,6 +185,7 @@ namespace Vi.Editor
             int counter = 0;
             foreach (string prefabFilePath in files)
             {
+                counter++;
                 EditorUtility.DisplayProgressBar("Looking for missing network prefabs (not VFX)", counter.ToString() + " out of " + files.Length.ToString(), counter / (float)files.Length);
 
                 if (prefabFilePath.Contains("VFX")) { continue; }
@@ -232,6 +233,7 @@ namespace Vi.Editor
             int counter = 0;
             foreach (string prefabFilePath in files)
             {
+                counter++;
                 EditorUtility.DisplayProgressBar("Looking for missing VFX network prefabs", counter.ToString() + " out of " + files.Count.ToString(), counter / (float)files.Count);
 
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
