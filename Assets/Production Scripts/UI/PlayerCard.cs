@@ -85,6 +85,7 @@ namespace Vi.UI
                     }
                 }
 
+                RefreshLevelingSystem();
                 StartCoroutine(SetNameText());
             }
         }
@@ -179,6 +180,11 @@ namespace Vi.UI
                 }
             }
 
+            RefreshLevelingSystem();
+        }
+
+        private void RefreshLevelingSystem()
+        {
             if (GameModeManager.Singleton)
             {
                 if (GameModeManager.Singleton.LevelingEnabled)

@@ -325,6 +325,12 @@ namespace Vi.Core.GameModeManagers
                     scoreList[killerIndex] = killerScore;
                 }
 
+                foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
+                {
+                    if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
+                    teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
+                }
+
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -362,7 +368,9 @@ namespace Vi.Core.GameModeManagers
         }
 
         private const float minAssistDamage = 30;
-        private const float experienceDamageAwardMultiplier = 0.5f;
+        private const float experienceDamageAwardMultiplier = 1;
+        private const float teamKillExperienceReward = 5;
+        private const float finalBlowExperienceReward = 5;
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {
