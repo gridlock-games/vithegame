@@ -183,9 +183,17 @@ namespace Vi.UI
             {
                 if (GameModeManager.Singleton.LevelingEnabled)
                 {
-                    levelText.enabled = true;
-                    experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
-                    levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                    if (combatAgent)
+                    {
+                        levelText.enabled = true;
+                        experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
+                        levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                    }
+                    else
+                    {
+                        levelText.enabled = false;
+                        experienceProgressImage.fillAmount = 0;
+                    }
                 }
                 else
                 {
