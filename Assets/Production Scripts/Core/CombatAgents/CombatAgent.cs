@@ -842,22 +842,35 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             GlowRenderer.RenderHit();
-            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>().GetHitSoundEffect(armorType, weaponBone, ailment),
-                impactPosition, Weapon.hitSoundEffectVolume);
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
+            {
+                if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                        impactPosition, Weapon.hitSoundEffectVolume);
 
-            RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
+                    RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
+                }
+            }
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             GlowRenderer.RenderHit();
-            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>().GetHitSoundEffect(armorType, weaponBone, ailment),
-                impactPosition, Weapon.hitSoundEffectVolume);
+
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
+            {
+                if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                        impactPosition, Weapon.hitSoundEffectVolume);
+                }
+            }
         }
 
         protected void RenderHitGlowOnly()
