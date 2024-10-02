@@ -25,6 +25,8 @@ namespace Vi.Core.GameModeManagers
         private const float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
+        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        [SerializeField] private bool levelingEnabled = false;
 
         protected const float overtimeDuration = 20;
 
@@ -37,7 +39,7 @@ namespace Vi.Core.GameModeManagers
             ResetHPAndRegenSpirit
         }
 
-        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        public bool LevelingEnabled { get { return levelingEnabled; } }
 
         public RespawnType GetRespawnType() { return respawnType; }
 

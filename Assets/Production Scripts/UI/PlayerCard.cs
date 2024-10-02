@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -175,8 +176,21 @@ namespace Vi.UI
                             statusIcon.SetActive(false);
                         }
                     }
+                }
+            }
+
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.LevelingEnabled)
+                {
+                    levelText.enabled = true;
                     experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
                     levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                }
+                else
+                {
+                    levelText.enabled = false;
+                    experienceProgressImage.fillAmount = 0;
                 }
             }
         }
@@ -261,9 +275,12 @@ namespace Vi.UI
             lastMaxHP = maxHP;
             lastMaxRage = maxRage;
 
-            experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
-            levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
-
+            if (levelText.enabled)
+            {
+                levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
+            }
+            
             if (!staminaAndSpiritAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
@@ -352,11 +369,11 @@ namespace Vi.UI
                 {
                     case RageStatus.IsRaging:
                         rageStatusIndicator.texture = ragingRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CanActivateRage:
                         rageStatusIndicator.texture = rageReadyRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
                         rageStatusIndicator.texture = null;
