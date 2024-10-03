@@ -45,7 +45,9 @@ namespace Vi.Editor
         private SerializedProperty spAnimationSpeed;
         private SerializedProperty spRecoveryAnimationSpeed;
 
+        private SerializedProperty spXAngleRotationOffset;
         private SerializedProperty spYAngleRotationOffset;
+        private SerializedProperty spZAngleRotationOffset;
 
         private SerializedProperty spEffectedWeaponBones;
         private SerializedProperty spWeaponBonesToHide;
@@ -153,7 +155,10 @@ namespace Vi.Editor
             spDodgeCancelTransitionTime = serializedObject.FindProperty("dodgeCancelTransitionTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
             spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
+
+            spXAngleRotationOffset = serializedObject.FindProperty("XAngleRotationOffset");
             spYAngleRotationOffset = serializedObject.FindProperty("YAngleRotationOffset");
+            spZAngleRotationOffset = serializedObject.FindProperty("ZAngleRotationOffset");
 
             spAgentStaminaCost = serializedObject.FindProperty("agentStaminaCost");
             spAgentRageCost = serializedObject.FindProperty("agentRageCost");
@@ -272,7 +277,9 @@ namespace Vi.Editor
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
             
             EditorGUILayout.PropertyField(spAvatarLayer);
-            spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Y Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
+            spXAngleRotationOffset.floatValue = EditorGUILayout.Slider("Pitch Angle Rotation Offset", spXAngleRotationOffset.floatValue, 0, 360);
+            spYAngleRotationOffset.floatValue = EditorGUILayout.Slider("Yaw Angle Rotation Offset", spYAngleRotationOffset.floatValue, 0, 360);
+            spZAngleRotationOffset.floatValue = EditorGUILayout.Slider("Roll Angle Rotation Offset", spZAngleRotationOffset.floatValue, 0, 360);
 
             EditorGUILayout.LabelField("Root Motion Settings", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spShouldApplyRootMotion);

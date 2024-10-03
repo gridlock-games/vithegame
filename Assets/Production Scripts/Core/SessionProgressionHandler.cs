@@ -6,6 +6,7 @@ using UnityEngine.VFX;
 using Vi.Utility;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -36,6 +37,8 @@ namespace Vi.Core
         {
             if (!IsSpawned) { Debug.LogError("SessionProgressionHandler.AddExperience should only be called when spawned!"); return; }
             if (!IsServer) { Debug.LogError("SessionProgressionHandler.AddExperience should only be called on the server!"); return; }
+
+            if (mob) { return; }
 
             int prevLevel = Level;
             // Cap at level 100
@@ -95,13 +98,20 @@ namespace Vi.Core
         }
 
         private CombatAgent combatAgent;
+        private Mob mob;
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
+
+            if (combatAgent is Mob mob)
+            {
+                this.mob = mob;
+            }
         }
 
         private float GetAbilityLevelCooldownReduction(string weaponName, string abilityName)
         {
+            if (mob) { return 0; }
             if (!GameModeManager.Singleton.LevelingEnabled) { return 0; }
 
             var key = (weaponName.Replace("(Clone)", ""), abilityName);
@@ -117,6 +127,8 @@ namespace Vi.Core
 
         public int GetAbilityLevel(Weapon weapon, ActionClip ability)
         {
+            if (mob) { return 1; }
+
             var key = (weapon.name.Replace("(Clone)", ""), ability.name);
             if (abilityLevelTracker.ContainsKey(key))
             {
@@ -132,6 +144,7 @@ namespace Vi.Core
         {
             if (!IsSpawned) { Debug.LogError("Calling SessionProgressionHandler.UpgradeAbility() when not spawned!"); return; }
             if (skillPoints.Value == 0) { return; }
+            if (mob) { return; }
 
             if (IsServer)
             {

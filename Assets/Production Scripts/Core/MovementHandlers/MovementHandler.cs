@@ -48,14 +48,12 @@ namespace Vi.Core.MovementHandlers
 
 		public Vector3 BodyHeightOffset { get { return new Vector3(0, bodyHeightOffset, 0); } }
 		[SerializeField] private float bodyHeightOffset = 2;
-		public float BodyRadius { get { return bodyRadius; } }
-		[SerializeField] private float bodyRadius = 0.5f;
 
 		protected Vector3 GetRandomDestination()
         {
 			Vector3 randomDirection = Random.insideUnitSphere * Random.Range(1, destinationNavMeshDistanceThreshold);
 			randomDirection += GetPosition();
-			if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
             {
 				return hit.position;
 			}
@@ -77,7 +75,7 @@ namespace Vi.Core.MovementHandlers
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
 
-			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 			{
 				this.destination.Value = myNavHit.position;
 				return true;
@@ -108,7 +106,7 @@ namespace Vi.Core.MovementHandlers
 					}
 				}
 				
-				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 				{
 					destination.Value = myNavHit.position;
 					return true;
@@ -143,7 +141,7 @@ namespace Vi.Core.MovementHandlers
 				}
 			}
 
-			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 			{
 				destination.Value = myNavHit.position;
 				return true;
@@ -183,15 +181,15 @@ namespace Vi.Core.MovementHandlers
 		private const float nextPositionDistanceThreshold = 1;
 		private const float startPositionNavMeshDistanceThreshold = 20;
 
-		protected bool CalculatePath(Vector3 startPosition, int areaMask)
+		protected bool CalculatePath(Vector3 startPosition)
         {
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.CalculatePath() should only be called on the server!"); return false; }
 
-			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, navMeshQueryFilter))
             {
 				startPosition = hit.position;
-				if (NavMesh.CalculatePath(startPosition, Destination, areaMask, path))
+				if (NavMesh.CalculatePath(startPosition, Destination, navMeshQueryFilter, path))
 				{
 					// If there is a point in the path that has an angle of 0, use that as our next position
 					Vector3 prevCorner = startPosition;
@@ -251,7 +249,7 @@ namespace Vi.Core.MovementHandlers
 			else
             {
 				Debug.LogError("Start Position is not on navmesh! " + name);
-				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, navMeshQueryFilter))
 				{
 					SetOrientation(myNavHit.position, transform.rotation);
 				}
@@ -260,10 +258,20 @@ namespace Vi.Core.MovementHandlers
             }
 		}
 
+		NavMeshQueryFilter navMeshQueryFilter = new NavMeshQueryFilter()
+		{
+			agentTypeID = 0,
+			areaMask = NavMesh.AllAreas
+		};
+
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
+
+		[SerializeField] private string navMeshAgentTypeName = "Humanoid";
+
+		private int navMeshAgentTypeID;
 
         protected virtual void Awake()
 		{
@@ -275,6 +283,28 @@ namespace Vi.Core.MovementHandlers
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
+
+			bool agentTypeFound = false;
+			for (int i = 0; i < NavMesh.GetSettingsCount(); i++)
+			{
+				int agentTypeID = NavMesh.GetSettingsByIndex(i).agentTypeID;
+				if (navMeshAgentTypeName == NavMesh.GetSettingsNameFromID(agentTypeID))
+                {
+					navMeshAgentTypeID = agentTypeID;
+					agentTypeFound = true;
+					navMeshQueryFilter = new NavMeshQueryFilter()
+					{
+						agentTypeID = navMeshAgentTypeID,
+						areaMask = NavMesh.AllAreas
+					};
+					break;
+                }
+            }
+
+			if (!agentTypeFound)
+            {
+				Debug.LogError(this + " agent type not found! " + navMeshAgentTypeName);
+			}
         }
 
         protected virtual void OnEnable()
@@ -288,7 +318,7 @@ namespace Vi.Core.MovementHandlers
 			if (!NetworkObject.IsPlayerObject & IsServer)
             {
 				SetDestination(transform.position);
-				CalculatePath(transform.position, NavMesh.AllAreas);
+				CalculatePath(transform.position);
 			}
 		}
 
@@ -386,7 +416,10 @@ namespace Vi.Core.MovementHandlers
         {
             if (Application.isPlaying) { return; }
 			Gizmos.color = Color.blue;
-			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset - bodyRadius, 0), bodyRadius);
+			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset, 0), 0.5f);
+
+			Gizmos.color = Color.red;
+			Gizmos.DrawRay(transform.position, transform.forward * stoppingDistance);
         }
 
         protected virtual void OnDrawGizmosSelected()

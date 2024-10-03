@@ -270,7 +270,7 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned) { return; }
 
-            CalculatePath(Rigidbody.position, NavMesh.AllAreas);
+            CalculatePath(Rigidbody.position);
 
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -336,7 +336,7 @@ namespace Vi.ArtificialIntelligence
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            Vector3 startPos = Rigidbody.position;
+            Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
             startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
@@ -357,7 +357,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in combatAgent.NetworkCollider.Colliders)
@@ -409,9 +409,11 @@ namespace Vi.ArtificialIntelligence
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
-            Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
+
+        private const float bodyRadius = 0.5f;
 
         void OnDodge()
         {

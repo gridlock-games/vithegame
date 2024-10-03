@@ -245,20 +245,20 @@ namespace Vi.ProceduralAnimations
             meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
         }
 
-        public void SetRotationOffset(float angle)
+        public void SetRotationOffset(float pitchAngle, float yawAngle, float rollAngle)
         {
             if (!rotationOffsetConstraint) { return; }
             Vector3 targetOffset = Vector3.zero;
             switch (rotationOffsetAxis)
             {
                 case Axis.X:
-                    targetOffset = new Vector3(angle, 0, 0);
+                    targetOffset = new Vector3(yawAngle, rollAngle, pitchAngle);
                     break;
                 case Axis.Y:
-                    targetOffset = new Vector3(0, angle, 0);
+                    targetOffset = new Vector3(pitchAngle, yawAngle, rollAngle);
                     break;
                 case Axis.Z:
-                    targetOffset = new Vector3(0, 0, angle);
+                    targetOffset = new Vector3(rollAngle, pitchAngle, yawAngle);
                     break;
                 default:
                     Debug.LogError("Unsure how to handle rotation offset axis " + rotationOffsetAxis);

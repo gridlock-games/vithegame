@@ -232,7 +232,7 @@ namespace Vi.Core.MovementHandlers
 
             if (!IsSpawned) { return; }
 
-            CalculatePath(Rigidbody.position, NavMesh.AllAreas);
+            CalculatePath(Rigidbody.position);
 
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -298,7 +298,7 @@ namespace Vi.Core.MovementHandlers
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
             float stairMovement = 0;
-            Vector3 startPos = Rigidbody.position;
+            Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
             startPos.y += stairStepHeight;
             while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
             {
@@ -316,33 +316,6 @@ namespace Vi.Core.MovementHandlers
                 {
                     stairMovement = 0;
                     break;
-                }
-            }
-
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
-            {
-                bool collidersIgnoreEachOther = false;
-                foreach (Collider c in combatAgent.NetworkCollider.Colliders)
-                {
-                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
-                    {
-                        collidersIgnoreEachOther = true;
-                        break;
-                    }
-                }
-
-                if (!collidersIgnoreEachOther)
-                {
-                    Vector3 rel = playerHit.transform.root.position - Rigidbody.position;
-                    Quaternion targetRot = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
-                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                    if (angle > 180) { angle -= 360; }
-
-                    if (angle > -20 & angle < 20)
-                    {
-                        movement = Vector3.zero;
-                    }
                 }
             }
 
@@ -368,7 +341,7 @@ namespace Vi.Core.MovementHandlers
 
                     if (canFly)
                     {
-                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > lightAttackDistance + 1)
+                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > LightAttackDistance + 1)
                         {
                             Rigidbody.AddForce(new Vector3(0, Random.Range(0, flightMovement.EvaluateNormalizedTime(flightTime)), 0), ForceMode.VelocityChange);
                             flightTime += Time.fixedDeltaTime;
@@ -382,14 +355,13 @@ namespace Vi.Core.MovementHandlers
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
-            Rigidbody.AddForce(new Vector3(0, stairMovement, 0), ForceMode.VelocityChange);
+            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
 
         private float flightTime;
 
-        [Header("Light Attack")]
-        [SerializeField] private float lightAttackDistance = 2.5f;
+        private float LightAttackDistance { get { return stoppingDistance + 0.2f; } }
 
         [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
@@ -459,7 +431,7 @@ namespace Vi.Core.MovementHandlers
                     }
                 }
 
-                if (dist < lightAttackDistance)
+                if (dist < LightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
                     return;

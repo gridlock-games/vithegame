@@ -357,7 +357,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -576,7 +576,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1306,7 +1306,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1817,7 +1817,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -2229,6 +2229,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: stoppingDistance
+      value: 1.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: ability1DistanceMax
       value: 4
       objectReference: {fileID: 0}
@@ -2236,6 +2241,21 @@ PrefabInstance:
         type: 3}
       propertyPath: ability1DistanceMin
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: navMeshAgentTypeName
+      value: Medium Monster
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: stairStepForceMultiplier
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: stairRaycastingStartOffset.z
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5468,6 +5488,7 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 7863530828460626717}
     positionOffsetFromRenderer: {x: 0, y: 1, z: 0}
     scaleMultiplier: 1.25
 --- !u!114 &3314682893389164607
@@ -5503,6 +5524,7 @@ MonoBehaviour:
   - {fileID: 7811758668119185182}
   - {fileID: 9087510701031531758}
   - {fileID: 6146972849217907127}
+  hips: {fileID: 0}
 --- !u!4 &7644841297391566619 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2083495704182174477, guid: b883661c2d541e445a6f0a20402859c1,
@@ -5614,6 +5636,12 @@ CharacterJoint:
 --- !u!4 &7811758668119185182 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1915454761352862472, guid: b883661c2d541e445a6f0a20402859c1,
+    type: 3}
+  m_PrefabInstance: {fileID: 8574289547592338454}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &7863530828460626717 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2007797610910097163, guid: b883661c2d541e445a6f0a20402859c1,
     type: 3}
   m_PrefabInstance: {fileID: 8574289547592338454}
   m_PrefabAsset: {fileID: 0}

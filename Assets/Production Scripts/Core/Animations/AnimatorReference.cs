@@ -385,7 +385,18 @@ namespace Vi.Core
                 if (!animator.enabled) { animationHandler.ProcessNextActionClip(); }
             }
 
-            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
+            if (IsAtRest())
+            {
+                limbReferences.SetRotationOffset(0, 0, 0);
+            }
+            else
+            {
+                limbReferences.SetRotationOffset(
+                    combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset,
+                    combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset,
+                    combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset
+                );
+            }
         }
 
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
