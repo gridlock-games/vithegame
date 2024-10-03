@@ -28,7 +28,7 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 SetDestination(transform.position);
-                CalculatePath(transform.position, NavMesh.AllAreas);
+                CalculatePath(transform.position);
             }
         }
 
@@ -92,7 +92,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
             if (!targetFound) { SetDestination(transform.position); }
-            CalculatePath(transform.position, NavMesh.AllAreas);
+            CalculatePath(transform.position);
         }
     }
 }

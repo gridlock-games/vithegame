@@ -55,7 +55,7 @@ namespace Vi.Core.MovementHandlers
         {
 			Vector3 randomDirection = Random.insideUnitSphere * Random.Range(1, destinationNavMeshDistanceThreshold);
 			randomDirection += GetPosition();
-			if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
             {
 				return hit.position;
 			}
@@ -77,7 +77,7 @@ namespace Vi.Core.MovementHandlers
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
 
-			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(destination, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 			{
 				this.destination.Value = myNavHit.position;
 				return true;
@@ -108,7 +108,7 @@ namespace Vi.Core.MovementHandlers
 					}
 				}
 				
-				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 				{
 					destination.Value = myNavHit.position;
 					return true;
@@ -143,7 +143,7 @@ namespace Vi.Core.MovementHandlers
 				}
 			}
 
-			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 			{
 				destination.Value = myNavHit.position;
 				return true;
@@ -183,15 +183,15 @@ namespace Vi.Core.MovementHandlers
 		private const float nextPositionDistanceThreshold = 1;
 		private const float startPositionNavMeshDistanceThreshold = 20;
 
-		protected bool CalculatePath(Vector3 startPosition, int areaMask)
+		protected bool CalculatePath(Vector3 startPosition)
         {
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.CalculatePath() should only be called on the server!"); return false; }
 
-			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, NavMesh.AllAreas))
+			if (NavMesh.SamplePosition(startPosition, out NavMeshHit hit, startPositionNavMeshDistanceThreshold, navMeshQueryFilter))
             {
 				startPosition = hit.position;
-				if (NavMesh.CalculatePath(startPosition, Destination, areaMask, path))
+				if (NavMesh.CalculatePath(startPosition, Destination, navMeshQueryFilter, path))
 				{
 					// If there is a point in the path that has an angle of 0, use that as our next position
 					Vector3 prevCorner = startPosition;
@@ -251,7 +251,7 @@ namespace Vi.Core.MovementHandlers
 			else
             {
 				Debug.LogError("Start Position is not on navmesh! " + name);
-				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, NavMesh.AllAreas))
+				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, navMeshQueryFilter))
 				{
 					SetOrientation(myNavHit.position, transform.rotation);
 				}
@@ -259,6 +259,12 @@ namespace Vi.Core.MovementHandlers
 				return false;
             }
 		}
+
+		NavMeshQueryFilter navMeshQueryFilter = new NavMeshQueryFilter()
+		{
+			agentTypeID = 0,
+			areaMask = NavMesh.AllAreas
+		};
 
 		protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
@@ -275,6 +281,12 @@ namespace Vi.Core.MovementHandlers
 				moveAction = playerInput.actions.FindAction("Move");
 				lookAction = playerInput.actions.FindAction("Look");
             }
+
+			for (int i = 0; i < NavMesh.GetSettingsCount(); i++)
+            {
+				int agentTypeID = NavMesh.GetSettingsByIndex(i).agentTypeID;
+				Debug.Log(NavMesh.GetSettingsNameFromID(agentTypeID) + " " + agentTypeID);
+            }
         }
 
         protected virtual void OnEnable()
@@ -288,7 +300,7 @@ namespace Vi.Core.MovementHandlers
 			if (!NetworkObject.IsPlayerObject & IsServer)
             {
 				SetDestination(transform.position);
-				CalculatePath(transform.position, NavMesh.AllAreas);
+				CalculatePath(transform.position);
 			}
 		}
 

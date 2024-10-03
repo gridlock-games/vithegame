@@ -5468,6 +5468,7 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 7863530828460626717}
     positionOffsetFromRenderer: {x: 0, y: 1, z: 0}
     scaleMultiplier: 1.25
 --- !u!114 &3314682893389164607
@@ -5503,6 +5504,7 @@ MonoBehaviour:
   - {fileID: 7811758668119185182}
   - {fileID: 9087510701031531758}
   - {fileID: 6146972849217907127}
+  hips: {fileID: 0}
 --- !u!4 &7644841297391566619 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2083495704182174477, guid: b883661c2d541e445a6f0a20402859c1,
@@ -5614,6 +5616,12 @@ CharacterJoint:
 --- !u!4 &7811758668119185182 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1915454761352862472, guid: b883661c2d541e445a6f0a20402859c1,
+    type: 3}
+  m_PrefabInstance: {fileID: 8574289547592338454}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &7863530828460626717 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2007797610910097163, guid: b883661c2d541e445a6f0a20402859c1,
     type: 3}
   m_PrefabInstance: {fileID: 8574289547592338454}
   m_PrefabAsset: {fileID: 0}

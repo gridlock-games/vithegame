@@ -270,7 +270,7 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned) { return; }
 
-            CalculatePath(Rigidbody.position, NavMesh.AllAreas);
+            CalculatePath(Rigidbody.position);
 
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
