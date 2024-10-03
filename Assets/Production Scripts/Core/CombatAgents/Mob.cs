@@ -54,9 +54,9 @@ namespace Vi.Core.CombatAgents
 
         public CharacterReference.WeaponOption GetWeaponOption() { return weaponOption; }
 
-        public override float GetMaxHP() { return maxHP; }
-        public override float GetMaxStamina() { return 100; }
-        public override float GetMaxSpirit() { return 100; }
+        public override float GetMaxHP() { return maxHP + SessionProgressionHandler.MaxHPBonus; }
+        public override float GetMaxStamina() { return 100 + SessionProgressionHandler.MaxStaminaBonus; }
+        public override float GetMaxSpirit() { return 100 + SessionProgressionHandler.MaxSpiritBonus; }
         public override float GetMaxRage() { return 100; }
 
         public override void OnNetworkSpawn()
@@ -206,7 +206,7 @@ namespace Vi.Core.CombatAgents
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
-            float HPDamage = -attack.damage;
+            float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attackerCombatAgent.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 

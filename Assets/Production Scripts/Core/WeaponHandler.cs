@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -935,6 +936,12 @@ namespace Vi.Core
             ClearPreviewActionVFXInstances();
         }
 
+        private bool upgradePressed;
+        void OnUpgrade(InputValue value)
+        {
+            upgradePressed = value.isPressed;
+        }
+
         void OnAbility1(InputValue value)
         {
             Ability1(value.isPressed);
@@ -944,6 +951,19 @@ namespace Vi.Core
         public void Ability1(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility1();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -981,6 +1001,19 @@ namespace Vi.Core
         public void Ability2(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility2();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -1018,6 +1051,19 @@ namespace Vi.Core
         public void Ability3(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility3();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -1055,6 +1101,19 @@ namespace Vi.Core
         public void Ability4(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility4();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)

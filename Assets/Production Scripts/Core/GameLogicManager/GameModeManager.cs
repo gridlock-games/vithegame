@@ -25,6 +25,8 @@ namespace Vi.Core.GameModeManagers
         private const float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
+        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        [SerializeField] private bool levelingEnabled = false;
 
         protected const float overtimeDuration = 20;
 
@@ -37,7 +39,7 @@ namespace Vi.Core.GameModeManagers
             ResetHPAndRegenSpirit
         }
 
-        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        public bool LevelingEnabled { get { return levelingEnabled; } }
 
         public RespawnType GetRespawnType() { return respawnType; }
 
@@ -323,6 +325,15 @@ namespace Vi.Core.GameModeManagers
                     scoreList[killerIndex] = killerScore;
                 }
 
+                if (LevelingEnabled)
+                {
+                    foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
+                    {
+                        if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
+                        teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
+                    }
+                }
+                
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -350,10 +361,22 @@ namespace Vi.Core.GameModeManagers
                 {
                     killHistory.Add(new KillHistoryElement(killer, victim));
                 }
+
+                if (LevelingEnabled)
+                {
+                    foreach (KeyValuePair<CombatAgent, float> kvp in victim.GetDamageMappingThisLife())
+                    {
+                        if (!kvp.Key) { continue; }
+                        kvp.Key.SessionProgressionHandler.AddExperience(kvp.Value * experienceDamageAwardMultiplier);
+                    }
+                }
             }
         }
 
         private const float minAssistDamage = 30;
+        private const float experienceDamageAwardMultiplier = 1;
+        private const float teamKillExperienceReward = 5;
+        private const float finalBlowExperienceReward = 5;
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {

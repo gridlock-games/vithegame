@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -48,6 +49,10 @@ namespace Vi.UI
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
+        [Header("Experience UI")]
+        [SerializeField] private Image experienceProgressImage;
+        [SerializeField] private Text levelText;
+
         private CombatAgent combatAgent;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -80,6 +85,7 @@ namespace Vi.UI
                     }
                 }
 
+                RefreshLevelingSystem();
                 StartCoroutine(SetNameText());
             }
         }
@@ -144,6 +150,8 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
 
+            experienceProgressImage.fillAmount = 0;
+
             if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
             if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
         }
@@ -169,6 +177,34 @@ namespace Vi.UI
                             statusIcon.SetActive(false);
                         }
                     }
+                }
+            }
+
+            RefreshLevelingSystem();
+        }
+
+        private void RefreshLevelingSystem()
+        {
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.LevelingEnabled)
+                {
+                    if (combatAgent)
+                    {
+                        levelText.enabled = true;
+                        experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
+                        levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                    }
+                    else
+                    {
+                        levelText.enabled = false;
+                        experienceProgressImage.fillAmount = 0;
+                    }
+                }
+                else
+                {
+                    levelText.enabled = false;
+                    experienceProgressImage.fillAmount = 0;
                 }
             }
         }
@@ -253,6 +289,12 @@ namespace Vi.UI
             lastMaxHP = maxHP;
             lastMaxRage = maxRage;
 
+            if (levelText.enabled)
+            {
+                levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
+            }
+            
             if (!staminaAndSpiritAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
@@ -341,11 +383,11 @@ namespace Vi.UI
                 {
                     case RageStatus.IsRaging:
                         rageStatusIndicator.texture = ragingRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CanActivateRage:
                         rageStatusIndicator.texture = rageReadyRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
                         rageStatusIndicator.texture = null;

@@ -389,7 +389,7 @@ namespace Vi.UI
                     deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
-                        ability1.UpdateCard(abilities[0], binding.ToDisplayString());
+                        ability1.Initialize(abilities[0], binding.ToDisplayString());
                         ability1Initialized = true;
                         shouldBreak = true;
                         break;
@@ -398,7 +398,7 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
-            if (!ability1Initialized) { ability1.UpdateCard(abilities[0], ""); }
+            if (!ability1Initialized) { ability1.Initialize(abilities[0], ""); }
 
             bool ability2Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability2"].bindings)
@@ -410,7 +410,7 @@ namespace Vi.UI
                     deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
-                        ability2.UpdateCard(abilities[1], binding.ToDisplayString());
+                        ability2.Initialize(abilities[1], binding.ToDisplayString());
                         ability2Initialized = true;
                         shouldBreak = true;
                         break;
@@ -419,7 +419,7 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
-            if (!ability2Initialized) { ability2.UpdateCard(abilities[1], ""); }
+            if (!ability2Initialized) { ability2.Initialize(abilities[1], ""); }
 
             bool ability3Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability3"].bindings)
@@ -431,7 +431,7 @@ namespace Vi.UI
                     deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
-                        ability3.UpdateCard(abilities[2], binding.ToDisplayString());
+                        ability3.Initialize(abilities[2], binding.ToDisplayString());
                         ability3Initialized = true;
                         shouldBreak = true;
                         break;
@@ -440,7 +440,7 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
-            if (!ability3Initialized) { ability3.UpdateCard(abilities[2], ""); }
+            if (!ability3Initialized) { ability3.Initialize(abilities[2], ""); }
 
             bool ability4Initialized = false;
             foreach (InputBinding binding in playerInput.actions["Ability4"].bindings)
@@ -452,7 +452,7 @@ namespace Vi.UI
                     deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
                     if (binding.path.ToLower().Contains(deviceName.ToLower()))
                     {
-                        ability4.UpdateCard(abilities[3], binding.ToDisplayString());
+                        ability4.Initialize(abilities[3], binding.ToDisplayString());
                         ability4Initialized = true;
                         shouldBreak = true;
                         break;
@@ -461,7 +461,7 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
-            if (!ability4Initialized) { ability4.UpdateCard(abilities[3], ""); }
+            if (!ability4Initialized) { ability4.Initialize(abilities[3], ""); }
 
             lastWeapon = attributes.WeaponHandler.GetWeapon();
 

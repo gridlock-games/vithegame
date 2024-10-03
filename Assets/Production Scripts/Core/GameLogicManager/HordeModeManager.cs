@@ -69,8 +69,15 @@ namespace Vi.Core.GameModeManagers
             {
                 roundResultMessage.Value = gameOver.Value ? "Corruption Cleared! " : "Wave Defeated. ";
                 wavesCompleted.Value++;
+
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    attributes.SessionProgressionHandler.AddExperience(waveCompletionExperienceReward);
+                }
             }
         }
+
+        private const float waveCompletionExperienceReward = 100;
 
         private NetworkVariable<int> wavesCompleted = new NetworkVariable<int>();
         public int GetWavesCompleted() { return wavesCompleted.Value; }
