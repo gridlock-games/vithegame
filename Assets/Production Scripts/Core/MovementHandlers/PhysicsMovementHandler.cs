@@ -228,8 +228,17 @@ namespace Vi.Core.MovementHandlers
         protected const float stairStepHeight = 0.01f;
 
         [Header("Physics Locomotion Settings")]
+        [SerializeField] protected Vector3 stairRaycastingStartOffset;
+        [SerializeField] protected float stairStepForceMultiplier = 1;
         [SerializeField] protected float maxStairStepHeight = 0.5f;
         [SerializeField] protected float airborneHorizontalDragMultiplier = 0.1f;
         [SerializeField] protected float gravityScale = 2;
+
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(transform.position + transform.rotation * stairRaycastingStartOffset, 0.3f);
+        }
     }
 }
