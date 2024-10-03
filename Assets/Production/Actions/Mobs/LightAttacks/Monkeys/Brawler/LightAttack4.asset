@@ -957,12 +957,14 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 1
+  animationSpeed: 0.8
+  recoveryAnimationSpeed: 0.8
   agentStaminaCost: 20
   agentRageCost: 50
   effectedWeaponBones: 12000000

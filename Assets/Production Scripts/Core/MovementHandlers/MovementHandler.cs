@@ -417,6 +417,9 @@ namespace Vi.Core.MovementHandlers
             if (Application.isPlaying) { return; }
 			Gizmos.color = Color.blue;
 			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset, 0), 0.5f);
+
+			Gizmos.color = Color.red;
+			Gizmos.DrawRay(transform.position, transform.forward * stoppingDistance);
         }
 
         protected virtual void OnDrawGizmosSelected()
