@@ -419,7 +419,6 @@ namespace Vi.Core.MovementHandlers
             if (targetFinder.GetTarget())
             {
                 float dist = Vector3.Distance(Destination, transform.position);
-                Debug.Log(name + " " + dist + " " + lightAttackDistance);
                 if (dist < suicideDistance & canSuicide)
                 {
                     combatAgent.ProcessEnvironmentDamage(-combatAgent.GetHP(), NetworkObject);
