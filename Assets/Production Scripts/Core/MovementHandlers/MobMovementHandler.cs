@@ -341,7 +341,7 @@ namespace Vi.Core.MovementHandlers
 
                     if (canFly)
                     {
-                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > lightAttackDistance + 1)
+                        if (Vector2.Distance(new Vector2(Destination.x, Destination.z), new Vector2(Rigidbody.position.x, Rigidbody.position.z)) > LightAttackDistance + 1)
                         {
                             Rigidbody.AddForce(new Vector3(0, Random.Range(0, flightMovement.EvaluateNormalizedTime(flightTime)), 0), ForceMode.VelocityChange);
                             flightTime += Time.fixedDeltaTime;
@@ -361,8 +361,7 @@ namespace Vi.Core.MovementHandlers
 
         private float flightTime;
 
-        [Header("Light Attack")]
-        [SerializeField] private float lightAttackDistance = 2.5f;
+        private float LightAttackDistance { get { return stoppingDistance + 0.2f; } }
 
         [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
@@ -432,7 +431,7 @@ namespace Vi.Core.MovementHandlers
                     }
                 }
 
-                if (dist < lightAttackDistance)
+                if (dist < LightAttackDistance)
                 {
                     weaponHandler.LightAttack(true);
                     return;
