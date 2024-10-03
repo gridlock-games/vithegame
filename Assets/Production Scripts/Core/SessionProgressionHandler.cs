@@ -67,6 +67,10 @@ namespace Vi.Core
 
         [SerializeField] private VisualEffect levelUpVisualEffect;
         [SerializeField] private AudioClip levelUpAudioClip;
+
+        public int SkillPoints { get { return skillPoints.Value; } }
+        private NetworkVariable<int> skillPoints = new NetworkVariable<int>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+
         private void OnExperienceChanged(float prev, float current)
         {
             if (CalculateLevel(prev) < CalculateLevel(current))
@@ -76,6 +80,16 @@ namespace Vi.Core
                     levelUpVisualEffect.Play();
                     AudioManager.Singleton.PlayClipOnTransform(transform, levelUpAudioClip, false, 0.5f);
                 }
+
+                if (IsServer)
+                {
+                    skillPoints.Value++;
+                    if (!NetworkObject.IsPlayerObject)
+                    {
+                        //UpgradeAbility(abilityAttackTypes[lastAbilityIndexUpgraded]);
+                        //if (lastAbilityIndexUpgraded > abilityAttackTypes.Length) { lastAbilityIndexUpgraded = 0; }
+                    }
+                }
             }
         }
 
@@ -83,6 +97,77 @@ namespace Vi.Core
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
+        }
+
+        public int GetAbilityLevel(Weapon weapon, ActionClip ability)
+        {
+            var key = (weapon.name.Replace("(Clone)", ""), ability.name);
+            if (abilityLevelTracker.ContainsKey(key))
+            {
+                return abilityLevelTracker[key];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public void UpgradeAbility(Weapon weapon, ActionClip ability)
+        {
+            if (!IsSpawned) { Debug.LogError("Calling SessionProgressionHandler.UpgradeAbility() when not spawned!"); return; }
+            if (skillPoints.Value == 0) { return; }
+
+            if (IsServer)
+            {
+                UpgradeAbilityLocally(weapon.name, ability.name);
+            }
+            else if (IsOwner)
+            {
+                UpgradeAbilityServerRpc(weapon.name, ability.name);
+            }
+            else
+            {
+                Debug.LogError("Calling UpgradeAbility() when not the owner and not the server!");
+            }
+        }
+
+        private Dictionary<(string, string), int> abilityLevelTracker = new Dictionary<(string, string), int>();
+
+        private void OnDisable()
+        {
+            abilityLevelTracker.Clear();
+        }
+
+        private void UpgradeAbilityLocally(string weaponName, string abilityName)
+        {
+            if (IsServer)
+            {
+                if (skillPoints.Value == 0) { return; }
+                skillPoints.Value--;
+            }
+
+            var key = (weaponName.Replace("(Clone)", ""), abilityName);
+            if (abilityLevelTracker.ContainsKey(key))
+            {
+                abilityLevelTracker[key]++;
+            }
+            else
+            {
+                abilityLevelTracker.Add(key, 1);
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void UpgradeAbilityServerRpc(string weaponName, string abilityName)
+        {
+            UpgradeAbilityLocally(weaponName, abilityName);
+            UpgradeAbilityOwnerRpc(weaponName, abilityName);
+        }
+
+        [Rpc(SendTo.Owner)]
+        private void UpgradeAbilityOwnerRpc(string weaponName, string abilityName)
+        {
+            UpgradeAbilityLocally(weaponName, abilityName);
         }
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -13,6 +14,9 @@ namespace Vi.UI
         [SerializeField] private Text cooldownText;
         [SerializeField] private Text keybindText;
         [SerializeField] private ActionClip previewAbility;
+        [SerializeField] private Image upgradeIcon;
+        [SerializeField] private RectTransform upgradeIconActivePosition;
+        [SerializeField] private RectTransform upgradeIconInactivePosition;
 
         public ActionClip Ability { get; private set; }
 
@@ -38,7 +42,7 @@ namespace Vi.UI
             cooldownText.text = "";
         }
 
-        public void UpdateCard(ActionClip ability, string keybindText)
+        public void Initialize(ActionClip ability, string keybindText)
         {
             Ability = ability;
             abilityIcon.sprite = ability.abilityImageIcon;
@@ -48,15 +52,13 @@ namespace Vi.UI
 
         private Image borderImage;
         private Color originalBorderImageColor;
-        private WeaponHandler weaponHandler;
-        private AnimationHandler animationHandler;
+        private CombatAgent combatAgent;
 
         private void Start()
         {
             borderImage = GetComponent<Image>();
             originalBorderImageColor = borderImage.color;
-            weaponHandler = GetComponentInParent<WeaponHandler>();
-            animationHandler = weaponHandler.GetComponent<AnimationHandler>();
+            combatAgent = GetComponentInParent<CombatAgent>();
 
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
@@ -65,11 +67,26 @@ namespace Vi.UI
         {
             if (Ability == null) { return; }
 
-            float timeLeft = weaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
-            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
-            abilityIcon.fillAmount = 1 - weaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+            upgradeIcon.rectTransform.position = Vector3.Lerp(upgradeIcon.transform.position,
+                combatAgent.SessionProgressionHandler.SkillPoints > 0 ? upgradeIconActivePosition.position : upgradeIconInactivePosition.position,
+                Time.deltaTime * 4);
 
-            if (animationHandler.AreActionClipRequirementsMet(Ability))
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == 0)
+                {
+                    borderImage.color = originalBorderImageColor;
+                    cooldownText.text = "";
+                    abilityIcon.fillAmount = 1;
+                    return;
+                }
+            }
+            
+            float timeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
+            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
+            abilityIcon.fillAmount = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+
+            if (combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability))
             {
                 borderImage.color = originalBorderImageColor;
             }

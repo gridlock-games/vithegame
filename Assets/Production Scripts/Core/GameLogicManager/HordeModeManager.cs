@@ -77,7 +77,7 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        private const float waveCompletionExperienceReward = 25;
+        private const float waveCompletionExperienceReward = 100;
 
         private NetworkVariable<int> wavesCompleted = new NetworkVariable<int>();
         public int GetWavesCompleted() { return wavesCompleted.Value; }
