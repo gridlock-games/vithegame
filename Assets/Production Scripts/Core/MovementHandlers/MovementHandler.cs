@@ -271,6 +271,10 @@ namespace Vi.Core.MovementHandlers
 		protected InputAction moveAction;
 		protected InputAction lookAction;
 
+		[SerializeField] private string navMeshAgentTypeName = "Humanoid";
+
+		private int navMeshAgentTypeID;
+
         protected virtual void Awake()
 		{
 			path = new NavMeshPath();
@@ -282,11 +286,27 @@ namespace Vi.Core.MovementHandlers
 				lookAction = playerInput.actions.FindAction("Look");
             }
 
+			bool agentTypeFound = false;
 			for (int i = 0; i < NavMesh.GetSettingsCount(); i++)
-            {
+			{
 				int agentTypeID = NavMesh.GetSettingsByIndex(i).agentTypeID;
-				Debug.Log(NavMesh.GetSettingsNameFromID(agentTypeID) + " " + agentTypeID);
+				if (navMeshAgentTypeName == NavMesh.GetSettingsNameFromID(agentTypeID))
+                {
+					navMeshAgentTypeID = agentTypeID;
+					agentTypeFound = true;
+					navMeshQueryFilter = new NavMeshQueryFilter()
+					{
+						agentTypeID = navMeshAgentTypeID,
+						areaMask = NavMesh.AllAreas
+					};
+					break;
+                }
             }
+
+			if (!agentTypeFound)
+            {
+				Debug.LogError(this + " agent type not found! " + navMeshAgentTypeName);
+			}
         }
 
         protected virtual void OnEnable()

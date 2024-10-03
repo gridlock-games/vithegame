@@ -1125,6 +1125,11 @@ PrefabInstance:
       propertyPath: lightAttackDistance
       value: 5.5
       objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: navMeshAgentTypeName
+      value: Large Monster
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -2717,6 +2722,7 @@ MonoBehaviour:
   values:
   - {fileID: 5988590654808373986}
   - {fileID: 5666271911465351761}
+  hips: {fileID: 0}
 --- !u!114 &494487538115460974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2745,6 +2751,7 @@ MonoBehaviour:
   materialReplacementDefintions: []
   wearableEquipmentRendererDefinitions: []
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 3449496669694542742}
     positionOffsetFromRenderer: {x: 0, y: 0, z: 3}
     scaleMultiplier: 2.5
 --- !u!4 &2921527921386854053 stripped
@@ -2756,6 +2763,12 @@ Transform:
 --- !u!4 &3402352574124894266 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6828072847274860010, guid: a206272500bf0584ca62cdabf6aeb0c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 8211651671837078992}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &3449496669694542742 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6785437281946580550, guid: a206272500bf0584ca62cdabf6aeb0c9,
     type: 3}
   m_PrefabInstance: {fileID: 8211651671837078992}
   m_PrefabAsset: {fileID: 0}
