@@ -325,12 +325,15 @@ namespace Vi.Core.GameModeManagers
                     scoreList[killerIndex] = killerScore;
                 }
 
-                foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
+                if (LevelingEnabled)
                 {
-                    if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
-                    teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
+                    foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
+                    {
+                        if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
+                        teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
+                    }
                 }
-
+                
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -359,10 +362,13 @@ namespace Vi.Core.GameModeManagers
                     killHistory.Add(new KillHistoryElement(killer, victim));
                 }
 
-                foreach (KeyValuePair<CombatAgent, float> kvp in victim.GetDamageMappingThisLife())
+                if (LevelingEnabled)
                 {
-                    if (!kvp.Key) { continue; }
-                    kvp.Key.SessionProgressionHandler.AddExperience(kvp.Value * experienceDamageAwardMultiplier);
+                    foreach (KeyValuePair<CombatAgent, float> kvp in victim.GetDamageMappingThisLife())
+                    {
+                        if (!kvp.Key) { continue; }
+                        kvp.Key.SessionProgressionHandler.AddExperience(kvp.Value * experienceDamageAwardMultiplier);
+                    }
                 }
             }
         }
