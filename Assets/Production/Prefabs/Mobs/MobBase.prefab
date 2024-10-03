@@ -159,8 +159,11 @@ MonoBehaviour:
   bodyHeightOffset: 2
   bodyRadius: 0.5
   stoppingDistance: 2
+  navMeshAgentTypeName: Humanoid
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
+  stairRaycastingStartOffset: {x: 0, y: 0, z: 0}
+  stairStepForceMultiplier: 10
   maxStairStepHeight: 0.5
   airborneHorizontalDragMultiplier: 0.1
   gravityScale: 2

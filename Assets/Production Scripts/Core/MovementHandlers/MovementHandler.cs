@@ -48,8 +48,6 @@ namespace Vi.Core.MovementHandlers
 
 		public Vector3 BodyHeightOffset { get { return new Vector3(0, bodyHeightOffset, 0); } }
 		[SerializeField] private float bodyHeightOffset = 2;
-		public float BodyRadius { get { return bodyRadius; } }
-		[SerializeField] private float bodyRadius = 0.5f;
 
 		protected Vector3 GetRandomDestination()
         {
@@ -418,7 +416,7 @@ namespace Vi.Core.MovementHandlers
         {
             if (Application.isPlaying) { return; }
 			Gizmos.color = Color.blue;
-			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset - bodyRadius, 0), bodyRadius);
+			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset, 0), 0.5f);
         }
 
         protected virtual void OnDrawGizmosSelected()

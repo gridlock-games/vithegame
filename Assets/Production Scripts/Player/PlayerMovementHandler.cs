@@ -438,7 +438,7 @@ namespace Vi.Player
                 }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in combatAgent.NetworkCollider.Colliders)
@@ -494,6 +494,8 @@ namespace Vi.Player
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
         }
+
+        private const float bodyRadius = 0.5f;
 
         private Quaternion EvaluateRotation()
         {

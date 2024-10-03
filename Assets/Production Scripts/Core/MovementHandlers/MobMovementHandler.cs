@@ -319,33 +319,6 @@ namespace Vi.Core.MovementHandlers
                 }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
-            {
-                bool collidersIgnoreEachOther = false;
-                foreach (Collider c in combatAgent.NetworkCollider.Colliders)
-                {
-                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
-                    {
-                        collidersIgnoreEachOther = true;
-                        break;
-                    }
-                }
-
-                if (!collidersIgnoreEachOther)
-                {
-                    Vector3 rel = playerHit.transform.root.position - Rigidbody.position;
-                    Quaternion targetRot = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
-                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                    if (angle > 180) { angle -= 360; }
-
-                    if (angle > -20 & angle < 20)
-                    {
-                        movement = Vector3.zero;
-                    }
-                }
-            }
-
             bool evaluateForce = true;
             if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
             {

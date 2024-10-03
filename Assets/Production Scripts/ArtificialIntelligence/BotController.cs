@@ -357,7 +357,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, BodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
             {
                 bool collidersIgnoreEachOther = false;
                 foreach (Collider c in combatAgent.NetworkCollider.Colliders)
@@ -412,6 +412,8 @@ namespace Vi.ArtificialIntelligence
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
         }
+
+        private const float bodyRadius = 0.5f;
 
         void OnDodge()
         {
