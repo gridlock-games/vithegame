@@ -289,7 +289,6 @@ namespace Vi.Core
             if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
                 weaponInstance.StartAbilityCooldown(CurrentActionClip);
-                // TODO reduce ability cooldown based on level here
             }
             else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {

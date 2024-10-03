@@ -473,21 +473,22 @@ namespace Vi.ScriptableObjects
 
         public float GetAbilityCooldownTimeLeft(ActionClip ability)
         {
+            float abilityCooldownTime = GetAbilityCooldownTime(ability);
             if (ability == ability1)
             {
-                return ability1.abilityCooldownTime - (Time.time - lastAbility1ActivateTime);
+                return abilityCooldownTime - (Time.time - lastAbility1ActivateTime);
             }
             else if (ability == ability2)
             {
-                return ability2.abilityCooldownTime - (Time.time - lastAbility2ActivateTime);
+                return abilityCooldownTime - (Time.time - lastAbility2ActivateTime);
             }
             else if (ability == ability3)
             {
-                return ability3.abilityCooldownTime - (Time.time - lastAbility3ActivateTime);
+                return abilityCooldownTime - (Time.time - lastAbility3ActivateTime);
             }
             else if (ability == ability4)
             {
-                return ability4.abilityCooldownTime - (Time.time - lastAbility4ActivateTime);
+                return abilityCooldownTime - (Time.time - lastAbility4ActivateTime);
             }
             else
             {
@@ -498,27 +499,87 @@ namespace Vi.ScriptableObjects
 
         public float GetAbilityCooldownProgress(ActionClip ability)
         {
+            float abilityCooldownTime = GetAbilityCooldownTime(ability);
             if (ability == ability1)
             {
-                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / ability1.abilityCooldownTime, 0, 1);
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / abilityCooldownTime, 0, 1);
             }
             else if (ability == ability2)
             {
-                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / ability2.abilityCooldownTime, 0, 1);
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / abilityCooldownTime, 0, 1);
             }
             else if (ability == ability3)
             {
-                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / ability3.abilityCooldownTime, 0, 1);
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / abilityCooldownTime, 0, 1);
             }
             else if (ability == ability4)
             {
-                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / ability4.abilityCooldownTime, 0, 1);
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / abilityCooldownTime, 0, 1);
             }
             else
             {
                 Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
                 return 0;
             }
+        }
+
+        private float GetAbilityCooldownTime(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return Mathf.Max(0, ability1.abilityCooldownTime - ability1CooldownOffset);
+            }
+            else if (ability == ability2)
+            {
+                return Mathf.Max(0, ability2.abilityCooldownTime - ability2CooldownOffset);
+            }
+            else if (ability == ability3)
+            {
+                return Mathf.Max(0, ability3.abilityCooldownTime - ability3CooldownOffset);
+            }
+            else if (ability == ability4)
+            {
+                return Mathf.Max(0, ability4.abilityCooldownTime - ability4CooldownOffset);
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
+        private float ability1CooldownOffset;
+        private float ability2CooldownOffset;
+        private float ability3CooldownOffset;
+        private float ability4CooldownOffset;
+
+        public void PermanentlyReduceAbilityCooldownTime(ActionClip ability, float percent)
+        {
+            if (ability == ability1)
+            {
+                ability1CooldownOffset = ability1.abilityCooldownTime * percent;
+            }
+            else if (ability == ability2)
+            {
+                ability2CooldownOffset = ability2.abilityCooldownTime * percent;
+            }
+            else if (ability == ability3)
+            {
+                ability3CooldownOffset = ability3.abilityCooldownTime * percent;
+            }
+            else if (ability == ability4)
+            {
+                ability4CooldownOffset = ability4.abilityCooldownTime * percent;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+            ReduceAbilityCooldownTime(ability, percent);
         }
 
         public void ReduceAbilityCooldownTime(ActionClip ability, float percent)

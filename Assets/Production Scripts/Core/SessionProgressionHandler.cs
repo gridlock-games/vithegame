@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine.VFX;
 using Vi.Utility;
 using Vi.ScriptableObjects;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -99,6 +100,21 @@ namespace Vi.Core
             combatAgent = GetComponent<CombatAgent>();
         }
 
+        private float GetAbilityLevelCooldownReduction(string weaponName, string abilityName)
+        {
+            if (!GameModeManager.Singleton.LevelingEnabled) { return 0; }
+
+            var key = (weaponName.Replace("(Clone)", ""), abilityName);
+            if (abilityLevelTracker.ContainsKey(key))
+            {
+                return abilityLevelTracker[key] / (float)10;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public int GetAbilityLevel(Weapon weapon, ActionClip ability)
         {
             var key = (weapon.name.Replace("(Clone)", ""), ability.name);
@@ -155,6 +171,9 @@ namespace Vi.Core
             {
                 abilityLevelTracker.Add(key, 1);
             }
+
+            combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName),
+                combatAgent.SessionProgressionHandler.GetAbilityLevelCooldownReduction(weaponName, abilityName));
         }
 
         [Rpc(SendTo.Server)]
