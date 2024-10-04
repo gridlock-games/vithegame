@@ -7,6 +7,7 @@ using Vi.Utility;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
+using Vi.Core.Structures;
 
 namespace Vi.Core
 {
@@ -78,8 +79,60 @@ namespace Vi.Core
 
             if (IsServer)
             {
+                essences.Value -= GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount;
+
                 // TODO perform the action here
-                Debug.Log(GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
+                switch (GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title)
+                {
+                    case "Heal The Ancient":
+                        Structure[] structures = PlayerDataManager.Singleton.GetActiveStructures();
+                        if (structures.Length > 0)
+                        {
+                            Structure structure = structures[0];
+                            structure.StatusAgent.TryAddStatus(ActionClip.Status.healing, 0.1f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Rage":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.AddRage(attributes.GetMaxRage(), false);
+                            attributes.OnActivateRage();
+                        }
+                        break;
+                    case "Increased Move Speed":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedIncrease, 0.2f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Resist Ailments":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.immuneToAilments, 0, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Resist Statuses":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.immuneToNegativeStatuses, 0, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Damage Resistance":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.damageReductionMultiplier, 0.7f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Health Regeneration":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.healing, 0.1f, buffDuration, 0, false);
+                        }
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle essence buff option titled: " + GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
+                        break;
+                }
             }
             else if (IsOwner)
             {
@@ -91,18 +144,12 @@ namespace Vi.Core
             }
         }
 
+        private const float buffDuration = 40;
+
         [Rpc(SendTo.Server)]
         private void RedeemEssenceBuffRpc(int essenceBuffIndex)
         {
             RedeemEssenceBuff(essenceBuffIndex);
-        }
-
-        public void ClearEssenceBuffs()
-        {
-            if (!IsSpawned) { Debug.LogError("SessionProgressionHandler.ClearEssenceBuffs should only be called when spawned!"); return; }
-            if (!IsServer) { Debug.LogError("SessionProgressionHandler.ClearEssenceBuffs should only be called on the server!"); return; }
-
-            // TODO Perform the action here
         }
 
         public override void OnNetworkSpawn()

@@ -330,15 +330,6 @@ namespace Vi.Core.GameModeManagers
                     }
                 }
 
-                if (LevelingEnabled)
-                {
-                    foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
-                    {
-                        if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
-                        teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
-                    }
-                }
-                
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -359,6 +350,11 @@ namespace Vi.Core.GameModeManagers
                         assistScore.cumulativeAssists += 1;
                         assistScore.assistsThisRound += 1;
                         scoreList[assistIndex] = assistScore;
+
+                        if (assistAttributes.NetworkObject.IsPlayerObject)
+                        {
+                            assistAttributes.SessionProgressionHandler.AddEssence();
+                        }
                     }
                     killHistory.Add(new KillHistoryElement(killer, assist, victim));
                 }
@@ -380,8 +376,6 @@ namespace Vi.Core.GameModeManagers
 
         private const float minAssistDamage = 30;
         private const float experienceDamageAwardMultiplier = 1;
-        private const float teamKillExperienceReward = 5;
-        private const float finalBlowExperienceReward = 5;
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {
@@ -523,11 +517,6 @@ namespace Vi.Core.GameModeManagers
             else
             {
                 overtime.Value = false;
-            }
-
-            foreach (CombatAgent combatAgent in PlayerDataManager.Singleton.GetActiveCombatAgents())
-            {
-                combatAgent.SessionProgressionHandler.ClearEssenceBuffs();
             }
 
             nextGameActionTimer.Value = nextGameActionDuration;

@@ -119,7 +119,7 @@ namespace Vi.UI
                     {
                         if (hordeModeManager.ShouldDisplayEssenceUI)
                         {
-                            essenceBuffMenu.Initialize(actionMapHandler, hordeModeManager.EssenceBuffOptions);
+                            essenceBuffMenu.Initialize(actionMapHandler);
                         }
                         else
                         {

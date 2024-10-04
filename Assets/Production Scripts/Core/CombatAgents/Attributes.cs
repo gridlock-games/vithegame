@@ -86,13 +86,20 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        public override void AddRage(float amount)
+        public override void AddRage(float amount, bool clampPositive = true)
         {
             if (amount > 0)
             {
                 if (rage.Value < GetMaxRage())
                 {
-                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
+                    if (clampPositive)
+                    {
+                        rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
+                    }
+                    else
+                    {
+                        rage.Value += amount;
+                    }
                 }
             }
             else // Delta is less than or equal to zero

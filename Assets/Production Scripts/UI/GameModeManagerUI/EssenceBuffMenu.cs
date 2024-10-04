@@ -24,14 +24,14 @@ namespace Vi.UI
 
         private List<EssenceBuffOption> instances = new List<EssenceBuffOption>();
         private ActionMapHandler actionMapHandler;
-        public void Initialize(ActionMapHandler actionMapHandler, GameModeManager.EssenceBuffOption[] essenceBuffOptions)
+        public void Initialize(ActionMapHandler actionMapHandler)
         {
             actionMapHandler.SetExternalUI(actionMapHandler);
             this.actionMapHandler = actionMapHandler;
-
+            
             Dictionary<GameModeManager.EssenceBuffOption, int> indexCrosswalk = new Dictionary<GameModeManager.EssenceBuffOption, int>();
             int counter = 0;
-            foreach (GameModeManager.EssenceBuffOption essenceBuffOption in essenceBuffOptions)
+            foreach (GameModeManager.EssenceBuffOption essenceBuffOption in GameModeManager.Singleton.EssenceBuffOptions)
             {
                 indexCrosswalk.Add(essenceBuffOption, counter);
                 counter++;
@@ -40,13 +40,32 @@ namespace Vi.UI
             SessionProgressionHandler sessionProgressionHandler = actionMapHandler.GetComponent<SessionProgressionHandler>();
             essenceCountText.text = sessionProgressionHandler.Essences.ToString();
 
-            foreach (GameModeManager.EssenceBuffOption essenceBuffOption in essenceBuffOptions.OrderBy(i => Guid.NewGuid()).Take(3))
+            foreach (GameModeManager.EssenceBuffOption essenceBuffOption in GameModeManager.Singleton.EssenceBuffOptions.OrderBy(i => Guid.NewGuid()).Take(3))
             {
                 EssenceBuffOption instance = Instantiate(essenceBuffOptionPrefab.gameObject, essenceBuffOptionParent).GetComponent<EssenceBuffOption>();
-                instance.Initialize(sessionProgressionHandler, essenceBuffOption, indexCrosswalk[essenceBuffOption]);
+                instance.Initialize(this, sessionProgressionHandler, essenceBuffOption, indexCrosswalk[essenceBuffOption]);
                 instances.Add(instance);
             }
             canvas.enabled = true;
+        }
+
+        public void OnEssenceBuffOptionSelected(int essenceBuffOptionIndex)
+        {
+            if (int.TryParse(essenceCountText.text, out int oldEssenceCount))
+            {
+                int newEssenceCount = oldEssenceCount - GameModeManager.Singleton.EssenceBuffOptions[essenceBuffOptionIndex].requiredEssenceCount;
+
+                essenceCountText.text = newEssenceCount.ToString();
+
+                foreach (EssenceBuffOption instance in instances)
+                {
+                    instance.Refresh(newEssenceCount);
+                }
+            }
+            else
+            {
+                Debug.LogError("Unable to parse essence count from essence count text!");
+            }
         }
 
         public void CloseMenu()
