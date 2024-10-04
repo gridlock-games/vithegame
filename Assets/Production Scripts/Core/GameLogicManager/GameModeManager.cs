@@ -22,7 +22,7 @@ namespace Vi.Core.GameModeManagers
 
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
-        private const float nextGameActionDuration = 10;
+        [SerializeField] private float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
         [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
@@ -323,6 +323,11 @@ namespace Vi.Core.GameModeManagers
                     killerScore.cumulativeKills += 1;
                     killerScore.killsThisRound += 1;
                     scoreList[killerIndex] = killerScore;
+
+                    if (killerAttributes.NetworkObject.IsPlayerObject)
+                    {
+                        killerAttributes.SessionProgressionHandler.AddEssence();
+                    }
                 }
 
                 if (LevelingEnabled)
@@ -519,6 +524,12 @@ namespace Vi.Core.GameModeManagers
             {
                 overtime.Value = false;
             }
+
+            foreach (CombatAgent combatAgent in PlayerDataManager.Singleton.GetActiveCombatAgents())
+            {
+                combatAgent.SessionProgressionHandler.ClearEssenceBuffs();
+            }
+
             nextGameActionTimer.Value = nextGameActionDuration;
         }
 
@@ -554,10 +565,10 @@ namespace Vi.Core.GameModeManagers
             if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
             scoreList.OnListChanged += OnScoreListChange;
+            nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
             if (IsServer)
             {
                 roundTimer.OnValueChanged += OnRoundTimerChange;
-                nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
                     AddPlayerScore(playerData.id, playerData.character._id);
@@ -571,10 +582,10 @@ namespace Vi.Core.GameModeManagers
         public override void OnNetworkDespawn()
         {
             scoreList.OnListChanged -= OnScoreListChange;
+            nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             if (IsServer)
             {
                 roundTimer.OnValueChanged -= OnRoundTimerChange;
-                nextGameActionTimer.OnValueChanged -= OnNextGameActionTimerChange;
             }
             gameOver.OnValueChanged -= OnGameOverChanged;
         }
@@ -688,104 +699,135 @@ namespace Vi.Core.GameModeManagers
         protected string roundAboutToStartPrefix = "Round ";
         protected string roundAboutToStartSuffix = " is About to Start ";
 
+        protected virtual void OnNextGameActionTimerThreeFourths()
+        {
+
+        }
+
+        protected virtual void OnNextGameActionTimerHalfway()
+        {
+            if (IsServer)
+            {
+                if (!respawnsCalledByRoundCount.Contains(GetRoundCount()))
+                {
+                    respawnsCalledByRoundCount.Add(GetRoundCount());
+                    switch (respawnType)
+                    {
+                        case RespawnType.Respawn:
+                            PlayerDataManager.Singleton.RespawnAllPlayers();
+                            break;
+                        case RespawnType.DontRespawn:
+                            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                            {
+                                if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                {
+                                    StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                }
+                                else
+                                {
+                                    attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                }
+                            }
+                            break;
+                        case RespawnType.ResetStats:
+                            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                            {
+                                if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                {
+                                    StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                }
+                                else
+                                {
+                                    attributes.ResetStats(1, true, true, false);
+                                    attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                }
+                            }
+                            break;
+                        case RespawnType.ResetHP:
+                            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                            {
+                                if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                {
+                                    StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                }
+                                else
+                                {
+                                    attributes.ResetStats(1, false, false, false);
+                                    attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                }
+                            }
+                            break;
+                        case RespawnType.ResetHPAndRegenSpirit:
+                            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                            {
+                                if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                {
+                                    StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                }
+                                else
+                                {
+                                    attributes.ResetStats(1, false, false, false);
+                                    attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                    attributes.StartSpiritRegen();
+                                }
+                            }
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle respawn type " + respawnType);
+                            break;
+                    }
+                    roundResultMessage.Value = roundAboutToStartPrefix + (GetRoundCount() + 1).ToString() + roundAboutToStartSuffix;
+                }
+            }
+        }
+
+        protected virtual void OnNextGameActionTimerOneFourth()
+        {
+
+        }
+
         private void OnNextGameActionTimerChange(float prev, float current)
         {
             if (!gameOver.Value & GetRoundCount() > 0)
             {
+                if (current <= nextGameActionDuration * 0.75f & prev > nextGameActionDuration * 0.75f)
+                {
+                    OnNextGameActionTimerThreeFourths();
+                }
+
                 if (current <= nextGameActionDuration / 2 & prev > nextGameActionDuration / 2)
                 {
-                    if (!respawnsCalledByRoundCount.Contains(GetRoundCount()))
-                    {
-                        respawnsCalledByRoundCount.Add(GetRoundCount());
-                        switch (respawnType)
-                        {
-                            case RespawnType.Respawn:
-                                PlayerDataManager.Singleton.RespawnAllPlayers();
-                                break;
-                            case RespawnType.DontRespawn:
-                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                                {
-                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
-                                    {
-                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
-                                    }
-                                    else
-                                    {
-                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
-                                    }
-                                }
-                                break;
-                            case RespawnType.ResetStats:
-                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                                {
-                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
-                                    {
-                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
-                                    }
-                                    else
-                                    {
-                                        attributes.ResetStats(1, true, true, false);
-                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
-                                    }
-                                }
-                                break;
-                            case RespawnType.ResetHP:
-                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                                {
-                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
-                                    {
-                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
-                                    }
-                                    else
-                                    {
-                                        attributes.ResetStats(1, false, false, false);
-                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
-                                    }
-                                }
-                                break;
-                            case RespawnType.ResetHPAndRegenSpirit:
-                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                                {
-                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
-                                    {
-                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
-                                    }
-                                    else
-                                    {
-                                        attributes.ResetStats(1, false, false, false);
-                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
-                                        attributes.StartSpiritRegen();
-                                    }
-                                }
-                                break;
-                            default:
-                                Debug.LogError("Unsure how to handle respawn type " + respawnType);
-                                break;
-                        }
-                        roundResultMessage.Value = roundAboutToStartPrefix + (GetRoundCount() + 1).ToString() + roundAboutToStartSuffix;
-                    }
+                    OnNextGameActionTimerHalfway();
+                }
+
+                if (current <= nextGameActionDuration * 0.25f & prev > nextGameActionDuration * 0.25f)
+                {
+                    OnNextGameActionTimerOneFourth();
                 }
             }
 
-            if (current == 0 & prev > 0)
+            if (IsServer)
             {
-                if (gameOver.Value)
+                if (current == 0 & prev > 0)
                 {
-                    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { StartCoroutine(DisplayPostGameEvents()); }
-                }
-                else
-                {
-                    switch (timerMode)
+                    if (gameOver.Value)
                     {
-                        case TimerMode.CountDown:
-                            roundTimer.Value = roundDuration;
-                            break;
-                        case TimerMode.CountUp:
-                            OnRoundStart();
-                            break;
-                        default:
-                            Debug.LogError("Unsure how to handle timer mode " + timerMode + " when next game action timer reaches 0!");
-                            break;
+                        if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { StartCoroutine(DisplayPostGameEvents()); }
+                    }
+                    else
+                    {
+                        switch (timerMode)
+                        {
+                            case TimerMode.CountDown:
+                                roundTimer.Value = roundDuration;
+                                break;
+                            case TimerMode.CountUp:
+                                OnRoundStart();
+                                break;
+                            default:
+                                Debug.LogError("Unsure how to handle timer mode " + timerMode + " when next game action timer reaches 0!");
+                                break;
+                        }
                     }
                 }
             }
@@ -1167,6 +1209,25 @@ namespace Vi.Core.GameModeManagers
             {
                 serializer.SerializeValue(ref characterId);
                 serializer.SerializeNetworkSerializable(ref playerScore);
+            }
+        }
+
+        public EssenceBuffOption[] EssenceBuffOptions { get { return essenceBuffOptions.ToArray(); } }
+
+        [SerializeField] protected EssenceBuffOption[] essenceBuffOptions;
+
+        [System.Serializable]
+        public struct EssenceBuffOption : System.IEquatable<EssenceBuffOption>
+        {
+            public string title;
+            public string description;
+            public Color iconColor;
+            public Sprite iconSprite;
+            public int requiredEssenceCount;
+
+            public bool Equals(EssenceBuffOption other)
+            {
+                return title == other.title & description == other.description & iconColor == other.iconColor & iconSprite == other.iconSprite & requiredEssenceCount == other.requiredEssenceCount;
             }
         }
     }

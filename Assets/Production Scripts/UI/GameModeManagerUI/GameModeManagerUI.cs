@@ -87,8 +87,42 @@ namespace Vi.UI
             }
         }
 
+        protected ActionMapHandler actionMapHandler;
+        private void FindLocalActionMapHandler()
+        {
+            if (actionMapHandler)
+            {
+                if (actionMapHandler.gameObject.activeInHierarchy)
+                {
+                    return;
+                }
+            }
+
+            if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
+                {
+                    var spectator = PlayerDataManager.Singleton.GetLocalSpectatorObject().Value;
+                    if (spectator)
+                    {
+                        actionMapHandler = spectator.GetComponent<ActionMapHandler>();
+                    }
+                }
+                else
+                {
+                    var player = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
+                    if (player)
+                    {
+                        actionMapHandler = player.GetComponent<ActionMapHandler>();
+                    }
+                }
+            }
+        }
+
         protected void Update()
         {
+            FindLocalActionMapHandler();
+
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { OnScoreListChanged(); }
 
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -137,17 +171,10 @@ namespace Vi.UI
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
-                    if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+
+                    if (actionMapHandler)
                     {
-                        PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
-                        if (playerData.team == PlayerDataManager.Team.Spectator)
-                        {
-                            PlayerDataManager.Singleton.GetLocalSpectatorObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
-                        }
-                        else
-                        {
-                            PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
-                        }
+                        actionMapHandler.OpenScoreboard();
                     }
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))

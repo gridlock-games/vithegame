@@ -5,6 +5,7 @@ using Vi.Core;
 using Vi.Core.CombatAgents;
 using Unity.Netcode;
 using Vi.Core.Structures;
+using System.Linq;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -155,6 +156,23 @@ namespace Vi.Core.GameModeManagers
                 winningPlayerIds.Add(attributes.GetPlayerDataId());
             }
             OnRoundEnd(winningPlayerIds.ToArray());
+        }
+
+        public bool ShouldDisplayEssenceUI { get; private set; }
+
+        protected override void OnNextGameActionTimerThreeFourths()
+        {
+            base.OnNextGameActionTimerThreeFourths();
+            if (!gameOver.Value & GetRoundCount() > 0)
+            {
+                ShouldDisplayEssenceUI = true;
+            }
+        }
+
+        protected override void OnNextGameActionTimerOneFourth()
+        {
+            base.OnNextGameActionTimerOneFourth();
+            ShouldDisplayEssenceUI = false;
         }
     }
 }

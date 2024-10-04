@@ -59,6 +59,52 @@ namespace Vi.Core
             }
         }
 
+        public void AddEssence()
+        {
+            if (!IsSpawned) { Debug.LogError("SessionProgressionHandler.AddEssence should only be called when spawned!"); return; }
+            if (!IsServer) { Debug.LogError("SessionProgressionHandler.AddEssence should only be called on the server!"); return; }
+
+            if (mob) { return; }
+
+            essences.Value++;
+        }
+
+        public int Essences { get { return essences.Value; } }
+        private NetworkVariable<int> essences = new NetworkVariable<int>();
+
+        public void RedeemEssenceBuff(int essenceBuffIndex)
+        {
+            if (Essences < GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount) { return; }
+
+            if (IsServer)
+            {
+                // TODO perform the action here
+                Debug.Log(GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
+            }
+            else if (IsOwner)
+            {
+                RedeemEssenceBuffRpc(essenceBuffIndex);
+            }
+            else
+            {
+                Debug.LogError("RedeemEssenceBuff should only be called on the server or from the owner!");
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void RedeemEssenceBuffRpc(int essenceBuffIndex)
+        {
+            RedeemEssenceBuff(essenceBuffIndex);
+        }
+
+        public void ClearEssenceBuffs()
+        {
+            if (!IsSpawned) { Debug.LogError("SessionProgressionHandler.ClearEssenceBuffs should only be called when spawned!"); return; }
+            if (!IsServer) { Debug.LogError("SessionProgressionHandler.ClearEssenceBuffs should only be called on the server!"); return; }
+
+            // TODO Perform the action here
+        }
+
         public override void OnNetworkSpawn()
         {
             experience.OnValueChanged += OnExperienceChanged;

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.Core.Structures;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -108,7 +109,31 @@ namespace Vi.UI
             {
                 FindStructure();
             }
+
+            // Display essence menu
+            if (lastEssenceUIState != hordeModeManager.ShouldDisplayEssenceUI)
+            {
+                if (actionMapHandler)
+                {
+                    if (!actionMapHandler.GetComponent<Spectator>())
+                    {
+                        if (hordeModeManager.ShouldDisplayEssenceUI)
+                        {
+                            essenceBuffMenu.Initialize(actionMapHandler, hordeModeManager.EssenceBuffOptions);
+                        }
+                        else
+                        {
+                            essenceBuffMenu.CloseMenu();
+                        }
+                    }
+                }
+            }
+
+            lastEssenceUIState = hordeModeManager.ShouldDisplayEssenceUI;
         }
+
+        [SerializeField] private EssenceBuffMenu essenceBuffMenu;
+        private bool lastEssenceUIState;
 
         private void EvaluateWavesText()
         {
