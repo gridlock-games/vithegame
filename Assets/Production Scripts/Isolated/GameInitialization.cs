@@ -222,7 +222,15 @@ namespace Vi.Core
             if (downloadsSuccessful)
             {
                 headerText.text = "Loading Main Menu";
-                yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Single);
+
+                try
+                {
+                    Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Single);
+                }
+                catch
+                {
+                    headerText.text = "Could Not Load Main Menu";
+                }
             }
             else
             {
