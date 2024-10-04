@@ -10,7 +10,7 @@ using System;
 
 namespace Vi.UI
 {
-    public class EssenceBuffMenu : MonoBehaviour
+    public class EssenceBuffMenu : MonoBehaviour, ExternalUI
     {
         [SerializeField] private EssenceBuffOption essenceBuffOptionPrefab;
         [SerializeField] private Transform essenceBuffOptionParent;
@@ -26,7 +26,7 @@ namespace Vi.UI
         private ActionMapHandler actionMapHandler;
         public void Initialize(ActionMapHandler actionMapHandler)
         {
-            actionMapHandler.SetExternalUI(actionMapHandler);
+            actionMapHandler.SetExternalUI(this);
             this.actionMapHandler = actionMapHandler;
             
             Dictionary<GameModeManager.EssenceBuffOption, int> indexCrosswalk = new Dictionary<GameModeManager.EssenceBuffOption, int>();
@@ -102,7 +102,7 @@ namespace Vi.UI
             }
         }
 
-        private void OnPause()
+        public void OnPause()
         {
             CloseMenu();
         }
