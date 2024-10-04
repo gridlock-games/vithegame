@@ -205,6 +205,7 @@ namespace Vi.Core
         private float GetAbilityLevelCooldownReduction(string weaponName, string abilityName)
         {
             if (mob) { return 0; }
+            if (!GameModeManager.Singleton) { return 0; }
             if (!GameModeManager.Singleton.LevelingEnabled) { return 0; }
 
             var key = (weaponName.Replace("(Clone)", ""), abilityName);
@@ -279,7 +280,15 @@ namespace Vi.Core
             }
 
             combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName),
-                combatAgent.SessionProgressionHandler.GetAbilityLevelCooldownReduction(weaponName, abilityName));
+                GetAbilityLevelCooldownReduction(weaponName, abilityName));
+        }
+
+        public void SyncAbilityCooldowns(Weapon weapon)
+        {
+            foreach (ActionClip ability in weapon.GetAbilities())
+            {
+                weapon.PermanentlyReduceAbilityCooldownTime(ability, GetAbilityLevelCooldownReduction(weapon.name, ability.name));
+            }
         }
 
         [Rpc(SendTo.Server)]
