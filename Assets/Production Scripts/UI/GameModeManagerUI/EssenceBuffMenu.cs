@@ -40,13 +40,18 @@ namespace Vi.UI
             SessionProgressionHandler sessionProgressionHandler = actionMapHandler.GetComponent<SessionProgressionHandler>();
             essenceCountText.text = sessionProgressionHandler.Essences.ToString();
 
+            bool allNotInteractable = true;
             foreach (GameModeManager.EssenceBuffOption essenceBuffOption in GameModeManager.Singleton.EssenceBuffOptions.OrderBy(i => Guid.NewGuid()).Take(3))
             {
                 EssenceBuffOption instance = Instantiate(essenceBuffOptionPrefab.gameObject, essenceBuffOptionParent).GetComponent<EssenceBuffOption>();
                 instance.Initialize(this, sessionProgressionHandler, essenceBuffOption, indexCrosswalk[essenceBuffOption]);
                 instances.Add(instance);
+
+                if (instance.IsInteractable()) { allNotInteractable = false; }
             }
-            canvas.enabled = true;
+
+            if (allNotInteractable) { CloseMenu(); }
+            else { canvas.enabled = true; }
         }
 
         public void OnEssenceBuffOptionSelected(int essenceBuffOptionIndex)
@@ -57,10 +62,13 @@ namespace Vi.UI
 
                 essenceCountText.text = newEssenceCount.ToString();
 
+                bool allNotInteractable = true;
                 foreach (EssenceBuffOption instance in instances)
                 {
-                    instance.Refresh(newEssenceCount);
+                    if (instance.Refresh(newEssenceCount, essenceBuffOptionIndex)) { allNotInteractable = false; }
                 }
+
+                if (allNotInteractable) { CloseMenu(); }
             }
             else
             {
@@ -92,6 +100,11 @@ namespace Vi.UI
                     actionMapHandler.SetExternalUI(null);
                 }
             }
+        }
+
+        private void OnPause()
+        {
+            CloseMenu();
         }
     }
 }

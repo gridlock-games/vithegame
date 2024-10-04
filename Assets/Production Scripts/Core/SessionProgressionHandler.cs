@@ -144,7 +144,7 @@ namespace Vi.Core
             }
         }
 
-        private const float buffDuration = 40;
+        private const float buffDuration = 60;
 
         [Rpc(SendTo.Server)]
         private void RedeemEssenceBuffRpc(int essenceBuffIndex)

@@ -138,7 +138,7 @@ namespace Vi.Player
         {
             if (ExternalUI)
             {
-                ExternalUI.SendMessage("OnPause");
+                ExternalUI.SendMessage("OnPause", SendMessageOptions.DontRequireReceiver);
                 return;
             }
             if (textChatIsOpen)

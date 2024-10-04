@@ -15,9 +15,11 @@ namespace Vi.UI
         [SerializeField] private Text requiredEssenceCountText;
 
         private GameModeManager.EssenceBuffOption essenceBuffOption;
+        private int essenceBuffIndex;
         public void Initialize(EssenceBuffMenu menu, SessionProgressionHandler sessionProgressionHandler, GameModeManager.EssenceBuffOption essenceBuffOption, int essenceBuffIndex)
         {
             this.essenceBuffOption = essenceBuffOption;
+            this.essenceBuffIndex = essenceBuffIndex;
 
             titleText.text = essenceBuffOption.title;
             descriptionText.text = essenceBuffOption.description;
@@ -33,6 +35,11 @@ namespace Vi.UI
             button.onClick.AddListener(() => ApplyBuffOption(menu, sessionProgressionHandler, essenceBuffIndex));
         }
 
+        public bool IsInteractable()
+        {
+            return GetComponent<Button>().interactable;
+        }
+
         private void ApplyBuffOption(EssenceBuffMenu menu, SessionProgressionHandler sessionProgressionHandler, int essenceBuffIndex)
         {
             sessionProgressionHandler.RedeemEssenceBuff(essenceBuffIndex);
@@ -40,10 +47,19 @@ namespace Vi.UI
             menu.OnEssenceBuffOptionSelected(essenceBuffIndex);
         }
 
-        public void Refresh(int newEssenceCount)
+        public bool Refresh(int newEssenceCount, int selectedEssenceBuffIndex)
         {
             requiredEssenceCountText.color = newEssenceCount < essenceBuffOption.requiredEssenceCount ? Color.red : Color.white;
-            GetComponent<Button>().interactable = newEssenceCount >= essenceBuffOption.requiredEssenceCount;
+            Button button = GetComponent<Button>();
+            if (essenceBuffIndex == selectedEssenceBuffIndex)
+            {
+                button.interactable = essenceBuffOption.stackable & newEssenceCount >= essenceBuffOption.requiredEssenceCount;
+            }
+            else
+            {
+                button.interactable = newEssenceCount >= essenceBuffOption.requiredEssenceCount;
+            }
+            return button.interactable;
         }
     }
 }

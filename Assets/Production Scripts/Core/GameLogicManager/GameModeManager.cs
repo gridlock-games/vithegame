@@ -1213,10 +1213,11 @@ namespace Vi.Core.GameModeManagers
             public Color iconColor;
             public Sprite iconSprite;
             public int requiredEssenceCount;
+            public bool stackable;
 
             public bool Equals(EssenceBuffOption other)
             {
-                return title == other.title & description == other.description & iconColor == other.iconColor & iconSprite == other.iconSprite & requiredEssenceCount == other.requiredEssenceCount;
+                return title == other.title & description == other.description & iconColor == other.iconColor & iconSprite == other.iconSprite & requiredEssenceCount == other.requiredEssenceCount & stackable == other.stackable;
             }
         }
     }
