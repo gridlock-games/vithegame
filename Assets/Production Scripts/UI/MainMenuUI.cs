@@ -288,7 +288,6 @@ namespace Vi.UI
             Debug.Log("Logging in with Steam");
             dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.steam);
             openDialogue("Steam");
-            SteamUserAccountData suad;
             SteamAuthentication.Auth((success, error, tokenData, steamuserAccountData, steamusername) =>
             {
                 if (success)
@@ -296,8 +295,8 @@ namespace Vi.UI
                     Debug.Log("Success");
                     updateSteamData(tokenData, steamuserAccountData, steamusername);
 
-              //StartCoroutine(WaitForSteamAuth(tokenData, steamuserAccountData, steamusername));
-          }
+                    //StartCoroutine(WaitForSteamAuth(tokenData, steamuserAccountData, steamusername));
+                }
                 else
                 {
                     Debug.LogError("Steam sign in error - " + error);
@@ -726,8 +725,10 @@ namespace Vi.UI
             initialParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
         }
 
+        private bool isAutomaticallyLoggingIn;
         private IEnumerator AutomaticallyAttemptLogin()
         {
+            isAutomaticallyLoggingIn = true;
             yield return new WaitUntil(() => WebRequestManager.Singleton.GameIsUpToDate);
 
             if (FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
@@ -765,6 +766,7 @@ namespace Vi.UI
                         break;
                 }
             }
+            isAutomaticallyLoggingIn = false;
         }
 
         private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
@@ -793,7 +795,22 @@ namespace Vi.UI
 
         private void Update()
         {
-            loginMethodText.text = WebRequestManager.Singleton.IsCheckingGameVersion ? "Checking Game Version..." : WebRequestManager.Singleton.IsLoggingIn ? "Logging In..." : "Please Select Login Method";
+            if (WebRequestManager.Singleton.IsCheckingGameVersion)
+            {
+                loginMethodText.text = "Checking Game Version...";
+            }
+            else if (isAutomaticallyLoggingIn)
+            {
+                loginMethodText.text = "Logging In...";
+            }
+            else if (WebRequestManager.Singleton.IsLoggingIn)
+            {
+                loginMethodText.text = "Logging In...";
+            }
+            else
+            {
+                loginMethodText.text = "Please Select Login Method";
+            }
 
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
@@ -819,7 +836,7 @@ namespace Vi.UI
             forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
-                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion;
+                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion & !isAutomaticallyLoggingIn;
             }
 
             if (!initialParent.activeSelf)
