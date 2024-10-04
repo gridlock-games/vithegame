@@ -107,6 +107,7 @@ namespace Vi.Core
                     if (servers.Exists(item => item.ip == localhostIP))
                     {
                         HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
+                        if (HubServers.Length == 0) { HubServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray(); }
                         LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
                     }
                     else
