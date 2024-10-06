@@ -223,32 +223,17 @@ namespace Vi.Core
             if (downloadsSuccessful)
             {
                 headerText.text = "Loading Main Menu";
-
-                AsyncOperationHandle<SceneInstance> handle;
+                yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
                 try
                 {
-                    handle = Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Single);
-                    handle.ReleaseHandleOnCompletion();
-                    
+                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
                 }
                 catch
                 {
                     headerText.text = "Could Not Load Main Menu";
                     yield break;
                 }
-
-                while (true)
-                {
-                    if (!handle.IsValid() | handle.IsDone)
-                    {
-                        downloadProgressBarImage.fillAmount = 1;
-                        break;
-                    }
-
-                    downloadProgressBarImage.fillAmount = handle.PercentComplete;
-
-                    yield return null;
-                }
+                SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
             }
             else
             {
