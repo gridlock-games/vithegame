@@ -658,11 +658,6 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.DeleteKey("AccountName");
         }
 
-        public void ForgotPassword()
-        {
-            Debug.LogError("Not implemented yet!");
-        }
-
         private FirebaseAuth auth;
 
         private void Start()
@@ -869,6 +864,22 @@ namespace Vi.UI
                 //Change logic here that would handle scenario where the player is host.
                 PlatformRichPresence.instance.UpdatePlatformStatus("Logging to Vi", "Login Menu");
             }
+        }
+
+        public void OpenViDiscord()
+        {
+            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
+        }
+
+        // Used for forgot password button
+        public void EnableGameObject(GameObject target)
+        {
+            target.SetActive(true);
+        }
+
+        public void DisableGameObject(GameObject target)
+        {
+            target.SetActive(false);
         }
     }
 }
