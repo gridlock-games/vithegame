@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Analytics;
 using Vi.Utility;
+using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Vi.Core
 {
@@ -223,13 +224,30 @@ namespace Vi.Core
             {
                 headerText.text = "Loading Main Menu";
 
+                AsyncOperationHandle<SceneInstance> handle;
                 try
                 {
-                    Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Single);
+                    handle = Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Single);
+                    handle.ReleaseHandleOnCompletion();
+                    
                 }
                 catch
                 {
                     headerText.text = "Could Not Load Main Menu";
+                    yield break;
+                }
+
+                while (true)
+                {
+                    if (!handle.IsValid() | handle.IsDone)
+                    {
+                        downloadProgressBarImage.fillAmount = 1;
+                        break;
+                    }
+
+                    downloadProgressBarImage.fillAmount = handle.PercentComplete;
+
+                    yield return null;
                 }
             }
             else
