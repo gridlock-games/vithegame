@@ -230,6 +230,7 @@ namespace Vi.Core
                     if (handle.IsDone)
                     {
                         downloadProgressBarImage.fillAmount = 0;
+                        downloadProgressBarText.text = "100%";
                         break;
                     }
                     downloadProgressBarImage.fillAmount = handle.PercentComplete;
