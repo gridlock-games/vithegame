@@ -78,9 +78,27 @@ namespace Vi.UI
             leftScoreText.text = gameModeManager.GetLeftScoreString();
             rightScoreText.text = gameModeManager.GetRightScoreString();
 
+            UpdateDiscordRichPresence();
+        }
+
+        protected virtual void UpdateDiscordRichPresence()
+        {
             if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
             {
-                DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), "Score string");
+                string scoreString = null;
+                if (!string.IsNullOrWhiteSpace(leftScoreText.text) & !string.IsNullOrWhiteSpace(rightScoreText.text))
+                {
+                    scoreString = leftScoreText.text + " | " + rightScoreText.text;
+                }
+                else if (!string.IsNullOrWhiteSpace(leftScoreText.text))
+                {
+                    scoreString = leftScoreText.text;
+                }
+                else if (!string.IsNullOrWhiteSpace(rightScoreText.text))
+                {
+                    scoreString = rightScoreText.text;
+                }
+                DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), scoreString);
             }
         }
 

@@ -41,6 +41,13 @@ namespace Vi.UI
             }
         }
 
+        protected override void UpdateDiscordRichPresence()
+        {
+            string scoreString = null;
+            if (hordeModeManager) { scoreString = "Waves Completed: " + hordeModeManager.GetWavesCompleted(); }
+            DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), scoreString);
+        }
+
         private int lastRoundCount = -1;
         private int lastWavesCompleted = -1;
 

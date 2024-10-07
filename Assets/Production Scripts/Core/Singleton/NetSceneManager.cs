@@ -146,7 +146,8 @@ namespace Vi.Core
                     DiscordManager.UpdateActivity(null, "At " + associatedScenePayload.name);
                     break;
                 case SceneType.SynchronizedUI:
-                    DiscordManager.UpdateActivity(null, "At " + associatedScenePayload.name);
+                    DiscordManager.UpdateActivity("In " + associatedScenePayload.name + " (" + PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count + " Players)",
+                        PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()));
                     break;
                 case SceneType.Gameplay:
                     if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)

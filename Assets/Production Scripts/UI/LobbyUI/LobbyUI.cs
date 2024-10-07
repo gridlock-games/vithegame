@@ -704,6 +704,8 @@ namespace Vi.UI
 
             if (lastPlayersString != playersString)
             {
+                UpdateRichPresence();
+
                 RefreshPlayerCards();
                 if (IsServer & dataString != lastDataString)
                 {
@@ -732,9 +734,15 @@ namespace Vi.UI
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
                 RefreshGameMode(false);
+                UpdateRichPresence();
             }
 
             gameModeText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
+
+            if (mapText.text != PlayerDataManager.Singleton.GetMapName())
+            {
+                UpdateRichPresence();
+            }
             mapText.text = PlayerDataManager.Singleton.GetMapName();
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
@@ -1055,15 +1063,10 @@ namespace Vi.UI
             }
         }
 
-        //public void HandlePlatformAPI()
-        //{
-
-        //  //Rich presence
-        //  if (PlatformRichPresence.instance != null)
-        //  {
-        //    //Change logic here that would handle scenario where the player is host.
-        //    PlatformRichPresence.instance.UpdatePlatformStatus("At Lobby", "Waiting for the game to start", "[Host Selected Mode] - [Total Number of rounds]");
-        //  }
-        //}
+        private void UpdateRichPresence()
+        {
+            DiscordManager.UpdateActivity("In Lobby (" + PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count + " of " + PlayerDataManager.Singleton.GetMaxPlayersForMap() + " Players)",
+                        PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " | " + PlayerDataManager.Singleton.GetMapName());
+        }
     }
 }

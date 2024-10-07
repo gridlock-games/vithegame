@@ -20,7 +20,7 @@ namespace Vi.Core
                 Details = details,
                 Assets = {
                     LargeImage = "app-logo",
-                    //LargeText = state,
+                    LargeText = details,
                     //SmallImage = "app-logo",
                     //SmallText = details
                 },
