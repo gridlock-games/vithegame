@@ -10,6 +10,7 @@ namespace Vi.Core
     {
         public static void UpdateActivity(string state, string details)
         {
+            if (discord == null) { return; }
             if (!canRun) { return; }
 
             // Create a new activity
@@ -43,6 +44,7 @@ namespace Vi.Core
 
         private static void ClearActivity()
         {
+            if (discord == null) { return; }
             if (!canRun) { return; }
 
             ActivityManager activityManager = discord.GetActivityManager();
@@ -62,14 +64,17 @@ namespace Vi.Core
         private const long CLIENT_ID = 1292647294285643836;
 
 		void Start()
-		{
-			discord = new Discord.Discord(CLIENT_ID, (ulong)CreateFlags.NoRequireDiscord);
+        {
+#if !UNITY_SERVER
+            discord = new Discord.Discord(CLIENT_ID, (ulong)CreateFlags.NoRequireDiscord);
             startTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+#endif
         }
 
         private static bool canRun = true;
         private void Update()
         {
+            if (discord == null) { return; }
             if (!canRun) { return; }
 
             try
@@ -85,6 +90,7 @@ namespace Vi.Core
 
         private void OnApplicationQuit()
         {
+            if (discord == null) { return; }
             if (!canRun) { return; }
 
             ClearActivity();
