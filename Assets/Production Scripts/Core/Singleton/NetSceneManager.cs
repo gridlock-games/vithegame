@@ -143,19 +143,19 @@ namespace Vi.Core
             switch (associatedScenePayload.sceneType)
             {
                 case SceneType.LocalUI:
-                    DiscordManager.UpdateActivity("At " + associatedScenePayload.name);
+                    DiscordManager.UpdateActivity(null, "At " + associatedScenePayload.name);
                     break;
                 case SceneType.SynchronizedUI:
-                    DiscordManager.UpdateActivity("At " + associatedScenePayload.name);
+                    DiscordManager.UpdateActivity(null, "At " + associatedScenePayload.name);
                     break;
                 case SceneType.Gameplay:
-                    if (GameModeManager.Singleton)
+                    if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
                     {
-                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), GameModeManager.Singleton.GetOneLineScoreString());
+                        DiscordManager.UpdateActivity("In " + associatedScenePayload.name, null);
                     }
                     else
                     {
-                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()));
+                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), null);
                     }
                     break;
                 case SceneType.Environment:

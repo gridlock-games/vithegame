@@ -8,7 +8,7 @@ namespace Vi.Core
 {
 	public class DiscordManager : MonoBehaviour
     {
-        public static void UpdateActivity(string state, string details = null)
+        public static void UpdateActivity(string state, string details)
         {
             // Create a new activity
             // SmallText and LargeText are hover text elements for the images you pass in

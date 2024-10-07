@@ -77,6 +77,11 @@ namespace Vi.UI
         {
             leftScoreText.text = gameModeManager.GetLeftScoreString();
             rightScoreText.text = gameModeManager.GetRightScoreString();
+
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+            {
+                DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), "Score string");
+            }
         }
 
         private void RefreshStatus()
