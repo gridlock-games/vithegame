@@ -1220,5 +1220,10 @@ namespace Vi.Core.GameModeManagers
                 return title == other.title & description == other.description & iconColor == other.iconColor & iconSprite == other.iconSprite & requiredEssenceCount == other.requiredEssenceCount & stackable == other.stackable;
             }
         }
+
+        public virtual string GetOneLineScoreString()
+        {
+            return null;
+        }
     }
 }

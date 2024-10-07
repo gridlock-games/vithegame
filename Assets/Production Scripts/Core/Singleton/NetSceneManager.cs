@@ -9,6 +9,7 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 using System.Linq;
 using Vi.Utility;
 using UnityEngine.Events;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -137,12 +138,35 @@ namespace Vi.Core
         private void SceneHandleLoaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             // If this scene is part of an environment scene payload
-            if (System.Array.Exists(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name) & scenePayload.sceneType == SceneType.Environment))
+            ScenePayload associatedScenePayload = System.Array.Find(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name));
+
+            switch (associatedScenePayload.sceneType)
             {
-                if (SceneManager.GetActiveScene() != sceneHandle.Result.Scene)
-                {
-                    SceneManager.SetActiveScene(sceneHandle.Result.Scene);
-                }
+                case SceneType.LocalUI:
+                    DiscordManager.UpdateActivity("At " + associatedScenePayload.name);
+                    break;
+                case SceneType.SynchronizedUI:
+                    DiscordManager.UpdateActivity("At " + associatedScenePayload.name);
+                    break;
+                case SceneType.Gameplay:
+                    if (GameModeManager.Singleton)
+                    {
+                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), GameModeManager.Singleton.GetOneLineScoreString());
+                    }
+                    else
+                    {
+                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()));
+                    }
+                    break;
+                case SceneType.Environment:
+                    if (SceneManager.GetActiveScene() != sceneHandle.Result.Scene)
+                    {
+                        SceneManager.SetActiveScene(sceneHandle.Result.Scene);
+                    }
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle scene type " + associatedScenePayload.sceneType);
+                    break;
             }
 
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
