@@ -3455,7 +3455,6 @@ GameObject:
   - component: {fileID: 1563227359098940248}
   - component: {fileID: 156064236195362540}
   - component: {fileID: 3236510906858396090}
-  - component: {fileID: 4953534693916984557}
   m_Layer: 5
   m_Name: UpgradeIcon
   m_TagString: Untagged
@@ -3563,41 +3562,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 156064236195362540}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
---- !u!114 &4953534693916984557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 648086667263530929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a970316557296394f8bafd54de9dab4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onPointerDown:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7062514562923407540}
         m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability1
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  onPointerUp:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability1
-        m_Mode: 6
+        m_MethodName: UpgradeAbility1
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3606,9 +3575,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  whilePointerPressed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &717720337097954089
 GameObject:
   m_ObjectHideFlags: 0
@@ -3866,7 +3832,6 @@ GameObject:
   - component: {fileID: 5869822113615845436}
   - component: {fileID: 80875546371169227}
   - component: {fileID: 4424855243196007800}
-  - component: {fileID: 1361944134663456188}
   m_Layer: 5
   m_Name: UpgradeIcon
   m_TagString: Untagged
@@ -3974,41 +3939,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 80875546371169227}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1361944134663456188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196596937497115874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a970316557296394f8bafd54de9dab4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onPointerDown:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7062514562923407540}
         m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability3
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  onPointerUp:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability3
-        m_Mode: 6
+        m_MethodName: UpgradeAbility3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -4017,9 +3952,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  whilePointerPressed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1261820042609325003
 GameObject:
   m_ObjectHideFlags: 0
@@ -4920,6 +4852,10 @@ MonoBehaviour:
     type: 3}
   openTextChatButton: {fileID: 8978807710316110678}
   textChatMessageNumberText: {fileID: 6352875043665942195}
+  upgradeAbility1Image: {fileID: 156064236195362540}
+  upgradeAbility2Image: {fileID: 3304830361347522377}
+  upgradeAbility3Image: {fileID: 80875546371169227}
+  upgradeAbility4Image: {fileID: 7101378010486669570}
   aliveUIChildCanvases:
   - {fileID: 1563455796112825708}
   - {fileID: 5714880452247409252}
@@ -8648,7 +8584,6 @@ GameObject:
   - component: {fileID: 4008744680531557821}
   - component: {fileID: 3304830361347522377}
   - component: {fileID: 1860157501024091636}
-  - component: {fileID: 2138647118571063814}
   m_Layer: 5
   m_Name: UpgradeIcon
   m_TagString: Untagged
@@ -8756,41 +8691,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3304830361347522377}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
---- !u!114 &2138647118571063814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6385505261750386339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a970316557296394f8bafd54de9dab4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onPointerDown:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7062514562923407540}
         m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability2
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  onPointerUp:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability2
-        m_Mode: 6
+        m_MethodName: UpgradeAbility2
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -8799,9 +8704,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  whilePointerPressed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &6548516312016021084
 GameObject:
   m_ObjectHideFlags: 0
@@ -9933,7 +9835,6 @@ GameObject:
   - component: {fileID: 5901214071720657474}
   - component: {fileID: 7101378010486669570}
   - component: {fileID: 4949383972659299836}
-  - component: {fileID: 5501041693661905192}
   m_Layer: 5
   m_Name: UpgradeIcon
   m_TagString: Untagged
@@ -10041,41 +9942,11 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7101378010486669570}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
---- !u!114 &5501041693661905192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8190393507275162740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a970316557296394f8bafd54de9dab4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onPointerDown:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7062514562923407540}
         m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability4
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  onPointerUp:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: Ability4
-        m_Mode: 6
+        m_MethodName: UpgradeAbility4
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -10084,9 +9955,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  whilePointerPressed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &8364342373343631008
 GameObject:
   m_ObjectHideFlags: 0
