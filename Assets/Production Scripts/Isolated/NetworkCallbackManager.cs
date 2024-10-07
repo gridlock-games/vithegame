@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.Utility;
 using System.Linq;
 using Vi.Core;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Isolated
 {
@@ -27,14 +28,20 @@ namespace Vi.Isolated
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             CreatePlayerDataManager(false);
             CreateNetSceneManager();
-            
-            NetSceneManager.Singleton.LoadScene("Main Menu");
+
+            StartCoroutine(LoadMainMenu());
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.OnServerStopped += OnServerStopped;
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
+        }
+
+        private IEnumerator LoadMainMenu()
+        {
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
+            NetSceneManager.Singleton.LoadScene("Main Menu");
         }
 
         private void CreatePlayerDataManager(bool forceRefresh)

@@ -87,6 +87,8 @@ namespace Vi.Utility
 
         private void PoolInitialObjects(Scene scene)
         {
+            if (SceneManager.GetActiveScene().name == "Initialization") { return; }
+
             foreach (PooledObject pooledObject in pooledObjectList.GetPooledObjects())
             {
                 while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool())
@@ -138,6 +140,7 @@ namespace Vi.Utility
 
         private static void SpawnObjectForInitialPool(PooledObject objectToSpawn)
         {
+            if (!objectToSpawn) { Debug.LogError("Pooled object is null while trying to spawn it for initial pool!"); return; }
             if (objectToSpawn.GetPooledObjectIndex() == -1) { Debug.LogError(objectToSpawn + " isn't registered in the pooled object list!"); return; }
 
             objectToSpawn.SetIsPrewarmStatus(true);
