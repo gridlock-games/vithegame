@@ -10,6 +10,8 @@ namespace Vi.Core
     {
         public static void UpdateActivity(string state, string details)
         {
+            if (!canRun) { return; }
+
             // Create a new activity
             // SmallText and LargeText are hover text elements for the images you pass in
             Activity activity = new Activity
@@ -34,20 +36,22 @@ namespace Vi.Core
             {
                 if (res != Result.Ok)
                 {
-                    Debug.LogError("Discord error " + res);
+                    Debug.LogError("Discord error while updating activity " + res);
                 }
             });
         }
 
         private static void ClearActivity()
         {
+            if (!canRun) { return; }
+
             ActivityManager activityManager = discord.GetActivityManager();
             // Clear the current activity
             activityManager.ClearActivity((res) =>
             {
                 if (res != Result.Ok)
                 {
-                    Debug.LogError("Discord error " + res);
+                    Debug.LogError("Discord error while clearing activity " + res);
                 }
             });
         }
@@ -63,13 +67,26 @@ namespace Vi.Core
             startTime = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         }
 
+        private static bool canRun = true;
         private void Update()
         {
-            discord.RunCallbacks();
+            if (!canRun) { return; }
+
+            try
+            {
+                discord.RunCallbacks();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Discord Error - " + e);
+                canRun = false;
+            }
         }
 
         private void OnApplicationQuit()
         {
+            if (!canRun) { return; }
+
             ClearActivity();
             discord.RunCallbacks();
         }
