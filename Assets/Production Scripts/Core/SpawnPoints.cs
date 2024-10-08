@@ -141,13 +141,13 @@ namespace Vi.Core
             if (possibleSpawnPoints.Count == 0) { Debug.LogError("Possible spawn point count is 0! - Game mode: " + gameMode + " - Team: " + team); }
 
             List<(float, TransformData, int)> verifiedSpawnPoints = new List<(float, TransformData, int)>();
-            List<Attributes> activePlayerObjects = PlayerDataManager.Singleton.GetActivePlayerObjects(attributesToExcludeInLogic);
+            List<CombatAgent> activeCombatAgents = PlayerDataManager.Singleton.GetActiveCombatAgents(attributesToExcludeInLogic);
             foreach ((int spawnPriority, TransformData transformData) in possibleSpawnPoints)
             {
                 float minDistance = Mathf.Infinity;
-                foreach (Attributes attributes in activePlayerObjects)
+                foreach (CombatAgent combatAgent in activeCombatAgents)
                 {
-                    float distance = Vector3.Distance(attributes.MovementHandler.GetPosition(), transformData.position);
+                    float distance = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), transformData.position);
                     if (distance < minDistance) { minDistance = distance; }
                 }
                 verifiedSpawnPoints.Add((minDistance, transformData, spawnPriority));
@@ -210,7 +210,7 @@ namespace Vi.Core
             {
                 if (spawnPoint.gameModes.Contains(gameMode) & spawnPoint.teams.Contains(team))
                 {
-                    findMostClearSpawnPoint = spawnPoint.findMostClearSpawnPoint;
+                    findMostClearSpawnPoint = gameMode == PlayerDataManager.GameMode.FreeForAll;
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         if (i < spawnPoint.spawnPriorities.Length)
@@ -228,7 +228,6 @@ namespace Vi.Core
         {
             public PlayerDataManager.GameMode[] gameModes;
             public PlayerDataManager.Team[] teams;
-            public bool findMostClearSpawnPoint = true;
             public Vector3[] spawnPositions = new Vector3[0];
             public Vector3[] spawnRotations = new Vector3[0];
             public int[] spawnPriorities = new int[0];
