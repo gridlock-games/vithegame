@@ -30,7 +30,7 @@ namespace Vi.Core.MovementHandlers
         protected override void Update()
         {
             base.Update();
-            if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death & CanMove())
             {
                 transform.position = Rigidbody.transform.position;
                 transform.rotation = EvaluateRotation();
@@ -234,7 +234,13 @@ namespace Vi.Core.MovementHandlers
 
             CalculatePath(Rigidbody.position);
 
-            if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
+            if (!CanMove())
+            {
+                transform.position = Rigidbody.position;
+                Rigidbody.Sleep();
+                return;
+            }
+            else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 Rigidbody.Sleep();
                 return;
