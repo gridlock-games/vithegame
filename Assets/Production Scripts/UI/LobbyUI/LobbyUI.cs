@@ -300,22 +300,41 @@ namespace Vi.UI
             // Even out teams
             if (IsServer & !calledFromInit)
             {
-                Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
-                foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
-                {
-                    teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
-                }
-
+                // Check if any team has more than the limit of players
+                Dictionary<PlayerDataManager.Team, int> originalTeamCounts = new Dictionary<PlayerDataManager.Team, int>();
                 foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
-                    PlayerDataManager.PlayerData newPlayerData = playerData;
-                    // Get the team with the lowest player count
-                    newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
+                    if (originalTeamCounts.ContainsKey(playerData.team))
+                    {
+                        originalTeamCounts[playerData.team]++;
+                    }
+                    else
+                    {
+                        originalTeamCounts.Add(playerData.team, 1);
+                    }
+                }
 
-                    PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+                // If there is a player data element that is on a team other than the possible teams
+                if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Exists(item => !possibleTeams.Contains(item.team))
+                    | originalTeamCounts.Any(item => item.Value > PlayerDataManager.Singleton.GetMaxPlayersForMap() / possibleTeams.Length))
+                {
+                    Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
+                    foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
+                    {
+                        teamCounts.Add(possibleTeam, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Where(item => item.team == possibleTeam).ToArray().Length);
+                    }
 
-                    if (teamCounts.ContainsKey(playerData.team)) { teamCounts[playerData.team]--; }
-                    teamCounts[newPlayerData.team]++;
+                    foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                    {
+                        PlayerDataManager.PlayerData newPlayerData = playerData;
+                        // Get the team with the lowest player count
+                        newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
+
+                        PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+
+                        if (teamCounts.ContainsKey(playerData.team)) { teamCounts[playerData.team]--; }
+                        teamCounts[newPlayerData.team]++;
+                    }
                 }
             }
 
