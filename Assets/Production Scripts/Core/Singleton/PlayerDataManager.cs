@@ -1457,8 +1457,8 @@ namespace Vi.Core
             }
 
             yield return null;
+            //yield return new WaitUntil(() => netObj.IsSpawned);
 
-            //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;
             spawnPlayerRunning = false;

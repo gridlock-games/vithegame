@@ -57,7 +57,10 @@ namespace Vi.UI
             }
             else
             {
-                button.interactable = newEssenceCount >= essenceBuffOption.requiredEssenceCount;
+                if (button.interactable)
+                {
+                    button.interactable = newEssenceCount >= essenceBuffOption.requiredEssenceCount;
+                }
             }
             return button.interactable;
         }
