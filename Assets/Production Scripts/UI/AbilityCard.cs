@@ -17,6 +17,7 @@ namespace Vi.UI
         [SerializeField] private Image upgradeIcon;
         [SerializeField] private RectTransform upgradeIconActivePosition;
         [SerializeField] private RectTransform upgradeIconInactivePosition;
+        [SerializeField] private Animator upgradeAnimationImage;
 
         public ActionClip Ability { get; private set; }
 
@@ -63,6 +64,7 @@ namespace Vi.UI
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
 
+        private int lastAbilityLevel = -1;
         private void Update()
         {
             if (Ability == null) { return; }
@@ -97,6 +99,16 @@ namespace Vi.UI
             {
                 borderImage.color = Color.red;
             }
+
+            int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
+            if (abilityLevel != lastAbilityLevel)
+            {
+                upgradeAnimationImage.Play("AbilityCardUpgradeAnimation", 0, 0);
+                AudioManager.Singleton.Play2DClip(gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
+            }
+            lastAbilityLevel = abilityLevel;
         }
+
+        [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;
     }
 }
