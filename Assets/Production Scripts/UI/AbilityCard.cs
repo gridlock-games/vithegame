@@ -67,13 +67,16 @@ namespace Vi.UI
         {
             if (Ability == null) { return; }
 
+            bool canUpgrade = combatAgent.SessionProgressionHandler.CanUpgradeAbility(Ability, combatAgent.WeaponHandler.GetWeapon());
             upgradeIcon.rectTransform.position = Vector3.Lerp(upgradeIcon.transform.position,
-                combatAgent.SessionProgressionHandler.SkillPoints > 0 ? upgradeIconActivePosition.position : upgradeIconInactivePosition.position,
+                canUpgrade ? upgradeIconActivePosition.position : upgradeIconInactivePosition.position,
                 Time.deltaTime * 4);
+
+            upgradeIcon.raycastTarget = canUpgrade;
 
             if (GameModeManager.Singleton.LevelingEnabled)
             {
-                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == 0)
+                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
                 {
                     borderImage.color = originalBorderImageColor;
                     cooldownText.text = "";

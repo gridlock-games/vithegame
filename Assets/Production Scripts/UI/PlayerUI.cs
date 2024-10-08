@@ -242,37 +242,33 @@ namespace Vi.UI
             attributes.WeaponHandler.Ability4(isPressed);
         }
 
-        [SerializeField] private Image upgradeAbility1Image;
         public void UpgradeAbility1()
         {
-            if (attributes.SessionProgressionHandler.SkillPoints > 0)
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility1(), attributes.WeaponHandler.GetWeapon()))
             {
                 attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility1());
             }
         }
 
-        [SerializeField] private Image upgradeAbility2Image;
         public void UpgradeAbility2()
         {
-            if (attributes.SessionProgressionHandler.SkillPoints > 0)
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility2(), attributes.WeaponHandler.GetWeapon()))
             {
                 attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility2());
             }
         }
 
-        [SerializeField] private Image upgradeAbility3Image;
         public void UpgradeAbility3()
         {
-            if (attributes.SessionProgressionHandler.SkillPoints > 0)
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility3(), attributes.WeaponHandler.GetWeapon()))
             {
                 attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility3());
             }
         }
 
-        [SerializeField] private Image upgradeAbility4Image;
         public void UpgradeAbility4()
         {
-            if (attributes.SessionProgressionHandler.SkillPoints > 0)
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility4(), attributes.WeaponHandler.GetWeapon()))
             {
                 attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility4());
             }
@@ -637,11 +633,6 @@ namespace Vi.UI
         private int moveTouchId;
         private void Update()
         {
-            upgradeAbility1Image.raycastTarget = attributes.SessionProgressionHandler.SkillPoints > 0;
-            upgradeAbility2Image.raycastTarget = attributes.SessionProgressionHandler.SkillPoints > 0;
-            upgradeAbility3Image.raycastTarget = attributes.SessionProgressionHandler.SkillPoints > 0;
-            upgradeAbility4Image.raycastTarget = attributes.SessionProgressionHandler.SkillPoints > 0;
-
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             if (!PlayerDataManager.Singleton.ContainsId(attributes.GetPlayerDataId())) { return; }

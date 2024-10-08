@@ -24,7 +24,7 @@ namespace Vi.Core
         private int CalculateLevel(float experience) { return Mathf.FloorToInt(experience / experienceRequiredToReachNextLevel); }
 
         private const float experienceRequiredToReachNextLevel = 100;
-        private const float maxExperience = 10000;
+        private const float maxExperience = 99800;
 
         private NetworkVariable<float> experience = new NetworkVariable<float>();
 
@@ -32,7 +32,7 @@ namespace Vi.Core
         public float MaxStaminaBonus { get { return Level * 4; } }
         public float MaxSpiritBonus { get { return Level * 4; } }
 
-        public float BaseDamageBonus { get { return Level / 10; } }
+        public float BaseDamageBonus { get { return Level; } }
 
         public void AddExperience(float experienceToAdd)
         {
@@ -163,9 +163,8 @@ namespace Vi.Core
         }
 
         [SerializeField] private VisualEffect levelUpVisualEffect;
-        [SerializeField] private AudioClip levelUpAudioClip;
+        [SerializeField] private AudioClip[] levelUpAudioClips;
 
-        public int SkillPoints { get { return skillPoints.Value; } }
         private NetworkVariable<int> skillPoints = new NetworkVariable<int>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
 
         private void OnExperienceChanged(float prev, float current)
@@ -175,7 +174,7 @@ namespace Vi.Core
                 if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
                 {
                     levelUpVisualEffect.Play();
-                    AudioManager.Singleton.PlayClipOnTransform(transform, levelUpAudioClip, false, 0.5f);
+                    AudioManager.Singleton.PlayClipOnTransform(transform, levelUpAudioClips[Random.Range(0, levelUpAudioClips.Length)], false, 0.5f);
                 }
 
                 if (IsServer)
@@ -230,7 +229,7 @@ namespace Vi.Core
             }
             else
             {
-                return 0;
+                return -1;
             }
         }
 
@@ -261,11 +260,11 @@ namespace Vi.Core
             abilityLevelTracker.Clear();
         }
 
-        private void UpgradeAbilityLocally(string weaponName, string abilityName)
+        private bool UpgradeAbilityLocally(string weaponName, string abilityName)
         {
             if (IsServer)
             {
-                if (skillPoints.Value == 0) { return; }
+                if (skillPoints.Value == 0) { return false; }
                 skillPoints.Value--;
             }
 
@@ -276,11 +275,11 @@ namespace Vi.Core
             }
             else
             {
-                abilityLevelTracker.Add(key, 1);
+                abilityLevelTracker.Add(key, 0);
             }
-
             combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName),
                 GetAbilityLevelCooldownReduction(weaponName, abilityName));
+            return true;
         }
 
         public void SyncAbilityCooldowns(Weapon weapon)
@@ -291,11 +290,18 @@ namespace Vi.Core
             }
         }
 
+        public bool CanUpgradeAbility(ActionClip ability, Weapon weapon)
+        {
+            return skillPoints.Value > 0 & weapon.GetAbilityOffsetDifference(ability) > 0;
+        }
+
         [Rpc(SendTo.Server)]
         private void UpgradeAbilityServerRpc(string weaponName, string abilityName)
         {
-            UpgradeAbilityLocally(weaponName, abilityName);
-            UpgradeAbilityOwnerRpc(weaponName, abilityName);
+            if (UpgradeAbilityLocally(weaponName, abilityName))
+            {
+                UpgradeAbilityOwnerRpc(weaponName, abilityName);
+            }
         }
 
         [Rpc(SendTo.Owner)]
