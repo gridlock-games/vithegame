@@ -31,6 +31,8 @@ namespace Vi.UI
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            borderImage = GetComponent<Image>();
+            combatAgent = GetComponentInParent<CombatAgent>();
         }
 
         public void SetPreviewOn()
@@ -59,10 +61,7 @@ namespace Vi.UI
 
         private void Start()
         {
-            borderImage = GetComponent<Image>();
             originalBorderImageColor = borderImage.color;
-            combatAgent = GetComponentInParent<CombatAgent>();
-
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
 

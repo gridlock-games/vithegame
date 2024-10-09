@@ -92,6 +92,7 @@ namespace Vi.Player
 
         private void OnDisable()
         {
+            externalUI = null;
             if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
             if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
