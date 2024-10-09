@@ -33,7 +33,7 @@ namespace Vi.Utility
             DontDestroyOnLoad(gameObject);
             pooledObjectListInstance = Instantiate(pooledObjectList);
 
-            for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
+            for (int i = 0; i < pooledObjectListInstance.TotalReferenceCount; i++)
             {
                 despawnedObjectPools.Add(new List<PooledObject>());
                 spawnedObjectPools.Add(new List<PooledObject>());
@@ -95,8 +95,11 @@ namespace Vi.Utility
             if (SceneManager.GetActiveScene().name == "Initialization") { return; }
             if (pooledObjectListInstance.LoadCompletedCount != pooledObjectListInstance.TotalReferenceCount) { return; }
 
-            foreach (PooledObject pooledObject in pooledObjectList.GetPooledObjects())
+            for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
             {
+                PooledObject pooledObject = pooledObjectListInstance.GetPooledObjects()[i];
+                if (!pooledObject) { Debug.LogError("Trying to initial pool a null object! Index: " + i); continue; }
+
                 while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool())
                 {
                     SpawnObjectForInitialPool(pooledObject);

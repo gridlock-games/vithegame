@@ -566,6 +566,7 @@ namespace Vi.Core.GameModeManagers
                 nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
             gameOver.OnValueChanged += OnGameOverChanged;
+            Debug.Log("ON NETWORK SPAWN " + this);
         }
 
         public override void OnNetworkDespawn()

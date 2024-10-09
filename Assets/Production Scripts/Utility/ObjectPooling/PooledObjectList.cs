@@ -21,13 +21,32 @@ namespace Vi.Utility
 
         [SerializeField] private List<PooledObjectReference> pooledObjectReferences = new List<PooledObjectReference>();
 
-        private PooledObject[] pooledObjects;
+        private AsyncOperationHandle<PooledObject>[] pooledObjectHandles;
 
-        public List<PooledObject> GetPooledObjects() { return pooledObjects.ToList(); }
+        public List<PooledObject> GetPooledObjects()
+        {
+            List<PooledObject> pooledObjects = new List<PooledObject>();
+            foreach (AsyncOperationHandle<PooledObject> handle in pooledObjectHandles)
+            {
+                if (!handle.IsValid())
+                {
+                    pooledObjects.Add(null);
+                }
+                if (handle.IsDone)
+                {
+                    pooledObjects.Add(handle.Result);
+                }
+                else
+                {
+                    pooledObjects.Add(null);
+                }
+            }
+            return pooledObjects;
+        }
 
         private void Awake()
         {
-            pooledObjects = new PooledObject[pooledObjectReferences.Count];
+            pooledObjectHandles = new AsyncOperationHandle<PooledObject>[pooledObjectReferences.Count];
             for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
                 int var = i;
@@ -41,7 +60,7 @@ namespace Vi.Utility
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
                 handle.Result.SetPooledObjectIndex(index);
-                pooledObjects[index] = handle.Result;
+                pooledObjectHandles[index] = handle;
             }
             else
             {
@@ -63,53 +82,16 @@ namespace Vi.Utility
             return networkPrefabsLists;
         }
 
-        [ContextMenu("Find Unregistered Pooled Objects")]
-        private void FindUnregisteredPooledObjects()
-        {
-            List<string> files = new List<string>();
-            files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
-            files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
-            foreach (string prefabFilePath in files)
-            {
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-                if (!prefab) { continue; }
-                if (prefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (prefab.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        bool contains = false;
-                        foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
-                        {
-                            if (networkPrefabsList.Contains(networkObject.gameObject))
-                            {
-                                contains = true;
-                                break;
-                            }
-                        }
-
-                        if (contains)
-                        {
-                            PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
-                            if (!pooledObjectReferences.Contains(reference)) { Debug.Log(prefabFilePath); }
-                        }
-                    }
-                    else
-                    {
-                        PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
-                        if (!pooledObjectReferences.Contains(reference)) { Debug.Log(prefabFilePath); }
-                    }
-                }
-            }
-        }
-
         [ContextMenu("Add Unregistered Pooled Objects")]
         public void AddUnregisteredPooledObjects()
         {
             List<string> files = new List<string>();
-            files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
-            files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
+            files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
+            //files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
+            //files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
             foreach (string prefabFilePath in files)
             {
+                string guid = AssetDatabase.AssetPathToGUID(prefabFilePath);
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (!prefab) { continue; }
                 if (prefab.TryGetComponent(out PooledObject pooledObject))
@@ -128,9 +110,9 @@ namespace Vi.Utility
 
                         if (contains)
                         {
-                            PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
-                            MakeReferenceAddressable(reference);
-                            if (!pooledObjectReferences.Contains(reference))
+                            PooledObjectReference reference = new PooledObjectReference(guid);
+                            MakeReferenceAddressable(guid, reference);
+                            if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
                             {
                                 Debug.Log(prefabFilePath);
                                 pooledObjectReferences.Add(reference);
@@ -139,9 +121,9 @@ namespace Vi.Utility
                     }
                     else
                     {
-                        PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
-                        MakeReferenceAddressable(reference);
-                        if (!pooledObjectReferences.Contains(reference))
+                        PooledObjectReference reference = new PooledObjectReference(guid);
+                        MakeReferenceAddressable(guid, reference);
+                        if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
                         {
                             Debug.Log(prefabFilePath);
                             pooledObjectReferences.Add(reference);
@@ -151,16 +133,16 @@ namespace Vi.Utility
             }
         }
 
-        private static bool IsAssetAddressable(Object obj)
+        private static bool IsAssetAddressable(string guid)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj)));
+            AddressableAssetEntry entry = settings.FindAssetEntry(guid);
             return entry != null;
         }
 
-        private void MakeReferenceAddressable(PooledObjectReference reference)
+        private void MakeReferenceAddressable(string guid, PooledObjectReference reference)
         {
-            if (IsAssetAddressable(reference.Asset)) { return; }
+            if (IsAssetAddressable(guid)) { return; }
 
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
