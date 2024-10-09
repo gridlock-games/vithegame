@@ -365,34 +365,19 @@ namespace Vi.Player
             if (followTargetOffset.z > 1) { followTargetOffset.z = 1; }
         }
 
-        public ulong GetRoundTripTime() { return roundTripTime.Value; }
-
-        private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
-
         protected override void RefreshStatus()
         {
             base.RefreshStatus();
-            if (IsOwner)
-            {
-                pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
-            }
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             cam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
             cam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
-
-        private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private new void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             base.Update();
-
-            if (IsServer)
-            {
-                if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
-            }
 
             if (!IsLocalPlayer) { return; }
 

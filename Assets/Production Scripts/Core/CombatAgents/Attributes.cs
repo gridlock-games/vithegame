@@ -148,8 +148,6 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
-            RefreshStatus();
-
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
@@ -675,26 +673,9 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        public ulong GetRoundTripTime() { return roundTripTime.Value; }
-
-        private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
-
-        protected void RefreshStatus()
-        {
-            if (IsSpawned & IsOwner)
-            {
-                pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
-            }
-        }
-
-        private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
         protected override void Update()
         {
             base.Update();
-
-            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
-
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -714,8 +695,6 @@ namespace Vi.Core.CombatAgents
                 // Regen for 50 seconds
                 if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
             }
-
-            if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
         private float staminaDelayCooldown;
