@@ -76,7 +76,7 @@ namespace Vi.Utility
         {
             ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
             IsSpawned = false;
-            gameObject.hideFlags = ObjectPoolingManager.hideFlagsForSpawnedObjects;
+            gameObject.hideFlags = HideFlags.None;
         }
 
         private void OnValidate()

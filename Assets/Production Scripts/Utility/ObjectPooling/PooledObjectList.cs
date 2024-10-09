@@ -31,7 +31,7 @@ namespace Vi.Utility
             for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
                 int var = i;
-                pooledObjectReferences[i].LoadAssetAsync().Completed += (handle) => OnInitialObjectLoad(handle, var);
+                //pooledObjectReferences[i].LoadAssetAsync().Completed += (handle) => OnInitialObjectLoad(handle, var);
             }
         }
 

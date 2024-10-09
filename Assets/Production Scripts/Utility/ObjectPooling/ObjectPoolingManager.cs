@@ -12,7 +12,6 @@ namespace Vi.Utility
     {
         public const string cullingOverrideTag = "DoNotCull";
         public const string instantiationSceneName = "Base";
-        public const HideFlags hideFlagsForSpawnedObjects = HideFlags.HideInHierarchy;
 
         [SerializeField] private PooledObjectList pooledObjectList;
 
