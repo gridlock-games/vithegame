@@ -43,6 +43,12 @@ namespace Vi.Utility
 
         private void Start()
         {
+            StartCoroutine(WaitForLoad());
+        }
+
+        private IEnumerator WaitForLoad()
+        {
+            yield return new WaitUntil(() => pooledObjectListInstance.LoadCompletedCount == pooledObjectListInstance.TotalReferenceCount);
             foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
             {
                 if (pooledObject.TryGetComponent(out NetworkObject networkObject))
@@ -88,6 +94,7 @@ namespace Vi.Utility
         private void PoolInitialObjects(Scene scene)
         {
             if (SceneManager.GetActiveScene().name == "Initialization") { return; }
+            if (pooledObjectListInstance.LoadCompletedCount != pooledObjectListInstance.TotalReferenceCount) { return; }
 
             foreach (PooledObject pooledObject in pooledObjectList.GetPooledObjects())
             {

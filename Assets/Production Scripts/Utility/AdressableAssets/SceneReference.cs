@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 using UnityEditor;
 #endif
 
-namespace Vi.Core
+namespace Vi.Utility
 {
     [Serializable]
     public class SceneReference : AssetReference
@@ -18,7 +18,7 @@ namespace Vi.Core
             get { return sceneName; }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public SceneReference(SceneAsset scene)
         : base(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(scene)))
         {
@@ -53,7 +53,6 @@ namespace Vi.Core
                 return false;
             }
         }
-
-    #endif
+#endif
     }
 }

@@ -5,31 +5,66 @@ using System.Linq;
 using System.IO;
 using UnityEditor;
 using Unity.Netcode;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Utility
 {
     [CreateAssetMenu(fileName = "PooledObjectList", menuName = "Production/Pooled Object List")]
     public class PooledObjectList : ScriptableObject
     {
-        [SerializeField] private List<PooledObject> pooledObjects = new List<PooledObject>();
+        public int TotalReferenceCount { get { return pooledObjectReferences.Count; } }
+
+        [SerializeField] private List<PooledObjectReference> pooledObjectReferences = new List<PooledObjectReference>();
+
+        private PooledObject[] pooledObjects;
 
         public List<PooledObject> GetPooledObjects() { return pooledObjects.ToList(); }
 
         private void Awake()
         {
-            for (int i = 0; i < pooledObjects.Count; i++)
+            pooledObjects = new PooledObject[pooledObjectReferences.Count];
+            for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
-                if (pooledObjects[i]) { pooledObjects[i].SetPooledObjectIndex(i); }
+                pooledObjectReferences[i].LoadAssetAsync<PooledObject>().Completed += (handle) => OnInitialObjectLoad(handle, i);
             }
         }
 
+        public int LoadCompletedCount { get; private set; }
+        private void OnInitialObjectLoad(AsyncOperationHandle<PooledObject> handle, int index)
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Debug.Log(handle.Result + " " + index);
+                handle.Result.SetPooledObjectIndex(index);
+                pooledObjects[index] = handle.Result;
+            }
+            else
+            {
+                Debug.LogError("Loading pooled object failed!");
+            }
+            LoadCompletedCount++;
+        }
+
 # if UNITY_EDITOR
+        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
+        static List<NetworkPrefabsList> GetNetworkPrefabsLists()
+        {
+            List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
+            foreach (string listPath in Directory.GetFiles(networkPrefabListFolderPath, "*.asset", SearchOption.AllDirectories))
+            {
+                var prefabsList = AssetDatabase.LoadAssetAtPath<NetworkPrefabsList>(listPath);
+                if (prefabsList) { networkPrefabsLists.Add(prefabsList); }
+            }
+            return networkPrefabsLists;
+        }
+
         [ContextMenu("Find Unregistered Pooled Objects")]
         private void FindUnregisteredPooledObjects()
         {
-            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
-
-            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
+            files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
+            foreach (string prefabFilePath in files)
             {
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (!prefab) { continue; }
@@ -37,45 +72,38 @@ namespace Vi.Utility
                 {
                     if (prefab.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (networkPrefabsList.Contains(prefab))
+                        bool contains = false;
+                        foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
                         {
-                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                            if (networkPrefabsList.Contains(networkObject.gameObject))
+                            {
+                                contains = true;
+                                break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
-                    }
-                }
-            }
 
-            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories))
-            {
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-                if (!prefab) { continue; }
-                if (prefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (prefab.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        if (networkPrefabsList.Contains(prefab))
+                        if (contains)
                         {
-                            if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                            PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                            if (!pooledObjectReferences.Contains(reference)) { Debug.Log(prefabFilePath); }
                         }
                     }
                     else
                     {
-                        if (!pooledObjects.Contains(pooledObject)) { Debug.Log(prefabFilePath); }
+                        PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                        if (!pooledObjectReferences.Contains(reference)) { Debug.Log(prefabFilePath); }
                     }
                 }
             }
         }
 
         [ContextMenu("Add Unregistered Pooled Objects")]
-        private void AddUnregisteredPooledObjects()
+        public void AddUnregisteredPooledObjects()
         {
-            NetworkPrefabsList networkPrefabsList = (NetworkPrefabsList)Selection.activeObject;
-
-            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories))
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
+            files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
+            foreach (string prefabFilePath in files)
             {
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (!prefab) { continue; }
@@ -83,49 +111,33 @@ namespace Vi.Utility
                 {
                     if (prefab.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (networkPrefabsList.Contains(prefab))
+                        bool contains = false;
+                        foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
                         {
-                            if (!pooledObjects.Contains(pooledObject))
+                            if (networkPrefabsList.Contains(networkObject.gameObject))
                             {
-                                Debug.Log(prefabFilePath);
-                                pooledObjects.Add(pooledObject);
+                                contains = true;
+                                break;
                             }
                         }
-                    }
-                    else
-                    {
-                        if (!pooledObjects.Contains(pooledObject))
-                        {
-                            Debug.Log(prefabFilePath);
-                            pooledObjects.Add(pooledObject);
-                        }
-                    }
-                }
-            }
 
-            foreach (string prefabFilePath in Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories))
-            {
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-                if (!prefab) { continue; }
-                if (prefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (prefab.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        if (networkPrefabsList.Contains(prefab))
+                        if (contains)
                         {
-                            if (!pooledObjects.Contains(pooledObject))
+                            PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                            if (!pooledObjectReferences.Contains(reference))
                             {
                                 Debug.Log(prefabFilePath);
-                                pooledObjects.Add(pooledObject);
+                                pooledObjectReferences.Add(reference);
                             }
                         }
                     }
                     else
                     {
-                        if (!pooledObjects.Contains(pooledObject))
+                        PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                        if (!pooledObjectReferences.Contains(reference))
                         {
                             Debug.Log(prefabFilePath);
-                            pooledObjects.Add(pooledObject);
+                            pooledObjectReferences.Add(reference);
                         }
                     }
                 }
@@ -135,14 +147,14 @@ namespace Vi.Utility
         [ContextMenu("Find Duplicates")]
         private void FindDuplicates()
         {
-            pooledObjects.RemoveAll(item => !item);
+            pooledObjectReferences.RemoveAll(item => item == null);
 
-            List<PooledObject> query = pooledObjects.GroupBy(x => x)
+            List<PooledObjectReference> query = pooledObjectReferences.GroupBy(x => x)
               .Where(g => g.Count() > 1)
               .Select(y => y.Key)
               .ToList();
 
-            foreach (PooledObject pooledObject in query)
+            foreach (PooledObjectReference pooledObject in query)
             {
                 Debug.Log(pooledObject);
             }
