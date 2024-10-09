@@ -7,6 +7,11 @@ using UnityEditor;
 using Unity.Netcode;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
+#if UNITY_EDITOR
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
+#endif
+
 namespace Vi.Utility
 {
     [CreateAssetMenu(fileName = "PooledObjectList", menuName = "Production/Pooled Object List")]
@@ -25,7 +30,8 @@ namespace Vi.Utility
             pooledObjects = new PooledObject[pooledObjectReferences.Count];
             for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
-                pooledObjectReferences[i].LoadAssetAsync<PooledObject>().Completed += (handle) => OnInitialObjectLoad(handle, i);
+                int var = i;
+                pooledObjectReferences[i].LoadAssetAsync().Completed += (handle) => OnInitialObjectLoad(handle, var);
             }
         }
 
@@ -34,13 +40,12 @@ namespace Vi.Utility
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                Debug.Log(handle.Result + " " + index);
                 handle.Result.SetPooledObjectIndex(index);
                 pooledObjects[index] = handle.Result;
             }
             else
             {
-                Debug.LogError("Loading pooled object failed!");
+                Debug.LogError("Loading pooled object failed! Index: " + index);
             }
             LoadCompletedCount++;
         }
@@ -124,6 +129,7 @@ namespace Vi.Utility
                         if (contains)
                         {
                             PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                            MakeReferenceAddressable(reference);
                             if (!pooledObjectReferences.Contains(reference))
                             {
                                 Debug.Log(prefabFilePath);
@@ -134,6 +140,7 @@ namespace Vi.Utility
                     else
                     {
                         PooledObjectReference reference = new PooledObjectReference(AssetDatabase.AssetPathToGUID(prefabFilePath));
+                        MakeReferenceAddressable(reference);
                         if (!pooledObjectReferences.Contains(reference))
                         {
                             Debug.Log(prefabFilePath);
@@ -142,6 +149,29 @@ namespace Vi.Utility
                     }
                 }
             }
+        }
+
+        private static bool IsAssetAddressable(Object obj)
+        {
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+            AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj)));
+            return entry != null;
+        }
+
+        private void MakeReferenceAddressable(PooledObjectReference reference)
+        {
+            if (IsAssetAddressable(reference.Asset)) { return; }
+
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+
+            AddressableAssetGroup referenceGroup = settings.FindGroup(item => item.Name == "Assets Production Prefabs Mobs Ogres ");
+            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
+
+            if (!groupToOrganize)
+            {
+                groupToOrganize = settings.CreateGroup("Duplicate Asset Isolation", false, false, false, referenceGroup.Schemas.ToList(), referenceGroup.SchemaTypes.ToArray());
+            }
+            settings.CreateOrMoveEntry(reference.AssetGUID, groupToOrganize);
         }
 
         [ContextMenu("Find Duplicates")]

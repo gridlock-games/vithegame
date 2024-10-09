@@ -2440,6 +2440,7 @@ MonoBehaviour:
     skinnedMeshRenderers:
     - {fileID: 623947084820485759}
   worldSpaceLabelTransformInfo:
+    rendererToFollow: {fileID: 3016371331583155660}
     positionOffsetFromRenderer: {x: 0, y: 0, z: 0.15}
     scaleMultiplier: 1.1
 --- !u!114 &814986204387674719
@@ -2455,8 +2456,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 174
-  isPrewarmObject: 1
+  pooledObjectIndex: 7
+  isPrewarmObject: 0
 --- !u!114 &7494491284798005078
 MonoBehaviour:
   m_ObjectHideFlags: 0

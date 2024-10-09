@@ -19,7 +19,11 @@ namespace Vi.Utility
         public void SetPooledObjectIndex(int index)
         {
             #if UNITY_EDITOR
-            if (index != pooledObjectIndex) { UnityEditor.EditorUtility.SetDirty(this); }
+            if (index != pooledObjectIndex)
+            {
+                Debug.Log("Setting pooled object index: " + index + " " + this);
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
             #endif
             pooledObjectIndex = index;
         }

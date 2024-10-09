@@ -541,8 +541,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyHeightOffset: 2
-  bodyRadius: 0.5
   stoppingDistance: 1
+  navMeshAgentTypeName: Humanoid
 --- !u!114 &4091993530340001571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -592,7 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 108
+  pooledObjectIndex: 77
   isPrewarmObject: 1
 --- !u!114 &7364762670049708735
 MonoBehaviour:

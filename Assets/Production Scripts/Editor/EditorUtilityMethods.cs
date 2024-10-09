@@ -17,13 +17,6 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
-        private static bool IsAssetAddressable(Object obj)
-        {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj)));
-            return entry != null;
-        }
-
         [MenuItem("Tools/Production/Organize Addressable Groups")]
         private static void OrganizeAddressables()
         {

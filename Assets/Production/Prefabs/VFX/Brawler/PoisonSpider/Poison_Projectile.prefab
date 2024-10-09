@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1110790271
+  GlobalObjectIdHash: 348674511
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -257,6 +257,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.7
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -265,6 +266,7 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1
@@ -290,5 +292,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 178
+  pooledObjectIndex: 98
   isPrewarmObject: 1

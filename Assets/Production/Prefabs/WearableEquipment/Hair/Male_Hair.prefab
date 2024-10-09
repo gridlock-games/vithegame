@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8998180375253954598, guid: 6681c57ed9380c94f87eea2e2be3838f,
@@ -708,6 +709,17 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6681c57ed9380c94f87eea2e2be3838f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7301104956023788035}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6681c57ed9380c94f87eea2e2be3838f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7345212650611192199}
   m_SourcePrefab: {fileID: 100100000, guid: 6681c57ed9380c94f87eea2e2be3838f, type: 3}
 --- !u!1 &4223510982984379204 stripped
 GameObject:
@@ -745,7 +757,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 65
+  pooledObjectIndex: 92
+  isPrewarmObject: 0
 --- !u!137 &5075622725556380237 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 8083326875927295064, guid: 6681c57ed9380c94f87eea2e2be3838f,
