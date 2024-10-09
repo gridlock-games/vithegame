@@ -73,7 +73,21 @@ namespace Vi.Editor
             FindVFXNotInNetworkPrefabsList();
             SetTextureImportOverrides();
             GetPooledObjectList().AddUnregisteredPooledObjects();
+            AssetDatabase.SaveAssets();
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
+        }
+
+        [MenuItem("Tools/Production/Set Network Prefabs As Dirty")]
+        static void SetNetworkPrefabsAsDirty()
+        {
+            foreach (NetworkPrefabsList networkPrefabList in GetNetworkPrefabsLists())
+            {
+                foreach (NetworkPrefab networkPrefab in networkPrefabList.PrefabList)
+                {
+                    EditorUtility.SetDirty(networkPrefab.Prefab);
+                }
+            }
+            AssetDatabase.SaveAssets();
         }
 
         private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";

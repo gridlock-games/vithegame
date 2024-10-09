@@ -18,7 +18,6 @@ namespace Vi.Core.GameModeManagers
         protected static GameModeManager _singleton;
 
         [SerializeField] private GameObject UIPrefab;
-        [SerializeField] private GameObject RPPrefab;
 
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
@@ -547,11 +546,9 @@ namespace Vi.Core.GameModeManagers
         public string GetNextGameActionTimerDisplayString() { return Mathf.Ceil(nextGameActionTimer.Value).ToString("F0"); }
 
         private GameObject UIInstance;
-        private GameObject RPInstance;
         public override void OnNetworkSpawn()
         {
             if (UIPrefab) { UIInstance = Instantiate(UIPrefab, transform); }
-            if (RPPrefab) { RPInstance = Instantiate(RPPrefab, transform); }
             _singleton = this;
             scoreList.OnListChanged += OnScoreListChange;
             nextGameActionTimer.OnValueChanged += OnNextGameActionTimerChange;
@@ -566,7 +563,6 @@ namespace Vi.Core.GameModeManagers
                 nextGameActionTimer.Value = nextGameActionDuration / 2;
             }
             gameOver.OnValueChanged += OnGameOverChanged;
-            Debug.Log("ON NETWORK SPAWN " + this);
         }
 
         public override void OnNetworkDespawn()
