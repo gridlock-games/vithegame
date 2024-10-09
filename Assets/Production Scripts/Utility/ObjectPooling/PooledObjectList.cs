@@ -6,6 +6,7 @@ using System.IO;
 using UnityEditor;
 using Unity.Netcode;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
 using UnityEditor.AddressableAssets;
@@ -47,6 +48,10 @@ namespace Vi.Utility
         private void Awake()
         {
             pooledObjectHandles = new AsyncOperationHandle<PooledObject>[pooledObjectReferences.Count];
+        }
+
+        public void LoadAssets()
+        {
             for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
                 int var = i;

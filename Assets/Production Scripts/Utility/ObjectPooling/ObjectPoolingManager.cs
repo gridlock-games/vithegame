@@ -42,11 +42,17 @@ namespace Vi.Utility
 
         private void Start()
         {
-            StartCoroutine(WaitForLoad());
+            StartCoroutine(LoadAssets());
         }
 
-        private IEnumerator WaitForLoad()
+        public static bool canPool;
+
+        private IEnumerator LoadAssets()
         {
+            yield return new WaitUntil(() => canPool);
+            yield return new WaitUntil(() => SceneManager.GetSceneByName(instantiationSceneName).isLoaded);
+            pooledObjectListInstance.LoadAssets();
+
             yield return new WaitUntil(() => pooledObjectListInstance.LoadCompletedCount == pooledObjectListInstance.TotalReferenceCount);
             foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
             {
@@ -55,6 +61,7 @@ namespace Vi.Utility
                     NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
                 }
             }
+            PoolInitialObjects();
         }
 
         private class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
@@ -82,15 +89,20 @@ namespace Vi.Utility
 
         private void OnEnable()
         {
-            EventDelegateManager.sceneLoaded += PoolInitialObjects;
+            EventDelegateManager.sceneLoaded += OnSceneEvent;
         }
 
         private void OnDisable()
         {
-            EventDelegateManager.sceneLoaded -= PoolInitialObjects;
+            EventDelegateManager.sceneLoaded -= OnSceneEvent;
         }
 
-        private void PoolInitialObjects(Scene scene)
+        private void OnSceneEvent(Scene scene)
+        {
+            PoolInitialObjects();
+        }
+
+        private void PoolInitialObjects()
         {
             if (SceneManager.GetActiveScene().name == "Initialization") { return; }
             if (pooledObjectListInstance.LoadCompletedCount != pooledObjectListInstance.TotalReferenceCount) { return; }
