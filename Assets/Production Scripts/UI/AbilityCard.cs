@@ -49,6 +49,8 @@ namespace Vi.UI
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
+
+            lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
         }
 
         private Image borderImage;
@@ -62,7 +64,6 @@ namespace Vi.UI
             combatAgent = GetComponentInParent<CombatAgent>();
 
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
-
         }
 
         private int lastAbilityLevel = -1;
