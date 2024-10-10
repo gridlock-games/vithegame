@@ -40,17 +40,18 @@ namespace Vi.Isolated
 
         private IEnumerator LoadMainMenu()
         {
-            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
-
-            loadedPlayerDataManagerPrefab = playerDataManagerPrefab.LoadAssetAsync();
             loadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
-
-            yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone & loadedNetSceneManagerPrefab.IsDone);
-
-            CreatePlayerDataManager(false);
+            yield return new WaitUntil(() => loadedNetSceneManagerPrefab.IsDone);
             CreateNetSceneManager();
-
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
             NetSceneManager.Singleton.LoadScene("Main Menu");
+
+            yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
+            loadedPlayerDataManagerPrefab = playerDataManagerPrefab.LoadAssetAsync();
+
+            yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone);
+            CreatePlayerDataManager(false);
+
             ObjectPoolingManager.canPool = true;
         }
 

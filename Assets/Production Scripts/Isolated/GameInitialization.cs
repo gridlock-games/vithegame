@@ -74,7 +74,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasBool("AutoAim")) { FasterPlayerPrefs.Singleton.SetBool("AutoAim", true); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetBool("FPSEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
 

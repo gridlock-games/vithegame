@@ -724,7 +724,7 @@ namespace Vi.UI
         private IEnumerator AutomaticallyAttemptLogin()
         {
             isAutomaticallyLoggingIn = true;
-            yield return new WaitUntil(() => WebRequestManager.Singleton.GameIsUpToDate);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
             {

@@ -51,17 +51,15 @@ namespace Vi.Utility
         {
             yield return new WaitUntil(() => canPool);
             yield return new WaitUntil(() => SceneManager.GetSceneByName(instantiationSceneName).isLoaded);
-            pooledObjectListInstance.LoadAssets();
+            StartCoroutine(pooledObjectListInstance.LoadAssets());
+        }
 
-            yield return new WaitUntil(() => pooledObjectListInstance.LoadCompletedCount == pooledObjectListInstance.TotalReferenceCount);
-            foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
+        public static void EvaluateNetworkPrefabHandler(PooledObject pooledObject)
+        {
+            if (pooledObject.TryGetComponent(out NetworkObject networkObject))
             {
-                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
-                {
-                    NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
-                }
+                NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
             }
-            PoolInitialObjects();
         }
 
         private class PooledPrefabInstanceHandler : INetworkPrefabInstanceHandler
@@ -105,31 +103,39 @@ namespace Vi.Utility
         private void PoolInitialObjects()
         {
             if (SceneManager.GetActiveScene().name == "Initialization") { return; }
-            if (pooledObjectListInstance.LoadCompletedCount != pooledObjectListInstance.TotalReferenceCount) { return; }
 
-            for (int i = 0; i < pooledObjectListInstance.GetPooledObjects().Count; i++)
+            foreach (PooledObject pooledObject in pooledObjectListInstance.GetPooledObjects())
             {
-                PooledObject pooledObject = pooledObjectListInstance.GetPooledObjects()[i];
-                if (!pooledObject) { Debug.LogError("Trying to initial pool a null object! Index: " + i); continue; }
-
-                while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool())
+                if (pooledObject)
                 {
-                    SpawnObjectForInitialPool(pooledObject);
+                    StartCoroutine(PoolInitialObjects(pooledObject));
                 }
+            }
+        }
 
-                while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count > pooledObject.GetNumberOfObjectsToPool())
+        public static IEnumerator PoolInitialObjects(PooledObject pooledObject)
+        {
+            if (!pooledObject) { Debug.LogError("Trying to initial pool a null object!"); yield break; }
+
+            while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool())
+            {
+                SpawnObjectForInitialPool(pooledObject);
+                yield return null;
+            }
+
+            while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count > pooledObject.GetNumberOfObjectsToPool())
+            {
+                PooledObject objToDestroy = despawnedObjectPools[pooledObject.GetPooledObjectIndex()].FirstOrDefault();
+                if (objToDestroy)
                 {
-                    PooledObject objToDestroy = despawnedObjectPools[pooledObject.GetPooledObjectIndex()].FirstOrDefault();
-                    if (objToDestroy)
-                    {
-                        despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(objToDestroy);
-                        objToDestroy.MarkForDestruction();
-                        Destroy(objToDestroy.gameObject);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(objToDestroy);
+                    objToDestroy.MarkForDestruction();
+                    Destroy(objToDestroy.gameObject);
+                    yield return null;
+                }
+                else
+                {
+                    break;
                 }
             }
         }

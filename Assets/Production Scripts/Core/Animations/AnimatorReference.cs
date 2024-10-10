@@ -317,6 +317,7 @@ namespace Vi.Core
         {
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
+                if (!skinnedMeshRenderer) { continue; }
                 skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
             }
         }

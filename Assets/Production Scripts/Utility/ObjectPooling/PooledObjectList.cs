@@ -33,7 +33,7 @@ namespace Vi.Utility
                 {
                     pooledObjects.Add(null);
                 }
-                if (handle.IsDone)
+                else if (handle.IsDone)
                 {
                     pooledObjects.Add(handle.Result);
                 }
@@ -50,12 +50,15 @@ namespace Vi.Utility
             pooledObjectHandles = new AsyncOperationHandle<PooledObject>[pooledObjectReferences.Count];
         }
 
-        public void LoadAssets()
+        public IEnumerator LoadAssets()
         {
+            int loadCalledCount = 0;
             for (int i = 0; i < pooledObjectReferences.Count; i++)
             {
                 int var = i;
                 pooledObjectReferences[i].LoadAssetAsync().Completed += (handle) => OnInitialObjectLoad(handle, var);
+                loadCalledCount++;
+                yield return new WaitUntil(() => loadCalledCount - LoadCompletedCount < 1);
             }
         }
 
@@ -66,6 +69,8 @@ namespace Vi.Utility
             {
                 handle.Result.SetPooledObjectIndex(index);
                 pooledObjectHandles[index] = handle;
+                ObjectPoolingManager.EvaluateNetworkPrefabHandler(handle.Result);
+                ObjectPoolingManager.Singleton.StartCoroutine(ObjectPoolingManager.PoolInitialObjects(handle.Result));
             }
             else
             {

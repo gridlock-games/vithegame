@@ -38,8 +38,8 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        //private string APIURL = "154.90.35.191/";
-        private string APIURL = "http://154.90.35.191:80/";
+        private string APIURL = "http://154.90.36.42:80/";
+        //private string APIURL = "http://154.90.35.191:80/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
@@ -2763,6 +2763,7 @@ namespace Vi.Core
 
             getRequest.Dispose();
 
+            yield return new WaitUntil(() => PlayerDataManager.IsCharacterReferenceLoaded());
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
             for (int i = 0; i < weaponOptions.Length; i++)
