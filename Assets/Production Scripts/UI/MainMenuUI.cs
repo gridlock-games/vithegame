@@ -60,6 +60,10 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
+        [SerializeField] private Button playButton;
+        [SerializeField] private GameObject loadingProgressParent;
+        [SerializeField] private Text loadingProgressText;
+        [SerializeField] private Image loadingProgresssBar;
 
         [SerializeField] private Text welcomeUserText;
         [SerializeField] private Image welcomeUserImage;
@@ -790,6 +794,15 @@ namespace Vi.UI
 
         private void Update()
         {
+            playButton.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            loadingProgressParent.SetActive(ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+            if (loadingProgressParent.activeSelf)
+            {
+                float progress = ObjectPoolingManager.Singleton.GetPooledObjectList().LoadCompletedCount / (float)ObjectPoolingManager.Singleton.GetPooledObjectList().TotalReferenceCount;
+                loadingProgressText.text = "Loading Assets In Background " + (progress * 100).ToString("F0") + "%";
+                loadingProgresssBar.fillAmount = progress;
+            }
+
             if (WebRequestManager.Singleton.IsCheckingGameVersion)
             {
                 loginMethodText.text = "Checking Game Version...";

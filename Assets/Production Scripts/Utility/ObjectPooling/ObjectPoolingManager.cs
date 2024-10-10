@@ -108,19 +108,22 @@ namespace Vi.Utility
             {
                 if (pooledObject)
                 {
-                    StartCoroutine(PoolInitialObjects(pooledObject));
+                    PoolInitialObjects(pooledObject);
                 }
             }
         }
 
-        public static IEnumerator PoolInitialObjects(PooledObject pooledObject)
+        public bool IsLoadingOrPooling { get { return pooledObjectListInstance.TotalReferenceCount != pooledObjectListInstance.LoadCompletedCount; } }
+
+        public PooledObjectList GetPooledObjectList() { return pooledObjectListInstance; }
+
+        public static void PoolInitialObjects(PooledObject pooledObject)
         {
-            if (!pooledObject) { Debug.LogError("Trying to initial pool a null object!"); yield break; }
+            if (!pooledObject) { Debug.LogError("Trying to initial pool a null object!"); return; }
 
             while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count < pooledObject.GetNumberOfObjectsToPool())
             {
                 SpawnObjectForInitialPool(pooledObject);
-                yield return null;
             }
 
             while (despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count + spawnedObjectPools[pooledObject.GetPooledObjectIndex()].Count > pooledObject.GetNumberOfObjectsToPool())
@@ -131,7 +134,6 @@ namespace Vi.Utility
                     despawnedObjectPools[pooledObject.GetPooledObjectIndex()].Remove(objToDestroy);
                     objToDestroy.MarkForDestruction();
                     Destroy(objToDestroy.gameObject);
-                    yield return null;
                 }
                 else
                 {
