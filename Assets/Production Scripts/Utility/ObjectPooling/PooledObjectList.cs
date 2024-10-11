@@ -161,7 +161,7 @@ namespace Vi.Utility
 
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
-            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
+            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Pooled Objects");
 
             if (!groupToOrganize)
             {

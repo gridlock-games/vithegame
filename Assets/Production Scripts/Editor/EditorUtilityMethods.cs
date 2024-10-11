@@ -22,7 +22,7 @@ namespace Vi.Editor
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
-            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Assets Production Weapons Mobs Ogres ");
+            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
 
             if (groupToOrganize)
             {
