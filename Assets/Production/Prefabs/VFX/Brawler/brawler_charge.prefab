@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4122723776687528984, guid: 7292a2bb23f74ca458f627ecac440374,
@@ -16,6 +17,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: brawler_charge
+      objectReference: {fileID: 0}
+    - target: {fileID: 4122723776687528986, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4122723776687528991, guid: 7292a2bb23f74ca458f627ecac440374,
         type: 3}
@@ -92,10 +98,20 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4122723777002945109, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4122723777002945114, guid: 7292a2bb23f74ca458f627ecac440374,
         type: 3}
       propertyPath: looping
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4122723778392664624, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4122723778392664629, guid: 7292a2bb23f74ca458f627ecac440374,
         type: 3}
@@ -107,12 +123,41 @@ PrefabInstance:
       propertyPath: looping
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4122723778536112695, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4122723778609761296, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4122723778609761301, guid: 7292a2bb23f74ca458f627ecac440374,
         type: 3}
       propertyPath: looping
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4122723776687528986, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4192588820448792942}
+    - targetCorrespondingSourceObject: {fileID: 4122723776687528986, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4366948335726922309}
+    - targetCorrespondingSourceObject: {fileID: 4122723776687528986, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4599335361847203033}
+    - targetCorrespondingSourceObject: {fileID: 4122723776687528986, guid: 7292a2bb23f74ca458f627ecac440374,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4854236365453631728}
   m_SourcePrefab: {fileID: 100100000, guid: 7292a2bb23f74ca458f627ecac440374, type: 3}
 --- !u!1 &3253269747984225782 stripped
 GameObject:
@@ -120,27 +165,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1446558144797575660}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4366948335726922309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3253269747984225782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 467900528
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &4192588820448792942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,6 +196,27 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &4366948335726922309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253269747984225782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 467900528
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &4599335361847203033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +233,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -196,6 +242,21 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
+--- !u!114 &4854236365453631728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253269747984225782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: -1
+  isPrewarmObject: 0

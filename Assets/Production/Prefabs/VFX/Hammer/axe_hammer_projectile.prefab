@@ -5,19 +5,20 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 119070087, guid: 5750154a22692224e92f088407844f8a, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 469809414, guid: 5750154a22692224e92f088407844f8a, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1041132980, guid: 5750154a22692224e92f088407844f8a, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
         type: 3}
@@ -27,7 +28,7 @@ PrefabInstance:
     - target: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5881470062439506428, guid: 5750154a22692224e92f088407844f8a,
         type: 3}
@@ -85,6 +86,37 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6720721584199962366}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3026728006053429838}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4224864520324637082}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4524040081079284013}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6515331773666235339}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7678018654892989001}
+    - targetCorrespondingSourceObject: {fileID: 5881470062439506179, guid: 5750154a22692224e92f088407844f8a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8806913053299418287}
   m_SourcePrefab: {fileID: 100100000, guid: 5750154a22692224e92f088407844f8a, type: 3}
 --- !u!1 &6506327649238488174 stripped
 GameObject:
@@ -99,10 +131,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6506327649238488174}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -116,9 +159,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6506327649238488174}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1, y: 2, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4224864520324637082
@@ -136,27 +187,6 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: -1
   isPrewarmObject: 0
---- !u!114 &7678018654892989001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6506327649238488174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1388944221
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &4524040081079284013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,6 +234,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 3
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.3
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -212,15 +243,39 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 0
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  teamColorParticleSystems: []
   projectileForce: {x: 0, y: 0, z: 5}
   timeToActivateGravity: 1
   killDistance: 50
+  whooshNearbySound: []
+--- !u!114 &7678018654892989001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6506327649238488174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2786713923
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &8806913053299418287
 MonoBehaviour:
   m_ObjectHideFlags: 0
