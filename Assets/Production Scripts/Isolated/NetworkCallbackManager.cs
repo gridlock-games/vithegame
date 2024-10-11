@@ -52,7 +52,7 @@ namespace Vi.Isolated
             yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone);
             CreatePlayerDataManager(false);
 
-            ObjectPoolingManager.canPool = true;
+            ObjectPoolingManager.CanPool = true;
         }
 
         private AsyncOperationHandle<GameObject> loadedPlayerDataManagerPrefab;
