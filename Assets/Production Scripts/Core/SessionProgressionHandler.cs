@@ -7,6 +7,7 @@ using Vi.Utility;
 using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
+using Vi.Core.Structures;
 
 namespace Vi.Core
 {
@@ -23,7 +24,7 @@ namespace Vi.Core
         private int CalculateLevel(float experience) { return Mathf.FloorToInt(experience / experienceRequiredToReachNextLevel); }
 
         private const float experienceRequiredToReachNextLevel = 100;
-        private const float maxExperience = 10000;
+        private const float maxExperience = 99800;
 
         private NetworkVariable<float> experience = new NetworkVariable<float>();
 
@@ -31,7 +32,7 @@ namespace Vi.Core
         public float MaxStaminaBonus { get { return Level * 4; } }
         public float MaxSpiritBonus { get { return Level * 4; } }
 
-        public float BaseDamageBonus { get { return Level / 10; } }
+        public float BaseDamageBonus { get { return Level; } }
 
         public void AddExperience(float experienceToAdd)
         {
@@ -59,6 +60,98 @@ namespace Vi.Core
             }
         }
 
+        public void AddEssence()
+        {
+            if (!IsSpawned) { Debug.LogError("SessionProgressionHandler.AddEssence should only be called when spawned!"); return; }
+            if (!IsServer) { Debug.LogError("SessionProgressionHandler.AddEssence should only be called on the server!"); return; }
+
+            if (mob) { return; }
+
+            essences.Value++;
+        }
+
+        public int Essences { get { return essences.Value; } }
+        private NetworkVariable<int> essences = new NetworkVariable<int>();
+
+        public void RedeemEssenceBuff(int essenceBuffIndex)
+        {
+            if (Essences < GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount) { return; }
+
+            if (IsServer)
+            {
+                essences.Value -= GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount;
+
+                // TODO perform the action here
+                switch (GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title)
+                {
+                    case "Heal The Ancient":
+                        Structure[] structures = PlayerDataManager.Singleton.GetActiveStructures();
+                        if (structures.Length > 0)
+                        {
+                            Structure structure = structures[0];
+                            structure.StatusAgent.TryAddStatus(ActionClip.Status.healing, 0.1f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Rage":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.AddRage(attributes.GetMaxRage(), false);
+                            attributes.OnActivateRage();
+                        }
+                        break;
+                    case "Increased Move Speed":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedIncrease, 0.2f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Resist Ailments":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.immuneToAilments, 0, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Resist Statuses":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.immuneToNegativeStatuses, 0, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Damage Resistance":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.damageReductionMultiplier, 0.7f, buffDuration, 0, false);
+                        }
+                        break;
+                    case "Health Regeneration":
+                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                        {
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.healing, 0.1f, buffDuration, 0, false);
+                        }
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle essence buff option titled: " + GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
+                        break;
+                }
+            }
+            else if (IsOwner)
+            {
+                RedeemEssenceBuffRpc(essenceBuffIndex);
+            }
+            else
+            {
+                Debug.LogError("RedeemEssenceBuff should only be called on the server or from the owner!");
+            }
+        }
+
+        private const float buffDuration = 60;
+
+        [Rpc(SendTo.Server)]
+        private void RedeemEssenceBuffRpc(int essenceBuffIndex)
+        {
+            RedeemEssenceBuff(essenceBuffIndex);
+        }
+
         public override void OnNetworkSpawn()
         {
             experience.OnValueChanged += OnExperienceChanged;
@@ -70,9 +163,8 @@ namespace Vi.Core
         }
 
         [SerializeField] private VisualEffect levelUpVisualEffect;
-        [SerializeField] private AudioClip levelUpAudioClip;
+        [SerializeField] private AudioClip[] levelUpAudioClips;
 
-        public int SkillPoints { get { return skillPoints.Value; } }
         private NetworkVariable<int> skillPoints = new NetworkVariable<int>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
 
         private void OnExperienceChanged(float prev, float current)
@@ -82,7 +174,7 @@ namespace Vi.Core
                 if (combatAgent.GetAilment() != ActionClip.Ailment.Death)
                 {
                     levelUpVisualEffect.Play();
-                    AudioManager.Singleton.PlayClipOnTransform(transform, levelUpAudioClip, false, 0.5f);
+                    AudioManager.Singleton.PlayClipOnTransform(transform, levelUpAudioClips[Random.Range(0, levelUpAudioClips.Length)], false, 0.5f);
                 }
 
                 if (IsServer)
@@ -112,6 +204,7 @@ namespace Vi.Core
         private float GetAbilityLevelCooldownReduction(string weaponName, string abilityName)
         {
             if (mob) { return 0; }
+            if (!GameModeManager.Singleton) { return 0; }
             if (!GameModeManager.Singleton.LevelingEnabled) { return 0; }
 
             var key = (weaponName.Replace("(Clone)", ""), abilityName);
@@ -136,7 +229,7 @@ namespace Vi.Core
             }
             else
             {
-                return 0;
+                return -1;
             }
         }
 
@@ -167,11 +260,11 @@ namespace Vi.Core
             abilityLevelTracker.Clear();
         }
 
-        private void UpgradeAbilityLocally(string weaponName, string abilityName)
+        private bool UpgradeAbilityLocally(string weaponName, string abilityName)
         {
             if (IsServer)
             {
-                if (skillPoints.Value == 0) { return; }
+                if (skillPoints.Value == 0) { return false; }
                 skillPoints.Value--;
             }
 
@@ -182,18 +275,33 @@ namespace Vi.Core
             }
             else
             {
-                abilityLevelTracker.Add(key, 1);
+                abilityLevelTracker.Add(key, 0);
             }
-
             combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName),
-                combatAgent.SessionProgressionHandler.GetAbilityLevelCooldownReduction(weaponName, abilityName));
+                GetAbilityLevelCooldownReduction(weaponName, abilityName));
+            return true;
+        }
+
+        public void SyncAbilityCooldowns(Weapon weapon)
+        {
+            foreach (ActionClip ability in weapon.GetAbilities())
+            {
+                weapon.PermanentlyReduceAbilityCooldownTime(ability, GetAbilityLevelCooldownReduction(weapon.name, ability.name));
+            }
+        }
+
+        public bool CanUpgradeAbility(ActionClip ability, Weapon weapon)
+        {
+            return skillPoints.Value > 0 & weapon.GetAbilityOffsetDifference(ability) > 0;
         }
 
         [Rpc(SendTo.Server)]
         private void UpgradeAbilityServerRpc(string weaponName, string abilityName)
         {
-            UpgradeAbilityLocally(weaponName, abilityName);
-            UpgradeAbilityOwnerRpc(weaponName, abilityName);
+            if (UpgradeAbilityLocally(weaponName, abilityName))
+            {
+                UpgradeAbilityOwnerRpc(weaponName, abilityName);
+            }
         }
 
         [Rpc(SendTo.Owner)]

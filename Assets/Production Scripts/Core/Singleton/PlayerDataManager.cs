@@ -12,15 +12,15 @@ using Vi.Utility;
 using Newtonsoft.Json;
 using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Core
 {
     public class PlayerDataManager : NetworkBehaviour
     {
         [SerializeField] private GameObject spectatorPrefab;
-        [SerializeField] private CharacterReference characterReference;
-        [SerializeField] private ControlsImageMapping controlsImageMapping;
-
+        
         [SerializeField] private List<GameModeInfo> gameModeInfos;
 
         [System.Serializable]
@@ -33,9 +33,37 @@ namespace Vi.Core
             public int[] maxPlayersOnMap;
         }
 
-        public CharacterReference GetCharacterReference() { return characterReference; }
+        public static bool IsCharacterReferenceLoaded() { return characterReferenceHandle.IsValid() & characterReferenceHandle.IsDone; }
 
-        public ControlsImageMapping GetControlsImageMapping() { return controlsImageMapping; }
+        [SerializeField] private AssetReference characterReferenceAddressable;
+        private static AsyncOperationHandle<CharacterReference> characterReferenceHandle;
+        public CharacterReference GetCharacterReference()
+        {
+            if (characterReferenceHandle.IsValid() & characterReferenceHandle.IsDone)
+            {
+                return characterReferenceHandle.Result;
+            }
+            else
+            {
+                Debug.LogError("Accessing character reference before it is loaded!");
+                return null;
+            }
+        }
+
+        [SerializeField] private AssetReference controlsImageMappingAddressable;
+        private static AsyncOperationHandle<ControlsImageMapping> controlsImageMappingHandle;
+        public ControlsImageMapping GetControlsImageMapping()
+        {
+            if (controlsImageMappingHandle.IsValid() & controlsImageMappingHandle.IsDone)
+            {
+                return controlsImageMappingHandle.Result;
+            }
+            else
+            {
+                Debug.LogError("Accessing controls image mapping before it is loaded!");
+                return null;
+            }
+        }
 
         public GameModeInfo GetGameModeInfo() { return gameModeInfos.Find(item => item.gameMode == gameMode.Value); }
 
@@ -914,6 +942,19 @@ namespace Vi.Core
             channelCounts = new NetworkList<int>(initialChannelCounts);
         }
 
+        private void Start()
+        {
+            StartCoroutine(LoadScriptableObjects());
+        }
+
+        private IEnumerator LoadScriptableObjects()
+        {
+            if (!characterReferenceHandle.IsValid()) { characterReferenceHandle = characterReferenceAddressable.LoadAssetAsync<CharacterReference>(); }
+            yield return new WaitUntil(() => characterReferenceHandle.IsDone);
+            if (!controlsImageMappingHandle.IsValid()) { controlsImageMappingHandle = controlsImageMappingAddressable.LoadAssetAsync<ControlsImageMapping>(); }
+            yield return new WaitUntil(() => controlsImageMappingHandle.IsDone);
+        }
+
         private void OnEnable()
         {
             RefreshStatus();
@@ -1439,9 +1480,9 @@ namespace Vi.Core
             else
             {
                 if (playerData.id >= 0)
-                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
                 else
-                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
 
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
@@ -1457,8 +1498,8 @@ namespace Vi.Core
             }
 
             yield return null;
+            //yield return new WaitUntil(() => netObj.IsSpawned);
 
-            //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;
             spawnPlayerRunning = false;

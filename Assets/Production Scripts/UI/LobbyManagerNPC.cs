@@ -8,7 +8,7 @@ using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
-    public class LobbyManagerNPC : NetworkInteractable
+    public class LobbyManagerNPC : NetworkInteractable, ExternalUI
     {
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private HubServerBrowser UI;
@@ -22,7 +22,7 @@ namespace Vi.UI
             UI.gameObject.SetActive(true);
         }
 
-        private void OnPause()
+        public void OnPause()
         {
             CloseServerBrowser();
         }

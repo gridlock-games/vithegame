@@ -6,13 +6,16 @@ using UnityEngine.UI;
 using Vi.Utility;
 using System.Linq;
 using Vi.Core;
+using UnityEngine.SceneManagement;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Isolated
 {
     public class NetworkCallbackManager : MonoBehaviour
     {
-        [SerializeField] private PlayerDataManager playerDataManagerPrefab;
-        [SerializeField] private NetSceneManager networkSceneManagerPrefab;
+        [SerializeField] private AssetReferenceGameObject playerDataManagerPrefab;
+        [SerializeField] private AssetReferenceGameObject networkSceneManagerPrefab;
         [Header("Must be less than 60 seconds")]
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
@@ -25,10 +28,8 @@ namespace Vi.Isolated
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogError("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
             NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-            CreatePlayerDataManager(false);
-            CreateNetSceneManager();
-            
-            NetSceneManager.Singleton.LoadScene("Main Menu");
+
+            StartCoroutine(LoadMainMenu());
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.OnServerStopped += OnServerStopped;
@@ -37,20 +38,39 @@ namespace Vi.Isolated
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
         }
 
+        private IEnumerator LoadMainMenu()
+        {
+            loadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
+            yield return new WaitUntil(() => loadedNetSceneManagerPrefab.IsDone);
+            CreateNetSceneManager();
+            yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
+            NetSceneManager.Singleton.LoadScene("Main Menu");
+
+            yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
+            loadedPlayerDataManagerPrefab = playerDataManagerPrefab.LoadAssetAsync();
+
+            yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone);
+            CreatePlayerDataManager(false);
+
+            ObjectPoolingManager.canPool = true;
+        }
+
+        private AsyncOperationHandle<GameObject> loadedPlayerDataManagerPrefab;
         private void CreatePlayerDataManager(bool forceRefresh)
         {
-            if (forceRefresh) { Destroy(PlayerDataManager.Singleton.gameObject); }
+            if (forceRefresh & PlayerDataManager.DoesExist()) { Destroy(PlayerDataManager.Singleton.gameObject); }
             if (!PlayerDataManager.DoesExist() | forceRefresh)
             {
-                DontDestroyOnLoad(Instantiate(playerDataManagerPrefab.gameObject));
+                DontDestroyOnLoad(Instantiate(loadedPlayerDataManagerPrefab.Result));
             }
         }
 
+        private AsyncOperationHandle<GameObject> loadedNetSceneManagerPrefab;
         private void CreateNetSceneManager()
         {
             if (!NetSceneManager.DoesExist())
             {
-                DontDestroyOnLoad(Instantiate(networkSceneManagerPrefab.gameObject));
+                DontDestroyOnLoad(Instantiate(loadedNetSceneManagerPrefab.Result));
             }
         }
 
@@ -170,7 +190,7 @@ namespace Vi.Isolated
                     WebRequestManager.Singleton.CharacterById,
                     team));
             }
-            
+
             addPlayerDataRunning = false;
         }
 

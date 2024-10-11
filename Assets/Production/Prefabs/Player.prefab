@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 891803348
+  GlobalObjectIdHash: 1977550921
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -231,10 +231,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyHeightOffset: 2
-  bodyRadius: 0.5
   stoppingDistance: 2
+  navMeshAgentTypeName: Humanoid
   runAnimationTransitionSpeed: 5
   isGroundedSphereCheckRadius: 0.6
+  stairRaycastingStartOffset: {x: 0, y: 0, z: 0}
+  stairStepForceMultiplier: 1
   maxStairStepHeight: 0.5
   airborneHorizontalDragMultiplier: 0.1
   gravityScale: 2
@@ -322,7 +324,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useConstantRateForHPDrainStatuses: 0
 --- !u!114 &1238877169349753619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,7 +349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 170
+  pooledObjectIndex: 4
   isPrewarmObject: 1
 --- !u!114 &9172447631836445654
 MonoBehaviour:
@@ -363,7 +364,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelUpVisualEffect: {fileID: 3648217496154362164}
-  levelUpAudioClip: {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
+  levelUpAudioClips:
+  - {fileID: 8300000, guid: 56c4e4ddee84e40a48ef2fc8b3c9d801, type: 3}
+  - {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
+  - {fileID: 8300000, guid: 7b5328697392b45a8a23b60c6aeaeb21, type: 3}
+  - {fileID: 8300000, guid: d9b20368f2a9744a68cc7dc05669e76f, type: 3}
+  - {fileID: 8300000, guid: b46d4a4ff540040f5b7d50f52122f3a1, type: 3}
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0

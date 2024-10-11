@@ -14,17 +14,17 @@ namespace Vi.Player
         [SerializeField] private GameObject playerUIPrefab;
         [SerializeField] private GameObject spectatorUIPrefab;
 
-        public MonoBehaviour ExternalUI { get; private set; }
+        private ExternalUI externalUI;
 
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
         private PlayerInput playerInput;
         private WeaponHandler weaponHandler;
 
-        public void SetExternalUI(MonoBehaviour externalUI)
+        public void SetExternalUI(ExternalUI externalUI)
         {
-            ExternalUI = externalUI;
-            if (externalUI)
+            this.externalUI = externalUI;
+            if (externalUI != null)
             {
                 Cursor.lockState = CursorLockMode.None;
                 if (playerUIInstance)
@@ -92,6 +92,7 @@ namespace Vi.Player
 
         private void OnDisable()
         {
+            externalUI = null;
             if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
             if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
@@ -101,7 +102,7 @@ namespace Vi.Player
 
         private void ToggleScoreboard(bool isOn)
         {
-            if (ExternalUI) { return; }
+            if (externalUI != null) { return; }
             if (!GameModeManager.Singleton) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
@@ -136,9 +137,9 @@ namespace Vi.Player
         GameObject pauseInstance;
         public void OnPause()
         {
-            if (ExternalUI)
+            if (externalUI != null)
             {
-                ExternalUI.SendMessage("OnPause");
+                externalUI.OnPause();
                 return;
             }
             if (textChatIsOpen)
@@ -175,7 +176,7 @@ namespace Vi.Player
         GameObject inventoryInstance;
         public void OnInventory()
         {
-            if (ExternalUI) { return; }
+            if (externalUI != null) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (textChatIsOpen) { return; }
@@ -204,7 +205,7 @@ namespace Vi.Player
 
         public void OnTextChat()
         {
-            if (ExternalUI) { return; }
+            if (externalUI != null) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }

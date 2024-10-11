@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Analytics;
 using Vi.Utility;
+using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace Vi.Core
 {
@@ -42,6 +43,8 @@ namespace Vi.Core
             }
 
             headerText.text = "Preparing Your Vi Experience";
+
+            DiscordManager.UpdateActivity(null, "Loading Game");
         }
 
         private void InitializePlayerPrefs()
@@ -91,7 +94,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", QualitySettings.GetQualityLevel() > 0); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
 
@@ -221,22 +224,45 @@ namespace Vi.Core
 
             if (downloadsSuccessful)
             {
-                headerText.text = "Loading Main Menu";
-                yield return Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
-                try
+                downloadProgressBarText.text = "Loading Base Game Logic";
+                AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(baseSceneReference, LoadSceneMode.Additive);
+
+                while (true)
                 {
-                    SceneManager.SetActiveScene(SceneManager.GetSceneByName(baseSceneReference.SceneName));
+                    if (handle.IsDone)
+                    {
+                        downloadProgressBarImage.fillAmount = 0;
+                        downloadProgressBarText.text = "100%";
+                        break;
+                    }
+                    downloadProgressBarImage.fillAmount = handle.PercentComplete;
+                    downloadProgressBarText.text = "Loading Base Game Logic " + (handle.PercentComplete * 100).ToString("F0") + "%";
+                    yield return null;
                 }
-                catch
+
+                Scene baseScene = SceneManager.GetSceneByName(baseSceneReference.SceneName);
+                if (baseScene.isLoaded & baseScene.IsValid())
                 {
-                    headerText.text = "Could Not Load Main Menu";
-                    yield break;
+                    if (SceneManager.SetActiveScene(baseScene))
+                    {
+                        SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                    }
+                    else
+                    {
+                        headerText.text = "Restart The Game To Try Again";
+                        downloadProgressBarText.text = "Error While Loading";
+                    }
                 }
-                SceneManager.UnloadSceneAsync("Initialization", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                else
+                {
+                    headerText.text = "Restart The Game To Try Again";
+                    downloadProgressBarText.text = "Error While Loading";
+                }
             }
             else
             {
                 headerText.text = "Restart The Game To Try Again";
+                downloadProgressBarText.text = "Error While Loading";
             }
         }
 

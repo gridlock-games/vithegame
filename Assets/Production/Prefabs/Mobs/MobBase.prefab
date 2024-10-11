@@ -76,7 +76,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useConstantRateForHPDrainStatuses: 0
 --- !u!114 &1544070057548558332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,7 +156,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyHeightOffset: 2
-  bodyRadius: 0.5
   stoppingDistance: 2
   navMeshAgentTypeName: Humanoid
   runAnimationTransitionSpeed: 5
@@ -176,7 +174,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  lightAttackDistance: 2.5
   canUseAbility1: 1
   ability1IsConstrainedByDistance: 1
   ability1DistanceMin: 8
@@ -238,7 +235,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelUpVisualEffect: {fileID: 3483705629146674760}
-  levelUpAudioClip: {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
+  levelUpAudioClips:
+  - {fileID: 8300000, guid: 56c4e4ddee84e40a48ef2fc8b3c9d801, type: 3}
+  - {fileID: 8300000, guid: 32bb4609b5276455ba69002d4b0d8b64, type: 3}
+  - {fileID: 8300000, guid: 7b5328697392b45a8a23b60c6aeaeb21, type: 3}
+  - {fileID: 8300000, guid: d9b20368f2a9744a68cc7dc05669e76f, type: 3}
+  - {fileID: 8300000, guid: b46d4a4ff540040f5b7d50f52122f3a1, type: 3}
 --- !u!1 &7880380624370242607
 GameObject:
   m_ObjectHideFlags: 0

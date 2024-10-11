@@ -6,7 +6,7 @@ using Vi.Player;
 
 namespace Vi.UI
 {
-    public class MalakasLeaderboardNPC : NetworkInteractable
+    public class MalakasLeaderboardNPC : NetworkInteractable, ExternalUI
     {
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private LeaderboardUI UI;
@@ -20,7 +20,7 @@ namespace Vi.UI
             UI.gameObject.SetActive(true);
         }
 
-        private void OnPause()
+        public void OnPause()
         {
             CloseLeaderboard();
         }

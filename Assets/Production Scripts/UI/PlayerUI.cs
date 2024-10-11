@@ -242,6 +242,38 @@ namespace Vi.UI
             attributes.WeaponHandler.Ability4(isPressed);
         }
 
+        public void UpgradeAbility1()
+        {
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility1(), attributes.WeaponHandler.GetWeapon()))
+            {
+                attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility1());
+            }
+        }
+
+        public void UpgradeAbility2()
+        {
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility2(), attributes.WeaponHandler.GetWeapon()))
+            {
+                attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility2());
+            }
+        }
+
+        public void UpgradeAbility3()
+        {
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility3(), attributes.WeaponHandler.GetWeapon()))
+            {
+                attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility3());
+            }
+        }
+
+        public void UpgradeAbility4()
+        {
+            if (attributes.SessionProgressionHandler.CanUpgradeAbility(attributes.WeaponHandler.GetWeapon().GetAbility4(), attributes.WeaponHandler.GetWeapon()))
+            {
+                attributes.SessionProgressionHandler.UpgradeAbility(attributes.WeaponHandler.GetWeapon(), attributes.WeaponHandler.GetWeapon().GetAbility4());
+            }
+        }
+
         private InputAction reloadAction;
         public void Reload()
         {

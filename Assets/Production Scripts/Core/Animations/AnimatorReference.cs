@@ -315,6 +315,7 @@ namespace Vi.Core
 
         public void OnNetworkSpawn()
         {
+            if (!combatAgent) { return; }
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");

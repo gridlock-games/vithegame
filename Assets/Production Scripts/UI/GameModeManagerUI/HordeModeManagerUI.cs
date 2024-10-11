@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Vi.Core.Structures;
 using Vi.Core;
 using Vi.ScriptableObjects;
+using Vi.Player;
 
 namespace Vi.UI
 {
@@ -38,6 +39,13 @@ namespace Vi.UI
                 statusIcon.InitializeStatusIcon(status);
                 statusIcons.Add(statusIcon);
             }
+        }
+
+        protected override void UpdateDiscordRichPresence()
+        {
+            string scoreString = null;
+            if (hordeModeManager) { scoreString = "Waves Completed: " + hordeModeManager.GetWavesCompleted(); }
+            DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), scoreString);
         }
 
         private int lastRoundCount = -1;
@@ -108,7 +116,31 @@ namespace Vi.UI
             {
                 FindStructure();
             }
+
+            // Display essence menu
+            if (lastEssenceUIState != hordeModeManager.ShouldDisplayEssenceUI)
+            {
+                if (actionMapHandler)
+                {
+                    if (!actionMapHandler.GetComponent<Spectator>())
+                    {
+                        if (hordeModeManager.ShouldDisplayEssenceUI)
+                        {
+                            essenceBuffMenu.Initialize(actionMapHandler);
+                        }
+                        else
+                        {
+                            essenceBuffMenu.CloseMenu();
+                        }
+                    }
+                }
+            }
+
+            lastEssenceUIState = hordeModeManager.ShouldDisplayEssenceUI;
         }
+
+        [SerializeField] private EssenceBuffMenu essenceBuffMenu;
+        private bool lastEssenceUIState;
 
         private void EvaluateWavesText()
         {

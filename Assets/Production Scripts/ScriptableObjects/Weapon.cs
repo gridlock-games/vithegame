@@ -582,6 +582,31 @@ namespace Vi.ScriptableObjects
             ReduceAbilityCooldownTime(ability, percent);
         }
 
+        public float GetAbilityOffsetDifference(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return ability1.abilityCooldownTime - ability1CooldownOffset;
+            }
+            else if (ability == ability2)
+            {
+                return ability2.abilityCooldownTime - ability2CooldownOffset;
+            }
+            else if (ability == ability3)
+            {
+                return ability3.abilityCooldownTime - ability3CooldownOffset;
+            }
+            else if (ability == ability4)
+            {
+                return ability4.abilityCooldownTime - ability4CooldownOffset;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
         public void ReduceAbilityCooldownTime(ActionClip ability, float percent)
         {
             if (ability == ability1)
