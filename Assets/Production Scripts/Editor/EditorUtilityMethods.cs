@@ -69,8 +69,8 @@ namespace Vi.Editor
         {
             GenerateDroppedWeaponVariants();
             RemoveComponentsFromWeaponPreviews();
-            FindMissingNetworkPrefabs();
             FindVFXNotInNetworkPrefabsList();
+            FindMissingNetworkPrefabs();
             SetTextureImportOverrides();
             GetPooledObjectList().AddUnregisteredPooledObjects();
             AssetDatabase.SaveAssets();

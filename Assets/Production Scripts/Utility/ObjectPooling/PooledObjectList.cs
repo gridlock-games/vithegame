@@ -24,6 +24,10 @@ namespace Vi.Utility
 
         private AsyncOperationHandle<PooledObject>[] pooledObjectHandles;
 
+#if UNITY_EDITOR
+        public List<PooledObjectReference> GetPooledObjectReferences() { return pooledObjectReferences; }
+#endif
+
         public List<PooledObject> GetPooledObjects()
         {
             List<PooledObject> pooledObjects = new List<PooledObject>();
@@ -67,6 +71,11 @@ namespace Vi.Utility
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
+                if (handle.Result.name.Contains("Scoreboard"))
+                {
+                    Debug.Log(index + " " + handle.Result);
+                }
+
                 handle.Result.SetPooledObjectIndex(index);
                 pooledObjectHandles[index] = handle;
                 ObjectPoolingManager.EvaluateNetworkPrefabHandler(handle.Result);
@@ -102,6 +111,7 @@ namespace Vi.Utility
             foreach (string prefabFilePath in files)
             {
                 string guid = AssetDatabase.AssetPathToGUID(prefabFilePath);
+
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (!prefab) { continue; }
                 if (prefab.TryGetComponent(out PooledObject pooledObject))
@@ -179,14 +189,14 @@ namespace Vi.Utility
         {
             pooledObjectReferences.RemoveAll(item => item == null);
 
-            List<PooledObjectReference> query = pooledObjectReferences.GroupBy(x => x)
+            List<string> query = pooledObjectReferences.GroupBy(x => x.AssetGUID)
               .Where(g => g.Count() > 1)
               .Select(y => y.Key)
               .ToList();
 
-            foreach (PooledObjectReference pooledObject in query)
+            foreach (string guid in query)
             {
-                Debug.Log(pooledObject);
+                Debug.Log(AssetDatabase.GUIDToAssetPath(guid));
             }
         }
 #endif
