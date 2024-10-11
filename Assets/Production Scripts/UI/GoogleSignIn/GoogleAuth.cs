@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Net;
 using System.Web;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Vi.UI.SimpleGoogleSignIn
 {
@@ -182,6 +183,11 @@ namespace Vi.UI.SimpleGoogleSignIn
 
     private static string webpageHTML()
     {
+      //For implementation
+      string htmlFileLocation = Application.streamingAssetsPath + "/AuthenticationLocalhost.html";
+
+      //PC File read
+
       string htmlStuff = "<!--Vi authentication page MJM--><!--DO NOT ADD THE AUTHENTICATION JAVASCRIPT ON THIS PAGE - USED FOR THE LOCALHOST BASED AUTHENTICATION-->\r\n<!DOCTYPE html>\r\n<html>\r\n\r\n<head>\r\n    <title>Vi Content Server</title>\r\n    <link rel=\"stylesheet\" href=\"https://unpkg.com/plain-css@latest/dist/plain.min.css\">\r\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\r\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\r\n    <link href=\"https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap\"\r\n        rel=\"stylesheet\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <meta charset=\"UTF-8\">\r\n    <style>\r\n        * {\r\n            margin: 0;\r\n            padding: 0;\r\n            box-sizing: border-box;\r\n        }\r\n\r\n        .container {\r\n            display: flex;\r\n            flex-direction: column;\r\n            align-items: center;\r\n            justify-content: center;\r\n        }\r\n\r\n        body {\r\n            height: 100%;\r\n            display: flex;\r\n            justify-content: center;\r\n            align-items: center;\r\n            background-color: #252525;\r\n            background-size: cover;\r\n            font-family: \"Jost\", sans-serif;\r\n            background-image: url(https://authentication.vi-assets.com/vibackground.png);\r\n\r\n        }\r\n\r\n        .centerizedA {\r\n            height: auto;\r\n            width: auto;\r\n            position: relative;\r\n\r\n        }\r\n\r\n        .centerizedB {\r\n            padding: 20px;\r\n            border: 2px solid #6d6d6d;\r\n            background-color: #ffffff;\r\n            background-image: url(https://authentication.vi-assets.com/LoginWindow.png);\r\n            background-size: 200%;\r\n            background-position: center;\r\n            text-align: center;\r\n            border-radius: 10px;\r\n            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\r\n            max-width: 100%;\r\n            width: 100%;\r\n            max-width: 600px;\r\n            display: flex;\r\n            flex-direction: column;\r\n            justify-content: center;\r\n            align-items: center;\r\n            color: white;\r\n\r\n        }\r\n    </style>\r\n</head>\r\n\r\n<body>\r\n    <div class=\"container\">\r\n    <div class=centerizedB> <img src=https://authentication.vi-assets.com/vilogo.png alt=Vi Game Logo\r\n            style=width:184px;height:184px; class=floating_element />\r\n        <h1 id=titleText class=display:inline;>Login Successful</h1>\r\n        <p id=subtitleText>\r\n            You may close this tab and return to Vi</p>\r\n    </div>\r\n</div>\r\n</body>\r\n\r\n</html>";
 
       return htmlStuff;
