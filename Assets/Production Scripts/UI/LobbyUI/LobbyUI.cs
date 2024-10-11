@@ -16,6 +16,9 @@ namespace Vi.UI
         [SerializeField] private Image backgroundImage;
         [SerializeField] private GameObject roomSettingsParent;
         [SerializeField] private GameObject lobbyUIParent;
+        [Header("Character Preview")]
+        [SerializeField] private Camera characterPreviewCamera;
+        [SerializeField] private RawImage characterPreviewImage;
         [Header("Lobby UI Assignments")]
         [SerializeField] private Button returnToHubButton;
         [SerializeField] private Vector3 previewCharacterPosition;
@@ -170,6 +173,17 @@ namespace Vi.UI
             leftTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { leftTeamParent.ApplyTeamNameOverride(); });
             rightTeamParent.teamPrefixOverrideInputField.onEndEdit.AddListener(delegate { rightTeamParent.ApplyTeamNameOverride(); });
 
+        }
+
+        private void Start()
+        {
+            if (characterPreviewCamera)
+            {
+                characterPreviewCamera.transform.SetParent(null);
+                characterPreviewCamera.transform.position = new Vector3(0, 2.033f, -9.592f);
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(18.07f, 0, 0);
+                characterPreviewImage.texture = characterPreviewCamera.targetTexture;
+            }
         }
 
         private void SyncRoomSettingsFields()
@@ -851,6 +865,8 @@ namespace Vi.UI
         private new void OnDestroy()
         {
             base.OnDestroy();
+            if (characterPreviewCamera) { Destroy(characterPreviewCamera.gameObject); }
+
             if (previewObject)
             {
                 if (previewObject.TryGetComponent(out PooledObject pooledObject))
