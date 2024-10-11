@@ -71,11 +71,6 @@ namespace Vi.Utility
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                if (handle.Result.name.Contains("Scoreboard"))
-                {
-                    Debug.Log(index + " " + handle.Result);
-                }
-
                 handle.Result.SetPooledObjectIndex(index);
                 pooledObjectHandles[index] = handle;
                 ObjectPoolingManager.EvaluateNetworkPrefabHandler(handle.Result);
