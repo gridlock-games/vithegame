@@ -18,14 +18,14 @@ namespace Vi.Utility
 
         public void SetPooledObjectIndex(int index)
         {
-            #if UNITY_EDITOR
             if (index != pooledObjectIndex)
             {
-                Debug.Log("Setting pooled object index: " + index + " " + this);
+                Debug.Log("Setting pooled object index: " + index + " prev: " + pooledObjectIndex + " " + this);
+                pooledObjectIndex = index;
+#if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(this);
+#endif
             }
-            #endif
-            pooledObjectIndex = index;
         }
 
         [SerializeField] private bool isPrewarmObject;
@@ -85,6 +85,18 @@ namespace Vi.Utility
             {
                 networkObject.AutoObjectParentSync = false;
             }
+
+#if UNITY_EDITOR
+            PooledObjectList pooledObjectList = UnityEditor.AssetDatabase.LoadAssetAtPath<PooledObjectList>(@"Assets\Production\PooledObjectList.asset");
+            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabStage)
+            {
+                if (!pooledObjectList.GetPooledObjectReferences().Exists(item => item.AssetGUID == UnityEditor.AssetDatabase.GUIDFromAssetPath(prefabStage.assetPath).ToString()))
+                {
+                    SetPooledObjectIndex(-1);
+                }
+            }
+#endif
         }
     }
 }

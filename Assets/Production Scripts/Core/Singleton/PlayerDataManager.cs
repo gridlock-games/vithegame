@@ -33,15 +33,15 @@ namespace Vi.Core
             public int[] maxPlayersOnMap;
         }
 
-        public static bool IsCharacterReferenceLoaded() { return characterReferenceHandle.IsValid() & characterReferenceHandle.IsDone; }
+        public static bool IsCharacterReferenceLoaded() { return CharacterReferenceHandle.IsValid() & CharacterReferenceHandle.IsDone; }
 
         [SerializeField] private AssetReference characterReferenceAddressable;
-        private static AsyncOperationHandle<CharacterReference> characterReferenceHandle;
+        public static AsyncOperationHandle<CharacterReference> CharacterReferenceHandle { get; private set; }
         public CharacterReference GetCharacterReference()
         {
-            if (characterReferenceHandle.IsValid() & characterReferenceHandle.IsDone)
+            if (CharacterReferenceHandle.IsValid() & CharacterReferenceHandle.IsDone)
             {
-                return characterReferenceHandle.Result;
+                return CharacterReferenceHandle.Result;
             }
             else
             {
@@ -51,12 +51,12 @@ namespace Vi.Core
         }
 
         [SerializeField] private AssetReference controlsImageMappingAddressable;
-        private static AsyncOperationHandle<ControlsImageMapping> controlsImageMappingHandle;
+        public static AsyncOperationHandle<ControlsImageMapping> ControlsImageMappingHandle;
         public ControlsImageMapping GetControlsImageMapping()
         {
-            if (controlsImageMappingHandle.IsValid() & controlsImageMappingHandle.IsDone)
+            if (ControlsImageMappingHandle.IsValid() & ControlsImageMappingHandle.IsDone)
             {
-                return controlsImageMappingHandle.Result;
+                return ControlsImageMappingHandle.Result;
             }
             else
             {
@@ -949,10 +949,10 @@ namespace Vi.Core
 
         private IEnumerator LoadScriptableObjects()
         {
-            if (!characterReferenceHandle.IsValid()) { characterReferenceHandle = characterReferenceAddressable.LoadAssetAsync<CharacterReference>(); }
-            yield return new WaitUntil(() => characterReferenceHandle.IsDone);
-            if (!controlsImageMappingHandle.IsValid()) { controlsImageMappingHandle = controlsImageMappingAddressable.LoadAssetAsync<ControlsImageMapping>(); }
-            yield return new WaitUntil(() => controlsImageMappingHandle.IsDone);
+            if (!CharacterReferenceHandle.IsValid()) { CharacterReferenceHandle = characterReferenceAddressable.LoadAssetAsync<CharacterReference>(); }
+            yield return new WaitUntil(() => CharacterReferenceHandle.IsDone);
+            if (!ControlsImageMappingHandle.IsValid()) { ControlsImageMappingHandle = controlsImageMappingAddressable.LoadAssetAsync<ControlsImageMapping>(); }
+            yield return new WaitUntil(() => ControlsImageMappingHandle.IsDone);
         }
 
         private void OnEnable()

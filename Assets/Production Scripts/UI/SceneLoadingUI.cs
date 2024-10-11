@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
+using Vi.Isolated;
 
 namespace Vi.UI
 {
@@ -57,6 +58,16 @@ namespace Vi.UI
             mainCamera = Camera.main;
         }
 
+        NetworkCallbackManager networkCallbackManager;
+        private void Start()
+        {
+            networkCallbackManager = FindObjectOfType<NetworkCallbackManager>();
+            if (!networkCallbackManager)
+            {
+                Debug.LogError("Can't find network callback manager");
+            }
+        }
+
         private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
@@ -102,7 +113,7 @@ namespace Vi.UI
                 spawningPlayerObjectParent.SetActive(false);
             }
 
-            progressBarParent.SetActive(NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
+            progressBarParent.SetActive(!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone | NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
 
             if (spawningPlayerObjectParent.activeSelf)
             {
@@ -133,7 +144,12 @@ namespace Vi.UI
             canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
 
             scenesLeftText.text = "";
-            if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
+            if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+            {
+                progressBarText.text = "Loading Scene Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete*100).ToString("F0") + "%";
+                progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
+            }
+            else if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
                 if (NetworkManager.Singleton.ShutdownInProgress)
                 {

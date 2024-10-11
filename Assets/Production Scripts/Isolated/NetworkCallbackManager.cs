@@ -40,8 +40,8 @@ namespace Vi.Isolated
 
         private IEnumerator LoadMainMenu()
         {
-            loadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
-            yield return new WaitUntil(() => loadedNetSceneManagerPrefab.IsDone);
+            LoadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
+            yield return new WaitUntil(() => LoadedNetSceneManagerPrefab.IsDone);
             CreateNetSceneManager();
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
             NetSceneManager.Singleton.LoadScene("Main Menu");
@@ -52,7 +52,7 @@ namespace Vi.Isolated
             yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone);
             CreatePlayerDataManager(false);
 
-            ObjectPoolingManager.canPool = true;
+            ObjectPoolingManager.CanPool = true;
         }
 
         private AsyncOperationHandle<GameObject> loadedPlayerDataManagerPrefab;
@@ -65,12 +65,12 @@ namespace Vi.Isolated
             }
         }
 
-        private AsyncOperationHandle<GameObject> loadedNetSceneManagerPrefab;
+        public AsyncOperationHandle<GameObject> LoadedNetSceneManagerPrefab { get; private set; }
         private void CreateNetSceneManager()
         {
             if (!NetSceneManager.DoesExist())
             {
-                DontDestroyOnLoad(Instantiate(loadedNetSceneManagerPrefab.Result));
+                DontDestroyOnLoad(Instantiate(LoadedNetSceneManagerPrefab.Result));
             }
         }
 
