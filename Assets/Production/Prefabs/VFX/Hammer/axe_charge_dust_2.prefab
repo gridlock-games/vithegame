@@ -5,8 +5,14 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 570383733135311285, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1030975243857146572, guid: fed7c97a88174e245b699436089f8291,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -107,6 +113,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: axe_charge_dust_2
       objectReference: {fileID: 0}
+    - target: {fileID: 1030975243857146575, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4381868210990660354, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4381868210990660364, guid: fed7c97a88174e245b699436089f8291,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -127,12 +143,41 @@ PrefabInstance:
       propertyPath: InitialModule.startColor.maxColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5781439080604321637, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6469333563662758676, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6469333563662758681, guid: fed7c97a88174e245b699436089f8291,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
       value: 0.08627451
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1030975243857146575, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1063683607691655105}
+    - targetCorrespondingSourceObject: {fileID: 1030975243857146575, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2311124054834290518}
+    - targetCorrespondingSourceObject: {fileID: 1030975243857146575, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7367974588117583478}
+    - targetCorrespondingSourceObject: {fileID: 1030975243857146575, guid: fed7c97a88174e245b699436089f8291,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8017302554934645797}
   m_SourcePrefab: {fileID: 100100000, guid: fed7c97a88174e245b699436089f8291, type: 3}
 --- !u!1 &3657530279099700069 stripped
 GameObject:
@@ -156,6 +201,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 1
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -165,8 +211,24 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: d316ef2ab4e684e238a1673306007afa,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
+--- !u!114 &2311124054834290518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3657530279099700069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: 89
+  isPrewarmObject: 1
 --- !u!114 &7367974588117583478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,18 +280,4 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &2311124054834290518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3657530279099700069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numberOfObjectsToPool: 5
-  pooledObjectIndex: 89
+  AutoObjectParentSync: 0

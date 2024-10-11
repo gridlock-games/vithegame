@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -28,13 +29,13 @@ namespace Vi.Core
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
-            weaponInstance = ScriptableObject.CreateInstance<Weapon>();
-            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             RefreshStatus();
         }
 
         private void OnEnable()
         {
+            weaponInstance = ScriptableObject.CreateInstance<Weapon>();
+            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             RefreshStatus();
         }
 
@@ -42,16 +43,32 @@ namespace Vi.Core
         public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
         public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
-            if (IsOwner) { aiming.Value = false; }
+            if (IsOwner & IsSpawned) { aiming.Value = false; }
 
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
-            StartCoroutine(SwapAnimatorController());
+
+            if (combatAgent.AnimationHandler.IsAiming())
+            {
+                if (gameObject.activeInHierarchy)
+                {
+                    StartCoroutine(SwapAnimatorControllerAfterNotAiming());
+                }
+                else
+                {
+                    Debug.LogError("Cannot swap animator controller in coroutine because object is inactive");
+                }
+            }
+            else
+            {
+                combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
+            }
+            
             EquipWeapon();
             WeaponInitialized = true;
         }
 
-        private IEnumerator SwapAnimatorController()
+        private IEnumerator SwapAnimatorControllerAfterNotAiming()
         {
             yield return new WaitUntil(() => !combatAgent.AnimationHandler.IsAiming());
             combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
@@ -105,6 +122,42 @@ namespace Vi.Core
             combatAgent.LoadoutManager.UseAmmo(weaponInstance);
         }
 
+        private void OnDisable()
+        {
+            foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
+            }
+            weaponInstances.Clear();
+            foreach (PooledObject g in stowedWeaponInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(g);
+            }
+            stowedWeaponInstances.Clear();
+
+            inputHistory.Clear();
+
+            CanAim = false;
+            CanADS = false;
+
+            currentActionClipWeapon = default;
+
+            actionSoundEffectIdTracker.Clear();
+
+            actionVFXTracker.Clear();
+
+            IsInAnticipation = false;
+            isAboutToAttack = false;
+            IsAttacking = false;
+            IsInRecovery = false;
+
+            ClearPreviewActionVFXInstances();
+
+            reloadFinished = false;
+
+            IsBlocking = false;
+        }
+
         private void EquipWeapon()
         {
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
@@ -120,7 +173,7 @@ namespace Vi.Core
             bool broken = false;
             foreach (Weapon.WeaponModelData data in weaponInstance.GetWeaponModelData())
             {
-                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
+                if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", "") | data.skinPrefab.name == name.Replace("(Clone)", ""))
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
@@ -217,6 +270,7 @@ namespace Vi.Core
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
 
+            summonablesCount = 0;
             if (IsInAnticipation)
             {
                 if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -254,7 +308,14 @@ namespace Vi.Core
                 }
             }
 
-            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+            if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Reload)
+            {
+                ResetComboSystem();
+                reloadFinished = false;
+                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
+                if (reloadSoundEffect) { AudioManager.Singleton.PlayClipOnTransform(transform, reloadSoundEffect, false, Weapon.reloadSoundEffectVolume); }
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge | CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
             {
                 ResetComboSystem();
             }
@@ -323,7 +384,7 @@ namespace Vi.Core
             return previewInstance.gameObject;
         }
 
-        private (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, bool isPreviewVFX, Transform attackerTransform, Transform victimTransform = null)
+        public (SpawnPoints.TransformData, Transform) GetActionVFXOrientation(ActionClip actionClip, ActionVFX actionVFX, bool isPreviewVFX, Transform attackerTransform, Transform victimTransform = null)
         {
             SpawnPoints.TransformData orientation = new SpawnPoints.TransformData();
             Transform parent = null;
@@ -429,6 +490,11 @@ namespace Vi.Core
                     break;
             }
 
+            if (actionVFX.offsetByTargetBodyHeight)
+            {
+                orientation.position += combatAgent.MovementHandler.BodyHeightOffset;
+            }
+
             return (orientation, parent);
         }
 
@@ -453,19 +519,33 @@ namespace Vi.Core
 
             if (vfxInstance)
             {
-                if (!IsServer) { Debug.LogError("Why the fuck are we not the server here!?"); return null; }
+                if (!IsServer) { Debug.LogError("You can only spawn action VFX on server!"); return null; }
+                
+                if (attackerTransform)
+                {
+                    if (attackerTransform.TryGetComponent(out CombatAgent attacker))
+                    {
+                        if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
+                        {
+                            gameInteractiveActionVFX.InitializeVFX(attacker, actionClip);
+                        }
+                    }
+                }
+                
                 if (vfxInstance.TryGetComponent(out NetworkObject netObj))
                 {
-                    netObj.Spawn(true);
+                    if (netObj.IsSpawned)
+                    {
+                        Debug.LogError("Trying to spawn an action VFX instance that is already spawned " + vfxInstance);
+                    }
+                    else
+                    {
+                        netObj.Spawn(true);
+                    }
                 }
                 else
                 {
                     Debug.LogError("VFX Instance doesn't have a network object component! " + vfxInstance);
-                }
-
-                if (vfxInstance.TryGetComponent(out GameInteractiveActionVFX gameInteractiveActionVFX))
-                {
-                    gameInteractiveActionVFX.InitializeVFX(combatAgent, CurrentActionClip);
                 }
             }
             else if (actionVFXPrefab.transformType != ActionVFX.TransformType.ConformToGround)
@@ -482,6 +562,10 @@ namespace Vi.Core
         private bool isAboutToAttack;
         public bool IsAttacking { get; private set; }
         public bool IsInRecovery { get; private set; }
+
+        private bool reloadFinished;
+
+        private int summonablesCount;
 
         private void FixedUpdate()
         {
@@ -511,12 +595,27 @@ namespace Vi.Core
                             SpawnActionVFX(CurrentActionClip, actionVFX, transform);
                         }
                     }
+
+                    if (summonablesCount < CurrentActionClip.summonableCount)
+                    {
+                        if (CurrentActionClip.summonables.Length > 0)
+                        {
+                            if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                            {
+                                Mob mob = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<Mob>();
+                                mob.SetTeam(combatAgent.GetTeam());
+                                mob.SetMaster(combatAgent);
+                                mob.NetworkObject.Spawn(true);
+                                summonablesCount++;
+                            }
+                        }
+                    }
                 }
 
                 // Action sound effect logic here
                 foreach (ActionClip.ActionSoundEffect actionSoundEffect in CurrentActionClip.GetActionClipSoundEffects(combatAgent.GetRaceAndGender(), actionSoundEffectIdTracker))
                 {
-                    if (Mathf.Approximately(0, actionSoundEffect.normalizedPlayTime))
+                    if (normalizedTime >= actionSoundEffect.normalizedPlayTime)
                     {
                         AudioManager.Singleton.PlayClipOnTransform(transform, actionSoundEffect.audioClip, false, ActionClip.actionClipSoundEffectVolume);
                         actionSoundEffectIdTracker.Add(actionSoundEffect.id);
@@ -530,6 +629,22 @@ namespace Vi.Core
                 isAboutToAttack = false;
                 IsAttacking = false;
                 IsInRecovery = false;
+            }
+            else if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Reload)
+            {
+                IsInAnticipation = false;
+                isAboutToAttack = false;
+                IsAttacking = false;
+                IsInRecovery = false;
+
+                if (IsServer)
+                {
+                    if (!reloadFinished)
+                    {
+                        float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                        if (normalizedTime >= CurrentActionClip.reloadNormalizedTime) { combatAgent.LoadoutManager.Reload(weaponInstance); reloadFinished = true; }
+                    }
+                }
             }
             else if (CurrentActionClip.IsAttack())
             {
@@ -578,12 +693,12 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                                Debug.LogError("Weapon instance was destroyed for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                             }
                         }
                         else
                         {
-                            Debug.LogError("Affected weapon bone " + weaponBone + " but there isn't a weapon instance");
+                            Debug.LogError("No weapon instance for affected bone " + weaponBone + " for weapon " + weaponInstance.name + " for action clip " + CurrentActionClip.name);
                         }
                     }
                 }
@@ -660,13 +775,11 @@ namespace Vi.Core
         public override void OnNetworkSpawn()
         {
             lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
-            reloadingAnimParameterValue.OnValueChanged += OnReloadAnimParameterChange;
         }
 
         public override void OnNetworkDespawn()
         {
             lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
-            reloadingAnimParameterValue.OnValueChanged -= OnReloadAnimParameterChange;
         }
 
         public void LightAttack(bool isPressed)
@@ -727,28 +840,6 @@ namespace Vi.Core
             while (true)
             {
                 ExecuteLightAttack(true);
-                yield return null;
-                yield return null;
-            }
-        }
-
-        private void OnReloadAnimParameterChange(bool prev, bool current)
-        {
-            if (current)
-            {
-                AudioClip reloadSoundEffect = GetWeapon().GetReloadSoundEffect();
-                if (reloadSoundEffect) { StartCoroutine(PlayReloadSoundEffect(reloadSoundEffect)); }
-            }
-        }
-
-        private IEnumerator PlayReloadSoundEffect(AudioClip reloadSoundEffect)
-        {
-            AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(gameObject, reloadSoundEffect, transform.position, Weapon.reloadSoundEffectVolume);
-            while (true)
-            {
-                if (!reloadingAnimParameterValue.Value) { break; }
-                if (!audioSource) { break; }
-                if (!audioSource.isPlaying) { break; }
                 yield return null;
             }
         }
@@ -845,6 +936,12 @@ namespace Vi.Core
             ClearPreviewActionVFXInstances();
         }
 
+        private bool upgradePressed;
+        void OnUpgrade(InputValue value)
+        {
+            upgradePressed = value.isPressed;
+        }
+
         void OnAbility1(InputValue value)
         {
             Ability1(value.isPressed);
@@ -854,6 +951,19 @@ namespace Vi.Core
         public void Ability1(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility1();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -891,6 +1001,19 @@ namespace Vi.Core
         public void Ability2(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility2();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -928,6 +1051,19 @@ namespace Vi.Core
         public void Ability3(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility3();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -965,6 +1101,19 @@ namespace Vi.Core
         public void Ability4(bool isPressed)
         {
             ActionClip actionClip = weaponInstance.GetAbility4();
+            if (GameModeManager.Singleton.LevelingEnabled)
+            {
+                if (upgradePressed & combatAgent.SessionProgressionHandler.SkillPoints > 0)
+                {
+                    combatAgent.SessionProgressionHandler.UpgradeAbility(GetWeapon(), actionClip);
+                    return;
+                }
+                else if (combatAgent.SessionProgressionHandler.GetAbilityLevel(GetWeapon(), actionClip) == 0)
+                {
+                    return;
+                }
+            }
+
             if (actionClip != null)
             {
                 if (actionClip.previewActionVFX & IsLocalPlayer)
@@ -1030,7 +1179,6 @@ namespace Vi.Core
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
         }
 
-        private NetworkVariable<bool> reloadingAnimParameterValue = new NetworkVariable<bool>();
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -1039,21 +1187,15 @@ namespace Vi.Core
 
             combatAgent.AnimationHandler.Animator.SetBool("Blocking", IsBlocking);
 
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
-                reloadingAnimParameterValue.Value = combatAgent.AnimationHandler.Animator.GetBool("Reloading");
-
                 if (ShouldUseAmmo())
                 {
                     if (GetAmmoCount() == 0)
                     {
-                        if (combatAgent.MovementHandler.GetMoveInput() == Vector2.zero) { OnReload(); }
+                        if (combatAgent.MovementHandler.GetPlayerMoveInput() == Vector2.zero) { OnReload(); }
                     }
                 }
-            }
-            else
-            {
-                combatAgent.AnimationHandler.Animator.SetBool("Reloading", reloadingAnimParameterValue.Value);
             }
 
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
@@ -1067,51 +1209,11 @@ namespace Vi.Core
         void OnReload()
         {
             if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
-            if (IsServer)
-            {
-                ReloadOnServer();
-            }
-            else
-            {
-                ReloadServerRpc();
-                WaitingForReloadToPlay = true;
-            }
-        }
-
-        public bool WaitingForReloadToPlay { get; private set; }
-
-        [Rpc(SendTo.Server)]
-        private void ReloadServerRpc()
-        {
-            ReloadOnServer();
-            ResetWaitingForReloadRpc();
-        }
-
-        [Rpc(SendTo.Owner)] private void ResetWaitingForReloadRpc() { WaitingForReloadToPlay = false; }
-
-        private void ReloadOnServer()
-        {
-            if (reloadRunning) { return; }
             if (combatAgent.AnimationHandler.IsReloading()) { return; }
-            if (combatAgent.LoadoutManager.GetAmmoCount(weaponInstance) == weaponInstance.GetMaxAmmoCount()) { return; }
             if (!combatAgent.AnimationHandler.IsAtRest()) { return; }
 
-            foreach (ShooterWeapon shooterWeapon in shooterWeapons)
-            {
-                StartCoroutine(Reload(shooterWeapon));
-                break;
-            }
-        }
-
-        private bool reloadRunning;
-        private IEnumerator Reload(ShooterWeapon shooterWeapon)
-        {
-            reloadRunning = true;
-            combatAgent.AnimationHandler.Animator.SetBool("Reloading", true);
-            yield return new WaitUntil(() => combatAgent.AnimationHandler.IsFinishingReload());
-            combatAgent.AnimationHandler.Animator.SetBool("Reloading", false);
-            combatAgent.LoadoutManager.Reload(weaponInstance);
-            reloadRunning = false;
+            ActionClip reloadClip = GetWeapon().GetReloadClip();
+            if (reloadClip) { combatAgent.AnimationHandler.PlayAction(reloadClip); }
         }
 
         public bool IsBlocking { get; private set; }
@@ -1162,7 +1264,7 @@ namespace Vi.Core
 
         void OnAddForce()
         {
-            combatAgent.MovementHandler.GetRigidbody().AddForce((transform.forward + Vector3.up) * 50);
+            combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
 
@@ -1304,16 +1406,16 @@ namespace Vi.Core
                     case Weapon.ComboCondition.None:
                         break;
                     case Weapon.ComboCondition.InputForward:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y > 0.7f;
                         break;
                     case Weapon.ComboCondition.InputBackwards:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().y < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().y < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputLeft:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x < -0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x < -0.7f;
                         break;
                     case Weapon.ComboCondition.InputRight:
-                        conditionMet = combatAgent.MovementHandler.GetMoveInput().x > 0.7f;
+                        conditionMet = combatAgent.MovementHandler.GetPlayerMoveInput().x > 0.7f;
                         break;
                     default:
                         Debug.Log(attack.comboCondition + " has not been implemented yet!");

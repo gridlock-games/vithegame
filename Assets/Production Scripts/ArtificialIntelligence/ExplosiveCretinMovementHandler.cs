@@ -5,6 +5,7 @@ using Vi.Core;
 using Unity.Netcode;
 using Vi.Core.VFX;
 using UnityEngine.AI;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -18,15 +19,16 @@ namespace Vi.ArtificialIntelligence
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             actionVFX = GetComponent<GameInteractiveActionVFX>();
-            SetDestination(transform.position, true);
+            SetDestination(transform.position);
         }
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsServer)
             {
-                SetDestination(transform.position, true);
-                CalculatePath(transform.position, NavMesh.AllAreas);
+                SetDestination(transform.position);
+                CalculatePath(transform.position);
             }
         }
 
@@ -86,11 +88,11 @@ namespace Vi.ArtificialIntelligence
                         }
                     }
 
-                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition(), true); targetFound = true; }
+                    if (shouldAffect) { SetDestination(networkCollider.MovementHandler.GetPosition()); targetFound = true; }
                 }
             }
-            if (!targetFound) { SetDestination(transform.position, true); }
-            CalculatePath(transform.position, NavMesh.AllAreas);
+            if (!targetFound) { SetDestination(transform.position); }
+            CalculatePath(transform.position);
         }
     }
 }

@@ -5,22 +5,23 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1307818078017732520, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2694391759692933637, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2694391760879300546, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3234501369689784568, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
@@ -95,19 +96,50 @@ PrefabInstance:
     - target: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4559843453540174112, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7453404159013872571, guid: 0615d860257d4de479ba213d2b1150d4,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4190956643139954957}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5069685640363414994}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2397159746693335794}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3802610379530131370}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4072807706216768431}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6752391505022537033}
+    - targetCorrespondingSourceObject: {fileID: 3234501369689784574, guid: 0615d860257d4de479ba213d2b1150d4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6835742619814306194}
   m_SourcePrefab: {fileID: 100100000, guid: 0615d860257d4de479ba213d2b1150d4, type: 3}
 --- !u!1 &4127371521242055783 stripped
 GameObject:
@@ -122,10 +154,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4127371521242055783}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -139,32 +182,19 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4127371521242055783}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 5.218707
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4072807706216768431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4127371521242055783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3443587292
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &2397159746693335794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +223,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -202,12 +233,14 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 4583ceba17f16405f844e17bd7559459,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
   spellType: 1
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  teamColorParticleSystems: []
   shouldAffectSelf: 0
   shouldAffectTeammates: 0
   shouldAffectEnemies: 1
@@ -218,6 +251,27 @@ MonoBehaviour:
   scaleVFXBasedOnEdges: 0
   boundsPoint: {x: 0, y: 0, z: 2.5}
   boundsLocalAxis: {x: 0, y: -1, z: 0}
+--- !u!114 &4072807706216768431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4127371521242055783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3443587292
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &6752391505022537033
 MonoBehaviour:
   m_ObjectHideFlags: 0

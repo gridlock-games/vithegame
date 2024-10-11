@@ -6,7 +6,7 @@ using UnityEngine;
 using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Utility;
-using System.Linq;
+using Vi.Core.VFX;
 
 namespace Vi.Core.CombatAgents
 {
@@ -23,9 +23,6 @@ namespace Vi.Core.CombatAgents
 
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
-        private NetworkVariable<bool> spawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        public bool IsSpawnedOnOwnerInstance() { return spawnedOnOwnerInstance.Value; }
-
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
 
         public void SetCachedPlayerData(PlayerDataManager.PlayerData playerData)
@@ -34,9 +31,9 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = playerData;
         }
 
-        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP(); }
-        public override float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina(); }
-        public override float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit(); }
+        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
+        public override float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
+        public override float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit() + SessionProgressionHandler.MaxSpiritBonus; }
         public override float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public override void AddStamina(float amount, bool activateCooldown = true)
@@ -64,7 +61,7 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private void AddSpirit(float amount)
+        public override void AddSpirit(float amount)
         {
             if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
             if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
@@ -111,25 +108,25 @@ namespace Vi.Core.CombatAgents
             }
         }
 
+        [SerializeField] private PooledObject teamIndicatorPrefab;
+        private PooledObject teamIndicatorInstance;
+
         public override void OnNetworkSpawn()
         {
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
             base.OnNetworkSpawn();
 
-            if (IsServer)
+            if (NetworkManager.Singleton.IsServer)
             {
+                UpdateNetworkVisiblity();
                 StartCoroutine(InitStats());
-                StartCoroutine(SetNetworkVisibilityAfterSpawn());
             }
-
-            spirit.OnValueChanged += OnSpiritChanged;
-            rage.OnValueChanged += OnRageChanged;
-            isRaging.OnValueChanged += OnIsRagingChanged;
-            comboCounter.OnValueChanged += OnComboCounterChange;
 
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
-            if (IsOwner) { spawnedOnOwnerInstance.Value = true; }
+            spirit.OnValueChanged += OnSpiritChanged;
+            rage.OnValueChanged += OnRageChanged;
+            comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
             {
@@ -144,17 +141,21 @@ namespace Vi.Core.CombatAgents
                     }
                 }
             }
+            RefreshStatus();
+
+            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
         public void UpdateNetworkVisiblity()
         {
-            if (!IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Attributes.UpdateNetworkVisibility() should only be called on the server!"); return; }
+            if (!gameObject.activeInHierarchy) { return; }
             StartCoroutine(SetNetworkVisibilityAfterSpawn());
         }
 
         private IEnumerator SetNetworkVisibilityAfterSpawn()
         {
-            if (!IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Attributes.SetNetworkVisibilityAfterSpawn() should only be called on the server!"); yield break; }
             yield return null;
             if (!IsSpawned) { yield return new WaitUntil(() => IsSpawned); }
 
@@ -186,13 +187,16 @@ namespace Vi.Core.CombatAgents
 
         private IEnumerator InitStats()
         {
-            yield return new WaitUntil(() => WeaponHandler.GetWeapon() != null);
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("You should onyl call Attributes.InitStats() on the server!"); yield break; }
+            yield return new WaitUntil(() => IsSpawned);
+            yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = WeaponHandler.GetWeapon().GetMaxHP();
             spirit.Value = WeaponHandler.GetWeapon().GetMaxSpirit();
         }
 
         private IEnumerator AddPlayerObjectToPlayerDataManager()
         {
+            yield return new WaitUntil(() => IsSpawned);
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
             PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
         }
@@ -202,10 +206,11 @@ namespace Vi.Core.CombatAgents
             base.OnNetworkDespawn();
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
-            isRaging.OnValueChanged -= OnIsRagingChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
+
+            ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
         [SerializeField] private AudioClip heartbeatSoundEffect;
@@ -251,12 +256,16 @@ namespace Vi.Core.CombatAgents
             }
         }
 
+        public void StartSpiritRegen()
+        {
+            if (!IsServer) { Debug.LogError("Attributes.StartSpiritRegen() should only be called on the server!"); return; }
+            spiritRegenActivateTime = Time.time;
+        }
+
         private const float rageEndPercent = 0.01f;
 
         [SerializeField] private PooledObject rageAtMaxVFXPrefab;
-        [SerializeField] private PooledObject ragingVFXPrefab;
         private PooledObject rageAtMaxVFXInstance;
-        private PooledObject ragingVFXInstance;
         private void OnRageChanged(float prev, float current)
         {
             float currentRagePercent = GetRage() / GetMaxRage();
@@ -278,32 +287,42 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private void OnIsRagingChanged(bool prev, bool current)
+        protected override void OnIsRagingChanged(bool prev, bool current)
         {
+            base.OnIsRagingChanged(prev, current);
             if (current)
             {
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
-            }
-            else
-            {
-                if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             }
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
-        [SerializeField] private PooledObject teamIndicatorPrefab;
-        private PooledObject teamIndicatorInstance;
-        private void Start()
+        protected override void OnDisable()
         {
-            teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
+            base.OnDisable();
+            CachedPlayerData = default;
+
+            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
+
+            lastComboCounterChangeTime = default;
+            lastBlockTime = Mathf.NegativeInfinity;
+
+            staminaDelayCooldown = default;
+
+            spiritRegenActivateTime = Mathf.NegativeInfinity;
+
+            rageDelayCooldown = default;
+
+            IsRespawning = false;
+            isWaitingForSpawnPoint = false;
+            respawnSelfCalledTime = default;
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
@@ -378,20 +397,6 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        private NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
-
-        private void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
-
-        public NetworkObject GetKiller()
-        {
-            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
-
-            if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
-                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
-            else
-                return null;
-        }
-
         public void AddHitToComboCounter() { comboCounter.Value++; }
 
         private const float comboCounterResetTime = 3;
@@ -421,15 +426,16 @@ namespace Vi.Core.CombatAgents
 
         private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
+            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+
             if (isMeleeHit)
             {
                 if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
+                if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
             }
 
-            if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-
             // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed())
+            if (IsGrabbed)
             {
                 if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
                 if (attacker != GetGrabAssailant()) { return false; }
@@ -454,12 +460,12 @@ namespace Vi.Core.CombatAgents
 
             if (attack.maxHitLimit == 0) { return false; }
 
-            if (IsInvincible()) { return false; }
+            if (IsInvincible) { return false; }
             if (isMeleeHit)
             {
                 if (attacker.wasStaggeredThisFrame) { return false; }
 
-                if (!IsUninterruptable())
+                if (!IsUninterruptable)
                 {
                     wasStaggeredThisFrame = true;
                     StartCoroutine(ResetStaggerBool());
@@ -468,17 +474,19 @@ namespace Vi.Core.CombatAgents
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
 
-            if (IsUninterruptable()) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+
+            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
 
             AddStamina(-attack.staminaDamage);
-            if (!attacker.IsRaging()) { attacker.AddRage(attackerRageToBeAddedOnHit); }
-            if (!IsRaging()) { AddRage(victimRageToBeAddedOnHit); }
+            if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
+            if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
-            float HPDamage = -attack.damage;
+            float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
@@ -544,7 +552,7 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            if (IsRaging()) { HPDamage *= rageDamageMultiplier; }
+            if (IsRaging) { HPDamage *= rageDamageMultiplier; }
 
             bool hitReactionWasPlayed = false;
             if (AddHPWithoutApply(HPDamage) <= 0)
@@ -552,7 +560,7 @@ namespace Vi.Core.CombatAgents
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
 
-                if (IsGrabbed())
+                if (IsGrabbed)
                 {
                     if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
                     CancelGrab();
@@ -561,7 +569,7 @@ namespace Vi.Core.CombatAgents
                 AnimationHandler.PlayAction(hitReaction);
                 hitReactionWasPlayed = true;
             }
-            else if (!IsUninterruptable())
+            else if (!IsUninterruptable)
             {
                 if (hitReaction.ailment == ActionClip.Ailment.Grab)
                 {
@@ -575,7 +583,7 @@ namespace Vi.Core.CombatAgents
 
                 if (hitReaction.ailment == ActionClip.Ailment.None)
                 {
-                    if (!IsGrabbed() & !IsRaging())
+                    if (!IsGrabbed & !IsRaging)
                     {
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
@@ -622,153 +630,42 @@ namespace Vi.Core.CombatAgents
 
             if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
 
-            if (IsServer)
+            if (IsServer & runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, actionVFX, attacker.transform, transform);
+                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attacker.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                        {
+                            if (!hitCounter.ContainsKey(this))
+                            {
+                                hitCounter.Add(this, new(1, Time.time));
+                            }
+                            else
+                            {
+                                hitCounter[this] = new(hitCounter[this].hitNumber + 1, Time.time);
+                            }
+                            actionVFXParticleSystem.AddToHitCounter(hitCounter);
+                        }
                     }
                 }
             }
 
-            if (!IsUninterruptable())
+            if (!IsUninterruptable)
             {
-                if (attack.shouldFlinch | IsRaging())
+                if (attack.shouldFlinch | IsRaging)
                 {
-                    MovementHandler.Flinch(attack.GetFlinchAmount());
-                    if (!hitReactionWasPlayed & !IsGrabbed()) { AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle)); }
+                    if (!hitReactionWasPlayed & !IsGrabbed)
+                    {
+                        AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle));
+                        MovementHandler.Flinch(attack.GetFlinchAmount());
+                    }
                 }
             }
 
             lastAttackingCombatAgent = attacker;
             return true;
-        }
-
-        protected override void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
-        {
-            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
-            {
-                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
-            }
-
-            // Ailments
-            if (attackAilment != ailment.Value | applyAilmentRegardless)
-            {
-                bool shouldApplyAilment = false;
-                if (attackAilment != ActionClip.Ailment.None)
-                {
-                    Vector3 startPos = transform.position;
-                    Vector3 endPos = hitSourcePosition;
-                    startPos.y = 0;
-                    endPos.y = 0;
-                    Vector3 rel = endPos - startPos;
-                    ailmentRotation.Value = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
-
-                    shouldApplyAilment = true;
-
-                    if (attackAilment == ActionClip.Ailment.Pull)
-                    {
-                        pullAssailantDataId.Value = attacker.NetworkObjectId;
-                        isPulled.Value = true;
-                    }
-                    else if (attackAilment == ActionClip.Ailment.Grab)
-                    {
-                        if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                        ailment.Value = ActionClip.Ailment.None;
-                    }
-                    else
-                    {
-                        ailment.Value = attackAilment;
-                        if (ailment.Value == ActionClip.Ailment.Death)
-                        {
-                            if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(attacker, this); }
-                            SetKiller(attacker);
-                        }
-                    }
-                }
-                else // If this attack's ailment is none
-                {
-                    if (ailment.Value == ActionClip.Ailment.Stun | ailment.Value == ActionClip.Ailment.Stagger)
-                    {
-                        ailment.Value = ActionClip.Ailment.None;
-                    }
-                }
-
-                // If we started a new ailment on this attack, we want to start a reset coroutine
-                if (shouldApplyAilment)
-                {
-                    switch (ailment.Value)
-                    {
-                        case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
-                            break;
-                        case ActionClip.Ailment.Knockup:
-                            knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
-                            break;
-                        case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
-                            break;
-                        case ActionClip.Ailment.Stagger:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
-                            break;
-                        case ActionClip.Ailment.Pull:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
-                            break;
-                        case ActionClip.Ailment.Death:
-                            break;
-                        default:
-                            if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
-                            break;
-                    }
-
-                    if (attackAilment == ActionClip.Ailment.Pull) { pullResetCoroutine = StartCoroutine(ResetPullAfterAnimationPlays(hitReaction)); }
-                    if (attackAilment == ActionClip.Ailment.Grab) { grabResetCoroutine = StartCoroutine(ResetGrabAfterAnimationPlays(attack, hitReaction)); }
-                }
-            }
-
-            if (ailment.Value == ActionClip.Ailment.Knockup)
-            {
-                knockupHitCounter++;
-                if (knockupHitCounter >= knockupHitLimit)
-                {
-                    if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-                    SetInviniciblity(recoveryTimeInvincibilityBuffer + ActionClip.HitStopEffectDuration);
-                    ailment.Value = ActionClip.Ailment.None;
-                }
-            }
-        }
-
-        private IEnumerator DestroyVFXAfterAilmentIsDone(ActionClip.Ailment vfxAilment, GameObject vfxInstance)
-        {
-            yield return new WaitUntil(() => ailment.Value != vfxAilment | IsGrabbed() | IsPulled());
-            if (vfxInstance) { Destroy(vfxInstance); }
-        }
-
-        [System.Serializable]
-        private struct OnHitActionVFX
-        {
-            public ActionClip.Ailment ailment;
-            public ActionVFX actionVFX;
-        }
-
-        [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
-
-        private void OnValidate()
-        {
-            List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();
-            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
-            {
-                if (!onHitActionVFX.actionVFX) { continue; }
-                if (onHitActionVFX.actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnHit) { actionVFXToRemove.Add(onHitActionVFX.actionVFX); }
-            }
-
-            foreach (ActionVFX actionVFX in actionVFXToRemove)
-            {
-                ailmentOnHitActionVFXList.RemoveAll(item => item.actionVFX == actionVFX);
-            }
         }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
@@ -777,7 +674,7 @@ namespace Vi.Core.CombatAgents
 
         protected void RefreshStatus()
         {
-            if (IsOwner)
+            if (IsSpawned & IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }
@@ -788,6 +685,9 @@ namespace Vi.Core.CombatAgents
         protected override void Update()
         {
             base.Update();
+
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
@@ -807,7 +707,7 @@ namespace Vi.Core.CombatAgents
                 // Regen for 50 seconds
                 if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
             }
-            
+
             if (pingEnabled.Value) { roundTripTime.Value = networkTransport.GetCurrentRtt(OwnerClientId); }
         }
 
@@ -830,7 +730,7 @@ namespace Vi.Core.CombatAgents
         private float rageDelayCooldown;
         private void UpdateRage()
         {
-            if (IsRaging())
+            if (IsRaging)
             {
                 AddRage(-rageDepletionRate * Time.deltaTime);
             }
@@ -840,28 +740,13 @@ namespace Vi.Core.CombatAgents
             AddRage(WeaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
-        private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC
-
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             base.OnAilmentChanged(prev, current);
-            if (IsServer)
-            {
-                foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList.Where(item => item.ailment == ailment.Value))
-                {
-                    if (onHitActionVFX.actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                    {
-                        GameObject instance = WeaponHandler.SpawnActionVFX(WeaponHandler.CurrentActionClip, onHitActionVFX.actionVFX, null, transform);
-                        StartCoroutine(DestroyVFXAfterAilmentIsDone(ailment.Value, instance));
-                    }
-                }
-            }
-
             if (current == ActionClip.Ailment.Death)
             {
                 spiritRegenActivateTime = Mathf.NegativeInfinity;
                 respawnCoroutine = StartCoroutine(RespawnSelf());
-                AnimationHandler.Animator.enabled = false;
             }
             else if (prev == ActionClip.Ailment.Death)
             {
@@ -870,7 +755,6 @@ namespace Vi.Core.CombatAgents
                     IsRespawning = false;
                     StopCoroutine(respawnCoroutine);
                 }
-                AnimationHandler.Animator.enabled = true;
             }
         }
 
@@ -911,33 +795,6 @@ namespace Vi.Core.CombatAgents
             }
             yield return new WaitUntil(() => ailment.Value != ActionClip.Ailment.Death);
             IsRespawning = false;
-        }
-
-        public bool ShouldApplyAilmentRotation() { return (ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull) | IsGrabbed(); }
-        public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
-
-        private const float recoveryTimeInvincibilityBuffer = 1;
-        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
-        {
-            if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
-            if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
-            yield return new WaitForSeconds(duration);
-            SetInviniciblity(recoveryTimeInvincibilityBuffer);
-            ailment.Value = ActionClip.Ailment.None;
-        }
-
-        private IEnumerator ResetAilmentAfterAnimationPlays(ActionClip hitReaction)
-        {
-            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
-            ailment.Value = ActionClip.Ailment.None;
-        }
-
-        private Coroutine pullResetCoroutine;
-        private IEnumerator ResetPullAfterAnimationPlays(ActionClip hitReaction)
-        {
-            if (pullResetCoroutine != null) { StopCoroutine(pullResetCoroutine); }
-            yield return new WaitForSeconds(AnimationHandler.GetTotalActionClipLengthInSeconds(hitReaction));
-            isPulled.Value = false;
         }
     }
 }

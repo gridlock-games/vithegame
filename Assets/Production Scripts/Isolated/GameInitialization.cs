@@ -22,7 +22,7 @@ namespace Vi.Core
 
         public void ExitGame()
         {
-            Application.Quit();
+            FasterPlayerPrefs.QuitGame();
         }
 
         private void Start()
@@ -51,7 +51,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("TargetFrameRate"))
             {
-                int targetFrameRate = Screen.currentResolution.refreshRate + 60;
+                int targetFrameRate = Mathf.CeilToInt((float)Screen.currentResolution.refreshRateRatio.value + 60);
                 if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 60; }
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
@@ -64,6 +64,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasString("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             
+            if (!FasterPlayerPrefs.Singleton.HasFloat("FieldOfView")) { FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", 60); }
+
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
             FasterPlayerPrefs.Singleton.SetBool("BotsCanOnlyLightAttack", false);
 
@@ -79,17 +81,17 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MasterVolume"))
             {
-                FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.75f);
-                AudioListener.volume = 0.75f;
+                FasterPlayerPrefs.Singleton.SetFloat("MasterVolume", 0.4f);
+                AudioListener.volume = 0.4f;
             }
             else
             {
                 AudioListener.volume = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.75f); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", (QualitySettings.GetQualityLevel() > 0)); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", QualitySettings.GetQualityLevel() > 0); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.7f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
 
@@ -102,10 +104,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 200); }
 
-            if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", Application.platform == RuntimePlatform.WindowsPlayer
-                | Application.platform == RuntimePlatform.OSXPlayer | Application.platform == RuntimePlatform.LinuxPlayer
-                | Application.platform == RuntimePlatform.WindowsEditor | Application.platform == RuntimePlatform.OSXEditor
-                | Application.platform == RuntimePlatform.LinuxEditor ? "PRESS" : "HOLD"); }
+            if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", "HOLD"); }
 
             VerifyHoldPlayerPref("ZoomMode", 1);
             VerifyHoldPlayerPref("BlockingMode", 0);

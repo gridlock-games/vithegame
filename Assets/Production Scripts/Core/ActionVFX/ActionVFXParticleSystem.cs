@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core.VFX
 {
@@ -84,31 +84,31 @@ namespace Vi.Core.VFX
             }
         }
 
-        private bool CanHit(CombatAgent combatAgent)
+        private bool CanHit(HittableAgent hittableAgent)
         {
             if (!IsSpawned) { return false; }
             if (!IsServer) { Debug.LogError("ActionVFXParticleSystem.CanHit() should only be called on the server!"); return false; }
 
-            if (!ShouldAffect(combatAgent)) { return false; }
+            if (!ShouldAffect(hittableAgent)) { return false; }
 
             bool canHit = true;
-            if (hitCounter.ContainsKey(combatAgent))
+            if (hitCounter.ContainsKey(hittableAgent))
             {
-                if (hitCounter[combatAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : GetAttack().maxHitLimit)) { canHit = false; }
-                if (Time.time - hitCounter[combatAgent].timeOfHit < GetAttack().GetTimeBetweenHits(1)) { canHit = false; }
+                if (hitCounter[hittableAgent].hitNumber >= (shouldOverrideMaxHits ? maxHitOverride : GetAttack().maxHitLimit)) { canHit = false; }
+                if (Time.time - hitCounter[hittableAgent].timeOfHit < GetAttack().GetTimeBetweenHits(1)) { canHit = false; }
             }
 
             if (spellType == SpellType.GroundSpell)
             {
-                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), combatAgent))
+                if (PlayerDataManager.Singleton.CanHit(GetAttacker(), hittableAgent))
                 {
-                    if (combatAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
+                    if (hittableAgent.StatusAgent.IsImmuneToGroundSpells()) { canHit = false; }
                 }
             }
             return canHit;
         }
 
-        private void ProcessHit(IHittable hittable, Vector3 impactPosition)
+        private void ProcessHit(HittableAgent hittable, Vector3 impactPosition)
         {
             if (hittable.ProcessProjectileHit(GetAttacker(), null, hitCounter, GetAttack(), impactPosition, shouldUseAttackerPositionForHitAngles ? GetAttacker().transform.position : transform.position))
             {
@@ -127,13 +127,14 @@ namespace Vi.Core.VFX
 
         protected void OnTriggerEnter(Collider other)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
                 if (other.isTrigger) { return; }
-                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider) | other.transform.root.TryGetComponent(out IHittable hittable))
                 {
                     foreach (ParticleSystem ps in particleSystems)
                     {
@@ -167,12 +168,20 @@ namespace Vi.Core.VFX
                         }
                     }
                 }
+                else if (other.transform.root.TryGetComponent(out HittableAgent hittable))
+                {
+                    if (CanHit(hittable))
+                    {
+                        ProcessHit(hittable, other.ClosestPointOnBounds(transform.position));
+                    }
+                }
             }
         }
 
         protected void OnTriggerStay(Collider other)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }
 
             if (particleSystemType == ParticleSystemType.GenericCollisions)
@@ -188,10 +197,34 @@ namespace Vi.Core.VFX
                         }
                     }
                 }
+                else if (other.transform.root.TryGetComponent(out HittableAgent hittable))
+                {
+                    if (CanHit(hittable))
+                    {
+                        ProcessHit(hittable, other.ClosestPointOnBounds(transform.position));
+                    }
+                }
             }
         }
 
         private Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter = new Dictionary<IHittable, RuntimeWeapon.HitCounterData>();
+
+        public void AddToHitCounter(Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounterToAdd)
+        {
+            if (!IsSpawned) { Debug.LogError("Trying to add to hit counter while not spawned " + this); }
+            if (!IsServer) { Debug.LogWarning("Trying to add to hit counter when we are not the server, this will have no effect " + this); }
+            foreach (KeyValuePair<IHittable, RuntimeWeapon.HitCounterData> kvp in hitCounterToAdd)
+            {
+                if (hitCounter.ContainsKey(kvp.Key))
+                {
+                    hitCounter[kvp.Key] = new RuntimeWeapon.HitCounterData(hitCounter[kvp.Key].hitNumber + kvp.Value.hitNumber, Time.time);
+                }
+                else
+                {
+                    hitCounter.Add(kvp.Key, new RuntimeWeapon.HitCounterData(1, Time.time));
+                }
+            }
+        }
 
         protected new void OnDisable()
         {
@@ -204,22 +237,12 @@ namespace Vi.Core.VFX
                     ps.trigger.RemoveCollider(i);
                 }
             }
-
-            particleEnterCalledThisFrame = false;
-        }
-
-        private bool particleEnterCalledThisFrame;
-        protected void LateUpdate()
-        {
-            particleEnterCalledThisFrame = false;
         }
 
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
-            if (!NetworkManager.Singleton.IsServer) { return; }
-
-            if (particleEnterCalledThisFrame) { return; }
-            particleEnterCalledThisFrame = true;
+            if (!IsSpawned)
+            if (!IsServer) { return; }
 
             List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
@@ -237,6 +260,13 @@ namespace Vi.Core.VFX
                             {
                                 ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
                             }
+                        }
+                    }
+                    else if (col.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+                    {
+                        if (CanHit(hittableAgent))
+                        {
+                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(enter[particleIndex].position));
                         }
                     }
                 }
@@ -258,6 +288,13 @@ namespace Vi.Core.VFX
                             {
                                 ProcessHit(networkCollider.CombatAgent, col.ClosestPointOnBounds(inside[particleIndex].position));
                             }
+                        }
+                    }
+                    else if (col.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+                    {
+                        if (CanHit(hittableAgent))
+                        {
+                            ProcessHit(hittableAgent, col.ClosestPointOnBounds(inside[particleIndex].position));
                         }
                     }
                 }

@@ -152,16 +152,6 @@ namespace Vi.ProceduralAnimations
             aimingDictionary.Add(Hand.RightHand, false);
             aimingDictionary.Add(Hand.LeftHand, false);
 
-            if (rightHandAimRig) rightHandAimRig.weight = 0;
-            if (rightHandAimBodyConstraint) rightHandAimBodyConstraint.weight = 0;
-            if (rightHandAimBodyInvertedConstraint) rightHandAimBodyInvertedConstraint.weight = 0;
-            if (leftHandAimRig) leftHandAimRig.weight = 0;
-            if (leftHandAimBodyConstraint) leftHandAimBodyConstraint.weight = 0;
-            if (leftHandAimBodyInvertedConstraint) leftHandAimBodyInvertedConstraint.weight = 0;
-            if (rightHandReachRig) rightHandReachRig.weight = 0;
-            if (leftHandReachRig) leftHandReachRig.weight = 0;
-            if (meleeVerticalAimRig) meleeVerticalAimRig.weight = 0;
-
             for (int i = 0; i < keys.Length; i++)
             {
                 if (weaponBoneMapping.ContainsKey(keys[i]))
@@ -177,18 +167,42 @@ namespace Vi.ProceduralAnimations
         {
             foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
             {
-                if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.AddRigidbody(rigidbody);
             }
+
+            if (rightHandAimRig) { rightHandAimRig.weight = 0; rightHandAimRig.GetRig().weight = 0; }
+            if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = 0; }
+            if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.weight = 0; }
+            if (leftHandAimRig) { leftHandAimRig.weight = 0; leftHandAimRig.GetRig().weight = 0; }
+            if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = 0; }
+            if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.weight = 0; }
+            if (rightHandReachRig) { rightHandReachRig.weight = 0; rightHandReachRig.GetRig().weight = 0; }
+            if (leftHandReachRig) { leftHandReachRig.weight = 0; leftHandReachRig.GetRig().weight = 0; }
+            if (meleeVerticalAimRig) { meleeVerticalAimRig.weight = 0; meleeVerticalAimRig.GetRig().weight = 0; }
+
+            aimingDictionary[Hand.RightHand] = false;
+            aimingDictionary[Hand.LeftHand] = false;
         }
 
         private void OnDisable()
         {
             foreach (Rigidbody rigidbody in GetComponentsInChildren<Rigidbody>())
             {
-                if (rigidbody.transform.root == rigidbody.transform) { continue; }
                 NetworkPhysicsSimulation.RemoveRigidbody(rigidbody);
             }
+
+            if (rightHandAimRig) { rightHandAimRig.weight = 0; rightHandAimRig.GetRig().weight = 0; }
+            if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.weight = 0; }
+            if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.weight = 0; }
+            if (leftHandAimRig) { leftHandAimRig.weight = 0; leftHandAimRig.GetRig().weight = 0; }
+            if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.weight = 0; }
+            if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.weight = 0; }
+            if (rightHandReachRig) { rightHandReachRig.weight = 0; rightHandReachRig.GetRig().weight = 0; }
+            if (leftHandReachRig) { leftHandReachRig.weight = 0; leftHandReachRig.GetRig().weight = 0; }
+            if (meleeVerticalAimRig) { meleeVerticalAimRig.weight = 0; meleeVerticalAimRig.GetRig().weight = 0; }
+
+            aimingDictionary[Hand.RightHand] = false;
+            aimingDictionary[Hand.LeftHand] = false;
         }
 
         private Dictionary<Weapon.WeaponBone, Transform> weaponBoneMapping = new Dictionary<Weapon.WeaponBone, Transform>();
@@ -231,20 +245,20 @@ namespace Vi.ProceduralAnimations
             meleeVerticalAimRig.weight = isEnabled ? 1 : 0;
         }
 
-        public void SetRotationOffset(float angle)
+        public void SetRotationOffset(float pitchAngle, float yawAngle, float rollAngle)
         {
             if (!rotationOffsetConstraint) { return; }
             Vector3 targetOffset = Vector3.zero;
             switch (rotationOffsetAxis)
             {
                 case Axis.X:
-                    targetOffset = new Vector3(angle, 0, 0);
+                    targetOffset = new Vector3(yawAngle, rollAngle, pitchAngle);
                     break;
                 case Axis.Y:
-                    targetOffset = new Vector3(0, angle, 0);
+                    targetOffset = new Vector3(pitchAngle, yawAngle, rollAngle);
                     break;
                 case Axis.Z:
-                    targetOffset = new Vector3(0, 0, angle);
+                    targetOffset = new Vector3(rollAngle, pitchAngle, yawAngle);
                     break;
                 default:
                     Debug.LogError("Unsure how to handle rotation offset axis " + rotationOffsetAxis);
@@ -288,5 +302,8 @@ namespace Vi.ProceduralAnimations
             }
             return null;
         }
+
+        public Transform Hips { get { return hips; } }
+        [SerializeField] private Transform hips;
     }
 }

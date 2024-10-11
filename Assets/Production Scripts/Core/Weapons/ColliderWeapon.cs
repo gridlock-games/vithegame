@@ -14,8 +14,9 @@ namespace Vi.Core
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
             if (!weaponTrailVFX) { return; }
             if (!parentCombatAgent) { return; }
 
@@ -33,13 +34,13 @@ namespace Vi.Core
         private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
         private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
 
-        private List<IHittable> hitsOnThisPhysicsUpdate = new List<IHittable>();
         private void ProcessTriggerEvent(Collider other)
         {
             if (isStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }
+            if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
             if (!parentCombatAgent.WeaponHandler.IsAttacking) { return; }
             if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
             if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
@@ -53,26 +54,17 @@ namespace Vi.Core
                 if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 
-                if (hitsOnThisPhysicsUpdate.Contains(networkCollider.CombatAgent)) { return; }
-
                 bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
                     parentCombatAgent.transform.position
                 );
-
-                if (bHit)
-                {
-                    hitsOnThisPhysicsUpdate.Add(networkCollider.CombatAgent);
-                }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
                 if ((Object)hittable == parentCombatAgent) { return; }
                 if (!CanHit(hittable)) { return; }
-
-                if (hitsOnThisPhysicsUpdate.Contains(hittable)) { return; }
 
                 bool bHit = hittable.ProcessMeleeHit(parentCombatAgent,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
@@ -80,41 +72,36 @@ namespace Vi.Core
                     other.ClosestPointOnBounds(transform.position),
                     parentCombatAgent.transform.position
                 );
-
-                if (bHit)
-                {
-                    hitsOnThisPhysicsUpdate.Add(hittable);
-                }
             }
-        }
-
-        private bool clearListNextUpdate;
-        private void FixedUpdate()
-        {
-            if (clearListNextUpdate) { hitsOnThisPhysicsUpdate.Clear(); }
-            clearListNextUpdate = hitsOnThisPhysicsUpdate.Count > 0;
         }
 
         private void OnDrawGizmos()
         {
             if (!parentCombatAgent) { return; }
 
-            if (TryGetComponent(out BoxCollider boxCollider))
+            foreach (Collider col in GetComponentsInChildren<Collider>())
             {
-                if (parentCombatAgent.WeaponHandler.CurrentActionClip)
+                if (col is BoxCollider boxCollider)
                 {
-                    if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                    if (parentCombatAgent.WeaponHandler.CurrentActionClip)
                     {
-                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                         {
-                            if (parentCombatAgent.WeaponHandler.IsInAnticipation)
-                                Gizmos.color = Color.yellow;
-                            else if (parentCombatAgent.WeaponHandler.IsAttacking)
-                                Gizmos.color = Color.red;
-                            else if (parentCombatAgent.WeaponHandler.IsInRecovery)
-                                Gizmos.color = Color.magenta;
+                            if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                            {
+                                if (parentCombatAgent.WeaponHandler.IsInAnticipation)
+                                    Gizmos.color = Color.yellow;
+                                else if (parentCombatAgent.WeaponHandler.IsAttacking)
+                                    Gizmos.color = Color.red;
+                                else if (parentCombatAgent.WeaponHandler.IsInRecovery)
+                                    Gizmos.color = Color.magenta;
+                                else
+                                    Gizmos.color = Color.white;
+                            }
                             else
+                            {
                                 Gizmos.color = Color.white;
+                            }
                         }
                         else
                         {
@@ -125,32 +112,32 @@ namespace Vi.Core
                     {
                         Gizmos.color = Color.white;
                     }
-                }
-                else
-                {
-                    Gizmos.color = Color.white;
-                }
 
-                Matrix4x4 rotationMatrix = Matrix4x4.TRS(boxCollider.transform.position, boxCollider.transform.rotation, boxCollider.transform.lossyScale);
-                Gizmos.matrix = rotationMatrix;
-                Gizmos.DrawWireCube(boxCollider.center, boxCollider.size);
-            }
-            else if (TryGetComponent(out SphereCollider sphereCollider))
-            {
-                if (parentCombatAgent.WeaponHandler.CurrentActionClip)
+                    Matrix4x4 rotationMatrix = Matrix4x4.TRS(boxCollider.transform.position, boxCollider.transform.rotation, boxCollider.transform.lossyScale);
+                    Gizmos.matrix = rotationMatrix;
+                    Gizmos.DrawWireCube(boxCollider.center, boxCollider.size);
+                }
+                else if (col is SphereCollider sphereCollider)
                 {
-                    if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
+                    if (parentCombatAgent.WeaponHandler.CurrentActionClip)
                     {
-                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                        if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones != null)
                         {
-                            if (parentCombatAgent.WeaponHandler.IsInAnticipation)
-                                Gizmos.color = Color.yellow;
-                            else if (parentCombatAgent.WeaponHandler.IsAttacking)
-                                Gizmos.color = Color.red;
-                            else if (parentCombatAgent.WeaponHandler.IsInRecovery)
-                                Gizmos.color = Color.magenta;
+                            if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone))
+                            {
+                                if (parentCombatAgent.WeaponHandler.IsInAnticipation)
+                                    Gizmos.color = Color.yellow;
+                                else if (parentCombatAgent.WeaponHandler.IsAttacking)
+                                    Gizmos.color = Color.red;
+                                else if (parentCombatAgent.WeaponHandler.IsInRecovery)
+                                    Gizmos.color = Color.magenta;
+                                else
+                                    Gizmos.color = Color.white;
+                            }
                             else
+                            {
                                 Gizmos.color = Color.white;
+                            }
                         }
                         else
                         {
@@ -161,15 +148,11 @@ namespace Vi.Core
                     {
                         Gizmos.color = Color.white;
                     }
-                }
-                else
-                {
-                    Gizmos.color = Color.white;
-                }
 
-                Matrix4x4 rotationMatrix = Matrix4x4.TRS(sphereCollider.transform.position, sphereCollider.transform.rotation, sphereCollider.transform.lossyScale);
-                Gizmos.matrix = rotationMatrix;
-                Gizmos.DrawWireSphere(sphereCollider.center, sphereCollider.radius);
+                    Matrix4x4 rotationMatrix = Matrix4x4.TRS(sphereCollider.transform.position, sphereCollider.transform.rotation, sphereCollider.transform.lossyScale);
+                    Gizmos.matrix = rotationMatrix;
+                    Gizmos.DrawWireSphere(sphereCollider.center, sphereCollider.radius);
+                }
             }
         }
     }

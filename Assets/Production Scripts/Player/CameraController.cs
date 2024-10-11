@@ -7,6 +7,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Player
 {
@@ -63,15 +64,30 @@ namespace Vi.Player
             attributes = movementHandler.GetComponent<Attributes>();
         }
 
-        private void Start()
+        private void OnEnable()
         {
             targetRotationX = 0;
             targetRotationY = transform.parent.eulerAngles.y - 180;
 
             transform.SetParent(null, true);
 
-            cameraInterp = new GameObject("Camera Interp");
-            CameraPositionClone = new GameObject("Empty Camera Position Clone");
+            if (cameraInterp)
+            {
+                cameraInterp.SetActive(true);
+            }
+            else
+            {
+                cameraInterp = new GameObject("Camera Interp");
+            }
+            
+            if (CameraPositionClone)
+            {
+                CameraPositionClone.SetActive(true);
+            }
+            else
+            {
+                CameraPositionClone = new GameObject("Empty Camera Position Clone");
+            }
             
             currentPositionOffset = positionOffset;
             RefreshStatus();
@@ -87,6 +103,12 @@ namespace Vi.Player
             UpdateCamera();
         }
 
+        private void OnDisable()
+        {
+            if (cameraInterp) { cameraInterp.SetActive(false); }
+            if (CameraPositionClone) { CameraPositionClone.SetActive(false); }
+        }
+
         private void OnDestroy()
         {
             Destroy(cameraInterp);
@@ -100,6 +122,7 @@ namespace Vi.Player
         {
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             Camera.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            Camera.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
 
         private Vector3 GetCameraTargetPosition()

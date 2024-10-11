@@ -185,7 +185,8 @@ namespace Vi.Core
 
         public static bool CanHit(Team attackerTeam, Team victimTeam)
         {
-            if (attackerTeam == Team.Peaceful) { return false; }
+            if (attackerTeam == Team.Spectator | victimTeam == Team.Spectator) { return false; }
+            if (attackerTeam == Team.Peaceful | victimTeam == Team.Peaceful) { return false; }
 
             if (attackerTeam != Team.Competitor & victimTeam != Team.Competitor)
             {
@@ -449,7 +450,14 @@ namespace Vi.Core
         private Dictionary<int, Attributes> localPlayers = new Dictionary<int, Attributes>();
         public void AddPlayerObject(int clientId, Attributes playerObject)
         {
-            localPlayers.Add(clientId, playerObject);
+            if (localPlayers.ContainsKey(clientId))
+            {
+                Debug.LogError("Trying to add a local player that is already present. Client Id: " + clientId);
+            }
+            else
+            {
+                localPlayers.Add(clientId, playerObject);
+            }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
@@ -460,7 +468,7 @@ namespace Vi.Core
 
         public void RemovePlayerObject(int clientId)
         {
-            localPlayers.Remove(clientId);
+            if (!localPlayers.Remove(clientId) & !NetworkManager.ShutdownInProgress) { Debug.LogError("Could not remove client id local player " + clientId); }
             LocalPlayersWasUpdatedThisFrame = true;
 
             if (resetLocalPlayerBoolCoroutine != null) { StopCoroutine(resetLocalPlayerBoolCoroutine); }
@@ -1046,12 +1054,20 @@ namespace Vi.Core
                 {
                     foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
-                        combatAgent.NetworkObject.Despawn(true);
+                        if (combatAgent.IsSpawned) { combatAgent.NetworkObject.Despawn(true); }
+                        else
+                        {
+                            Debug.LogError("Unsure how to handle despawned combat agent on scene unload " + combatAgent);
+                        }
                     }
 
                     foreach (NetworkObject spectator in localSpectators.Values.ToList())
                     {
-                        spectator.Despawn(true);
+                        if (spectator.IsSpawned) { spectator.Despawn(true); }
+                        else
+                        {
+                            Debug.LogError("Unsure how to handle despawned spectator on scene unload " + spectator);
+                        }
                     }
                 }
             }
@@ -1087,7 +1103,7 @@ namespace Vi.Core
 
             if (!playerSpawnPoints)
             {
-                if (NetSceneManager.Singleton.IsEnvironmentLoaded())
+                if (NetSceneManager.IsEnvironmentLoaded())
                 {
                     playerSpawnPoints = FindFirstObjectByType<SpawnPoints>();
                 }
@@ -1196,7 +1212,10 @@ namespace Vi.Core
 
                         foreach (Attributes player in localPlayers.Values)
                         {
-                            if (player) { player.UpdateNetworkVisiblity(); }
+                            if (player)
+                            {
+                                player.UpdateNetworkVisiblity();
+                            }
                         }
                     }
                     break;
@@ -1224,8 +1243,11 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Value:
                     if (localPlayers.ContainsKey(networkListEvent.Value.id))
                     {
+                        bool waitForRespawn = GetGameMode() != GameMode.None;
+                        if (GameModeManager.Singleton) { waitForRespawn &= !GameModeManager.Singleton.ShouldDisplayNextGameAction(); }
+
                         LoadoutManager loadoutManager = localPlayers[networkListEvent.Value.id].LoadoutManager;
-                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), GetGameMode() != GameMode.None);
+                        loadoutManager.ApplyLoadout(networkListEvent.Value.character.raceAndGender, networkListEvent.Value.character.GetActiveLoadout(), networkListEvent.Value.character._id.ToString(), waitForRespawn);
 
                         localPlayers[networkListEvent.Value.id].SetCachedPlayerData(networkListEvent.Value);
                     }
@@ -1294,7 +1316,7 @@ namespace Vi.Core
             Quaternion spawnRotation = transformData.rotation;
 
             attributesToRespawn.ResetStats(1, true, true, false);
-            attributesToRespawn.AnimationHandler.CancelAllActions(0);
+            attributesToRespawn.AnimationHandler.CancelAllActions(0, true);
             attributesToRespawn.MovementHandler.SetOrientation(spawnPosition, spawnRotation);
             attributesToRespawn.LoadoutManager.SwapLoadoutOnRespawn();
         }
@@ -1302,7 +1324,7 @@ namespace Vi.Core
         public void RevivePlayer(Attributes attributesToRevive)
         {
             attributesToRevive.ResetStats(0.5f, true, true, false);
-            attributesToRevive.AnimationHandler.CancelAllActions(0);
+            attributesToRevive.AnimationHandler.CancelAllActions(0, true);
         }
 
         public void RespawnAllPlayers()
@@ -1328,7 +1350,8 @@ namespace Vi.Core
                 }
                 else
                 {
-                    Destroy(playerObjectToSpawn);
+                    ObjectPoolingManager.ReturnObjectToPool(playerObjectToSpawn.GetComponent<PooledObject>());
+                    playerObjectToSpawn = null;
                 }
             }
             
@@ -1411,14 +1434,14 @@ namespace Vi.Core
             bool isSpectator = playerData.team == Team.Spectator;
             if (isSpectator)
             {
-                playerObjectToSpawn = Instantiate(spectatorPrefab, spawnPosition, spawnRotation);
+                playerObjectToSpawn = ObjectPoolingManager.SpawnObject(spectatorPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
             }
             else
             {
                 if (playerData.id >= 0)
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
                 else
-                    playerObjectToSpawn = Instantiate(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab, spawnPosition, spawnRotation);
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(characterReference.GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
 
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }
@@ -1433,7 +1456,11 @@ namespace Vi.Core
                 netObj.Spawn(true);
             }
 
+            yield return null;
+
             //yield return new WaitUntil(() => playerObject.GetComponent<NetworkObject>().IsSpawned);
+            playerObjectToSpawn = null;
+            playerIdThatIsBeingSpawned = default;
             spawnPlayerRunning = false;
         }
 
@@ -1460,9 +1487,10 @@ namespace Vi.Core
 
         private IEnumerator ReturnToCharacterSelectOnServerShutdown()
         {
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
             yield return null;
             if (NetworkManager.Singleton.IsListening) { yield break; }
-            yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
             if (!NetSceneManager.Singleton.IsSceneGroupLoaded("Character Select"))
             {
                 NetSceneManager.Singleton.LoadScene("Character Select");

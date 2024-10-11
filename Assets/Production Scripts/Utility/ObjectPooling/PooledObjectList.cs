@@ -135,6 +135,8 @@ namespace Vi.Utility
         [ContextMenu("Find Duplicates")]
         private void FindDuplicates()
         {
+            pooledObjects.RemoveAll(item => !item);
+
             List<PooledObject> query = pooledObjects.GroupBy(x => x)
               .Where(g => g.Count() > 1)
               .Select(y => y.Key)

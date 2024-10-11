@@ -56,7 +56,21 @@ namespace Vi.UI
         private void OnDestroy()
         {
             gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
-            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
+            }
         }
 
         protected void OnScoreListChanged()
@@ -135,6 +149,25 @@ namespace Vi.UI
                             PlayerDataManager.Singleton.GetLocalPlayerObject().Value.GetComponent<ActionMapHandler>().OpenScoreboard();
                         }
                     }
+
+                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
+                    {
+                        if (MVPPreviewObject)
+                        {
+                            if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                            {
+                                if (pooledObject.IsSpawned)
+                                {
+                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                }
+                                MVPPreviewObject = null;
+                            }
+                            else
+                            {
+                                Destroy(MVPPreviewObject);
+                            }
+                        }
+                    }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
@@ -167,17 +200,39 @@ namespace Vi.UI
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            if (MVPPreviewObject) { Destroy(MVPPreviewObject); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
+            }
+
             // Instantiate the player model
-            MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(gameModeManager.GetMVPScore().id);
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledPrefab))
+            {
+                MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,
+                    basePos,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    basePos,
+                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+            }
 
             AnimationHandler animationHandler = MVPPreviewObject.GetComponent<AnimationHandler>();
             animationHandler.ChangeCharacter(character);
             MVPPreviewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
 
-            MVPPresentationCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+            MVPPresentationCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
             MVPPresentationCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             MVPPresentationCamera.enabled = true;
 

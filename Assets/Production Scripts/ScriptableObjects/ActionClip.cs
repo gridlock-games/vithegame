@@ -20,7 +20,8 @@ namespace Vi.ScriptableObjects
             FlashAttack,
             GrabAttack,
             Lunge,
-            Flinch
+            Flinch,
+            Reload
         }
 
         public enum HitReactionType
@@ -141,7 +142,11 @@ namespace Vi.ScriptableObjects
         [SerializeField] private Vector2 flinchAmountMin = new Vector2(-10, -10);
         [SerializeField] private Vector2 flinchAmountMax = new Vector2(10, 10);
 
-        public Vector2 GetFlinchAmount() { return new Vector2(Random.Range(flinchAmountMin.x, flinchAmountMax.x), Random.Range(flinchAmountMin.y, flinchAmountMax.y)); }
+        public Vector2 GetFlinchAmount()
+        {
+            if (!IsAttack()) { Debug.LogError("You should only be getting flinch amount on an attack clip!"); return Vector2.zero; }
+            return new Vector2(Random.Range(flinchAmountMin.x, flinchAmountMax.x), Random.Range(flinchAmountMin.y, flinchAmountMax.y));
+        }
 
         public bool shouldPlayHitReaction = true;
         [SerializeField] private AnimationCurve hitReactionRootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
@@ -154,7 +159,7 @@ namespace Vi.ScriptableObjects
 
         public void SetHitReactionRootMotionMultipliers(ActionClip attackClip)
         {
-            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip!"); return; }
+            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip! " + attackClip + " " + attackClip.GetClipType()); return; }
             if (GetClipType() != ClipType.HitReaction) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called on a hit reaction!"); return; }
 
             hitReactionRootMotionForwardMultiplier = attackClip.attackRootMotionForwardMultiplier;
@@ -166,7 +171,9 @@ namespace Vi.ScriptableObjects
         [SerializeField] private AnimationCurve debugSidesMotion;
         [SerializeField] private AnimationCurve debugVerticalMotion;
 
+        public float XAngleRotationOffset = 0;
         public float YAngleRotationOffset = 0;
+        public float ZAngleRotationOffset = 0;
 
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
@@ -317,5 +324,11 @@ namespace Vi.ScriptableObjects
         public bool shouldAimOffHand = true;
         public bool requireAmmo;
         public int requiredAmmoAmount = 1;
+        public float reloadNormalizedTime = 0.5f;
+
+        public NetworkObject[] summonables = new NetworkObject[0];
+        public float normalizedSummonTime = 0.5f;
+        public Vector3 summonPositionOffset = new Vector3(0, 0, 2);
+        public int summonableCount = 0;
     }
 }

@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Unity.Collections;
 using Vi.Core.CombatAgents;
 using UnityEngine.InputSystem;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -28,6 +29,7 @@ namespace Vi.Core
 
         public void Reload(Weapon weapon)
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.Reload() should only be called on the server!"); return; }
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
             if (weapon == secondaryWeaponInstance) { secondaryAmmo.Value = weapon.GetMaxAmmoCount(); return; }
             Debug.LogError("Unknown weapon to reload " + weapon);
@@ -35,12 +37,14 @@ namespace Vi.Core
 
         public void ReloadAllWeapons()
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.ReloadAllWeapons() should only be called on the server!"); return; }
             if (primaryWeaponInstance) { primaryAmmo.Value = primaryWeaponInstance.GetMaxAmmoCount(); }
             if (secondaryWeaponInstance) { secondaryAmmo.Value = secondaryWeaponInstance.GetMaxAmmoCount(); }
         }
 
         public void UseAmmo(Weapon weapon)
         {
+            if (!IsServer) { Debug.LogError("LoadoutManager.UseAmmo() should only be called on the server!"); return; }
             if (weapon == primaryWeaponInstance) { primaryAmmo.Value--; return; }
             if (weapon == secondaryWeaponInstance) { secondaryAmmo.Value--; return; }
             Debug.LogError("Unknown weapon to fire " + weapon);
@@ -81,15 +85,37 @@ namespace Vi.Core
             animationHandler = GetComponent<AnimationHandler>();
             combatAgent = GetComponent<CombatAgent>();
 
-            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
-            {
-                equippedEquipment.Add(equipmentType, null);
-            }
-
             if (TryGetComponent(out PlayerInput playerInput))
             {
                 switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             }
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnSpawnFromPool += OnSpawnFromPool;
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
+        }
+
+        private void OnSpawnFromPool()
+        {
+            foreach (CharacterReference.EquipmentType equipmentType in System.Enum.GetValues(typeof(CharacterReference.EquipmentType)))
+            {
+                equippedEquipment.Add(equipmentType, null);
+            }
+        }
+
+        private void OnReturnToPool()
+        {
+            equippedEquipment.Clear();
+
+            PrimaryWeaponOption = default;
+            primaryWeaponInstance = default;
+            
+            SecondaryWeaponOption = default;
+            secondaryWeaponInstance = default;
+
+            WeaponNameThatCanFlashAttack = default;
         }
 
         public override void OnNetworkSpawn()
@@ -119,7 +145,14 @@ namespace Vi.Core
         public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn = false)
         {
             if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
-            applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
+            if (gameObject.activeInHierarchy)
+            {
+                applyLoadoutCoroutine = StartCoroutine(ApplyLoadoutCoroutine(raceAndGender, loadout, characterId, waitForRespawn));
+            }
+            else
+            {
+                Debug.LogError("Trying to apply a loadout to an inactive object " + this);
+            }
         }
 
         private bool canApplyLoadoutThisFrame;
@@ -150,8 +183,6 @@ namespace Vi.Core
         {
             if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
 
-            //CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
             if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
@@ -161,12 +192,20 @@ namespace Vi.Core
                 {
                     PrimaryWeaponOption = weaponOption;
                 }
+                else
+                {
+                    Debug.LogError("Could not find primary weapon option for inventory id: " + loadout.weapon1ItemId + " for character id: " + characterId);
+                }
             }
             if (PrimaryWeaponOption == null)
             {
                 if (weaponOptions.TryGetValue(loadout.weapon1ItemId.ToString(), out CharacterReference.WeaponOption weaponOption))
                 {
                     PrimaryWeaponOption = weaponOption;
+                }
+                else
+                {
+                    Debug.LogError("Could not find primary weapon option for generic item id: " + loadout.weapon1ItemId + " for character id: " + characterId);
                 }
             }
 
@@ -177,6 +216,10 @@ namespace Vi.Core
                 {
                     SecondaryWeaponOption = weaponOption;
                 }
+                else
+                {
+                    Debug.LogError("Could not find secondary weapon option for inventory id: " + loadout.weapon1ItemId + " for character id: " + characterId);
+                }
             }
             if (SecondaryWeaponOption == null)
             {
@@ -184,16 +227,22 @@ namespace Vi.Core
                 {
                     SecondaryWeaponOption = weaponOption;
                 }
+                else
+                {
+                    Debug.LogError("Could not find secondary weapon option for generic item id: " + loadout.weapon1ItemId + " for character id: " + characterId);
+                }
             }
 
             primaryWeaponInstance = Instantiate(PrimaryWeaponOption.weapon);
             secondaryWeaponInstance = Instantiate(SecondaryWeaponOption.weapon);
 
-            if (IsServer)
+            if (IsServer & IsSpawned)
             {
                 primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;
                 secondaryAmmo.Value = secondaryWeaponInstance.ShouldUseAmmo() ? secondaryWeaponInstance.GetMaxAmmoCount() : 0;
             }
+
+            if (!animationHandler.Animator) { yield return new WaitUntil(() => animationHandler.Animator); }
 
             OnCurrentEquippedWeaponChange(0, currentEquippedWeapon.Value);
 
@@ -230,7 +279,8 @@ namespace Vi.Core
 
         public CharacterReference.WearableEquipmentOption GetEquippedEquipmentOption(CharacterReference.EquipmentType equipmentType)
         {
-            return equippedEquipment[equipmentType];
+            equippedEquipment.TryGetValue(equipmentType, out CharacterReference.WearableEquipmentOption option);
+            return option;
         }
 
         public override void OnNetworkDespawn()
@@ -245,12 +295,12 @@ namespace Vi.Core
                 case 1:
                     combatAgent.WeaponHandler.SetNewWeapon(primaryWeaponInstance, PrimaryWeaponOption.animationController);
                     combatAgent.WeaponHandler.SetStowedWeapon(secondaryWeaponInstance);
-                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer & IsSpawned) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 case 2:
                     combatAgent.WeaponHandler.SetNewWeapon(secondaryWeaponInstance, SecondaryWeaponOption.animationController);
                     combatAgent.WeaponHandler.SetStowedWeapon(primaryWeaponInstance);
-                    if (IsServer) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
+                    if (IsServer & IsSpawned) { combatAgent.StatusAgent.RemoveAllStatusesAssociatedWithWeapon(); }
                     break;
                 default:
                     Debug.LogError(current + " not assigned to a weapon");

@@ -7,6 +7,7 @@ using Vi.ScriptableObjects;
 namespace Vi.Core
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(StatusAgent))]
     public abstract class HittableAgent : NetworkBehaviour, IHittable
     {
         public abstract bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition);
@@ -16,5 +17,67 @@ namespace Vi.Core
 
         public abstract string GetName();
         public abstract PlayerDataManager.Team GetTeam();
+
+        public StatusAgent StatusAgent { get; private set; }
+        protected virtual void Awake()
+        {
+            StatusAgent = GetComponent<StatusAgent>();
+        }
+
+        protected NetworkVariable<float> HP = new NetworkVariable<float>();
+        public float GetHP() { return HP.Value; }
+
+        public abstract float GetMaxHP();
+
+        public void AddHP(float amount)
+        {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
+            if (amount > 0)
+            {
+                if (HP.Value < GetMaxHP())
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > GetMaxHP())
+                {
+                    HP.Value += amount;
+                }
+                else
+                {
+                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+        }
+
+        protected float AddHPWithoutApply(float amount)
+        {
+            if (amount < 0) { amount *= StatusAgent.DamageReceivedMultiplier / StatusAgent.DamageReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.HealingMultiplier; }
+
+            if (amount > 0)
+            {
+                if (HP.Value < GetMaxHP())
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (HP.Value > GetMaxHP())
+                {
+                    return HP.Value + amount;
+                }
+                else
+                {
+                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
+                }
+            }
+            return HP.Value;
+        }
     }
 }

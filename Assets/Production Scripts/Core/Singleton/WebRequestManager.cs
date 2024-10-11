@@ -39,7 +39,7 @@ namespace Vi.Core
         }
 
         //private string APIURL = "154.90.35.191/";
-        private string APIURL = "154.90.35.191/";
+        private string APIURL = "http://154.90.35.191:80/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
@@ -476,7 +476,7 @@ namespace Vi.Core
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
+            
             UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
@@ -491,7 +491,6 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
-
                 IsLoggedIn = false;
                 currentlyLoggedInUserId = "";
             }
@@ -533,7 +532,6 @@ namespace Vi.Core
 
         public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
         {
-      Debug.Log("attempt to login to firebase");
             IsLoggingIn = true;
             LogInErrorText = "";
             LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
@@ -2578,10 +2576,10 @@ namespace Vi.Core
         public List<KillsLeaderboardEntry> killsLeaderboardEntries { get; private set; } = new List<KillsLeaderboardEntry>();
         public List<HordeLeaderboardEntry> hordeLeaderboardEntries { get; private set; } = new List<HordeLeaderboardEntry>();
 
-        public IEnumerator GetLeaderboard(string characterId)
+        public IEnumerator GetLeaderboard()
         {
             // Kills leaderboard
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderboard/kills");
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderBoardSummary/kills");
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
@@ -2618,7 +2616,6 @@ namespace Vi.Core
             public string boardType;
             public string charId;
             public KillsRecord record;
-            public string dateCreated;
         }
 
         public struct HordeLeaderboardEntry
@@ -2726,7 +2723,7 @@ namespace Vi.Core
                         if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
                         {
                             Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            Application.Quit();
+                            FasterPlayerPrefs.QuitGame();
                         }
                     }
                     else if (thisServer.type == 1)
@@ -2734,7 +2731,7 @@ namespace Vi.Core
                         if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
                         {
                             Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            Application.Quit();
+                            FasterPlayerPrefs.QuitGame();
                         }
                     }
                     else

@@ -12,13 +12,25 @@ namespace Vi.Core
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
 
-        [Header("MVP Presentation Info")]
-        public Vector3 previewCharacterPosition;
+        public Vector3 GetCharacterPreviewPosition(int playerDataIdToPreview)
+        {
+            if (PlayerDataManager.Singleton.IdHasLocalPlayer(playerDataIdToPreview))
+            {
+                return PlayerDataManager.Singleton.GetPlayerObjectById(playerDataIdToPreview).transform.position;
+            }
+            else
+            {
+                foreach (CombatAgent combatAgent in PlayerDataManager.Singleton.GetActiveCombatAgents())
+                {
+                    return combatAgent.transform.position;
+                }
+            }
+            return new Vector3(0, 5, 0);
+        }
 
-        public static readonly Vector3 previewCharacterPositionOffset = new Vector3(0, 0.3f, -7);
         public static readonly Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
-        public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 2.033f, -9.592f);
+        public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 1.733f, -2.592f);
         public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(18.07f, 0, 0);
 
         [Header("Damage Circle")]
@@ -201,7 +213,7 @@ namespace Vi.Core
         private int mobSpawnPointIndex = -1;
         public TransformData GetMobSpawnPoint(Mob mobPrefab)
         {
-            if (mobSpawnPoints.Length == 0) { return default; }
+            if (mobSpawnPoints.Length == 0) { return new TransformData(new Vector3(Random.Range(-10, 10), Random.Range(3, 5), Random.Range(-10, 10)), default); }
             mobSpawnPointIndex++;
             if (mobSpawnPointIndex >= mobSpawnPoints.Length) { mobSpawnPointIndex = 0; }
             MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[mobSpawnPointIndex];
@@ -263,7 +275,7 @@ namespace Vi.Core
 
                 foreach (SpawnPointDefinition spawnPoint in spawnPoints)
                 {
-                    Gizmos.color = PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
+                    Gizmos.color = spawnPoint.teams[0] == PlayerDataManager.Team.Competitor ? Color.black : PlayerDataManager.GetTeamColor(spawnPoint.teams[0]);
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         Vector3 spawnPosition = spawnPoint.spawnPositions[i];

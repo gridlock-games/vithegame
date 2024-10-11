@@ -90,9 +90,13 @@ namespace Vi.Player
             ToggleScoreboard(false);
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
+            if (pauseInstance) { pauseInstance.GetComponent<Menu>().DestroyAllMenus(); }
+            if (inventoryInstance) { inventoryInstance.GetComponent<Menu>().DestroyAllMenus(); }
             if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
+            if (playerUIInstance) { Destroy(playerUIInstance); }
+            if (spectatorUIInstance) { Destroy(spectatorUIInstance); }
         }
 
         private void ToggleScoreboard(bool isOn)

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
+using jomarcentermjm.steamauthentication;
 
 namespace Vi.UI
 {
@@ -51,6 +52,7 @@ namespace Vi.UI
 
         [Header("Individual Login Buttons")]
         [SerializeField] private GameObject steamLoginButton;
+
         [Header("OAuth")]
         [SerializeField] private GameObject oAuthParent;
 
@@ -278,8 +280,8 @@ namespace Vi.UI
 
         public FirebaseUser _firebasesteamuser;
         public SteamUserAccountData _SteamUserAccountData;
-        string _steamusername;
-        bool steamAuthExternalstepdone;
+        private string _steamusername;
+        private bool steamAuthExternalstepdone;
 
         public void LoginWithSteam()
         {
@@ -305,7 +307,7 @@ namespace Vi.UI
             });
         }
 
-        void updateSteamData(FirebaseUser user, SteamUserAccountData suad, string steamUsername)
+        private void updateSteamData(FirebaseUser user, SteamUserAccountData suad, string steamUsername)
         {
             _firebasesteamuser = user;
             _SteamUserAccountData = suad;
@@ -320,7 +322,6 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.IsLoggedIn)
             {
-
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
                 welcomeUserText.text = steamUsername;
@@ -330,7 +331,6 @@ namespace Vi.UI
             }
             else
             {
-
                 oAuthParent.SetActive(false);
                 initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
             }
@@ -423,7 +423,7 @@ namespace Vi.UI
 
         public void QuitGame()
         {
-            Application.Quit();
+            FasterPlayerPrefs.QuitGame();
         }
 
         public IEnumerator CreateAccount()
@@ -692,15 +692,19 @@ namespace Vi.UI
                         case "Vi":
                             welcomeUserImage.sprite = baseImageSprite;
                             break;
+
                         case "Google":
                             welcomeUserImage.sprite = googleImageSprite;
                             break;
+
                         case "Facebook":
                             welcomeUserImage.sprite = facebookImageSprite;
                             break;
+
                         case "Steam":
                             welcomeUserImage.sprite = steamImageSprite;
                             break;
+
                         default:
                             Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
                             break;
@@ -743,12 +747,19 @@ namespace Vi.UI
                             initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
                         }
                         break;
+
                     case "Google":
                         yield return WaitForGoogleAuth(JsonUtility.FromJson<GoogleAuth.GoogleIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("GoogleIdTokenResponse")), true);
                         break;
+
                     case "Facebook":
                         yield return WaitForFacebookAuth(JsonUtility.FromJson<FacebookAuth.FacebookIdTokenResponse>(FasterPlayerPrefs.Singleton.GetString("FacebookIdTokenResponse")));
                         break;
+                    case "Steam":
+                        //added steam
+                        LoginWithSteam();
+                        break;
+
                     default:
                         Debug.LogError("Not sure how to handle last sign in type " + FasterPlayerPrefs.Singleton.GetString("LastSignInType"));
                         break;
@@ -831,7 +842,6 @@ namespace Vi.UI
                 StartCoroutine(WaitForSteamAuth(_firebasesteamuser, _SteamUserAccountData, _steamusername));
                 steamAuthExternalstepdone = false;
             }
-
         }
 
         public void HandlePlatformAPI()

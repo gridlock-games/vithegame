@@ -34,6 +34,20 @@ namespace Vi.UI
 
         private void FindPlayerInput()
         {
+            if (playerInput)
+            {
+                if (!playerInput.gameObject.activeInHierarchy)
+                {
+                    playerInput = null;
+                    playerMovementHandler = null;
+                    attributes = null;
+                    weaponHandler = null;
+                    animationHandler = null;
+                    loadoutManager = null;
+                    playerUI = null;
+                }
+            }
+
             if (playerInput) { return; }
             if (!PlayerDataManager.DoesExist()) { return; }
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
@@ -62,8 +76,10 @@ namespace Vi.UI
                 playerUI.GetBlockingButton().gameObject.SetActive(false);
                 playerUI.GetDodgeButton().gameObject.SetActive(false);
                 playerUI.GetMainPlayerCard().gameObject.SetActive(false);
-                playerUI.GetOnScreenReloadButton().gameObject.SetActive(false);
-                playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+                if (!weaponHandler.CanADS)
+                {
+                    playerUI.GetHeavyAttackButton().gameObject.SetActive(false);
+                }
 
                 playerUI.GetPauseMenuButton().gameObject.SetActive(false);
                 playerUI.GetScoreboardButton().gameObject.SetActive(false);
@@ -463,7 +479,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
                 PlayerDataManager.Singleton.RespawnAllPlayers();
                 yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.back * 6, playerMovementHandler.transform.rotation);
+                playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.right * 6, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
             else if (currentActionIndex == 9) // Swap Weapons

@@ -23,11 +23,11 @@ namespace ViNetAnalytics
         private void Awake()
         {
             _singleton = this;
-            StartCoroutine("DoDataCaptureCommunication");
+            StartCoroutine(DoDataCaptureCommunication());
         }
 
         private bool alreadyCapture = false;
-        private const string APIURL = "154.90.35.191/";
+        private const string APIURL = "http://154.90.35.191:80/";
         public Deviceinfo capturedData;
         public bool dataPrivacyAnonymousPermission = true;
 
@@ -83,7 +83,7 @@ namespace ViNetAnalytics
 
             Debug.Log("SendingData");
             //Begin Transfer - Held for Dataprivacy test
-            using (UnityWebRequest sentRequest = UnityWebRequest.Post($"{APIURL}game/saveDeviceInfo", jsonDataConverted))
+            using (UnityWebRequest sentRequest = UnityWebRequest.PostWwwForm($"{APIURL}game/saveDeviceInfo", jsonDataConverted))
             {
                 yield return sentRequest.SendWebRequest();
 

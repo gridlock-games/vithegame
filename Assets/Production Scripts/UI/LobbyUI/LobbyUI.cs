@@ -216,7 +216,7 @@ namespace Vi.UI
             }
         }
 
-        private void RefreshGameMode()
+        private void RefreshGameMode(bool calledFromInit)
         {
             // Player account card display logic
             teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -298,7 +298,7 @@ namespace Vi.UI
             RefreshMapOptions();
 
             // Even out teams
-            if (IsServer)
+            if (IsServer & !calledFromInit)
             {
                 Dictionary<PlayerDataManager.Team, int> teamCounts = new Dictionary<PlayerDataManager.Team, int>();
                 foreach (PlayerDataManager.Team possibleTeam in possibleTeams)
@@ -381,7 +381,7 @@ namespace Vi.UI
             lockCharacterButton.onClick.AddListener(LockCharacter);
             lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
 
-            RefreshGameMode();
+            RefreshGameMode(true);
 
             RefreshPlayerCards();
 
@@ -488,7 +488,7 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
-                yield return new WaitUntil(() => !NetSceneManager.Singleton.IsBusyLoadingScenes());
+                yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
                 networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
                 networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
                 NetworkManager.Singleton.StartClient();
@@ -569,7 +569,7 @@ namespace Vi.UI
                     List<PlayerDataManager.PlayerData> team2List = playerDataListWithoutSpectators.FindAll(item => item.team == PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams[1]);
                     canCountDown = team1List.Count >= 2 & team2List.Count >= 2 & team1List.Count == team2List.Count;
 
-                    if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 3 or more players on each team to play"; }
+                    if (!(team1List.Count >= 2 & team2List.Count >= 2)) { cannotCountDownMessage = "Need 2 or more players on each team to play"; }
                     else if (team1List.Count != team2List.Count) { cannotCountDownMessage = "Each team needs the same number of players"; }
                     break;
                 case PlayerDataManager.GameMode.EssenceWar:
@@ -685,14 +685,14 @@ namespace Vi.UI
             roomSettingsButton.gameObject.SetActive(isLobbyLeader & Mathf.Approximately(startGameTimer.Value, startGameTime));
             if (!roomSettingsButton.gameObject.activeSelf) { CloseRoomSettings(); }
             
-            leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.text != "");
-            rightTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.text != "");
+            leftTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & leftTeamParent.teamTitleText.gameObject.activeSelf);
+            rightTeamParent.addBotButton.gameObject.SetActive(isLobbyLeader & !(canStartGame & canCountDown) & rightTeamParent.teamTitleText.gameObject.activeSelf);
 
             leftTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
             rightTeamParent.addBotButton.interactable = playerDataListWithoutSpectators.Count < maxPlayersForMap;
 
-            leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
-            rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.text != "" & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
+            leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.gameObject.activeSelf & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
+            rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.gameObject.activeSelf & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             
             string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             string dataString = "";
@@ -731,7 +731,7 @@ namespace Vi.UI
 
             if (PlayerDataManager.Singleton.GetGameMode() != lastGameMode)
             {
-                RefreshGameMode();
+                RefreshGameMode(false);
             }
 
             gameModeText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
@@ -754,11 +754,27 @@ namespace Vi.UI
             int characterIndex = kvp.Key;
             int skinIndex = kvp.Value;
 
-            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
-
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
             // Instantiate the player model
-            previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pO))
+            {
+                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+            }
+            else
+            {
+                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+            }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
@@ -808,7 +824,22 @@ namespace Vi.UI
         private new void OnDestroy()
         {
             base.OnDestroy();
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
+
             if (pauseInstance)
             {
                 if (pauseInstance.TryGetComponent(out PauseMenu pauseMenu))
@@ -866,6 +897,12 @@ namespace Vi.UI
 
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
+
+            Unity.Collections.FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if ((loadoutSlot + 1).ToString() != activeLoadoutSlot)
+            {
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+            }
 
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
 
@@ -990,10 +1027,16 @@ namespace Vi.UI
         private void UnlockCharacterLocal()
         {
             spectateButton.interactable = true;
-            foreach (Button button in loadoutPresetButtons)
+            int activeLoadoutSlot = 0;
+            for (int i = 0; i < loadoutPresetButtons.Length; i++)
             {
-                button.interactable = true;
+                Button button = loadoutPresetButtons[i];
+                int var = i;
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(delegate { ChooseLoadoutPreset(button, var); });
+                if (PlayerDataManager.Singleton.LocalPlayerData.character.IsSlotActive(i)) { activeLoadoutSlot = i; }
             }
+            loadoutPresetButtons[activeLoadoutSlot].onClick.Invoke();
 
             lockCharacterButton.onClick.RemoveAllListeners();
             lockCharacterButton.onClick.AddListener(LockCharacter);

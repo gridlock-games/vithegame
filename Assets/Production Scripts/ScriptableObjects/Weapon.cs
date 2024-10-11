@@ -98,6 +98,9 @@ namespace Vi.ScriptableObjects
         [Header("Shooter Weapon Settings")]
         [SerializeField] private bool shouldUseAmmo;
         [SerializeField] private int maxAmmoCount;
+        [SerializeField] private ActionClip reloadClip;
+
+        public ActionClip GetReloadClip() { return reloadClip; }
 
         public bool ShouldUseAmmo() { return shouldUseAmmo; }
         public int GetMaxAmmoCount() { return maxAmmoCount; }
@@ -166,7 +169,26 @@ namespace Vi.ScriptableObjects
                 inflictHitSoundEffect = inflictHitSoundEffects.Find(item => item.armorType == armorType & item.ailment == ActionClip.Ailment.None);
                 if (inflictHitSoundEffect == null)
                 {
-                    return inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None).hitSounds[Random.Range(0, inflictHitSoundEffect.hitSounds.Length)];
+                    InflictHitSoundEffect soundEffect = inflictHitSoundEffects.Find(item => item.ailment == ActionClip.Ailment.None);
+                    if (soundEffect == null)
+                    {
+                        Debug.LogError(this + " doesn't have any inflict hit sound effects with ailment none!");
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds == null)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else if (soundEffect.hitSounds.Length == 0)
+                    {
+                        Debug.LogError("No Inflict Sound effect for " + this + " for the following params: " + armorType + " " + weaponBone + " " + ailment);
+                        return null;
+                    }
+                    else
+                    {
+                        return soundEffect.hitSounds[Random.Range(0, soundEffect.hitSounds.Length)];
+                    }
                 }
                 else // If armor effect isn't null
                 {
@@ -209,7 +231,11 @@ namespace Vi.ScriptableObjects
         [SerializeField] private List<AudioClip> reloadSoundEffects = new List<AudioClip>();
 
         public const float reloadSoundEffectVolume = 0.1f;
-        public AudioClip GetReloadSoundEffect() { return reloadSoundEffects[Random.Range(0, reloadSoundEffects.Count)]; }
+        public AudioClip GetReloadSoundEffect()
+        {
+            if (reloadSoundEffects.Count == 0) { return null; }
+            return reloadSoundEffects[Random.Range(0, reloadSoundEffects.Count)];
+        }
 
         public enum WeaponBone
         {
@@ -263,9 +289,16 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
 
-        public ActionClip GetDeathReaction() { return hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip; }
+        public ActionClip GetDeathReaction() { return CreateCopyOfActionClip(hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip); }
 
-        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip; }
+        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return CreateCopyOfActionClip(hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip); }
+
+        private ActionClip CreateCopyOfActionClip(ActionClip actionClip)
+        {
+            ActionClip instance = Instantiate(actionClip);
+            instance.name = actionClip.name;
+            return instance;
+        }
 
         public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
         {
@@ -337,7 +370,7 @@ namespace Vi.ScriptableObjects
                 return null;
             }
 
-            return hitReaction.reactionClip;
+            return CreateCopyOfActionClip(hitReaction.reactionClip);
         }
 
         [System.Serializable]
@@ -438,29 +471,115 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public float GetAbilityCooldownProgress(ActionClip ability)
+        public float GetAbilityCooldownTimeLeft(ActionClip ability)
         {
+            float abilityCooldownTime = GetAbilityCooldownTime(ability);
             if (ability == ability1)
             {
-                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / ability1.abilityCooldownTime, 0, 1);
+                return abilityCooldownTime - (Time.time - lastAbility1ActivateTime);
             }
             else if (ability == ability2)
             {
-                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / ability2.abilityCooldownTime, 0, 1);
+                return abilityCooldownTime - (Time.time - lastAbility2ActivateTime);
             }
             else if (ability == ability3)
             {
-                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / ability3.abilityCooldownTime, 0, 1);
+                return abilityCooldownTime - (Time.time - lastAbility3ActivateTime);
             }
             else if (ability == ability4)
             {
-                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / ability4.abilityCooldownTime, 0, 1);
+                return abilityCooldownTime - (Time.time - lastAbility4ActivateTime);
             }
             else
             {
                 Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
                 return 0;
             }
+        }
+
+        public float GetAbilityCooldownProgress(ActionClip ability)
+        {
+            float abilityCooldownTime = GetAbilityCooldownTime(ability);
+            if (ability == ability1)
+            {
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability2)
+            {
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability3)
+            {
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / abilityCooldownTime, 0, 1);
+            }
+            else if (ability == ability4)
+            {
+                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
+                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / abilityCooldownTime, 0, 1);
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
+        private float GetAbilityCooldownTime(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return Mathf.Max(0, ability1.abilityCooldownTime - ability1CooldownOffset);
+            }
+            else if (ability == ability2)
+            {
+                return Mathf.Max(0, ability2.abilityCooldownTime - ability2CooldownOffset);
+            }
+            else if (ability == ability3)
+            {
+                return Mathf.Max(0, ability3.abilityCooldownTime - ability3CooldownOffset);
+            }
+            else if (ability == ability4)
+            {
+                return Mathf.Max(0, ability4.abilityCooldownTime - ability4CooldownOffset);
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
+        private float ability1CooldownOffset;
+        private float ability2CooldownOffset;
+        private float ability3CooldownOffset;
+        private float ability4CooldownOffset;
+
+        public void PermanentlyReduceAbilityCooldownTime(ActionClip ability, float percent)
+        {
+            if (ability == ability1)
+            {
+                ability1CooldownOffset = ability1.abilityCooldownTime * percent;
+            }
+            else if (ability == ability2)
+            {
+                ability2CooldownOffset = ability2.abilityCooldownTime * percent;
+            }
+            else if (ability == ability3)
+            {
+                ability3CooldownOffset = ability3.abilityCooldownTime * percent;
+            }
+            else if (ability == ability4)
+            {
+                ability4CooldownOffset = ability4.abilityCooldownTime * percent;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+            ReduceAbilityCooldownTime(ability, percent);
         }
 
         public void ReduceAbilityCooldownTime(ActionClip ability, float percent)
@@ -588,8 +707,24 @@ namespace Vi.ScriptableObjects
 
         [Header("Lunge Assignments")]
         [SerializeField] private ActionClip lunge;
+        [SerializeField] private ActionClip invinicbleLunge;
+        [SerializeField] private ActionClip uninterruptableLunge;
 
-        public ActionClip GetLungeClip() { return lunge; }
+        public ActionClip GetLungeClip(bool isUninterruptable, bool isInvincible)
+        {
+            if (isInvincible)
+            {
+                return invinicbleLunge;
+            }
+            else if (isUninterruptable)
+            {
+                return uninterruptableLunge;
+            }
+            else
+            {
+                return lunge;
+            }
+        }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
         private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
@@ -603,6 +738,8 @@ namespace Vi.ScriptableObjects
         {
             Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
 
+            if (reloadClip) { actionClipLookup.TryAdd(reloadClip.name, reloadClip); }
+
             if (dodgeF) { actionClipLookup.TryAdd(dodgeF.name, dodgeF); }
             if (dodgeFL) { actionClipLookup.TryAdd(dodgeFL.name, dodgeFL); }
             if (dodgeFR) { actionClipLookup.TryAdd(dodgeFR.name, dodgeFR); }
@@ -613,6 +750,8 @@ namespace Vi.ScriptableObjects
             if (dodgeR) { actionClipLookup.TryAdd(dodgeR.name, dodgeR); }
 
             if (lunge) { actionClipLookup.TryAdd(lunge.name, lunge); }
+            if (invinicbleLunge) { actionClipLookup.TryAdd(invinicbleLunge.name, invinicbleLunge); }
+            if (uninterruptableLunge) { actionClipLookup.TryAdd(uninterruptableLunge.name, uninterruptableLunge); }
 
             if (ability1) { actionClipLookup.TryAdd(ability1.name, ability1); }
             if (ability2) { actionClipLookup.TryAdd(ability2.name, ability2); }

@@ -28,6 +28,35 @@ namespace Vi.UI
             backgroundImageSelector = GetComponent<SceneLoadingInfoUI>();
         }
 
+        private void OnEnable()
+        {
+            NetSceneManager.OnNetSceneManagerDespawn += OnNetSceneManagerDespawn;
+        }
+
+        private void OnDisable()
+        {
+            NetSceneManager.OnNetSceneManagerDespawn -= OnNetSceneManagerDespawn;
+        }
+
+        private void OnNetSceneManagerDespawn()
+        {
+            UpdateUI(false);
+            Canvas.ForceUpdateCanvases();
+        }
+
+        private Camera mainCamera;
+        private void FindMainCamera()
+        {
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
+            mainCamera = Camera.main;
+        }
+
         private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
@@ -37,43 +66,46 @@ namespace Vi.UI
         private bool lastCanvasState;
         private void Update()
         {
-            canvas.enabled = canvasGroup.alpha > 0.05f;
-            if (canvas.enabled & !lastCanvasState) { backgroundImageSelector.ChangeBackground(); }
-            lastCanvasState = canvas.enabled;
+            UpdateUI(true);
+        }
 
-            if (!NetSceneManager.DoesExist())
+        private void UpdateUI(bool fade)
+        {
+            FindMainCamera();
+
+            string topText = "";
+            if (NetworkManager.Singleton.ShutdownInProgress)
             {
-                canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, Time.deltaTime * alphaLerpSpeed);
-                return;
+                spawningPlayerObjectParent.SetActive(true);
+                topText = "Network Shutdown In Progress";
             }
-
-            NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-            spawningPlayerObjectParent.SetActive((!NetSceneManager.Singleton.IsSpawned & NetworkManager.Singleton.IsListening) | (NetSceneManager.Singleton.ShouldSpawnPlayer & !playerObject) | (NetworkManager.Singleton.ShutdownInProgress));
-            progressBarParent.SetActive(PersistentLocalObjects.Singleton.LoadingOperations.Count > 0 | (NetSceneManager.Singleton.IsSpawned & NetSceneManager.Singleton.ShouldSpawnPlayer & !playerObject));
-
-            if (spawningPlayerObjectParent.activeSelf)
+            else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
             {
-                string topText;
-                if (NetworkManager.Singleton.ShutdownInProgress)
+                spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
+
+                if (PlayerDataManager.DoesExist())
                 {
-                    topText = "Network Shutdown In Progress";
-                }
-                else if (NetSceneManager.Singleton.IsSpawned)
-                {
-                    if (PlayerDataManager.DoesExist())
-                    {
-                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
-                    }
-                    else
-                    {
-                        topText = "Spawning Player Object";
-                    }
+                    topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
                 }
                 else
                 {
-                    topText = "Connecting To Server";
+                    topText = "Spawning Player Object";
                 }
-                
+            }
+            else if (NetworkManager.Singleton.IsListening & NetworkManager.Singleton.IsClient)
+            {
+                spawningPlayerObjectParent.SetActive(true);
+                topText = "Connecting To Server";
+            }
+            else
+            {
+                spawningPlayerObjectParent.SetActive(false);
+            }
+
+            progressBarParent.SetActive(NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
+
+            if (spawningPlayerObjectParent.activeSelf)
+            {
                 if (!spawningPlayerObjectText.text.Contains(topText)) { spawningPlayerObjectText.text = topText; }
 
                 if (Time.time - lastTextChangeTime > 0.5f)
@@ -97,13 +129,22 @@ namespace Vi.UI
                 }
             }
 
-            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0, Time.deltaTime * alphaLerpSpeed);
+            float alphaTarget = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0;
+            canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
 
             scenesLeftText.text = "";
             if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
-                progressBarText.text = "Scene Loading Complete";
-                progressBarImage.fillAmount = 1;
+                if (NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    progressBarText.text = "";
+                    progressBarImage.fillAmount = 0;
+                }
+                else
+                {
+                    progressBarText.text = "Scene Loading Complete";
+                    progressBarImage.fillAmount = 1;
+                }
             }
 
             for (int i = 0; i < PersistentLocalObjects.Singleton.LoadingOperations.Count; i++)
@@ -134,6 +175,15 @@ namespace Vi.UI
 
                 progressBarImage.fillAmount = PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.IsDone ? 1 : PersistentLocalObjects.Singleton.LoadingOperations[i].asyncOperation.PercentComplete;
             }
+
+            OnEndUpdateUI();
+        }
+
+        private void OnEndUpdateUI()
+        {
+            canvas.enabled = canvasGroup.alpha > 0.05f;
+            if (canvas.enabled & !lastCanvasState) { backgroundImageSelector.ChangeBackground(); }
+            lastCanvasState = canvas.enabled;
         }
     }
 }

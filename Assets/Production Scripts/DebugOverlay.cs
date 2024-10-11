@@ -104,9 +104,9 @@ public class DebugOverlay : MonoBehaviour
             myLog = type.ToString() + ": " + output + "\n" + myLog;
         }
 
-        if (myLog.Length > 1000)
+        if (myLog.Length > 3000)
         {
-            myLog = myLog.Substring(0, 1000);
+            myLog = myLog.Substring(0, 3000);
         }
 
         consoleLogText.text = myLog;
@@ -119,6 +119,16 @@ public class DebugOverlay : MonoBehaviour
     private Spectator localSpectator;
     private void FindLocalPlayer()
     {
+        if (localPlayer)
+        {
+            if (!localPlayer.gameObject.activeInHierarchy) { localPlayer = null; }
+        }
+
+        if (localSpectator)
+        {
+            if (!localSpectator.gameObject.activeInHierarchy) { localSpectator = null; }
+        }
+
         if (localPlayer) { return; }
         if (localSpectator) { return; }
         if (!PlayerDataManager.DoesExist()) { return; }
@@ -138,7 +148,7 @@ public class DebugOverlay : MonoBehaviour
             myLog = "";
             consoleLogText.text = "";
         }
-        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled;
+        Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
         debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
         consoleParent.enabled = consoleEnabled;
 
@@ -187,11 +197,11 @@ public class DebugOverlay : MonoBehaviour
             }
             else
             {
-                if (fpsValue >= Screen.currentResolution.refreshRate)
+                if (fpsValue >= Screen.currentResolution.refreshRateRatio.value)
                 {
                     fpsTextColor = Color.green;
                 }
-                else if (fpsValue >= Screen.currentResolution.refreshRate / 2)
+                else if (fpsValue >= Screen.currentResolution.refreshRateRatio.value / 2)
                 {
                     fpsTextColor = Color.yellow;
                 }

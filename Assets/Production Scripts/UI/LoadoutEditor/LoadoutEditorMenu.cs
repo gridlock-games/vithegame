@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.Player;
+using Vi.Utility;
+using Unity.Collections;
 
 namespace Vi.UI
 {
@@ -41,9 +43,11 @@ namespace Vi.UI
         [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
+        private FixedString64Bytes originalActiveLoadoutSlot;
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
+            originalActiveLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
         }
 
         private GameObject previewObject;
@@ -59,14 +63,24 @@ namespace Vi.UI
             if (!previewObject)
             {
                 // Instantiate the player model
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
-                    PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.previewCharacterPositionOffset,
-                    Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(PlayerDataManager.Singleton.LocalPlayerData.id);
+                if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
+                        basePos,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+                }
+                else
+                {
+                    previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                        basePos,
+                        Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+                }
 
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
 
-                characterPreviewCamera.transform.position = PlayerDataManager.Singleton.GetPlayerSpawnPoints().previewCharacterPosition + SpawnPoints.cameraPreviewCharacterPositionOffset;
+                characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             }
 
@@ -75,7 +89,24 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
+
+            FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if (originalActiveLoadoutSlot != activeLoadoutSlot)
+            {
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(attributes.CachedPlayerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+            }
         }
 
         private void OnEnable()
@@ -96,7 +127,18 @@ namespace Vi.UI
 
         private void OnDisable()
         {
-            if (previewObject) { Destroy(previewObject); }
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    previewObject = null;
+                }
+                else
+                {
+                    Destroy(previewObject);
+                }
+            }
         }
 
         private void Update()
@@ -119,7 +161,6 @@ namespace Vi.UI
 
             if (!playerData.character.GetActiveLoadout().Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
-                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
                 playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }

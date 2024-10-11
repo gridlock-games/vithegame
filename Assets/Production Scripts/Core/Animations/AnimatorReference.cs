@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
@@ -48,7 +47,7 @@ namespace Vi.Core
                 skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
             }
         }
-        
+
         private Dictionary<CharacterReference.EquipmentType, WearableEquipment> wearableEquipmentInstances = new Dictionary<CharacterReference.EquipmentType, WearableEquipment>();
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
@@ -169,7 +168,7 @@ namespace Vi.Core
                 {
                     Destroy(wearableEquipmentInstances[equipmentType].gameObject);
                 }
-                
+
                 wearableEquipmentInstances.Remove(equipmentType);
             }
 
@@ -182,7 +181,7 @@ namespace Vi.Core
                 }
             }
             SetArmorType();
-            StartCoroutine(SetRendererStatusForCharacterCosmetics());
+            if (gameObject.activeSelf) { StartCoroutine(SetRendererStatusForCharacterCosmetics()); }
         }
 
         private IEnumerator SetRendererStatusForCharacterCosmetics()
@@ -199,22 +198,25 @@ namespace Vi.Core
             }
         }
 
-        private void OnDestroy()
+        private void OnReturnToPool()
         {
-            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in wearableEquipmentInstances)
+            foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in new Dictionary<CharacterReference.EquipmentType, WearableEquipment>(wearableEquipmentInstances))
             {
-                if (kvp.Value.TryGetComponent(out PooledObject pooledObject))
-                {
-                    kvp.Value.transform.SetParent(null, true);
-                    SceneManager.MoveGameObjectToScene(kvp.Value.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
-                    ObjectPoolingManager.ReturnObjectToPool(ref pooledObject);
-                    kvp.Value.enabled = true;
-                }
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
                 {
                     glowRenderer.UnregisterRenderer(smr);
                 }
+                ClearWearableEquipment(kvp.Key);
             }
+
+            armorType = Weapon.ArmorType.Flesh;
+            accumulatedRootMotion = Vector3.zero;
+            combatAgent = null;
+            animationHandler = null;
+            CurrentActionsAnimatorStateInfo = default;
+            NextActionsAnimatorStateInfo = default;
+            CurrentFlinchAnimatorStateInfo = default;
+            NextFlinchAnimatorStateInfo = default;
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -287,27 +289,53 @@ namespace Vi.Core
         private int flinchLayerIndex;
 
         Animator animator;
-        CombatAgent combatAgent;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
+        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; } = new SkinnedMeshRenderer[0];
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
 
-            combatAgent = GetComponentInParent<CombatAgent>();
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
 
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
+
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
+            SkinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
         }
 
-        private void Start()
+        public void OnNetworkSpawn()
         {
-            SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>(true);
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in smrs)
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
+            }
+        }
+
+        CombatAgent combatAgent;
+        AnimationHandler animationHandler;
+        private void OnEnable()
+        {
+            combatAgent = GetComponentInParent<CombatAgent>();
+            if (combatAgent)
+            {
+                animationHandler = combatAgent.GetComponent<AnimationHandler>();
+                foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+                {
+                    skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
+                }
+            }
+
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
             }
@@ -317,7 +345,7 @@ namespace Vi.Core
         private IEnumerator TurnRenderersBackOn()
         {
             yield return null;
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
             }
@@ -344,6 +372,7 @@ namespace Vi.Core
 
         public bool ShouldApplyRootMotion()
         {
+            if (!combatAgent) { return false; }
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
             return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
@@ -351,7 +380,23 @@ namespace Vi.Core
 
         private void Update()
         {
-            limbReferences.SetRotationOffset(IsAtRest() ? 0 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset);
+            if (animationHandler)
+            {
+                if (!animator.enabled) { animationHandler.ProcessNextActionClip(); }
+            }
+
+            if (IsAtRest())
+            {
+                limbReferences.SetRotationOffset(0, 0, 0);
+            }
+            else
+            {
+                limbReferences.SetRotationOffset(
+                    combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.XAngleRotationOffset,
+                    combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.YAngleRotationOffset,
+                    combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset > 180 ? combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset - 360 : combatAgent.WeaponHandler.CurrentActionClip.ZAngleRotationOffset
+                );
+            }
         }
 
         public AnimatorStateInfo CurrentActionsAnimatorStateInfo { get; private set; }
@@ -390,8 +435,81 @@ namespace Vi.Core
                         worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                 }
-                accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
+                accumulatedRootMotion += new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z) / Time.fixedDeltaTime;
             }
+
+            if (animationHandler) { animationHandler.ProcessNextActionClip(); }
+        }
+
+        private Rigidbody[] ragdollRigidbodies = new Rigidbody[0];
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!combatAgent) { return; }
+            foreach (Rigidbody rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+                rb.interpolation = combatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            }
+            animator.enabled = !isActive;
+        }
+
+        [System.Serializable]
+        public struct WorldSpaceLabelTransformInfo
+        {
+            public Renderer rendererToFollow;
+            public Vector3 positionOffsetFromRenderer;
+            public float scaleMultiplier;
+
+            public WorldSpaceLabelTransformInfo(Renderer rendererToFollow, Vector3 positionOffsetFromRenderer, float scaleMultiplier)
+            {
+                this.rendererToFollow = rendererToFollow;
+                this.positionOffsetFromRenderer = positionOffsetFromRenderer;
+                this.scaleMultiplier = scaleMultiplier;
+            }
+
+            public static WorldSpaceLabelTransformInfo GetDefaultWorldSpaceLabelTransformInfo()
+            {
+                return new WorldSpaceLabelTransformInfo(null, new Vector3(0, 0, -0.25f), 1);
+            }
+        }
+
+        public WorldSpaceLabelTransformInfo GetWorldSpaceLabelTransformInfo() { return worldSpaceLabelTransformInfo; }
+        [SerializeField] private WorldSpaceLabelTransformInfo worldSpaceLabelTransformInfo = WorldSpaceLabelTransformInfo.GetDefaultWorldSpaceLabelTransformInfo();
+
+        private void OnValidate()
+        {
+            SkinnedMeshRenderer[] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (renderers.Length == 0) { return; }
+            Vector3 highestPoint = renderers[0].bounds.center;
+            Renderer rendererToFollow = renderers[0];
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.bounds.center.y > highestPoint.y)
+                {
+                    rendererToFollow = renderer;
+                    highestPoint = renderer.bounds.center;
+                }
+            }
+            worldSpaceLabelTransformInfo.rendererToFollow = rendererToFollow;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (Application.isPlaying) { return; }
+            SkinnedMeshRenderer[] renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (renderers.Length == 0) { return; }
+            Vector3 highestPoint = renderers[0].bounds.center;
+            Renderer rendererToFollow = renderers[0];
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.bounds.center.y > highestPoint.y)
+                {
+                    rendererToFollow = renderer;
+                    highestPoint = renderer.bounds.center;
+                }
+            }
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawCube(rendererToFollow.bounds.center + rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer, new Vector3(worldSpaceLabelTransformInfo.scaleMultiplier, 0.1f, 0.1f));
         }
     }
 }

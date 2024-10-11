@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core
 {
@@ -20,18 +21,19 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                AddActionToServerQueue(actionClip.name, isFollowUpClip);
+                AddActionToServerQueue(actionClip.name, isFollowUpClip, false);
+                WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
             {
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
-                WaitingForActionClipToPlay = true;
                 PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                WaitingForActionClipToPlay = true;
             }
             else
             {
-                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip);
+                Debug.LogError("You should not be calling AnimationHandler.PlayAction() when we aren't the owner or the server " + actionClip + " " + name);
             }
         }
 
@@ -90,6 +92,7 @@ namespace Vi.Core
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Lunge) { animationStateName = "LungeF"; }
             animationStateName = (actionClip.GetClipType() == ActionClip.ClipType.Flinch ? flinchLayerName : actionsLayerName) + "." + animationStateName;
             return animationStateName;
         }
@@ -100,6 +103,7 @@ namespace Vi.Core
             string animationStateName = actionClip.name;
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { animationStateName = "GrabAttack"; }
             if (actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { animationStateName = actionClip.name + "_Attack"; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Lunge) { animationStateName = "LungeF"; }
             return animationStateName;
         }
 
@@ -123,8 +127,17 @@ namespace Vi.Core
             return normalizedTime;
         }
 
-        public bool IsAtRest() { return animatorReference.IsAtRest(); }
-        public bool IsAtRestIgnoringTransition() { return animatorReference.IsAtRestIgnoringTransition(); }
+        public bool IsAtRest()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRest();
+        }
+
+        public bool IsAtRestIgnoringTransition()
+        {
+            if (!animatorReference) { return true; }
+            return animatorReference.IsAtRestIgnoringTransition();
+        }
 
         public bool CanAim()
         {
@@ -141,17 +154,15 @@ namespace Vi.Core
 
         public bool IsAiming()
         {
+            if (!Animator) { return false; }
             return Animator.IsInTransition(Animator.GetLayerIndex("Aiming")) | !Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Aiming")).IsName("Empty");
         }
 
         public bool IsReloading()
         {
-            return Animator.GetBool("Reloading") | Animator.IsInTransition(Animator.GetLayerIndex("Reload")) | Animator.GetCurrentAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
-        }
-
-        public bool IsFinishingReload()
-        {
-            return Animator.IsInTransition(Animator.GetLayerIndex("Reload")) & !Animator.GetNextAnimatorStateInfo(Animator.GetLayerIndex("Reload")).IsName("Reload");
+            if (!lastClipPlayed) { return false; }
+            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Reload) { return false; }
+            return !IsAtRest();
         }
 
         public bool IsDodging()
@@ -210,13 +221,34 @@ namespace Vi.Core
             if (IsServer) { combatAgent.StatusAgent.RemoveAllStatuses(); }
         }
 
+        public void HideRenderers()
+        {
+            StartCoroutine(HideRenderersAfterDuration());
+        }
+
+        private const float deadRendererDisplayTime = 5;
+        private IEnumerator HideRenderersAfterDuration()
+        {
+            yield return new WaitForSeconds(deadRendererDisplayTime);
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = true;
+            }
+            yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = false;
+            }
+        }
+
         public void OnRevive()
         {
             Animator.Play("Empty", actionsLayerIndex);
             Animator.Play("Empty", flinchLayerIndex);
         }
 
-        public void CancelAllActions(float transitionTime)
+        public void CancelAllActions(float transitionTime, bool resetGameplayVariables)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.CancelAllActions() should only be called on the server!"); return; }
 
@@ -229,11 +261,15 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
-            combatAgent.SetInviniciblity(0);
-            combatAgent.SetUninterruptable(0);
-            combatAgent.ResetAilment();
-            combatAgent.StatusAgent.RemoveAllStatuses();
-            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+
+            if (resetGameplayVariables)
+            {
+                combatAgent.SetInviniciblity(0);
+                combatAgent.SetUninterruptable(0);
+                combatAgent.ResetAilment();
+                combatAgent.StatusAgent.RemoveAllStatuses();
+                combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            }
             
             CancelAllActionsClientRpc(transitionTime);
         }
@@ -265,7 +301,7 @@ namespace Vi.Core
             ActionClip.ClipType.Ability
         };
 
-        private struct CanPlayActionClipResult
+        public struct CanPlayActionClipResult
         {
             public bool canPlay;
             public bool shouldUseDodgeCancelTransitionTime;
@@ -275,10 +311,12 @@ namespace Vi.Core
                 this.canPlay = canPlay;
                 this.shouldUseDodgeCancelTransitionTime = shouldUseDodgeCancelTransitionTime;
             }
+
+            public static implicit operator bool(CanPlayActionClipResult result) => result.canPlay;
         }
 
         RaycastHit[] allHits = new RaycastHit[10];
-        private CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
+        public CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
@@ -299,7 +337,7 @@ namespace Vi.Core
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
             if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
-                if (combatAgent.IsGrabbed() & actionClip.ailment != ActionClip.Ailment.Grab) { return default; }
+                if (combatAgent.IsGrabbed & actionClip.ailment != ActionClip.Ailment.Grab) { return default; }
             }
 
             if (!isFollowUpClip & IsServer)
@@ -310,16 +348,12 @@ namespace Vi.Core
                     {
                         if (!IsLunging())
                         {
-                            ActionClip lungeClip = Instantiate(combatAgent.WeaponHandler.GetWeapon().GetLungeClip());
-                            lungeClip.name = lungeClip.name.Replace("(Clone)", "");
-                            lungeClip.isInvincible = actionClip.isInvincible;
-                            lungeClip.isUninterruptable = actionClip.isUninterruptable;
+                            ActionClip lungeClip = combatAgent.WeaponHandler.GetWeapon().GetLungeClip(actionClip.isUninterruptable, actionClip.isInvincible);
 
                             if (AreActionClipRequirementsMet(lungeClip) & AreActionClipRequirementsMet(actionClip))
                             {
-                                // Lunge mechanic
 #if UNITY_EDITOR
-                                ExtDebug.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
+                                DebugExtensions.DrawBoxCastBox(transform.position + ActionClip.boxCastOriginPositionOffset, ActionClip.boxCastHalfExtents, transform.forward, transform.rotation, ActionClip.boxCastDistance, Color.red, 1);
 #endif
                                 int allHitsCount = Physics.BoxCastNonAlloc(transform.position + ActionClip.boxCastOriginPositionOffset,
                                     ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
@@ -330,7 +364,7 @@ namespace Vi.Core
                                 {
                                     if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                                     {
-                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible())
+                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
                                         {
                                             Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
                                             angleList.Add((networkCollider,
@@ -415,6 +449,7 @@ namespace Vi.Core
                     case ActionClip.ClipType.HeavyAttack:
                     case ActionClip.ClipType.Ability:
                     case ActionClip.ClipType.FlashAttack:
+                    case ActionClip.ClipType.Reload:
                         if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             if (IsDodging())
@@ -509,23 +544,30 @@ namespace Vi.Core
             return new CanPlayActionClipResult(true, shouldUseDodgeCancelTransitionTime);
         }
 
-        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip); }
+        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip, true); }
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
-        private Queue<(string, bool)> serverActionQueue = new Queue<(string, bool)>();
-        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip)
+        private Queue<(string, bool, bool)> serverActionQueue = new Queue<(string, bool, bool)>();
+        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
-            serverActionQueue.Enqueue((actionClipName, isFollowUpClip));
+            serverActionQueue.Enqueue((actionClipName, isFollowUpClip, wasCalledFromServerRpc));
         }
 
-        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip)
+        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
+            if (!IsServer) { Debug.LogError("AnimationHandler.PlayActionOnServer() should only be called on the server! " + actionClipName); return false; }
+
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
-            if (!canPlayActionClipResult.canPlay) { ResetWaitingForActionToPlayClientRpc(); return false; }
+            if (!canPlayActionClipResult.canPlay)
+            {
+                WaitingForActionClipToPlay = false;
+                if (wasCalledFromServerRpc) { ResetWaitingForActionToPlayClientRpc(); }
+                return false;
+            }
 
             // Check stamina and rage requirements
             if (ShouldApplyStaminaCost(actionClip))
@@ -546,7 +588,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
             {
-                SetInvincibleStatusOnDodge(actionClipName);
+                SetInvincibleStatusOnDodge(actionClip);
             }
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
@@ -584,13 +626,14 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -612,9 +655,16 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
             return true;
+        }
+
+        private IEnumerator ResetWaitingForActionClipToPlayAfterOneFrame()
+        {
+            yield return null;
+            WaitingForActionClipToPlay = false;
         }
 
         private Coroutine evaluateGrabAttackHitsCoroutine;
@@ -693,16 +743,17 @@ namespace Vi.Core
             switch (actionClip.GetClipType())
             {
                 case ActionClip.ClipType.Dodge:
-                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * CombatAgent.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
+                    return combatAgent.IsRaging & actionClip.isAffectedByRage ? combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost * CombatAgent.ragingStaminaCostMultiplier : combatAgent.WeaponHandler.GetWeapon().dodgeStaminaCost;
                 case ActionClip.ClipType.LightAttack:
                 case ActionClip.ClipType.HeavyAttack:
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.FlashAttack:
                 case ActionClip.ClipType.Lunge:
-                    return combatAgent.IsRaging() & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * CombatAgent.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
+                    return combatAgent.IsRaging & actionClip.isAffectedByRage ? actionClip.agentStaminaCost * CombatAgent.ragingStaminaCostMultiplier : actionClip.agentStaminaCost;
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
                 case ActionClip.ClipType.GrabAttack:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -734,6 +785,7 @@ namespace Vi.Core
                 case ActionClip.ClipType.Dodge:
                 case ActionClip.ClipType.HitReaction:
                 case ActionClip.ClipType.Flinch:
+                case ActionClip.ClipType.Reload:
                     return -1;
                 default:
                     Debug.LogError("Unsure how to calculate stamina cost of clip type " + actionClip.GetClipType());
@@ -929,21 +981,20 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
         {
-            StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+            if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
             WaitingForActionClipToPlay = false;
         }
 
+        private Coroutine playActionOnClientCoroutine;
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
         {
             // Retrieve the ActionClip based on the actionStateName
-            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
-            if (actionClip.IsAttack())
+            if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
             {
-                if (combatAgent.WeaponHandler.GetWeapon().name != weaponName)
-                {
-                    yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
-                }
+                yield return new WaitUntil(() => combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") == weaponName.Replace("(Clone)", ""));
             }
+            ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
             {
@@ -977,13 +1028,14 @@ namespace Vi.Core
                 case ActionClip.ClipType.Ability:
                 case ActionClip.ClipType.GrabAttack:
                 case ActionClip.ClipType.Lunge:
+                case ActionClip.ClipType.Reload:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
                     break;
                 case ActionClip.ClipType.HeavyAttack:
                     heavyAttackCoroutine = StartCoroutine(PlayHeavyAttack(actionClip));
                     break;
                 case ActionClip.ClipType.HitReaction:
-                    Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
+                    if (actionClip.ailment != ActionClip.Ailment.Death) { Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0); }
                     break;
                 case ActionClip.ClipType.FlashAttack:
                     Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex, 0);
@@ -1000,13 +1052,13 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (lastClipPlayed.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
         }
 
         // Coroutine for setting invincibility status during a dodge
-        private void SetInvincibleStatusOnDodge(string actionStateName)
+        private void SetInvincibleStatusOnDodge(ActionClip actionClip)
         {
-            combatAgent.SetInviniciblity(combatAgent.WeaponHandler.AnimatorOverrideControllerInstance[actionStateName].length * 0.35f);
+            combatAgent.SetInviniciblity(GetTotalActionClipLengthInSeconds(actionClip) * 0.35f);
         }
 
         public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
@@ -1040,6 +1092,12 @@ namespace Vi.Core
 
         public Weapon.ArmorType GetArmorType() { return animatorReference.GetArmorType(); }
 
+        public AnimatorReference.WorldSpaceLabelTransformInfo GetWorldSpaceLabelTransformInfo()
+        {
+            if (!animatorReference) { return AnimatorReference.WorldSpaceLabelTransformInfo.GetDefaultWorldSpaceLabelTransformInfo(); }
+            return animatorReference.GetWorldSpaceLabelTransformInfo();
+        }
+
         AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {
@@ -1053,14 +1111,33 @@ namespace Vi.Core
             {
                 shouldCreateNewSkin = animatorReference.name.Replace("(Clone)", "") != character.model;
 
-                if (shouldCreateNewSkin) { Destroy(animatorReference.gameObject); }
+                if (shouldCreateNewSkin)
+                {
+                    if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    else
+                    {
+                        Destroy(animatorReference.gameObject);
+                    }
+                }
             }
 
             if (shouldCreateNewSkin)
             {
-                if (characterIndex == -1) { Debug.LogWarning("Character Index is -1!"); yield break; }
+                if (characterIndex == -1) { Debug.LogError("Character Index is -1! " + name); yield break; }
                 CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
-                GameObject modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+
+                GameObject modelInstance;
+                if (modelOption.skinOptions[skinIndex].TryGetComponent(out PooledObject pooledObject))
+                {
+                    modelInstance = ObjectPoolingManager.SpawnObject(modelOption.skinOptions[skinIndex].GetComponent<PooledObject>(), transform).gameObject;
+                }
+                else
+                {
+                    modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+                }
 
                 Animator = modelInstance.GetComponent<Animator>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
@@ -1068,6 +1145,10 @@ namespace Vi.Core
 
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
+
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
+
+                SetRagdollActive(false);
             }
 
             yield return null;
@@ -1088,6 +1169,47 @@ namespace Vi.Core
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
         }
 
+        private void OnReturnToPool()
+        {
+            if (animatorReference)
+            {
+                foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+                {
+                    skinnedMeshRenderer.forceRenderingOff = false;
+                }
+
+                if (animatorReference.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                        Animator = null;
+                        LimbReferences = null;
+                        animatorReference = null;
+                        explodableMeshes = null;
+                    }
+                }
+            }
+
+            WaitingForActionClipToPlay = false;
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
+        }
+
+        private new void OnDestroy()
+        {
+            base.OnDestroy();
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
+        }
+
         public void ChangeCharacter(WebRequestManager.Character character)
         {
             if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
@@ -1100,6 +1222,11 @@ namespace Vi.Core
             {
                 StartCoroutine(ChangeCharacterCoroutine(attributes.CachedPlayerData.character));
             }
+
+            if (animatorReference)
+            {
+                animatorReference.OnNetworkSpawn();
+            }
         }
 
         private const string actionsLayerName = "Actions";
@@ -1108,20 +1235,31 @@ namespace Vi.Core
         private int actionsLayerIndex;
         private int flinchLayerIndex;
 
-        CombatAgent combatAgent;
+        private CombatAgent combatAgent;
+
+        private ExplodableMesh[] explodableMeshes;
+
         private void Awake()
         {
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
             combatAgent = GetComponent<CombatAgent>();
 
-            if (TryGetComponent(out Animator animator))
+            AnimatorReference animatorReference = GetComponentInChildren<AnimatorReference>();
+            if (animatorReference)
             {
-                Animator = animator;
+                this.animatorReference = animatorReference;
+                LimbReferences = animatorReference.GetComponent<LimbReferences>();
+                Animator = animatorReference.GetComponent<Animator>();
+                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
-                LimbReferences = GetComponent<LimbReferences>();
-                animatorReference = GetComponent<AnimatorReference>();
             }
+            GetComponent<PooledObject>().OnReturnToPool += OnReturnToPool;
+        }
+
+        private void OnEnable()
+        {
+            SetRagdollActive(false);
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
@@ -1131,19 +1269,29 @@ namespace Vi.Core
         public Vector3 GetCameraForwardDirection() { return NetworkObject.IsPlayerObject ? cameraForwardDir.Value : transform.forward; }
         private NetworkVariable<Vector3> cameraForwardDir = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        private readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
+        private static readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
 
         private Camera mainCamera;
         private void FindMainCamera()
         {
-            if (mainCamera) { return; }
+            if (mainCamera)
+            {
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                {
+                    return;
+                }
+            }
             mainCamera = Camera.main;
         }
 
         private void Update()
         {
             RefreshAimPoint();
-            if (serverActionQueue.TryDequeue(out (string, bool) result)) { PlayActionOnServer(result.Item1, result.Item2); }
+        }
+
+        public void ProcessNextActionClip()
+        {
+            if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
         private void RefreshAimPoint()
@@ -1168,6 +1316,58 @@ namespace Vi.Core
 
             LimbReferences.SetMeleeVerticalAimConstraintOffset(combatAgent.WeaponHandler.IsInAnticipation | combatAgent.WeaponHandler.IsAttacking ? (GetCameraPivotPoint().y - aimPoint.Value.y) * 6 : 0);
             LimbReferences.aimTargetIKSolver.transform.position = aimPoint.Value;
+        }
+
+        public void SetRagdollActive(bool isActive)
+        {
+            if (!animatorReference) { return; }
+            animatorReference.SetRagdollActive(isActive);
+        }
+
+        private Coroutine explosionCoroutine;
+        public void Explode(float explosionDelay)
+        {
+            if (explosionCoroutine != null) { RemoveExplosion(); }
+            explosionCoroutine = StartCoroutine(ExplosionDelay(explosionDelay));
+        }
+
+        private List<PooledObject> sliceInstances = new List<PooledObject>();
+        private IEnumerator ExplosionDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = true;
+            }
+
+            foreach (ExplodableMesh explodableMesh in explodableMeshes)
+            {
+                sliceInstances.AddRange(explodableMesh.Explode());
+            }
+
+            yield return new WaitForSeconds(deadRendererDisplayTime);
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
+        }
+
+        public void RemoveExplosion()
+        {
+            if (explosionCoroutine != null) { StopCoroutine(explosionCoroutine); }
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            {
+                skinnedMeshRenderer.forceRenderingOff = false;
+            }
+
+            foreach (PooledObject sliceInstance in sliceInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
+            }
+            sliceInstances.Clear();
         }
     }
 }

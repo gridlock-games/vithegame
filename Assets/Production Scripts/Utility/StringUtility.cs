@@ -73,5 +73,11 @@ namespace Vi.Utility
                 return input.ToString();
             }
         }
+
+        public static string FormatDynamicFloatForUI(float dynamicFloat, float decimalThreshold = 10)
+        {
+            if (dynamicFloat < 0.1f & dynamicFloat > 0) { dynamicFloat = 0.1f; }
+            return dynamicFloat < decimalThreshold & dynamicFloat > 0 ? dynamicFloat.ToString("F1") : dynamicFloat.ToString("F0");
+        }
     }
 }

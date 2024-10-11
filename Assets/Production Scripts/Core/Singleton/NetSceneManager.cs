@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using System.Linq;
+using Vi.Utility;
+using UnityEngine.Events;
 
 namespace Vi.Core
 {
@@ -156,14 +158,23 @@ namespace Vi.Core
                     }
                 }
             }
-
-            if (NetworkManager.Singleton.IsClient)
+            else if (NetworkManager.Singleton.IsClient)
             {
                 foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
                 {
                     if (g.TryGetComponent(out NetworkObject networkObject))
                     {
-                        if (!networkObject.IsSpawned) { Destroy(g); }
+                        if (!networkObject.IsSpawned)
+                        {
+                            if (networkObject.TryGetComponent(out PooledObject pooledObject))
+                            {
+                                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                            }
+                            else
+                            {
+                                Destroy(g);
+                            }
+                        }
                     }
                 }
             }
@@ -253,6 +264,68 @@ namespace Vi.Core
             {
                 AsyncOperationHandle<SceneInstance> loadedHandle = PersistentLocalObjects.Singleton.SceneHandles.Find(item => item.Result.Scene.name == scene.SceneName);
                 if (!loadedHandle.IsValid()) { continue; }
+                if (loadedHandle.IsDone)
+                {
+                    foreach (GameObject g in loadedHandle.Result.Scene.GetRootGameObjects())
+                    {
+                        foreach (PooledObject pooledObject in g.GetComponents<PooledObject>())
+                        {
+                            if (pooledObject.IsSpawned)
+                            {
+                                if (pooledObject.TryGetComponent(out NetworkObject networkObject))
+                                {
+                                    if (networkObject.transform.parent)
+                                    {
+                                        Debug.LogError(networkObject + " pooled network object that isn't a root object will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
+                                    }
+                                    else
+                                    {
+                                        SceneManager.MoveGameObjectToScene(networkObject.gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
+                                    }
+
+                                    if (NetworkManager.Singleton.IsServer)
+                                    {
+                                        if (networkObject.IsSpawned)
+                                        {
+                                            networkObject.Despawn(true);
+                                        }
+                                        else
+                                        {
+                                            Debug.LogError(networkObject + " is despawned and will be destroyed on scene unload! Why wasn't it moved to the base scene when it was despawned?");
+                                            if (pooledObject.IsSpawned)
+                                            {
+                                                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                            }
+                                            else
+                                            {
+                                                Debug.LogError(pooledObject + " isn't spawned!");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (networkObject.IsSpawned)
+                                        {
+                                            Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                        }
+                                        else
+                                        {
+                                            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError(pooledObject + " in scene " + pooledObject.gameObject.scene.name + " will be destroyed on scene unload! ");
+                            }
+                        }
+                    }
+                }
                 AsyncOperationHandle<SceneInstance> unloadHandle = Addressables.UnloadSceneAsync(loadedHandle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 unloadHandle.Completed += SceneHandleUnloaded;
                 PersistentLocalObjects.Singleton.LoadingOperations.Add(new AsyncOperationUI(scenePayload, unloadHandle, AsyncOperationUI.LoadingType.Unloading));
@@ -278,6 +351,7 @@ namespace Vi.Core
             }
         }
 
+        public static UnityAction OnNetSceneManagerDespawn;
         public override void OnNetworkDespawn()
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
@@ -285,7 +359,11 @@ namespace Vi.Core
             UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
             UnloadAllScenePayloadsOfType(SceneType.Gameplay);
             UnloadAllScenePayloadsOfType(SceneType.Environment);
+
+            if (OnNetSceneManagerDespawn != null) { OnNetSceneManagerDespawn.Invoke(); }
         }
+
+        private const string defaultActiveSceneName = "Base";
 
         private void Awake()
         {
@@ -295,7 +373,7 @@ namespace Vi.Core
 
         public bool ShouldSpawnPlayer { get; private set; }
 
-        private bool SetShouldSpawnPlayer()
+        private static bool SetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
@@ -309,7 +387,7 @@ namespace Vi.Core
             return gameplaySceneIsLoaded;
         }
 
-        public bool IsBusyLoadingScenes()
+        public static bool IsBusyLoadingScenes()
         {
             return PersistentLocalObjects.Singleton.LoadingOperations.Count > 0;
         }
@@ -324,7 +402,7 @@ namespace Vi.Core
             return true;
         }
 
-        private bool IsSceneGroupLoading(string sceneGroupName)
+        private static bool IsSceneGroupLoading(string sceneGroupName)
         {
             foreach (AsyncOperationUI asyncOperationUI in PersistentLocalObjects.Singleton.LoadingOperations.FindAll(item => item.sceneName == sceneGroupName))
             {
@@ -333,7 +411,7 @@ namespace Vi.Core
             return false;
         }
 
-        public bool IsEnvironmentLoaded()
+        public static bool IsEnvironmentLoaded()
         {
             return PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Count(item => item.sceneType == SceneType.Environment) > 0;
         }

@@ -5,8 +5,8 @@ using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Vi.Core;
 using Vi.Utility;
-using Vi.Core.CombatAgents;
 using UnityEngine.Rendering.Universal;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Player
 {
@@ -22,8 +22,11 @@ namespace Vi.Player
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                gameObject.tag = "MainCamera";
+
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
                 RefreshStatus();
@@ -63,6 +66,8 @@ namespace Vi.Player
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
+
+            gameObject.tag = "Untagged";
         }
 
         void OnLook(InputValue value)
@@ -304,7 +309,7 @@ namespace Vi.Player
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private UniversalAdditionalCameraData cameraData;
         public Camera cam;
-        private new void Awake()
+        protected override void Awake()
         {
             base.Awake();
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -319,14 +324,15 @@ namespace Vi.Player
             targetPosition = transform.position;
         }
 
-        private new void OnEnable()
+        protected override void OnEnable()
         {
             base.OnEnable();
+            followTargetOffset = defaultFollowTargetOffset;
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             if (IsLocalPlayer)
                 UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
@@ -337,23 +343,42 @@ namespace Vi.Player
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
 
         private const float lerpSpeed = 8;
-        private static readonly Vector3 followTargetOffset = new Vector3(0, 3, -3);
-        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.5f, 0);
+        private static readonly Vector3 defaultFollowTargetOffset = new Vector3(0, 3, -3);
+        private static readonly Vector3 followTargetLookAtPositionOffset = new Vector3(0, 0.75f, 0);
 
-        [SerializeField] private float collisionPositionOffset = -0.3f;
+        private Vector3 followTargetOffset;
+
+        private const float zoomSensitivity = 0.2f;
+        void OnZoom(InputValue value)
+        {
+            Vector2 scrollVal = value.Get<Vector2>();
+            if (scrollVal.y > 0)
+            {
+                followTargetOffset.z += zoomSensitivity;
+            }
+            else if (scrollVal.y < 0)
+            {
+                followTargetOffset.z -= zoomSensitivity;
+            }
+
+            // Limit how much you can zoom in
+            if (followTargetOffset.z > 1) { followTargetOffset.z = 1; }
+        }
 
         public ulong GetRoundTripTime() { return roundTripTime.Value; }
 
         private NetworkVariable<ulong> roundTripTime = new NetworkVariable<ulong>();
 
-        private void RefreshStatus()
+        protected override void RefreshStatus()
         {
+            base.RefreshStatus();
             if (IsOwner)
             {
                 pingEnabled.Value = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             }
             cameraData.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             cam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            cam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
         }
 
         private NetworkVariable<bool> pingEnabled = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -376,26 +401,28 @@ namespace Vi.Player
             if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
                 Vector2 lookInputToAdd = Vector2.zero;
-                PlayerInput playerInput = GetComponent<PlayerInput>();
-                if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
+                if (playerInput.currentActionMap != null)
                 {
-                    foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+                    if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                     {
-                        if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
-
-                        bool isTouchingJoystick = false;
-                        foreach (UIDeadZoneElement joystick in joysticks)
+                        foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                            if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
+
+                            bool isTouchingJoystick = false;
+                            foreach (UIDeadZoneElement joystick in joysticks)
                             {
-                                isTouchingJoystick = true;
-                                break;
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                {
+                                    isTouchingJoystick = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
-                        {
-                            lookInputToAdd += touch.delta;
+                            if (!isTouchingJoystick & touch.startScreenPosition.x > Screen.width / 2f)
+                            {
+                                lookInputToAdd += touch.delta;
+                            }
                         }
                     }
                 }
@@ -414,6 +441,8 @@ namespace Vi.Player
 
             if (shouldViewEnvironment)
             {
+                followTargetOffset = defaultFollowTargetOffset;
+
                 transform.position = Vector3.Lerp(transform.position, environmentViewPosition, Time.deltaTime * lerpSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, environmentViewRotation, Time.deltaTime * lerpSpeed);
 
@@ -421,8 +450,8 @@ namespace Vi.Player
             }
             else if (followTarget)
             {
-                Vector3 targetPosition = followTarget.transform.position + followTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
-                Quaternion targetRotation = Quaternion.LookRotation(followTarget.transform.position + followTargetLookAtPositionOffset - transform.position);
+                Vector3 targetPosition = followTarget.NetworkCollider.transform.position + followTarget.transform.rotation * Quaternion.Euler(0, followCamAngleOffset, 0) * followTargetOffset;
+                Quaternion targetRotation = Quaternion.LookRotation(followTarget.NetworkCollider.transform.position + followTargetLookAtPositionOffset - transform.position);
 
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lerpSpeed);
@@ -433,6 +462,8 @@ namespace Vi.Player
             }
             else
             {
+                followTargetOffset = defaultFollowTargetOffset;
+
                 float verticalSpeed = 0;
                 if (isAscending) { verticalSpeed = 1; }
                 if (isDescending) { verticalSpeed = -1; }

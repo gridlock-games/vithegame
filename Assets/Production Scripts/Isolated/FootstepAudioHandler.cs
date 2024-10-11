@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Isolated
 {
@@ -13,15 +14,21 @@ namespace Vi.Isolated
         private const float volume = 0.05f;
 
         CombatAgent combatAgent;
-        private void Awake()
+        private void OnEnable()
         {
             combatAgent = GetComponentInParent<CombatAgent>();
+        }
+
+        private void OnDisable()
+        {
+            footRaised = false;
         }
 
         private bool footRaised;
         private const float footRaisedDistanceThreshold = 0.2f;
         private void LateUpdate()
         {
+            if (!combatAgent) { return; }
             if (!combatAgent.IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 

@@ -30,8 +30,11 @@ namespace Vi.Utility
             {
                 rb.position = position;
                 rb.rotation = rotation;
-                rb.velocity = velocity;
-                rb.angularVelocity = angularVelocity;
+                if (!rb.isKinematic)
+                {
+                    rb.velocity = velocity;
+                    rb.angularVelocity = angularVelocity;
+                }
             }
         }
 
@@ -49,11 +52,7 @@ namespace Vi.Utility
 
         public static void RemoveRigidbody(Rigidbody rb)
         {
-            if (activeRigidbodies.Contains(rb))
-            {
-                activeRigidbodies.Remove(rb);
-            }
-            else
+            if (!activeRigidbodies.Remove(rb))
             {
                 Debug.LogWarning("Trying to remove a rigidbody " + rb.name + " but it is not present in list");
             }
@@ -72,9 +71,9 @@ namespace Vi.Utility
                 }
             }
 
-            Physics.autoSimulation = false;
+            Physics.simulationMode = SimulationMode.Script;
             Physics.Simulate(Time.fixedDeltaTime);
-            Physics.autoSimulation = true;
+            Physics.simulationMode = SimulationMode.FixedUpdate;
 
             foreach (RigidbodyData rigidbodyData in rigidbodyDataBeforeSimulation)
             {

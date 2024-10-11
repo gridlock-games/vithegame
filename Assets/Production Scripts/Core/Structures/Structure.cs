@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core.Structures
 {
@@ -12,9 +13,29 @@ namespace Vi.Core.Structures
     {
         [SerializeField] private float maxHP = 100;
         [SerializeField] private PlayerDataManager.Team team = PlayerDataManager.Team.Competitor;
+        [SerializeField] private AudioClip deathSound;
 
-        private NetworkVariable<float> HP = new NetworkVariable<float>();
+        public Collider[] Colliders { get; private set; }
 
+        private ExplodableMesh[] explodableMeshes;
+        protected override void Awake()
+        {
+            base.Awake();
+            Colliders = GetComponentsInChildren<Collider>();
+            explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
+
+            List<Collider> networkPredictionLayerColliders = new List<Collider>();
+            foreach (Collider col in Colliders)
+            {
+                if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    networkPredictionLayerColliders.Add(col);
+                }
+            }
+            Colliders = networkPredictionLayerColliders.ToArray();
+        }
+
+        private List<PooledObject> explodableMeshInstances = new List<PooledObject>();
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -35,69 +56,64 @@ namespace Vi.Core.Structures
 
         public override string GetName() { return name.Replace("(Clone)", ""); }
         public override PlayerDataManager.Team GetTeam() { return team; }
-        public float GetHP() { return HP.Value; }
-        public float GetMaxHP() { return maxHP; }
+        public override float GetMaxHP() { return maxHP; }
 
-        public void AddHP(float amount)
-        {
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    HP.Value += amount;
-                }
-                else
-                {
-                    HP.Value = Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-        }
-
-        protected float AddHPWithoutApply(float amount)
-        {
-            if (amount > 0)
-            {
-                if (HP.Value < GetMaxHP())
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (HP.Value > GetMaxHP())
-                {
-                    return HP.Value + amount;
-                }
-                else
-                {
-                    return Mathf.Clamp(HP.Value + amount, 0, GetMaxHP());
-                }
-            }
-            return HP.Value;
-        }
-
+        public bool IsDead { get; private set; }
         private void OnHPChanged(float prev, float current)
         {
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
+                IsDead = true;
+
                 foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 {
                     r.forceRenderingOff = true;
                 }
+
+                foreach (ExplodableMesh explodableMesh in explodableMeshes)
+                {
+                    explodableMeshInstances.AddRange(explodableMesh.Explode());
+                }
+
+                if (deathSound)
+                {
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject, deathSound, transform.position, 1);
+                }
             }
+            else if (prev <= 0 & current > 0)
+            {
+                IsDead = false;
+                foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
+                }
+                explodableMeshInstances.Clear();
+            }
+        }
+
+        private void OnDisable()
+        {
+            foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
+            }
+            explodableMeshInstances.Clear();
         }
 
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Metal;
         protected bool ProcessHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!PlayerDataManager.Singleton.CanHit(attacker, this)) { return false; }
+
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
+            {
+                AddHP(attack.healAmount);
+                foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
+                {
+                    StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+                }
+                return false;
+            }
 
             float HPDamage = -attack.damage;
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
@@ -122,6 +138,12 @@ namespace Vi.Core.Structures
 
             AddHP(HPDamage);
 
+            foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
+            {
+                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+            }
+
+            lastAttackingCombatAgent = attacker;
             return true;
         }
 
@@ -129,25 +151,33 @@ namespace Vi.Core.Structures
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
-            CombatAgent attackingCombatAgent = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
+            {
+                if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
+                        impactPosition, Weapon.hitSoundEffectVolume);
 
-            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
-                impactPosition, Weapon.hitSoundEffectVolume);
-
-            RenderHitClientRpc(attackerNetObjId, impactPosition, weaponBone);
+                    RenderHitClientRpc(attackerNetObjId, impactPosition, weaponBone);
+                }
+            }
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.WeaponBone weaponBone)
         {
-            CombatAgent attackingCombatAgent = NetworkManager.SpawnManager.SpawnedObjects[attackerNetObjId].GetComponent<CombatAgent>();
-
-            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-            AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
-                impactPosition, Weapon.hitSoundEffectVolume);
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
+            {
+                if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(attackingCombatAgent.GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ActionClip.Ailment.None),
+                        impactPosition, Weapon.hitSoundEffectVolume);
+                }
+            }
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
@@ -160,7 +190,33 @@ namespace Vi.Core.Structures
             return ProcessHit(attacker, attack, runtimeWeapon, impactPosition, hitSourcePosition);
         }
 
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
-        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
+        protected CombatAgent lastAttackingCombatAgent;
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Structure.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
+            if (IsDead) { return false; }
+
+            if (HP.Value + damage <= 0 & !IsDead)
+            {
+                IsDead = true;
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnStructureKill(lastAttackingCombatAgent, this); }
+            }
+            AddHP(damage);
+            return true;
+        }
+
+        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
+        {
+            if (!IsServer) { Debug.LogError("Structure.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
+            if (IsDead) { return false; }
+
+            if (HP.Value + damage <= 0 & !IsDead)
+            {
+                IsDead = true;
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnStructureKill(lastAttackingCombatAgent, this); }
+            }
+            AddHP(damage);
+            return true;
+        }
     }
 }

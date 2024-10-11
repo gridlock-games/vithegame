@@ -169,6 +169,8 @@ namespace Vi.Core
         {
             if (!parentCombatAgent) { return 1; }
             int damageMultiplerIndex = parentCombatAgent.WeaponHandler.GetMaxAmmoCount() - parentCombatAgent.WeaponHandler.GetAmmoCount();
+            if (damageMultiplerIndex < 0) { return 1; }
+            if (damageMultiplerIndex == 0 & ammoCountDamageMultipliers.Length == 0) { return 1; }
             return ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1;
         }
 

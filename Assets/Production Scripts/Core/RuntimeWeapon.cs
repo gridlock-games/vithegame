@@ -95,24 +95,135 @@ namespace Vi.Core
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
-        protected void OnEnable()
+        private void Awake()
         {
-            parentCombatAgent = GetComponentInParent<CombatAgent>();
+            renderers = GetComponentsInChildren<Renderer>(true);
+            colliders = GetComponentsInChildren<Collider>(true);
+
+            foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            {
+                if (child.gameObject.layer != LayerMask.NameToLayer("NetworkPrediction"))
+                {
+                    Debug.LogError(this + " runtime weapons should be in the network prediction layer!");
+                }
+            }
+        }
+
+        [SerializeField] private PooledObject dropWeaponPrefab;
+        private PooledObject dropWeaponInstance;
+
+        private ActionClip.Ailment lastAilment = ActionClip.Ailment.None;
+        protected virtual void Update()
+        {
             if (!parentCombatAgent) { return; }
 
-            colliders = GetComponentsInChildren<Collider>(true);
-            foreach (Collider col in colliders)
+            if (parentCombatAgent.GetAilment() != lastAilment)
             {
-                col.enabled = parentCombatAgent.IsServer;
+                if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    if (dropWeaponPrefab)
+                    {
+                        dropWeaponInstance = ObjectPoolingManager.SpawnObject(dropWeaponPrefab, transform.position, transform.rotation);
+                        if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                        {
+                            rb.interpolation = parentCombatAgent.IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+                            rb.collisionDetectionMode = parentCombatAgent.IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+                            NetworkPhysicsSimulation.AddRigidbody(rb);
+                        }
+                        else
+                        {
+                            Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                        }
+                    }
+
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.forceRenderingOff = true;
+                    }
+
+                    foreach (Collider col in colliders)
+                    {
+                        col.enabled = false;
+                    }
+                }
+                else // Alive
+                {
+                    if (dropWeaponInstance)
+                    {
+                        if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                        {
+                            NetworkPhysicsSimulation.RemoveRigidbody(rb);
+                        }
+                        else
+                        {
+                            Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                        }
+                        ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance);
+                    }
+
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.forceRenderingOff = false;
+                    }
+
+                    foreach (Collider col in colliders)
+                    {
+                        col.enabled = parentCombatAgent.IsServer;
+                    }
+                }
+            }
+            lastAilment = parentCombatAgent.GetAilment();
+        }
+
+        protected void OnEnable()
+        {
+            parentCombatAgent = transform.root.GetComponent<CombatAgent>();
+            if (!parentCombatAgent) { return; }
+
+            foreach (Collider c in colliders)
+            {
+                c.enabled = parentCombatAgent.IsServer;
             }
 
-            renderers = GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 if (renderer is SkinnedMeshRenderer smr)
                 {
                     smr.updateWhenOffscreen = parentCombatAgent.IsServer;
                 }
+                renderer.forceRenderingOff = true;
+                renderer.gameObject.layer = LayerMask.NameToLayer(parentCombatAgent.IsSpawned ? "NetworkPrediction" : "Preview");
+            }
+            StartCoroutine(EnableRenderersAfterOneFrame());
+        }
+
+        private IEnumerator EnableRenderersAfterOneFrame()
+        {
+            yield return null;
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = false;
+            }
+        }
+
+        protected void OnDisable()
+        {
+            parentCombatAgent = null;
+            isStowed = false;
+            associatedRuntimeWeapons.Clear();
+            hitCounter.Clear();
+
+            if (dropWeaponInstance)
+            {
+                if (dropWeaponInstance.TryGetComponent(out Rigidbody rb))
+                {
+                    NetworkPhysicsSimulation.RemoveRigidbody(rb);
+                }
+                else
+                {
+                    Debug.LogError(dropWeaponInstance + " doesn't have a rigidbody!");
+                }
+                ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance);
             }
         }
 
@@ -140,9 +251,45 @@ namespace Vi.Core
             this.isStowed = isStowed;
         }
 
-        protected void OnDisable()
+#if UNITY_EDITOR
+        [ContextMenu("Generate Drop Weapon Prefab Variant")]
+        public void CreateDropWeaponPrefabVariant()
         {
-            isStowed = false;
+            if (!GetComponentInChildren<Renderer>()) { return; }
+
+            string variantAssetPath = UnityEditor.AssetDatabase.GetAssetPath(gameObject).Replace(".prefab", "") + "_dropped.prefab";
+            if (System.IO.File.Exists(variantAssetPath)) { return; }
+
+            Debug.Log("Creating dropped weapon variant at path " + variantAssetPath);
+            GameObject objSource = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(gameObject);
+            foreach (Component component in objSource.GetComponentsInChildren<Component>())
+            {
+                if (component is not Transform
+                    & component is not Renderer)
+                {
+                    DestroyImmediate(component);
+                }
+            }
+
+            Renderer renderer = objSource.GetComponentInChildren<Renderer>();
+            if (!renderer) { return; }
+            objSource.AddComponent<Rigidbody>();
+            objSource.AddComponent<PooledObject>();
+            BoxCollider boxCollider = objSource.AddComponent<BoxCollider>();
+            boxCollider.center = renderer.localBounds.center;
+            boxCollider.size = renderer.localBounds.size;
+
+            foreach (Transform child in objSource.GetComponentsInChildren<Transform>())
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Character");
+            }
+
+            dropWeaponPrefab = UnityEditor.PrefabUtility.SaveAsPrefabAsset(objSource, variantAssetPath).GetComponent<PooledObject>();
+
+            DestroyImmediate(objSource);
+
+            UnityEditor.EditorUtility.SetDirty(this);
         }
+#endif
     }
 }

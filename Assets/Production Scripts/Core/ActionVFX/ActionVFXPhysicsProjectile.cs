@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Utility;
-using Vi.Core.GameModeManagers;
+using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
 
 namespace Vi.Core.VFX
@@ -24,10 +24,12 @@ namespace Vi.Core.VFX
             rb = GetComponent<Rigidbody>();
         }
 
+        private Quaternion originalRotation;
         public override void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             base.InitializeVFX(attacker, attack);
             startPosition = attacker.MovementHandler.GetPosition();
+            originalRotation = transform.rotation;
         }
 
         private Vector3 startPosition;
@@ -52,6 +54,9 @@ namespace Vi.Core.VFX
             }
 
             if (gameObject.layer != LayerMask.NameToLayer("Projectile")) { Debug.LogError("Make sure projectiles are in the Projectile Layer!"); }
+
+            rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
+            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
         }
 
         private IEnumerator AddForceAfter1Frame()
@@ -68,12 +73,49 @@ namespace Vi.Core.VFX
             rb.useGravity = true;
         }
 
+        [SerializeField] private AudioClip[] whooshNearbySound = new AudioClip[0];
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            nearbyWhooshPlayed = false;
+            originalRotation = default;
+            rb.Sleep();
+        }
+
+        private bool nearbyWhooshPlayed;
         private void Update()
         {
+            if (IsClient)
+            {
+                if (whooshNearbySound.Length > 0)
+                {
+                    if (!nearbyWhooshPlayed)
+                    {
+                        KeyValuePair<int, Attributes> localPlayerKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                        if (localPlayerKvp.Value)
+                        {
+                            if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
+                            {
+                                AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, whooshNearbySound.Length)], false, Weapon.projectileNearbyWhooshVolume);
+                                audioSource.maxDistance = 20;
+                                nearbyWhooshPlayed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
             if (!GetAttacker()) { return; }
             if (Vector3.Distance(transform.position, startPosition) > killDistance) { NetworkObject.Despawn(true); }
+        }
+
+        private void FixedUpdate()
+        {
+            if (!IsServer) { return; }
+            rb.MoveRotation(rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity));
         }
 
         private void OnTriggerEnter(Collider other)

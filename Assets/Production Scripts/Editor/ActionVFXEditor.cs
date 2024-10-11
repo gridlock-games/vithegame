@@ -15,6 +15,7 @@ namespace Vi.Editor
 
         private SerializedProperty spVFXSpawnType;
         private SerializedProperty spTransformType;
+        private SerializedProperty spOffsetByTargetBodyHeight;
 
         private SerializedProperty spRaycastOffset;
         private SerializedProperty spFartherRaycastOffset;
@@ -27,6 +28,7 @@ namespace Vi.Editor
 
         protected SerializedProperty spAudioClipToPlayOnAwake;
         protected SerializedProperty spAwakeAudioClipDelay;
+        protected SerializedProperty spAwakeAudioClipStartTime;
         protected SerializedProperty spAudioClipToPlayOnDestroy;
 
         private SerializedProperty spVFXToPlayOnDestroy;
@@ -38,6 +40,7 @@ namespace Vi.Editor
 
             spVFXSpawnType = serializedObject.FindProperty("vfxSpawnType");
             spTransformType = serializedObject.FindProperty("transformType");
+            spOffsetByTargetBodyHeight = serializedObject.FindProperty("offsetByTargetBodyHeight");
 
             spRaycastOffset = serializedObject.FindProperty("raycastOffset");
             spFartherRaycastOffset = serializedObject.FindProperty("fartherRaycastOffset");
@@ -50,6 +53,7 @@ namespace Vi.Editor
 
             spAudioClipToPlayOnAwake = serializedObject.FindProperty("audioClipToPlayOnAwake");
             spAwakeAudioClipDelay = serializedObject.FindProperty("awakeAudioClipDelay");
+            spAwakeAudioClipStartTime = serializedObject.FindProperty("awakeAudioClipStartTime");
             spAudioClipToPlayOnDestroy = serializedObject.FindProperty("audioClipToPlayOnDestroy");
 
             spVFXToPlayOnDestroy = serializedObject.FindProperty("VFXToPlayOnDestroy");
@@ -68,6 +72,7 @@ namespace Vi.Editor
             }
 
             EditorGUILayout.PropertyField(spTransformType);
+            EditorGUILayout.PropertyField(spOffsetByTargetBodyHeight);
             if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.ConformToGround)
             {
                 EditorGUILayout.PropertyField(spRaycastOffset);
@@ -83,6 +88,7 @@ namespace Vi.Editor
 
             EditorGUILayout.PropertyField(spAudioClipToPlayOnAwake);
             EditorGUILayout.PropertyField(spAwakeAudioClipDelay);
+            EditorGUILayout.PropertyField(spAwakeAudioClipStartTime);
             EditorGUILayout.PropertyField(spAudioClipToPlayOnDestroy);
 
             EditorGUILayout.PropertyField(spVFXToPlayOnDestroy);

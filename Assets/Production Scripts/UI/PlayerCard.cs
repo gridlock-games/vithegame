@@ -6,6 +6,8 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.Utility;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -47,6 +49,10 @@ namespace Vi.UI
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
+        [Header("Experience UI")]
+        [SerializeField] private Image experienceProgressImage;
+        [SerializeField] private Text levelText;
+
         private CombatAgent combatAgent;
         private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
@@ -60,11 +66,27 @@ namespace Vi.UI
             if (setNameTextCoroutine != null) { StopCoroutine(setNameTextCoroutine); }
             if (combatAgent)
             {
-                StartCoroutine(SetNameText());
                 if (useTeamColor)
                 {
                     healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
                 }
+
+                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
+                foreach (StatusIcon statusIcon in statusIcons)
+                {
+                    if (activeStatuses.Contains(statusIcon.Status))
+                    {
+                        statusIcon.SetActive(true);
+                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                    }
+                    else
+                    {
+                        statusIcon.SetActive(false);
+                    }
+                }
+
+                RefreshLevelingSystem();
+                StartCoroutine(SetNameText());
             }
         }
 
@@ -128,13 +150,63 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
 
+            experienceProgressImage.fillAmount = 0;
+
             if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
             if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
         }
 
         private void OnEnable()
         {
-            if (!IsMainCard()) { DisableStaminaAndSpiritDisplay(); }
+            if (!IsMainCard())
+            {
+                DisableStaminaAndSpiritDisplay();
+
+                if (combatAgent)
+                {
+                    List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
+                    foreach (StatusIcon statusIcon in statusIcons)
+                    {
+                        if (activeStatuses.Contains(statusIcon.Status))
+                        {
+                            statusIcon.SetActive(true);
+                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
+                        }
+                        else
+                        {
+                            statusIcon.SetActive(false);
+                        }
+                    }
+                }
+            }
+
+            RefreshLevelingSystem();
+        }
+
+        private void RefreshLevelingSystem()
+        {
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.LevelingEnabled)
+                {
+                    if (combatAgent)
+                    {
+                        levelText.enabled = true;
+                        experienceProgressImage.fillAmount = combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel;
+                        levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                    }
+                    else
+                    {
+                        levelText.enabled = false;
+                        experienceProgressImage.fillAmount = 0;
+                    }
+                }
+                else
+                {
+                    levelText.enabled = false;
+                    experienceProgressImage.fillAmount = 0;
+                }
+            }
         }
 
         [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
@@ -202,7 +274,7 @@ namespace Vi.UI
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
-                healthText.text = "HP " + (HP < 10 & HP > 0 ? HP.ToString("F1") : HP.ToString("F0")) + " / " + maxHP.ToString("F0");
+                healthText.text = "HP " + StringUtility.FormatDynamicFloatForUI(HP) + " / " + maxHP.ToString("F0");
                 healthFillImage.fillAmount = HP / maxHP;
             }
 
@@ -217,25 +289,29 @@ namespace Vi.UI
             lastMaxHP = maxHP;
             lastMaxRage = maxRage;
 
+            if (levelText.enabled)
+            {
+                levelText.text = combatAgent.SessionProgressionHandler.DisplayLevel;
+                experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
+            }
+            
             if (!staminaAndSpiritAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                if (stamina < 0.1f & stamina > 0) { stamina = 0.1f; }
                 float spirit = combatAgent.GetSpirit();
-                if (spirit < 0.1f & spirit > 0) { spirit = 0.1f; }
 
                 float maxStamina = combatAgent.GetMaxStamina();
                 float maxSpirit = combatAgent.GetMaxSpirit();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
-                    staminaText.text = "ST " + (stamina < 10 & stamina > 0 ? stamina.ToString("F1") : stamina.ToString("F0")) + " / " + maxStamina.ToString("F0");
+                    staminaText.text = "ST " + StringUtility.FormatDynamicFloatForUI(stamina) + " / " + maxStamina.ToString("F0");
                     staminaFillImage.fillAmount = stamina / maxStamina;
                 }
 
                 if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
                 {
-                    spiritText.text = "SP " + (spirit < 10 & spirit > 0 ? spirit.ToString("F1") : spirit.ToString("F0")) + " / " + maxSpirit.ToString("F0");
+                    spiritText.text = "SP " + StringUtility.FormatDynamicFloatForUI(spirit) + " / " + maxSpirit.ToString("F0");
                     spiritFillImage.fillAmount = spirit / maxSpirit;
                 }
 
@@ -254,7 +330,7 @@ namespace Vi.UI
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, rage / maxRage, Time.deltaTime * fillSpeed);
 
-            if (!playerUI)
+            if (!playerUI | staminaAndSpiritAreDisabled)
             {
                 if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
                 {
@@ -288,7 +364,7 @@ namespace Vi.UI
             }
 
             RageStatus currentRageStatus;
-            if (combatAgent.IsRaging())
+            if (combatAgent.IsRaging)
             {
                 currentRageStatus = RageStatus.IsRaging;
             }
@@ -307,11 +383,11 @@ namespace Vi.UI
                 {
                     case RageStatus.IsRaging:
                         rageStatusIndicator.texture = ragingRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CanActivateRage:
                         rageStatusIndicator.texture = rageReadyRT;
-                        rageStatusIndicator.color = new Color(1, 1, 1, 1);
+                        rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
                         rageStatusIndicator.texture = null;

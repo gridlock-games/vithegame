@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.EnhancedTouch;
 using Vi.Core;
 using Vi.Utility;
 using Vi.Player;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.UI
 {
@@ -35,10 +36,9 @@ namespace Vi.UI
         private Vector2 joystickOriginalAnchoredPosition;
         private MovementHandler movementHandler;
         private PlayerInput playerInput;
+        private CombatAgent combatAgent;
         private void Start()
         {
-            RefreshStatus();
-
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
 
@@ -47,6 +47,7 @@ namespace Vi.UI
 
             movementHandler = transform.root.GetComponent<MovementHandler>();
             playerInput = movementHandler.GetComponent<PlayerInput>();
+            combatAgent = movementHandler.GetComponent<CombatAgent>();
         }
 
         private void RefreshStatus()
@@ -61,6 +62,7 @@ namespace Vi.UI
 
         private void OnEnable()
         {
+            RefreshStatus();
             InputSystem.onBeforeUpdate += UpdateJoystick;
         }
 
@@ -140,7 +142,7 @@ namespace Vi.UI
                             movementHandler.SetMoveInput(GetJoystickValue());
                             break;
                         case JoystickActionType.Look:
-                            movementHandler.SetLookInput(GetJoystickValue());
+                            movementHandler.SetLookInput(GetJoystickValue() * (combatAgent ? (combatAgent.StatusAgent.IsFeared() ? -1 : 1) : 1));
                             break;
                         default:
                             Debug.LogError("Not sure how to handle joystick action type - " + joystickActionType);

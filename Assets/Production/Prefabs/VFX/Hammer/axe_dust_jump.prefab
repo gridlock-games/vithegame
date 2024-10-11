@@ -5,8 +5,18 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 331661676, guid: a1ec5084af0426e4b8c0e48774636073, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1492178900878372929, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1492178900878372935, guid: a1ec5084af0426e4b8c0e48774636073,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -26,6 +36,16 @@ PrefabInstance:
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596107483438090, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5149596108083174216, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5149596108083174221, guid: a1ec5084af0426e4b8c0e48774636073,
         type: 3}
@@ -132,7 +152,36 @@ PrefabInstance:
       propertyPath: m_Name
       value: axe_dust_jump
       objectReference: {fileID: 0}
+    - target: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6091300484807619855, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5831262896477501955}
+    - targetCorrespondingSourceObject: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6258121986214751179}
+    - targetCorrespondingSourceObject: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7547277543802123160}
+    - targetCorrespondingSourceObject: {fileID: 5550403049875251295, guid: a1ec5084af0426e4b8c0e48774636073,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8833714250989002524}
   m_SourcePrefab: {fileID: 100100000, guid: a1ec5084af0426e4b8c0e48774636073, type: 3}
 --- !u!1 &3348358700104744221 stripped
 GameObject:
@@ -140,27 +189,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7165574821925608770}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8833714250989002524
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3348358700104744221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1329445387
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &5831262896477501955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +205,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.1
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -186,6 +215,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: 201d2e3c3ad864d548a31dbff9272921,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &6258121986214751179
@@ -234,3 +264,24 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &8833714250989002524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3348358700104744221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1329445387
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0

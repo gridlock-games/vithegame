@@ -48,15 +48,61 @@ namespace Vi.Core.VFX
         public ActionClip GetAttack()
         {
             if (!IsServer) { Debug.LogError("GameInteractiveActionVFX.GetAttack() should only be called on the server!"); }
+            if (!attack) { Debug.LogError(this + " has no attack!"); }
             return attack;
         }
+
+        [SerializeField] private ParticleSystem[] teamColorParticleSystems = new ParticleSystem[0];
 
         public virtual void InitializeVFX(CombatAgent attacker, ActionClip attack)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("GameInteractiveActionVFX.InitializeVFX() should only be called on the server!"); }
+            if (!attack.IsAttack()) { Debug.LogError("Initializing " + this + " without an attack! " + attack + " " + attack.GetClipType()); }
             this.attacker = attacker;
             this.attack = attack;
             attackerNetworkObjectId.Value = attacker.NetworkObjectId;
+        }
+
+        private List<ParticleSystem.MinMaxGradient> originalColors = new List<ParticleSystem.MinMaxGradient>();
+        protected override void Awake()
+        {
+            base.Awake();
+            foreach (ParticleSystem ps in teamColorParticleSystems)
+            {
+                var main = ps.main;
+                originalColors.Add(main.startColor);
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            bool displayingEnemyColors = false;
+            CombatAgent attacker = GetAttacker();
+            if (attacker)
+            {
+                if (!attacker.IsLocalPlayer)
+                {
+                    if (PlayerDataManager.CanHit(attacker.GetTeam(), PlayerDataManager.Singleton.LocalPlayerData.team))
+                    {
+                        for (int i = 0; i < teamColorParticleSystems.Length; i++)
+                        {
+                            var main = teamColorParticleSystems[i].main;
+                            main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
+                            displayingEnemyColors = true;
+                        }
+                    }
+                }
+            }
+
+            if (!displayingEnemyColors)
+            {
+                for (int i = 0; i < teamColorParticleSystems.Length; i++)
+                {
+                    var main = teamColorParticleSystems[i].main;
+                    main.startColor = originalColors[i];
+                }
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -66,9 +112,9 @@ namespace Vi.Core.VFX
             {
                 foreach (FollowUpVFX prefab in followUpVFXToPlayOnDestroy)
                 {
-                    NetworkObject netObj = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation).GetComponent<NetworkObject>();
-                    netObj.Spawn(true);
-                    if (netObj.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
+                    PooledObject pooledObject = ObjectPoolingManager.SpawnObject(prefab.GetComponent<PooledObject>(), transform.position, transform.rotation);
+                    if (pooledObject.TryGetComponent(out FollowUpVFX vfx)) { vfx.InitializeVFX(attacker, attack); }
+                    if (pooledObject.TryGetComponent(out NetworkObject netObj)) { netObj.Spawn(true); }
                 }
             }
 

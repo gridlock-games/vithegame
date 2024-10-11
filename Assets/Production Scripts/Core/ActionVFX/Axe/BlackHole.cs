@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using Vi.Core.MovementHandlers;
 
 namespace Vi.Core.VFX.Axe
 {
@@ -47,10 +48,10 @@ namespace Vi.Core.VFX.Axe
 
                 if (ShouldAffect(networkCollider.CombatAgent))
                 {
-                    MovementHandler movementHandler = networkCollider.MovementHandler;
+                    PhysicsMovementHandler movementHandler = networkCollider.MovementHandler;
                     movementHandler.ExternalForceAffecting();
                     Vector3 rel = transform.position - movementHandler.GetPosition();
-                    movementHandler.GetRigidbody().AddForce(rel * pullStrength - movementHandler.GetRigidbody().velocity, ForceMode.VelocityChange);
+                    movementHandler.Rigidbody.AddForce(rel * pullStrength - movementHandler.Rigidbody.velocity, ForceMode.VelocityChange);
                 }
             }
             else if (other.transform.root.GetComponent<Projectile>())
@@ -86,8 +87,8 @@ namespace Vi.Core.VFX.Axe
 
                     if (ShouldAffect(networkCollider.CombatAgent))
                     {
-                        MovementHandler movementHandler = networkCollider.MovementHandler;
-                        movementHandler.GetRigidbody().AddExplosionForce(explosionForce, new Vector3(transform.position.x, movementHandler.GetPosition().y + 2, transform.position.z), sphereCollider.radius, -1, ForceMode.VelocityChange);
+                        PhysicsMovementHandler movementHandler = networkCollider.MovementHandler;
+                        movementHandler.Rigidbody.AddExplosionForce(explosionForce, new Vector3(transform.position.x, movementHandler.GetPosition().y + 2, transform.position.z), sphereCollider.radius, -1, ForceMode.VelocityChange);
 
                         if (NetworkManager.Singleton.IsServer)
                         {

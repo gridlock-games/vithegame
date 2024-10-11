@@ -5,8 +5,24 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1215135391175299827, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1215135391951884939, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1215135392071267787, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1405116446760944942, guid: 2dd7cce54cc54684bbf475b7e61db48c,
         type: 3}
       propertyPath: m_RootOrder
@@ -87,7 +103,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: brawler_charge_2
       objectReference: {fileID: 0}
+    - target: {fileID: 1405116446760944943, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3860617058719553368, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056120433204508470, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1405116446760944943, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3514187058608717973}
+    - targetCorrespondingSourceObject: {fileID: 1405116446760944943, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 669004292584078758}
+    - targetCorrespondingSourceObject: {fileID: 1405116446760944943, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1606236797348723939}
+    - targetCorrespondingSourceObject: {fileID: 1405116446760944943, guid: 2dd7cce54cc54684bbf475b7e61db48c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2638637670202016559}
   m_SourcePrefab: {fileID: 100100000, guid: 2dd7cce54cc54684bbf475b7e61db48c, type: 3}
 --- !u!1 &6667736650616558442 stripped
 GameObject:
@@ -95,27 +145,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5762204946898654789}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2638637670202016559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6667736650616558442}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2218305965
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &-3514187058608717973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +161,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0.03
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -141,6 +171,7 @@ MonoBehaviour:
   audioClipToPlayOnAwake: {fileID: 8300000, guid: dee4971921c9d440b8689f6832427638,
     type: 3}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
 --- !u!114 &669004292584078758
@@ -189,3 +220,24 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 71
   isPrewarmObject: 1
+--- !u!114 &2638637670202016559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6667736650616558442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2218305965
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0

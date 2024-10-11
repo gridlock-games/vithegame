@@ -25,6 +25,8 @@ namespace Vi.Core.GameModeManagers
         private const float nextGameActionDuration = 10;
         [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
+        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        [SerializeField] private bool levelingEnabled = false;
 
         protected const float overtimeDuration = 20;
 
@@ -33,10 +35,11 @@ namespace Vi.Core.GameModeManagers
             Respawn,
             DontRespawn,
             ResetStats,
-            ResetHP
+            ResetHP,
+            ResetHPAndRegenSpirit
         }
 
-        [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
+        public bool LevelingEnabled { get { return levelingEnabled; } }
 
         public RespawnType GetRespawnType() { return respawnType; }
 
@@ -322,6 +325,15 @@ namespace Vi.Core.GameModeManagers
                     scoreList[killerIndex] = killerScore;
                 }
 
+                if (LevelingEnabled)
+                {
+                    foreach (CombatAgent teammate in PlayerDataManager.Singleton.GetCombatAgentsOnTeam(killer.GetTeam()))
+                    {
+                        if (teammate == killer) { teammate.SessionProgressionHandler.AddExperience(finalBlowExperienceReward); }
+                        teammate.SessionProgressionHandler.AddExperience(teamKillExperienceReward);
+                    }
+                }
+                
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -349,10 +361,22 @@ namespace Vi.Core.GameModeManagers
                 {
                     killHistory.Add(new KillHistoryElement(killer, victim));
                 }
+
+                if (LevelingEnabled)
+                {
+                    foreach (KeyValuePair<CombatAgent, float> kvp in victim.GetDamageMappingThisLife())
+                    {
+                        if (!kvp.Key) { continue; }
+                        kvp.Key.SessionProgressionHandler.AddExperience(kvp.Value * experienceDamageAwardMultiplier);
+                    }
+                }
             }
         }
 
         private const float minAssistDamage = 30;
+        private const float experienceDamageAwardMultiplier = 1;
+        private const float teamKillExperienceReward = 5;
+        private const float finalBlowExperienceReward = 5;
 
         public virtual void OnEnvironmentKill(CombatAgent victim)
         {
@@ -719,6 +743,21 @@ namespace Vi.Core.GameModeManagers
                                     }
                                 }
                                 break;
+                            case RespawnType.ResetHPAndRegenSpirit:
+                                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                                {
+                                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                                    {
+                                        StartCoroutine(PlayerDataManager.Singleton.RespawnPlayer(attributes));
+                                    }
+                                    else
+                                    {
+                                        attributes.ResetStats(1, false, false, false);
+                                        attributes.LoadoutManager.SwapLoadoutOnRespawn();
+                                        attributes.StartSpiritRegen();
+                                    }
+                                }
+                                break;
                             default:
                                 Debug.LogError("Unsure how to handle respawn type " + respawnType);
                                 break;
@@ -988,11 +1027,12 @@ namespace Vi.Core.GameModeManagers
         public bool IsWaitingForPlayers { get; private set; } = true;
         private bool AreAllPlayersConnected()
         {
+            if (Time.time - startTime > 15) { return true; }
+
             if (!PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().TrueForAll(item => PlayerDataManager.Singleton.IdHasLocalPlayer(item.id))) { return false; }
 
             List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
-            if (players.Count == 0) { return false; }
-            return players.TrueForAll(item => item.IsSpawnedOnOwnerInstance());
+            return players.Count > 0;
         }
 
         protected enum TimerMode
@@ -1002,6 +1042,12 @@ namespace Vi.Core.GameModeManagers
         }
 
         [SerializeField] private TimerMode timerMode = TimerMode.CountDown;
+
+        private float startTime;
+        protected void Start()
+        {
+            startTime = Time.time;
+        }
 
         protected void Update()
         {
