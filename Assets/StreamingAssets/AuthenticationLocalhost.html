@@ -1,0 +1,81 @@
+<!--Vi authentication page MJM--><!--DO NOT ADD THE AUTHENTICATION JAVASCRIPT ON THIS PAGE - USED FOR THE LOCALHOST BASED AUTHENTICATION-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Vi Content Server</title>
+    <link rel="stylesheet" href="https://unpkg.com/plain-css@latest/dist/plain.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #252525;
+            background-size: cover;
+            font-family: "Jost", sans-serif;
+            background-image: url(https://authentication.vi-assets.com/vibackground.png);
+
+        }
+
+        .centerizedA {
+            height: auto;
+            width: auto;
+            position: relative;
+
+        }
+
+        .centerizedB {
+            padding: 20px;
+            border: 2px solid #6d6d6d;
+            background-color: #ffffff;
+            background-image: url(https://authentication.vi-assets.com/LoginWindow.png);
+            background-size: 200%;
+            background-position: center;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+    <div class=centerizedB> <img src=https://authentication.vi-assets.com/vilogo.png alt=Vi Game Logo
+            style=width:184px;height:184px; class=floating_element />
+        <h1 id=titleText class=display:inline;>Login Successful</h1>
+        <p id=subtitleText>
+            You may close this tab and return to Vi</p>
+    </div>
+</div>
+</body>
+
+</html>
