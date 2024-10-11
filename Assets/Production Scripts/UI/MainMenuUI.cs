@@ -99,6 +99,8 @@ namespace Vi.UI
             startServerCalled = true;
             AudioListener.volume = 0;
 
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+
             string serverIP = null;
             if (File.Exists(serverConfig))
             {
@@ -151,6 +153,8 @@ namespace Vi.UI
             if (startServerCalled) { yield break; }
             startServerCalled = true;
             AudioListener.volume = 0;
+
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
 
             var serverConfig = Path.Join(Application.dataPath, "ServerConfig.txt");
 
@@ -234,6 +238,8 @@ namespace Vi.UI
 
         private IEnumerator LaunchAutoClient()
         {
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+
             LoginWithVi();
 
             usernameInput.text = automatedClientUsername;

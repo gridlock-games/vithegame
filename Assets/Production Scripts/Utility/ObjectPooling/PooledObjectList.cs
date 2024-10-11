@@ -121,7 +121,7 @@ namespace Vi.Utility
                         if (contains)
                         {
                             PooledObjectReference reference = new PooledObjectReference(guid);
-                            MakeReferenceAddressable(guid, reference);
+                            MakeReferenceAddressable(guid);
                             if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
                             {
                                 Debug.Log(prefabFilePath);
@@ -132,7 +132,7 @@ namespace Vi.Utility
                     else
                     {
                         PooledObjectReference reference = new PooledObjectReference(guid);
-                        MakeReferenceAddressable(guid, reference);
+                        MakeReferenceAddressable(guid);
                         if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
                         {
                             Debug.Log(prefabFilePath);
@@ -150,20 +150,28 @@ namespace Vi.Utility
             return entry != null;
         }
 
-        private void MakeReferenceAddressable(string guid, PooledObjectReference reference)
+        private void MakeReferenceAddressable(string guid)
         {
             if (IsAssetAddressable(guid)) { return; }
 
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
-            AddressableAssetGroup referenceGroup = settings.FindGroup(item => item.Name == "Assets Production Prefabs Mobs Ogres ");
             AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
 
             if (!groupToOrganize)
             {
-                groupToOrganize = settings.CreateGroup("Duplicate Asset Isolation", false, false, false, referenceGroup.Schemas.ToList(), referenceGroup.SchemaTypes.ToArray());
+                groupToOrganize = settings.CreateGroup("Duplicate Asset Isolation", false, false, false, settings.DefaultGroup.Schemas.ToList(), settings.DefaultGroup.SchemaTypes.ToArray());
             }
-            settings.CreateOrMoveEntry(reference.AssetGUID, groupToOrganize);
+            settings.CreateOrMoveEntry(guid, groupToOrganize);
+        }
+
+        [ContextMenu("Make All References In List Addressable")]
+        private void MakeAllReferencesInListAddressable()
+        {
+            foreach (PooledObjectReference reference in pooledObjectReferences)
+            {
+                MakeReferenceAddressable(reference.AssetGUID);
+            }
         }
 
         [ContextMenu("Find Duplicates")]

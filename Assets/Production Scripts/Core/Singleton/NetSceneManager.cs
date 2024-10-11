@@ -134,6 +134,8 @@ namespace Vi.Core
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Add(scenePayload);
         }
 
+        private bool spawnCalled;
+        private GameObject debugObject;
         private void SceneHandleLoaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             // If this scene is part of an environment scene payload
@@ -176,6 +178,13 @@ namespace Vi.Core
             {
                 foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
                 {
+                    if (g.name.Contains("HordeMode"))
+                    {
+                        spawnCalled = true;
+                        debugObject = g;
+                        Debug.Log("Scene loaded callback occurred");
+                    }
+
                     if (g.TryGetComponent(out NetworkObject networkObject))
                     {
                         if (!networkObject.IsSpawned) { networkObject.Spawn(true); }
@@ -206,6 +215,18 @@ namespace Vi.Core
             ShouldSpawnPlayer = SetShouldSpawnPlayer();
 
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
+        }
+
+        private void Update()
+        {
+            if (spawnCalled)
+            {
+                Debug.Log("Scene loaded callback occurred");
+                if (debugObject)
+                {
+                    Debug.Log(string.Join("-", debugObject.GetComponents<Component>().ToList()));
+                }
+            }
         }
 
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
