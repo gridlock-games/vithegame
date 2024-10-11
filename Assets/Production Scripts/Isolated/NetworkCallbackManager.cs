@@ -14,6 +14,7 @@ namespace Vi.Isolated
 {
     public class NetworkCallbackManager : MonoBehaviour
     {
+        [SerializeField] private AssetReferenceGameObject networkManagerPrefab;
         [SerializeField] private AssetReferenceGameObject playerDataManagerPrefab;
         [SerializeField] private AssetReferenceGameObject networkSceneManagerPrefab;
         [Header("Must be less than 60 seconds")]
@@ -23,23 +24,26 @@ namespace Vi.Isolated
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
         {
-            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-
             if (clientConnectTimeoutThreshold >= 60) { Debug.LogError("Client connect timeout is greater than 60 seconds! The network manager will turn off before then!"); }
 
-            NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-
             StartCoroutine(LoadMainMenu());
+        }
 
+        public AsyncOperationHandle<GameObject> NetworkManagerLoadingOperation { get; private set; }
+
+        private IEnumerator LoadMainMenu()
+        {
+            NetworkManagerLoadingOperation = networkManagerPrefab.InstantiateAsync();
+            yield return NetworkManagerLoadingOperation;
+            yield return new WaitUntil(() => NetworkManager.Singleton);
+            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.OnServerStopped += OnServerStopped;
             NetworkManager.Singleton.OnClientStarted += OnClientStarted;
             NetworkManager.Singleton.OnServerStopped += OnClientStopped;
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
-        }
 
-        private IEnumerator LoadMainMenu()
-        {
             LoadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
             yield return new WaitUntil(() => LoadedNetSceneManagerPrefab.IsDone);
             CreateNetSceneManager();
@@ -166,11 +170,14 @@ namespace Vi.Isolated
                 }
             }
 
-            if (!NetworkManager.Singleton.IsConnectedClient & lastConnectedClientState)
+            if (NetworkManager.Singleton)
             {
-                CreatePlayerDataManager(true);
+                if (!NetworkManager.Singleton.IsConnectedClient & lastConnectedClientState)
+                {
+                    CreatePlayerDataManager(true);
+                }
+                lastConnectedClientState = NetworkManager.Singleton.IsConnectedClient;
             }
-            lastConnectedClientState = NetworkManager.Singleton.IsConnectedClient;
         }
         private bool lastConnectedClientState;
 

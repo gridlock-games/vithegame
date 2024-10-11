@@ -85,35 +85,48 @@ namespace Vi.UI
             FindMainCamera();
 
             string topText = "";
-            if (NetworkManager.Singleton.ShutdownInProgress)
+            if (NetworkManager.Singleton)
             {
-                spawningPlayerObjectParent.SetActive(true);
-                topText = "Network Shutdown In Progress";
-            }
-            else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
-            {
-                spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
-
-                if (PlayerDataManager.DoesExist())
+                if (NetworkManager.Singleton.ShutdownInProgress)
                 {
-                    topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    spawningPlayerObjectParent.SetActive(true);
+                    topText = "Network Shutdown In Progress";
+                }
+                else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
+                {
+                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
+
+                    if (PlayerDataManager.DoesExist())
+                    {
+                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    }
+                    else
+                    {
+                        topText = "Spawning Player Object";
+                    }
+                }
+                else if (NetworkManager.Singleton.IsListening & NetworkManager.Singleton.IsClient)
+                {
+                    spawningPlayerObjectParent.SetActive(true);
+                    topText = "Connecting To Server";
                 }
                 else
                 {
-                    topText = "Spawning Player Object";
+                    spawningPlayerObjectParent.SetActive(false);
                 }
             }
-            else if (NetworkManager.Singleton.IsListening & NetworkManager.Singleton.IsClient)
+
+            bool mainMenuLoading = false;
+            if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
             {
-                spawningPlayerObjectParent.SetActive(true);
-                topText = "Connecting To Server";
+                mainMenuLoading = true;
             }
-            else
+            else if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
             {
-                spawningPlayerObjectParent.SetActive(false);
+                mainMenuLoading = true;
             }
 
-            progressBarParent.SetActive(!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone | NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
+            progressBarParent.SetActive(mainMenuLoading | NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
 
             if (spawningPlayerObjectParent.activeSelf)
             {
@@ -144,19 +157,37 @@ namespace Vi.UI
             canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
 
             scenesLeftText.text = "";
-            if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+            if (mainMenuLoading)
             {
-                progressBarText.text = "Loading Scene Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete*100).ToString("F0") + "%";
-                progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
+                if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+                {
+                    progressBarText.text = "Loading Network Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
+                }
+                else if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+                {
+                    progressBarText.text = "Loading Scene Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
+                }
+                else
+                {
+                    progressBarText.text = "Cleaning up...";
+                    progressBarImage.fillAmount = 0;
+                }
             }
             else if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
             {
-                if (NetworkManager.Singleton.ShutdownInProgress)
+                bool evaluated = false;
+                if (NetworkManager.Singleton)
                 {
-                    progressBarText.text = "";
-                    progressBarImage.fillAmount = 0;
+                    if (NetworkManager.Singleton.ShutdownInProgress)
+                    {
+                        progressBarText.text = "";
+                        progressBarImage.fillAmount = 0;
+                    }
                 }
-                else
+
+                if (!evaluated)
                 {
                     progressBarText.text = "Scene Loading Complete";
                     progressBarImage.fillAmount = 1;
