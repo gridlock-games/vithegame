@@ -99,7 +99,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2598392145743516070
 RectTransform:
   m_ObjectHideFlags: 0
@@ -268,6 +268,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1277115422958635894}
+  - component: {fileID: 4715791379624552624}
   m_Layer: 0
   m_Name: ScreenshotUI
   m_TagString: Untagged
@@ -291,3 +292,16 @@ Transform:
   - {fileID: 2598392145743516070}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4715791379624552624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530289572306329653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03a0d96cb3980e1498bfcf95f8282e55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  screenshotFrontground: {fileID: 5609740243216240614}

@@ -12,23 +12,20 @@ namespace Vi.UI
   {
     private Texture2D captureTexture;
     //[SerializeField] private RawImage screenshotUI;
-    private GameObject screenshotFrontground;
+    [SerializeField] private GameObject screenshotFrontground;
     private byte[] screenshotbyte;
     // Start is called before the first frame update
     void Start()
     {
-
+      StartCoroutine(TakeScreenShot());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-    }
 
     private IEnumerator TakeScreenShot()
     {
-      //Show 
+      //Show screenshot
+      screenshotFrontground.SetActive(true);
       yield return new WaitForEndOfFrame();
       Texture2D screenImage = new Texture2D(Screen.width, Screen.height);
       screenImage.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
@@ -37,6 +34,7 @@ namespace Vi.UI
       //Show screenshot to UI
       //screenshotUI.texture = captureTexture;
       yield return new WaitForEndOfFrame();
+      screenshotFrontground.SetActive(false);
 
       //Save and send a notification of screenshot
       ProcessScreenshot();
@@ -66,6 +64,8 @@ namespace Vi.UI
       {
         Debug.Log("File already exists");
       }
+
+      //Destroy GameObject Once complete
     }
 
     private string createScreenshotFolder()
