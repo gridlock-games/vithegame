@@ -1,3 +1,5 @@
+/*old code - prepping for take and transfer*/
+
 using Newtonsoft.Json;
 using Proyecto26;
 using System.Collections;
@@ -7,7 +9,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using WebSocketSharp;
 
 public class BugReportFormJSON
 {
