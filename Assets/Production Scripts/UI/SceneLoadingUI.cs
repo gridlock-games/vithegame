@@ -115,6 +115,10 @@ namespace Vi.UI
                     spawningPlayerObjectParent.SetActive(false);
                 }
             }
+            else
+            {
+                spawningPlayerObjectParent.SetActive(false);
+            }
 
             bool mainMenuLoading = false;
             if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
