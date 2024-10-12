@@ -43,7 +43,6 @@ namespace Vi.UI
 
             //Vector3 startPos = UnityEngine.InputSystem.Mouse.current.position.value;
             //startPos.z = cam.nearClipPlane;
-            //Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
             //Vector3 pos = cam.ScreenToWorldPoint(startPos);
             //emitSettings.position = pos;
             //particle.Emit(emitSettings, 1);
@@ -54,7 +53,6 @@ namespace Vi.UI
                 {
                     Vector3 startPos = touch.screenPosition;
                     startPos.z = cam.nearClipPlane;
-                    Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
                     Vector3 pos = cam.ScreenToWorldPoint(startPos);
                     emitSettings.position = pos;
                     particle.Emit(emitSettings, 1);
