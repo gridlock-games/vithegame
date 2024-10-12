@@ -41,25 +41,25 @@ namespace Vi.UI
 
             particle.gameObject.SetActive(true);
 
-            Vector3 startPos = UnityEngine.InputSystem.Mouse.current.position.value;
-            startPos.z = cam.nearClipPlane;
-            Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
-            Vector3 pos = cam.ScreenToWorldPoint(startPos);
-            emitSettings.position = pos;
-            particle.Emit(emitSettings, 1);
+            //Vector3 startPos = UnityEngine.InputSystem.Mouse.current.position.value;
+            //startPos.z = cam.nearClipPlane;
+            //Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
+            //Vector3 pos = cam.ScreenToWorldPoint(startPos);
+            //emitSettings.position = pos;
+            //particle.Emit(emitSettings, 1);
 
-            //foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
-            //{
-            //    if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-            //    {
-            //        Vector3 startPos = touch.screenPosition;
-            //        startPos.z = cam.nearClipPlane;
-            //        Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
-            //        Vector3 pos = cam.ScreenToWorldPoint(startPos);
-            //        emitSettings.position = pos;
-            //        particle.Emit(emitSettings, 1);
-            //    }
-            //}
+            foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+            {
+                if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+                {
+                    Vector3 startPos = touch.screenPosition;
+                    startPos.z = cam.nearClipPlane;
+                    Debug.Log(startPos + " " + cam.ScreenToWorldPoint(startPos));
+                    Vector3 pos = cam.ScreenToWorldPoint(startPos);
+                    emitSettings.position = pos;
+                    particle.Emit(emitSettings, 1);
+                }
+            }
         }
 #endif
     }
