@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CandyCoded.HapticFeedback;
 
 namespace Vi.UI
 {
@@ -57,7 +58,7 @@ namespace Vi.UI
                     emitSettings.position = pos;
                     particle.Emit(emitSettings, 1);
 
-                    Handheld.Vibrate();
+                    HapticFeedback.LightFeedback();
                 }
             }
         }
