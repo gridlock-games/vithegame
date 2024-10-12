@@ -349,6 +349,9 @@ namespace Vi.UI
         private CanvasGroup[] canvasGroups;
         private void Start()
         {
+            GetComponent<Canvas>().enabled = false;
+            StartCoroutine(EnableCanvas());
+
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
@@ -370,6 +373,14 @@ namespace Vi.UI
             UpdateTeammateAttributesList();
 
             UpdateWeapon(false);
+        }
+
+        private IEnumerator EnableCanvas()
+        {
+            yield return new WaitUntil(() => attributes.WeaponHandler.WeaponInitialized);
+            yield return null;
+            yield return null;
+            GetComponent<Canvas>().enabled = true;
         }
 
         private void RefreshStatus()
