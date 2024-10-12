@@ -159,6 +159,7 @@ namespace Vi.UI
 
             float alphaTarget = progressBarParent.activeSelf | spawningPlayerObjectParent.activeSelf ? 1 : 0;
             canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
+            Debug.Log(canvasGroup.alpha);
 
             scenesLeftText.text = "";
             if (mainMenuLoading)

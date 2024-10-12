@@ -52,7 +52,7 @@ namespace Vi.UI
 
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
-            else if (MainCamera) { cam.enabled = false; }
+            else if (MainCamera & !SceneLoadingUI.IsDisplaying) { cam.enabled = false; }
             else { cam.enabled = UICameras[^1] == this; }
 
             if (cam.enabled != lastCamState)

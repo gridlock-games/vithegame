@@ -47,11 +47,12 @@ namespace Vi.Player
         }
 
         private NetworkObject networkObject;
-
+        private Camera playerCamera;
         private void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
             networkObject = GetComponent<NetworkObject>();
+            playerCamera = GetComponentInChildren<Camera>();
         }
 
         private void OnEnable()
@@ -60,6 +61,10 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
+                Canvas canvas = playerUIInstance.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = playerCamera;
+                canvas.planeDistance = playerCamera.nearClipPlane + 0.01f;
                 if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
