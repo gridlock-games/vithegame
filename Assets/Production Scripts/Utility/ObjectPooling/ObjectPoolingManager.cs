@@ -58,6 +58,7 @@ namespace Vi.Utility
         {
             if (pooledObject.TryGetComponent(out NetworkObject networkObject))
             {
+                NetworkManager.Singleton.AddNetworkPrefab(networkObject.gameObject);
                 NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
             }
         }
