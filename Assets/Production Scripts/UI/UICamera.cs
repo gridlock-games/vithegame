@@ -42,7 +42,6 @@ namespace Vi.UI
             {
                 return null;
             }
-            else if (MainCamera) { return MainCamera; }
             else { return UICameras[^1].cam; }
         }
 
