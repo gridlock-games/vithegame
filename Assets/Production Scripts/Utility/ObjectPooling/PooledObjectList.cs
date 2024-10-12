@@ -84,68 +84,20 @@ namespace Vi.Utility
         }
 
 # if UNITY_EDITOR
-        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
-        static List<NetworkPrefabsList> GetNetworkPrefabsLists()
+        public bool TryAddPooledObject(PooledObject pooledObject)
         {
-            List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
-            foreach (string listPath in Directory.GetFiles(networkPrefabListFolderPath, "*.asset", SearchOption.AllDirectories))
+            string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(pooledObject.gameObject));
+
+            PooledObjectReference reference = new PooledObjectReference(guid);
+            MakeReferenceAddressable(guid);
+            if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
             {
-                var prefabsList = AssetDatabase.LoadAssetAtPath<NetworkPrefabsList>(listPath);
-                if (prefabsList) { networkPrefabsLists.Add(prefabsList); }
+                Debug.Log("Adding pooled object to references list " + pooledObject);
+                pooledObjectReferences.Add(reference);
+                EditorUtility.SetDirty(this);
+                return true;
             }
-            return networkPrefabsLists;
-        }
-
-        [ContextMenu("Add Unregistered Pooled Objects")]
-        public void AddUnregisteredPooledObjects()
-        {
-            List<string> files = new List<string>();
-            files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
-            //files.AddRange(Directory.GetFiles(Path.Join("Assets", "Production"), "*.prefab", SearchOption.AllDirectories));
-            //files.AddRange(Directory.GetFiles(Path.Join("Assets", "PackagedPrefabs"), "*.prefab", SearchOption.AllDirectories));
-            foreach (string prefabFilePath in files)
-            {
-                string guid = AssetDatabase.AssetPathToGUID(prefabFilePath);
-
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
-                if (!prefab) { continue; }
-                if (prefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (prefab.TryGetComponent(out NetworkObject networkObject))
-                    {
-                        bool contains = false;
-                        foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
-                        {
-                            if (networkPrefabsList.Contains(networkObject.gameObject))
-                            {
-                                contains = true;
-                                break;
-                            }
-                        }
-
-                        if (contains)
-                        {
-                            PooledObjectReference reference = new PooledObjectReference(guid);
-                            MakeReferenceAddressable(guid);
-                            if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
-                            {
-                                Debug.Log(prefabFilePath);
-                                pooledObjectReferences.Add(reference);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        PooledObjectReference reference = new PooledObjectReference(guid);
-                        MakeReferenceAddressable(guid);
-                        if (!pooledObjectReferences.Exists(item => item.AssetGUID == guid))
-                        {
-                            Debug.Log(prefabFilePath);
-                            pooledObjectReferences.Add(reference);
-                        }
-                    }
-                }
-            }
+            return false;
         }
 
         private static bool IsAssetAddressable(string guid)

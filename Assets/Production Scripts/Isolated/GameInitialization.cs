@@ -43,8 +43,6 @@ namespace Vi.Core
             }
 
             headerText.text = "Preparing Your Vi Experience";
-
-            DiscordManager.UpdateActivity(null, "Loading Game");
         }
 
         private void InitializePlayerPrefs()
