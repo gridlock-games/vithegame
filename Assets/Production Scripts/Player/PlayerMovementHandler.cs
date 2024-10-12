@@ -579,7 +579,6 @@ namespace Vi.Player
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 actionMapHandler.enabled = true;
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
@@ -605,7 +604,6 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
 

@@ -36,6 +36,15 @@ namespace Vi.UI
             mainCamera = Camera.main;
         }
 
+        public static Camera GetActiveUICamera()
+        {
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
+            {
+                return null;
+            }
+            else { return UICameras[^1].cam; }
+        }
+
         private bool lastCamState;
         private void Update()
         {
