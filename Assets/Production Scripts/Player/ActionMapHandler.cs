@@ -70,6 +70,10 @@ namespace Vi.Player
             else if (playerInput.defaultActionMap == "Spectator")
             {
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
+                Canvas canvas = spectatorUIInstance.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = playerCamera;
+                canvas.planeDistance = playerCamera.nearClipPlane + 0.01f;
                 if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
             else
