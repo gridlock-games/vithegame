@@ -23,17 +23,17 @@ namespace Vi.UI
             cam.depth = -1;
         }
 
-        private Camera mainCamera;
+        public static Camera MainCamera { get; private set; }
         private void FindMainCamera()
         {
-            if (mainCamera)
+            if (MainCamera)
             {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
+                if (MainCamera.gameObject.CompareTag("MainCamera"))
                 {
                     return;
                 }
             }
-            mainCamera = Camera.main;
+            MainCamera = Camera.main;
         }
 
         public static Camera GetActiveUICamera()
@@ -42,6 +42,7 @@ namespace Vi.UI
             {
                 return null;
             }
+            else if (MainCamera) { return MainCamera; }
             else { return UICameras[^1].cam; }
         }
 
@@ -52,17 +53,19 @@ namespace Vi.UI
 
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
-            else if (mainCamera) { cam.enabled = false; }
+            else if (MainCamera) { cam.enabled = false; }
             else { cam.enabled = UICameras[^1] == this; }
 
             if (cam.enabled != lastCamState)
             {
                 if (cam.enabled)
                 {
+                    cam.depth = 0;
                     if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 }
                 else
                 {
+                    cam.depth = -1;
                     if (audioListener) { Destroy(audioListener); }
                 }
             }

@@ -3317,6 +3317,7 @@ GameObject:
   - component: {fileID: 3584783593542317166}
   - component: {fileID: 249109944019934734}
   - component: {fileID: 3584783593542317162}
+  - component: {fileID: 2784820041657350436}
   m_Layer: 5
   m_Name: LobbyUI
   m_TagString: Untagged
@@ -3536,6 +3537,18 @@ MonoBehaviour:
     inputFields: []
   pauseMenu: {fileID: 7309343886950099502, guid: d228d73cb92b5344589d4bdcbcc33e48,
     type: 3}
+--- !u!114 &2784820041657350436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3584783593542317167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 074948244ca7b024a8f5ca68ad1a20d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3670719882853157526
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ namespace Vi.UI
     {
         [SerializeField] ParticleSystem particle;
 
-#if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
         ParticleSystem.EmitParams emitSettings;
 
         private void Start()
