@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Vi.Utility;
-using CandyCoded.HapticFeedback;
 
 namespace Vi.UI
 {
@@ -23,7 +22,9 @@ namespace Vi.UI
         public void Play2DAudio()
         {
             AudioManager.Singleton.Play2DClip(null, audioClip, volume);
-            HapticFeedback.HeavyFeedback();
+#if UNITY_ANDROID || UNITY_IOS
+            CandyCoded.HapticFeedback.HapticFeedback.HeavyFeedback();
+#endif
         }
     }
 }
