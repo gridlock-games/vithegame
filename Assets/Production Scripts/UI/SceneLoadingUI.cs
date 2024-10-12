@@ -121,7 +121,7 @@ namespace Vi.UI
             }
 
             bool mainMenuLoading = false;
-            if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+            if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
             {
                 mainMenuLoading = true;
             }
@@ -163,10 +163,10 @@ namespace Vi.UI
             scenesLeftText.text = "";
             if (mainMenuLoading)
             {
-                if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+                if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
                 {
-                    progressBarText.text = "Loading Network Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete * 100).ToString("F0") + "%";
-                    progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
+                    progressBarText.text = "Loading Network Manager " + (networkCallbackManager.NetworkManagerLoadingOperation.PercentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = networkCallbackManager.NetworkManagerLoadingOperation.PercentComplete;
                 }
                 else if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
                 {
