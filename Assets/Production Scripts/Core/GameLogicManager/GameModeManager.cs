@@ -196,20 +196,20 @@ namespace Vi.Core.GameModeManagers
                 killerTeam = PlayerDataManager.Team.Competitor;
                 assistTeam = PlayerDataManager.Team.Competitor;
                 victimTeam = PlayerDataManager.Team.Competitor;
-                var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+                var weaponOptions = PlayerDataManager.IsCharacterReferenceLoaded() ? PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions() : null;
                 switch (killType)
                 {
                     case KillType.Player:
                         killerName = "Killer";
                         assistName = "";
                         victimName = "Victim";
-                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        weaponName = weaponOptions == null ? "Weapon" : weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
                         return;
                     case KillType.PlayerWithAssist:
                         killerName = "Killer";
                         assistName = "Assist";
                         victimName = "Victim";
-                        weaponName = weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
+                        weaponName = weaponOptions == null ? "Weapon" : weaponOptions[Random.Range(0, weaponOptions.Length - 1)].weapon.name;
                         return;
                     case KillType.Environment:
                         killerName = "";
@@ -232,12 +232,15 @@ namespace Vi.Core.GameModeManagers
                 if (killType == KillType.Player | killType == KillType.PlayerWithAssist)
                 {
                     Sprite killFeedIcon = null;
-                    CharacterReference.WeaponOption weaponOption = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString());
-                    if (weaponOption != null) { killFeedIcon = weaponOption.killFeedIcon; }
-                    return killFeedIcon ? killFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
+                    if (PlayerDataManager.IsCharacterReferenceLoaded())
+                    {
+                        CharacterReference.WeaponOption weaponOption = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions(), item => item.weapon.name == killHistoryElement.weaponName.ToString());
+                        if (weaponOption != null) { killFeedIcon = weaponOption.killFeedIcon; }
+                    }
+                    return killFeedIcon ? killFeedIcon : PlayerDataManager.Singleton.DefaultEnvironmentKillIcon;
                 }
                 else if (killType == KillType.Environment)
-                    return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.GetCharacterReference().defaultEnvironmentKillIcon;
+                    return Singleton ? Singleton.environmentKillFeedIcon : PlayerDataManager.Singleton.DefaultEnvironmentKillIcon;
                 else
                     Debug.LogError("Not sure what icon to provide for kill type: " + killHistoryElement.killType);
                 return null;

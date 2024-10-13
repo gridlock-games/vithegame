@@ -87,15 +87,15 @@ namespace Vi.Utility
             }
 
 #if UNITY_EDITOR
-            PooledObjectList pooledObjectList = UnityEditor.AssetDatabase.LoadAssetAtPath<PooledObjectList>(@"Assets\Production\PooledObjectList.asset");
-            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage)
-            {
-                if (!pooledObjectList.GetPooledObjectReferences().Exists(item => item.AssetGUID == UnityEditor.AssetDatabase.GUIDFromAssetPath(prefabStage.assetPath).ToString()))
-                {
-                    SetPooledObjectIndex(-1);
-                }
-            }
+            //PooledObjectList pooledObjectList = UnityEditor.AssetDatabase.LoadAssetAtPath<PooledObjectList>(@"Assets\Production\PooledObjectList.asset");
+            //var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+            //if (prefabStage)
+            //{
+            //    if (!pooledObjectList.GetPooledObjectReferences().Exists(item => item.AssetGUID == UnityEditor.AssetDatabase.GUIDFromAssetPath(prefabStage.assetPath).ToString()))
+            //    {
+            //        SetPooledObjectIndex(-1);
+            //    }
+            //}
 #endif
         }
     }

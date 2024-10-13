@@ -11,7 +11,6 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "CharacterReference", menuName = "Production/Character Reference")]
     public class CharacterReference : ScriptableObject
     {
-        public Sprite defaultEnvironmentKillIcon;
         [SerializeField] private PlayerModelOption[] playerModelOptions;
         [SerializeField] private WeaponOption[] weaponOptions;
         [SerializeField] private WearableEquipment emptyWearableEquipment;
