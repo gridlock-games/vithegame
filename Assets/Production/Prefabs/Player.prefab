@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 3945128956232022059}
   - component: {fileID: 3953540349477575377}
   m_Layer: 6
-  m_Name: UICamera
+  m_Name: PlayerCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -519,8 +519,6 @@ MonoBehaviour:
   aimingTransitionSpeed: 8
   aimingPositionOffset: {x: 0, y: 0, z: 1}
   collisionPositionOffset: -0.3
-  _UICamera: {fileID: 3945128956232022068}
-  _MainCamera: {fileID: 3945128956232022068}
 --- !u!95 &3953540349477575377
 Animator:
   serializedVersion: 5
