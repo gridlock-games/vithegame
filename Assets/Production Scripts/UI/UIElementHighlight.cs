@@ -22,6 +22,8 @@ namespace Vi.UI
             RectTransform parentRT = (RectTransform)transform.parent;
             Vector3 pos = parentRT.TransformPoint(parentRT.rect.center);
             rt.position = pos;
+            rt.localRotation = Quaternion.identity;
+            rt.localScale = Vector3.ClampMagnitude(rt.localScale, 1.732f);
         }
 
         private float directionMultiplier = 1;
