@@ -263,7 +263,6 @@ namespace Vi.Core
         public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
         private IEnumerator DeleteServerCoroutine(string serverId)
         {
-            if (IsDeletingServer) { yield break; }
             IsDeletingServer = true;
             ServerDeletePayload payload = new ServerDeletePayload(serverId);
 
