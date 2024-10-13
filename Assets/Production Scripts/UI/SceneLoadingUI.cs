@@ -74,12 +74,12 @@ namespace Vi.UI
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
 
-        private bool lastCanvasState;
         private void Update()
         {
             UpdateUI(true);
         }
 
+        public static bool IsDisplaying { get; private set; }
         private void UpdateUI(bool fade)
         {
             FindMainCamera();
@@ -233,8 +233,8 @@ namespace Vi.UI
         private void OnEndUpdateUI()
         {
             canvas.enabled = canvasGroup.alpha > 0.05f;
-            if (canvas.enabled & !lastCanvasState) { backgroundImageSelector.ChangeBackground(); }
-            lastCanvasState = canvas.enabled;
+            if (canvas.enabled & !IsDisplaying) { backgroundImageSelector.ChangeBackground(); }
+            IsDisplaying = canvas.enabled;
         }
     }
 }

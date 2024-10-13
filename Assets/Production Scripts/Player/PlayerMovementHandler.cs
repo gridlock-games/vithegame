@@ -579,7 +579,6 @@ namespace Vi.Player
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 actionMapHandler.enabled = true;
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             }
             else
             {
@@ -605,7 +604,6 @@ namespace Vi.Player
         {
             if (IsLocalPlayer)
             {
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
 
@@ -718,7 +716,7 @@ namespace Vi.Player
                                     bool isTouchingJoystick = false;
                                     foreach (UIDeadZoneElement joystick in joysticks)
                                     {
-                                        if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                        if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition, cameraController.Camera))
                                         {
                                             isTouchingJoystick = true;
                                             break;

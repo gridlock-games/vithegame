@@ -38,7 +38,7 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        private string APIURL = "http://154.90.36.42:80/";
+        private string APIURL = "http://38.60.246.146:80/";
         //private string APIURL = "http://154.90.35.191:80/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
@@ -263,7 +263,6 @@ namespace Vi.Core
         public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
         private IEnumerator DeleteServerCoroutine(string serverId)
         {
-            if (IsDeletingServer) { yield break; }
             IsDeletingServer = true;
             ServerDeletePayload payload = new ServerDeletePayload(serverId);
 
@@ -2719,7 +2718,7 @@ namespace Vi.Core
                 {
                     RefreshServers();
 
-                    if (thisServer.type == 0)
+                    if (thisServer.type == 0) // Hub
                     {
                         if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
                         {
@@ -2727,7 +2726,7 @@ namespace Vi.Core
                             FasterPlayerPrefs.QuitGame();
                         }
                     }
-                    else if (thisServer.type == 1)
+                    else if (thisServer.type == 1) // Lobby
                     {
                         if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
                         {

@@ -97,7 +97,7 @@ namespace Vi.UI
 
                             if (raycastResults.Count == 0)
                             {
-                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, null, out Vector2 localPoint);
+                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, UICamera.MainCamera, out Vector2 localPoint);
                                 rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
@@ -113,7 +113,7 @@ namespace Vi.UI
                     {
                         if (interactingTouchId == -1)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition))
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition, UICamera.MainCamera))
                             {
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
@@ -155,14 +155,14 @@ namespace Vi.UI
         private void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, null, out Vector2 localPoint);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, UICamera.MainCamera, out Vector2 localPoint);
             rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 
         private void OnTouchDrag(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, null, out Vector2 localPoint);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, UICamera.MainCamera, out Vector2 localPoint);
             rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 

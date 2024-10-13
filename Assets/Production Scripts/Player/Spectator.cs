@@ -381,7 +381,7 @@ namespace Vi.Player
 
             if (!IsLocalPlayer) { return; }
 
-            #if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID
             // If on a mobile platform
             if (UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
             {
@@ -397,7 +397,7 @@ namespace Vi.Player
                             bool isTouchingJoystick = false;
                             foreach (UIDeadZoneElement joystick in joysticks)
                             {
-                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition))
+                                if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition, cam))
                                 {
                                     isTouchingJoystick = true;
                                     break;
@@ -413,7 +413,7 @@ namespace Vi.Player
                 }
                 lookInput += lookInputToAdd;
             }
-            #endif
+#endif
 
             if (moveInput != Vector2.zero)
             {
