@@ -38,7 +38,7 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        private string APIURL = "http://154.90.36.42:80/";
+        private string APIURL = "http://38.60.246.146:80/";
         //private string APIURL = "http://154.90.35.191:80/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
