@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1977550921
+  GlobalObjectIdHash: 891803348
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 3945128956232022059}
   - component: {fileID: 3953540349477575377}
   m_Layer: 6
-  m_Name: PlayerCamera
+  m_Name: UICamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -444,7 +444,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 3319
+    m_Bits: 3287
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -519,6 +519,8 @@ MonoBehaviour:
   aimingTransitionSpeed: 8
   aimingPositionOffset: {x: 0, y: 0, z: 1}
   collisionPositionOffset: -0.3
+  _UICamera: {fileID: 3945128956232022068}
+  _MainCamera: {fileID: 3945128956232022068}
 --- !u!95 &3953540349477575377
 Animator:
   serializedVersion: 5

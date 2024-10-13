@@ -45,7 +45,6 @@ namespace Vi.UI
                     animationHandler = null;
                     loadoutManager = null;
                     playerUI = null;
-                    tutorialCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 }
             }
 
@@ -85,10 +84,6 @@ namespace Vi.UI
                 playerUI.GetPauseMenuButton().gameObject.SetActive(false);
                 playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 playerUI.GetLoadoutMenuButton().gameObject.SetActive(false);
-
-                tutorialCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-                tutorialCanvas.worldCamera = Camera.main;
-                tutorialCanvas.planeDistance = Camera.main.nearClipPlane + 0.02f;
             }
         }
 

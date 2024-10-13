@@ -37,6 +37,7 @@ namespace Vi.UI
         private MovementHandler movementHandler;
         private PlayerInput playerInput;
         private CombatAgent combatAgent;
+        private Canvas canvas;
         private void Start()
         {
             RectTransform rt = (RectTransform)transform.parent;
@@ -48,6 +49,7 @@ namespace Vi.UI
             movementHandler = transform.root.GetComponent<MovementHandler>();
             playerInput = movementHandler.GetComponent<PlayerInput>();
             combatAgent = movementHandler.GetComponent<CombatAgent>();
+            canvas = GetComponentInParent<Canvas>().rootCanvas;
         }
 
         private void RefreshStatus()
@@ -97,7 +99,7 @@ namespace Vi.UI
 
                             if (raycastResults.Count == 0)
                             {
-                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, UICamera.MainCamera, out Vector2 localPoint);
+                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
                                 rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
@@ -113,7 +115,7 @@ namespace Vi.UI
                     {
                         if (interactingTouchId == -1)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition, UICamera.MainCamera))
+                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition, canvas.worldCamera))
                             {
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
@@ -155,14 +157,14 @@ namespace Vi.UI
         private void OnTouchDown(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, UICamera.MainCamera, out Vector2 localPoint);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, canvas.worldCamera, out Vector2 localPoint);
             rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 
         private void OnTouchDrag(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
         {
             RectTransform rt = (RectTransform)transform;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, UICamera.MainCamera, out Vector2 localPoint);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(limits, touch.screenPosition, canvas.worldCamera, out Vector2 localPoint);
             rt.anchoredPosition = Vector2.ClampMagnitude(localPoint - limits.sizeDelta / 2, movementRange);
         }
 

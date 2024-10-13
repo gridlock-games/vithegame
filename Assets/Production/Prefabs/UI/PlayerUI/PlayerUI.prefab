@@ -4810,6 +4810,7 @@ GameObject:
   - component: {fileID: 8924606105618773431}
   - component: {fileID: 7062514562923407540}
   - component: {fileID: 5666987421114583128}
+  - component: {fileID: -6788166042418314461}
   m_Layer: 5
   m_Name: PlayerUI
   m_TagString: Untagged
@@ -5027,6 +5028,18 @@ MonoBehaviour:
     - {fileID: 3596164951838448002}
     gameObjectsToDestroy: []
     objectsToMove: []
+--- !u!114 &-6788166042418314461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2452549437775322352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 074948244ca7b024a8f5ca68ad1a20d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2539763201719894588
 GameObject:
   m_ObjectHideFlags: 0
