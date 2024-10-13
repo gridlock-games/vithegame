@@ -22,9 +22,6 @@ namespace Vi.UI
         public void Play2DAudio(int value)
         {
             AudioManager.Singleton.Play2DClip(null, audioClip, volume);
-#if UNITY_ANDROID || UNITY_IOS
-            CandyCoded.HapticFeedback.HapticFeedback.MediumFeedback();
-#endif
         }
     }
 }

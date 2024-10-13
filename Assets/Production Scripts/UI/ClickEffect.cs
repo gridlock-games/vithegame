@@ -56,8 +56,6 @@ namespace Vi.UI
                     Vector3 pos = cam.ScreenToWorldPoint(startPos);
                     emitSettings.position = pos;
                     particle.Emit(emitSettings, 1);
-
-                    CandyCoded.HapticFeedback.HapticFeedback.LightFeedback();
                 }
             }
         }
