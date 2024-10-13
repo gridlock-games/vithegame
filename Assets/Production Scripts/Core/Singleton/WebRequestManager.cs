@@ -2719,7 +2719,7 @@ namespace Vi.Core
                 {
                     RefreshServers();
 
-                    if (thisServer.type == 0)
+                    if (thisServer.type == 0) // Hub
                     {
                         if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
                         {
@@ -2727,7 +2727,7 @@ namespace Vi.Core
                             FasterPlayerPrefs.QuitGame();
                         }
                     }
-                    else if (thisServer.type == 1)
+                    else if (thisServer.type == 1) // Lobby
                     {
                         if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
                         {
