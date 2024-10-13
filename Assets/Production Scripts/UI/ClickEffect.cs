@@ -41,11 +41,15 @@ namespace Vi.UI
 
             particle.gameObject.SetActive(true);
 
-            //Vector3 startPos = UnityEngine.InputSystem.Mouse.current.position.value;
-            //startPos.z = cam.nearClipPlane;
-            //Vector3 pos = cam.ScreenToWorldPoint(startPos);
-            //emitSettings.position = pos;
-            //particle.Emit(emitSettings, 1);
+#if UNITY_EDITOR
+            if (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Vector3 startPosEditor = UnityEngine.InputSystem.Mouse.current.position.value;
+                startPosEditor.z = cam.nearClipPlane;
+                emitSettings.position = cam.ScreenToWorldPoint(startPosEditor);
+                particle.Emit(emitSettings, 1);
+            }
+#endif
 
             foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
             {
@@ -53,8 +57,7 @@ namespace Vi.UI
                 {
                     Vector3 startPos = touch.screenPosition;
                     startPos.z = cam.nearClipPlane;
-                    Vector3 pos = cam.ScreenToWorldPoint(startPos);
-                    emitSettings.position = pos;
+                    emitSettings.position = cam.ScreenToWorldPoint(startPos);
                     particle.Emit(emitSettings, 1);
                 }
             }

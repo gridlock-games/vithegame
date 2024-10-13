@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Vi.UI
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
     public class CameraSpaceCanvas : MonoBehaviour
     {
@@ -12,17 +13,18 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            canvas.planeDistance = 100;
         }
 
         private void Start()
         {
             canvas.worldCamera = UICamera.GetActiveUICamera();
+            canvas.planeDistance = canvas.worldCamera.nearClipPlane + 0.01f;
         }
 
         private void Update()
         {
             canvas.worldCamera = UICamera.GetActiveUICamera();
+            canvas.planeDistance = canvas.worldCamera.nearClipPlane + 0.01f;
         }
     }
 }

@@ -19,6 +19,9 @@ namespace Vi.Core
 {
     public class PlayerDataManager : NetworkBehaviour
     {
+        public Sprite DefaultEnvironmentKillIcon { get { return _defaultEnvironmentKillIcon; } }
+        public Sprite _defaultEnvironmentKillIcon;
+
         [SerializeField] private GameObject spectatorPrefab;
         
         [SerializeField] private List<GameModeInfo> gameModeInfos;

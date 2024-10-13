@@ -1304,7 +1304,7 @@ namespace Vi.Core
 
             if (IsOwner)
             {
-                if (NetworkObject.IsPlayerObject)
+                if (NetworkObject.IsPlayerObject & mainCamera)
                 {
                     aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
                     cameraForwardDir.Value = mainCamera.transform.forward;

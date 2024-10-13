@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.UI
 {
@@ -14,6 +15,7 @@ namespace Vi.UI
 
         private Camera cam;
         private AudioListener audioListener;
+        private UniversalAdditionalCameraData cameraData;
         private void Awake()
         {
             UICameras.Add(this);
@@ -21,19 +23,26 @@ namespace Vi.UI
             cam = GetComponent<Camera>();
             cam.cullingMask = LayerMask.GetMask(layerMask);
             cam.depth = -1;
+
+            cameraData = GetComponent<UniversalAdditionalCameraData>();
         }
 
-        public static Camera MainCamera { get; private set; }
+        private static Camera mainCamera;
+        private static UniversalAdditionalCameraData mainCameraData;
         private void FindMainCamera()
         {
-            if (MainCamera)
+            if (mainCamera)
             {
-                if (MainCamera.gameObject.CompareTag("MainCamera"))
+                if (mainCamera.gameObject.CompareTag("MainCamera"))
                 {
                     return;
                 }
             }
-            MainCamera = Camera.main;
+            mainCamera = Camera.main;
+            if (mainCamera)
+            {
+                mainCameraData = mainCamera.GetComponent<UniversalAdditionalCameraData>();
+            }
         }
 
         public static Camera GetActiveUICamera()
@@ -42,6 +51,7 @@ namespace Vi.UI
             {
                 return null;
             }
+            //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { return MainCamera; }
             else { return UICameras[^1].cam; }
         }
 
@@ -52,7 +62,7 @@ namespace Vi.UI
 
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
-            else if (MainCamera & !SceneLoadingUI.IsDisplaying) { cam.enabled = false; }
+            //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { cam.enabled = false; }
             else { cam.enabled = UICameras[^1] == this; }
 
             if (cam.enabled != lastCamState)
@@ -70,6 +80,29 @@ namespace Vi.UI
             }
 
             lastCamState = cam.enabled;
+
+            if (mainCamera)
+            {
+                if (audioListener) { Destroy(audioListener); }
+
+                if (cameraData.renderType == CameraRenderType.Base)
+                {
+                    cameraData.renderType = CameraRenderType.Overlay;
+                    mainCameraData.cameraStack.Add(cam);
+                }
+            }
+            else if (cam.enabled)
+            {
+                if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
+                
+                if (cameraData.renderType == CameraRenderType.Overlay)
+                {
+                    mainCameraData.cameraStack.Remove(cam);
+                    cameraData.renderType = CameraRenderType.Base;
+                }
+            }
+
+            if (mainCamera) { if (audioListener) { Destroy(audioListener); } }
         }
 
         private void OnDestroy()
