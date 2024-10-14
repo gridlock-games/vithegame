@@ -17,6 +17,7 @@ namespace Vi.UI
         [SerializeField] private Image upgradeIcon;
         [SerializeField] private RectTransform upgradeIconActivePosition;
         [SerializeField] private RectTransform upgradeIconInactivePosition;
+        [SerializeField] private Animator upgradeAnimationAnimator;
 
         public ActionClip Ability { get; private set; }
 
@@ -30,6 +31,8 @@ namespace Vi.UI
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            borderImage = GetComponent<Image>();
+            combatAgent = GetComponentInParent<CombatAgent>();
         }
 
         public void SetPreviewOn()
@@ -48,6 +51,8 @@ namespace Vi.UI
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
+
+            lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
         }
 
         private Image borderImage;
@@ -56,24 +61,25 @@ namespace Vi.UI
 
         private void Start()
         {
-            borderImage = GetComponent<Image>();
             originalBorderImageColor = borderImage.color;
-            combatAgent = GetComponentInParent<CombatAgent>();
-
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
 
+        private int lastAbilityLevel = -1;
         private void Update()
         {
             if (Ability == null) { return; }
 
+            bool canUpgrade = combatAgent.SessionProgressionHandler.CanUpgradeAbility(Ability, combatAgent.WeaponHandler.GetWeapon());
             upgradeIcon.rectTransform.position = Vector3.Lerp(upgradeIcon.transform.position,
-                combatAgent.SessionProgressionHandler.SkillPoints > 0 ? upgradeIconActivePosition.position : upgradeIconInactivePosition.position,
+                canUpgrade ? upgradeIconActivePosition.position : upgradeIconInactivePosition.position,
                 Time.deltaTime * 4);
+
+            upgradeIcon.raycastTarget = canUpgrade;
 
             if (GameModeManager.Singleton.LevelingEnabled)
             {
-                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == 0)
+                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
                 {
                     borderImage.color = originalBorderImageColor;
                     cooldownText.text = "";
@@ -94,6 +100,16 @@ namespace Vi.UI
             {
                 borderImage.color = Color.red;
             }
+
+            int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
+            if (abilityLevel != lastAbilityLevel)
+            {
+                upgradeAnimationAnimator.Play("AbilityCardUpgradeAnimation", 0, 0);
+                AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
+            }
+            lastAbilityLevel = abilityLevel;
         }
+
+        [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;
     }
 }

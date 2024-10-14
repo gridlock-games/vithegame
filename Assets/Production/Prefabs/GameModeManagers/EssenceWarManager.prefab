@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5519423893761400350}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5519423893761400351
 MonoBehaviour:
@@ -68,13 +68,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UIPrefab: {fileID: 7757707048149690173, guid: adf14309a35c0e84bb4e1b7237f4a42a,
     type: 3}
-  RPPrefab: {fileID: 5562196947256669990, guid: db11c19449afdd049ad37bd03da9695a,
-    type: 3}
   numberOfRoundsWinsToWinGame: 5
   roundDuration: 360
+  nextGameActionDuration: 10
   respawnTime: 5
+  respawnType: 0
+  levelingEnabled: 0
   environmentKillFeedIcon: {fileID: 21300000, guid: f2c8db0bfcb4a42c3b3ebc9507158784,
     type: 3}
+  timerMode: 0
+  essenceBuffOptions: []
   ancientBossCorruptPrefab: {fileID: 2624424858987274656, guid: 3536290fd72777b4d9d6c36c5368dfe0,
     type: 3}
   ancientBossLightPrefab: {fileID: 2995855160032362727, guid: 483d145d69118cb4791629bf2abc3853,

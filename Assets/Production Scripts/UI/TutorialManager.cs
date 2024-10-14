@@ -123,7 +123,7 @@ namespace Vi.UI
 
             foreach (InputAction action in playerInput.actions)
             {
-                if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+                if (!action.name.Contains("Look") & !action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Disable(); }
             }
 
             yield return new WaitUntil(() => !attributes.GetComponent<PlayerMovementHandler>().IsCameraAnimating());
@@ -193,7 +193,7 @@ namespace Vi.UI
                 currentOverlayMessage = "Look Around.";
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (!action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Disable(); }
+                    if (!action.name.Contains("Look") & !action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetLookJoystickCenter(), true));
@@ -253,6 +253,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
             }
@@ -288,6 +289,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
@@ -306,6 +308,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
@@ -386,7 +389,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
                 foreach (InputAction action in playerInput.actions)
                 {
-                    if (action.name.Contains("Block") | action.name.Contains("Look")) { playerInput.actions.FindAction(action.name).Enable(); }
+                    if (action.name.Contains("Block") | action.name.Contains("Look") | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
                     else { playerInput.actions.FindAction(action.name).Disable(); }
                 }
 
@@ -404,6 +407,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
@@ -445,6 +449,7 @@ namespace Vi.UI
                 FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
@@ -463,6 +468,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 
@@ -579,6 +585,7 @@ namespace Vi.UI
 
                 foreach (InputAction action in playerInput.actions)
                 {
+                    if (action.name.Contains("Aim")) { continue; }
                     playerInput.actions.FindAction(action.name).Disable();
                 }
 

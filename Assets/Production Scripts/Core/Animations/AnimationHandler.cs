@@ -560,6 +560,7 @@ namespace Vi.Core
 
             // Retrieve the appropriate ActionClip based on the provided actionStateName
             ActionClip actionClip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(actionClipName);
+            if (!actionClip) { return false; }
 
             CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
             if (!canPlayActionClipResult.canPlay)

@@ -10,6 +10,7 @@ using Unity.Netcode;
 using UnityEngine.Profiling;
 using System.IO;
 using Vi.Core.CombatAgents;
+using Unity.Netcode.Transports.UTP;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -70,13 +71,12 @@ public class DebugOverlay : MonoBehaviour
 
     private void RefreshPing()
     {
-        if (localPlayer)
+        if (networkTransport & NetworkManager.Singleton)
         {
-            pingValue = localPlayer.GetRoundTripTime();
-        }
-        else if (localSpectator)
-        {
-            pingValue = localSpectator.GetRoundTripTime();
+            if (NetworkManager.Singleton.IsConnectedClient)
+            {
+                pingValue = networkTransport.GetCurrentRtt(NetworkManager.ServerClientId);
+            }
         }
         else
         {
@@ -115,26 +115,14 @@ public class DebugOverlay : MonoBehaviour
     private int fpsValue;
     private ulong pingValue;
 
-    private Attributes localPlayer;
-    private Spectator localSpectator;
-    private void FindLocalPlayer()
+    private UnityTransport networkTransport;
+    private void FindNetworkTransport()
     {
-        if (localPlayer)
+        if (networkTransport) { return; }
+        if (NetworkManager.Singleton)
         {
-            if (!localPlayer.gameObject.activeInHierarchy) { localPlayer = null; }
+            networkTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         }
-
-        if (localSpectator)
-        {
-            if (!localSpectator.gameObject.activeInHierarchy) { localSpectator = null; }
-        }
-
-        if (localPlayer) { return; }
-        if (localSpectator) { return; }
-        if (!PlayerDataManager.DoesExist()) { return; }
-        localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
-        NetworkObject specGO = PlayerDataManager.Singleton.GetLocalSpectatorObject().Value;
-        if (specGO) { localSpectator = specGO.GetComponent<Spectator>(); }
     }
 
     private void RefreshStatus()
@@ -215,29 +203,32 @@ public class DebugOverlay : MonoBehaviour
 
         if (pingEnabled)
         {
-            FindLocalPlayer();
+            FindNetworkTransport();
             bool pingTextEvaluated = false;
-            if (localPlayer | localSpectator)
+            if (NetworkManager.Singleton)
             {
-                pingText.text = pingValue.ToString() + "ms";
-                dividerText.text = fpsEnabled ? "|" : "";
-                Color pingTextColor;
-                if (pingValue >= 80)
+                if (NetworkManager.Singleton.IsConnectedClient)
                 {
-                    pingTextColor = Color.red;
+                    pingText.text = pingValue.ToString() + "ms";
+                    dividerText.text = fpsEnabled ? "|" : "";
+                    Color pingTextColor;
+                    if (pingValue >= 80)
+                    {
+                        pingTextColor = Color.red;
+                    }
+                    else if (pingValue >= 50)
+                    {
+                        pingTextColor = Color.yellow;
+                    }
+                    else
+                    {
+                        pingTextColor = Color.green;
+                    }
+                    pingText.color = pingTextColor;
+                    pingTextEvaluated = true;
                 }
-                else if (pingValue >= 50)
-                {
-                    pingTextColor = Color.yellow;
-                }
-                else
-                {
-                    pingTextColor = Color.green;
-                }
-                pingText.color = pingTextColor;
-                pingTextEvaluated = true;
             }
-
+            
             if (!pingTextEvaluated)
             {
                 pingText.text = "";

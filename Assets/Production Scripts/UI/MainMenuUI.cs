@@ -60,6 +60,10 @@ namespace Vi.UI
 
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
+        [SerializeField] private Button playButton;
+        [SerializeField] private GameObject loadingProgressParent;
+        [SerializeField] private Text loadingProgressText;
+        [SerializeField] private Image loadingProgresssBar;
 
         [SerializeField] private Text welcomeUserText;
         [SerializeField] private Image welcomeUserImage;
@@ -94,6 +98,8 @@ namespace Vi.UI
 
             startServerCalled = true;
             AudioListener.volume = 0;
+
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
 
             string serverIP = null;
             if (File.Exists(serverConfig))
@@ -147,6 +153,8 @@ namespace Vi.UI
             if (startServerCalled) { yield break; }
             startServerCalled = true;
             AudioListener.volume = 0;
+
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
 
             var serverConfig = Path.Join(Application.dataPath, "ServerConfig.txt");
 
@@ -230,6 +238,8 @@ namespace Vi.UI
 
         private IEnumerator LaunchAutoClient()
         {
+            yield return new WaitUntil(() => !ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+
             LoginWithVi();
 
             usernameInput.text = automatedClientUsername;
@@ -288,7 +298,6 @@ namespace Vi.UI
             Debug.Log("Logging in with Steam");
             dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.steam);
             openDialogue("Steam");
-            SteamUserAccountData suad;
             SteamAuthentication.Auth((success, error, tokenData, steamuserAccountData, steamusername) =>
             {
                 if (success)
@@ -296,8 +305,8 @@ namespace Vi.UI
                     Debug.Log("Success");
                     updateSteamData(tokenData, steamuserAccountData, steamusername);
 
-              //StartCoroutine(WaitForSteamAuth(tokenData, steamuserAccountData, steamusername));
-          }
+                    //StartCoroutine(WaitForSteamAuth(tokenData, steamuserAccountData, steamusername));
+                }
                 else
                 {
                     Debug.LogError("Steam sign in error - " + error);
@@ -659,11 +668,6 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.DeleteKey("AccountName");
         }
 
-        public void ForgotPassword()
-        {
-            Debug.LogError("Not implemented yet!");
-        }
-
         private FirebaseAuth auth;
 
         private void Start()
@@ -726,9 +730,11 @@ namespace Vi.UI
             initialParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
         }
 
+        private bool isAutomaticallyLoggingIn;
         private IEnumerator AutomaticallyAttemptLogin()
         {
-            yield return new WaitUntil(() => WebRequestManager.Singleton.GameIsUpToDate);
+            isAutomaticallyLoggingIn = true;
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
             {
@@ -765,6 +771,7 @@ namespace Vi.UI
                         break;
                 }
             }
+            isAutomaticallyLoggingIn = false;
         }
 
         private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
@@ -793,7 +800,31 @@ namespace Vi.UI
 
         private void Update()
         {
-            loginMethodText.text = WebRequestManager.Singleton.IsCheckingGameVersion ? "Checking Game Version..." : WebRequestManager.Singleton.IsLoggingIn ? "Logging In..." : "Please Select Login Method";
+            playButton.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            loadingProgressParent.SetActive(ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+            if (loadingProgressParent.activeSelf)
+            {
+                float progress = ObjectPoolingManager.Singleton.GetPooledObjectList().LoadCompletedCount / (float)ObjectPoolingManager.Singleton.GetPooledObjectList().TotalReferenceCount;
+                loadingProgressText.text = "Loading Assets In Background " + (progress * 100).ToString("F0") + "%";
+                loadingProgresssBar.fillAmount = progress;
+            }
+
+            if (WebRequestManager.Singleton.IsCheckingGameVersion)
+            {
+                loginMethodText.text = "Checking Game Version...";
+            }
+            else if (isAutomaticallyLoggingIn)
+            {
+                loginMethodText.text = "Logging In...";
+            }
+            else if (WebRequestManager.Singleton.IsLoggingIn)
+            {
+                loginMethodText.text = "Logging In...";
+            }
+            else
+            {
+                loginMethodText.text = "Please Select Login Method";
+            }
 
             startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
             startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
@@ -819,7 +850,7 @@ namespace Vi.UI
             forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
-                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion;
+                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion & !isAutomaticallyLoggingIn;
             }
 
             if (!initialParent.activeSelf)
@@ -852,6 +883,22 @@ namespace Vi.UI
                 //Change logic here that would handle scenario where the player is host.
                 PlatformRichPresence.instance.UpdatePlatformStatus("Logging to Vi", "Login Menu");
             }
+        }
+
+        public void OpenViDiscord()
+        {
+            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
+        }
+
+        // Used for forgot password button
+        public void EnableGameObject(GameObject target)
+        {
+            target.SetActive(true);
+        }
+
+        public void DisableGameObject(GameObject target)
+        {
+            target.SetActive(false);
         }
     }
 }

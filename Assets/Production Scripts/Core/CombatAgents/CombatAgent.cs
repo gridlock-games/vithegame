@@ -33,7 +33,7 @@ namespace Vi.Core
 
         public virtual void AddSpirit(float amount) { }
 
-        public virtual void AddRage(float amount) { }
+        public virtual void AddRage(float amount, bool clampPositive = true) { }
 
         protected virtual void OnHPChanged(float prev, float current)
         {
@@ -721,6 +721,11 @@ namespace Vi.Core
 
         protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {
+            if (StatusAgent.GetActiveStatuses().Contains(ActionClip.Status.immuneToAilments))
+            {
+                return (false, ActionClip.Ailment.None);
+            }
+
             // Combination ailment logic here
             bool applyAilmentRegardless = false;
             ActionClip.Ailment attackAilment;

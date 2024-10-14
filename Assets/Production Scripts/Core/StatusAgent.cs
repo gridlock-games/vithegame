@@ -57,9 +57,30 @@ namespace Vi.Core
 
         private NetworkList<int> activeStatuses;
 
+        private static readonly List<ActionClip.Status> negativeStatuses = new List<ActionClip.Status>()
+        {
+            ActionClip.Status.burning,
+            ActionClip.Status.damageReceivedMultiplier,
+            ActionClip.Status.drain,
+            ActionClip.Status.movementSpeedDecrease,
+            ActionClip.Status.poisoned,
+            ActionClip.Status.rooted,
+            ActionClip.Status.silenced,
+            ActionClip.Status.spiritIncreaseMultiplier
+        };
+
         public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
         {
             if (!IsServer) { Debug.LogError("Attributes.TryAddStatus() should only be called on the server"); return false; }
+
+            if (negativeStatuses.Contains(status))
+            {
+                if (GetActiveStatuses().Contains(ActionClip.Status.immuneToNegativeStatuses))
+                {
+                    return false;
+                }
+            }
+
             statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay, associatedWithCurrentWeapon));
             return true;
         }
@@ -190,8 +211,8 @@ namespace Vi.Core
             ActiveStatusesWasUpdatedThisFrame = false;
         }
 
-        [SerializeField] private bool useConstantRateForHPDrainStatuses;
-        private const float HPDrainMultiplier = 10;
+        private const bool useConstantRateForHPChangeStatuses = true;
+        private const float HPChangeMultiplier = 10;
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);
@@ -304,7 +325,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -318,7 +339,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -332,7 +353,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPDrainStatuses ? HPDrainMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -422,7 +443,7 @@ namespace Vi.Core
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {
-                        hittableAgent.AddHP(hittableAgent.GetMaxHP() / hittableAgent.GetHP() * 10 * statusPayload.value * Time.deltaTime);
+                        hittableAgent.AddHP((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetMaxHP() / hittableAgent.GetHP() * 10) * statusPayload.value * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
                         if (statusPayload.associatedWithCurrentWeapon)
                         {
@@ -433,6 +454,34 @@ namespace Vi.Core
                     TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToGroundSpells:
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    TryRemoveStatus(statusPayload);
+                    break;
+                case ActionClip.Status.immuneToAilments:
+                    elapsedTime = 0;
+                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    TryRemoveStatus(statusPayload);
+                    break;
+                case ActionClip.Status.immuneToNegativeStatuses:
                     elapsedTime = 0;
                     while (elapsedTime < statusPayload.duration & !stopAllStatuses)
                     {

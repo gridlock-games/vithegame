@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7730581629501221525, guid: ed0da22508f7f5c449639019342ed67e,
@@ -68,6 +69,13 @@ PrefabInstance:
       value: HCFX_Flash_01 Variant
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7730581629501221528, guid: ed0da22508f7f5c449639019342ed67e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5513285281047557367}
   m_SourcePrefab: {fileID: 100100000, guid: ed0da22508f7f5c449639019342ed67e, type: 3}
 --- !u!1 &695936972527590080 stripped
 GameObject:
@@ -88,4 +96,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 67
+  pooledObjectIndex: 84
+  isPrewarmObject: 1

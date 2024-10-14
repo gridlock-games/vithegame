@@ -236,6 +236,9 @@ namespace Vi.Core
             primaryWeaponInstance = Instantiate(PrimaryWeaponOption.weapon);
             secondaryWeaponInstance = Instantiate(SecondaryWeaponOption.weapon);
 
+            combatAgent.SessionProgressionHandler.SyncAbilityCooldowns(primaryWeaponInstance);
+            combatAgent.SessionProgressionHandler.SyncAbilityCooldowns(secondaryWeaponInstance);
+
             if (IsServer & IsSpawned)
             {
                 primaryAmmo.Value = primaryWeaponInstance.ShouldUseAmmo() ? primaryWeaponInstance.GetMaxAmmoCount() : 0;

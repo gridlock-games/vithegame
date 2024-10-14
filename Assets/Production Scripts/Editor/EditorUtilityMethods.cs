@@ -9,13 +9,60 @@ using Vi.ScriptableObjects;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.Utility;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
-        private static string characterReferenceAssetPath = @"Assets\Production\CharacterReference.asset";
-        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
+        [MenuItem("Tools/Production/Organize Addressable Groups")]
+        private static void OrganizeAddressables()
+        {
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+
+            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Assets Production Weapons Mobs Ogres ");
+
+            if (groupToOrganize)
+            {
+                // Organize the duplicate asset isolation group into different groups based on asset path
+                int originalCount = groupToOrganize.entries.Count;
+                foreach (AddressableAssetEntry entry in groupToOrganize.entries.ToArray())
+                {
+                    string[] directories = entry.AssetPath.Split('/');
+                    string targetGroupName = "";
+                    for (int i = 0; i < directories.Length - 1; i++)
+                    {
+                        targetGroupName += directories[i] + " ";
+                    }
+                    targetGroupName.Trim();
+
+                    AddressableAssetGroup groupToModify = settings.FindGroup(item => item.Name == targetGroupName);
+
+                    if (EditorUtility.DisplayCancelableProgressBar("Organizing Addressable Group: " + targetGroupName,
+                            groupToOrganize.entries.Count.ToString() + " assets left - " + entry.TargetAsset.name,
+                            groupToOrganize.entries.Count / (float)originalCount))
+                    { break; }
+
+                    if (!groupToModify)
+                    {
+                        groupToModify = settings.CreateGroup(targetGroupName, false, false, false, groupToOrganize.Schemas.ToList(), groupToOrganize.SchemaTypes.ToArray());
+                    }
+                    settings.MoveEntry(entry, groupToModify);
+                }
+                EditorUtility.ClearProgressBar();
+            }
+
+            // Remove groups with 0 entries in them
+            foreach (AddressableAssetGroup group in settings.groups.ToArray())
+            {
+                List<AddressableAssetEntry> entries = new List<AddressableAssetEntry>();
+                group.GatherAllAssets(entries, true, true, true);
+
+                if (entries.Count == 0) { Debug.Log("Removing group " + group.name); settings.RemoveGroup(group); }
+            }
+        }
 
         [MenuItem("Tools/Production/Perform Build Sanity Check")]
         static void PerformBuildSanityCheck()
@@ -25,9 +72,25 @@ namespace Vi.Editor
             FindMissingNetworkPrefabs();
             FindVFXNotInNetworkPrefabsList();
             SetTextureImportOverrides();
+            GetPooledObjectList().AddUnregisteredPooledObjects();
+            AssetDatabase.SaveAssets();
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
         }
 
+        [MenuItem("Tools/Production/Set Network Prefabs As Dirty")]
+        static void SetNetworkPrefabsAsDirty()
+        {
+            foreach (NetworkPrefabsList networkPrefabList in GetNetworkPrefabsLists())
+            {
+                foreach (NetworkPrefab networkPrefab in networkPrefabList.PrefabList)
+                {
+                    EditorUtility.SetDirty(networkPrefab.Prefab);
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
         static List<NetworkPrefabsList> GetNetworkPrefabsLists()
         {
             List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
@@ -39,9 +102,16 @@ namespace Vi.Editor
             return networkPrefabsLists;
         }
 
+        private static string characterReferenceAssetPath = @"Assets\Production\CharacterReference.asset";
         static CharacterReference GetCharacterReference()
         {
             return AssetDatabase.LoadAssetAtPath<CharacterReference>(characterReferenceAssetPath);
+        }
+
+        private static string pooledObjectListAssetPath = @"Assets\Production\PooledObjectList.asset";
+        static PooledObjectList GetPooledObjectList()
+        {
+            return AssetDatabase.LoadAssetAtPath<PooledObjectList>(pooledObjectListAssetPath);
         }
 
         [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]

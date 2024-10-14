@@ -134,15 +134,41 @@ namespace Vi.Core
             PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.Add(scenePayload);
         }
 
+        private bool spawnCalled;
+        private GameObject debugObject;
         private void SceneHandleLoaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             // If this scene is part of an environment scene payload
-            if (System.Array.Exists(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name) & scenePayload.sceneType == SceneType.Environment))
+            ScenePayload associatedScenePayload = System.Array.Find(scenePayloads, scenePayload => System.Array.Exists(scenePayload.sceneReferences, sceneReference => sceneReference.SceneName == sceneHandle.Result.Scene.name));
+
+            switch (associatedScenePayload.sceneType)
             {
-                if (SceneManager.GetActiveScene() != sceneHandle.Result.Scene)
-                {
-                    SceneManager.SetActiveScene(sceneHandle.Result.Scene);
-                }
+                case SceneType.LocalUI:
+                    DiscordManager.UpdateActivity(null, "At " + associatedScenePayload.name);
+                    break;
+                case SceneType.SynchronizedUI:
+                    DiscordManager.UpdateActivity("In " + associatedScenePayload.name + " (" + PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count + " Players)",
+                        PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()));
+                    break;
+                case SceneType.Gameplay:
+                    if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
+                    {
+                        DiscordManager.UpdateActivity("In " + associatedScenePayload.name, null);
+                    }
+                    else
+                    {
+                        DiscordManager.UpdateActivity("In " + PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()), null);
+                    }
+                    break;
+                case SceneType.Environment:
+                    if (SceneManager.GetActiveScene() != sceneHandle.Result.Scene)
+                    {
+                        SceneManager.SetActiveScene(sceneHandle.Result.Scene);
+                    }
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle scene type " + associatedScenePayload.sceneType);
+                    break;
             }
 
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
@@ -152,6 +178,13 @@ namespace Vi.Core
             {
                 foreach (GameObject g in sceneHandle.Result.Scene.GetRootGameObjects())
                 {
+                    if (g.name.Contains("HordeMode"))
+                    {
+                        spawnCalled = true;
+                        debugObject = g;
+                        Debug.Log("Scene loaded callback occurred");
+                    }
+
                     if (g.TryGetComponent(out NetworkObject networkObject))
                     {
                         if (!networkObject.IsSpawned) { networkObject.Spawn(true); }
@@ -182,6 +215,18 @@ namespace Vi.Core
             ShouldSpawnPlayer = SetShouldSpawnPlayer();
 
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
+        }
+
+        private void Update()
+        {
+            if (spawnCalled)
+            {
+                Debug.Log("Scene loaded callback occurred");
+                if (debugObject)
+                {
+                    Debug.Log(string.Join("-", debugObject.GetComponents<Component>().ToList()));
+                }
+            }
         }
 
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
