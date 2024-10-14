@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5112054213284246400, guid: 5de378093d01f1748a644c9832d30c89,
@@ -87,7 +88,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: axe_charge_dust
       objectReference: {fileID: 0}
+    - target: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5497946010978764110, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5497946011415020573, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7803361781611202622}
+    - targetCorrespondingSourceObject: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6429618310674714973}
+    - targetCorrespondingSourceObject: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7144874766736757649}
+    - targetCorrespondingSourceObject: {fileID: 5112054213284246415, guid: 5de378093d01f1748a644c9832d30c89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2021697578435052322}
   m_SourcePrefab: {fileID: 100100000, guid: 5de378093d01f1748a644c9832d30c89, type: 3}
 --- !u!1 &2116280371860152180 stripped
 GameObject:
@@ -95,27 +130,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 6606538700639939835}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7144874766736757649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2116280371860152180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2732339949
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &-7803361781611202622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +146,7 @@ MonoBehaviour:
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
+  offsetByTargetBodyHeight: 0
   onActivateVFXSpawnNormalizedTime: 0
   raycastOffset: {x: 0, y: 2, z: 3}
   fartherRaycastOffset: {x: 0, y: 4, z: 5}
@@ -140,9 +155,9 @@ MonoBehaviour:
   weaponBone: 18
   audioClipToPlayOnAwake: {fileID: 0}
   awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
   VFXToPlayOnDestroy: []
-  pooledVFXToPlayOnDestroy: []
 --- !u!114 &6429618310674714973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,3 +189,39 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &7144874766736757649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116280371860152180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2732339949
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+--- !u!114 &2021697578435052322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116280371860152180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2586d43dbd95bfb4cbd3b5ff03921b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfObjectsToPool: 5
+  pooledObjectIndex: -1
+  isPrewarmObject: 0

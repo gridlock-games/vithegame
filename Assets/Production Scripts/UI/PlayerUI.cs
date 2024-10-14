@@ -347,8 +347,12 @@ namespace Vi.UI
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
         private CanvasGroup[] canvasGroups;
+
+        private bool canFadeIn;
         private void Start()
         {
+            StartCoroutine(BeginFadeIn());
+
             foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
@@ -370,6 +374,14 @@ namespace Vi.UI
             UpdateTeammateAttributesList();
 
             UpdateWeapon(false);
+        }
+
+        private IEnumerator BeginFadeIn()
+        {
+            yield return new WaitUntil(() => attributes.WeaponHandler.WeaponInitialized);
+            yield return null;
+            yield return null;
+            canFadeIn = true;
         }
 
         private void RefreshStatus()
@@ -693,18 +705,21 @@ namespace Vi.UI
                     gameModeManagerShouldFadeToBlack = GameModeManager.Singleton.ShouldFadeToBlack();
                 }
 
-                if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
+                if (canFadeIn & !SceneLoadingUI.IsDisplaying)
                 {
-                    fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
-                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);
-                }
-                else
-                {
-                    fadeToBlackImage.color = Color.clear;
-                    fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                    if (shouldFadeToBlack | gameModeManagerShouldFadeToBlack)
+                    {
+                        fadeToBlackImage.color = Vector4.MoveTowards(fadeToBlackImage.color, Color.black, Time.deltaTime);
+                        fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.black, Time.deltaTime);
+                    }
+                    else
+                    {
+                        fadeToBlackImage.color = Color.clear;
+                        fadeToWhiteImage.color = Vector4.MoveTowards(fadeToWhiteImage.color, Color.clear, Time.deltaTime);
+                    }
                 }
             }
-            else
+            else // Dead
             {
                 NetworkObject killerNetObj = attributes.GetKiller();
                 CombatAgent killerCombatAgent = null;

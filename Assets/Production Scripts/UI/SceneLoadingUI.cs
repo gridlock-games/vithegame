@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
+using Vi.Isolated;
 
 namespace Vi.UI
 {
@@ -57,52 +58,79 @@ namespace Vi.UI
             mainCamera = Camera.main;
         }
 
+        NetworkCallbackManager networkCallbackManager;
+        private void Start()
+        {
+            networkCallbackManager = FindObjectOfType<NetworkCallbackManager>();
+            if (!networkCallbackManager)
+            {
+                Debug.LogError("Can't find network callback manager");
+            }
+        }
+
         private const float alphaLerpSpeed = 8;
 
         private float lastTextChangeTime;
         private float lastDownloadChangeTime;
         private float lastBytesAmount;
 
-        private bool lastCanvasState;
         private void Update()
         {
             UpdateUI(true);
         }
 
+        public static bool IsDisplaying { get; private set; }
         private void UpdateUI(bool fade)
         {
             FindMainCamera();
 
             string topText = "";
-            if (NetworkManager.Singleton.ShutdownInProgress)
+            if (NetworkManager.Singleton)
             {
-                spawningPlayerObjectParent.SetActive(true);
-                topText = "Network Shutdown In Progress";
-            }
-            else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
-            {
-                spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
-
-                if (PlayerDataManager.DoesExist())
+                if (NetworkManager.Singleton.ShutdownInProgress)
                 {
-                    topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    spawningPlayerObjectParent.SetActive(true);
+                    topText = "Network Shutdown In Progress";
+                }
+                else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
+                {
+                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
+
+                    if (PlayerDataManager.DoesExist())
+                    {
+                        topText = PlayerDataManager.Singleton.IsWaitingForSpawnPoint() ? "Waiting For Good Spawn Point" : "Spawning Player Object";
+                    }
+                    else
+                    {
+                        topText = "Spawning Player Object";
+                    }
+                }
+                else if (NetworkManager.Singleton.IsListening & NetworkManager.Singleton.IsClient)
+                {
+                    spawningPlayerObjectParent.SetActive(true);
+                    topText = "Connecting To Server";
                 }
                 else
                 {
-                    topText = "Spawning Player Object";
+                    spawningPlayerObjectParent.SetActive(false);
                 }
-            }
-            else if (NetworkManager.Singleton.IsListening & NetworkManager.Singleton.IsClient)
-            {
-                spawningPlayerObjectParent.SetActive(true);
-                topText = "Connecting To Server";
             }
             else
             {
                 spawningPlayerObjectParent.SetActive(false);
             }
 
-            progressBarParent.SetActive(NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
+            bool mainMenuLoading = false;
+            if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
+            {
+                mainMenuLoading = true;
+            }
+            else if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+            {
+                mainMenuLoading = true;
+            }
+
+            progressBarParent.SetActive(mainMenuLoading | NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
 
             if (spawningPlayerObjectParent.activeSelf)
             {
@@ -133,14 +161,37 @@ namespace Vi.UI
             canvasGroup.alpha = fade ? Mathf.Lerp(canvasGroup.alpha, alphaTarget, Time.deltaTime * alphaLerpSpeed) : alphaTarget;
 
             scenesLeftText.text = "";
-            if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
+            if (mainMenuLoading)
             {
-                if (NetworkManager.Singleton.ShutdownInProgress)
+                if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
                 {
-                    progressBarText.text = "";
-                    progressBarImage.fillAmount = 0;
+                    progressBarText.text = "Loading Network Manager " + (networkCallbackManager.NetworkManagerLoadingOperation.PercentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = networkCallbackManager.NetworkManagerLoadingOperation.PercentComplete;
+                }
+                else if (!networkCallbackManager.LoadedNetSceneManagerPrefab.IsDone)
+                {
+                    progressBarText.text = "Loading Scene Manager " + (networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = networkCallbackManager.LoadedNetSceneManagerPrefab.PercentComplete;
                 }
                 else
+                {
+                    progressBarText.text = "Cleaning up...";
+                    progressBarImage.fillAmount = 0;
+                }
+            }
+            else if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
+            {
+                bool evaluated = false;
+                if (NetworkManager.Singleton)
+                {
+                    if (NetworkManager.Singleton.ShutdownInProgress)
+                    {
+                        progressBarText.text = "";
+                        progressBarImage.fillAmount = 0;
+                    }
+                }
+
+                if (!evaluated)
                 {
                     progressBarText.text = "Scene Loading Complete";
                     progressBarImage.fillAmount = 1;
@@ -182,8 +233,8 @@ namespace Vi.UI
         private void OnEndUpdateUI()
         {
             canvas.enabled = canvasGroup.alpha > 0.05f;
-            if (canvas.enabled & !lastCanvasState) { backgroundImageSelector.ChangeBackground(); }
-            lastCanvasState = canvas.enabled;
+            if (canvas.enabled & !IsDisplaying) { backgroundImageSelector.ChangeBackground(); }
+            IsDisplaying = canvas.enabled;
         }
     }
 }

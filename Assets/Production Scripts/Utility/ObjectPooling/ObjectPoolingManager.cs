@@ -45,11 +45,11 @@ namespace Vi.Utility
             StartCoroutine(LoadAssets());
         }
 
-        public static bool canPool;
+        public static bool CanPool { get; set; }
 
         private IEnumerator LoadAssets()
         {
-            yield return new WaitUntil(() => canPool);
+            yield return new WaitUntil(() => CanPool);
             yield return new WaitUntil(() => SceneManager.GetSceneByName(instantiationSceneName).isLoaded);
             StartCoroutine(pooledObjectListInstance.LoadAssets());
         }
@@ -58,6 +58,7 @@ namespace Vi.Utility
         {
             if (pooledObject.TryGetComponent(out NetworkObject networkObject))
             {
+                NetworkManager.Singleton.AddNetworkPrefab(networkObject.gameObject);
                 NetworkManager.Singleton.PrefabHandler.AddHandler(networkObject, new PooledPrefabInstanceHandler(pooledObject));
             }
         }

@@ -22,7 +22,7 @@ namespace Vi.Editor
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
-            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Assets Production Weapons Mobs Ogres ");
+            AddressableAssetGroup groupToOrganize = settings.FindGroup(item => item.Name == "Duplicate Asset Isolation");
 
             if (groupToOrganize)
             {
@@ -67,14 +67,77 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Perform Build Sanity Check")]
         static void PerformBuildSanityCheck()
         {
+            SetTextureImportOverrides();
             GenerateDroppedWeaponVariants();
             RemoveComponentsFromWeaponPreviews();
-            FindMissingNetworkPrefabs();
-            FindVFXNotInNetworkPrefabsList();
-            SetTextureImportOverrides();
-            GetPooledObjectList().AddUnregisteredPooledObjects();
+            SetActionVFXLayers();
+            AddUnregisteredPooledObjects();
+            ValidateNetworkPrefabsLists();
             AssetDatabase.SaveAssets();
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
+        }
+
+        [MenuItem("Tools/Production/Add Unregistered Pooled Objects")]
+        static void AddUnregisteredPooledObjects()
+        {
+            List<ActionClip> actionClips = new List<ActionClip>();
+            string actionClipFolder = @"Assets/Production/Actions";
+            foreach (string actionClipFilePath in Directory.GetFiles(actionClipFolder, "*.asset", SearchOption.AllDirectories))
+            {
+                ActionClip actionClip = AssetDatabase.LoadAssetAtPath<ActionClip>(actionClipFilePath);
+                if (actionClip) { actionClips.Add(actionClip); }
+            }
+
+            int counter = 0;
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
+            foreach (string prefabFilePath in files)
+            {
+                counter++;
+                if (EditorUtility.DisplayCancelableProgressBar("Adding Unregistered Pooled Objects", counter + " out of " + files.Count, counter / (float)files.Count)) { break; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+                if (prefab)
+                {
+                    if (prefab.name == "MobBase") { continue; }
+                    if (prefab.TryGetComponent(out PooledObject pooledObject))
+                    {
+                        if (prefab.TryGetComponent(out NetworkObject networkObject))
+                        {
+                            if (prefab.TryGetComponent(out ActionVFX actionVFX))
+                            {
+                                bool vfxReferencedInActionClip = false;
+                                foreach (ActionClip actionClip in actionClips)
+                                {
+                                    if (actionClip.actionVFXList.Contains(actionVFX))
+                                    {
+                                        vfxReferencedInActionClip = true;
+                                        break;
+                                    }
+                                }
+
+                                if (vfxReferencedInActionClip)
+                                {
+                                    GetPooledObjectList().TryAddPooledObject(pooledObject);
+                                }
+                            }
+                            else
+                            {
+                                GetPooledObjectList().TryAddPooledObject(pooledObject);
+                            }
+                        }
+                        else // No Network Object
+                        {
+                            GetPooledObjectList().TryAddPooledObject(pooledObject);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Problem loading prefab at path " + prefabFilePath);
+                }
+            }
+            EditorUtility.ClearProgressBar();
         }
 
         [MenuItem("Tools/Production/Set Network Prefabs As Dirty")]
@@ -142,7 +205,13 @@ namespace Vi.Editor
             int counter = 0;
             foreach (var weaponOption in weaponOptions)
             {
-                EditorUtility.DisplayProgressBar("Creating dropped weapon variants", weaponOption.weapon.name + " | " + counter.ToString() + " out of " + weaponOptions.Count, counter / (float)weaponOptions.Count);
+                if (EditorUtility.DisplayCancelableProgressBar("Creating dropped weapon variants",
+                    weaponOption.weapon.name + " | " + counter.ToString() + " out of " + weaponOptions.Count,
+                    counter / (float)weaponOptions.Count))
+                {
+                    break;
+                }
+
                 foreach (var weaponModelData in weaponOption.weapon.GetWeaponModelData())
                 {
                     foreach (var data in weaponModelData.data)
@@ -165,8 +234,18 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Remove Components From Weapon Previews")]
         static void RemoveComponentsFromWeaponPreviews()
         {
+            int index = 0;
             foreach (var weaponOption in GetCharacterReference().GetWeaponOptions())
             {
+                index++;
+                if (EditorUtility.DisplayCancelableProgressBar("Removing components from weapon previews",
+                    weaponOption.weapon.ToString(),
+                    index / (float)GetCharacterReference().GetWeaponOptions().Length))
+                {
+                    break;
+                }
+
+                bool componentDestroyed = false;
                 foreach (Component component in weaponOption.weaponPreviewPrefab.GetComponentsInChildren<Component>())
                 {
                     if (component is not Transform
@@ -176,10 +255,13 @@ namespace Vi.Editor
                     {
                         Debug.Log("Destroying " + component + " from weapon preview prefab " + weaponOption.weaponPreviewPrefab);
                         DestroyImmediate(component, true);
+                        componentDestroyed = true;
                     }
                 }
-                EditorUtility.SetDirty(weaponOption.weaponPreviewPrefab);
+
+                if (componentDestroyed) { EditorUtility.SetDirty(weaponOption.weaponPreviewPrefab); }
             }
+            EditorUtility.ClearProgressBar();
         }
 
         [MenuItem("Tools/Production/Generate Exploded Meshes")]
@@ -247,8 +329,8 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Production/Find Missing Network Prefabs")]
-        static void FindMissingNetworkPrefabs()
+        [MenuItem("Tools/Production/Validate Network Prefabs Lists")]
+        static void ValidateNetworkPrefabsLists()
         {
             string baseFolder = @"Assets\Production\Prefabs";
             string[] files = Directory.GetFiles(baseFolder, "*.prefab", SearchOption.AllDirectories);
@@ -256,9 +338,13 @@ namespace Vi.Editor
             foreach (string prefabFilePath in files)
             {
                 counter++;
-                EditorUtility.DisplayProgressBar("Looking for missing network prefabs (not VFX)", counter.ToString() + " out of " + files.Length.ToString(), counter / (float)files.Length);
+                if (EditorUtility.DisplayCancelableProgressBar("Looking for missing network prefabs (not VFX)",
+                    counter.ToString() + " out of " + files.Length.ToString(),
+                    counter / (float)files.Length))
+                {
+                    break;
+                }
 
-                if (prefabFilePath.Contains("VFX")) { continue; }
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (prefab)
                 {
@@ -274,25 +360,26 @@ namespace Vi.Editor
                             }
                         }
 
-                        if (!contains) { Debug.LogError("MISSING NETWORK PREFAB AT PATH - " + prefabFilePath); }
+                        if (prefab.TryGetComponent(out PooledObject pooledObject))
+                        {
+                            if (contains)
+                            {
+                                Debug.LogError("POOLED NETWORK PREFAB AT PATH (should be removed) - " + prefabFilePath);
+                            }
+                        }
+                        else if (!contains)
+                        {
+                            Debug.LogError("MISSING NETWORK PREFAB AT PATH (should be added) - " + prefabFilePath);
+                        }
                     }
                 }
             }
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Find VFX Not In Network Prefabs List")]
-        static void FindVFXNotInNetworkPrefabsList()
+        [MenuItem("Tools/Production/Set Action VFX Layers")]
+        static void SetActionVFXLayers()
         {
-            List<ActionClip> actionClips = new List<ActionClip>();
-
-            string actionClipFolder = @"Assets/Production/Actions";
-            foreach (string actionClipFilePath in Directory.GetFiles(actionClipFolder, "*.asset", SearchOption.AllDirectories))
-            {
-                ActionClip actionClip = AssetDatabase.LoadAssetAtPath<ActionClip>(actionClipFilePath);
-                if (actionClip) { actionClips.Add(actionClip); }
-            }
-
             List<string> files = new List<string>();
             string VFXFolder = @"Assets\Production\Prefabs\VFX";
             files.AddRange(Directory.GetFiles(VFXFolder, "*.prefab", SearchOption.AllDirectories));
@@ -304,7 +391,12 @@ namespace Vi.Editor
             foreach (string prefabFilePath in files)
             {
                 counter++;
-                EditorUtility.DisplayProgressBar("Looking for missing VFX network prefabs", counter.ToString() + " out of " + files.Count.ToString(), counter / (float)files.Count);
+                if (EditorUtility.DisplayCancelableProgressBar("Setting Action VFX Layers",
+                    counter.ToString() + " out of " + files.Count.ToString(),
+                    counter / (float)files.Count))
+                {
+                    break;
+                }
 
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (prefab)
@@ -312,34 +404,6 @@ namespace Vi.Editor
                     if (prefab.TryGetComponent(out ActionVFX actionVFX))
                     {
                         actionVFX.SetLayers();
-
-                        bool vfxReferencedInActionClip = false;
-                        foreach (ActionClip actionClip in actionClips)
-                        {
-                            if (actionClip.actionVFXList.Contains(actionVFX))
-                            {
-                                vfxReferencedInActionClip = true;
-                                break;
-                            }
-                        }
-
-                        if (vfxReferencedInActionClip)
-                        {
-                            bool contains = false;
-                            foreach (NetworkPrefabsList networkPrefabsList in GetNetworkPrefabsLists())
-                            {
-                                if (networkPrefabsList.Contains(prefab))
-                                {
-                                    contains = true;
-                                    break;
-                                }
-                            }
-
-                            if (!contains)
-                            {
-                                Debug.LogError("MISSING VFX NETWORK PREFAB AT PATH - " + prefabFilePath);
-                            }
-                        }
                     }
                 }
                 else
@@ -356,9 +420,12 @@ namespace Vi.Editor
             string[] videoClips = AssetDatabase.FindAssets("t:VideoClip");
             for (int i = 0; i < videoClips.Length; i++)
             {
-                EditorUtility.DisplayProgressBar("Overriding video clips For Android",
+                if (EditorUtility.DisplayCancelableProgressBar("Overriding video clips For Android",
                     i.ToString() + " out of " + videoClips.Length.ToString() + " video clips completed",
-                    i / videoClips.Length);
+                    i / videoClips.Length))
+                {
+                    break;
+                }
 
                 string assetPath = AssetDatabase.GUIDToAssetPath(videoClips[i]);
                 if (assetPath.Contains("com.unity.")) { continue; }

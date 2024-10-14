@@ -580,6 +580,7 @@ GameObject:
   - component: {fileID: 1614372834745367549}
   - component: {fileID: 645840669137208754}
   - component: {fileID: 2061240302701082911}
+  - component: {fileID: 1262039763665118248}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -671,6 +672,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1262039763665118248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2633570054910499003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 074948244ca7b024a8f5ca68ad1a20d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2645457817358326444
 GameObject:
   m_ObjectHideFlags: 0
@@ -3767,6 +3780,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2109656416002388522, guid: f4765ff7f7167214f86b02cb1995750e,
+        type: 3}
+      propertyPath: m_Value
+      value: 0.6104296
+      objectReference: {fileID: 0}
     - target: {fileID: 2142642927647262916, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -4136,6 +4154,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6655096586461811236, guid: f4765ff7f7167214f86b02cb1995750e,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 349.46448
       objectReference: {fileID: 0}
     - target: {fileID: 7583172408512459165, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}

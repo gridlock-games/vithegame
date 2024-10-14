@@ -47,11 +47,12 @@ namespace Vi.Player
         }
 
         private NetworkObject networkObject;
-
+        private Camera playerCamera;
         private void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
             networkObject = GetComponent<NetworkObject>();
+            playerCamera = GetComponentInChildren<Camera>();
         }
 
         private void OnEnable()

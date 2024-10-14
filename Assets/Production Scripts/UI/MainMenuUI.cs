@@ -804,9 +804,32 @@ namespace Vi.UI
             loadingProgressParent.SetActive(ObjectPoolingManager.Singleton.IsLoadingOrPooling);
             if (loadingProgressParent.activeSelf)
             {
-                float progress = ObjectPoolingManager.Singleton.GetPooledObjectList().LoadCompletedCount / (float)ObjectPoolingManager.Singleton.GetPooledObjectList().TotalReferenceCount;
-                loadingProgressText.text = "Loading Assets In Background " + (progress * 100).ToString("F0") + "%";
-                loadingProgresssBar.fillAmount = progress;
+                if (!PlayerDataManager.CharacterReferenceHandle.IsValid())
+                {
+                    loadingProgressText.text = "Loading Player Data Manager...";
+                    loadingProgresssBar.fillAmount = 0;
+                }
+                else if (!PlayerDataManager.CharacterReferenceHandle.IsDone)
+                {
+                    loadingProgressText.text = "Loading Character Equipment " + (PlayerDataManager.CharacterReferenceHandle.PercentComplete * 100).ToString("F0") + "%";
+                    loadingProgresssBar.fillAmount = PlayerDataManager.CharacterReferenceHandle.PercentComplete;
+                }
+                else if (!PlayerDataManager.ControlsImageMappingHandle.IsValid())
+                {
+                    loadingProgressText.text = "Loading Controls Image Mapping...";
+                    loadingProgresssBar.fillAmount = 0;
+                }
+                else if (!PlayerDataManager.ControlsImageMappingHandle.IsDone)
+                {
+                    loadingProgressText.text = "Loading Controls Image Mapping " + (PlayerDataManager.ControlsImageMappingHandle.PercentComplete * 100).ToString("F0") + "%";
+                    loadingProgresssBar.fillAmount = PlayerDataManager.ControlsImageMappingHandle.PercentComplete;
+                }
+                else
+                {
+                    float progress = ObjectPoolingManager.Singleton.GetPooledObjectList().LoadCompletedCount / (float)ObjectPoolingManager.Singleton.GetPooledObjectList().TotalReferenceCount;
+                    loadingProgressText.text = "Loading Rest Of Assets " + (progress * 100).ToString("F0") + "%";
+                    loadingProgresssBar.fillAmount = progress;
+                }
             }
 
             if (WebRequestManager.Singleton.IsCheckingGameVersion)

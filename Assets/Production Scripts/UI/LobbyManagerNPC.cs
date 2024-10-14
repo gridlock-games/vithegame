@@ -69,7 +69,11 @@ namespace Vi.UI
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UI.gameObject.SetActive(false);
             networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+
+            currentLobbyCount = LobbyServers.Length;
         }
+
+        private WebRequestManager.Server[] LobbyServers { get { return System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address); } }
 
         private const float scalingSpeed = 8;
         private const float rotationSpeed = 15;
@@ -88,6 +92,11 @@ namespace Vi.UI
             mainCamera = Camera.main;
         }
 
+        private int currentLobbyCount;
+        private float lastLobbyCreationTime = Mathf.NegativeInfinity;
+
+        private List<string> currentlyDeletingServers = new List<string>();
+
         private void Update()
         {
             FindMainCamera();
@@ -101,29 +110,30 @@ namespace Vi.UI
 
             if (IsServer)
             {
-                if (!creatingNewLobby & !WebRequestManager.Singleton.IsDeletingServer)
-                {
-                    WebRequestManager.Server[] emptyServers = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address & item.population == 0);
+                currentlyDeletingServers.RemoveAll(item => !System.Array.Exists(LobbyServers, server => server._id == item));
 
-                    if (emptyServers.Length > emptyLobbyServersRequired)
-                    {
-                        Debug.Log("Deleting server with id " + emptyServers[0]._id.ToString());
-                        WebRequestManager.Singleton.DeleteServer(emptyServers[0]._id.ToString());
-                    }
-                    else if (emptyServers.Length < emptyLobbyServersRequired)
-                    {
-                        StartCoroutine(CreateNewLobby());
-                    }
+                WebRequestManager.Server[] emptyServers = System.Array.FindAll(LobbyServers, item => item.population == 0 & !currentlyDeletingServers.Contains(item._id));
+                WebRequestManager.Server[] notEmptyServers = System.Array.FindAll(LobbyServers, item => item.population != 0 & !currentlyDeletingServers.Contains(item._id));
+
+                if (emptyServers.Length > emptyLobbyServersRequired)
+                {
+                    Debug.Log("Deleting server with id " + emptyServers[0]._id + " prev count: " + currentLobbyCount);
+                    WebRequestManager.Singleton.DeleteServer(emptyServers[0]._id);
+                    currentlyDeletingServers.Add(emptyServers[0]._id);
+                    currentLobbyCount--;
+                }
+                else if (currentLobbyCount - notEmptyServers.Length < emptyLobbyServersRequired & Time.time - lastLobbyCreationTime > 5)
+                {
+                    Debug.Log("Creating new lobby - prev count: " + currentLobbyCount);
+                    CreateNewLobby();
+                    currentLobbyCount++;
+                    lastLobbyCreationTime = Time.time;
                 }
             }
         }
 
-        private bool creatingNewLobby;
-
-        private IEnumerator CreateNewLobby()
+        private void CreateNewLobby()
         {
-            creatingNewLobby = true;
-
             int originalServerCount = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length;
 
             string path = "";
@@ -147,21 +157,6 @@ namespace Vi.UI
             }
 
             System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
-            Debug.Log("Waiting for server count change: " + originalServerCount);
-            yield return new WaitUntil(() => System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length != originalServerCount);
-            Debug.Log("Prev server count: " + originalServerCount + " Current server count: " + System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length);
-
-            creatingNewLobby = false;
-        }
-
-        public void HandlePlatformAPI()
-        {
-            //Rich presence
-            if (PlatformRichPresence.instance != null)
-            {
-                //Change logic here that would handle scenario where the player is host.
-                PlatformRichPresence.instance.UpdatePlatformStatus($"At Lobby");
-            }
         }
     }
 }
