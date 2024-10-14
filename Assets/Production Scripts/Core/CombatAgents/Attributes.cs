@@ -498,7 +498,7 @@ namespace Vi.Core.CombatAgents
             if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
-            float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
+            float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
