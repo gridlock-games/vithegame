@@ -1508,7 +1508,7 @@ namespace Vi.Core
             spawnPlayerRunning = false;
         }
 
-        [HideInInspector] public bool wasDisconnectedByClient;
+        public bool WasDisconnectedByClient { get; set; }
 
         [SerializeField] private GameObject alertBoxPrefab;
         private void OnClientDisconnectCallback(ulong clientId)
@@ -1521,7 +1521,7 @@ namespace Vi.Core
             }
             if (IsClient)
             {
-                if (!wasDisconnectedByClient)
+                if (!WasDisconnectedByClient)
                 {
                     // This object gets despawned, so make sure to not start this on a networkobject
                     PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());

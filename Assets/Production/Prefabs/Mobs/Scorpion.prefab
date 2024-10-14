@@ -2128,7 +2128,7 @@ PrefabInstance:
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: maxHP
-      value: 70
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -2150,7 +2150,7 @@ PrefabInstance:
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2610528644
+      value: 4081866038
       objectReference: {fileID: 0}
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -2229,6 +2229,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: targetingType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: ability1Distance
       value: 4
       objectReference: {fileID: 0}
@@ -2251,6 +2256,11 @@ PrefabInstance:
         type: 3}
       propertyPath: navMeshAgentTypeName
       value: Medium Monster
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
+      propertyPath: targetingSwitchDistance
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}

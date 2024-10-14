@@ -761,6 +761,8 @@ namespace Vi.UI
 
         public void ReturnToMainMenu()
         {
+            if (NetworkManager.Singleton.IsListening) { return; }
+            returnButton.interactable = false;
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }

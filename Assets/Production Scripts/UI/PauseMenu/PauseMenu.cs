@@ -82,7 +82,7 @@ namespace Vi.UI
             returnToCharSelectButton.interactable = false;
             if (NetworkManager.Singleton.IsListening)
             {
-                PlayerDataManager.Singleton.wasDisconnectedByClient = true;
+                PlayerDataManager.Singleton.WasDisconnectedByClient = true;
                 NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }

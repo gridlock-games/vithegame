@@ -596,7 +596,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78da3fcd2563f9f429d1666053688ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particle: {fileID: 1035310795}
+  clickParticle: {fileID: 1035310795}
 --- !u!20 &494376425 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 533234322584259637, guid: 030cc18a9d9cba14184b6346d3165263,
@@ -1279,7 +1279,7 @@ GameObject:
   - component: {fileID: 1035310795}
   - component: {fileID: 1035310796}
   m_Layer: 12
-  m_Name: Particle System
+  m_Name: Click Particle Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

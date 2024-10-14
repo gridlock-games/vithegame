@@ -445,7 +445,18 @@ namespace Vi.Core.CombatAgents
                 if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
                 if (attacker != GetGrabAssailant()) { return false; }
             }
-            if (AnimationHandler.IsGrabAttacking()) { return false; }
+            
+            // If we hit someone and we are already grabbing but the person we're hitting isn't the attacker's grab victim
+            if (attacker.IsGrabbing)
+            {
+                CombatAgent grabVictim = attacker.GetGrabVictim();
+                if (grabVictim)
+                {
+                    if (grabVictim != this) { return false; }
+                }
+            }
+
+            if (IsGrabbing) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed
             if (attack.GetClipType() == ActionClip.ClipType.GrabAttack)
@@ -487,7 +498,7 @@ namespace Vi.Core.CombatAgents
             if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
-            float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
+            float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value);
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
