@@ -7,9 +7,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using UnityEngine.SceneManagement;
 using Vi.Core.CombatAgents;
-using System.Linq;
 using Unity.Netcode;
-using Vi.Player;
 
 namespace Vi.UI
 {
@@ -52,6 +50,10 @@ namespace Vi.UI
             {
                 StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
                 statusIcon.InitializeStatusIcon(status);
+                foreach (Transform child in statusIcon.GetComponentsInChildren<Transform>(true))
+                {
+                    child.gameObject.layer = gameObject.layer;
+                }
                 statusIcons.Add(statusIcon);
             }
 
