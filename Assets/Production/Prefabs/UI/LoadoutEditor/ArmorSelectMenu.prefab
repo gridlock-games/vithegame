@@ -709,6 +709,7 @@ GameObject:
   - component: {fileID: 6699076663248479905}
   - component: {fileID: 7887777159255932402}
   - component: {fileID: 2162864202067643293}
+  - component: {fileID: 6491560704294764391}
   m_Layer: 5
   m_Name: ArmorSelectMenu
   m_TagString: Untagged
@@ -816,6 +817,18 @@ MonoBehaviour:
   loadoutOptionPrefab: {fileID: 6272170253680808268, guid: 5e38bbcf4af81ff4b8d1a5a45b0909c0,
     type: 3}
   characterPreviewCamera: {fileID: 2205301470611026496}
+--- !u!114 &6491560704294764391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3608971393818348533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 074948244ca7b024a8f5ca68ad1a20d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4153170736469934598
 GameObject:
   m_ObjectHideFlags: 0
