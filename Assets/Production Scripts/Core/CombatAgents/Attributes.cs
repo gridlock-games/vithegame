@@ -445,7 +445,18 @@ namespace Vi.Core.CombatAgents
                 if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
                 if (attacker != GetGrabAssailant()) { return false; }
             }
-            if (AnimationHandler.IsGrabAttacking()) { return false; }
+            
+            // If we hit someone and we are already grabbing but the person we're hitting isn't the attacker's grab victim
+            if (attacker.IsGrabbing)
+            {
+                CombatAgent grabVictim = attacker.GetGrabVictim();
+                if (grabVictim)
+                {
+                    if (grabVictim != this) { return false; }
+                }
+            }
+
+            if (IsGrabbing) { return false; }
 
             // Don't let grab attack hit players that aren't grabbed
             if (attack.GetClipType() == ActionClip.ClipType.GrabAttack)
