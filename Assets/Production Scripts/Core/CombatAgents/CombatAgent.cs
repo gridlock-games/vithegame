@@ -94,6 +94,14 @@ namespace Vi.Core
             PlayerDataManager.Singleton.AddCombatAgent(this);
 
             isRaging.OnValueChanged += OnIsRagingChanged;
+
+            if (IsClient) { StartCoroutine(WaitForAnimator()); }
+        }
+
+        private IEnumerator WaitForAnimator()
+        {
+            yield return new WaitUntil(() => AnimationHandler.Animator);
+            OnAilmentChanged(ActionClip.Ailment.None, ailment.Value);
         }
 
         public override void OnNetworkDespawn()

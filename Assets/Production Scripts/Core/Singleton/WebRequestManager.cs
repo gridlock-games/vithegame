@@ -1023,15 +1023,9 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            List<Coroutine> loadoutCoroutines = new List<Coroutine>();
             foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
             {
-                loadoutCoroutines.Add(StartCoroutine(UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout.Copy())));
-            }
-
-            foreach (Coroutine coroutine in loadoutCoroutines)
-            {
-                yield return coroutine;
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
             }
 
             yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
