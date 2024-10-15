@@ -77,7 +77,6 @@ namespace Vi.Core.VFX
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            bool displayingEnemyColors = false;
             CombatAgent attacker = GetAttacker();
             if (attacker)
             {
@@ -89,18 +88,9 @@ namespace Vi.Core.VFX
                         {
                             var main = teamColorParticleSystems[i].main;
                             main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
-                            displayingEnemyColors = true;
+                            //teamColorParticleSystems[i].Play(false);
                         }
                     }
-                }
-            }
-
-            if (!displayingEnemyColors)
-            {
-                for (int i = 0; i < teamColorParticleSystems.Length; i++)
-                {
-                    var main = teamColorParticleSystems[i].main;
-                    main.startColor = originalColors[i];
                 }
             }
         }
@@ -121,6 +111,12 @@ namespace Vi.Core.VFX
             attacker = null;
             attack = null;
             if (IsServer) { attackerNetworkObjectId.Value = default; }
+
+            for (int i = 0; i < teamColorParticleSystems.Length; i++)
+            {
+                var main = teamColorParticleSystems[i].main;
+                main.startColor = originalColors[i];
+            }
         }
 
         protected virtual bool OnHit(CombatAgent attacker)
