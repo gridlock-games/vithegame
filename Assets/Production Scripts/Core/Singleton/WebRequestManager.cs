@@ -1017,6 +1017,8 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
             }
 
+            if (postRequest.downloadHandler.text == "false") { yield break; }
+
             character._id = postRequest.downloadHandler.text;
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
