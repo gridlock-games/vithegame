@@ -234,11 +234,31 @@ namespace Vi.Core
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
+                foreach (var kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                        {
+                            smr.enabled = false;
+                        }
+                    }
+                }
             }
             yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
+                foreach (var kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                        {
+                            smr.enabled = true;
+                        }
+                    }
+                }
             }
         }
 
