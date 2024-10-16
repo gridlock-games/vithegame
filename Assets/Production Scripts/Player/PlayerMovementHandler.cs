@@ -405,6 +405,7 @@ namespace Vi.Player
                     }
                     else
                     {
+                        if (IsOwner) { lastServerReconciliationTime = Time.time; }
                         movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
                     }
                     lastEvaluatedServerRootMotionTick = latestServerState.Value.tick;
@@ -544,7 +545,7 @@ namespace Vi.Player
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if ((Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming()))
+            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
                 float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
                 if (dist > serverReconciliationTeleportThreshold)
