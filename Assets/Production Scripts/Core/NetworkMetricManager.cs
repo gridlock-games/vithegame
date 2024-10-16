@@ -23,13 +23,20 @@ namespace Vi.Core
             if (IsServer)
             {
                 // Server broadcasts to all clients when a new client connects (just for example purposes)
-                NetworkManager.NetworkTickSystem.Tick += Tick;
+                StartCoroutine(SendPacket());
             }
         }
 
-        private void Tick()
+        private int localPacketID;
+        private IEnumerator SendPacket()
         {
-            SendMessage(NetworkManager.NetworkTickSystem.LocalTime.Tick % 128);
+            while (true)
+            {
+                SendMessage(localPacketID);
+                yield return new WaitForSeconds(1);
+                localPacketID++;
+                if (localPacketID == 128) { localPacketID = 0; }
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -37,12 +44,12 @@ namespace Vi.Core
             // De-register when the associated NetworkObject is despawned.
             NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(MessageName);
 
-            if (IsServer)
-            {
-                NetworkManager.NetworkTickSystem.Tick -= Tick;
-            }
+            PacketLoss = 0;
         }
 
+        public static float PacketLoss { get; private set; }
+
+        private bool firstPacketRecieved = true;
         /// <summary>
         /// Invoked when a custom message of type <see cref="MessageName"/>
         /// </summary>
@@ -57,8 +64,30 @@ namespace Vi.Core
             else
             {
                 Debug.Log($"Client received message ({receivedMessageContent.Value}) from the server.");
+
+                if (firstPacketRecieved)
+                {
+                    for (int i = 0; i < receivedMessageContent.Value; i++)
+                    {
+                        packetIDsRecieved.Add(i);
+                    }
+                    firstPacketRecieved = false;
+                }
+
+                if (receivedMessageContent.Value < localPacketID)
+                {
+                    localPacketID = 0;
+                    packetIDsRecieved.Clear();
+                }
+                packetIDsRecieved.Add(receivedMessageContent.Value);
+                localPacketID = receivedMessageContent.Value;
+
+                PacketLoss = 1 - (receivedMessageContent.Value == 0 ? 1 : ((packetIDsRecieved.Count - 1) / (float)receivedMessageContent.Value));
+                Debug.Log(packetIDsRecieved.Count - 1 + " " + receivedMessageContent.Value + " " + PacketLoss);
             }
         }
+
+        private List<int> packetIDsRecieved = new List<int>();
 
         /// <summary>
         /// Invoke this with a Guid by a client or server-host to send a
@@ -76,13 +105,13 @@ namespace Vi.Core
                 {
                     // This is a server-only method that will broadcast the named message.
                     // Caution: Invoking this method on a client will throw an exception!
-                    customMessagingManager.SendNamedMessageToAll(MessageName, writer, NetworkDelivery.Unreliable);
+                    customMessagingManager.SendNamedMessageToAll(MessageName, writer, NetworkDelivery.UnreliableSequenced);
                 }
                 else
                 {
                     // This is a client or server method that sends a named message to one target destination
                     // (client to server or server to client)
-                    customMessagingManager.SendNamedMessage(MessageName, NetworkManager.ServerClientId, writer, NetworkDelivery.Unreliable);
+                    customMessagingManager.SendNamedMessage(MessageName, NetworkManager.ServerClientId, writer, NetworkDelivery.UnreliableSequenced);
                 }
             }
         }
