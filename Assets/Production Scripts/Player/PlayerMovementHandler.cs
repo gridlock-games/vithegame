@@ -530,7 +530,7 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationLerpDuration = 1;
-        private const float serverReconciliationTeleportThreshold = 2;
+        private const float serverReconciliationTeleportThreshold = 0.5f;
         private const float serverReconciliationLerpSpeed = 8;
 
         private void UpdateTransform()
@@ -628,6 +628,7 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
+                Debug.Log(latestServerState.Value.tick + " " + networkListEvent.Value.tick);
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
             else
