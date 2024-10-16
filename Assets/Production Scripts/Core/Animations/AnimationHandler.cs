@@ -523,20 +523,17 @@ namespace Vi.Core
                 if (actionClip.GetClipType() == ActionClip.ClipType.Ability | actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
                     if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName)) { return default; }
-                    if (NetworkObject.IsPlayerObject)
+                    if (!actionClip.canCancelLightAttacks)
                     {
-                        if (!actionClip.canCancelLightAttacks)
-                        {
-                            if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return default; }
-                        }
-                        if (!actionClip.canCancelHeavyAttacks)
-                        {
-                            if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack) { return default; }
-                        }
-                        if (!actionClip.canCancelAbilities)
-                        {
-                            if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return default; }
-                        }
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.LightAttack) { return default; }
+                    }
+                    if (!actionClip.canCancelHeavyAttacks)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HeavyAttack) { return default; }
+                    }
+                    if (!actionClip.canCancelAbilities)
+                    {
+                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Ability) { return default; }
                     }
                 }
                 else if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
@@ -545,21 +542,14 @@ namespace Vi.Core
                 }
 
                 // If the last clip was a clip that can't be cancelled, don't play this clip
-                if (NetworkObject.IsPlayerObject)
+                if (clipTypesToCheckForCancellation.Contains(actionClip.GetClipType()) & !combatAgent.WeaponHandler.IsInRecovery & clipTypesToCheckForCancellation.Contains(lastClipPlayed.GetClipType()))
                 {
-                    if (clipTypesToCheckForCancellation.Contains(actionClip.GetClipType()) & !combatAgent.WeaponHandler.IsInRecovery & clipTypesToCheckForCancellation.Contains(lastClipPlayed.GetClipType()))
+                    if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
+                    & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
                     {
-                        if (!(actionClip.GetClipType() == ActionClip.ClipType.LightAttack & lastClipPlayed.canBeCancelledByLightAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
-                        & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
-                        {
-                            return default;
-                        }
+                        if (NetworkObject.IsPlayerObject) { return default; }
                     }
-                }
-                else
-                {
-                    return default;
                 }
             }
 

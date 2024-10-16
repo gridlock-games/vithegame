@@ -88,7 +88,8 @@ namespace Vi.Core.VFX
                         {
                             var main = teamColorParticleSystems[i].main;
                             main.startColor = PlayerDataManager.Singleton.GetRelativeTeamColor(GetAttacker().GetTeam());
-                            //teamColorParticleSystems[i].Play(false);
+                            teamColorParticleSystems[i].Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                            teamColorParticleSystems[i].Play(false);
                         }
                     }
                 }
