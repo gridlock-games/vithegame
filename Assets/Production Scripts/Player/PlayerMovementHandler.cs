@@ -179,6 +179,7 @@ namespace Vi.Player
             }
         }
 
+        private Vector2 lastMoveInputProcessedOnServer;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -194,11 +195,16 @@ namespace Vi.Player
 
             if (!IsClient)
             {
-                if (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+                while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
+                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero & !latestServerState.Value.usedRootMotion & !combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
+
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
+
+                    lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                    break;
                 }
             }
 
