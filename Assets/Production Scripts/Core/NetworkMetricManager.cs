@@ -9,8 +9,7 @@ namespace Vi.Core
 {
     public class NetworkMetricManager : NetworkBehaviour
     {
-        [Tooltip("The name identifier used for this custom message handler.")]
-        public string MessageName = "MyCustomNamedMessage";
+        private const string MessageName = "MyCustomNamedMessage";
 
         /// <summary>
         /// For most cases, you want to register once your NetworkBehaviour's
@@ -24,27 +23,24 @@ namespace Vi.Core
             if (IsServer)
             {
                 // Server broadcasts to all clients when a new client connects (just for example purposes)
+                NetworkManager.NetworkTickSystem.Tick += Tick;
             }
-            else
-            {
-                // Clients send a unique Guid to the server
-            }
-
-            NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
         private void Tick()
         {
-            SendMessage(Guid.NewGuid());
+            SendMessage(NetworkManager.NetworkTickSystem.LocalTime.Tick % 128);
         }
 
         public override void OnNetworkDespawn()
         {
             // De-register when the associated NetworkObject is despawned.
             NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(MessageName);
-            // Whether server or not, unregister this.
 
-            NetworkManager.NetworkTickSystem.Tick -= Tick;
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick -= Tick;
+            }
         }
 
         /// <summary>
@@ -52,15 +48,15 @@ namespace Vi.Core
         /// </summary>
         private void ReceiveMessage(ulong senderId, FastBufferReader messagePayload)
         {
-            var receivedMessageContent = new ForceNetworkSerializeByMemcpy<Guid>(new Guid());
+            var receivedMessageContent = new ForceNetworkSerializeByMemcpy<int>();
             messagePayload.ReadValueSafe(out receivedMessageContent);
             if (IsServer)
             {
-                Debug.Log($"Sever received GUID ({receivedMessageContent.Value}) from client ({senderId})");
+                Debug.Log($"Sever received message ({receivedMessageContent.Value}) from client ({senderId})");
             }
             else
             {
-                Debug.Log($"Client received GUID ({receivedMessageContent.Value}) from the server.");
+                Debug.Log($"Client received message ({receivedMessageContent.Value}) from the server.");
             }
         }
 
@@ -68,10 +64,10 @@ namespace Vi.Core
         /// Invoke this with a Guid by a client or server-host to send a
         /// custom named message.
         /// </summary>
-        public void SendMessage(Guid inGameIdentifier)
+        public void SendMessage(int sequenceNumber)
         {
-            var messageContent = new ForceNetworkSerializeByMemcpy<Guid>(inGameIdentifier);
-            var writer = new FastBufferWriter(1100, Allocator.Temp);
+            var messageContent = new ForceNetworkSerializeByMemcpy<int>(sequenceNumber);
+            var writer = new FastBufferWriter(4, Allocator.Temp);
             var customMessagingManager = NetworkManager.CustomMessagingManager;
             using (writer)
             {
@@ -80,15 +76,13 @@ namespace Vi.Core
                 {
                     // This is a server-only method that will broadcast the named message.
                     // Caution: Invoking this method on a client will throw an exception!
-                    Debug.Log("Sending message to all");
-                    customMessagingManager.SendNamedMessageToAll(MessageName, writer);
+                    customMessagingManager.SendNamedMessageToAll(MessageName, writer, NetworkDelivery.Unreliable);
                 }
                 else
                 {
                     // This is a client or server method that sends a named message to one target destination
                     // (client to server or server to client)
-                    Debug.Log("Sending message to server");
-                    customMessagingManager.SendNamedMessage(MessageName, NetworkManager.ServerClientId, writer);
+                    customMessagingManager.SendNamedMessage(MessageName, NetworkManager.ServerClientId, writer, NetworkDelivery.Unreliable);
                 }
             }
         }
