@@ -17,6 +17,70 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Remove Missing Scripts From Prefabs")]
+        private static void FindAndRemoveMissingInSelected()
+        {
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
+            List<GameObject> assetList = new List<GameObject>();
+            foreach (string file in files)
+            {
+                assetList.Add(AssetDatabase.LoadAssetAtPath<GameObject>(file));
+            }
+
+            // EditorUtility.CollectDeepHierarchy does not include inactive children
+            var deeperSelection = assetList.ToArray().SelectMany(go => go.GetComponentsInChildren<Transform>(true))
+                .Select(t => t.gameObject);
+            var prefabs = new HashSet<Object>();
+            int compCount = 0;
+            int goCount = 0;
+            foreach (var go in deeperSelection)
+            {
+                int count = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(go);
+                if (count > 0)
+                {
+                    if (PrefabUtility.IsPartOfAnyPrefab(go))
+                    {
+                        RecursivePrefabSource(go, prefabs, ref compCount, ref goCount);
+                        count = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(go);
+                        // if count == 0 the missing scripts has been removed from prefabs
+                        if (count == 0)
+                            continue;
+                        // if not the missing scripts must be prefab overrides on this instance
+                    }
+
+                    Undo.RegisterCompleteObjectUndo(go, "Remove missing scripts");
+                    GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
+                    compCount += count;
+                    goCount++;
+                }
+            }
+
+            Debug.Log($"Found and removed {compCount} missing scripts from {goCount} GameObjects");
+        }
+
+        // Prefabs can both be nested or variants, so best way to clean all is to go through them all
+        // rather than jumping straight to the original prefab source.
+        private static void RecursivePrefabSource(GameObject instance, HashSet<Object> prefabs, ref int compCount, ref int goCount)
+        {
+            var source = PrefabUtility.GetCorrespondingObjectFromSource(instance);
+            // Only visit if source is valid, and hasn't been visited before
+            if (source == null || !prefabs.Add(source))
+                return;
+
+            // go deep before removing, to differantiate local overrides from missing in source
+            RecursivePrefabSource(source, prefabs, ref compCount, ref goCount);
+
+            int count = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(source);
+            if (count > 0)
+            {
+                Undo.RegisterCompleteObjectUndo(source, "Remove missing scripts");
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(source);
+                compCount += count;
+                goCount++;
+            }
+        }
+
         [MenuItem("Tools/Production/Organize Addressable Groups")]
         private static void OrganizeAddressables()
         {
