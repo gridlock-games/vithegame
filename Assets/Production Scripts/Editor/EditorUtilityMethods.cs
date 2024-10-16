@@ -17,7 +17,7 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
-        [MenuItem("Auto/Remove Missing Scripts Recursively Visit Prefabs")]
+        [MenuItem("Tools/Production/Remove Missing Scripts From Prefabs")]
         private static void FindAndRemoveMissingInSelected()
         {
             List<string> files = new List<string>();
