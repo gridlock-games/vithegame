@@ -338,6 +338,12 @@ namespace Vi.Core
         RaycastHit[] allHits = new RaycastHit[10];
         public CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
+            // Validate input history for light attacks so that players can't cheat their light attack combos
+            if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
+            {
+                if (actionClip != combatAgent.WeaponHandler.SelectAttack(Weapon.InputAttackType.LightAttack, combatAgent.WeaponHandler.GetInputHistory())) { return default; }
+            }
+
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (!combatAgent.MovementHandler.CanMove()) { return default; }
