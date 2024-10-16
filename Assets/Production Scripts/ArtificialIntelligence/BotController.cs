@@ -162,8 +162,8 @@ namespace Vi.ArtificialIntelligence
                     weaponHandler.AimDownSights(true);
                     if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                     {
-                        weaponHandler.LightAttack(true);
                         EvaluateAbility();
+                        weaponHandler.LightAttack(true);
                     }
                 }
                 else
@@ -172,17 +172,17 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (!isHeavyAttacking)
                         {
-                            weaponHandler.LightAttack(true);
                             EvaluateAbility();
+                            weaponHandler.LightAttack(true);
                         }
                     }
                     else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                     {
+                        EvaluateAbility();
                         if (!weaponHandler.CanADS)
                         {
                             if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
                         }
-                        EvaluateAbility();
                     }
                 }
             }
@@ -222,7 +222,36 @@ namespace Vi.ArtificialIntelligence
                     return;
                 }
 
-                int abilityNum = Random.Range(1, 5);
+                List<int> abilitiesOffCooldown = new List<int>();
+                for (int i = 1; i < 5; i++)
+                {
+                    switch (i)
+                    {
+                        case 1:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility1()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 2:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility2()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 3:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility3()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 4:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility4()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle ability num " + i);
+                            break;
+                    }
+                }
+
+                if (abilitiesOffCooldown.Count == 0)
+                {
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
+                int abilityNum = abilitiesOffCooldown[Random.Range(0, abilitiesOffCooldown.Count)];
                 if (abilityNum == 1)
                 {
                     weaponHandler.Ability1(true);
