@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 415599082405652376, guid: 1a872921ee1848841821203271a3f4d3,
@@ -133,7 +134,7 @@ PrefabInstance:
     - target: {fileID: 6023453941330493494, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 951099334
+      value: 3390826057
       objectReference: {fileID: 0}
     - target: {fileID: 7040230320165959133, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
@@ -282,6 +283,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7221596432275174223, guid: 1a872921ee1848841821203271a3f4d3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3508881426581689609}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a872921ee1848841821203271a3f4d3, type: 3}
 --- !u!4 &7527864471004905978 stripped
 Transform:
@@ -294,6 +302,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 7527864471004905978}
     m_Modifications:
     - target: {fileID: 2095082446787369307, guid: 0155cccbee4144fb5a3c2048bb72c69f,
@@ -362,7 +371,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0155cccbee4144fb5a3c2048bb72c69f, type: 3}
+--- !u!4 &3508881426581689609 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5472742943437030177, guid: 0155cccbee4144fb5a3c2048bb72c69f,
+    type: 3}
+  m_PrefabInstance: {fileID: 8881410344707757608}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &7372992672285577075 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 2095082446787369307, guid: 0155cccbee4144fb5a3c2048bb72c69f,

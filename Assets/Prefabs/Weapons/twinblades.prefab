@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 518123274900306048}
   - component: {fileID: 3503630956869482277}
   - component: {fileID: 1692107177324741615}
-  - component: {fileID: -4575188425694844681}
   m_Layer: 0
   m_Name: twinblades
   m_TagString: Untagged
@@ -26,6 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 899434540764439098}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -34,7 +34,6 @@ Transform:
   - {fileID: 4804669915917762402}
   - {fileID: 1415989422847931449}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3503630956869482277
 MeshFilter:
@@ -86,54 +85,12 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-4575188425694844681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 899434540764439098}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46ce5ca9303944be08d0e95a6aab1c2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  captureHits: 2
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  segmentResolution: 0.05
-  pointA: {x: 0, y: 1, z: 0}
-  pointB: {x: 0, y: -1, z: 0}
-  radius: 0.5
-  offset: {x: 0, y: 0, z: 0}
-  boxInterframePredictions: 9
-  boxCenter: {x: 0, y: 0, z: 0}
-  boxSize: {x: 0.2, y: 2.5, z: 0.2}
-  debugMode: 0
-  EventAttackStart:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackActivation:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackRecovery:
-    m_PersistentCalls:
-      m_Calls: []
-  weaponBone: 18
-  enableWeaponTrail: 1
-  trailMaterial: {fileID: 2100000, guid: bd5ef410d675441c78ce115ba4c6e478, type: 2}
-  trailGranularity: 30
-  trailDuration: 0.5
-  isOrbitLocked: 0
 --- !u!1001 &4982991818560231561
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 518123274900306048}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: b8429e260a2f3c2489982da2e0f2c575,
@@ -197,6 +154,9 @@ PrefabInstance:
       value: Spear2h
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8429e260a2f3c2489982da2e0f2c575, type: 3}
 --- !u!4 &4804669915917762402 stripped
 Transform:
@@ -209,6 +169,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 518123274900306048}
     m_Modifications:
     - target: {fileID: 4664686835202544085, guid: 1a8eaaa38b934ed4dbe357ed598e1318,
@@ -272,6 +233,9 @@ PrefabInstance:
       value: Spear1H_Medium
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a8eaaa38b934ed4dbe357ed598e1318, type: 3}
 --- !u!4 &1415989422847931449 stripped
 Transform:

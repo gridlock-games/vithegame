@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 415599082405652376, guid: 1a872921ee1848841821203271a3f4d3,
@@ -138,7 +139,7 @@ PrefabInstance:
     - target: {fileID: 6023453941330493494, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 951099334
+      value: 2213037474
       objectReference: {fileID: 0}
     - target: {fileID: 7221596432275174218, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
@@ -277,6 +278,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7221596432275174223, guid: 1a872921ee1848841821203271a3f4d3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2618745997264160308}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a872921ee1848841821203271a3f4d3, type: 3}
 --- !u!4 &7527864471004905978 stripped
 Transform:
@@ -289,6 +297,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 7527864471004905978}
     m_Modifications:
     - target: {fileID: 206969736365183893, guid: 036e1d147f62c6441b53b3476ea2b3dd,
@@ -352,7 +361,16 @@ PrefabInstance:
       value: _Lubu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 036e1d147f62c6441b53b3476ea2b3dd, type: 3}
+--- !u!4 &2618745997264160308 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 206969736365183893, guid: 036e1d147f62c6441b53b3476ea2b3dd,
+    type: 3}
+  m_PrefabInstance: {fileID: 2776726992675247521}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &8638607588313081904 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 036e1d147f62c6441b53b3476ea2b3dd,

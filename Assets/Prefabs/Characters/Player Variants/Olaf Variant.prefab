@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 156197361619990464}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -0.245, y: 0.065, z: 1.05}
   m_LocalScale: {x: 0.95238096, y: 0.9523808, z: 0.9523808}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4370883340715564153}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!2083052967 &9013466543766615045
 VisualEffect:
@@ -46,6 +46,7 @@ VisualEffect:
   m_InitialEventNameOverriden: 1
   m_StartSeed: 0
   m_ResetSeedOnPlay: 1
+  m_AllowInstancing: 1
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
@@ -138,13 +139,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6639982261989575151}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.208, y: 0.065, z: 1.05}
   m_LocalScale: {x: 0.95238096, y: 0.9523808, z: 0.9523808}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4370883340715564153}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!2083052967 &6225907016486724003
 VisualEffect:
@@ -159,6 +160,7 @@ VisualEffect:
   m_InitialEventNameOverriden: 1
   m_StartSeed: 0
   m_ResetSeedOnPlay: 1
+  m_AllowInstancing: 1
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
@@ -231,6 +233,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1785448430332772765, guid: 1a872921ee1848841821203271a3f4d3,
@@ -281,7 +284,7 @@ PrefabInstance:
     - target: {fileID: 6023453941330493494, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 951099334
+      value: 4156780842
       objectReference: {fileID: 0}
     - target: {fileID: 7221596432275174218, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
@@ -415,6 +418,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7221596432275174223, guid: 1a872921ee1848841821203271a3f4d3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4370883340715564159}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a872921ee1848841821203271a3f4d3, type: 3}
 --- !u!4 &2413843143962055824 stripped
 Transform:
@@ -427,6 +437,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 2413843143962055824}
     m_Modifications:
     - target: {fileID: 5005247954928665991, guid: 57e4ed9570117ab41ad9346b3f6a0af0,
@@ -575,10 +586,27 @@ PrefabInstance:
       value: Viking_Raider_B
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5005247954937768787, guid: 57e4ed9570117ab41ad9346b3f6a0af0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8732108921542316577}
+    - targetCorrespondingSourceObject: {fileID: 5005247954937768787, guid: 57e4ed9570117ab41ad9346b3f6a0af0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1134155710789440992}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57e4ed9570117ab41ad9346b3f6a0af0, type: 3}
 --- !u!4 &4370883340715564153 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5005247954937768787, guid: 57e4ed9570117ab41ad9346b3f6a0af0,
+    type: 3}
+  m_PrefabInstance: {fileID: 8781536877423818538}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4370883340715564159 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5005247954937768789, guid: 57e4ed9570117ab41ad9346b3f6a0af0,
     type: 3}
   m_PrefabInstance: {fileID: 8781536877423818538}
   m_PrefabAsset: {fileID: 0}
