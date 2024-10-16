@@ -628,7 +628,6 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
-                Debug.Log(latestServerState.Value.tick + " " + networkListEvent.Value.tick);
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
             else
