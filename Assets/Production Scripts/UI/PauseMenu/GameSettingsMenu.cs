@@ -16,6 +16,8 @@ namespace Vi.UI
         [SerializeField] private Toggle consoleToggle;
         [SerializeField] private Toggle showFPSToggle;
         [SerializeField] private Toggle showPingToggle;
+        [SerializeField] private Toggle showPacketLossToggle;
+        [SerializeField] private Toggle showJitterToggle;
         [SerializeField] private Slider UIOpacitySlider;
         [SerializeField] private GameObject channelDropdownParent;
         [SerializeField] private TMP_Dropdown channelDropdown;
@@ -36,11 +38,15 @@ namespace Vi.UI
             consoleToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
             showFPSToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("FPSEnabled");
             showPingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
+            showPacketLossToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
+            showJitterToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
 
             autoAimToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(autoAimToggle, "AutoAim"); });
             consoleToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(consoleToggle, "ConsoleEnabled"); });
             showFPSToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showFPSToggle, "FPSEnabled"); });
             showPingToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showPingToggle, "PingEnabled"); });
+            showPacketLossToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showPacketLossToggle, "PacketLossEnabled"); });
+            showJitterToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showJitterToggle, "JitterEnabled"); });
 
             UIOpacitySlider.value = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             UIOpacitySlider.minValue = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.1f : 0;

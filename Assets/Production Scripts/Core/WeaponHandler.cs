@@ -1267,7 +1267,7 @@ namespace Vi.Core
             combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
-
+        public List<Weapon.InputAttackType> GetInputHistory() { return inputHistory.ToList(); }
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
@@ -1373,7 +1373,7 @@ namespace Vi.Core
 
         private void ResetComboSystem() { inputHistory.Clear(); }
 
-        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
+        public ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
             switch (inputAttackType)
             {
