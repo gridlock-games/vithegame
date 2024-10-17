@@ -31,90 +31,6 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = playerData;
         }
 
-        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
-        public override float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
-        public override float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit() + SessionProgressionHandler.MaxSpiritBonus; }
-        public override float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
-
-        public override void AddStamina(float amount, bool activateCooldown = true)
-        {
-            if (activateCooldown)
-                staminaDelayCooldown = WeaponHandler.GetWeapon().GetStaminaDelay();
-
-            if (amount > 0)
-            {
-                if (stamina.Value < GetMaxStamina())
-                {
-                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, GetMaxStamina());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (stamina.Value > GetMaxStamina())
-                {
-                    stamina.Value += amount;
-                }
-                else
-                {
-                    stamina.Value = Mathf.Clamp(stamina.Value + amount, 0, GetMaxStamina());
-                }
-            }
-        }
-
-        public override void AddSpirit(float amount)
-        {
-            if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
-
-            if (amount > 0)
-            {
-                if (spirit.Value < GetMaxSpirit())
-                {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (spirit.Value > GetMaxSpirit())
-                {
-                    spirit.Value += amount;
-                }
-                else
-                {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
-                }
-            }
-        }
-
-        public override void AddRage(float amount, bool clampPositive = true)
-        {
-            if (amount > 0)
-            {
-                if (rage.Value < GetMaxRage())
-                {
-                    if (clampPositive)
-                    {
-                        rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
-                    }
-                    else
-                    {
-                        rage.Value += amount;
-                    }
-                }
-            }
-            else // Delta is less than or equal to zero
-            {
-                if (rage.Value > GetMaxRage())
-                {
-                    rage.Value += amount;
-                }
-                else
-                {
-                    rage.Value = Mathf.Clamp(rage.Value + amount, 0, GetMaxRage());
-                }
-            }
-        }
-
         [SerializeField] private PooledObject teamIndicatorPrefab;
         private PooledObject teamIndicatorInstance;
 
@@ -126,13 +42,10 @@ namespace Vi.Core.CombatAgents
             if (NetworkManager.Singleton.IsServer)
             {
                 UpdateNetworkVisiblity();
-                StartCoroutine(InitStats());
             }
 
             StartCoroutine(AddPlayerObjectToPlayerDataManager());
 
-            spirit.OnValueChanged += OnSpiritChanged;
-            rage.OnValueChanged += OnRageChanged;
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
@@ -190,15 +103,6 @@ namespace Vi.Core.CombatAgents
             }
         }
 
-        private IEnumerator InitStats()
-        {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("You should onyl call Attributes.InitStats() on the server!"); yield break; }
-            yield return new WaitUntil(() => IsSpawned);
-            yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
-            HP.Value = WeaponHandler.GetWeapon().GetMaxHP();
-            spirit.Value = WeaponHandler.GetWeapon().GetMaxSpirit();
-        }
-
         private IEnumerator AddPlayerObjectToPlayerDataManager()
         {
             yield return new WaitUntil(() => IsSpawned);
@@ -209,8 +113,6 @@ namespace Vi.Core.CombatAgents
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            spirit.OnValueChanged -= OnSpiritChanged;
-            rage.OnValueChanged -= OnRageChanged;
             comboCounter.OnValueChanged -= OnComboCounterChange;
 
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
@@ -253,59 +155,9 @@ namespace Vi.Core.CombatAgents
             heartbeatSoundIsPlaying = false;
         }
 
-        private void OnSpiritChanged(float prev, float current)
-        {
-            if (Mathf.Approximately(current, 0))
-            {
-                spiritRegenActivateTime = Time.time;
-            }
-        }
-
-        public void StartSpiritRegen()
-        {
-            if (!IsServer) { Debug.LogError("Attributes.StartSpiritRegen() should only be called on the server!"); return; }
-            spiritRegenActivateTime = Time.time;
-        }
-
-        private const float rageEndPercent = 0.01f;
-
-        [SerializeField] private PooledObject rageAtMaxVFXPrefab;
-        private PooledObject rageAtMaxVFXInstance;
-        private void OnRageChanged(float prev, float current)
-        {
-            float currentRagePercent = GetRage() / GetMaxRage();
-            if (currentRagePercent >= 1)
-            {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
-            }
-            else
-            {
-                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            }
-
-            if (IsServer)
-            {
-                if (currentRagePercent < rageEndPercent)
-                {
-                    isRaging.Value = false;
-                }
-            }
-        }
-
-        protected override void OnIsRagingChanged(bool prev, bool current)
-        {
-            base.OnIsRagingChanged(prev, current);
-            if (current)
-            {
-                if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            }
-        }
-
-        private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         protected override void Awake()
         {
             base.Awake();
-            networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             SetCachedPlayerData(PlayerDataManager.Singleton.GetPlayerData(GetPlayerDataId()));
         }
 
@@ -314,16 +166,8 @@ namespace Vi.Core.CombatAgents
             base.OnDisable();
             CachedPlayerData = default;
 
-            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-
             lastComboCounterChangeTime = default;
             lastBlockTime = Mathf.NegativeInfinity;
-
-            staminaDelayCooldown = default;
-
-            spiritRegenActivateTime = Mathf.NegativeInfinity;
-
-            rageDelayCooldown = default;
 
             IsRespawning = false;
             isWaitingForSpawnPoint = false;
@@ -333,13 +177,33 @@ namespace Vi.Core.CombatAgents
         public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
-            return ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
+
+            HitResult hitResult = ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
+            if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
+
+            bool hitSuccess = CastHitResultToBoolean(hitResult);
+            if (hitSuccess)
+            {
+                if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
+            }
+
+            return hitSuccess;
         }
 
         public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
-            return ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
+
+            HitResult hitResult = ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
+            if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
+
+            bool hitSuccess = CastHitResultToBoolean(hitResult);
+            if (hitSuccess)
+            {
+                if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
+            }
+            
+            return hitSuccess;
         }
 
         public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
@@ -429,226 +293,6 @@ namespace Vi.Core.CombatAgents
             return Time.time - lastBlockTime <= 0.25f;
         }
 
-        private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
-        {
-            if (!CanProcessHit(isMeleeHit, attacker, attack, runtimeWeapon)) { return false; }
-
-            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
-            {
-                AddHP(attack.healAmount);
-                foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
-                {
-                    StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
-                }
-                return false;
-            }
-
-            if (!CanHit(isMeleeHit, attacker, attack)) { return false; }
-
-            (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
-
-            if (IsUninterruptable)
-            {
-                attackAilment = ActionClip.Ailment.None;
-            }
-            else
-            {
-                wasStaggeredThisFrame = true;
-                StartCoroutine(ResetStaggerBool());
-            }
-
-            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
-
-            AddStamina(-attack.staminaDamage);
-            if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
-            if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
-
-            float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
-            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
-            hitReaction.SetHitReactionRootMotionMultipliers(attack);
-
-            float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
-            HPDamage *= attacker.StatusAgent.DamageMultiplier;
-            HPDamage *= damageMultiplier;
-
-            bool shouldPlayHitReaction = false;
-            switch (hitReaction.GetHitReactionType())
-            {
-                case ActionClip.HitReactionType.Normal:
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
-                    {
-                        AddSpirit(HPDamage * 0.7f);
-                        HPDamage *= 0.7f;
-                    }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
-                    {
-                        AddSpirit(HPDamage * 0.7f);
-                        shouldPlayHitReaction = true;
-                        HPDamage *= 0.7f;
-                    }
-                    else // Spirit is at 0
-                    {
-                        AddSpirit(HPDamage);
-                        shouldPlayHitReaction = true;
-                    }
-                    break;
-                case ActionClip.HitReactionType.Blocking:
-                    lastBlockTime = Time.time;
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
-                    {
-                        AddSpirit(HPDamage * 0.5f);
-                        HPDamage = 0;
-                    }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
-                    {
-                        AddSpirit(-GetMaxSpirit());
-                        AddStamina(-GetMaxStamina() * 0.3f);
-                        shouldPlayHitReaction = true;
-                        HPDamage *= 0.7f;
-                    }
-                    else // Spirit is at 0
-                    {
-                        AddStamina(-GetMaxStamina() * 0.3f);
-                        AddSpirit(HPDamage);
-                        if (GetStamina() <= 0)
-                        {
-                            if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
-                            hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value, false);
-                            hitReaction.SetHitReactionRootMotionMultipliers(attack);
-                        }
-                        shouldPlayHitReaction = true;
-                    }
-                    break;
-                default:
-                    Debug.LogError("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
-                    break;
-            }
-
-            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
-            {
-                HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
-                {
-                    HPDamage *= attack.enhancedChargeDamageMultiplier;
-                }
-            }
-
-            if (IsRaging) { HPDamage *= rageDamageMultiplier; }
-
-            bool hitReactionWasPlayed = false;
-            if (AddHPWithoutApply(HPDamage) <= 0)
-            {
-                attackAilment = ActionClip.Ailment.Death;
-                hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
-
-                if (IsGrabbed)
-                {
-                    if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
-                    CancelGrab();
-                }
-
-                AnimationHandler.PlayAction(hitReaction);
-                hitReactionWasPlayed = true;
-            }
-            else if (!IsUninterruptable)
-            {
-                if (hitReaction.ailment == ActionClip.Ailment.Grab)
-                {
-                    grabAttackClipName.Value = attack.name;
-                    grabAssailantDataId.Value = attacker.NetworkObjectId;
-                    attacker.SetGrabVictim(NetworkObjectId);
-                    isGrabbed.Value = true;
-                    attacker.SetIsGrabbingToTrue();
-                    attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
-                }
-
-                if (hitReaction.ailment == ActionClip.Ailment.None)
-                {
-                    if (!IsGrabbed & !IsRaging)
-                    {
-                        if (attack.shouldPlayHitReaction
-                            | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
-                            | AnimationHandler.IsCharging()
-                            | shouldPlayHitReaction) // For spirit logic
-                        {
-                            AnimationHandler.PlayAction(hitReaction);
-                            hitReactionWasPlayed = true;
-                        }
-                    }
-                }
-                else // Hit reaction ailment isn't None
-                {
-                    AnimationHandler.PlayAction(hitReaction);
-                    hitReactionWasPlayed = true;
-                }
-            }
-
-            if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
-
-            StartHitStop(attacker, isMeleeHit);
-
-            if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
-            {
-                RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
-                float prevHP = GetHP();
-                AddHP(HPDamage);
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                AddDamageToMapping(attacker, prevHP - GetHP());
-            }
-            else // Not blocking
-            {
-                if (!Mathf.Approximately(HPDamage, 0))
-                {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
-                    float prevHP = GetHP();
-                    AddHP(HPDamage);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attacker, prevHP - GetHP());
-                }
-
-                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
-            }
-
-            if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
-
-            if (IsServer & runtimeWeapon)
-            {
-                foreach (ActionVFX actionVFX in attack.actionVFXList)
-                {
-                    if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
-                    {
-                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attacker.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
-                        {
-                            if (!hitCounter.ContainsKey(this))
-                            {
-                                hitCounter.Add(this, new(1, Time.time));
-                            }
-                            else
-                            {
-                                hitCounter[this] = new(hitCounter[this].hitNumber + 1, Time.time);
-                            }
-                            actionVFXParticleSystem.AddToHitCounter(hitCounter);
-                        }
-                    }
-                }
-            }
-
-            if (!IsUninterruptable)
-            {
-                if (attack.shouldFlinch | IsRaging)
-                {
-                    if (!hitReactionWasPlayed & !IsGrabbed)
-                    {
-                        AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetFlinchClip(attackAngle));
-                        MovementHandler.Flinch(attack.GetFlinchAmount());
-                    }
-                }
-            }
-
-            lastAttackingCombatAgent = attacker;
-            return true;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -656,50 +300,6 @@ namespace Vi.Core.CombatAgents
             if (!IsServer) { return; }
 
             if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
-
-            bool canRegenStats = true;
-            if (GameModeManager.Singleton)
-            {
-                canRegenStats = !GameModeManager.Singleton.WaitingToPlayGame();
-            }
-
-            if (canRegenStats)
-            {
-                UpdateStamina();
-                UpdateRage();
-
-                // Regen for 50 seconds
-                if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
-            }
-        }
-
-        private float staminaDelayCooldown;
-        private void UpdateStamina()
-        {
-            staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
-            if (staminaDelayCooldown > 0) { return; }
-            AddStamina(WeaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
-        }
-
-        private float spiritRegenActivateTime = Mathf.NegativeInfinity;
-        private const float spiritRegenRate = 3;
-        private void UpdateSpirit()
-        {
-            AddSpirit(spiritRegenRate * Time.deltaTime);
-        }
-
-        private const float rageDepletionRate = 1;
-        private float rageDelayCooldown;
-        private void UpdateRage()
-        {
-            if (IsRaging)
-            {
-                AddRage(-rageDepletionRate * Time.deltaTime);
-            }
-
-            rageDelayCooldown = Mathf.Max(0, rageDelayCooldown - Time.deltaTime);
-            if (rageDelayCooldown > 0) { return; }
-            AddRage(WeaponHandler.GetWeapon().GetRageRecoveryRate() * Time.deltaTime);
         }
 
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
@@ -707,7 +307,6 @@ namespace Vi.Core.CombatAgents
             base.OnAilmentChanged(prev, current);
             if (current == ActionClip.Ailment.Death)
             {
-                spiritRegenActivateTime = Mathf.NegativeInfinity;
                 respawnCoroutine = StartCoroutine(RespawnSelf());
             }
             else if (prev == ActionClip.Ailment.Death)
