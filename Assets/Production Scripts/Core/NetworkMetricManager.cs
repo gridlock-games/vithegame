@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using System;
 using Unity.Collections;
 
 namespace Vi.Core
@@ -11,12 +10,18 @@ namespace Vi.Core
     {
         private const string MessageName = "MyCustomNamedMessage";
 
+        public static NetworkMetricManager Singleton { get { return _singleton; } }
+
+        private static NetworkMetricManager _singleton;
+
         /// <summary>
         /// For most cases, you want to register once your NetworkBehaviour's
         /// NetworkObject (typically in-scene placed) is spawned.
         /// </summary>
         public override void OnNetworkSpawn()
         {
+            _singleton = this;
+
             // Both the server-host and client(s) register the custom named message.
             NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(MessageName, ReceiveMessage);
 
@@ -28,26 +33,29 @@ namespace Vi.Core
         }
 
         private int localPacketID;
+        private const int numPacketsToSend = 32;
         private IEnumerator SendPacket()
         {
             while (true)
             {
                 SendMessage(localPacketID);
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(0.25f);
                 localPacketID++;
-                if (localPacketID == 128) { localPacketID = 0; }
+                if (localPacketID == numPacketsToSend) { localPacketID = 0; }
             }
         }
 
         public override void OnNetworkDespawn()
         {
+            _singleton = null;
+
             // De-register when the associated NetworkObject is despawned.
             NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(MessageName);
 
             PacketLoss = 0;
         }
 
-        public static float PacketLoss { get; private set; }
+        public float PacketLoss { get; private set; }
 
         private bool firstPacketRecieved = true;
         /// <summary>
@@ -82,7 +90,7 @@ namespace Vi.Core
                 packetIDsRecieved.Add(receivedMessageContent.Value);
                 localPacketID = receivedMessageContent.Value;
 
-                PacketLoss = 1 - (receivedMessageContent.Value == 0 ? 1 : ((packetIDsRecieved.Count - 1) / (float)receivedMessageContent.Value));
+                if (receivedMessageContent.Value > numPacketsToSend / 2) { PacketLoss = 1 - (receivedMessageContent.Value == 0 ? 1 : ((packetIDsRecieved.Count - 1) / (float)receivedMessageContent.Value)); }
                 Debug.Log(packetIDsRecieved.Count - 1 + " " + receivedMessageContent.Value + " " + PacketLoss);
             }
         }

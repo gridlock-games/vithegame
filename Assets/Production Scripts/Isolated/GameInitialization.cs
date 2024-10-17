@@ -75,6 +75,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasBool("ConsoleEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ConsoleEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("FPSEnabled")) { FasterPlayerPrefs.Singleton.SetBool("FPSEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PacketLossEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PacketLossEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("JitterEnabled")) { FasterPlayerPrefs.Singleton.SetBool("JitterEnabled", false); }
 
             if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
