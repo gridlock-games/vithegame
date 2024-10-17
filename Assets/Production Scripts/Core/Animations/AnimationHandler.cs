@@ -7,6 +7,7 @@ using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
 using Vi.Core.MeshSlicing;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -342,6 +343,14 @@ namespace Vi.Core
             if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
             {
                 if (actionClip != combatAgent.WeaponHandler.SelectAttack(Weapon.InputAttackType.LightAttack, combatAgent.WeaponHandler.GetInputHistory())) { return default; }
+            }
+
+            if (actionClip.summonableCount > 0)
+            {
+                if (combatAgent.GetSlaves().Count(item => item.GetAilment() != ActionClip.Ailment.Death) >= ActionClip.maxLivingSummonables)
+                {
+                    return default;
+                }
             }
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);

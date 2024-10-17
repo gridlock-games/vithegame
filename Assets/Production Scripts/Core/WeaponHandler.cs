@@ -270,7 +270,7 @@ namespace Vi.Core
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
 
-            summonablesCount = 0;
+            thisClipSummonablesCount = 0;
             if (IsInAnticipation)
             {
                 if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -565,7 +565,7 @@ namespace Vi.Core
 
         private bool reloadFinished;
 
-        private int summonablesCount;
+        private int thisClipSummonablesCount;
 
         private void FixedUpdate()
         {
@@ -596,17 +596,19 @@ namespace Vi.Core
                         }
                     }
 
-                    if (summonablesCount < CurrentActionClip.summonableCount)
+                    if (thisClipSummonablesCount < CurrentActionClip.summonableCount)
                     {
                         if (CurrentActionClip.summonables.Length > 0)
                         {
-                            if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                            if (combatAgent.GetSlaves().Count(item => item.GetAilment() != ActionClip.Ailment.Death) < ActionClip.maxLivingSummonables)
                             {
-                                Mob mob = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<Mob>();
-                                mob.SetTeam(combatAgent.GetTeam());
-                                mob.SetMaster(combatAgent);
-                                mob.NetworkObject.Spawn(true);
-                                summonablesCount++;
+                                if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                                {
+                                    CombatAgent summonedAgent = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<CombatAgent>();
+                                    summonedAgent.SetMaster(combatAgent);
+                                    summonedAgent.NetworkObject.Spawn(true);
+                                    thisClipSummonablesCount++;
+                                }
                             }
                         }
                     }

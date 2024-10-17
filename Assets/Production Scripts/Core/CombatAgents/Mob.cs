@@ -13,16 +13,13 @@ namespace Vi.Core.CombatAgents
     {
         private NetworkVariable<PlayerDataManager.Team> team = new NetworkVariable<PlayerDataManager.Team>();
 
-        public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
-
-        public CombatAgent Master { get; private set; }
-        public void SetMaster(CombatAgent master) { Master = master; }
-
-        protected override void OnDisable()
+        public override void SetMaster(CombatAgent master)
         {
-            base.OnDisable();
-            Master = null;
+            base.SetMaster(master);
+            SetTeam(master.GetTeam());
         }
+
+        public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
 
         protected override void Update()
         {

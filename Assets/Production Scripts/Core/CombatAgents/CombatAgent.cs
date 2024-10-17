@@ -17,6 +17,16 @@ namespace Vi.Core
     [RequireComponent(typeof(SessionProgressionHandler))]
     public abstract class CombatAgent : HittableAgent
     {
+        public CombatAgent Master { get; private set; }
+        public virtual void SetMaster(CombatAgent master)
+        {
+            Master = master;
+            Master.slaves.Add(this);
+        }
+
+        public List<CombatAgent> GetSlaves() { return slaves.ToList(); }
+        private List<CombatAgent> slaves = new List<CombatAgent>();
+
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
         protected NetworkVariable<float> spirit = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
@@ -285,6 +295,9 @@ namespace Vi.Core
             staminaDelayCooldown = default;
             spiritRegenActivateTime = Mathf.NegativeInfinity;
             rageDelayCooldown = default;
+
+            Master = null;
+            slaves.Clear();
         }
 
         public virtual CharacterReference.RaceAndGender GetRaceAndGender() { return CharacterReference.RaceAndGender.Universal; }
