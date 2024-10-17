@@ -8,7 +8,7 @@ namespace Vi.Core
 {
     public class NetworkMetricManager : NetworkBehaviour
     {
-        private const string MessageName = "MyCustomNamedMessage";
+        private const string messageName = "PacketLoss";
 
         public static NetworkMetricManager Singleton { get { return _singleton; } }
 
@@ -23,7 +23,7 @@ namespace Vi.Core
             _singleton = this;
 
             // Both the server-host and client(s) register the custom named message.
-            NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(MessageName, ReceiveMessage);
+            NetworkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, ReceiveMessage);
 
             if (IsServer)
             {
@@ -50,7 +50,7 @@ namespace Vi.Core
             _singleton = null;
 
             // De-register when the associated NetworkObject is despawned.
-            NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(MessageName);
+            NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(messageName);
 
             PacketLoss = 0;
         }
@@ -59,7 +59,7 @@ namespace Vi.Core
 
         private bool firstPacketRecieved = true;
         /// <summary>
-        /// Invoked when a custom message of type <see cref="MessageName"/>
+        /// Invoked when a custom message of type <see cref="messageName"/>
         /// </summary>
         private void ReceiveMessage(ulong senderId, FastBufferReader messagePayload)
         {
@@ -67,11 +67,11 @@ namespace Vi.Core
             messagePayload.ReadValueSafe(out receivedMessageContent);
             if (IsServer)
             {
-                Debug.Log($"Sever received message ({receivedMessageContent.Value}) from client ({senderId})");
+                //Debug.Log($"Sever received message ({receivedMessageContent.Value}) from client ({senderId})");
             }
             else
             {
-                Debug.Log($"Client received message ({receivedMessageContent.Value}) from the server.");
+                //Debug.Log($"Client received message ({receivedMessageContent.Value}) from the server.");
 
                 if (firstPacketRecieved)
                 {
@@ -91,7 +91,7 @@ namespace Vi.Core
                 localPacketID = receivedMessageContent.Value;
 
                 if (receivedMessageContent.Value > numPacketsToSend / 2) { PacketLoss = 1 - (receivedMessageContent.Value == 0 ? 1 : ((packetIDsRecieved.Count - 1) / (float)receivedMessageContent.Value)); }
-                Debug.Log(packetIDsRecieved.Count - 1 + " " + receivedMessageContent.Value + " " + PacketLoss);
+                //Debug.Log(packetIDsRecieved.Count - 1 + " " + receivedMessageContent.Value + " " + PacketLoss);
             }
         }
 
@@ -113,13 +113,13 @@ namespace Vi.Core
                 {
                     // This is a server-only method that will broadcast the named message.
                     // Caution: Invoking this method on a client will throw an exception!
-                    customMessagingManager.SendNamedMessageToAll(MessageName, writer, NetworkDelivery.UnreliableSequenced);
+                    customMessagingManager.SendNamedMessageToAll(messageName, writer, NetworkDelivery.UnreliableSequenced);
                 }
                 else
                 {
                     // This is a client or server method that sends a named message to one target destination
                     // (client to server or server to client)
-                    customMessagingManager.SendNamedMessage(MessageName, NetworkManager.ServerClientId, writer, NetworkDelivery.UnreliableSequenced);
+                    customMessagingManager.SendNamedMessage(messageName, NetworkManager.ServerClientId, writer, NetworkDelivery.UnreliableSequenced);
                 }
             }
         }

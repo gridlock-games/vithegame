@@ -75,9 +75,9 @@ public class DebugOverlay : MonoBehaviour
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
 
-    private ulong[] pingHistory;
+    private int[] pingHistory;
     private int pingHistoryIndex;
-    private float jitterValue;
+    private ulong jitterValue;
     private void RefreshPing()
     {
         if (networkTransport & NetworkManager.Singleton)
@@ -85,8 +85,8 @@ public class DebugOverlay : MonoBehaviour
             if (NetworkManager.Singleton.IsConnectedClient)
             {
                 pingValue = networkTransport.GetCurrentRtt(NetworkManager.ServerClientId);
-                if (pingHistory == default) { pingHistory = new ulong[32]; }
-                pingHistory[pingHistoryIndex] = pingValue;
+                if (pingHistory == default) { pingHistory = new int[32]; }
+                pingHistory[pingHistoryIndex] = (int)pingValue;
                 pingHistoryIndex++;
                 if (pingHistoryIndex == pingHistory.Length) { pingHistoryIndex = 0; }
 
@@ -97,7 +97,7 @@ public class DebugOverlay : MonoBehaviour
                     totalJitter += Mathf.Abs(pingHistory[i] - pingHistory[i - 1]);
                 }
                 // Return the average jitter (mean of the differences)
-                jitterValue = totalJitter / (pingHistory.Length - 1);
+                jitterValue = (ulong)(totalJitter / (pingHistory.Length - 1));
             }
             else
             {
@@ -204,7 +204,7 @@ public class DebugOverlay : MonoBehaviour
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
-        
+
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
         if (fpsEnabled)
@@ -271,7 +271,7 @@ public class DebugOverlay : MonoBehaviour
                     pingTextEvaluated = true;
                 }
             }
-            
+
             if (!pingTextEvaluated)
             {
                 pingText.text = "";
@@ -306,7 +306,7 @@ public class DebugOverlay : MonoBehaviour
                 packetLossText.text = "";
             }
         }
-        
+
         if (jitterEnabled)
         {
             bool jitterTextEvaluated = false;
@@ -314,7 +314,7 @@ public class DebugOverlay : MonoBehaviour
             {
                 if (NetworkManager.Singleton.IsConnectedClient)
                 {
-                    jitterText.text = jitterValue.ToString("F0") + "ms";
+                    jitterText.text = jitterValue.ToString() + "ms";
                     bottomDividerText.text = packetLossEnabled ? "|" : "";
 
                     Color jitterTextColor;
