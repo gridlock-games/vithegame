@@ -80,7 +80,7 @@ namespace Vi.Player
                 tick = inputPayload.tick;
                 moveInput = inputPayload.moveInput;
                 position = Rigidbody.position;
-                velocity = Rigidbody.velocity;
+                velocity = Rigidbody.linearVelocity;
                 this.rotation = rotation;
                 this.usedRootMotion = usedRootMotion;
             }
@@ -145,7 +145,7 @@ namespace Vi.Player
                 // Now re-simulate the rest of the ticks up to the current tick on the client
                 Physics.simulationMode = SimulationMode.Script;
                 Rigidbody.position = latestServerState.Value.position;
-                if (!Rigidbody.isKinematic) { Rigidbody.velocity = latestServerState.Value.velocity; }
+                if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
 
                 int tickToProcess = latestServerState.Value.tick + 1;
@@ -476,7 +476,7 @@ namespace Vi.Player
             {
                 if (combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    Rigidbody.AddForce(movement - Rigidbody.velocity, ForceMode.VelocityChange);
+                    Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
                     evaluateForce = false;
                 }
             }
@@ -485,15 +485,15 @@ namespace Vi.Player
             {
                 if (IsGrounded())
                 {
-                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
-                    if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
+                    if (Rigidbody.linearVelocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
-                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
+                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.linearVelocity.y, 0), ForceMode.VelocityChange);
                     }
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.linearVelocity.x, 0, -Rigidbody.linearVelocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }

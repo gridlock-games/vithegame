@@ -146,7 +146,7 @@ namespace Vi.Core.MovementHandlers
             combatAgent.AnimationHandler.Animator.SetFloat("MoveForward", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveForward"), walkCycleAnims.y, Time.deltaTime * runAnimationTransitionSpeed));
             combatAgent.AnimationHandler.Animator.SetFloat("MoveSides", Mathf.MoveTowards(combatAgent.AnimationHandler.Animator.GetFloat("MoveSides"), walkCycleAnims.x, Time.deltaTime * runAnimationTransitionSpeed));
             combatAgent.AnimationHandler.Animator.SetBool("IsGrounded", IsSpawned ? IsGrounded() : true);
-            combatAgent.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.velocity.y);
+            combatAgent.AnimationHandler.Animator.SetFloat("VerticalSpeed", Rigidbody.linearVelocity.y);
         }
 
         private Vector2 GetWalkCycleAnimationParameters()
