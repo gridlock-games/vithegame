@@ -212,7 +212,7 @@ namespace Vi.Core
         }
 
         private const bool useConstantRateForHPChangeStatuses = true;
-        private const float HPChangeMultiplier = 10;
+        private const float HPChangeMultiplier = 1;
         private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
         {
             yield return new WaitForSeconds(statusPayload.delay);

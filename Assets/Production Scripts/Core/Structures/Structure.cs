@@ -100,6 +100,7 @@ namespace Vi.Core.Structures
             explodableMeshInstances.Clear();
         }
 
+        public override Weapon.ArmorType GetArmorType() { return armorType; }
         [SerializeField] private Weapon.ArmorType armorType = Weapon.ArmorType.Metal;
         protected bool ProcessHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {

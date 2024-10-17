@@ -300,7 +300,7 @@ namespace Vi.ScriptableObjects
             return instance;
         }
 
-        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment)
+        public ActionClip GetHitReaction(ActionClip attack, float attackAngle, bool isBlocking, ActionClip.Ailment attackAilment, ActionClip.Ailment currentAilment, bool applyAilmentRegardless)
         {
             HitLocation hitLocation;
             if (attackAngle <= 45.00f && attackAngle >= -45.00f)
@@ -354,7 +354,14 @@ namespace Vi.ScriptableObjects
                     // If we can't find an in progress reaction, just get a normal reaction
                     if (hitReaction == null)
                     {
-                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                        if (applyAilmentRegardless)
+                        {
+                            hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                        }
+                        else
+                        {
+                            hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                        }
                     }
                 }
                 else

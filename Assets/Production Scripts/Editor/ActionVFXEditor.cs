@@ -11,6 +11,7 @@ namespace Vi.Editor
     public class ActionVFXEditor : UnityEditor.Editor
     {
         private SerializedProperty spVFXPositionOffset;
+        private SerializedProperty spBaseRotationOnRoot;
         private SerializedProperty spVFXRotationOffset;
 
         private SerializedProperty spVFXSpawnType;
@@ -36,6 +37,7 @@ namespace Vi.Editor
         protected void OnEnable()
         {
             spVFXPositionOffset = serializedObject.FindProperty("vfxPositionOffset");
+            spBaseRotationOnRoot = serializedObject.FindProperty("baseRotationOnRoot");
             spVFXRotationOffset = serializedObject.FindProperty("vfxRotationOffset");
 
             spVFXSpawnType = serializedObject.FindProperty("vfxSpawnType");
@@ -63,6 +65,7 @@ namespace Vi.Editor
         {
             EditorGUILayout.LabelField("Action VFX", EditorStyles.whiteLargeLabel);
             EditorGUILayout.PropertyField(spVFXPositionOffset);
+            if ((ActionVFX.TransformType)spTransformType.enumValueIndex == ActionVFX.TransformType.SpawnAtWeaponPoint) { EditorGUILayout.PropertyField(spBaseRotationOnRoot); }
             EditorGUILayout.PropertyField(spVFXRotationOffset);
 
             EditorGUILayout.PropertyField(spVFXSpawnType);

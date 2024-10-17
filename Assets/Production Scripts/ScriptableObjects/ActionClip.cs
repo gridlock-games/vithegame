@@ -332,5 +332,7 @@ namespace Vi.ScriptableObjects
         public float normalizedSummonTime = 0.5f;
         public Vector3 summonPositionOffset = new Vector3(0, 0, 2);
         public int summonableCount = 0;
+
+        public const int maxLivingSummonables = 3;
     }
 }

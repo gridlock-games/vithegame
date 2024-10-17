@@ -17,6 +17,7 @@ namespace Vi.Core
 
         public abstract string GetName();
         public abstract PlayerDataManager.Team GetTeam();
+        public abstract Weapon.ArmorType GetArmorType();
 
         public StatusAgent StatusAgent { get; private set; }
         protected virtual void Awake()

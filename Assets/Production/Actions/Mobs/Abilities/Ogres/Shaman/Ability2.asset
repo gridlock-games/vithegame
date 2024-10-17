@@ -1515,7 +1515,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
@@ -1566,7 +1568,7 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit:
   - status: 12
     value: 0
-    duration: 3
+    duration: 2
     delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit:
