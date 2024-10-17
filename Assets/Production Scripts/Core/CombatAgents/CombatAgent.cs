@@ -434,6 +434,9 @@ namespace Vi.Core
                 GlowRenderer.RenderUninterruptable(IsUninterruptable);
             }
 
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
             bool canRegenStats = true;
             if (GameModeManager.Singleton)
             {
