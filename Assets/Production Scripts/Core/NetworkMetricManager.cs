@@ -50,8 +50,11 @@ namespace Vi.Core
             _singleton = null;
 
             // De-register when the associated NetworkObject is despawned.
-            NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(messageName);
-
+            if (NetworkManager.CustomMessagingManager != null)
+            {
+                NetworkManager.CustomMessagingManager.UnregisterNamedMessageHandler(messageName);
+            }
+            
             PacketLoss = 0;
         }
 
