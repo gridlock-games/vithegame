@@ -116,7 +116,7 @@ MonoBehaviour:
     type: 3}
   canADS: 1
   projectileSpawnPoint: {fileID: 6049529673539774852}
-  projectile: {fileID: 2116712592617969172, guid: 3d57fd6cdde3a134aa01786a0dd8f495,
+  projectile: {fileID: 5500358582595872425, guid: 719f0ef59099d724e896612719d5038d,
     type: 3}
   projectileForce: {x: 0, y: 0, z: 40}
   ammoCountDamageMultipliers:
@@ -205,6 +205,9 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
