@@ -405,7 +405,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
                     orientation.position = weaponInstances[actionVFX.weaponBone].transform.position;
-                    orientation.rotation = weaponInstances[actionVFX.weaponBone].transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
+                    orientation.rotation = (actionVFX.baseRotationOnRoot ? attackerTransform.rotation : weaponInstances[actionVFX.weaponBone].transform.rotation) * Quaternion.Euler(actionVFX.vfxRotationOffset);
                     orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                     parent = isPreviewVFX ? weaponInstances[actionVFX.weaponBone].transform : null;
                     break;
