@@ -51,73 +51,10 @@ namespace Vi.Core.CombatAgents
             ActionClip.Ailment.Death
         };
 
+        public override Weapon.ArmorType GetArmorType() { return armorType; }
         public CharacterReference.WeaponOption GetWeaponOption() { return weaponOption; }
-
         public override PlayerDataManager.Team GetTeam() { return team.Value; }
-
         public override string GetName() { return name.Replace("(Clone)", ""); }
-
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
-            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
-
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
-
-                if (GameModeManager.Singleton)
-                {
-                    if (lastAttackingCombatAgent)
-                    {
-                        GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this);
-                    }
-                    else
-                    {
-                        GameModeManager.Singleton.OnEnvironmentKill(this);
-                    }
-                }
-            }
-            RenderHitGlowOnly();
-            AddHP(damage);
-            return true;
-        }
-
-        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
-        {
-            if (!IsServer) { Debug.LogError("Mob.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
-            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
-
-            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                attackAilment = ActionClip.Ailment.Death;
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
-
-                if (GameModeManager.Singleton)
-                {
-                    if (lastAttackingCombatAgent)
-                    {
-                        GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this);
-                    }
-                    else
-                    {
-                        GameModeManager.Singleton.OnEnvironmentKill(this);
-                    }
-                }
-            }
-            else
-            {
-                ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
-                AnimationHandler.PlayAction(hitReaction);
-            }
-
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, armorType, Weapon.WeaponBone.Root, attackAilment);
-            AddHP(damage);
-            return true;
-        }
 
         protected override (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {

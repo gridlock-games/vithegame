@@ -21,6 +21,8 @@ namespace Vi.Core.CombatAgents
 
         public override string GetName() { return CachedPlayerData.character.name.ToString(); }
 
+        public override Weapon.ArmorType GetArmorType() { return AnimationHandler.GetArmorType(); }
+
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return CachedPlayerData.character.raceAndGender; }
 
         public PlayerDataManager.PlayerData CachedPlayerData { get; private set; }
@@ -204,66 +206,6 @@ namespace Vi.Core.CombatAgents
             }
             
             return hitSuccess;
-        }
-
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
-            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
-
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
-
-                if (lastAttackingCombatAgent)
-                {
-                    SetKiller(lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
-                }
-            }
-            RenderHitGlowOnly();
-            AddHP(damage);
-            return true;
-        }
-
-        public override bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
-            if (ailment.Value == ActionClip.Ailment.Death) { return false; }
-
-            ActionClip.Ailment attackAilment = ActionClip.Ailment.None;
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                attackAilment = ActionClip.Ailment.Death;
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
-
-                if (lastAttackingCombatAgent)
-                {
-                    SetKiller(lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
-                }
-            }
-            else
-            {
-                ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReactionByDirection(Weapon.HitLocation.Front);
-                AnimationHandler.PlayAction(hitReaction);
-            }
-
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, AnimationHandler.GetArmorType(), Weapon.WeaponBone.Root, attackAilment);
-            AddHP(damage);
-            return true;
         }
 
         public void AddHitToComboCounter() { comboCounter.Value++; }
