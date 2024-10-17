@@ -713,6 +713,57 @@ namespace Vi.Core
             }
         }
 
+        protected bool CanProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon = null)
+        {
+            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+
+            if (isMeleeHit)
+            {
+                if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
+                if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
+            }
+
+            // Make grab people invinicible to all attacks except for the grab hits
+            if (IsGrabbed)
+            {
+                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
+                if (attacker != GetGrabAssailant()) { return false; }
+            }
+
+            // If we hit someone and we are already grabbing but the person we're hitting isn't the attacker's grab victim
+            if (attacker.IsGrabbing)
+            {
+                CombatAgent grabVictim = attacker.GetGrabVictim();
+                if (grabVictim)
+                {
+                    if (grabVictim != this) { return false; }
+                }
+            }
+
+            if (IsGrabbing) { return false; }
+
+            // Don't let grab attack hit players that aren't grabbed
+            if (attack.GetClipType() == ActionClip.ClipType.GrabAttack)
+            {
+                if (attacker.GetGrabVictim() != this) { return false; }
+            }
+            return true;
+        }
+
+        protected bool CanHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack)
+        {
+            if (attack.maxHitLimit == 0) { return false; }
+
+            if (IsInvincible) { return false; }
+
+            if (isMeleeHit)
+            {
+                if (attacker.wasStaggeredThisFrame) { return false; }
+            }
+
+            return true;
+        }
+
         private IEnumerator ClearDamageMappingAfter1Frame()
         {
             yield return null;
@@ -727,7 +778,7 @@ namespace Vi.Core
             wasStaggeredThisFrame = false;
         }
 
-        protected (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
+        protected virtual (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {
             if (StatusAgent.GetActiveStatuses().Contains(ActionClip.Status.immuneToAilments))
             {

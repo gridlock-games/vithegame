@@ -147,17 +147,31 @@ namespace Vi.Core.CombatAgents
             return true;
         }
 
-        private bool ProcessHit(bool isMeleeHit, CombatAgent attackerCombatAgent, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
+        protected override (bool, ActionClip.Ailment) GetAttackAilment(ActionClip attack, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter)
         {
-            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
+            (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = base.GetAttackAilment(attack, hitCounter);
 
-            if (isMeleeHit)
+            if (!whitelistedAilments.Contains(attackAilment))
             {
-                if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
-                if (GetAilment() == ActionClip.Ailment.Death | attackerCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return false; }
+                if (attackAilment != ActionClip.Ailment.None & whitelistedAilments.Contains(ActionClip.Ailment.Stun))
+                {
+                    attackAilment = ActionClip.Ailment.Stun;
+                    applyAilmentRegardless = true;
+                }
+                else
+                {
+                    attackAilment = ActionClip.Ailment.None;
+                }
             }
 
-            if (!PlayerDataManager.Singleton.CanHit(attackerCombatAgent, this))
+            return (applyAilmentRegardless, attackAilment);
+        }
+
+        private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
+        {
+            if (!CanProcessHit(isMeleeHit, attacker, attack, runtimeWeapon)) { return false; }
+
+            if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
@@ -167,39 +181,23 @@ namespace Vi.Core.CombatAgents
                 return false;
             }
 
-            if (attack.maxHitLimit == 0) { return false; }
-
-            if (IsInvincible) { return false; }
-
-            if (isMeleeHit)
-            {
-                if (attackerCombatAgent.wasStaggeredThisFrame) { return false; }
-
-                if (!IsUninterruptable)
-                {
-                    wasStaggeredThisFrame = true;
-                    StartCoroutine(ResetStaggerBool());
-                }
-            }
+            if (!CanHit(isMeleeHit, attacker, attack)) { return false; }
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
-            if (!whitelistedAilments.Contains(attackAilment))
+
+            if (IsUninterruptable)
             {
-                if (attackAilment != ActionClip.Ailment.None & whitelistedAilments.Contains(ActionClip.Ailment.Stun))
-                {
-                    attackAilment = ActionClip.Ailment.Stun;
-                }
-                else
-                {
-                    attackAilment = ActionClip.Ailment.None;
-                }
+                attackAilment = ActionClip.Ailment.None;
+            }
+            else
+            {
+                wasStaggeredThisFrame = true;
+                StartCoroutine(ResetStaggerBool());
             }
 
-            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
 
-            if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attackerCombatAgent.MovementHandler.GetPosition(); }
-
-            if (!attackerCombatAgent.IsRaging) { attackerCombatAgent.AddRage(attackerRageToBeAddedOnHit); }
+            if (!attacker.IsRaging) { attacker.AddRage(attackerRageToBeAddedOnHit); }
             if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, hitSourcePosition - transform.position, Vector3.up);
@@ -207,22 +205,22 @@ namespace Vi.Core.CombatAgents
             hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
             float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
-            HPDamage *= attackerCombatAgent.StatusAgent.DamageMultiplier;
+            HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
             bool shouldPlayHitReaction = false;
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
-                HPDamage *= attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                if (attack.canEnhance & attackerCombatAgent.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
+                HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
                 {
                     HPDamage *= attack.enhancedChargeDamageMultiplier;
                 }
             }
 
-            if (attackerCombatAgent.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
+            if (attacker.AnimationHandler.IsCharging()) { shouldPlayHitReaction = true; }
 
-            if (attackerCombatAgent is Attributes attacker) { attacker.AddHitToComboCounter(); }
+            if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
 
             bool hitReactionWasPlayed = false;
             if (AddHPWithoutApply(HPDamage) <= 0)
@@ -244,11 +242,11 @@ namespace Vi.Core.CombatAgents
                 if (hitReaction.ailment == ActionClip.Ailment.Grab)
                 {
                     grabAttackClipName.Value = attack.name;
-                    grabAssailantDataId.Value = attackerCombatAgent.NetworkObjectId;
-                    attackerCombatAgent.SetGrabVictim(NetworkObjectId);
+                    grabAssailantDataId.Value = attacker.NetworkObjectId;
+                    attacker.SetGrabVictim(NetworkObjectId);
                     isGrabbed.Value = true;
-                    attackerCombatAgent.SetIsGrabbingToTrue();
-                    attackerCombatAgent.AnimationHandler.PlayAction(attackerCombatAgent.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
+                    attacker.SetIsGrabbingToTrue();
+                    attacker.AnimationHandler.PlayAction(attacker.WeaponHandler.GetWeapon().GetGrabAttackClip(attack));
                 }
 
                 if (hitReaction.ailment == ActionClip.Ailment.None)
@@ -274,28 +272,28 @@ namespace Vi.Core.CombatAgents
 
             if (runtimeWeapon) { runtimeWeapon.AddHit(this); }
 
-            StartHitStop(attackerCombatAgent, isMeleeHit);
+            StartHitStop(attacker, isMeleeHit);
 
             if (hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
                 RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
                 float prevHP = GetHP();
                 AddHP(HPDamage);
-                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attackerCombatAgent, this, prevHP - GetHP()); }
-                AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                AddDamageToMapping(attacker, prevHP - GetHP());
             }
             else // Not blocking
             {
                 if (!Mathf.Approximately(HPDamage, 0))
                 {
-                    RenderHit(attackerCombatAgent.NetworkObjectId, impactPosition, armorType, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
+                    RenderHit(attacker.NetworkObjectId, impactPosition, armorType, runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
                     AddHP(HPDamage);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attackerCombatAgent, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attackerCombatAgent, prevHP - GetHP());
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                    AddDamageToMapping(attacker, prevHP - GetHP());
                 }
 
-                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attackerCombatAgent, attack, hitReaction);
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
             }
 
             if (IsServer & runtimeWeapon)
@@ -304,7 +302,7 @@ namespace Vi.Core.CombatAgents
                 {
                     if (actionVFX.vfxSpawnType == ActionVFX.VFXSpawnType.OnHit)
                     {
-                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attackerCombatAgent.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
+                        if (WeaponHandler.SpawnActionVFX(attack, actionVFX, attacker.transform, transform).TryGetComponent(out ActionVFXParticleSystem actionVFXParticleSystem))
                         {
                             if (!hitCounter.ContainsKey(this))
                             {
@@ -329,7 +327,7 @@ namespace Vi.Core.CombatAgents
                 }
             }
 
-            lastAttackingCombatAgent = attackerCombatAgent;
+            lastAttackingCombatAgent = attacker;
             return true;
         }
 

@@ -431,38 +431,7 @@ namespace Vi.Core.CombatAgents
 
         private bool ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
-            if (!attack.IsAttack()) { Debug.LogError("Trying to process a hit with an action clip that isn't an attack! " + attack); return false; }
-
-            if (isMeleeHit)
-            {
-                if (!runtimeWeapon) { Debug.LogError("When processing a melee hit, you need to pass in a runtime weapon!"); return false; }
-                if (GetAilment() == ActionClip.Ailment.Death | attacker.GetAilment() == ActionClip.Ailment.Death) { return false; }
-            }
-
-            // Make grab people invinicible to all attacks except for the grab hits
-            if (IsGrabbed)
-            {
-                if (attack.GetClipType() != ActionClip.ClipType.GrabAttack) { return false; }
-                if (attacker != GetGrabAssailant()) { return false; }
-            }
-            
-            // If we hit someone and we are already grabbing but the person we're hitting isn't the attacker's grab victim
-            if (attacker.IsGrabbing)
-            {
-                CombatAgent grabVictim = attacker.GetGrabVictim();
-                if (grabVictim)
-                {
-                    if (grabVictim != this) { return false; }
-                }
-            }
-
-            if (IsGrabbing) { return false; }
-
-            // Don't let grab attack hit players that aren't grabbed
-            if (attack.GetClipType() == ActionClip.ClipType.GrabAttack)
-            {
-                if (attacker.GetGrabVictim() != this) { return false; }
-            }
+            if (!CanProcessHit(isMeleeHit, attacker, attack, runtimeWeapon)) { return false; }
 
             if (!PlayerDataManager.Singleton.CanHit(attacker, this))
             {
@@ -474,23 +443,19 @@ namespace Vi.Core.CombatAgents
                 return false;
             }
 
-            if (attack.maxHitLimit == 0) { return false; }
-
-            if (IsInvincible) { return false; }
-            if (isMeleeHit)
-            {
-                if (attacker.wasStaggeredThisFrame) { return false; }
-
-                if (!IsUninterruptable)
-                {
-                    wasStaggeredThisFrame = true;
-                    StartCoroutine(ResetStaggerBool());
-                }
-            }
+            if (!CanHit(isMeleeHit, attacker, attack)) { return false; }
 
             (bool applyAilmentRegardless, ActionClip.Ailment attackAilment) = GetAttackAilment(attack, hitCounter);
 
-            if (IsUninterruptable) { attackAilment = ActionClip.Ailment.None; }
+            if (IsUninterruptable)
+            {
+                attackAilment = ActionClip.Ailment.None;
+            }
+            else
+            {
+                wasStaggeredThisFrame = true;
+                StartCoroutine(ResetStaggerBool());
+            }
 
             if (attackAilment == ActionClip.Ailment.Grab) { hitSourcePosition = attacker.MovementHandler.GetPosition(); }
 
@@ -555,7 +520,7 @@ namespace Vi.Core.CombatAgents
                     }
                     break;
                 default:
-                    Debug.Log("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
+                    Debug.LogError("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
                     break;
             }
 
