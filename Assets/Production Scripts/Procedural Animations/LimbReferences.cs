@@ -293,8 +293,11 @@ namespace Vi.ProceduralAnimations
             if (!hips)
             {
                 Transform root = transform.Find("root");
-                hips = root.Find("pelvis");
-                if (hips) { UnityEditor.EditorUtility.SetDirty(this); }
+                if (root)
+                {
+                    hips = root.Find("pelvis");
+                    if (hips) { UnityEditor.EditorUtility.SetDirty(this); }
+                }
             }
         }
 #endif
