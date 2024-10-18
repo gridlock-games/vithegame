@@ -2735,10 +2735,20 @@ namespace Vi.Core
 
         private void Start()
         {
-            CheckGameVersion(false);
+            StartCoroutine(Initialize());
 #if UNITY_EDITOR
             StartCoroutine(CreateItems());
 #endif
+        }
+
+        private IEnumerator Initialize()
+        {
+#if UNITY_SERVER && !UNITY_EDITOR
+            yield return GetPublicIP();
+            APIURL = "http://" + PublicIP + ":80/";
+#endif
+            CheckGameVersion(false);
+            yield return null;
         }
 
         private void Update()
