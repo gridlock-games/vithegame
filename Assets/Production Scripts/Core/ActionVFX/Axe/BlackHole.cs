@@ -51,7 +51,7 @@ namespace Vi.Core.VFX.Axe
                     PhysicsMovementHandler movementHandler = networkCollider.MovementHandler;
                     movementHandler.ExternalForceAffecting();
                     Vector3 rel = transform.position - movementHandler.GetPosition();
-                    movementHandler.Rigidbody.AddForce(rel * pullStrength - movementHandler.Rigidbody.velocity, ForceMode.VelocityChange);
+                    movementHandler.Rigidbody.AddForce(rel * pullStrength - movementHandler.Rigidbody.linearVelocity, ForceMode.VelocityChange);
                 }
             }
             else if (other.transform.root.GetComponent<Projectile>())

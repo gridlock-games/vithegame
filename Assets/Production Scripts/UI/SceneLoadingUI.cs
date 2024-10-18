@@ -61,7 +61,7 @@ namespace Vi.UI
         NetworkCallbackManager networkCallbackManager;
         private void Start()
         {
-            networkCallbackManager = FindObjectOfType<NetworkCallbackManager>();
+            networkCallbackManager = FindFirstObjectByType<NetworkCallbackManager>();
             if (!networkCallbackManager)
             {
                 Debug.LogError("Can't find network callback manager");

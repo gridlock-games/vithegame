@@ -50,6 +50,23 @@ namespace Vi.Core
             CheckGameVersion(true);
         }
 
+        public string PublicIP { get; private set; }
+        public IEnumerator GetPublicIP()
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get("http://icanhazip.com");
+            yield return getRequest.SendWebRequest();
+
+            servers.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.GetPublicIP() " + getRequest.error);
+                getRequest.Dispose();
+                IsRefreshingServers = false;
+                yield break;
+            }
+            PublicIP = getRequest.downloadHandler.text.Replace("\\r\\n", "").Replace("\\n", "").Trim();
+        }
+
         public bool IsRefreshingServers { get; private set; }
         public Server[] LobbyServers { get; private set; } = new Server[0];
         public Server[] HubServers { get; private set; } = new Server[0];
@@ -2718,8 +2735,20 @@ namespace Vi.Core
 
         private void Start()
         {
-            if (Application.isEditor) { StartCoroutine(CreateItems()); }
+            StartCoroutine(Initialize());
+#if UNITY_EDITOR
+            StartCoroutine(CreateItems());
+#endif
+        }
+
+        private IEnumerator Initialize()
+        {
+#if UNITY_SERVER && !UNITY_EDITOR
+            yield return GetPublicIP();
+            APIURL = "http://" + PublicIP + ":80/";
+#endif
             CheckGameVersion(false);
+            yield return null;
         }
 
         private void Update()
@@ -2754,6 +2783,7 @@ namespace Vi.Core
             }
         }
 
+#if UNITY_EDITOR
         private IEnumerator CreateItems()
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
@@ -2965,6 +2995,7 @@ namespace Vi.Core
             }
 
         }
+#endif
 
         public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
         {

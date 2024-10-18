@@ -22,7 +22,7 @@ namespace Vi.Utility
                 this.rb = rb;
                 position = rb.position;
                 rotation = rb.rotation;
-                velocity = rb.velocity;
+                velocity = rb.linearVelocity;
                 angularVelocity = rb.angularVelocity;
             }
 
@@ -32,7 +32,7 @@ namespace Vi.Utility
                 rb.rotation = rotation;
                 if (!rb.isKinematic)
                 {
-                    rb.velocity = velocity;
+                    rb.linearVelocity = velocity;
                     rb.angularVelocity = angularVelocity;
                 }
             }

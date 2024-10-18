@@ -128,7 +128,7 @@ namespace Vi.Core
         {
             if (!initialized) { return; }
             if (!IsServer) { return; }
-            rb.MoveRotation(rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity));
+            rb.MoveRotation(rb.linearVelocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.linearVelocity));
         }
 
         [HideInInspector] public bool canHitPlayers = true;
@@ -162,7 +162,7 @@ namespace Vi.Core
             }
             else if (other.attachedRigidbody)
             {
-                other.attachedRigidbody.AddForceAtPosition(rb.velocity, other.ClosestPointOnBounds(transform.position), ForceMode.VelocityChange);
+                other.attachedRigidbody.AddForceAtPosition(rb.linearVelocity, other.ClosestPointOnBounds(transform.position), ForceMode.VelocityChange);
             }
 
             if (!other.isTrigger | shouldDestroy) { NetworkObject.Despawn(true); }

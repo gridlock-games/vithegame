@@ -36,8 +36,15 @@ namespace Vi.Core
         private const int numPacketsToSend = 32;
         private IEnumerator SendPacket()
         {
+            if (!IsServer) { Debug.LogError("Should only call SendPacket() on the server"); yield break; }
+
             while (true)
             {
+                if (NetworkManager.ConnectedClients.Count == 0)
+                {
+                    yield return null;
+                    continue;
+                }
                 SendMessage(localPacketID);
                 yield return new WaitForSeconds(0.25f);
                 localPacketID++;

@@ -11,7 +11,7 @@ namespace Vi.Core
     [RequireComponent(typeof(Rigidbody))]
     public class NetworkCollider : MonoBehaviour
     {
-        [SerializeField] private PhysicMaterial physicMaterial;
+        [SerializeField] private PhysicsMaterial physicMaterial;
 
         public CombatAgent CombatAgent { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }

@@ -70,7 +70,7 @@ namespace Vi.UI
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
-            if (!playerInput) { playerInput = FindObjectOfType<PlayerInput>(); }
+            if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(); }
 
             originalSizeDelta = rebindingElementParent.sizeDelta;
         }

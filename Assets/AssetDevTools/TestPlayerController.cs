@@ -162,7 +162,7 @@ namespace AssetDevTools
             else
             {
                 Vector3 deltaPos = targetPosition - rb.position;
-                rb.velocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
+                rb.linearVelocity = 1f / Time.fixedDeltaTime * deltaPos * Mathf.Pow(positionStrength, 90f * Time.fixedDeltaTime);
 
                 //(movementPrediction.CurrentRotation * Quaternion.Inverse(transform.rotation)).ToAngleAxis(out float angle, out Vector3 axis);
                 //if (angle > 180.0f) angle -= 360.0f;
