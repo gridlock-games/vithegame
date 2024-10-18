@@ -777,7 +777,7 @@ namespace Vi.UI
         private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
         {
             Debug.Log($"Prepare deeplink login to look for {loginSource} Oauth");
-            DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
+            DeepLinkProcessing dlp = FindFirstObjectByType<DeepLinkProcessing>();
             dlp.SetLoginSource(loginSource);
         }
 
