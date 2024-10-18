@@ -177,7 +177,7 @@ namespace Vi.Core
             float currentRagePercent = GetRage() / GetMaxRage();
             if (currentRagePercent >= 1)
             {
-                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, AnimationHandler.Animator.GetBoneTransform(HumanBodyBones.Hips)); }
+                if (!rageAtMaxVFXInstance) { rageAtMaxVFXInstance = ObjectPoolingManager.SpawnObject(rageAtMaxVFXPrefab, AnimationHandler.LimbReferences.Hips); }
             }
             else
             {

@@ -285,10 +285,19 @@ namespace Vi.ProceduralAnimations
         [SerializeField] private Weapon.WeaponBone[] keys = new Weapon.WeaponBone[0];
         [SerializeField] private Transform[] values = new Transform[0];
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
             if (keys.Length != values.Length) { Debug.LogError("Keys and Values must be the same length!"); }
+
+            if (!hips)
+            {
+                Transform root = transform.Find("root");
+                hips = root.Find("pelvis");
+                if (hips) { UnityEditor.EditorUtility.SetDirty(this); }
+            }
         }
+#endif
 
         public Transform GetBoneTransform(Weapon.WeaponBone weaponBone)
         {
