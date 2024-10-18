@@ -50,6 +50,23 @@ namespace Vi.Core
             CheckGameVersion(true);
         }
 
+        public string PublicIP { get; private set; }
+        public IEnumerator GetPublicIP()
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get("http://icanhazip.com");
+            yield return getRequest.SendWebRequest();
+
+            servers.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.GetPublicIP() " + getRequest.error);
+                getRequest.Dispose();
+                IsRefreshingServers = false;
+                yield break;
+            }
+            PublicIP = getRequest.downloadHandler.text.Replace("\\r\\n", "").Replace("\\n", "").Trim();
+        }
+
         public bool IsRefreshingServers { get; private set; }
         public Server[] LobbyServers { get; private set; } = new Server[0];
         public Server[] HubServers { get; private set; } = new Server[0];
