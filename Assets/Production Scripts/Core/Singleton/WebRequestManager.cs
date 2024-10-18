@@ -2735,8 +2735,10 @@ namespace Vi.Core
 
         private void Start()
         {
-            if (Application.isEditor) { StartCoroutine(CreateItems()); }
             CheckGameVersion(false);
+#if UNITY_EDITOR
+            StartCoroutine(CreateItems());
+#endif
         }
 
         private void Update()
@@ -2771,6 +2773,7 @@ namespace Vi.Core
             }
         }
 
+#if UNITY_EDITOR
         private IEnumerator CreateItems()
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
@@ -2982,6 +2985,7 @@ namespace Vi.Core
             }
 
         }
+#endif
 
         public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
         {
