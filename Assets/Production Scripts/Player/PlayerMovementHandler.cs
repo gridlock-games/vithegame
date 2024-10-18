@@ -197,7 +197,7 @@ namespace Vi.Player
             {
                 while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
-                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero & !latestServerState.Value.usedRootMotion & !combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
+                    if (serverInputQueue.Count > 0 & inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero & !latestServerState.Value.usedRootMotion & !combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
 
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
