@@ -9,6 +9,7 @@ using Vi.Core.MovementHandlers;
 using Vi.Core.VFX;
 using Vi.Core.GameModeManagers;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -1210,6 +1211,8 @@ namespace Vi.Core
                     }
                 }
             }
+
+            if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
 
             lastAttackingCombatAgent = attacker;
             return hitReaction.GetHitReactionType() == ActionClip.HitReactionType.Blocking ? HitResult.Block : HitResult.True;
