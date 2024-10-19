@@ -133,9 +133,12 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
+            float velocityError = Vector3.Distance(latestServerState.Value.velocity, stateBuffer[serverStateBufferIndex].velocity);
+            if (velocityError > 0.01f) { Debug.Log(velocityError); }
+
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(OwnerClientId + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 //Debug.Log(positionError + " " + (Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex + 1].position) < serverReconciliationThreshold));
                 lastServerReconciliationTime = Time.time;
 
@@ -179,7 +182,6 @@ namespace Vi.Player
             }
         }
 
-        private Vector2 lastMoveInputProcessedOnServer;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -195,15 +197,12 @@ namespace Vi.Player
 
             if (!IsClient)
             {
+                Debug.Log("Queued inputs " + serverInputQueue.Count);
                 while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
-                    if (serverInputQueue.Count > 0 & inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero & !latestServerState.Value.usedRootMotion & !combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
-
                     StatePayload statePayload = Move(inputPayload);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-
-                    lastMoveInputProcessedOnServer = inputPayload.moveInput;
                     break;
                 }
             }
@@ -571,9 +570,11 @@ namespace Vi.Player
             transform.rotation = EvaluateRotation();
         }
 
+        private float spawnTime;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            spawnTime = Time.time;
             if (IsLocalPlayer)
             {
                 cameraController.gameObject.tag = "MainCamera";
