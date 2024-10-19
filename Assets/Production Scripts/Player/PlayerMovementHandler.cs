@@ -175,7 +175,7 @@ namespace Vi.Player
                 {
                     if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
                     {
-                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { Debug.Log("skipping input for action clip " + serverInputQueue.Count); continue; }
+                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
                     }
                 }
 
@@ -209,7 +209,7 @@ namespace Vi.Player
                     {
                         if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
                         {
-                            if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { Debug.Log("skipping input " + serverInputQueue.Count); continue; }
+                            if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
                         }
                     }
 
