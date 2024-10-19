@@ -652,6 +652,8 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
+            combatAgent.MovementHandler.OnServerActionClipPlayed();
+
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
@@ -686,8 +688,6 @@ namespace Vi.Core
                 if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
                 playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
             }
-
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);

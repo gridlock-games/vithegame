@@ -171,11 +171,19 @@ namespace Vi.Player
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
+                if (serverInputQueue.Count > 0)
+                {
+                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
+                    {
+                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { Debug.Log("skipping input for action clip " + serverInputQueue.Count); continue; }
+                    }
+                }
+
                 StatePayload statePayload = Move(inputPayload);
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                 latestServerState.Value = statePayload;
-
-                if (serverInputQueue.Count > 0) { NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody); }
+                lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
             }
         }
 
