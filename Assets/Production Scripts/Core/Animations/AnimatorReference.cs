@@ -419,23 +419,22 @@ namespace Vi.Core
 
                 if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
 
-                Vector3 localSpaceRootMotion = animator.deltaPosition;
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(animator.rootRotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
                 {
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                     {
-                        localSpaceRootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(normalizedTime);
-                        localSpaceRootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(normalizedTime);
-                        localSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime) * combatAgent.WeaponHandler.CurrentActionClip.GetHitReactionRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                     else
                     {
-                        localSpaceRootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime);
-                        localSpaceRootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime);
-                        localSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.x *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionSidesMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.y *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionVerticalMultiplier().Evaluate(normalizedTime);
+                        worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().Evaluate(normalizedTime);
                     }
                 }
-                Vector3 worldSpaceRootMotion = Quaternion.Inverse(animator.rootRotation) * localSpaceRootMotion;
                 accumulatedRootMotion += new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z) / Time.fixedDeltaTime;
             }
 
