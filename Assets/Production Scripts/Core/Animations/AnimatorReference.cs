@@ -51,7 +51,7 @@ namespace Vi.Core
         public Dictionary<CharacterReference.EquipmentType, WearableEquipment> WearableEquipmentInstances { get; private set; } = new Dictionary<CharacterReference.EquipmentType, WearableEquipment>();
         public void ApplyWearableEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
-            WearableEquipment model = wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment());
+            WearableEquipment model = wearableEquipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment);
             if (WearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
             {
                 if (WearableEquipmentInstances[wearableEquipmentOption.equipmentType])

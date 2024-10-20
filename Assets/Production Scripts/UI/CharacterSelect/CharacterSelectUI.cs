@@ -384,7 +384,7 @@ namespace Vi.UI
                 CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
                 buttonElement.InitializeAsEquipment(equipmentOption, raceAndGender);
                 buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name));
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name));
             }
 
             Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;

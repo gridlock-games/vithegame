@@ -15,14 +15,13 @@ namespace Vi.ScriptableObjects
         [SerializeField] private GameObject playerPrefab;
         public GameObject BotPrefab { get { return botPrefab; } }
         [SerializeField] private GameObject botPrefab;
+        public WearableEquipment EmptyWearableEquipment { get { return emptyWearableEquipment; } }
+        [SerializeField] private WearableEquipment emptyWearableEquipment;
 
         [SerializeField] private PlayerModelOption[] playerModelOptions;
         [SerializeField] private WeaponOption[] weaponOptions;
-        [SerializeField] private WearableEquipment emptyWearableEquipment;
         [SerializeField] private List<WearableEquipmentOption> equipmentOptions;
         [SerializeField] private List<CharacterMaterial> characterMaterialOptions;
-
-        public WearableEquipment GetEmptyWearableEquipment() { return emptyWearableEquipment; }
 
         [System.Serializable]
         public class PlayerModelOption

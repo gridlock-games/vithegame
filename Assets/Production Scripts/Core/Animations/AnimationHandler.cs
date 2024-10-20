@@ -1192,11 +1192,11 @@ namespace Vi.Core
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(character.raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.EmptyWearableEquipment).name == character.beard);
             ApplyWearableEquipment(CharacterReference.EquipmentType.Beard, beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), character.raceAndGender);
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.EmptyWearableEquipment).name == character.brows);
             ApplyWearableEquipment(CharacterReference.EquipmentType.Brows, browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), character.raceAndGender);
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.EmptyWearableEquipment).name == character.hair);
             ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), character.raceAndGender);
         }
 
