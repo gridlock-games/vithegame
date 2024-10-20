@@ -250,7 +250,7 @@ namespace Vi.Utility
                 musicSource.spatialBlend = 0;
             }
 
-            foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>())
+            foreach (AudioSource audioSource in FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (audioSource == musicSource) { continue; }
                 RegisterAudioSourceToBeAffectedByTimescale(audioSource);

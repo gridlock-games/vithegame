@@ -419,7 +419,7 @@ namespace Vi.Core
 
                 if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
 
-                Vector3 worldSpaceRootMotion = Quaternion.Inverse(transform.root.rotation) * animator.deltaPosition;
+                Vector3 worldSpaceRootMotion = Quaternion.Inverse(animator.rootRotation) * animator.deltaPosition;
                 if (shouldApplyCurves)
                 {
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)

@@ -1035,7 +1035,6 @@ namespace Vi.Core
 
             float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
-            hitReaction.SetHitReactionRootMotionMultipliers(attack);
 
             float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
@@ -1083,7 +1082,6 @@ namespace Vi.Core
                         {
                             if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
                             hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value, false);
-                            hitReaction.SetHitReactionRootMotionMultipliers(attack);
                         }
                         shouldPlayHitReaction = true;
                     }
