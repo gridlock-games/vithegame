@@ -58,7 +58,7 @@ namespace Vi.Utility
             }
         }
 
-        public static void SimulateOneRigidbody(Rigidbody rigidbodyToSimulate)
+        public static void SimulateOneRigidbody(Rigidbody rigidbodyToSimulate, bool changeSimulationMode = true)
         {
             List<RigidbodyData> rigidbodyDataBeforeSimulation = new List<RigidbodyData>();
             foreach (Rigidbody rb in activeRigidbodies)
@@ -71,9 +71,9 @@ namespace Vi.Utility
                 }
             }
 
-            Physics.simulationMode = SimulationMode.Script;
+            if (changeSimulationMode) { Physics.simulationMode = SimulationMode.Script; }
             Physics.Simulate(Time.fixedDeltaTime);
-            Physics.simulationMode = SimulationMode.FixedUpdate;
+            if (changeSimulationMode) { Physics.simulationMode = SimulationMode.FixedUpdate; }
 
             foreach (RigidbodyData rigidbodyData in rigidbodyDataBeforeSimulation)
             {

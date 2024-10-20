@@ -10,13 +10,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
+      propertyPath: vfxPositionOffset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
+        type: 3}
       propertyPath: vfxPositionOffset.y
-      value: -1
+      value: -1.25
       objectReference: {fileID: 0}
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
       propertyPath: vfxPositionOffset.z
-      value: -0.5
+      value: -0.75
       objectReference: {fileID: 0}
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
@@ -26,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
       propertyPath: vfxRotationOffset.y
-      value: -45
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
@@ -36,12 +41,12 @@ PrefabInstance:
     - target: {fileID: -9006139087169861769, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
       propertyPath: onActivateVFXSpawnNormalizedTime
-      value: 0.03
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 3295572927145124125, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3037237490
+      value: 181117221
       objectReference: {fileID: 0}
     - target: {fileID: 3295572927145124125, guid: 8aa7d5deab0ec469dba89e2179f33da4,
         type: 3}
