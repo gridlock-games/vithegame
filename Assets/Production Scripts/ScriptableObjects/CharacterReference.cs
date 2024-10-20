@@ -34,12 +34,13 @@ namespace Vi.ScriptableObjects
         public class WeaponOption
         {
             public string name;
+            public string itemWebId;
+            public bool isBasicGear;
             public Sprite weaponIcon;
             public Sprite killFeedIcon;
             public AnimatorOverrideController animationController;
             public Weapon weapon;
             public GameObject weaponPreviewPrefab;
-            public string itemWebId;
         }
 
         [System.Serializable]
@@ -112,8 +113,9 @@ namespace Vi.ScriptableObjects
         public class WearableEquipmentOption : System.IEquatable<WearableEquipmentOption>
         {
             public string name;
-            public EquipmentType equipmentType;
             public string itemWebId;
+            public bool isBasicGear;
+            public EquipmentType equipmentType;
             [SerializeField] private List<RaceAndGender> raceAndGenders = new List<RaceAndGender>();
             [SerializeField] private List<WearableEquipment> wearableEquipmentOptions = new List<WearableEquipment>();
             [SerializeField] private List<Sprite> equipmentIcons = new List<Sprite>();
@@ -253,7 +255,7 @@ namespace Vi.ScriptableObjects
 
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
-        # if UNITY_EDITOR
+# if UNITY_EDITOR
         [ContextMenu("Set Dirty")]
         private void SetDirtyAtWill()
         {
@@ -463,6 +465,6 @@ namespace Vi.ScriptableObjects
                 weaponOption.weapon.FindAnimations();
             }
         }
-        #endif
+#endif
     }
 }

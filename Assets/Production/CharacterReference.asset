@@ -16,6 +16,8 @@ MonoBehaviour:
     type: 3}
   botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
     type: 3}
+  emptyWearableEquipment: {fileID: 4940541453049098453, guid: 0d63d1c715aa4c14d9842fd63a41c092,
+    type: 3}
   playerModelOptions:
   - raceAndGender: 0
     model: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df, type: 3}
@@ -23,6 +25,8 @@ MonoBehaviour:
     model: {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785, type: 3}
   weaponOptions:
   - name: Bluesteel Raptor
+    itemWebId: 6715601345fb1538294a0a31
+    isBasicGear: 1
     weaponIcon: {fileID: 21300000, guid: 11f58536fed42074cb32651259890196, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 11f58536fed42074cb32651259890196, type: 3}
     animationController: {fileID: 22100000, guid: 5080149d10b51314aaa9b363ac4cb70e,
@@ -30,8 +34,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: c076585e4b9ade9469cd00419092e15a, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 5513925cc1a5fd644ab816b40ca94a3d,
       type: 3}
-    itemWebId: 6678b01ceec2c1a29095a053
   - name: Flintblade
+    itemWebId: 6715601345fb1538294a0a34
+    isBasicGear: 1
     weaponIcon: {fileID: 21300000, guid: eec3238fb45e43f4ca06d9fbaaa8f55c, type: 3}
     killFeedIcon: {fileID: 21300000, guid: eec3238fb45e43f4ca06d9fbaaa8f55c, type: 3}
     animationController: {fileID: 22100000, guid: b75d4eff0bb989b47b60e33dd77d1536,
@@ -39,8 +44,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 8c8295c6352352240bdc92806db30ce0, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: ae398536bf363f849b1251753e5231fe,
       type: 3}
-    itemWebId: 6678b01ceec2c1a29095a055
   - name: Sylvan Sentinel
+    itemWebId: 6715601445fb1538294a0a37
+    isBasicGear: 1
     weaponIcon: {fileID: 21300000, guid: ecffe41a25dc6b843848bb31597dc511, type: 3}
     killFeedIcon: {fileID: 21300000, guid: ecffe41a25dc6b843848bb31597dc511, type: 3}
     animationController: {fileID: 22100000, guid: df923ae8fdaa5214c8d112ef74e0c79e,
@@ -48,8 +54,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: e986ac8372a05cd478be867ae3f44c31, type: 2}
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: af22b4a2825753b48b9a67d4cb444187,
       type: 3}
-    itemWebId: 6678b01ceec2c1a29095a057
   - name: Woodwarden Cleaver
+    itemWebId: 6715601445fb1538294a0a39
+    isBasicGear: 1
     weaponIcon: {fileID: 21300000, guid: 13ffadec5da9a484aabcf21335917c71, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 13ffadec5da9a484aabcf21335917c71, type: 3}
     animationController: {fileID: 22100000, guid: f5fa05dc6033fce439e31716c589022f,
@@ -57,8 +64,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 8e03fbcb73ec70c4a8740ad7a3b173aa, type: 2}
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: f56c8fe4c780d8c4dac0ae5c53a2e46d,
       type: 3}
-    itemWebId: 6678b01ceec2c1a29095a059
   - name: Crimson Gleam
+    itemWebId: 6715601445fb1538294a0a3b
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 6bf2ba9bb11402e498fcacc580d1b96d, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 6bf2ba9bb11402e498fcacc580d1b96d, type: 3}
     animationController: {fileID: 22100000, guid: 7570c88645febdd4b8d6b50b5150d40b,
@@ -66,8 +74,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 060ad1d37d0be174b811c5077dafdd72, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 3135b9be0adbbeb459db6da35d83099b,
       type: 3}
-    itemWebId: 6678b01deec2c1a29095a05b
   - name: Thunderpoint
+    itemWebId: 6715601545fb1538294a0a3d
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 1add0e5330e719242830c78110c73889, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 1add0e5330e719242830c78110c73889, type: 3}
     animationController: {fileID: 22100000, guid: 001d40c9e0126aa47a7403fdb3c650e5,
@@ -75,8 +84,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: b3d943d201794084aa7f2c30ca4643c0, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 508265564c4464843bf7042c4da46839,
       type: 3}
-    itemWebId: 6678b01deec2c1a29095a05d
   - name: Grimbane
+    itemWebId: 6715601545fb1538294a0a3f
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: ab55b9878c965e44a8e159ce2c062d61, type: 3}
     killFeedIcon: {fileID: 21300000, guid: ab55b9878c965e44a8e159ce2c062d61, type: 3}
     animationController: {fileID: 22100000, guid: 08bd022814ebb0a4cb16990851bf7dda,
@@ -84,8 +94,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: a7404c483eb8721438c7e2d4a8a9a6cb, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 71772301ead80994a84a7facb3128cc5,
       type: 3}
-    itemWebId: 6678b01deec2c1a29095a05f
   - name: Iron Talon
+    itemWebId: 6715601645fb1538294a0a41
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 28d6752e42025ec428a199a9b1eea8c8, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 28d6752e42025ec428a199a9b1eea8c8, type: 3}
     animationController: {fileID: 22100000, guid: 7ff411bb9ab0ae04e8e6cba04b969138,
@@ -93,8 +104,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 730971d05a0eefb46890429729ae874e, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 18e2506ab0a196542a9607435993d875,
       type: 3}
-    itemWebId: 6678b01eeec2c1a29095a061
   - name: Reaper's Fist
+    itemWebId: 6715601645fb1538294a0a43
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: e7f0a07acbc3cde4f8bf13fd90e78628, type: 3}
     killFeedIcon: {fileID: 21300000, guid: e7f0a07acbc3cde4f8bf13fd90e78628, type: 3}
     animationController: {fileID: 22100000, guid: 33cdfb9025d01804994cbf38301a61cc,
@@ -102,8 +114,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 81aa861858f132841bb8972c43fdc38a, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 76475ced6acef5948b0daa271f16ae55,
       type: 3}
-    itemWebId: 6678b01eeec2c1a29095a063
   - name: Twinsteel Punch
+    itemWebId: 6715601645fb1538294a0a45
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: c81e1a40d72229a49b541e7c971f2cd0, type: 3}
     killFeedIcon: {fileID: 21300000, guid: c81e1a40d72229a49b541e7c971f2cd0, type: 3}
     animationController: {fileID: 22100000, guid: c41b47cb1bf80844989bb25be32795cd,
@@ -111,8 +124,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 02c1cba239f378d46806eefeb4547ea6, type: 2}
     weaponPreviewPrefab: {fileID: 9120665817193852633, guid: 993a9a644823b12419858dd0ac8175fd,
       type: 3}
-    itemWebId: 6678b01eeec2c1a29095a065
   - name: Embercleave
+    itemWebId: 6715601645fb1538294a0a47
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 83fd7e50267b8ba4b951acd03010419c, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 83fd7e50267b8ba4b951acd03010419c, type: 3}
     animationController: {fileID: 22100000, guid: 3d7dab311cf2d964b9bbe60b9caa2a81,
@@ -120,8 +134,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 8339cc3fdcf680a4e82e7cdb5b54e5f6, type: 2}
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: 21fab8c75ef984647b086ddc425273f7,
       type: 3}
-    itemWebId: 6678b01eeec2c1a29095a067
   - name: Naga's Grasp
+    itemWebId: 6715601745fb1538294a0a49
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: ed9826815db3e6946b12a0112297e9f9, type: 3}
     killFeedIcon: {fileID: 21300000, guid: ed9826815db3e6946b12a0112297e9f9, type: 3}
     animationController: {fileID: 22100000, guid: 2656ce6253047714eb7e42da4a6b5bfb,
@@ -129,8 +144,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 74d3b6a036d204a419c50418c8eb65cb, type: 2}
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: 708edfd2c1024ae40b3cc230f1c1f518,
       type: 3}
-    itemWebId: 6678b01feec2c1a29095a069
   - name: Doomskull Reaver
+    itemWebId: 6715601745fb1538294a0a4b
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 0efed01dea215c944a90afcc9b003933, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 0efed01dea215c944a90afcc9b003933, type: 3}
     animationController: {fileID: 22100000, guid: 66700afb543567646a50be46a6fe52d0,
@@ -138,8 +154,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 34ca3ff156bce574e9623ae5181055dd, type: 2}
     weaponPreviewPrefab: {fileID: 4763046253870307255, guid: da25912adf50af94b8bb9104780edc44,
       type: 3}
-    itemWebId: 6678b01feec2c1a29095a06b
   - name: Sapphire Strike
+    itemWebId: 6715601745fb1538294a0a4d
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 86cbd78538b163b49bb3fcf4739c1db6, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 86cbd78538b163b49bb3fcf4739c1db6, type: 3}
     animationController: {fileID: 22100000, guid: 5a5d44a46d7f7f346ab56265a92374f1,
@@ -147,8 +164,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: f35638378d4d50b4b988b47de13fe721, type: 2}
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: 11245dc525d774e428ac83d776538902,
       type: 3}
-    itemWebId: 6678b01feec2c1a29095a06d
   - name: Stag's Majesty
+    itemWebId: 6715601845fb1538294a0a4f
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 2fe06eb360499a84da20a0b103e29104, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 2fe06eb360499a84da20a0b103e29104, type: 3}
     animationController: {fileID: 22100000, guid: c5d83e08b57579e47ad01f445d76ef16,
@@ -156,8 +174,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: fa814df82eba57745b02124f71419f83, type: 2}
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: 5e4e1ed16156c5f48b4760c033a7b854,
       type: 3}
-    itemWebId: 6678b020eec2c1a29095a06f
   - name: The Soulreaper
+    itemWebId: 6715601845fb1538294a0a51
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: d705d846818fc0849829774bf056d971, type: 3}
     killFeedIcon: {fileID: 21300000, guid: d705d846818fc0849829774bf056d971, type: 3}
     animationController: {fileID: 22100000, guid: b374e41a9cc558944b138321e7f17be8,
@@ -165,8 +184,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: ac028e91a77bd1540a0f8cbfd4342dbd, type: 2}
     weaponPreviewPrefab: {fileID: 3178962258874356211, guid: 9a7793dc61204eb4db197b212a036a15,
       type: 3}
-    itemWebId: 6678b020eec2c1a29095a071
   - name: Cerulean Glaive
+    itemWebId: 6715601845fb1538294a0a53
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: b66c30d28e9db6d49845e8413d9e34a5, type: 3}
     killFeedIcon: {fileID: 21300000, guid: b66c30d28e9db6d49845e8413d9e34a5, type: 3}
     animationController: {fileID: 22100000, guid: 90cfc8f74ed8d39439361da21743d2a8,
@@ -174,8 +194,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 48af974a8cfde574bbd3000d7d7a3cb1, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 9b764b762bf676645875b88b0e71ef84,
       type: 3}
-    itemWebId: 6678b020eec2c1a29095a073
   - name: Verdantblade Pike
+    itemWebId: 6715601945fb1538294a0a55
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 1e2c2dc7a99454744832c66397cb61fa, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 1e2c2dc7a99454744832c66397cb61fa, type: 3}
     animationController: {fileID: 22100000, guid: 342b0b480fe74ff4aad28e93cc3d2730,
@@ -183,8 +204,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 4351ea1e1d73d2c408305f763bec31ec, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 160fe5d2b5a3d9c4bb29d5efb734085c,
       type: 3}
-    itemWebId: 6678b020eec2c1a29095a075
   - name: Deathvine Halbeard
+    itemWebId: 6715601945fb1538294a0a57
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 7b52f67216117f44e9f611d0808b2b88, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 7b52f67216117f44e9f611d0808b2b88, type: 3}
     animationController: {fileID: 22100000, guid: f14a49f864d0fa64e92021cfb1f8835f,
@@ -192,8 +214,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 531d10267f09df948b245ef198d426bc, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 14a35266ab1f76842914ab61e8b8420f,
       type: 3}
-    itemWebId: 6678b021eec2c1a29095a077
   - name: Cross of the Enchanter
+    itemWebId: 6715601945fb1538294a0a59
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: c53d6bca20b716447afb7f44c51951a7, type: 3}
     killFeedIcon: {fileID: 21300000, guid: c53d6bca20b716447afb7f44c51951a7, type: 3}
     animationController: {fileID: 22100000, guid: eb35f9e7368d6ad4593cf82010e88217,
@@ -201,8 +224,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: b8c854e692e561149a91a8872f3229a7, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: d9160d16337dae44dbfdfee34e5fd268,
       type: 3}
-    itemWebId: 66a303fb84815a0bd50210d0
   - name: Lumina Woodstaff
+    itemWebId: 6715601a45fb1538294a0a5b
+    isBasicGear: 1
     weaponIcon: {fileID: 21300000, guid: a20f5064a182b7447a635ffd767ce010, type: 3}
     killFeedIcon: {fileID: 21300000, guid: a20f5064a182b7447a635ffd767ce010, type: 3}
     animationController: {fileID: 22100000, guid: 1cf78e1a2e1e9024da721ef77fd1f096,
@@ -210,8 +234,9 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 9efd2fb72ea3c4d40a75f6fa13cf2a53, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: f0f8eda4895d4de42a021e58cdca5d60,
       type: 3}
-    itemWebId: 66a5abe584815a0bd58abeb7
   - name: Reaper's Touch
+    itemWebId: 6715601a45fb1538294a0a5d
+    isBasicGear: 0
     weaponIcon: {fileID: 21300000, guid: 5e85327daca319843b963ae48ab49e64, type: 3}
     killFeedIcon: {fileID: 21300000, guid: 5e85327daca319843b963ae48ab49e64, type: 3}
     animationController: {fileID: 22100000, guid: 26563340f87cb0143bb0052254b16538,
@@ -219,306 +244,5 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: d35a5f0318b4a4144af8d1214217a2ce, type: 2}
     weaponPreviewPrefab: {fileID: 899434540764439098, guid: 55f194fcdab374746828ef0707c5ec69,
       type: 3}
-    itemWebId: 66a5abe684815a0bd58abecb
-  emptyWearableEquipment: {fileID: 4940541453049098453, guid: 0d63d1c715aa4c14d9842fd63a41c092,
-    type: 3}
-  equipmentOptions:
-  - name: Arab Belt
-    equipmentType: 0
-    itemWebId: 6678b021eec2c1a29095a079
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 8227565456574029610, guid: d361612143077e34580b4808b00d8686, type: 3}
-    - {fileID: 5018431000275761832, guid: e49535ab9d5ebb7408083392cc8531c2, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 69c40671178090f4591529fd2a36eddd, type: 3}
-    - {fileID: 21300000, guid: 133a52c39f2f0294ea6759d0bed88342, type: 3}
-  - name: Arab Boots
-    equipmentType: 1
-    itemWebId: 6678b021eec2c1a29095a07b
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 336487264287222916, guid: a2deac26adc911747b63784ea76bbe70, type: 3}
-    - {fileID: 7689353322763404186, guid: 695fae91d2276e74dab8237771494a4c, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 66f6e87bedea1764eb058fee392c0783, type: 3}
-    - {fileID: 21300000, guid: c4a08068cdc73f245ac83859e3358840, type: 3}
-  - name: Arab Chest
-    equipmentType: 3
-    itemWebId: 6678b022eec2c1a29095a07d
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 1849807225689395491, guid: 3d5614bc790077d43bfb5fe258aa6b63, type: 3}
-    - {fileID: 8011782809947272121, guid: 7b6f2a65da14e6247b3a7245ced5259e, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 4eb731cf6f013074b88af646ccbe8609, type: 3}
-    - {fileID: 21300000, guid: 0e55e9f6e2f712848b6273832a6528d2, type: 3}
-  - name: Arab Gloves
-    equipmentType: 4
-    itemWebId: 6678b022eec2c1a29095a07f
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 3602836918358040421, guid: c8e0da978bcbbfa42b8683ca5eb52c2e, type: 3}
-    - {fileID: 8392520174590038646, guid: 98ba609fa62e6864ba710f26f44b5464, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: da6a29842ae93254e87b70d5ee02b51d, type: 3}
-    - {fileID: 21300000, guid: c32189a147faa514da11b671b86faaf7, type: 3}
-  - name: Arab Helm
-    equipmentType: 5
-    itemWebId: 6678b022eec2c1a29095a081
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 6022333199203844286, guid: 585cdce70c424fb4e8c9d1115a69d750, type: 3}
-    - {fileID: 34421861813703689, guid: b7b7452bd60ba7f489c2b016eed7cfe3, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 2fd7fa09ae7b1694694cc512e5820eba, type: 3}
-    - {fileID: 21300000, guid: dfaa03ebb868894448d27789e2efbdb4, type: 3}
-  - name: Arab Pants
-    equipmentType: 6
-    itemWebId: 6678b022eec2c1a29095a083
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 4221896528435528380, guid: fad6be6a4bce2da40adca1a38a464e61, type: 3}
-    - {fileID: 8584576227869146840, guid: ba421554f5ecf204db604f0000f47449, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: c9fa710bfad683043b7592e45fab9179, type: 3}
-    - {fileID: 21300000, guid: b40b51d9de68a1040b3d5318cc40f9cb, type: 3}
-  - name: Runic Boots
-    equipmentType: 1
-    itemWebId: 6678b023eec2c1a29095a085
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 2960521421875701326, guid: 876b801ef5f4d8544bd38811626c10b7, type: 3}
-    - {fileID: 4877412807948652129, guid: 76730ddddf96daf44ba70269803743c5, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 0788d2da6d70e8947b2502e0d06e162b, type: 3}
-    - {fileID: 21300000, guid: 544f69d93d300454ca300d867371bb55, type: 3}
-  - name: Runic Cape
-    equipmentType: 2
-    itemWebId: 6678b023eec2c1a29095a087
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 629400702248785959, guid: 3005f4ad4589b0b408055111b34751b2, type: 3}
-    - {fileID: 3473690653304552396, guid: 228e9f2085014714c84aaa8506dadec7, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 6721912a88f64414cb2e1c3afca77423, type: 3}
-    - {fileID: 21300000, guid: 09f9d5354d6ab7b499879564a0f7ded7, type: 3}
-  - name: Runic Chest
-    equipmentType: 3
-    itemWebId: 6678b023eec2c1a29095a089
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 8900552189078437240, guid: 2fbc45abeedf5b141b2acb91a3366c39, type: 3}
-    - {fileID: 2845856886260701892, guid: 2d65ca064f80d3e4798621700807c56d, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: e79d90e5eee96c34ea183925008775a2, type: 3}
-    - {fileID: 21300000, guid: 06ff9a3144b318645931ede2aef68d45, type: 3}
-  - name: Runic Gloves
-    equipmentType: 4
-    itemWebId: 6678b024eec2c1a29095a08b
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 3141958370974047423, guid: edd7a8694467276449958cf21d631878, type: 3}
-    - {fileID: 44817825463069584, guid: 024f4f83007b9854cab6d0a0b960affc, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 597524d17ace68443ae4e156f52a1d16, type: 3}
-    - {fileID: 21300000, guid: 4f84d77288b01854db744eed3961ecd6, type: 3}
-  - name: Runic Pants
-    equipmentType: 6
-    itemWebId: 6678b024eec2c1a29095a08d
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 86348611692484151, guid: 170fe12a1f0887b4d856c1ef1dc4bb66, type: 3}
-    - {fileID: 2862443126372418796, guid: 07504d313b4039a4f929eb59f54d0a38, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: a74bcdc80d0cc7244a1ef7cfe2809e92, type: 3}
-    - {fileID: 21300000, guid: 07137962a0d535540bcc9a368a2d02bc, type: 3}
-  - name: Runic Shoulders
-    equipmentType: 8
-    itemWebId: 6678b024eec2c1a29095a08f
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 7834197904394956578, guid: 988cc165c0034e34282baaf7f2d96b64, type: 3}
-    - {fileID: 966803504340038541, guid: 9f69142bbe3f68348b006c56457353cc, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 611d4d739318dad47b0c5c7be086570d, type: 3}
-    - {fileID: 21300000, guid: 14fcd578bd4ab284ab938dd876ca48a1, type: 3}
-  - name: Runic Belt
-    equipmentType: 0
-    itemWebId: 6678b024eec2c1a29095a091
-    raceAndGenders: 00000000
-    wearableEquipmentOptions:
-    - {fileID: 4663531067712379620, guid: d455157f8dac69849819375066269db8, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: bd5585be7655485499311197d6d6127e, type: 3}
-  - name: Hair 1
-    equipmentType: 11
-    itemWebId: 
-    raceAndGenders: 0000000001000000
-    wearableEquipmentOptions:
-    - {fileID: 7301104956023788035, guid: 6ed737a65d7ad344b9201fc4882b3c28, type: 3}
-    - {fileID: 7188414755119894204, guid: 91e7d60fb5b7a054a83181f601b05c35, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: c565dda04a684c5419a7007e9a2264d2, type: 3}
-    - {fileID: 21300000, guid: 69cf03093eba8a5499fe674acc9f1038, type: 3}
-  - name: Assassin Belt
-    equipmentType: 0
-    itemWebId: 667f27aaea2df2c20ce25894
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 7830744759515969986, guid: fa58b7bbcd367d642828526727044890, type: 3}
-    - {fileID: 3497094938622122046, guid: 9376041f4f506d94fa51cf3e6a7c479b, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: c881fc07be5250045b81332a8c82e6c3, type: 3}
-    - {fileID: 21300000, guid: a40adccf72680c74da68ae53858d519a, type: 3}
-  - name: Assassin Boots
-    equipmentType: 1
-    itemWebId: 667f27aaea2df2c20ce25898
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 3326138393951176630, guid: a5329746e81c5ea48ac414e64b2afb71, type: 3}
-    - {fileID: 1767781102236740586, guid: 4db2dbb5168a5af4e931d53a266fc9e7, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 8cdc10c72bff1404cbb7a292a4f21cd9, type: 3}
-    - {fileID: 21300000, guid: e853a445269c9d648ac190d613ae936e, type: 3}
-  - name: Assassin Chest
-    equipmentType: 3
-    itemWebId: 667f27abea2df2c20ce2589a
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 4500617072886132026, guid: 16e2c0c2661113143bc01a02ec5f83eb, type: 3}
-    - {fileID: 4673163311507882856, guid: 41333f7d06e90b44180304a059c2e5bc, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: a40d2e74a0f7a204a97b9b0ec8a88ade, type: 3}
-    - {fileID: 21300000, guid: 545550e113457454f9911da38166a4aa, type: 3}
-  - name: Assassin Helm
-    equipmentType: 5
-    itemWebId: 667f27abea2df2c20ce2589c
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 7406966896484744889, guid: 546bda282672fe9498f61d90bab8fa5c, type: 3}
-    - {fileID: 5144768678742532080, guid: 5cd1fc5c874ec2c4b8a11ad5caef2953, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 2d06d25a65fde9b4081cd4ed69851383, type: 3}
-    - {fileID: 21300000, guid: 59b64510ec20bcd4aad209bfaf7ed85f, type: 3}
-  - name: Assassin Pants
-    equipmentType: 6
-    itemWebId: 667f27abea2df2c20ce2589e
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 2247963779651151487, guid: 39c68098ddb800940aa6593dc21c3660, type: 3}
-    - {fileID: 3464823441149913952, guid: c5f8e70b4fc88834a9eb2753e502d7ab, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 9c6ca90196c24984697e41bceb34e037, type: 3}
-    - {fileID: 21300000, guid: 97ea2626a0f412f44bdb9133c3c3527c, type: 3}
-  - name: Assassin Shoulders
-    equipmentType: 8
-    itemWebId: 667f27acea2df2c20ce258a0
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 5738330021159345886, guid: 320907e3d17c6e446a46630baf4d30fc, type: 3}
-    - {fileID: 1432434168705815661, guid: bfb0e33d90dc59c4cab5b6ba1860ca77, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 349f79d5cb4d2854ea99169499873844, type: 3}
-    - {fileID: 21300000, guid: c3d683ec857f5714db2390cb04f94fef, type: 3}
-  - name: Assassin Gloves
-    equipmentType: 4
-    itemWebId: 667f27acea2df2c20ce258a2
-    raceAndGenders: 0000000001000000
-    wearableEquipmentOptions:
-    - {fileID: 5175558174358472165, guid: b4be7ac4d4b14a04b84b158392c3f04a, type: 3}
-    - {fileID: 3695060663615811259, guid: 64d4f772930b9e04d8eacdf9247840db, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: cdadce76e877d5549b249e073eb196f5, type: 3}
-    - {fileID: 21300000, guid: bcabc359fc052114db8032546e21b776, type: 3}
-  - name: Assassin Cape
-    equipmentType: 2
-    itemWebId: 66842d1b198268e6325a6b76
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 7008941732449025597, guid: 44adf38f32f4ea44f944da0e84877498, type: 3}
-    - {fileID: 7980503783723967595, guid: 108284de1ec1a994d8077f5fca52a925, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 4d1b57420b9b4124b807a86e6c2a51c5, type: 3}
-    - {fileID: 21300000, guid: fd29a4b12cfa8ef41a50991539b65cb0, type: 3}
-  - name: Mage Belt
-    equipmentType: 0
-    itemWebId: 668a9802e7f98f89e2580ac4
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 5547829925125934029, guid: dccc660d25ddbcb49a0bad4913b7cab6, type: 3}
-    - {fileID: 1026766899454185300, guid: 4eac090b6f4cc6c4296eee3cf778f746, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: e5eb34d61da8687409b26d41d1226d1a, type: 3}
-    - {fileID: 21300000, guid: aad28efcc5984af41bc3455fcb9818d7, type: 3}
-  - name: Mage Boots
-    equipmentType: 1
-    itemWebId: 668a9802e7f98f89e2580ad1
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 435758465512657224, guid: cb3f0cc67a0c49142b4e4defdf63a7ad, type: 3}
-    - {fileID: 8362652864966212849, guid: 108c95c47b1379340b70602d542a6d4a, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: abd7affcd0b89df46b3fc5b121006260, type: 3}
-    - {fileID: 21300000, guid: 9b686a033fb7ebd4fabee3e2c7c84add, type: 3}
-  - name: Mage Cape
-    equipmentType: 2
-    itemWebId: 668a9803e7f98f89e2580ae0
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 5521049402202495006, guid: c961ca9d302e69f4e983490e5ab21052, type: 3}
-    - {fileID: 6552542356419275084, guid: da22bf25354ccdc488750e8bc072e722, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 294b74b3277778e46971e875bfee8f13, type: 3}
-    - {fileID: 21300000, guid: 1e6e40ccfcc1bca48b6bfaf1972db206, type: 3}
-  - name: Mage Chest
-    equipmentType: 3
-    itemWebId: 668a9803e7f98f89e2580aed
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 7507202042494640838, guid: 7a183da448437694e86444106452f89b, type: 3}
-    - {fileID: 3878028907823537916, guid: 76c10898676ae234ba7f3a7934fc4973, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 31181649a88371340993fece7b1b7c94, type: 3}
-    - {fileID: 21300000, guid: 8a23e963346296d40a346bbd23782e23, type: 3}
-  - name: Mage Gloves
-    equipmentType: 4
-    itemWebId: 668a9803e7f98f89e2580af8
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 43405497714436548, guid: 15bd4d85408e34c4998bc77c45cb05cd, type: 3}
-    - {fileID: 7756065800023761012, guid: ed515548e1493744d871da7a9a27b609, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 03e7d47c977bcb94e9c5233c7dd39fa3, type: 3}
-    - {fileID: 21300000, guid: 23d6eda655b04064398214d2c995e448, type: 3}
-  - name: Mage Helm
-    equipmentType: 5
-    itemWebId: 668a9804e7f98f89e2580b05
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 1672483337733960223, guid: ca5b7e473f2fdd64b86f9df22636be0f, type: 3}
-    - {fileID: 4387093154403535454, guid: a4b0fd88666fff64db1580b18855fa67, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 32f774c5e759df940aadade888146098, type: 3}
-    - {fileID: 21300000, guid: 8f30365fb0da7af4da58fb961ffdcb74, type: 3}
-  - name: Mage Pants
-    equipmentType: 6
-    itemWebId: 668a9804e7f98f89e2580b12
-    raceAndGenders: 0100000000000000
-    wearableEquipmentOptions:
-    - {fileID: 6984061147464613701, guid: ca811c58b7f00d541939466a9d56e14f, type: 3}
-    - {fileID: 3085474518798951854, guid: 387c9c42983e8dc42ab5bd04de670e0e, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: 9af1344d52569cd42ad761d07ea07667, type: 3}
-    - {fileID: 21300000, guid: 991bcd021f0adb24ea95ad9f7cb38090, type: 3}
-  - name: Mage Shoulders
-    equipmentType: 8
-    itemWebId: 668bee65e7f98f89e2917f2d
-    raceAndGenders: 0000000001000000
-    wearableEquipmentOptions:
-    - {fileID: 6648947003270770183, guid: c57efb0b47587964f80b363367d73b3c, type: 3}
-    - {fileID: 2197519502538376445, guid: 73d235e07688b3b458daaa1567b46a6f, type: 3}
-    equipmentIcons:
-    - {fileID: 21300000, guid: c96271ef527dba448a055b85c45b4d6e, type: 3}
-    - {fileID: 21300000, guid: 16f7d84e00381cc4895771b56891c61c, type: 3}
+  equipmentOptions: []
   characterMaterialOptions: []

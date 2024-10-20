@@ -2815,7 +2815,7 @@ namespace Vi.Core
 
                 Debug.Log("Creating weapon item: " + (i + 1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, weaponOption.isBasicGear,
                     weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name);
 
                 string json = JsonConvert.SerializeObject(payload);
@@ -2838,6 +2838,7 @@ namespace Vi.Core
                 }
 
                 weaponOption.itemWebId = postRequest.downloadHandler.text;
+                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
 
                 postRequest.Dispose();
             }
@@ -2853,7 +2854,7 @@ namespace Vi.Core
 
                 Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, wearableEquipmentOption.isBasicGear,
                     wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
                     wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanFemale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
                     wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
@@ -2879,6 +2880,7 @@ namespace Vi.Core
                 }
 
                 wearableEquipmentOption.itemWebId = postRequest.downloadHandler.text;
+                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
 
                 postRequest.Dispose();
             }
