@@ -528,12 +528,9 @@ namespace Vi.UI
         {
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
 
-            if (characterIndex == -1)
+            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+            if (string.IsNullOrWhiteSpace(character.model.ToString()))
             {
                 if (previewObject)
                 {
@@ -551,11 +548,8 @@ namespace Vi.UI
                 RefreshButtonInteractability();
                 return;
             }
-
-            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
-
-            bool shouldCreateNewModel = selectedCharacter.model != character.model;
-
+            
+            bool shouldCreateNewModel = selectedCharacter.raceAndGender != character.raceAndGender | selectedCharacter.model != character.model;
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -572,7 +566,7 @@ namespace Vi.UI
                     }
                 }
                 // Instantiate the player model
-                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+                previewObject = ObjectPoolingManager.SpawnObject(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
             }
 
@@ -631,10 +625,12 @@ namespace Vi.UI
             else
                 selectedGender = stringChange;
 
-            CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
+            var raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+            CharacterReference.PlayerModelOption option = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(raceAndGender);
             if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
             WebRequestManager.Character character = selectedCharacter;
-            character.model = option.skinOptions[0].name;
+            character.model = option.model.name;
+            character.raceAndGender = raceAndGender;
             UpdateSelectedCharacter(character);
         }
 

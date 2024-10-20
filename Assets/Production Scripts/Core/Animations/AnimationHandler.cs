@@ -1137,10 +1137,6 @@ namespace Vi.Core
         AnimatorReference animatorReference;
         private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
         {
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
-
             bool shouldCreateNewSkin = true;
             animatorReference = GetComponentInChildren<AnimatorReference>();
             if (animatorReference)
@@ -1162,17 +1158,17 @@ namespace Vi.Core
 
             if (shouldCreateNewSkin)
             {
-                if (characterIndex == -1) { Debug.LogError("Character Index is -1! " + name); yield break; }
-                CharacterReference.PlayerModelOption modelOption = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions()[characterIndex];
+                var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+                if (playerModelOption == null) { Debug.LogError("Could not find character model for race and gender " + character.raceAndGender); yield break; }
 
                 GameObject modelInstance;
-                if (modelOption.skinOptions[skinIndex].TryGetComponent(out PooledObject pooledObject))
+                if (playerModelOption.model.TryGetComponent(out PooledObject pooledObject))
                 {
-                    modelInstance = ObjectPoolingManager.SpawnObject(modelOption.skinOptions[skinIndex].GetComponent<PooledObject>(), transform).gameObject;
+                    modelInstance = ObjectPoolingManager.SpawnObject(playerModelOption.model.GetComponent<PooledObject>(), transform).gameObject;
                 }
                 else
                 {
-                    modelInstance = Instantiate(modelOption.skinOptions[skinIndex], transform, false);
+                    modelInstance = Instantiate(playerModelOption.model, transform, false);
                 }
 
                 Animator = modelInstance.GetComponent<Animator>();
@@ -1191,18 +1187,17 @@ namespace Vi.Core
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
 
             // Apply materials and equipment
-            CharacterReference.RaceAndGender raceAndGender = characterReference.GetPlayerModelOptions()[characterReference.GetPlayerModelOptionIndices(character.model.ToString()).Key].raceAndGender;
-            List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(raceAndGender);
+            List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(character.raceAndGender);
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
-            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
-            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
-            ApplyWearableEquipment(CharacterReference.EquipmentType.Beard, beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), raceAndGender);
-            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
-            ApplyWearableEquipment(CharacterReference.EquipmentType.Brows, browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), raceAndGender);
-            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
-            ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), raceAndGender);
+            List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(character.raceAndGender);
+            CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.beard);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Beard, beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), character.raceAndGender);
+            CharacterReference.WearableEquipmentOption browsOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.brows);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Brows, browsOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Brows), character.raceAndGender);
+            CharacterReference.WearableEquipmentOption hairOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.GetEmptyWearableEquipment()).name == character.hair);
+            ApplyWearableEquipment(CharacterReference.EquipmentType.Hair, hairOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Hair), character.raceAndGender);
         }
 
         private void OnReturnToPool()

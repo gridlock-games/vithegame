@@ -244,11 +244,7 @@ namespace Vi.UI
             MVPAssistsText.text = gameModeManager.GetMVPScore().cumulativeAssists.ToString();
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
-
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
+            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             if (MVPPreviewObject)
             {
@@ -265,7 +261,7 @@ namespace Vi.UI
 
             // Instantiate the player model
             Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(gameModeManager.GetMVPScore().id);
-            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledPrefab))
+            if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledPrefab))
             {
                 MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,
                     basePos,
@@ -273,7 +269,7 @@ namespace Vi.UI
             }
             else
             {
-                MVPPreviewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                MVPPreviewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab,
                     basePos,
                     Quaternion.Euler(SpawnPoints.previewCharacterRotation));
             }

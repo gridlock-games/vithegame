@@ -12,25 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be7643120aecab24ab0af35ddca173c0, type: 3}
   m_Name: CharacterReference
   m_EditorClassIdentifier: 
-  animationClipReference: {fileID: 11400000, guid: 621a11e0472eff04ca04e6d497df9f86,
-    type: 2}
-  defaultEnvironmentKillIcon: {fileID: 21300000, guid: f2c8db0bfcb4a42c3b3ebc9507158784,
+  playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
+    type: 3}
+  botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
     type: 3}
   playerModelOptions:
   - raceAndGender: 0
-    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
-      type: 3}
-    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-      type: 3}
-    skinOptions:
-    - {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df, type: 3}
+    model: {fileID: 510880237743440399, guid: cc32c1f0c8a78374388c92f7c69497df, type: 3}
   - raceAndGender: 1
-    playerPrefab: {fileID: 3945128955595459076, guid: 5a72b3612fcd2e143a6b0a6d295c6909,
-      type: 3}
-    botPrefab: {fileID: 1564116883212529240, guid: a25285dc08b71a24686e351903742cce,
-      type: 3}
-    skinOptions:
-    - {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785, type: 3}
+    model: {fileID: 4586326142833193949, guid: 6ffe07585db2ef943bdd643e19f35785, type: 3}
   weaponOptions:
   - name: Bluesteel Raptor
     weaponIcon: {fileID: 21300000, guid: 11f58536fed42074cb32651259890196, type: 3}

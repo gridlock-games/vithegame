@@ -1465,10 +1465,6 @@ namespace Vi.Core
                 Debug.LogError("Trying to spawn player without a player spawn points object!");
             }
 
-            KeyValuePair<int, int> kvp = Singleton.GetCharacterReference().GetPlayerModelOptionIndices(playerData.character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
-
             if (!ContainsId(playerData.id))
             {
                 spawnPlayerRunning = false;
@@ -1483,9 +1479,9 @@ namespace Vi.Core
             else
             {
                 if (playerData.id >= 0)
-                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().GetPlayerModelOptions()[characterIndex].playerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().PlayerPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
                 else
-                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().GetPlayerModelOptions()[characterIndex].botPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
+                    playerObjectToSpawn = ObjectPoolingManager.SpawnObject(GetCharacterReference().BotPrefab.GetComponent<PooledObject>(), spawnPosition, spawnRotation).gameObject;
 
                 playerObjectToSpawn.GetComponent<Attributes>().SetPlayerDataId(playerData.id);
             }

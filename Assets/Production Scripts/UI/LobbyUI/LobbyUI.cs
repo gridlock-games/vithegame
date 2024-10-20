@@ -790,11 +790,6 @@ namespace Vi.UI
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
-
             if (previewObject)
             {
                 if (previewObject.TryGetComponent(out PooledObject pooledObject))
@@ -808,13 +803,13 @@ namespace Vi.UI
                 }
             }
             // Instantiate the player model
-            if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pO))
+            if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pO))
             {
-                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+                previewObject = ObjectPoolingManager.SpawnObject(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
             }
             else
             {
-                previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
+                previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab, previewCharacterPosition, Quaternion.Euler(previewCharacterRotation));
             }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);

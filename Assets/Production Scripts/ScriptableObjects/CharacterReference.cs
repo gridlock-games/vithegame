@@ -11,6 +11,11 @@ namespace Vi.ScriptableObjects
     [CreateAssetMenu(fileName = "CharacterReference", menuName = "Production/Character Reference")]
     public class CharacterReference : ScriptableObject
     {
+        public GameObject PlayerPrefab { get { return playerPrefab; } }
+        [SerializeField] private GameObject playerPrefab;
+        public GameObject BotPrefab { get { return botPrefab; } }
+        [SerializeField] private GameObject botPrefab;
+
         [SerializeField] private PlayerModelOption[] playerModelOptions;
         [SerializeField] private WeaponOption[] weaponOptions;
         [SerializeField] private WearableEquipment emptyWearableEquipment;
@@ -23,9 +28,7 @@ namespace Vi.ScriptableObjects
         public class PlayerModelOption
         {
             public RaceAndGender raceAndGender;
-            public GameObject playerPrefab;
-            public GameObject botPrefab;
-            public GameObject[] skinOptions;
+            public GameObject model;
         }
 
         [System.Serializable]
@@ -216,14 +219,9 @@ namespace Vi.ScriptableObjects
             Hair
         }
 
-        public PlayerModelOption[] GetPlayerModelOptions() { return playerModelOptions; }
-
-        public KeyValuePair<int, int> GetPlayerModelOptionIndices(string characterModelName)
+        public PlayerModelOption GetCharacterModel(RaceAndGender raceAndGender)
         {
-            int characterIndex = System.Array.FindIndex(playerModelOptions, item => System.Array.FindIndex(item.skinOptions, skinItem => skinItem.name == characterModelName) != -1);
-            if (characterIndex == -1) { return new KeyValuePair<int, int>(characterIndex, -1); }
-            int skinIndex = System.Array.FindIndex(playerModelOptions[characterIndex].skinOptions, skinItem => skinItem.name == characterModelName);
-            return new KeyValuePair<int, int>(characterIndex, skinIndex);
+            return System.Array.Find(playerModelOptions, item => item.raceAndGender == raceAndGender);
         }
 
         public WeaponOption[] GetWeaponOptions() { return weaponOptions; }
