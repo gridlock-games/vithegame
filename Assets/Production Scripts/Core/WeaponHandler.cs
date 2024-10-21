@@ -417,7 +417,7 @@ namespace Vi.Core
                             if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                             {
                                 orientation.position = shooterWeapon.GetProjectileSpawnPoint().position;
-                                orientation.rotation = shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
+                                orientation.rotation = shooterWeapon.GetProjectileSpawnRotation() * Quaternion.Euler(actionVFX.vfxRotationOffset);
                                 orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                                 parent = isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null;
                                 break;

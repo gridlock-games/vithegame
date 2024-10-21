@@ -67,6 +67,35 @@ namespace Vi.Core
         private float lastProjectileSpawnTime = Mathf.NegativeInfinity;
         private int projectileSpawnCount;
 
+        public Quaternion GetProjectileSpawnRotation()
+        {
+            int hitCount = Physics.RaycastNonAlloc(parentCombatAgent.AnimationHandler.GetCameraPivotPoint(), parentCombatAgent.AnimationHandler.GetCameraForwardDirection().normalized,
+                        projectileRotationRaycastingResults, 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
+
+            Vector3 targetPoint = parentCombatAgent.AnimationHandler.GetAimPoint();
+            float minDistance = 0;
+            bool minDistanceInitialized = false;
+            for (int i = 0; i < hitCount; i++)
+            {
+                if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
+                RaycastHit hit = projectileRotationRaycastingResults[i];
+                if (hit.transform.root == parentCombatAgent.WeaponHandler.transform.root) { continue; }
+                if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+                {
+                    if (networkCollider.CombatAgent == parentCombatAgent) { continue; }
+                }
+                else // No Network Collider
+                {
+                    continue;
+                }
+                if (hit.distance > 1.5f) { targetPoint = hit.point; }
+                minDistance = hit.distance;
+                minDistanceInitialized = true;
+            }
+
+            return Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position);
+        }
+
         private RaycastHit[] projectileRotationRaycastingResults = new RaycastHit[10];
         private void LateUpdate()
         {
@@ -88,32 +117,8 @@ namespace Vi.Core
             {
                 if (Time.time - lastProjectileSpawnTime > parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed))
                 {
-                    int hitCount = Physics.RaycastNonAlloc(parentCombatAgent.AnimationHandler.GetCameraPivotPoint(), parentCombatAgent.AnimationHandler.GetCameraForwardDirection().normalized,
-                        projectileRotationRaycastingResults, 50, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
-                    
-                    Vector3 targetPoint = parentCombatAgent.AnimationHandler.GetAimPoint();
-                    float minDistance = 0;
-                    bool minDistanceInitialized = false;
-                    for (int i = 0; i < hitCount; i++)
-                    {
-                        if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
-                        RaycastHit hit = projectileRotationRaycastingResults[i];
-                        if (hit.transform.root == parentCombatAgent.WeaponHandler.transform.root) { continue; }
-                        if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
-                        {
-                            if (networkCollider.CombatAgent == parentCombatAgent) { continue; }
-                        }
-                        else // No Network Collider
-                        {
-                            continue;
-                        }
-                        if (hit.distance > 1.5f) { targetPoint = hit.point; }
-                        minDistance = hit.distance;
-                        minDistanceInitialized = true;
-                    }
-
                     PooledObject projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
-                        Quaternion.LookRotation(targetPoint - projectileSpawnPoint.transform.position));
+                        GetProjectileSpawnRotation());
                     
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
                     netObj.Spawn(true);
