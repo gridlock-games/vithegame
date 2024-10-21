@@ -210,8 +210,6 @@ namespace Vi.ProceduralAnimations
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
-        public Transform GetStowedWeaponParent() { return stowedWeaponParent; }
-
         [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
@@ -229,8 +227,8 @@ namespace Vi.ProceduralAnimations
         [Header("Animation Rotation Offset Settings")]
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
         [SerializeField] private Axis rotationOffsetAxis = Axis.Z;
-        [Header("Weapon Swapping")]
-        [SerializeField] private Transform stowedWeaponParent;
+        [Header("Rest Of Assignments")]
+        [SerializeField] private Transform middleSpine;
 
         public const float rotationConstraintOffsetSpeed = 12;
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)
@@ -284,7 +282,7 @@ namespace Vi.ProceduralAnimations
         public Transform Hips { get { return hips; } }
         [SerializeField] private Transform hips;
 
-        [Header("For Generic Rig Weapon Parenting")]
+        [Header("For Weapon Parenting")]
         [SerializeField] private Weapon.WeaponBone[] keys = new Weapon.WeaponBone[0];
         [SerializeField] private Transform[] values = new Transform[0];
 
@@ -296,9 +294,34 @@ namespace Vi.ProceduralAnimations
             }
             else
             {
+                if (animator.avatar)
+                {
+                    if (animator.avatar.isHuman)
+                    {
+                        return animator.GetBoneTransform((HumanBodyBones)weaponBone);
+                    }
+                }
                 Debug.LogError("Weapon bone not present in mapping! " + weaponBone + " " + name);
             }
             return null;
+        }
+
+        [System.Serializable]
+        private struct StowedWeaponParent
+        {
+            public Weapon.WeaponClass weaponClass;
+            public Transform bone;
+        }
+
+        [SerializeField] private StowedWeaponParent[] stowedWeaponParents;
+        public Transform GetStowedWeaponParent(Weapon.WeaponClass weaponClass)
+        {
+            if (System.Array.Exists(stowedWeaponParents, item => item.weaponClass == weaponClass))
+            {
+                StowedWeaponParent stowedWeaponParent = System.Array.Find(stowedWeaponParents, item => item.weaponClass == weaponClass);
+                return stowedWeaponParent.bone;
+            }
+            return middleSpine;
         }
 
 #if UNITY_EDITOR
@@ -349,7 +372,7 @@ namespace Vi.ProceduralAnimations
                 {
                     if (animator.avatar.isHuman)
                     {
-                        stowedWeaponParent = animator.GetBoneTransform(HumanBodyBones.Spine).GetChild(0);
+                        middleSpine = animator.GetBoneTransform(HumanBodyBones.Spine).GetChild(0);
 
                         if (rightHandReachRig)
                         {
@@ -363,7 +386,7 @@ namespace Vi.ProceduralAnimations
 
                         if (rotationOffsetConstraint) { rotationOffsetConstraint.data.constrainedObject = transform.Find("Root") ? transform.Find("Root") : transform.Find("root"); }
 
-                        if (meleeVerticalAimConstraint) { meleeVerticalAimConstraint.data.constrainedObject = stowedWeaponParent; }
+                        if (meleeVerticalAimConstraint) { meleeVerticalAimConstraint.data.constrainedObject = middleSpine; }
 
                         if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
                         if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }

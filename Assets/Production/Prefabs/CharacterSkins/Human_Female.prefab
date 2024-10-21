@@ -1578,10 +1578,25 @@ MonoBehaviour:
   meleeVerticalAimConstraint: {fileID: 409402409228881001}
   rotationOffsetConstraint: {fileID: 1555884732053692989}
   rotationOffsetAxis: 2
-  stowedWeaponParent: {fileID: 1710484132655373103}
+  middleSpine: {fileID: 1710484132655373103}
   hips: {fileID: 1829467840966828511}
-  keys: 
-  values: []
+  keys: 1100000012000000
+  values:
+  - {fileID: 7954649064892847931}
+  - {fileID: 4394847707192651466}
+  stowedWeaponParents:
+  - weaponClass: 0
+    bone: {fileID: 1286507944128629987}
+  - weaponClass: 1
+    bone: {fileID: 5489233693247206339}
+  - weaponClass: 2
+    bone: {fileID: 8920404950292409610}
+  - weaponClass: 3
+    bone: {fileID: 5489233693247206339}
+  - weaponClass: 4
+    bone: {fileID: 5489233693247206339}
+  - weaponClass: 5
+    bone: {fileID: 5489233693247206339}
 --- !u!114 &8935369246338372656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1658,7 +1673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 197
+  pooledObjectIndex: 194
   isPrewarmObject: 1
 --- !u!114 &7736768306598619903
 MonoBehaviour:
@@ -1686,6 +1701,12 @@ MonoBehaviour:
   - m_Rig: {fileID: 2640324431668586174}
     m_Active: 1
   m_Effectors: []
+--- !u!4 &1286507944128629987 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1634424486304067982, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1710484132655373103 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8013909246233647550, guid: da1332e915e84cb691bc1ad994e4ff8f,
@@ -1734,6 +1755,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &4394847707192651466 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4290134899344774055, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
 --- !u!137 &4554358596680901479 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4053355400751390218, guid: da1332e915e84cb691bc1ad994e4ff8f,
@@ -1749,6 +1776,12 @@ SkinnedMeshRenderer:
 --- !u!137 &5444532670850946840 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: -3676377794900678027, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5489233693247206339 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3793842106640822610, guid: da1332e915e84cb691bc1ad994e4ff8f,
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
@@ -1788,9 +1821,21 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &7954649064892847931 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7570739455113243222, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
 --- !u!137 &8839530263431342222 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 9068118457793910243, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8920404950292409610 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -234300105278402457, guid: da1332e915e84cb691bc1ad994e4ff8f,
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}

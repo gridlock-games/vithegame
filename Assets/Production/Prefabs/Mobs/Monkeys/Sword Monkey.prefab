@@ -885,7 +885,7 @@ PrefabInstance:
     - target: {fileID: 3702149485779398225, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: pooledObjectIndex
-      value: 34
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 3724913792320258764, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -1046,7 +1046,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18bd4124e8ce0d94eb4391c11b3f870e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!4 &2098481983509019259 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3724913792320258764, guid: 74547947c8c52264f9eba9178457359c,
@@ -2414,14 +2413,15 @@ MonoBehaviour:
   meleeVerticalAimConstraint: {fileID: 0}
   rotationOffsetConstraint: {fileID: 0}
   rotationOffsetAxis: 2
-  stowedWeaponParent: {fileID: 0}
+  middleSpine: {fileID: 6783781999510498724}
+  hips: {fileID: 5835427918432081748}
   keys: 12000000110000000600000005000000
   values:
   - {fileID: 1263486649039297490}
   - {fileID: 6931578649973241024}
   - {fileID: 8093134166187398786}
   - {fileID: 664856926187055524}
-  hips: {fileID: 5835427918432081748}
+  stowedWeaponParents: []
 --- !u!114 &7596644638737899235
 MonoBehaviour:
   m_ObjectHideFlags: 0

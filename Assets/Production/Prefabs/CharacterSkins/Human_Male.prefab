@@ -1558,6 +1558,12 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 5273004878553998780}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2225058549716015572 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2896510510166426520, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5273004878553998780}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2333131599753272999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1635498069567685861, guid: b8e1729aa66c4542b0dfb77c151371ff,
@@ -1594,6 +1600,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5273004878553998780}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &4754733020554564321 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 635374244500698973, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5273004878553998780}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5038419873832753389 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b8e1729aa66c4542b0dfb77c151371ff,
@@ -1627,10 +1639,25 @@ MonoBehaviour:
   meleeVerticalAimConstraint: {fileID: 8158951797868863509}
   rotationOffsetConstraint: {fileID: 8748341270363411130}
   rotationOffsetAxis: 2
-  stowedWeaponParent: {fileID: 7089063272096612996}
+  middleSpine: {fileID: 7089063272096612996}
   hips: {fileID: 4226443059062038620}
-  keys: 
-  values: []
+  keys: 1100000012000000
+  values:
+  - {fileID: 8619219647542001449}
+  - {fileID: 8883570043463712191}
+  stowedWeaponParents:
+  - weaponClass: 0
+    bone: {fileID: 7272609602690633849}
+  - weaponClass: 1
+    bone: {fileID: 4754733020554564321}
+  - weaponClass: 2
+    bone: {fileID: 2225058549716015572}
+  - weaponClass: 3
+    bone: {fileID: 4754733020554564321}
+  - weaponClass: 4
+    bone: {fileID: 4754733020554564321}
+  - weaponClass: 5
+    bone: {fileID: 4754733020554564321}
 --- !u!114 &3752772496089272209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1746,7 +1773,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 185
+  pooledObjectIndex: 183
   isPrewarmObject: 1
 --- !u!137 &5121705956526998793 stripped
 SkinnedMeshRenderer:
@@ -1772,6 +1799,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5273004878553998780}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &7272609602690633849 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3296641631870301637, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5273004878553998780}
+  m_PrefabAsset: {fileID: 0}
 --- !u!137 &7348145672944898466 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: -5992986596085287906, guid: b8e1729aa66c4542b0dfb77c151371ff,
@@ -1781,6 +1814,18 @@ SkinnedMeshRenderer:
 --- !u!4 &8490982984011288904 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4394231165876040948, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5273004878553998780}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8619219647542001449 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4706007187312207211, guid: b8e1729aa66c4542b0dfb77c151371ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 5273004878553998780}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8883570043463712191 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5591854330733373437, guid: b8e1729aa66c4542b0dfb77c151371ff,
     type: 3}
   m_PrefabInstance: {fileID: 5273004878553998780}
   m_PrefabAsset: {fileID: 0}

@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0, y: 0, z: 0}
+  baseRotationOnRoot: 0
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0
@@ -351,7 +352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 59
+  pooledObjectIndex: 57
   isPrewarmObject: 1
 --- !u!198 &7865164107599564033 stripped
 ParticleSystem:

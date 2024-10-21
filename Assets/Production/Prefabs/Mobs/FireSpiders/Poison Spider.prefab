@@ -715,7 +715,7 @@ PrefabInstance:
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1081990178
+      value: 3923012649
       objectReference: {fileID: 0}
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -740,7 +740,7 @@ PrefabInstance:
     - target: {fileID: 3702149485779398225, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: pooledObjectIndex
-      value: 31
+      value: 29
       objectReference: {fileID: 0}
     - target: {fileID: 3724913792320258764, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -1426,12 +1426,13 @@ MonoBehaviour:
   meleeVerticalAimConstraint: {fileID: 0}
   rotationOffsetConstraint: {fileID: 0}
   rotationOffsetAxis: 2
-  stowedWeaponParent: {fileID: 0}
+  middleSpine: {fileID: 0}
+  hips: {fileID: 1264027241997033429}
   keys: 1100000012000000
   values:
   - {fileID: 8307189383584622863}
   - {fileID: 1211589420604469407}
-  hips: {fileID: 1264027241997033429}
+  stowedWeaponParents: []
 --- !u!114 &1378656345672892948
 MonoBehaviour:
   m_ObjectHideFlags: 0
