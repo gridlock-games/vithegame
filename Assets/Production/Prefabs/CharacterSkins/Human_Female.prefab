@@ -1626,7 +1626,21 @@ MonoBehaviour:
   - characterMaterialType: 3
     skinnedMeshRenderers:
     - {fileID: 3539040566243589558}
-  wearableEquipmentRendererDefinitions: []
+  wearableEquipmentRendererDefinitions:
+  - equipmentType: 1
+    skinnedMeshRenderers:
+    - {fileID: 8839530263431342222}
+    - {fileID: 131176824625410237}
+  - equipmentType: 3
+    skinnedMeshRenderers:
+    - {fileID: 6336511214754582516}
+  - equipmentType: 4
+    skinnedMeshRenderers:
+    - {fileID: 669543002587028952}
+    - {fileID: 5444532670850946840}
+  - equipmentType: 6
+    skinnedMeshRenderers:
+    - {fileID: 6803946513047637144}
   worldSpaceLabelTransformInfo:
     rendererToFollow: {fileID: 3539040566243589558}
     positionOffsetFromRenderer: {x: 0, y: 0.1, z: -0.1}
