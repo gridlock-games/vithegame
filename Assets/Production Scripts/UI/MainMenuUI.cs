@@ -125,7 +125,8 @@ namespace Vi.UI
                 }
                 else
                 {
-                    serverIP = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+                    yield return WebRequestManager.Singleton.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.PublicIP;
                 }
             }
 
@@ -163,8 +164,6 @@ namespace Vi.UI
                 serverConfig = @"/Users/odaleroxas/Documents/Builds/mac/headless/ServerConfig.txt";
 #endif
 
-            Debug.Log(serverConfig);
-
             string serverIP = null;
             if (File.Exists(serverConfig))
             {
@@ -189,7 +188,8 @@ namespace Vi.UI
                 }
                 else
                 {
-                    serverIP = new WebClient().DownloadString("http://icanhazip.com").Replace("\\r\\n", "").Replace("\\n", "").Trim();
+                    yield return WebRequestManager.Singleton.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.PublicIP;
                 }
             }
 
@@ -777,7 +777,7 @@ namespace Vi.UI
         private void dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource loginSource)
         {
             Debug.Log($"Prepare deeplink login to look for {loginSource} Oauth");
-            DeepLinkProcessing dlp = GameObject.FindObjectOfType<DeepLinkProcessing>();
+            DeepLinkProcessing dlp = FindFirstObjectByType<DeepLinkProcessing>();
             dlp.SetLoginSource(loginSource);
         }
 
@@ -849,9 +849,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {

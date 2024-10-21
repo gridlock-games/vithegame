@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -272,7 +273,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.1
   dodgeCancelTransitionTime: 0.15
@@ -320,7 +323,12 @@ MonoBehaviour:
   abilityCooldownTime: 5
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit: []
+  statusesToApplyToTargetOnHit:
+  - status: 6
+    value: 0.33333334
+    duration: 3
+    delay: 0
+    associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 7759964872974293715, guid: 2b653f079be9e46208648fc4966dcce8, type: 3}
@@ -343,3 +351,8 @@ MonoBehaviour:
   shouldAimOffHand: 0
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0

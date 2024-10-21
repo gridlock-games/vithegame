@@ -33,6 +33,7 @@ namespace Vi.ScriptableObjects
         }
 
         public Vector3 vfxPositionOffset = new Vector3(0, 0, 0);
+        public bool baseRotationOnRoot;
         public Vector3 vfxRotationOffset = new Vector3(0, 0, 0);
 
         public VFXSpawnType vfxSpawnType = VFXSpawnType.OnActivate;

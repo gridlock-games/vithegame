@@ -161,12 +161,14 @@ namespace Vi.ScriptableObjects
 
         public void SetHitReactionRootMotionMultipliers(ActionClip attackClip)
         {
-            if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip! " + attackClip + " " + attackClip.GetClipType()); return; }
-            if (GetClipType() != ClipType.HitReaction) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called on a hit reaction!"); return; }
+            // TODO This needs to be networked and also needs to not use a shared instance of an action clip
 
-            hitReactionRootMotionForwardMultiplier = attackClip.attackRootMotionForwardMultiplier;
-            hitReactionRootMotionSidesMultiplier = attackClip.attackRootMotionSidesMultiplier;
-            hitReactionRootMotionVerticalMultiplier = attackClip.attackRootMotionVerticalMultiplier;
+            //if (!attackClip.IsAttack()) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called using an attack clip! " + attackClip + " " + attackClip.GetClipType()); return; }
+            //if (GetClipType() != ClipType.HitReaction) { Debug.LogError("ActionClip.SetHitReactionRootMotionMultipliers should only be called on a hit reaction!"); return; }
+
+            //hitReactionRootMotionForwardMultiplier = attackClip.attackRootMotionForwardMultiplier;
+            //hitReactionRootMotionSidesMultiplier = attackClip.attackRootMotionSidesMultiplier;
+            //hitReactionRootMotionVerticalMultiplier = attackClip.attackRootMotionVerticalMultiplier;
         }
 
         [SerializeField] private AnimationCurve debugForwardMotion;
@@ -332,5 +334,7 @@ namespace Vi.ScriptableObjects
         public float normalizedSummonTime = 0.5f;
         public Vector3 summonPositionOffset = new Vector3(0, 0, 2);
         public int summonableCount = 0;
+
+        public const int maxLivingSummonables = 3;
     }
 }

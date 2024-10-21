@@ -8,7 +8,6 @@ using System.IO;
 namespace Vi.Editor
 {
     [CustomEditor(typeof(ActionClip))]
-    [CanEditMultipleObjects]
     public class ActionClipEditor : UnityEditor.Editor
     {
         private SerializedProperty spClipType;

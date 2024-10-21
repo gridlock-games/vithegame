@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 415599082405652376, guid: 1a872921ee1848841821203271a3f4d3,
@@ -148,7 +149,7 @@ PrefabInstance:
     - target: {fileID: 6023453941330493494, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 951099334
+      value: 1261599964
       objectReference: {fileID: 0}
     - target: {fileID: 7221596432275174218, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
@@ -292,6 +293,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7221596432275174223, guid: 1a872921ee1848841821203271a3f4d3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 916445295224212621}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a872921ee1848841821203271a3f4d3, type: 3}
 --- !u!4 &7527864471004905978 stripped
 Transform:
@@ -304,6 +312,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 7527864471004905978}
     m_Modifications:
     - target: {fileID: 2489868650422198520, guid: 1e6a408f121fc684f9f5ace59e91ebf6,
@@ -372,7 +381,16 @@ PrefabInstance:
       value: toga_base
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1e6a408f121fc684f9f5ace59e91ebf6, type: 3}
+--- !u!4 &916445295224212621 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2578655663744899312, guid: 1e6a408f121fc684f9f5ace59e91ebf6,
+    type: 3}
+  m_PrefabInstance: {fileID: 3422427346848355453}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &1005197523875361925 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 2489868650422198520, guid: 1e6a408f121fc684f9f5ace59e91ebf6,

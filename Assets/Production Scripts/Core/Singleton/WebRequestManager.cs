@@ -38,8 +38,8 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        private string APIURL = "http://38.60.246.146:80/";
-        //private string APIURL = "http://154.90.35.191:80/";
+        //private string APIURL = "http://38.60.246.146:80/";
+        private string APIURL = "http://154.90.36.42:80/";
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
@@ -48,6 +48,23 @@ namespace Vi.Core
             APIURL = newAPIURL + "/";
 
             CheckGameVersion(true);
+        }
+
+        public string PublicIP { get; private set; }
+        public IEnumerator GetPublicIP()
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get("http://icanhazip.com");
+            yield return getRequest.SendWebRequest();
+
+            servers.Clear();
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.GetPublicIP() " + getRequest.error);
+                getRequest.Dispose();
+                IsRefreshingServers = false;
+                yield break;
+            }
+            PublicIP = getRequest.downloadHandler.text.Replace("\\r\\n", "").Replace("\\n", "").Trim();
         }
 
         public bool IsRefreshingServers { get; private set; }
@@ -717,32 +734,6 @@ namespace Vi.Core
             foreach (Character character in Characters)
             {
                 yield return GetCharacterInventory(character);
-
-                List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
-                CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-                bool itemWasAdded = false;
-                foreach (var option in armorOptions)
-                {
-                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
-                    {
-                        itemWasAdded = true;
-                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
-                    }
-                }
-
-                foreach (var option in weaponOptions)
-                {
-                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == option.itemWebId))
-                    {
-                        itemWasAdded = true;
-                        Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                        yield return AddItemToInventory(character._id.ToString(), option.itemWebId);
-                    }
-                }
-
-                if (itemWasAdded) { yield return GetCharacterInventory(character._id.ToString()); }
             }
 
             IsRefreshingCharacters = false;
@@ -1043,44 +1034,16 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
             }
 
-            yield return GetCharacterInventory(postRequest.downloadHandler.text);
-            
-            Loadout loadout1 = GetRandomizedLoadout(character.raceAndGender, true);
-            Loadout loadout2 = GetRandomizedLoadout(character.raceAndGender);
-            Loadout loadout3 = GetRandomizedLoadout(character.raceAndGender);
-            Loadout loadout4 = GetRandomizedLoadout(character.raceAndGender);
+            if (postRequest.downloadHandler.text == "false") { yield break; }
 
-            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-            // Add all items into character inventory
-            foreach (var option in armorOptions)
-            {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == option.itemWebId))
-                {
-                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, option.itemWebId);
-                }
-            }
-
-            foreach (var option in weaponOptions)
-            {
-                if (!InventoryItems[postRequest.downloadHandler.text].Exists(item => item.itemId == option.itemWebId))
-                {
-                    Debug.LogWarning("Item not in inventory but you're putting it in a loadout");
-                    yield return AddItemToInventory(postRequest.downloadHandler.text, option.itemWebId);
-                }
-            }
+            character._id = postRequest.downloadHandler.text;
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout1);
-            loadout2.loadoutSlot = "2";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout2);
-            loadout3.loadoutSlot = "3";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout3);
-            loadout4.loadoutSlot = "4";
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout4);
+            foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
+            {
+                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
+            }
 
             yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
@@ -1175,6 +1138,66 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Helm,
             CharacterReference.EquipmentType.Shoulders,
         };
+
+        private Loadout[] GetDefaultCharacterCreationLoadouts(Character character)
+        {
+            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+
+            var helmOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Helm & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var chestOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Chest & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var shoulderOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Shoulders & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var bootsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Boots & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var pantsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Pants & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var beltOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Belt & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var gloveOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Gloves & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var capeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Cape & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+            var robeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Robe & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+
+            weaponOptions = System.Array.FindAll(weaponOptions, item => InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
+
+            List<int> possibleWeaponIndicies = new List<int>();
+            for (int i = 0; i < weaponOptions.Length; i++)
+            {
+                possibleWeaponIndicies.Add(i);
+            }
+
+            List<Loadout> loadouts = new List<Loadout>();
+            for (int i = 1; i < 5; i++)
+            {
+                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(0, helmOptions.Count);
+                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(0, chestOptions.Count);
+                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(0, shoulderOptions.Count);
+                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(0, bootsOptions.Count);
+                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(0, pantsOptions.Count);
+                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(0, beltOptions.Count);
+                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(0, gloveOptions.Count);
+                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(0, capeOptions.Count);
+                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(0, robeOptions.Count);
+
+                int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
+                possibleWeaponIndicies.Remove(weapon1Index);
+
+                var weaponOptionsOfDifferentClass = System.Array.FindAll(weaponOptions, item => item.weapon.GetWeaponClass() != weaponOptions[weapon1Index].weapon.GetWeaponClass());
+                int weapon2Index = Random.Range(0, weaponOptionsOfDifferentClass.Length);
+                weapon2Index = System.Array.FindIndex(weaponOptions, item => item.itemWebId == weaponOptionsOfDifferentClass[weapon2Index].itemWebId);
+
+                loadouts.Add(new Loadout(i.ToString(),
+                    helmOptions.Count == 0 ? "" : (helmIndex == -1 ? "" : helmOptions[helmIndex].itemWebId),
+                    chestOptions.Count == 0 ? "" : (chestIndex == -1 ? "" : chestOptions[chestIndex].itemWebId),
+                    shoulderOptions.Count == 0 ? "" : (shoulderIndex == -1 ? "" : shoulderOptions[shoulderIndex].itemWebId),
+                    bootsOptions.Count == 0 ? "" : (bootsIndex == -1 ? "" : bootsOptions[bootsIndex].itemWebId),
+                    pantsOptions.Count == 0 ? "" : (pantsIndex == -1 ? "" : pantsOptions[pantsIndex].itemWebId),
+                    beltOptions.Count == 0 ? "" : (beltIndex == -1 ? "" : beltOptions[beltIndex].itemWebId),
+                    gloveOptions.Count == 0 ? "" : (gloveIndex == -1 ? "" : gloveOptions[gloveIndex].itemWebId),
+                    capeOptions.Count == 0 ? "" : (capeIndex == -1 ? "" : capeOptions[capeIndex].itemWebId),
+                    robeOptions.Count == 0 ? "" : (robeIndex == -1 ? "" : robeOptions[robeIndex].itemWebId),
+                    weaponOptions[weapon1Index].itemWebId,
+                    weaponOptions[weapon2Index].itemWebId,
+                    false));
+            }
+            return loadouts.ToArray();
+        }
 
         public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender, bool useDefaultPrimaryWeapon = false)
         {
@@ -1468,6 +1491,12 @@ namespace Vi.Core
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
+            }
+
+            public Loadout Copy()
+            {
+                return new Loadout(loadoutSlot, helmGearItemId, chestArmorGearItemId, shouldersGearItemId, bootsGearItemId, pantsGearItemId,
+                    beltGearItemId, glovesGearItemId, capeGearItemId, robeGearItemId, weapon1ItemId, weapon2ItemId, active);
             }
 
             public List<FixedString64Bytes> GetLoadoutAsList()
@@ -2706,8 +2735,20 @@ namespace Vi.Core
 
         private void Start()
         {
-            if (Application.isEditor) { StartCoroutine(CreateItems()); }
+            StartCoroutine(Initialize());
+#if UNITY_EDITOR
+            StartCoroutine(CreateItems());
+#endif
+        }
+
+        private IEnumerator Initialize()
+        {
+#if UNITY_SERVER && !UNITY_EDITOR
+            yield return GetPublicIP();
+            APIURL = "http://" + PublicIP + ":80/";
+#endif
             CheckGameVersion(false);
+            yield return null;
         }
 
         private void Update()
@@ -2742,6 +2783,7 @@ namespace Vi.Core
             }
         }
 
+#if UNITY_EDITOR
         private IEnumerator CreateItems()
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
@@ -2953,6 +2995,7 @@ namespace Vi.Core
             }
 
         }
+#endif
 
         public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
         {

@@ -18,8 +18,11 @@ public class DebugOverlay : MonoBehaviour
     [SerializeField] private Canvas consoleParent;
     [SerializeField] private Text consoleLogText;
     [SerializeField] private Text fpsText;
-    [SerializeField] private Text dividerText;
+    [SerializeField] private Text topDividerText;
     [SerializeField] private Text pingText;
+    [SerializeField] private Text packetLossText;
+    [SerializeField] private Text bottomDividerText;
+    [SerializeField] private Text jitterText;
 
     private void Start()
     {
@@ -29,8 +32,11 @@ public class DebugOverlay : MonoBehaviour
         DebugManager.instance.enableRuntimeUI = false;
 
         fpsText.text = "";
-        dividerText.text = "";
+        topDividerText.text = "";
         pingText.text = "";
+        packetLossText.text = "";
+        bottomDividerText.text = "";
+        jitterText.text = "";
 
         InvokeRepeating(nameof(RefreshFps), 0, 0.1f);
         InvokeRepeating(nameof(RefreshPing), 0, 0.1f);
@@ -69,6 +75,9 @@ public class DebugOverlay : MonoBehaviour
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
 
+    private int[] pingHistory;
+    private int pingHistoryIndex;
+    private ulong jitterValue;
     private void RefreshPing()
     {
         if (networkTransport & NetworkManager.Singleton)
@@ -76,11 +85,34 @@ public class DebugOverlay : MonoBehaviour
             if (NetworkManager.Singleton.IsConnectedClient)
             {
                 pingValue = networkTransport.GetCurrentRtt(NetworkManager.ServerClientId);
+                if (pingHistory == default) { pingHistory = new int[32]; }
+                pingHistory[pingHistoryIndex] = (int)pingValue;
+                pingHistoryIndex++;
+                if (pingHistoryIndex == pingHistory.Length) { pingHistoryIndex = 0; }
+
+                float totalJitter = 0;
+                // Calculate the difference between consecutive latencies
+                for (int i = 1; i < pingHistory.Length; i++)
+                {
+                    totalJitter += Mathf.Abs(pingHistory[i] - pingHistory[i - 1]);
+                }
+                // Return the average jitter (mean of the differences)
+                jitterValue = (ulong)(totalJitter / (pingHistory.Length - 1));
+            }
+            else
+            {
+                pingValue = 0;
+                pingHistoryIndex = 0;
+                if (pingHistory != default) { pingHistory = default; }
+                jitterValue = 0;
             }
         }
         else
         {
             pingValue = 0;
+            pingHistoryIndex = 0;
+            if (pingHistory != default) { pingHistory = default; }
+            jitterValue = 0;
         }
     }
 
@@ -130,12 +162,15 @@ public class DebugOverlay : MonoBehaviour
         consoleEnabled = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
         fpsEnabled = FasterPlayerPrefs.Singleton.GetBool("FPSEnabled");
         pingEnabled = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
+        packetLossEnabled = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
+        jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
 
         if (!consoleEnabled)
         {
             myLog = "";
             consoleLogText.text = "";
         }
+
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
         debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
         consoleParent.enabled = consoleEnabled;
@@ -145,13 +180,26 @@ public class DebugOverlay : MonoBehaviour
         if (!pingEnabled)
         {
             pingText.text = "";
-            dividerText.text = "";
+            topDividerText.text = "";
+        }
+
+        if (!packetLossEnabled)
+        {
+            packetLossText.text = "";
+        }
+
+        if (!jitterEnabled)
+        {
+            jitterText.text = "";
+            bottomDividerText.text = "";
         }
     }
 
     private bool consoleEnabled;
     private bool fpsEnabled;
     private bool pingEnabled;
+    private bool packetLossEnabled;
+    private bool jitterEnabled;
 
   //UNfortunately this is pretty much the easier way to get the logs.
   //  public string RetreveDebugLog()
@@ -161,7 +209,7 @@ public class DebugOverlay : MonoBehaviour
     private void Update()
     {
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
-        
+
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
         if (fpsEnabled)
@@ -210,7 +258,7 @@ public class DebugOverlay : MonoBehaviour
                 if (NetworkManager.Singleton.IsConnectedClient)
                 {
                     pingText.text = pingValue.ToString() + "ms";
-                    dividerText.text = fpsEnabled ? "|" : "";
+                    topDividerText.text = fpsEnabled ? "|" : "";
                     Color pingTextColor;
                     if (pingValue >= 80)
                     {
@@ -228,12 +276,75 @@ public class DebugOverlay : MonoBehaviour
                     pingTextEvaluated = true;
                 }
             }
-            
+
             if (!pingTextEvaluated)
             {
                 pingText.text = "";
-                dividerText.text = "";
+                topDividerText.text = "";
                 pingText.color = Color.green;
+            }
+        }
+
+        if (packetLossEnabled)
+        {
+            if (NetworkMetricManager.Singleton)
+            {
+                packetLossText.text = (NetworkMetricManager.Singleton.PacketLoss * 100).ToString("F0") + "%";
+
+                Color packetLossTextColor;
+                if (NetworkMetricManager.Singleton.PacketLoss >= 0.05f)
+                {
+                    packetLossTextColor = Color.red;
+                }
+                else if (NetworkMetricManager.Singleton.PacketLoss >= 0.02f)
+                {
+                    packetLossTextColor = Color.yellow;
+                }
+                else
+                {
+                    packetLossTextColor = Color.green;
+                }
+                packetLossText.color = packetLossTextColor;
+            }
+            else
+            {
+                packetLossText.text = "";
+            }
+        }
+
+        if (jitterEnabled)
+        {
+            bool jitterTextEvaluated = false;
+            if (NetworkManager.Singleton)
+            {
+                if (NetworkManager.Singleton.IsConnectedClient)
+                {
+                    jitterText.text = jitterValue.ToString() + "ms";
+                    bottomDividerText.text = packetLossEnabled ? "|" : "";
+
+                    Color jitterTextColor;
+                    if (jitterValue >= 30)
+                    {
+                        jitterTextColor = Color.red;
+                    }
+                    else if (jitterValue >= 10)
+                    {
+                        jitterTextColor = Color.yellow;
+                    }
+                    else
+                    {
+                        jitterTextColor = Color.green;
+                    }
+                    jitterText.color = jitterTextColor;
+                    jitterTextEvaluated = true;
+                }
+            }
+
+            if (!jitterTextEvaluated)
+            {
+                jitterText.text = "";
+                bottomDividerText.text = "";
+                jitterText.color = Color.green;
             }
         }
     }

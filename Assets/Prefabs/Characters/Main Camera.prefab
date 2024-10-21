@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 8570420301226025509}
   - component: {fileID: 8570420301236409537}
   - component: {fileID: 8570420301223741031}
-  - component: {fileID: 8570420301224085338}
-  - component: {fileID: 3955500355619807416}
   - component: {fileID: 3955500355619807415}
   m_Layer: 2
   m_Name: Main Camera
@@ -29,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8570420301224085339}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.13207309, y: -0.61688244, z: 0.10599979, w: 0.7686201}
   m_LocalPosition: {x: 4.1413364, y: 3.902131, z: -1.9181148}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &8570420301226025509
 Camera:
@@ -51,9 +49,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -96,52 +102,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8570420301224085339}
   m_Enabled: 1
---- !u!114 &8570420301224085338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8570420301224085339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63dd3fc351658c44aa112dfe38dfd68e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 8570420301226025509}
-  focusPoint: {fileID: 0}
-  useCameraDuplicate: 0
-  duplicatePrefab: {fileID: 0}
-  duplicate: {fileID: 0}
-  detectionRadius: 0.3
-  cushionOffset: 1
-  checkMultipleCollisions: 0
-  maskedTags:
-  - Player
-  maskedLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &3955500355619807416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8570420301224085339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 677966ebea7d27a42bef47d5f69f559a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 8570420301226025509}
-  focusPoint: {fileID: 0}
-  offset: {x: 0, y: 0, z: -4.5}
-  lookAtFocusPoint: 1
-  smoothFollow: 0
-  speed: 5
-  zoom: 0.5
-  maxOut: 5
-  maxIn: 0.5
 --- !u!114 &3955500355619807415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,6 +132,17 @@ MonoBehaviour:
   m_Dithering: 0
   m_ClearDepth: 1
   m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0

@@ -270,7 +270,7 @@ namespace Vi.Core
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
 
-            summonablesCount = 0;
+            thisClipSummonablesCount = 0;
             if (IsInAnticipation)
             {
                 if (CurrentActionClip.GetClipType() == ActionClip.ClipType.Ability)
@@ -405,7 +405,7 @@ namespace Vi.Core
                     break;
                 case ActionVFX.TransformType.SpawnAtWeaponPoint:
                     orientation.position = weaponInstances[actionVFX.weaponBone].transform.position;
-                    orientation.rotation = weaponInstances[actionVFX.weaponBone].transform.rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
+                    orientation.rotation = (actionVFX.baseRotationOnRoot ? attackerTransform.rotation : weaponInstances[actionVFX.weaponBone].transform.rotation) * Quaternion.Euler(actionVFX.vfxRotationOffset);
                     orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                     parent = isPreviewVFX ? weaponInstances[actionVFX.weaponBone].transform : null;
                     break;
@@ -565,7 +565,7 @@ namespace Vi.Core
 
         private bool reloadFinished;
 
-        private int summonablesCount;
+        private int thisClipSummonablesCount;
 
         private void FixedUpdate()
         {
@@ -596,17 +596,19 @@ namespace Vi.Core
                         }
                     }
 
-                    if (summonablesCount < CurrentActionClip.summonableCount)
+                    if (thisClipSummonablesCount < CurrentActionClip.summonableCount)
                     {
                         if (CurrentActionClip.summonables.Length > 0)
                         {
-                            if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                            if (combatAgent.GetSlaves().Count(item => item.GetAilment() != ActionClip.Ailment.Death) < ActionClip.maxLivingSummonables)
                             {
-                                Mob mob = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<Mob>();
-                                mob.SetTeam(combatAgent.GetTeam());
-                                mob.SetMaster(combatAgent);
-                                mob.NetworkObject.Spawn(true);
-                                summonablesCount++;
+                                if (normalizedTime >= CurrentActionClip.normalizedSummonTime)
+                                {
+                                    CombatAgent summonedAgent = ObjectPoolingManager.SpawnObject(CurrentActionClip.summonables[Random.Range(0, CurrentActionClip.summonables.Length)].GetComponent<PooledObject>(), combatAgent.MovementHandler.GetPosition() + combatAgent.MovementHandler.GetRotation() * CurrentActionClip.summonPositionOffset, combatAgent.MovementHandler.GetRotation()).GetComponent<CombatAgent>();
+                                    summonedAgent.SetMaster(combatAgent);
+                                    summonedAgent.NetworkObject.Spawn(true);
+                                    thisClipSummonablesCount++;
+                                }
                             }
                         }
                     }
@@ -1267,7 +1269,7 @@ namespace Vi.Core
             combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
 # endif
-
+        public List<Weapon.InputAttackType> GetInputHistory() { return inputHistory.ToList(); }
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
         {
@@ -1373,7 +1375,7 @@ namespace Vi.Core
 
         private void ResetComboSystem() { inputHistory.Clear(); }
 
-        private ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
+        public ActionClip SelectAttack(Weapon.InputAttackType inputAttackType, List<Weapon.InputAttackType> inputHistory)
         {
             switch (inputAttackType)
             {

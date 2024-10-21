@@ -115,7 +115,7 @@ namespace Vi.Core.VFX
         private void FixedUpdate()
         {
             if (!IsServer) { return; }
-            rb.MoveRotation(rb.velocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.velocity));
+            rb.MoveRotation(rb.linearVelocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.linearVelocity));
         }
 
         private void OnTriggerEnter(Collider other)

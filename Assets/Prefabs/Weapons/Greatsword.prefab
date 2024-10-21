@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2573536344531884105}
+  serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0.7071068, z: 0.00000005960465, w: -0.00000005960465}
   m_LocalPosition: {x: 0, y: 0, z: 0.035}
   m_LocalScale: {x: 1.3999999, y: 1.3999997, z: 0.8999997}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9120665817193852630}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7819042586905223686
 MeshFilter:
@@ -92,7 +92,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9120665817193852630}
-  - component: {fileID: 7819715846325170070}
   m_Layer: 0
   m_Name: Greatsword
   m_TagString: Untagged
@@ -107,6 +106,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9120665817193852633}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.0999999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -115,55 +115,13 @@ Transform:
   - {fileID: 1051286908996704271}
   - {fileID: 8021019487923880338}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7819715846325170070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9120665817193852633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46ce5ca9303944be08d0e95a6aab1c2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  captureHits: 2
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  segmentResolution: 0.05
-  pointA: {x: 0, y: 0, z: 1.1}
-  pointB: {x: 0, y: 0, z: 0}
-  radius: 0.5
-  offset: {x: 0, y: 0, z: 0}
-  boxInterframePredictions: 16
-  boxCenter: {x: 0, y: 0, z: 0.62}
-  boxSize: {x: 0.05, y: 0.08, z: 0.91}
-  debugMode: 0
-  EventAttackStart:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackActivation:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackRecovery:
-    m_PersistentCalls:
-      m_Calls: []
-  weaponBone: 18
-  enableWeaponTrail: 1
-  trailMaterial: {fileID: 2100000, guid: bd5ef410d675441c78ce115ba4c6e478, type: 2}
-  trailGranularity: 30
-  trailDuration: 0.5
 --- !u!1001 &7838502847734195483
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 9120665817193852630}
     m_Modifications:
     - target: {fileID: 258840934733964425, guid: 91a3f27c50b1442469da4da0162150d9,
@@ -242,6 +200,9 @@ PrefabInstance:
       value: SK_LongSword
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91a3f27c50b1442469da4da0162150d9, type: 3}
 --- !u!4 &8021019487923880338 stripped
 Transform:

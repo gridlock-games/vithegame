@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -3029479717123890878, guid: 54646c19f73b70c46a4ed076703abc3e,
@@ -92,6 +93,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2474656765017266961, guid: 54646c19f73b70c46a4ed076703abc3e,
+        type: 3}
+      propertyPath: worldSpaceLabelTransformInfo.rendererToFollow
+      value: 
+      objectReference: {fileID: 7649264959722809453}
     - target: {fileID: 3991640240029771182, guid: 54646c19f73b70c46a4ed076703abc3e,
         type: 3}
       propertyPath: m_IsActive
@@ -308,4 +314,13 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54646c19f73b70c46a4ed076703abc3e, type: 3}
+--- !u!137 &7649264959722809453 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1334551915767357702, guid: 54646c19f73b70c46a4ed076703abc3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8692758795647945067}
+  m_PrefabAsset: {fileID: 0}

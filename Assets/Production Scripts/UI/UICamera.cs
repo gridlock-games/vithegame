@@ -13,18 +13,24 @@ namespace Vi.UI
 
         private static List<UICamera> UICameras = new List<UICamera>();
 
-        private Camera cam;
+        private Camera attachedUICamera;
         private AudioListener audioListener;
         private UniversalAdditionalCameraData cameraData;
+
+        private Camera[] allCameras;
+        //private UniversalAdditionalCameraData[] allCameraDatas;
         private void Awake()
         {
             UICameras.Add(this);
 
-            cam = GetComponent<Camera>();
-            cam.cullingMask = LayerMask.GetMask(layerMask);
-            cam.depth = -1;
+            attachedUICamera = GetComponent<Camera>();
+            attachedUICamera.cullingMask = LayerMask.GetMask(layerMask);
+            attachedUICamera.depth = -1;
 
             cameraData = GetComponent<UniversalAdditionalCameraData>();
+
+            allCameras = GetComponentsInChildren<Camera>();
+            //allCameraDatas = GetComponentsInChildren<UniversalAdditionalCameraData>();
         }
 
         private static Camera mainCamera;
@@ -52,7 +58,7 @@ namespace Vi.UI
                 return null;
             }
             //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { return MainCamera; }
-            else { return UICameras[^1].cam; }
+            else { return UICameras[^1].attachedUICamera; }
         }
 
         private bool lastCamState;
@@ -60,26 +66,26 @@ namespace Vi.UI
         {
             FindMainCamera();
 
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { cam.enabled = false; }
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { attachedUICamera.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
             //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { cam.enabled = false; }
-            else { cam.enabled = UICameras[^1] == this; }
+            else { attachedUICamera.enabled = UICameras[^1] == this; }
 
-            if (cam.enabled != lastCamState)
+            if (attachedUICamera.enabled != lastCamState)
             {
-                if (cam.enabled)
+                if (attachedUICamera.enabled)
                 {
-                    cam.depth = 0;
+                    attachedUICamera.depth = 0;
                     if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 }
                 else
                 {
-                    cam.depth = -1;
+                    attachedUICamera.depth = -1;
                     if (audioListener) { Destroy(audioListener); }
                 }
             }
 
-            lastCamState = cam.enabled;
+            lastCamState = attachedUICamera.enabled;
 
             if (mainCamera)
             {
@@ -88,16 +94,22 @@ namespace Vi.UI
                 if (cameraData.renderType == CameraRenderType.Base)
                 {
                     cameraData.renderType = CameraRenderType.Overlay;
-                    mainCameraData.cameraStack.Add(cam);
+                    for (int i = 0; i < allCameras.Length; i++)
+                    {
+                        mainCameraData.cameraStack.Add(allCameras[i]);
+                    }
                 }
             }
-            else if (cam.enabled)
+            else if (attachedUICamera.enabled)
             {
                 if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 
                 if (cameraData.renderType == CameraRenderType.Overlay)
                 {
-                    mainCameraData.cameraStack.Remove(cam);
+                    for (int i = 0; i < allCameras.Length; i++)
+                    {
+                        mainCameraData.cameraStack.Remove(allCameras[i]);
+                    }
                     cameraData.renderType = CameraRenderType.Base;
                 }
             }
@@ -107,6 +119,13 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
+            if (cameraData.renderType == CameraRenderType.Overlay)
+            {
+                for (int i = 0; i < allCameras.Length; i++)
+                {
+                    mainCameraData.cameraStack.Remove(allCameras[i]);
+                }
+            }
             UICameras.Remove(this);
         }
     }

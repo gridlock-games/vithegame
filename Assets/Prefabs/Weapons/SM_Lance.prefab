@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6961701722804981233}
   - component: {fileID: 6961701722807881135}
   - component: {fileID: 6961701722806882159}
-  - component: {fileID: 3783639564690956729}
   m_Layer: 0
   m_Name: SM_Lance
   m_TagString: Untagged
@@ -26,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6961701722804949009}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.49941, y: 1.499411, z: 0.881641}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6961701722807881135
 MeshFilter:
@@ -84,45 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3783639564690956729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6961701722804949009}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46ce5ca9303944be08d0e95a6aab1c2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  captureHits: 2
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  segmentResolution: 0.05
-  pointA: {x: 0, y: 0, z: 0}
-  pointB: {x: 0, y: 0, z: 1}
-  radius: 0.5
-  offset: {x: 0, y: 0, z: 0}
-  boxInterframePredictions: 5
-  boxCenter: {x: 0, y: 0, z: 1.35}
-  boxSize: {x: 0.15, y: 0.15, z: 2.65}
-  debugMode: 0
-  EventAttackStart:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackActivation:
-    m_PersistentCalls:
-      m_Calls: []
-  EventAttackRecovery:
-    m_PersistentCalls:
-      m_Calls: []
-  weaponBone: 18
-  enableWeaponTrail: 0
-  trailMaterial: {fileID: 0}
-  trailGranularity: 60
-  trailDuration: 0.5

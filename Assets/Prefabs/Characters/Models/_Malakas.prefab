@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 12f7c65f120102646ada2a35e5ea4fe5,
@@ -108,50 +109,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12f7c65f120102646ada2a35e5ea4fe5, type: 3}
---- !u!1 &644146528115298420 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8617643225779568602, guid: 12f7c65f120102646ada2a35e5ea4fe5,
-    type: 3}
-  m_PrefabInstance: {fileID: 9180714291584135086}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1083373636890296515 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8097640993226485613, guid: 12f7c65f120102646ada2a35e5ea4fe5,
-    type: 3}
-  m_PrefabInstance: {fileID: 9180714291584135086}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8334222067460494079 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 12f7c65f120102646ada2a35e5ea4fe5,
-    type: 3}
-  m_PrefabInstance: {fileID: 9180714291584135086}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7267722047743122673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8334222067460494079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87974e256899b24e9956d7aa4c98b6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
---- !u!114 &8180494608565110261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8334222067460494079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b96538843a666564eb7336e61eea4f8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightHand: {fileID: 644146528115298420}
-  leftHand: {fileID: 1083373636890296515}
-  rightHandAimAxis: 0

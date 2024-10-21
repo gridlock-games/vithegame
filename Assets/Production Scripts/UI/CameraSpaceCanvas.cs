@@ -18,12 +18,14 @@ namespace Vi.UI
         private void Start()
         {
             canvas.worldCamera = UICamera.GetActiveUICamera();
+            if (!canvas.worldCamera) { return; }
             canvas.planeDistance = canvas.worldCamera.nearClipPlane + 0.01f;
         }
 
         private void Update()
         {
             canvas.worldCamera = UICamera.GetActiveUICamera();
+            if (!canvas.worldCamera) { return; }
             canvas.planeDistance = canvas.worldCamera.nearClipPlane + 0.01f;
         }
     }

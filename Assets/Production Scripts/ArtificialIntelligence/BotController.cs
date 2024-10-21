@@ -162,8 +162,8 @@ namespace Vi.ArtificialIntelligence
                     weaponHandler.AimDownSights(true);
                     if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                     {
-                        weaponHandler.LightAttack(true);
                         EvaluateAbility();
+                        weaponHandler.LightAttack(true);
                     }
                 }
                 else
@@ -172,17 +172,17 @@ namespace Vi.ArtificialIntelligence
                     {
                         if (!isHeavyAttacking)
                         {
-                            weaponHandler.LightAttack(true);
                             EvaluateAbility();
+                            weaponHandler.LightAttack(true);
                         }
                     }
                     else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
                     {
+                        EvaluateAbility();
                         if (!weaponHandler.CanADS)
                         {
                             if (!isHeavyAttacking & Time.time - lastChargeAttackTime > chargeWaitDuration) { StartCoroutine(HeavyAttack()); }
                         }
-                        EvaluateAbility();
                     }
                 }
             }
@@ -222,7 +222,36 @@ namespace Vi.ArtificialIntelligence
                     return;
                 }
 
-                int abilityNum = Random.Range(1, 5);
+                List<int> abilitiesOffCooldown = new List<int>();
+                for (int i = 1; i < 5; i++)
+                {
+                    switch (i)
+                    {
+                        case 1:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility1()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 2:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility2()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 3:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility3()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        case 4:
+                            if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility4()), 1)) { abilitiesOffCooldown.Add(i); }
+                            break;
+                        default:
+                            Debug.LogError("Unsure how to handle ability num " + i);
+                            break;
+                    }
+                }
+
+                if (abilitiesOffCooldown.Count == 0)
+                {
+                    lastAbilityTime = Time.time;
+                    return;
+                }
+
+                int abilityNum = abilitiesOffCooldown[Random.Range(0, abilitiesOffCooldown.Count)];
                 if (abilityNum == 1)
                 {
                     weaponHandler.Ability1(true);
@@ -394,7 +423,7 @@ namespace Vi.ArtificialIntelligence
             {
                 if (combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
                 {
-                    Rigidbody.AddForce(movement - Rigidbody.velocity, ForceMode.VelocityChange);
+                    Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
                     evaluateForce = false;
                 }
             }
@@ -403,15 +432,15 @@ namespace Vi.ArtificialIntelligence
             {
                 if (IsGrounded())
                 {
-                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.velocity.x, 0, Rigidbody.velocity.z), ForceMode.VelocityChange);
-                    if (Rigidbody.velocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
+                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
+                    if (Rigidbody.linearVelocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
                     {
-                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.velocity.y, 0), ForceMode.VelocityChange);
+                        Rigidbody.AddForce(new Vector3(0, -Rigidbody.linearVelocity.y, 0), ForceMode.VelocityChange);
                     }
                 }
                 else // Decelerate horizontal movement while aiRigidbodyorne
                 {
-                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.velocity.x, 0, -Rigidbody.velocity.z), airborneHorizontalDragMultiplier);
+                    Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.linearVelocity.x, 0, -Rigidbody.linearVelocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }

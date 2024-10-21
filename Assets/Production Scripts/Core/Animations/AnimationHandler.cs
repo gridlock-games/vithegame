@@ -7,6 +7,7 @@ using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
 using Vi.Core.MeshSlicing;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -234,11 +235,31 @@ namespace Vi.Core
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = true;
+                foreach (var kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                        {
+                            smr.enabled = false;
+                        }
+                    }
+                }
             }
             yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
             {
                 skinnedMeshRenderer.forceRenderingOff = false;
+                foreach (var kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                        {
+                            smr.enabled = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -318,6 +339,20 @@ namespace Vi.Core
         RaycastHit[] allHits = new RaycastHit[10];
         public CanPlayActionClipResult CanPlayActionClip(ActionClip actionClip, bool isFollowUpClip)
         {
+            // Validate input history for light attacks so that players can't cheat their light attack combos
+            if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
+            {
+                if (actionClip != combatAgent.WeaponHandler.SelectAttack(Weapon.InputAttackType.LightAttack, combatAgent.WeaponHandler.GetInputHistory())) { return default; }
+            }
+
+            if (actionClip.summonableCount > 0)
+            {
+                if (combatAgent.GetSlaves().Count(item => item.GetAilment() != ActionClip.Ailment.Death) >= ActionClip.maxLivingSummonables)
+                {
+                    return default;
+                }
+            }
+
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (!combatAgent.MovementHandler.CanMove()) { return default; }
@@ -528,7 +563,7 @@ namespace Vi.Core
                     & !(actionClip.GetClipType() == ActionClip.ClipType.HeavyAttack & lastClipPlayed.canBeCancelledByHeavyAttacks)
                     & !(actionClip.GetClipType() == ActionClip.ClipType.Ability & lastClipPlayed.canBeCancelledByAbilities))
                     {
-                        return default;
+                        if (NetworkObject.IsPlayerObject) { return default; }
                     }
                 }
             }
@@ -617,6 +652,8 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
+            combatAgent.MovementHandler.OnServerActionClipPlayed();
+
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
             // Play the action clip based on its type
@@ -651,8 +688,6 @@ namespace Vi.Core
                 if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
                 playAdditionalClipsCoroutine = StartCoroutine(PlayAdditionalClips(actionClip));
             }
-
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);

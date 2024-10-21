@@ -22,6 +22,8 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
+            if (characterPreviewCamera) { Destroy(characterPreviewCamera.gameObject); }
+
             if (previewObject)
             {
                 if (previewObject.TryGetComponent(out PooledObject pooledObject))
@@ -66,6 +68,7 @@ namespace Vi.UI
                 AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
                 animationHandler.ChangeCharacter(character);
 
+                characterPreviewCamera.transform.SetParent(null);
                 characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
             }

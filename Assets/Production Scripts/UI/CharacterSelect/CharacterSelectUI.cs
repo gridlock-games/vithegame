@@ -177,7 +177,21 @@ namespace Vi.UI
             gearOpenPivot = selectionBarUnselectedImage.pivot;
 
             OpenCharacterSelect();
-            finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
+
+            if (characterNameInputField.text.Length < 6)
+            {
+                finishCharacterCustomizationButton.interactable = false;
+            }
+            else if (characterNameInputField.text.Length > 12)
+            {
+                finishCharacterCustomizationButton.interactable = false;
+            }
+            else
+            {
+                finishCharacterCustomizationButton.interactable = true;
+            }
+            characterNameInputErrorText.text = "";
+
             selectCharacterButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString()) & WebRequestManager.Singleton.GameIsUpToDate;
             selectCharacterButton.onClick.AddListener(() => AutoConnectToHub());
             goToTrainingRoomButton.interactable = !string.IsNullOrEmpty(selectedCharacter._id.ToString());
@@ -753,14 +767,31 @@ namespace Vi.UI
             }
         }
 
+        [SerializeField] private Text characterNameInputErrorText;
         public void OnUsernameChange()
         {
-            finishCharacterCustomizationButton.interactable = characterNameInputField.text.Length > 0;
+            if (characterNameInputField.text.Length < 6)
+            {
+                characterNameInputErrorText.text = "Name must be longer than 5 characters";
+                finishCharacterCustomizationButton.interactable = false;
+            }
+            else if (characterNameInputField.text.Length > 12)
+            {
+                characterNameInputErrorText.text = "Name must be shorter than 13 characters";
+                finishCharacterCustomizationButton.interactable = false;
+            }
+            else
+            {
+                characterNameInputErrorText.text = "";
+                finishCharacterCustomizationButton.interactable = true;
+            }
             selectedCharacter.name = characterNameInputField.text;
         }
 
         public void ReturnToMainMenu()
         {
+            if (NetworkManager.Singleton.IsListening) { return; }
+            returnButton.interactable = false;
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
             NetSceneManager.Singleton.LoadScene("Main Menu");
         }

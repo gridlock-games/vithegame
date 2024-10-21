@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 415599082405652376, guid: 1a872921ee1848841821203271a3f4d3,
@@ -148,7 +149,7 @@ PrefabInstance:
     - target: {fileID: 6023453941330493494, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 951099334
+      value: 3360252335
       objectReference: {fileID: 0}
     - target: {fileID: 7221596432275174218, guid: 1a872921ee1848841821203271a3f4d3,
         type: 3}
@@ -277,6 +278,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7221596432275174223, guid: 1a872921ee1848841821203271a3f4d3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9017101443651401452}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a872921ee1848841821203271a3f4d3, type: 3}
 --- !u!4 &7527864471004905978 stripped
 Transform:
@@ -289,6 +297,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 7527864471004905978}
     m_Modifications:
     - target: {fileID: 1408242701769554095, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
@@ -357,10 +366,19 @@ PrefabInstance:
       value: guin_battle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1b4a5b3b48212d4c9f535d679d4fae7, type: 3}
 --- !u!95 &8838759023218888991 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1408242701769554095, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
+    type: 3}
+  m_PrefabInstance: {fileID: 7575760214196955568}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9017101443651401452 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1441622728665718620, guid: f1b4a5b3b48212d4c9f535d679d4fae7,
     type: 3}
   m_PrefabInstance: {fileID: 7575760214196955568}
   m_PrefabAsset: {fileID: 0}
