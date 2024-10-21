@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 103
+  pooledObjectIndex: 101
   isPrewarmObject: 1
 --- !u!114 &3556796361781534749
 MonoBehaviour:
@@ -311,6 +311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0, y: 0, z: 2}
+  baseRotationOnRoot: 0
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 0

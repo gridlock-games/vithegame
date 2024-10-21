@@ -1112,18 +1112,15 @@ namespace Vi.Core
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            var beltOption = armorOptions.Find(item => item.name == "Runic Belt");
-            var capeOption = armorOptions.Find(item => item.name == "Runic Cape");
-
             return new Loadout("1",
                 "",
-                armorOptions.Find(item => item.name == "Runic Chest").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Shoulders").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Boots").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Pants").itemWebId,
-                beltOption == null ? "" : beltOption.itemWebId,
-                armorOptions.Find(item => item.name == "Runic Gloves").itemWebId,
-                capeOption == null ? "" : capeOption.itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest).itemWebId,
+                "",
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants).itemWebId,
+                "",
+                "",
+                "",
                 "",
                 System.Array.Find(weaponOptions, item => item.name == "Flintblade").itemWebId,
                 System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel").itemWebId,

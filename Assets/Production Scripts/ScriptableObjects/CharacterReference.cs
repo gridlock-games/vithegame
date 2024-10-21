@@ -113,6 +113,7 @@ namespace Vi.ScriptableObjects
         public class WearableEquipmentOption : System.IEquatable<WearableEquipmentOption>
         {
             public string name;
+            public string groupName;
             public string itemWebId;
             public bool isBasicGear;
             public EquipmentType equipmentType;
@@ -134,9 +135,10 @@ namespace Vi.ScriptableObjects
                 return equipmentIcons[index];
             }
 
-            public WearableEquipmentOption(string name, EquipmentType equipmentType)
+            public WearableEquipmentOption(string name, string groupName, EquipmentType equipmentType)
             {
                 this.name = name;
+                this.groupName = groupName;
                 this.equipmentType = equipmentType;
             }
 
@@ -171,7 +173,7 @@ namespace Vi.ScriptableObjects
 
             public bool Equals(WearableEquipmentOption other)
             {
-                return name == other.name & equipmentType == other.equipmentType;
+                return groupName == other.groupName & equipmentType == other.equipmentType;
             }
         }
 
@@ -256,6 +258,212 @@ namespace Vi.ScriptableObjects
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
 # if UNITY_EDITOR
+        [ContextMenu("Create Equipment From Universal Material")]
+        private void CreateEquipmentFromUniversalMaterial()
+        {
+            string[] materialNamesToSearchFor = new string[]
+            {
+                "M_Pants_NArcher_U_Bl"
+            };
+
+            foreach (string materialName in materialNamesToSearchFor)
+            {
+                if (!materialName.Contains("_U_")) { Debug.LogError("This is not a universal material! " + materialName); continue; }
+
+                string[] results = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Materials", materialName + ".mat", SearchOption.AllDirectories);
+                if (results.Length == 0)
+                {
+                    Debug.LogError("Could not find material for name " + materialName);
+                }
+                else if (results.Length == 1)
+                {
+                    Material loadedMaterial = AssetDatabase.LoadAssetAtPath<Material>(results[0]);
+                    EquipmentType equipmentType = default;
+                    foreach (EquipmentType et in System.Enum.GetValues(typeof(EquipmentType)))
+                    {
+                        if (loadedMaterial.name.ToUpper().Contains(et.ToString().ToUpper()))
+                        {
+                            equipmentType = et;
+                            break;
+                        }
+                    }
+
+                    if (equipmentType == EquipmentType.Pants)
+                    {
+                        string[] basePrefabPaths = new string[]
+                        {
+                            @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Item\Equipment\Pants\Hu_F_Pants.prefab",
+                            @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Item\Equipment\Pants\Hu_M_Pants.prefab"
+                        };
+
+                        foreach (string basePrefabPath in basePrefabPaths)
+                        {
+                            GameObject loadedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(basePrefabPath);
+
+                            if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + loadedPrefab.name + ".prefab")) { continue; }
+
+                            GameObject instance = Instantiate(loadedPrefab);
+                            instance.name = instance.name.Replace("(Clone)", "");
+
+                            foreach (Behaviour component in instance.GetComponents<Behaviour>())
+                            {
+                                DestroyImmediate(component);
+                            }
+
+                            foreach (SkinnedMeshRenderer smr in instance.GetComponentsInChildren<SkinnedMeshRenderer>())
+                            {
+                                smr.sharedMaterial = loadedMaterial;
+                            }
+
+                            instance.AddComponent<PooledObject>();
+                            WearableEquipment wearableEquipment = instance.AddComponent<WearableEquipment>();
+                            wearableEquipment.equipmentType = equipmentType;
+
+                            TraverseHierarchy(instance.transform);
+
+                            RaceAndGender raceAndGender = RaceAndGender.Universal;
+                            string groupName = "";
+                            if (instance.name.Contains("Hu_M_"))
+                            {
+                                raceAndGender = RaceAndGender.HumanMale;
+                            }
+                            else if (instance.name.Contains("Hu_F_"))
+                            {
+                                raceAndGender = RaceAndGender.HumanFemale;
+                            }
+
+                            groupName = materialName.Replace("M_Pants_", "").Replace("_U_", "");
+
+                            if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
+
+                            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(instance, @"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab");
+
+                            var option = new WearableEquipmentOption(groupName, groupName, wearableEquipment.equipmentType);
+                            option.AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+
+                            if (equipmentOptions.Exists(item => item.Equals(option)))
+                            {
+                                equipmentOptions.Find(item => item.Equals(option)).AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+                            }
+                            else
+                            {
+                                equipmentOptions.Add(option);
+                            }
+                            UnityEditor.EditorUtility.SetDirty(this);
+
+                            DestroyImmediate(instance);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("Unsure what to do with universal material of equipment type " + equipmentType);
+                    }
+                }
+                else
+                {
+                    Debug.LogError("More than one result for material name " + materialName);
+                }
+            }
+        }
+
+        [ContextMenu("Create Equipment From Prefab")]
+        private void CreateEquipmentFromPrefab()
+        {
+            string[] prefabNamesToSearchFor = new string[]
+            {
+                "Hu_M_Boots_NArcher_Bl",
+                "Hu_M_Belt_NArcher_Bl",
+                "Hu_M_Cape_NArcher_Bl",
+                "Hu_M_Chest_NArcher_Bl",
+                "Hu_F_Boots_NArcher_Bl",
+                "Hu_F_Belt_NArcher_Bl",
+                "Hu_F_Cape_NArcher_Bl",
+                "Hu_F_Chest_NArcher_Bl"
+            };
+
+            foreach (string prefabName in prefabNamesToSearchFor)
+            {
+                string[] results = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs", prefabName + ".prefab", SearchOption.AllDirectories);
+                if (results.Length == 0)
+                {
+                    Debug.LogError("Could not find prefab for name " + prefabName);
+                }
+                else if (results.Length == 1)
+                {
+                    GameObject loadedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(results[0]);
+
+                    if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + loadedPrefab.name + ".prefab")) { continue; }
+
+                    GameObject instance = Instantiate(loadedPrefab);
+                    instance.name = instance.name.Replace("(Clone)", "");
+
+                    foreach (Behaviour component in instance.GetComponents<Behaviour>())
+                    {
+                        DestroyImmediate(component);
+                    }
+
+                    instance.AddComponent<PooledObject>();
+                    WearableEquipment wearableEquipment = instance.AddComponent<WearableEquipment>();
+                    foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
+                    {
+                        if (instance.name.ToUpper().Contains(equipmentType.ToString().ToUpper()))
+                        {
+                            wearableEquipment.equipmentType = equipmentType;
+                            break;
+                        }
+                    }
+
+                    TraverseHierarchy(instance.transform);
+
+                    RaceAndGender raceAndGender = RaceAndGender.Universal;
+                    string groupName = "";
+                    if (instance.name.Contains("Hu_M_"))
+                    {
+                        raceAndGender = RaceAndGender.HumanMale;
+                        groupName = instance.name.Replace("Hu_M_", "").Replace(wearableEquipment.equipmentType.ToString(), "").Replace("_", "");
+                    }
+                    else if (instance.name.Contains("Hu_F_"))
+                    {
+                        raceAndGender = RaceAndGender.HumanFemale;
+                        groupName = instance.name.Replace("Hu_F_", "").Replace(wearableEquipment.equipmentType.ToString(), "").Replace("_", "");
+                    }
+
+                    if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
+
+                    GameObject prefab = PrefabUtility.SaveAsPrefabAsset(instance, @"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab");
+
+                    var option = new WearableEquipmentOption(groupName, groupName, wearableEquipment.equipmentType);
+                    option.AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+
+                    if (equipmentOptions.Exists(item => item.Equals(option)))
+                    {
+                        equipmentOptions.Find(item => item.Equals(option)).AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+                    }
+                    else
+                    {
+                        equipmentOptions.Add(option);
+                    }
+                    UnityEditor.EditorUtility.SetDirty(this);
+
+                    DestroyImmediate(instance);
+                }
+                else
+                {
+                    Debug.LogError("More than one result for prefab name " + prefabName);
+                }
+            }
+        }
+
+        private void TraverseHierarchy(Transform root)
+        {
+            root.gameObject.layer = LayerMask.NameToLayer("Character");
+            foreach (Transform child in root)
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Character");
+                TraverseHierarchy(child);
+            }
+        }
+
         [ContextMenu("Set Dirty")]
         private void SetDirtyAtWill()
         {
@@ -408,7 +616,7 @@ namespace Vi.ScriptableObjects
                                 child.gameObject.layer = LayerMask.NameToLayer("Character");
                             }
 
-                            WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, wearableEquipment.equipmentType);
+                            WearableEquipmentOption wearableEquipmentOption = new WearableEquipmentOption(armorSetName + " " + wearableEquipment.name, "", wearableEquipment.equipmentType);
                             if (!equipmentOptions.Exists(item => item.Equals(wearableEquipmentOption))) { equipmentOptions.Add(wearableEquipmentOption); }
 
                             PrefabUtility.SaveAsPrefabAsset(modelSource, prefabVariantPath);
