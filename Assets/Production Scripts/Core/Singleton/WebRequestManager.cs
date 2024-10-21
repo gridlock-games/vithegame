@@ -1162,15 +1162,15 @@ namespace Vi.Core
             List<Loadout> loadouts = new List<Loadout>();
             for (int i = 1; i < 5; i++)
             {
-                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(0, helmOptions.Count);
-                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(0, chestOptions.Count);
-                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(0, shoulderOptions.Count);
-                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(0, bootsOptions.Count);
-                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(0, pantsOptions.Count);
-                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(0, beltOptions.Count);
-                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(0, gloveOptions.Count);
-                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(0, capeOptions.Count);
-                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(0, robeOptions.Count);
+                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
+                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Chest) ? -1 : 0, chestOptions.Count);
+                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
+                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Boots) ? -1 : 0, bootsOptions.Count);
+                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Pants) ? -1 : 0, pantsOptions.Count);
+                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Belt) ? -1 : 0, beltOptions.Count);
+                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
+                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
+                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
                 int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
                 possibleWeaponIndicies.Remove(weapon1Index);
