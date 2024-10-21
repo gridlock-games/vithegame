@@ -7,11 +7,11 @@ namespace Vi.UI
 {
     public class CharacterCustomizationRow : MonoBehaviour
     {
-        [SerializeField] private HorizontalLayoutGroup layoutGroup;
+        [SerializeField] private GridLayoutGroup layoutGroup;
         [SerializeField] private CharacterCustomizationButton[] buttons;
         public Text rowHeaderText;
 
-        public HorizontalLayoutGroup GetLayoutGroup() { return layoutGroup; }
+        public GridLayoutGroup GetLayoutGroup() { return layoutGroup; }
 
         public CharacterCustomizationButton GetUninitializedButton()
         {
@@ -23,5 +23,14 @@ namespace Vi.UI
             Debug.LogError("Returning null instead of a uninitialized button!");
             return null;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (Application.isPlaying) { return; }
+
+            buttons = GetComponentsInChildren<CharacterCustomizationButton>();
+        }
+#endif
     }
 }

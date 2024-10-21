@@ -19,7 +19,6 @@ namespace Vi.UI
         public void InitializeAsColor(Color color)
         {
             Initialized = true;
-            ((RectTransform)iconImage.transform).sizeDelta = new Vector2(125, 125);
             iconImage.sprite = materialSprite;
             iconImage.color = color;
         }
@@ -27,7 +26,6 @@ namespace Vi.UI
         public void InitializeAsMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             Initialized = true;
-            ((RectTransform)iconImage.transform).sizeDelta = new Vector2(125, 125);
             iconImage.sprite = materialSprite;
             iconImage.color = characterMaterial.averageTextureColor;
         }
@@ -35,7 +33,6 @@ namespace Vi.UI
         public void InitializeAsEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             Initialized = true;
-            ((RectTransform)iconImage.transform).sizeDelta = new Vector2(400, 225);
             iconImage.sprite = wearableEquipmentOption.GetIcon(raceAndGender);
             iconImage.color = Color.white;
         }
@@ -44,7 +41,6 @@ namespace Vi.UI
         {
             Initialized = true;
             selectedOverlayImage.enabled = false;
-            ((RectTransform)iconImage.transform).sizeDelta = new Vector2(125, 125);
             iconImage.sprite = removeEquipmentSprite;
             iconImage.color = Color.white;
         }
