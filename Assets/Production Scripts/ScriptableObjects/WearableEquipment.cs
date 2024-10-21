@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Utility;
 using UnityEngine.Assertions;
+using MagicaCloth2;
 
 namespace Vi.ScriptableObjects
 {
@@ -48,8 +49,12 @@ namespace Vi.ScriptableObjects
 
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {
-                if (srenderer.GetComponent<MagicaCloth2.MagicaCloth>())
+                if (srenderer.TryGetComponent(out MagicaCloth magicaCloth))
                 {
+                    ClothSerializeData sdata = magicaCloth.SerializeData;
+                    sdata.colliderCollisionConstraint.colliderList.Clear();
+                    sdata.colliderCollisionConstraint.colliderList.AddRange(animator.GetComponentsInChildren<ColliderComponent>());
+
                     foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {
                         bool shouldSkip = false;
