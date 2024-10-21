@@ -330,7 +330,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -357,7 +357,7 @@ MonoBehaviour:
     m_MinLimit: -180
     m_MaxLimit: 180
     m_AimAxis: 0
-    m_UpAxis: 5
+    m_UpAxis: 4
     m_WorldUpType: 0
     m_WorldUpObject: {fileID: 0}
     m_WorldUpAxis: 2
@@ -416,7 +416,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -673,7 +673,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -872,7 +872,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -958,7 +958,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -1281,7 +1281,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 0}
+        transform: {fileID: 2162788340571866391}
         weight: 1
       m_Item1:
         transform: {fileID: 0}
@@ -1580,23 +1580,24 @@ MonoBehaviour:
   rotationOffsetAxis: 2
   middleSpine: {fileID: 1710484132655373103}
   hips: {fileID: 1829467840966828511}
-  keys: 1100000012000000
+  keys: 11000000120000000f000000
   values:
   - {fileID: 7954649064892847931}
   - {fileID: 4394847707192651466}
+  - {fileID: 1337412794077547613}
   stowedWeaponParents:
   - weaponClass: 0
     bone: {fileID: 1286507944128629987}
   - weaponClass: 1
-    bone: {fileID: 5489233693247206339}
+    bone: {fileID: 8095869292183213725}
   - weaponClass: 2
     bone: {fileID: 8920404950292409610}
   - weaponClass: 3
-    bone: {fileID: 5489233693247206339}
+    bone: {fileID: 8095869292183213725}
   - weaponClass: 4
-    bone: {fileID: 5489233693247206339}
+    bone: {fileID: 8095869292183213725}
   - weaponClass: 5
-    bone: {fileID: 5489233693247206339}
+    bone: {fileID: 8095869292183213725}
 --- !u!114 &8935369246338372656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1700,10 +1701,24 @@ MonoBehaviour:
     m_Active: 1
   - m_Rig: {fileID: 2640324431668586174}
     m_Active: 1
-  m_Effectors: []
+  m_Effectors:
+  - m_Transform: {fileID: 2162788340571866391}
+    m_Style:
+      shape: {fileID: 4300000, guid: e050c2b16fe384bd994474655a4b4968, type: 2}
+      color: {r: 1, g: 0, b: 1, a: 0.5}
+      size: 0.5
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+    m_Visible: 1
 --- !u!4 &1286507944128629987 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1634424486304067982, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1337412794077547613 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7639427026703224528, guid: da1332e915e84cb691bc1ad994e4ff8f,
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
@@ -1779,12 +1794,6 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &5489233693247206339 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -3793842106640822610, guid: da1332e915e84cb691bc1ad994e4ff8f,
-    type: 3}
-  m_PrefabInstance: {fileID: 537120507931917677}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6004497279814287672 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6061983877138398293, guid: da1332e915e84cb691bc1ad994e4ff8f,
@@ -1824,6 +1833,12 @@ SkinnedMeshRenderer:
 --- !u!4 &7954649064892847931 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7570739455113243222, guid: da1332e915e84cb691bc1ad994e4ff8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 537120507931917677}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8095869292183213725 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -635444621982749712, guid: da1332e915e84cb691bc1ad994e4ff8f,
     type: 3}
   m_PrefabInstance: {fileID: 537120507931917677}
   m_PrefabAsset: {fileID: 0}
