@@ -44,6 +44,8 @@ namespace Vi.ProceduralAnimations
 
         private void OnDrawGizmosSelected()
         {
+            if (!root | !tip) { return; }
+
             Vector3 rootPos = root.position + EvaluateAxisOffset(root, rootAxis, rootMultiplier);
             Vector3 tipPos = tip.position + EvaluateAxisOffset(tip, tipAxis, tipMultiplier);
 
