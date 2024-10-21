@@ -41,8 +41,7 @@ namespace Vi.ScriptableObjects
 
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
 
-            Transform target = animator.transform;
-            FindRootBone(ref target, target);
+            Transform target = animator.avatarRoot;
 
             var boneMap = new Dictionary<string, Transform>();
             GetAllSkinnedMeshRenderers(ref boneMap, target);
@@ -103,21 +102,6 @@ namespace Vi.ScriptableObjects
                 renderList[i].bones = originalBones;
             }
             boneMapToFollow.Clear();
-        }
-
-        private void FindRootBone(ref Transform target, Transform start)
-        {
-            if (start.gameObject.layer != LayerMask.NameToLayer("Character")) { return; }
-
-            foreach (Transform child in start)
-            {
-                if (child.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
-                {
-                    target = skinnedMeshRenderer.rootBone;
-                    return;
-                }
-                FindRootBone(ref target, child);
-            }
         }
 
         private void GetAllSkinnedMeshRenderers(ref Dictionary<string, Transform> map, Transform target)
