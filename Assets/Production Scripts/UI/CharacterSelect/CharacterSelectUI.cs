@@ -412,7 +412,7 @@ namespace Vi.UI
                         break;
 
                     default:
-                        Debug.Log("Not sure how to handle race string " + race);
+                        Debug.LogError("Not sure how to handle race string " + race);
                         break;
                 }
 
@@ -606,7 +606,7 @@ namespace Vi.UI
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
-            selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+            selectedCharacter = character;
             selectedCharacter.raceAndGender = raceAndGender;
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
@@ -836,6 +836,9 @@ namespace Vi.UI
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             StartCoroutine(RefreshCharacterCards());
+
+            selectedRace = "Human";
+            selectedGender = "Male";
 
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(true);
