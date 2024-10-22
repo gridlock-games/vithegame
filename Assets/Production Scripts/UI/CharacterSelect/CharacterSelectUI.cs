@@ -445,6 +445,7 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
                     rowElement.SetAsArrowGroup(PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Where(item => item.equipmentType == equipmentOption.equipmentType));
                     //rowElement.GetLayoutGroup().childAlignment = childAlignment;
                     //rowElement.GetLayoutGroup().startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperLeft : GridLayoutGroup.Corner.UpperRight;
@@ -473,8 +474,6 @@ namespace Vi.UI
                     rowElement = buttonParent.GetComponentInParent<CharacterCustomizationRow>();
                     buttonParent = rowElement.GetLayoutGroup().transform;
                 }
-
-                rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
             }
         }
 
@@ -639,7 +638,7 @@ namespace Vi.UI
                     equipmentImageValues[i].gameObject.SetActive(false);
                 }
 
-                if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
+                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
             if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
