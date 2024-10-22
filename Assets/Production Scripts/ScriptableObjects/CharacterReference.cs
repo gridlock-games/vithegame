@@ -293,7 +293,12 @@ namespace Vi.ScriptableObjects
                 "M_Eye_Br",
                 "M_Eye_Bl",
                 "M_Eye_Gn",
-                "M_Eye_Pe"
+                "M_Eye_Pe",
+
+                "M_HuF_Facials_Bd",
+                "M_HuF_Facials_Bk",
+                "M_HuF_Facials_Br",
+                "M_HuF_Facials_Gr"
             };
 
             foreach (string materialName in materialNamesToSearchFor)
@@ -465,7 +470,31 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Cape_NArcher_Bl",
                 "Hu_F_Chest_NArcher_Bl",
 
-                "Hu_M_Hair_01_Bd"
+                "Hu_M_Hair_01_Bd",
+                "Hu_M_Hair_01_Bk",
+                "Hu_M_Hair_01_Br",
+                "Hu_M_Hair_01_Gr",
+                "Hu_M_Hair_02_Br",
+                "Hu_M_Hair_02_Bk",
+
+                "Hu_M_Beard_01_Bd",
+                "Hu_M_Beard_01_Bk",
+                "Hu_M_Beard_01_Br",
+                "Hu_M_Beard_01_Gr",
+                "Hu_M_Beard_02_Bd",
+                "Hu_M_Beard_02_Br",
+
+                "Hu_F_Brows_Bd",
+                "Hu_F_Brows_Bk",
+                "Hu_F_Brows_Br",
+                "Hu_F_Brows_Gr",
+
+                "Hu_F_Hair_01_Bd",
+                "Hu_F_Hair_01_Bk",
+                "Hu_F_Hair_01_Br",
+                "Hu_F_Hair_01_Gr",
+                "Hu_F_Hair_02_Bd",
+                "Hu_F_Hair_02_Br",
             };
 
             foreach (string prefabName in prefabNamesToSearchFor)

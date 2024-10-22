@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using static ViNetAnalytics.Deviceinfo;
 using Vi.Utility;
+using Vi.Core;
 
 namespace ViNetAnalytics
 {
@@ -27,7 +28,6 @@ namespace ViNetAnalytics
         }
 
         private bool alreadyCapture = false;
-        private const string APIURL = "http://154.90.35.191:80/";
         public Deviceinfo capturedData;
         public bool dataPrivacyAnonymousPermission = true;
 
@@ -83,7 +83,7 @@ namespace ViNetAnalytics
 
             Debug.Log("SendingData");
             //Begin Transfer - Held for Dataprivacy test
-            using (UnityWebRequest sentRequest = UnityWebRequest.PostWwwForm($"{APIURL}game/saveDeviceInfo", jsonDataConverted))
+            using (UnityWebRequest sentRequest = UnityWebRequest.PostWwwForm($"{WebRequestManager.Singleton.GetAPIURL()}/game/saveDeviceInfo", jsonDataConverted))
             {
                 yield return sentRequest.SendWebRequest();
 

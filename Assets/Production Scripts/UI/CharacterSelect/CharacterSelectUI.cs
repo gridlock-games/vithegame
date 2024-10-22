@@ -268,7 +268,7 @@ namespace Vi.UI
         }
 
         private readonly int leftStartOffset = 400;
-        private readonly int rightStartOffset = 450;
+        private readonly int rightStartOffset = 400;
         private readonly int spacing = -110;
         private int leftYLocalPosition;
         private int rightYLocalPosition;
@@ -402,7 +402,11 @@ namespace Vi.UI
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition += new Vector3(300, 0, 0);
+                        RectTransform rt = (RectTransform)headerText.transform;
+                        rt.anchorMin = Vector2.one;
+                        rt.anchorMax = Vector2.one;
+                        rt.pivot = Vector2.one;
+                        rt.anchoredPosition = Vector2.zero;
                         headerText.alignment = TextAnchor.MiddleLeft;
                     }
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
@@ -445,8 +449,12 @@ namespace Vi.UI
                     headerText.text = equipmentOption.equipmentType.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition += new Vector3(300, 0, 0);
-                        headerText.alignment = TextAnchor.MiddleLeft;
+                        RectTransform rt = (RectTransform)headerText.transform;
+                        rt.anchorMin = Vector2.one;
+                        rt.anchorMax = Vector2.one;
+                        rt.pivot = Vector2.one;
+                        rt.anchoredPosition = Vector2.zero;
+                        headerText.alignment = TextAnchor.MiddleRight;
                     }
                     characterEquipmentParents.Add(new EquipmentCustomizationParent() { equipmentType = equipmentOption.equipmentType, parent = buttonParent });
 
