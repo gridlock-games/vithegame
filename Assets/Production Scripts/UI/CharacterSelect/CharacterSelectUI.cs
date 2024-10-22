@@ -300,6 +300,59 @@ namespace Vi.UI
             leftQueuedSpacing = 0;
             rightQueuedSpacing = 0;
 
+            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
+            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
+            leftYLocalPosition += spacing + leftQueuedSpacing;
+            int raceCount = 2;
+            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
+            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
+            raceRowElement.rowHeaderText.text = "Race";
+            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
+
+            foreach (string race in new List<string>() { "Human" })
+            {
+                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
+
+                switch (race)
+                {
+                    case "Human":
+                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
+                        break;
+
+                    case "Orc":
+                        buttonElement.InitializeAsColor(Color.green);
+                        break;
+
+                    default:
+                        Debug.LogError("Not sure how to handle race string " + race);
+                        break;
+                }
+
+                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
+            }
+
+            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
+            otherCustomizationRowParents.Add(genderButtonParent.gameObject);
+            leftYLocalPosition += spacing + leftQueuedSpacing;
+            int genderCount = 2;
+            leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
+            genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
+            genderRowElement.rowHeaderText.text = "Gender";
+            genderButtonParent = genderRowElement.GetLayoutGroup().transform;
+
+            CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
+            boyButtonElement.InitializeAsColor(Color.blue);
+            boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
+            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
+
+            CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
+            girlButtonElement.InitializeAsColor(Color.magenta);
+            girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
+            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
+
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
@@ -386,59 +439,6 @@ namespace Vi.UI
                 buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
                 customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name));
             }
-
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
-            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int raceCount = 2;
-            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
-            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
-            raceRowElement.rowHeaderText.text = "Race";
-            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
-
-            foreach (string race in new List<string>() { "Human" })
-            {
-                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
-
-                switch (race)
-                {
-                    case "Human":
-                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
-                        break;
-
-                    case "Orc":
-                        buttonElement.InitializeAsColor(Color.green);
-                        break;
-
-                    default:
-                        Debug.LogError("Not sure how to handle race string " + race);
-                        break;
-                }
-
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
-            }
-
-            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
-            CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(genderButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int genderCount = 2;
-            leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
-            genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
-            genderRowElement.rowHeaderText.text = "Gender";
-            genderButtonParent = genderRowElement.GetLayoutGroup().transform;
-
-            CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
-            boyButtonElement.InitializeAsColor(Color.blue);
-            boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
-
-            CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
-            girlButtonElement.InitializeAsColor(Color.magenta);
-            girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
         }
 
         private const int customizationRowSpacing = -2000;
