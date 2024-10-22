@@ -480,7 +480,15 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Boots_NArcher_Bl",
                 "Hu_F_Belt_NArcher_Bl",
                 "Hu_F_Cape_NArcher_Bl",
-                "Hu_F_Chest_NArcher_Bl"
+                "Hu_F_Chest_NArcher_Bl",
+
+                "Hu_M_Helm_NMage_Bl",
+                "Hu_M_Shoulders_NMage_Bl",
+                "Hu_M_Cape_NMage_Bl",
+                "Hu_M_Gloves_NMage_Bl",
+                "Hu_M_Belt_NMage_Bl",
+                "Hu_M_Robe_NMage_Bl",
+                "Hu_M_Boots_NMage_01_Bl"
             };
 
             string[] folderPathsToAppend = new string[]
@@ -529,6 +537,12 @@ namespace Vi.ScriptableObjects
                             wearableEquipment.equipmentType = equipmentType;
                             break;
                         }
+                    }
+
+                    if (wearableEquipment.equipmentType == EquipmentType.Brows)
+                    {
+                        DestroyImmediate(instance);
+                        continue;
                     }
 
                     AssignCharacterLayerRecursively(instance.transform);

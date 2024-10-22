@@ -641,7 +641,7 @@ namespace Vi.UI
                 if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
-            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
+            if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
             selectedCharacter = character;
             selectedCharacter.raceAndGender = raceAndGender;
