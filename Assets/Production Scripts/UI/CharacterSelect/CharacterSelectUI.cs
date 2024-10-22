@@ -388,9 +388,10 @@ namespace Vi.UI
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
-
                     bool isOnLeftSide = true;
+
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
+
                     //isOnLeftSide = !isOnLeftSide;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).Count(item => item.materialApplicationLocation == characterMaterial.materialApplicationLocation);
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
@@ -432,11 +433,12 @@ namespace Vi.UI
                 CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentRight).transform;
+                    bool isOnLeftSide = false;
+
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
 
                     //bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
                     //isOnLeftSide = !isOnLeftSide;
-                    bool isOnLeftSide = false;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Count(item => item.equipmentType == equipmentOption.equipmentType);
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
@@ -671,6 +673,10 @@ namespace Vi.UI
             character.raceAndGender = raceAndGender;
             character.bodyColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name;
             character.eyeColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name;
+            if (raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
+            {
+                character.brows = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name;
+            }
             UpdateSelectedCharacter(character);
         }
 
@@ -679,7 +685,8 @@ namespace Vi.UI
         {
             previewObject.GetComponent<AnimationHandler>().ApplyCharacterMaterial(characterMaterial);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
-            shouldUseHeadCameraOrientation = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes;
+            shouldUseHeadCameraOrientation = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes
+                | characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows;
 
             if (shouldUseHeadCameraOrientation)
             {
