@@ -21,6 +21,11 @@ namespace Vi.UI
         [SerializeField] private Text webRequestStatusText;
         [SerializeField] private Text gameVersionText;
 
+        [Header("Character Preview")]
+        [SerializeField] private Camera characterPreviewCamera;
+        [SerializeField] private SpawnPoints.TransformData defaultCameraOrientation;
+        [SerializeField] private SpawnPoints.TransformData headCameraOrientation;
+
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
 
@@ -526,6 +531,7 @@ namespace Vi.UI
 
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
+            shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
 
@@ -636,16 +642,21 @@ namespace Vi.UI
             UpdateSelectedCharacter(character);
         }
 
+        private bool shouldUseHeadCameraOrientation;
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyCharacterMaterial(characterMaterial);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
+            shouldUseHeadCameraOrientation = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes;
         }
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption.equipmentType, wearableEquipmentOption, raceAndGender);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
+            shouldUseHeadCameraOrientation = wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Hair
+                | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Beard
+                | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Brows;
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
@@ -674,8 +685,12 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private bool lastClientState;
 
+        private const float cameraLerpSpeed = 2;
         private void Update()
         {
+            characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
+            characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
             statsParent.SetActive(statsSelected);
             gearParent.SetActive(!statsSelected);
@@ -833,6 +848,10 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
+            shouldUseHeadCameraOrientation = false;
+            characterPreviewCamera.transform.position = defaultCameraOrientation.position;
+            characterPreviewCamera.transform.rotation = defaultCameraOrientation.rotation;
+
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             StartCoroutine(RefreshCharacterCards());

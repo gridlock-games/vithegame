@@ -355,6 +355,11 @@ namespace Vi.Core
 
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
             SkinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+
+            foreach (SkinnedMeshRenderer smr in SkinnedMeshRenderers)
+            {
+                smr.updateWhenOffscreen = true;
+            }
         }
 
         public void OnNetworkSpawn()

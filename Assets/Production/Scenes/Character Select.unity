@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -1601,9 +1598,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 391615844}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 11
   m_Type: 0
-  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20
   m_Range: 8
@@ -1653,8 +1649,12 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!4 &391615847
 Transform:
   m_ObjectHideFlags: 0
@@ -1798,6 +1798,13 @@ MonoBehaviour:
   returnButton: {fileID: 2043266651}
   webRequestStatusText: {fileID: 861778791}
   gameVersionText: {fileID: 743725626}
+  characterPreviewCamera: {fileID: 1085791623}
+  defaultCameraOrientation:
+    position: {x: 0, y: 2.033, z: -9.592}
+    rotation: {x: 0.15703778, y: 0, z: 0, w: 0.9875926}
+  headCameraOrientation:
+    position: {x: -0.05, y: 1.677, z: -7.748}
+    rotation: {x: -0.04797813, y: 0, z: 0, w: 0.9988484}
   characterSelectParent: {fileID: 888486590}
   characterCardInstances:
   - {fileID: 1776220647}
@@ -2830,6 +2837,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2613126926477622201, guid: 030cc18a9d9cba14184b6346d3165263,
+        type: 3}
+      propertyPath: m_ClearFlags
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3929702495192597990, guid: 030cc18a9d9cba14184b6346d3165263,
         type: 3}
       propertyPath: m_Name
@@ -6720,7 +6732,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!114 &1085791621
 MonoBehaviour:
