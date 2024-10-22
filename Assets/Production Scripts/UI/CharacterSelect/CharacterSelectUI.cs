@@ -631,6 +631,8 @@ namespace Vi.UI
             WebRequestManager.Character character = selectedCharacter;
             character.model = option.model.name;
             character.raceAndGender = raceAndGender;
+            character.bodyColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name;
+            character.eyeColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name;
             UpdateSelectedCharacter(character);
         }
 
@@ -804,7 +806,7 @@ namespace Vi.UI
             returnButton.onClick.AddListener(OpenCharacterSelect);
 
             selectedCharacter = new WebRequestManager.Character();
-            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
+            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
 

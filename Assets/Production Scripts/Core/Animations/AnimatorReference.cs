@@ -24,7 +24,6 @@ namespace Vi.Core
 
             return new WebRequestManager.Character(currentCharacter._id.ToString(), name.Replace("(Clone)", ""), currentCharacter.name.ToString(), currentCharacter.experience,
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Body).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
-                //System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Head).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Eyes).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
                 browsReplacementDefinition == null ? (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Brows) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Brows].name.Replace("(Clone)", "") : "") : browsReplacementDefinition.skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
@@ -33,6 +32,7 @@ namespace Vi.Core
             );
         }
 
+        private Dictionary<CharacterReference.MaterialApplicationLocation, Material> appliedCharacterMaterials = new Dictionary<CharacterReference.MaterialApplicationLocation, Material>();
         public void ApplyCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
@@ -45,6 +45,34 @@ namespace Vi.Core
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
             {
                 skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
+            }
+            
+            if (appliedCharacterMaterials.ContainsKey(characterMaterial.materialApplicationLocation))
+            {
+                appliedCharacterMaterials[characterMaterial.materialApplicationLocation] = characterMaterial.material;
+            }
+            else
+            {
+                appliedCharacterMaterials.Add(characterMaterial.materialApplicationLocation, characterMaterial.material);
+            }
+
+            if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)
+            {
+                foreach (var kvp in WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
+                        {
+                            if (smr.gameObject.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                            {
+                                glowRenderer.UnregisterRenderer(smr);
+                                smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
+                                glowRenderer.RegisterNewRenderer(smr);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -86,6 +114,13 @@ namespace Vi.Core
                     {
                         foreach (SkinnedMeshRenderer smr in WearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                         {
+                            if (smr.gameObject.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                            {
+                                if (appliedCharacterMaterials.ContainsKey(CharacterReference.MaterialApplicationLocation.Body))
+                                {
+                                    smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
+                                }
+                            }
                             glowRenderer.RegisterNewRenderer(smr);
                         }
                     }
@@ -108,6 +143,13 @@ namespace Vi.Core
                 {
                     foreach (SkinnedMeshRenderer smr in WearableEquipmentInstances[wearableEquipmentOption.equipmentType].GetRenderList())
                     {
+                        if (smr.gameObject.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                        {
+                            if (appliedCharacterMaterials.ContainsKey(CharacterReference.MaterialApplicationLocation.Body))
+                            {
+                                smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
+                            }
+                        }
                         glowRenderer.RegisterNewRenderer(smr);
                     }
                 }
@@ -217,6 +259,8 @@ namespace Vi.Core
             NextActionsAnimatorStateInfo = default;
             CurrentFlinchAnimatorStateInfo = default;
             NextFlinchAnimatorStateInfo = default;
+
+            appliedCharacterMaterials.Clear();
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()

@@ -771,7 +771,7 @@ namespace Vi.Core
                 }
                 catch
                 {
-                    CharacterById = GetDefaultCharacter();
+                    CharacterById = GetDefaultCharacter(CharacterReference.RaceAndGender.HumanMale);
                 }
 
                 getRequest.Dispose();
@@ -1075,14 +1075,34 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter()
+        public Character GetDefaultCharacter(CharacterReference.RaceAndGender raceAndGender)
         {
-            return new Character("", "Human_Male", "", 0, 1,
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                CharacterReference.RaceAndGender.HumanMale);
+            switch (raceAndGender)
+            {
+                case CharacterReference.RaceAndGender.HumanMale:
+                    return new Character("", "Human_Male", "", 0,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
+                        "null", "null", "null", 1,
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        CharacterReference.RaceAndGender.HumanMale);
+                case CharacterReference.RaceAndGender.HumanFemale:
+                    return new Character("", "Human_Female", "", 0,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
+                        "null", "null", "null", 1,
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        CharacterReference.RaceAndGender.HumanFemale);
+                default:
+                    Debug.LogError("Unsure how to handle race and gennder " + raceAndGender);
+                    return default;
+            }
         }
 
         public Character GetRandomizedCharacter(bool useDefaultPrimaryWeapon)

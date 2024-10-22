@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using UnityEngine.Assertions;
 using MagicaCloth2;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -16,16 +17,25 @@ namespace Vi.ScriptableObjects
         public bool shouldDisableCharSkinRenderer = true;
 
         private const bool shouldDebugWarnings = false;
+        public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
         private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
         public SkinnedMeshRenderer[] GetRenderList() { return renderList; }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
-            renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (Application.isPlaying) { return; }
+            SkinnedMeshRenderer[] changes = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (!changes.SequenceEqual(renderList))
+            {
+                renderList = changes;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
         }
+#endif
 
         private void Awake()
         {
