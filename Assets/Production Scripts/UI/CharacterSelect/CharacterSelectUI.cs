@@ -54,7 +54,8 @@ namespace Vi.UI
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
 
-        [SerializeField] private Transform customizationRowsParent;
+        [SerializeField] private Transform customizationRowsParentLeft;
+        [SerializeField] private Transform customizationRowsParentRight;
         [SerializeField] private CharacterCustomizationRow characterCustomizationRowPrefab;
         [SerializeField] private CharacterCustomizationButton characterCustomizationButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
@@ -326,7 +327,7 @@ namespace Vi.UI
             leftQueuedSpacing = 0;
             rightQueuedSpacing = 0;
 
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
             CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
             otherCustomizationRowParents.Add(raceButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
@@ -359,7 +360,7 @@ namespace Vi.UI
                 customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
             }
 
-            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
             CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
             otherCustomizationRowParents.Add(genderButtonParent.gameObject);
             leftYLocalPosition += spacing + leftQueuedSpacing;
@@ -387,7 +388,7 @@ namespace Vi.UI
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
 
                     bool isOnLeftSide = true;
                     //isOnLeftSide = !isOnLeftSide;
@@ -427,10 +428,11 @@ namespace Vi.UI
                 CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentRight).transform;
 
-                    bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
+                    //bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
                     //isOnLeftSide = !isOnLeftSide;
+                    bool isOnLeftSide = false;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Count(item => item.equipmentType == equipmentOption.equipmentType);
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
@@ -438,6 +440,7 @@ namespace Vi.UI
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
                     rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    rowElement.GetLayoutGroup().startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperLeft : GridLayoutGroup.Corner.UpperRight;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = equipmentOption.equipmentType.ToString();
                     if (!isOnLeftSide)

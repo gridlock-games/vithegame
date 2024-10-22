@@ -463,7 +463,9 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Boots_NArcher_Bl",
                 "Hu_F_Belt_NArcher_Bl",
                 "Hu_F_Cape_NArcher_Bl",
-                "Hu_F_Chest_NArcher_Bl"
+                "Hu_F_Chest_NArcher_Bl",
+
+                "Hu_M_Hair_01_Bd"
             };
 
             foreach (string prefabName in prefabNamesToSearchFor)
@@ -476,8 +478,6 @@ namespace Vi.ScriptableObjects
                 else if (results.Length == 1)
                 {
                     GameObject loadedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(results[0]);
-
-                    if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + loadedPrefab.name + ".prefab")) { continue; }
 
                     GameObject instance = Instantiate(loadedPrefab);
                     instance.name = instance.name.Replace("(Clone)", "");
@@ -511,6 +511,12 @@ namespace Vi.ScriptableObjects
                     {
                         raceAndGender = RaceAndGender.HumanFemale;
                         groupName = instance.name.Replace("Hu_F_", "").Replace(wearableEquipment.equipmentType.ToString(), "").Replace("_", "");
+                    }
+
+                    if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab"))
+                    {
+                        DestroyImmediate(instance);
+                        continue;
                     }
 
                     if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
