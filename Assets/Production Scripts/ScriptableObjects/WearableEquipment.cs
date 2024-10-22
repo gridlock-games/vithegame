@@ -52,10 +52,8 @@ namespace Vi.ScriptableObjects
 
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
 
-            Transform target = animator.avatarRoot;
-
             var boneMap = new Dictionary<string, Transform>();
-            GetAllSkinnedMeshRenderers(ref boneMap, target);
+            GetAllSkinnedMeshRenderers(ref boneMap, animator.avatarRoot);
 
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {

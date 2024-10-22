@@ -48,7 +48,7 @@ namespace Vi.UI
         public void DecrementOption()
         {
             CounterIndex--;
-            if (CounterIndex < 0) { CounterIndex = 0; }
+            if (CounterIndex < 0) { CounterIndex = optionList.Length-1; }
             if (OnArrowPress != null) { OnArrowPress.Invoke(optionList[CounterIndex]); }
         }
 
