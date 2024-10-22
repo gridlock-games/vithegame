@@ -203,6 +203,27 @@ namespace Vi.UI
 
             deleteCharacterButton.onClick.RemoveAllListeners();
             deleteCharacterButton.onClick.AddListener(() => StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)));
+
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent += OnCharPreviewDrag;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent -= OnCharPreviewDrag;
+            }
+        }
+
+        private void OnCharPreviewDrag(Vector2 delta)
+        {
+            if (previewObject)
+            {
+                previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+            }
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
