@@ -126,6 +126,11 @@ namespace Vi.ScriptableObjects
             [SerializeField] private List<WearableEquipment> wearableEquipmentOptions = new List<WearableEquipment>();
             [SerializeField] private List<Sprite> equipmentIcons = new List<Sprite>();
 
+            public int GetTotalModelCount()
+            {
+                return wearableEquipmentOptions.Count(item => item != null);
+            }
+
             public WearableEquipment GetModel(RaceAndGender raceAndGender, WearableEquipment emptyWearableEquipment)
             {
                 int index = raceAndGenders.IndexOf(raceAndGender);
@@ -263,6 +268,13 @@ namespace Vi.ScriptableObjects
         public List<CharacterMaterial> GetCharacterMaterialOptions(RaceAndGender raceAndGender) { return characterMaterialOptions.FindAll(item => item.raceAndGender == raceAndGender | item.raceAndGender == RaceAndGender.Universal); }
 
 # if UNITY_EDITOR
+        [ContextMenu("Clean Empty Entries")]
+        private void CleanEmptyEntries()
+        {
+            Debug.Log("Removed " + equipmentOptions.RemoveAll(item => item.GetTotalModelCount() == 0) + " equipment options");
+            Debug.Log("Removed " + characterMaterialOptions.RemoveAll(item => item.material == null) + " character material options");
+        }
+
         [ContextMenu("Create Character Material Option From Material")]
         private void CreateCharacterMaterialOptionFromMaterial()
         {
