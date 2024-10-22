@@ -445,8 +445,9 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
-                    rowElement.GetLayoutGroup().childAlignment = childAlignment;
-                    rowElement.GetLayoutGroup().startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperLeft : GridLayoutGroup.Corner.UpperRight;
+                    rowElement.SetAsArrowGroup(PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Where(item => item.equipmentType == equipmentOption.equipmentType));
+                    //rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    //rowElement.GetLayoutGroup().startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperLeft : GridLayoutGroup.Corner.UpperRight;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = equipmentOption.equipmentType.ToString();
                     if (!isOnLeftSide)
@@ -473,10 +474,7 @@ namespace Vi.UI
                     buttonParent = rowElement.GetLayoutGroup().transform;
                 }
 
-                CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
-                buttonElement.InitializeAsEquipment(equipmentOption, raceAndGender);
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name));
+                rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
             }
         }
 

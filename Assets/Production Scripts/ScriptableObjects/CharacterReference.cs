@@ -468,36 +468,28 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Boots_NArcher_Bl",
                 "Hu_F_Belt_NArcher_Bl",
                 "Hu_F_Cape_NArcher_Bl",
-                "Hu_F_Chest_NArcher_Bl",
-
-                "Hu_M_Hair_01_Bd",
-                "Hu_M_Hair_01_Bk",
-                "Hu_M_Hair_01_Br",
-                "Hu_M_Hair_01_Gr",
-                "Hu_M_Hair_02_Br",
-                "Hu_M_Hair_02_Bk",
-
-                "Hu_M_Beard_01_Bd",
-                "Hu_M_Beard_01_Bk",
-                "Hu_M_Beard_01_Br",
-                "Hu_M_Beard_01_Gr",
-                "Hu_M_Beard_02_Bd",
-                "Hu_M_Beard_02_Br",
-
-                "Hu_F_Brows_Bd",
-                "Hu_F_Brows_Bk",
-                "Hu_F_Brows_Br",
-                "Hu_F_Brows_Gr",
-
-                "Hu_F_Hair_01_Bd",
-                "Hu_F_Hair_01_Bk",
-                "Hu_F_Hair_01_Br",
-                "Hu_F_Hair_01_Gr",
-                "Hu_F_Hair_02_Bd",
-                "Hu_F_Hair_02_Br",
+                "Hu_F_Chest_NArcher_Bl"
             };
 
-            foreach (string prefabName in prefabNamesToSearchFor)
+            string[] folderPathsToAppend = new string[]
+            {
+                @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Character\Human\Female\Customization\Hair",
+                @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Character\Human\Female\Customization\Brows",
+                @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Character\Human\Male\Customization\Facial",
+                @"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs\Character\Human\Male\Customization\Hair"
+            };
+
+            List<string> finalPrefabNameList = new List<string>();
+            finalPrefabNameList.AddRange(prefabNamesToSearchFor);
+            foreach (string folderPath in folderPathsToAppend)
+            {
+                foreach (string file in Directory.GetFiles(folderPath, "*.prefab", SearchOption.TopDirectoryOnly))
+                {
+                    finalPrefabNameList.Add(file[(file.LastIndexOf(@"\") + 1)..^0].Replace(".prefab", ""));
+                }
+            }
+
+            foreach (string prefabName in finalPrefabNameList)
             {
                 string[] results = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter\Prefabs", prefabName + ".prefab", SearchOption.AllDirectories);
                 if (results.Length == 0)

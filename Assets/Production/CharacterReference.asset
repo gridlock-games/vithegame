@@ -350,9 +350,10 @@ MonoBehaviour:
     itemWebId: 
     isBasicGear: 0
     equipmentType: 11
-    raceAndGenders: 00000000
+    raceAndGenders: 0000000001000000
     wearableEquipmentOptions:
     - {fileID: 2736515204758181334, guid: e393e5e5c78cb4740bb2764cec70e152, type: 3}
+    - {fileID: 339453007173884488, guid: bd047d8acaad4134f81412d235dd65f4, type: 3}
     equipmentIcons: []
   - name: 01Bd
     groupName: 01Bd
@@ -413,9 +414,586 @@ MonoBehaviour:
     itemWebId: 
     isBasicGear: 0
     equipmentType: 11
-    raceAndGenders: 01000000
+    raceAndGenders: 0100000000000000
     wearableEquipmentOptions:
     - {fileID: 7712363453426824653, guid: e9af44f784fa6dc47a334fd1bf444fb7, type: 3}
+    - {fileID: 672081766861111581, guid: 271592c329953da4aa62b37bd081d822, type: 3}
+    equipmentIcons: []
+  - name: 02Gr
+    groupName: 02Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 8130257700759055826, guid: 32ff4f91439d1da458db7a57c008e3c4, type: 3}
+    - {fileID: 3166602642490113105, guid: 6843d6f82a99cf94a819d52fa89ff4d9, type: 3}
+    equipmentIcons: []
+  - name: 03Bd
+    groupName: 03Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7568749782291450300, guid: 9269815b91e20124490c2cecdb9bb6ff, type: 3}
+    - {fileID: 1214783597478500952, guid: dbb0fe10dc80e614daa41c0bc6be3b8b, type: 3}
+    equipmentIcons: []
+  - name: 03Bk
+    groupName: 03Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 9161594285208025852, guid: 1e3b94a9f30031b45a768583822c6050, type: 3}
+    - {fileID: 8447750971093919684, guid: 593f66a87441d2a45ac033cc0e71fca7, type: 3}
+    equipmentIcons: []
+  - name: 03Br
+    groupName: 03Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 3690808428938775380, guid: b5ddd1f947dcaf04abce2c36ce816e15, type: 3}
+    - {fileID: 7480722539684637982, guid: 27da27a1565e1524386e4ee40d933789, type: 3}
+    equipmentIcons: []
+  - name: 03Gr
+    groupName: 03Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 518652109829851481, guid: df70f19f5ad17b6499e07b08234ad3fd, type: 3}
+    - {fileID: 1059167672747903567, guid: a4b344b7d1090ef4dbf53635f796f5da, type: 3}
+    equipmentIcons: []
+  - name: 04Bd
+    groupName: 04Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 8999627086865861640, guid: d83973e9ba2032747a4e0ec68ae821e9, type: 3}
+    - {fileID: 5924263818058079302, guid: 059e12225b001ae4189dfb68a28e33af, type: 3}
+    equipmentIcons: []
+  - name: 04Bk
+    groupName: 04Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7360387514282564810, guid: 236b83bc73db0e24191ef79fa1bb9528, type: 3}
+    - {fileID: 5202229372833063056, guid: c8716db129f3ffc4289c123c286b2acf, type: 3}
+    equipmentIcons: []
+  - name: 04Br
+    groupName: 04Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 5729721304484943478, guid: 1fff1e1aab9bcf14cafb5fed1e4307af, type: 3}
+    - {fileID: 8302700217852210453, guid: 3060d7d5f1fd1824ea0827326220c78b, type: 3}
+    equipmentIcons: []
+  - name: 04Gr
+    groupName: 04Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 0100000000000000
+    wearableEquipmentOptions:
+    - {fileID: 7806432736458906321, guid: f0eca427bed0bdc409320517f73c23f9, type: 3}
+    - {fileID: 5450280221520705309, guid: 3455c60af2f596b489048bbf5686093f, type: 3}
+    equipmentIcons: []
+  - name: 07Bd
+    groupName: 07Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 7854891374667176147, guid: b601b59fbe4975548b0becc147c9b6db, type: 3}
+    equipmentIcons: []
+  - name: 07Bk
+    groupName: 07Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 3568035895830143358, guid: 3a88607ca52f9424fa272b9f2f2b61f1, type: 3}
+    equipmentIcons: []
+  - name: 07Br
+    groupName: 07Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 6486762188082676426, guid: b5bc812b62deb1a45bfe0099d2eddfb6, type: 3}
+    equipmentIcons: []
+  - name: 07Gr
+    groupName: 07Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 7603991894094776648, guid: c486e81574de9e64b85b051847bc635b, type: 3}
+    equipmentIcons: []
+  - name: 08Bd
+    groupName: 08Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 3825396412792626196, guid: 1d2d96eafba51a04ab11a1c1ad87e1b5, type: 3}
+    equipmentIcons: []
+  - name: 08Bk
+    groupName: 08Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 7788505444282315873, guid: 1977d6472e1e12c4e8d81da448d21db8, type: 3}
+    equipmentIcons: []
+  - name: 08Br
+    groupName: 08Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 2226075273665345978, guid: ead1ec6d89492464eb70bddd876eb83a, type: 3}
+    equipmentIcons: []
+  - name: 08Gr
+    groupName: 08Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 1068026345747950360, guid: c25b5290c169cc04596de0ad56ad3dc7, type: 3}
+    equipmentIcons: []
+  - name: 10Bd
+    groupName: 10Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 1315544508342432032, guid: 77e135cde0aa9534791a7979e3738779, type: 3}
+    equipmentIcons: []
+  - name: 10Bk
+    groupName: 10Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 2005854208844914103, guid: 39d9057108c68e94eabd7fa302b11826, type: 3}
+    equipmentIcons: []
+  - name: 10Br
+    groupName: 10Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 6286592233286828348, guid: 160edc51c43123848b2b70137c8e391e, type: 3}
+    equipmentIcons: []
+  - name: 10Gr
+    groupName: 10Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 308108738382268441, guid: 88c3f01767d45ed42bd93d674c83a0dc, type: 3}
+    equipmentIcons: []
+  - name: Bd
+    groupName: Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 6075743359453775757, guid: 7899fbc6a6f22f248b68937c3ab18c33, type: 3}
+    equipmentIcons: []
+  - name: Bk
+    groupName: Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 7473943327408210725, guid: e9ac9aba2d05c154b9a9907abc8cc5d4, type: 3}
+    equipmentIcons: []
+  - name: Br
+    groupName: Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 2746117237336056323, guid: 5a8b20f5f4214604b92018bd95a4f1f5, type: 3}
+    equipmentIcons: []
+  - name: Gr
+    groupName: Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 01000000
+    wearableEquipmentOptions:
+    - {fileID: 7403223392214181271, guid: f7d3eb4e8fb3c7c4f96aeb535b02fa14, type: 3}
+    equipmentIcons: []
+  - name: 02Bk
+    groupName: 02Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 138588994253270762, guid: 6b97e09eb9796ad4fa7da6ba017d6c4b, type: 3}
+    equipmentIcons: []
+  - name: 02Gr
+    groupName: 02Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 5394906487113398587, guid: a288d1c2d6a25a84a83dcc65f451ac0f, type: 3}
+    equipmentIcons: []
+  - name: 03Bd
+    groupName: 03Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 2556256228786430904, guid: 7e604644bb9fbf741873048a0c4fdef0, type: 3}
+    equipmentIcons: []
+  - name: 03Bk
+    groupName: 03Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 1012441363579150397, guid: 64b591c8fe62e904886262d18b719700, type: 3}
+    equipmentIcons: []
+  - name: 03Br
+    groupName: 03Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 2312331345874626945, guid: f30da353672fd734a8fd31664da607fc, type: 3}
+    equipmentIcons: []
+  - name: 03Gr
+    groupName: 03Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 3032347754377771970, guid: 85393d3c9a2a7f84dafca082a0d25b00, type: 3}
+    equipmentIcons: []
+  - name: 05Bd
+    groupName: 05Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 5218319960212844282, guid: a1f5f6dc9b11a914ba1bf235590f8e69, type: 3}
+    equipmentIcons: []
+  - name: 05Bk
+    groupName: 05Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 779934906968751299, guid: 7751a1d1ff9757443a7624052e843c35, type: 3}
+    equipmentIcons: []
+  - name: 05Br
+    groupName: 05Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 4377221165901884520, guid: 7d9df978d62fe6f489cefec93ce5da15, type: 3}
+    equipmentIcons: []
+  - name: 05Gr
+    groupName: 05Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7318416933619787161, guid: 4e0e8d2723764d341838a43960996189, type: 3}
+    equipmentIcons: []
+  - name: 06Bd
+    groupName: 06Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 8441295753550137159, guid: 5026b9240f291964e9dae91b034725b7, type: 3}
+    equipmentIcons: []
+  - name: 06Bk
+    groupName: 06Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 2717399270428190781, guid: aba9cf68b53fd4740806a13b3ad30ab2, type: 3}
+    equipmentIcons: []
+  - name: 06Br
+    groupName: 06Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 6741352057215064748, guid: 66997a7a6b8019244b983d791714f42c, type: 3}
+    equipmentIcons: []
+  - name: 06Gr
+    groupName: 06Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 3269458676277754976, guid: fab0fcfc033415c4b821d67a2dc16871, type: 3}
+    equipmentIcons: []
+  - name: 07Bd
+    groupName: 07Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 4283326139921899308, guid: 8bf35784b95ea764cba27160fb50122c, type: 3}
+    equipmentIcons: []
+  - name: 07Bk
+    groupName: 07Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7274383801710726825, guid: 99a01ce56270af845b7272383dc7a530, type: 3}
+    equipmentIcons: []
+  - name: 07Br
+    groupName: 07Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7940508110362948939, guid: c77c90c6049e2124c8a6a425efc7302e, type: 3}
+    equipmentIcons: []
+  - name: 07Gr
+    groupName: 07Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 9
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 1754098416397468551, guid: d27bf676b227a364883b8e97486c445a, type: 3}
+    equipmentIcons: []
+  - name: 01Bd
+    groupName: 01Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 3655050417746477329, guid: d6e2089cf0e742b4ea2ee37d3301ecec, type: 3}
+    equipmentIcons: []
+  - name: 01Bk
+    groupName: 01Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7326811377324688264, guid: d373730afe5373f4aba7a411949d38f5, type: 3}
+    equipmentIcons: []
+  - name: 01Br
+    groupName: 01Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 5784225254539050227, guid: e593276afb7f5dc4681edda6208cced7, type: 3}
+    equipmentIcons: []
+  - name: 01Gr
+    groupName: 01Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 5971414105930419680, guid: e30756aa7c9c09745aea59a6132daa48, type: 3}
+    equipmentIcons: []
+  - name: 02Bd
+    groupName: 02Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7927832375302603115, guid: 8b92f6dd50d053c4e8c8b1ba17ad25d9, type: 3}
+    equipmentIcons: []
+  - name: 02Bk
+    groupName: 02Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 2078100664618899661, guid: 7a1dec322a00dad4e9e1e56c8a1d0339, type: 3}
+    equipmentIcons: []
+  - name: 02Br
+    groupName: 02Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 6594143002734427651, guid: cc46084a64be0bf4c8476e0475f55671, type: 3}
+    equipmentIcons: []
+  - name: 02Gr
+    groupName: 02Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 3055945705110949506, guid: 302376bee574ab34f9b382bcfc018e35, type: 3}
+    equipmentIcons: []
+  - name: 03Bd
+    groupName: 03Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7341999086089196726, guid: 1831c74911c848c46a06156b8a51a7f7, type: 3}
+    equipmentIcons: []
+  - name: 03Bk
+    groupName: 03Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7055655196278135734, guid: 319a57dd2966b6645bc1068bd5caa18b, type: 3}
+    equipmentIcons: []
+  - name: 03Br
+    groupName: 03Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 6054087192066390861, guid: a3ab2ac7eddfb0e4fa5e5b8e75bb3432, type: 3}
+    equipmentIcons: []
+  - name: 03Gr
+    groupName: 03Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 9044015262316258582, guid: 686e70122ead6de4487e455914dfe457, type: 3}
+    equipmentIcons: []
+  - name: 04Bd
+    groupName: 04Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 871031118557923874, guid: f3a8bf2db10e56a4fa45f3bd5471c28c, type: 3}
+    equipmentIcons: []
+  - name: 04Bk
+    groupName: 04Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 2777068161280675038, guid: 9966ff34c56a60f4b8c67b2e3693a88e, type: 3}
+    equipmentIcons: []
+  - name: 04Br
+    groupName: 04Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 7948918119686492470, guid: beb9194ae983ee849885339830978b24, type: 3}
+    equipmentIcons: []
+  - name: 04Gr
+    groupName: 04Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 10
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 82814073086892745, guid: 5946252f30de0d94b8caff33cd637e14, type: 3}
+    equipmentIcons: []
+  - name: 09Bd
+    groupName: 09Bd
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 9163600802225516612, guid: eac178874cc9383418652f3ecfa97af7, type: 3}
+    equipmentIcons: []
+  - name: 09Bk
+    groupName: 09Bk
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 1475881364856127226, guid: 4a006050c91357a45bb7d87840528f6d, type: 3}
+    equipmentIcons: []
+  - name: 09Br
+    groupName: 09Br
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 3502015619657433204, guid: 3d74482a4fc590a47b3cfd83abcc3c1d, type: 3}
+    equipmentIcons: []
+  - name: 09Gr
+    groupName: 09Gr
+    itemWebId: 
+    isBasicGear: 0
+    equipmentType: 11
+    raceAndGenders: 00000000
+    wearableEquipmentOptions:
+    - {fileID: 5764727167835258332, guid: 39200d3155a6e4a4ebc552ad4eae2e3f, type: 3}
     equipmentIcons: []
   characterMaterialOptions:
   - materialApplicationLocation: 0
