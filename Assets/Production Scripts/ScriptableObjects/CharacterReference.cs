@@ -535,6 +535,7 @@ namespace Vi.ScriptableObjects
                         if (instance.name.ToUpper().Contains(equipmentType.ToString().ToUpper()))
                         {
                             wearableEquipment.equipmentType = equipmentType;
+                            if (equipmentType == EquipmentType.Robe) { wearableEquipment.equipmentType = EquipmentType.Pants; }
                             break;
                         }
                     }
