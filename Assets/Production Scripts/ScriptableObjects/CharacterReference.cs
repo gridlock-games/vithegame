@@ -446,7 +446,7 @@ namespace Vi.ScriptableObjects
                             wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants;
                             foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
                             {
-                                if (smr.name.ToLower().Contains("_body"))
+                                if (smr.name.ToLower().Contains("_body") | smr.name.ToLower().Contains("_naked"))
                                 {
                                     smr.tag = WearableEquipment.equipmentBodyMaterialTag;
                                     wearableEquipment.shouldDisableCharSkinRenderer = true;
@@ -517,11 +517,18 @@ namespace Vi.ScriptableObjects
 
                 "Hu_M_Helm_NRanger_Bl",
                 "Hu_M_Shoulders_NRanger_Bl",
-                "Hu_M_Chest_NRanger_Bl",
+                //"Hu_M_Chest_NRanger_Bl",
                 "Hu_M_Cape_NRanger_Bl",
-                "Hu_M_Gloves_NRanger_Bl",
+                //"Hu_M_Gloves_NRanger_Bl",
                 "Hu_M_Belt_NRanger_Bl",
-                "Hu_M_Boots_NRanger_Bl"
+                "Hu_M_Boots_NRanger_Bl",
+
+                "Hu_F_Helm_NRanger_Bl",
+                "Hu_F_Shoulders_NRanger_Bl",
+                "Hu_F_Cape_NRanger_Bl",
+                //"Hu_F_Gloves_NRanger_Bl",
+                "Hu_F_Belt_NRanger_Bl",
+                "Hu_F_Boots_NRanger_Bl"
             };
 
             string[] folderPathsToAppend = new string[]
@@ -607,7 +614,7 @@ namespace Vi.ScriptableObjects
                     wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants;
                     foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
                     {
-                        if (smr.name.ToLower().Contains("_body"))
+                        if (smr.name.ToLower().Contains("_body") | smr.name.ToLower().Contains("_naked"))
                         {
                             smr.tag = WearableEquipment.equipmentBodyMaterialTag;
                             wearableEquipment.shouldDisableCharSkinRenderer = true;
