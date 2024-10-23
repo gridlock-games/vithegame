@@ -528,7 +528,25 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Cape_NRanger_Bl",
                 //"Hu_F_Gloves_NRanger_Bl",
                 "Hu_F_Belt_NRanger_Bl",
-                "Hu_F_Boots_NRanger_Bl"
+                "Hu_F_Boots_NRanger_Bl",
+
+                "Hu_M_Shoulders_NWarrior_Rd",
+                "Hu_M_Helm_NWarrior_Rd",
+                //"Hu_M_Chest_NWarrior_Rd",
+                "Hu_M_Cape_NWarrior_Rd",
+                //"Hu_M_Gloves_NWarrior_Rd",
+                "Hu_M_Belt_NWarrior_Rd",
+                //"Hu_M_Pants_NWarrior_Rd",
+                "Hu_M_Boots_NWarrior_Rd",
+
+                "Hu_F_Shoulders_NWarrior_Rd",
+                "Hu_F_Helm_NWarrior_Rd",
+                //"Hu_F_Chest_NWarrior_Rd",
+                "Hu_F_Cape_NWarrior_Rd",
+                //"Hu_F_Gloves_NWarrior_Rd",
+                "Hu_F_Belt_NWarrior_Rd",
+                //"Hu_F_Pants_NWarrior_Rd",
+                "Hu_F_Boots_NWarrior_Rd"
             };
 
             string[] folderPathsToAppend = new string[]
