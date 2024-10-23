@@ -486,13 +486,21 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Cape_NArcher_Bl",
                 "Hu_F_Chest_NArcher_Bl",
 
-                "Hu_M_Helm_NMage_Bl",
-                "Hu_M_Shoulders_NMage_Bl",
-                "Hu_M_Cape_NMage_Bl",
-                "Hu_M_Gloves_NMage_Bl",
-                "Hu_M_Belt_NMage_Bl",
-                "Hu_M_Robe_NMage_Bl",
-                "Hu_M_Boots_NMage_01_Bl",
+                "Hu_M_Helm_NMage_Gn",
+                "Hu_M_Shoulders_NMage_Gn",
+                "Hu_M_Cape_NMage_Gn",
+                "Hu_M_Gloves_NMage_Gn",
+                "Hu_M_Belt_NMage_Gn",
+                "Hu_M_Robe_NMage_Gn",
+                "Hu_M_Boots_NMage_01_Gn",
+
+                "Hu_F_Helm_NMage_Gn",
+                "Hu_F_Shoulders_NMage_Gn",
+                "Hu_F_Cape_NMage_Gn",
+                "Hu_F_Gloves_NMage_Gn",
+                "Hu_F_Belt_NMage_Gn",
+                "Hu_F_Robe_NMage_Gn",
+                "Hu_F_Boots_NMage_01_Gn",
 
                 "Hu_M_Gloves_NArcher"
             };
