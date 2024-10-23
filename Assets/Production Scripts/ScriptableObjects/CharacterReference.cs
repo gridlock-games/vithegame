@@ -517,6 +517,7 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Belt_NMage_Gn",
                 "Hu_F_Robe_NMage_Gn",
                 "Hu_F_Boots_NMage_01_Gn",
+                "Hu_F_Chest_NMage",
 
                 "Hu_M_Helm_NRanger_Bl",
                 "Hu_M_Shoulders_NRanger_Bl",
