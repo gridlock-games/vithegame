@@ -16,7 +16,7 @@ MonoBehaviour:
   runSpeed: 7
   walkSpeed: 3.5
   blockingLocomotion: 0
-  maxHP: 10
+  maxHP: 1
   maxStamina: 100
   staminaRecoveryRate: 0
   staminaDelay: 0
@@ -243,13 +243,13 @@ MonoBehaviour:
   attackList:
   - inputs: 00000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: 22dc4f63ff6eb924fb122086a134ded5, type: 2}
+    attackClip: {fileID: 11400000, guid: c7449414acae17e44af3abd3a52c2463, type: 2}
   - inputs: 0000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: b4d183b35ec59be4ab566b4de18d5f17, type: 2}
+    attackClip: {fileID: 11400000, guid: 60e5eddce5a2a6a48b5fc1633c34e78e, type: 2}
   - inputs: 000000000000000000000000
     comboCondition: 0
-    attackClip: {fileID: 11400000, guid: db1a5050c2389fd408e2ccf1f014a1ba, type: 2}
+    attackClip: {fileID: 11400000, guid: 51d6e6e49d69daa44843573678bd9b75, type: 2}
   grabAttackClipList: []
   dodgeCooldownDuration: 0
   dodgeF: {fileID: 0}
