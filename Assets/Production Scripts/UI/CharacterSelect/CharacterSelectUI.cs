@@ -653,7 +653,7 @@ namespace Vi.UI
         }
 
         private string selectedRace = "Human";
-        private string selectedGender = "Male";
+        private string selectedGender = "Female";
 
         public void ChangeCharacterModel(string stringChange, bool isRace)
         {
@@ -859,6 +859,9 @@ namespace Vi.UI
 
         public void OpenCharacterCustomization()
         {
+            selectedRace = "Human";
+            selectedGender = "Female";
+
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
@@ -903,7 +906,7 @@ namespace Vi.UI
             StartCoroutine(RefreshCharacterCards());
 
             selectedRace = "Human";
-            selectedGender = "Male";
+            selectedGender = "Female";
 
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(true);

@@ -1183,14 +1183,16 @@ namespace Vi.Core
                 SetRagdollActive(false);
             }
 
-            yield return null;
             CharacterReference characterReference = PlayerDataManager.Singleton.GetCharacterReference();
 
-            // Apply materials and equipment
+            // Apply materials
             List<CharacterReference.CharacterMaterial> characterMaterialOptions = characterReference.GetCharacterMaterialOptions(character.raceAndGender);
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.bodyColor));
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
+            yield return null;
+
+            // Apply equipment
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(character.raceAndGender);
             CharacterReference.WearableEquipmentOption beardOption = equipmentOptions.Find(item => item.GetModel(character.raceAndGender, characterReference.EmptyWearableEquipment).name == character.beard);
             ApplyWearableEquipment(CharacterReference.EquipmentType.Beard, beardOption ?? new CharacterReference.WearableEquipmentOption(CharacterReference.EquipmentType.Beard), character.raceAndGender);

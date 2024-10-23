@@ -114,7 +114,10 @@ namespace Vi.Core
                         }
                     }
 
-                    smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
+                    if (appliedCharacterMaterials.ContainsKey(CharacterReference.MaterialApplicationLocation.Body))
+                    {
+                        smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
+                    }
                     glowRenderer.RegisterNewRenderer(smr);
                 }
             }
