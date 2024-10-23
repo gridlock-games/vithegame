@@ -365,7 +365,8 @@ namespace Vi.ScriptableObjects
         {
             string[] materialNamesToSearchFor = new string[]
             {
-                "M_Pants_NArcher_U_Bl"
+                "M_Pants_NArcher_U_Bl",
+                "M_Pants_NRanger_U_Bl"
             };
 
             foreach (string materialName in materialNamesToSearchFor)
@@ -442,10 +443,21 @@ namespace Vi.ScriptableObjects
 
                             if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
 
+                            wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants;
+                            foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
+                            {
+                                if (smr.name.ToLower().Contains("_body"))
+                                {
+                                    smr.tag = WearableEquipment.equipmentBodyMaterialTag;
+                                    wearableEquipment.shouldDisableCharSkinRenderer = true;
+                                }
+                            }
+
                             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(instance, @"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab");
 
                             var option = new WearableEquipmentOption(groupName, groupName, wearableEquipment.equipmentType);
                             option.AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+                            option.isBasicGear = true;
 
                             if (equipmentOptions.Exists(item => item.Equals(option)))
                             {
@@ -485,6 +497,7 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Belt_NArcher_Bl",
                 "Hu_F_Cape_NArcher_Bl",
                 "Hu_F_Chest_NArcher_Bl",
+                "Hu_M_Gloves_NArcher",
 
                 "Hu_M_Helm_NMage_Gn",
                 "Hu_M_Shoulders_NMage_Gn",
@@ -502,7 +515,13 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Robe_NMage_Gn",
                 "Hu_F_Boots_NMage_01_Gn",
 
-                "Hu_M_Gloves_NArcher"
+                "Hu_M_Helm_NRanger_Bl",
+                "Hu_M_Shoulders_NRanger_Bl",
+                "Hu_M_Chest_NRanger_Bl",
+                "Hu_M_Cape_NRanger_Bl",
+                "Hu_M_Gloves_NRanger_Bl",
+                "Hu_M_Belt_NRanger_Bl",
+                "Hu_M_Boots_NRanger_Bl"
             };
 
             string[] folderPathsToAppend = new string[]
