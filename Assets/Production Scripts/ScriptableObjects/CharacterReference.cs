@@ -577,6 +577,7 @@ namespace Vi.ScriptableObjects
 
                     if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
 
+                    wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants;
                     foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
                     {
                         if (smr.name.ToLower().Contains("_body"))
