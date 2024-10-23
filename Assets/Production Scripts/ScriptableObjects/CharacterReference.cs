@@ -493,11 +493,13 @@ namespace Vi.ScriptableObjects
                 "Hu_M_Belt_NArcher_Bl",
                 "Hu_M_Cape_NArcher_Bl",
                 "Hu_M_Chest_NArcher_Bl",
+                "Hu_M_Gloves_NArcher",
+
                 "Hu_F_Boots_NArcher_Bl",
                 "Hu_F_Belt_NArcher_Bl",
                 "Hu_F_Cape_NArcher_Bl",
                 "Hu_F_Chest_NArcher_Bl",
-                "Hu_M_Gloves_NArcher",
+                "Hu_F_Gloves_NArcher",
 
                 "Hu_M_Helm_NMage_Gn",
                 "Hu_M_Shoulders_NMage_Gn",
