@@ -549,6 +549,16 @@ namespace Vi.Editor
                         shouldReimport = true;
                     }
 
+                    if (!importer.GetPlatformTextureSettings("iPhone").overridden)
+                    {
+                        TextureImporterPlatformSettings iPhoneSettings = new TextureImporterPlatformSettings();
+                        iPhoneSettings.name = "iPhone";
+                        iPhoneSettings.overridden = true;
+                        iPhoneSettings.maxTextureSize = importer.GetPlatformTextureSettings("Android").maxTextureSize;
+                        importer.SetPlatformTextureSettings(iPhoneSettings);
+                        shouldReimport = true;
+                    }
+
                     if (shouldReimport) { importer.SaveAndReimport(); }
                 }
             }
