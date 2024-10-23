@@ -147,7 +147,7 @@ namespace Vi.ScriptableObjects
 
             public WearableEquipmentOption(string name, string groupName, EquipmentType equipmentType)
             {
-                this.name = name;
+                this.name = name + " " + equipmentType.ToString();
                 this.groupName = groupName;
                 this.equipmentType = equipmentType;
             }
@@ -402,8 +402,6 @@ namespace Vi.ScriptableObjects
                         {
                             GameObject loadedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(basePrefabPath);
 
-                            if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + loadedPrefab.name + ".prefab")) { continue; }
-
                             GameObject instance = Instantiate(loadedPrefab);
                             instance.name = instance.name.Replace("(Clone)", "");
 
@@ -435,6 +433,12 @@ namespace Vi.ScriptableObjects
                             }
 
                             groupName = materialName.Replace("M_Pants_", "").Replace("_U_", "");
+
+                            if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab"))
+                            {
+                                DestroyImmediate(instance);
+                                continue;
+                            }
 
                             if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
 
@@ -488,7 +492,9 @@ namespace Vi.ScriptableObjects
                 "Hu_M_Gloves_NMage_Bl",
                 "Hu_M_Belt_NMage_Bl",
                 "Hu_M_Robe_NMage_Bl",
-                "Hu_M_Boots_NMage_01_Bl"
+                "Hu_M_Boots_NMage_01_Bl",
+
+                "Hu_M_Gloves_NArcher"
             };
 
             string[] folderPathsToAppend = new string[]
@@ -530,20 +536,16 @@ namespace Vi.ScriptableObjects
 
                     instance.AddComponent<PooledObject>();
                     WearableEquipment wearableEquipment = instance.AddComponent<WearableEquipment>();
+                    EquipmentType equipmentTypeInName = default;
                     foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
                     {
                         if (instance.name.ToUpper().Contains(equipmentType.ToString().ToUpper()))
                         {
                             wearableEquipment.equipmentType = equipmentType;
+                            equipmentTypeInName = equipmentType;
                             if (equipmentType == EquipmentType.Robe) { wearableEquipment.equipmentType = EquipmentType.Pants; }
                             break;
                         }
-                    }
-
-                    if (wearableEquipment.equipmentType == EquipmentType.Brows)
-                    {
-                        DestroyImmediate(instance);
-                        continue;
                     }
 
                     AssignCharacterLayerRecursively(instance.transform);
@@ -553,12 +555,18 @@ namespace Vi.ScriptableObjects
                     if (instance.name.Contains("Hu_M_"))
                     {
                         raceAndGender = RaceAndGender.HumanMale;
-                        groupName = instance.name.Replace("Hu_M_", "").Replace(wearableEquipment.equipmentType.ToString(), "").Replace("_", "");
+                        groupName = instance.name.Replace("Hu_M_", "").Replace(equipmentTypeInName.ToString(), "").Replace("_", "");
                     }
                     else if (instance.name.Contains("Hu_F_"))
                     {
                         raceAndGender = RaceAndGender.HumanFemale;
-                        groupName = instance.name.Replace("Hu_F_", "").Replace(wearableEquipment.equipmentType.ToString(), "").Replace("_", "");
+                        groupName = instance.name.Replace("Hu_F_", "").Replace(equipmentTypeInName.ToString(), "").Replace("_", "");
+                    }
+
+                    if (wearableEquipment.equipmentType == EquipmentType.Brows & raceAndGender != RaceAndGender.HumanMale)
+                    {
+                        DestroyImmediate(instance);
+                        continue;
                     }
 
                     if (AssetDatabase.AssetPathExists(@"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab"))
@@ -568,6 +576,14 @@ namespace Vi.ScriptableObjects
                     }
 
                     if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
+
+                    foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
+                    {
+                        if (smr.name.ToLower().Contains("_body"))
+                        {
+                            smr.tag = WearableEquipment.equipmentBodyMaterialTag;
+                        }
+                    }
 
                     GameObject prefab = PrefabUtility.SaveAsPrefabAsset(instance, @"Assets\Production\Prefabs\WearableEquipment\" + groupName + @"\" + instance.name + ".prefab");
 
