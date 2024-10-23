@@ -582,6 +582,7 @@ namespace Vi.ScriptableObjects
                         if (smr.name.ToLower().Contains("_body"))
                         {
                             smr.tag = WearableEquipment.equipmentBodyMaterialTag;
+                            wearableEquipment.shouldDisableCharSkinRenderer = true;
                         }
                     }
 
@@ -589,6 +590,7 @@ namespace Vi.ScriptableObjects
 
                     var option = new WearableEquipmentOption(groupName, groupName, wearableEquipment.equipmentType);
                     option.AddModel(raceAndGender, prefab.GetComponent<WearableEquipment>());
+                    option.isBasicGear = true;
 
                     if (equipmentOptions.Exists(item => item.Equals(option)))
                     {
