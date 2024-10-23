@@ -16,7 +16,7 @@ namespace Vi.ScriptableObjects
         public Weapon.ArmorType armorType = Weapon.ArmorType.Cloth;
         public bool shouldDisableCharSkinRenderer;
 
-        private const bool shouldDebugWarnings = false;
+        private const bool shouldDebugWarnings = true;
         public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
