@@ -1116,12 +1116,26 @@ namespace Vi.Core
             };
 
             CharacterReference.RaceAndGender raceAndGender = raceAndGenderList[Random.Range(0, raceAndGenderList.Count)];
+            var model = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(raceAndGender);
 
-            string[] raceAndGenderStrings = Regex.Matches(raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
-            string race = raceAndGenderStrings[0];
-            string gender = raceAndGenderStrings[1];
+            var characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender);
+            var equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
 
-            return new Character("", race + "_" + gender, "", 0, 1,
+            return new Character("", model.model.name,
+                "Name", 0,
+                characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).Random().material.name,
+                characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).Random().material.name,
+
+                raceAndGender != CharacterReference.RaceAndGender.HumanMale
+                    ? "null"
+                    : equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Beard).Random().GetModel(raceAndGender, null).name,
+
+                raceAndGender == CharacterReference.RaceAndGender.HumanFemale
+                    ? characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).Random().material.name
+                    : equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Brows).Random().GetModel(raceAndGender, null).name,
+
+                equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
+                1,
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
@@ -1311,28 +1325,6 @@ namespace Vi.Core
             public int level;
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
-
-            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
-            {
-                slot = 0;
-                this._id = _id;
-                this.model = model;
-                this.name = name;
-                this.experience = experience;
-                bodyColor = "";
-                eyeColor = "";
-                beard = "";
-                brows = "";
-                hair = "";
-                attributes = new CharacterAttributes();
-                userId = Singleton.currentlyLoggedInUserId;
-                this.level = level;
-                this.loadoutPreset1 = loadoutPreset1;
-                this.loadoutPreset2 = loadoutPreset2;
-                this.loadoutPreset3 = loadoutPreset3;
-                this.loadoutPreset4 = loadoutPreset4;
-                this.raceAndGender = raceAndGender;
-            }
 
             public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
