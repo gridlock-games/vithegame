@@ -771,7 +771,7 @@ namespace Vi.Core
                 }
                 catch
                 {
-                    CharacterById = GetDefaultCharacter();
+                    CharacterById = GetDefaultCharacter(CharacterReference.RaceAndGender.HumanMale);
                 }
 
                 getRequest.Dispose();
@@ -1075,14 +1075,36 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Character GetDefaultCharacter()
+        public Character GetDefaultCharacter(CharacterReference.RaceAndGender raceAndGender)
         {
-            return new Character("", "Human_Male", "", 0, 1,
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
-                CharacterReference.RaceAndGender.HumanMale);
+            switch (raceAndGender)
+            {
+                case CharacterReference.RaceAndGender.HumanMale:
+                    return new Character("", "Human_Male", "", 0,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
+                        "null", "null", "null", 1,
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        CharacterReference.RaceAndGender.HumanMale);
+                case CharacterReference.RaceAndGender.HumanFemale:
+                    return new Character("", "Human_Female", "", 0,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
+                        "null",
+                        PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name,
+                        "null", 1,
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
+                        CharacterReference.RaceAndGender.HumanFemale);
+                default:
+                    Debug.LogError("Unsure how to handle race and gennder " + raceAndGender);
+                    return default;
+            }
         }
 
         public Character GetRandomizedCharacter(bool useDefaultPrimaryWeapon)
@@ -1094,12 +1116,26 @@ namespace Vi.Core
             };
 
             CharacterReference.RaceAndGender raceAndGender = raceAndGenderList[Random.Range(0, raceAndGenderList.Count)];
+            var model = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(raceAndGender);
 
-            string[] raceAndGenderStrings = Regex.Matches(raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
-            string race = raceAndGenderStrings[0];
-            string gender = raceAndGenderStrings[1];
+            var characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender);
+            var equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
 
-            return new Character("", race + "_" + gender, "", 0, 1,
+            return new Character("", model.model.name,
+                "Name", 0,
+                characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).Random().material.name,
+                characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).Random().material.name,
+
+                raceAndGender != CharacterReference.RaceAndGender.HumanMale
+                    ? "null"
+                    : equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Beard).Random().GetModel(raceAndGender, null).name,
+
+                raceAndGender == CharacterReference.RaceAndGender.HumanFemale
+                    ? characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).Random().material.name
+                    : equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Brows).Random().GetModel(raceAndGender, null).name,
+
+                equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
+                1,
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
@@ -1112,18 +1148,15 @@ namespace Vi.Core
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
             CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
 
-            var beltOption = armorOptions.Find(item => item.name == "Runic Belt");
-            var capeOption = armorOptions.Find(item => item.name == "Runic Cape");
-
             return new Loadout("1",
                 "",
-                armorOptions.Find(item => item.name == "Runic Chest").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Shoulders").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Boots").itemWebId,
-                armorOptions.Find(item => item.name == "Runic Pants").itemWebId,
-                beltOption == null ? "" : beltOption.itemWebId,
-                armorOptions.Find(item => item.name == "Runic Gloves").itemWebId,
-                capeOption == null ? "" : capeOption.itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest).itemWebId,
+                "",
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants).itemWebId,
+                "",
+                "",
+                "",
                 "",
                 System.Array.Find(weaponOptions, item => item.name == "Flintblade").itemWebId,
                 System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel").itemWebId,
@@ -1165,15 +1198,15 @@ namespace Vi.Core
             List<Loadout> loadouts = new List<Loadout>();
             for (int i = 1; i < 5; i++)
             {
-                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(0, helmOptions.Count);
-                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(0, chestOptions.Count);
-                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(0, shoulderOptions.Count);
-                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(0, bootsOptions.Count);
-                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(0, pantsOptions.Count);
-                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(0, beltOptions.Count);
-                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(0, gloveOptions.Count);
-                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(0, capeOptions.Count);
-                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(0, robeOptions.Count);
+                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
+                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Chest) ? -1 : 0, chestOptions.Count);
+                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
+                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Boots) ? -1 : 0, bootsOptions.Count);
+                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Pants) ? -1 : 0, pantsOptions.Count);
+                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Belt) ? -1 : 0, beltOptions.Count);
+                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
+                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
+                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
                 int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
                 possibleWeaponIndicies.Remove(weapon1Index);
@@ -1292,28 +1325,6 @@ namespace Vi.Core
             public int level;
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
-
-            public Character(string _id, string model, string name, int experience, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
-            {
-                slot = 0;
-                this._id = _id;
-                this.model = model;
-                this.name = name;
-                this.experience = experience;
-                bodyColor = "";
-                eyeColor = "";
-                beard = "";
-                brows = "";
-                hair = "";
-                attributes = new CharacterAttributes();
-                userId = Singleton.currentlyLoggedInUserId;
-                this.level = level;
-                this.loadoutPreset1 = loadoutPreset1;
-                this.loadoutPreset2 = loadoutPreset2;
-                this.loadoutPreset3 = loadoutPreset3;
-                this.loadoutPreset4 = loadoutPreset4;
-                this.raceAndGender = raceAndGender;
-            }
 
             public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
@@ -2815,7 +2826,7 @@ namespace Vi.Core
 
                 Debug.Log("Creating weapon item: " + (i + 1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, weaponOption.isBasicGear,
                     weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name);
 
                 string json = JsonConvert.SerializeObject(payload);
@@ -2838,6 +2849,7 @@ namespace Vi.Core
                 }
 
                 weaponOption.itemWebId = postRequest.downloadHandler.text;
+                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
 
                 postRequest.Dispose();
             }
@@ -2853,11 +2865,11 @@ namespace Vi.Core
 
                 Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.name);
 
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, true,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanMale, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanFemale, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcMale, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcFemale, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name);
+                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, wearableEquipmentOption.isBasicGear,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanFemale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
+                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcFemale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name);
 
                 string json = JsonConvert.SerializeObject(payload);
                 byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -2879,6 +2891,7 @@ namespace Vi.Core
                 }
 
                 wearableEquipmentOption.itemWebId = postRequest.downloadHandler.text;
+                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
 
                 postRequest.Dispose();
             }

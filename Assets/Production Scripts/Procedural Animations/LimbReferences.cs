@@ -210,8 +210,6 @@ namespace Vi.ProceduralAnimations
         public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
         public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
 
-        public Transform GetStowedWeaponParent() { return stowedWeaponParent; }
-
         [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;
         [SerializeField] private RigWeightTarget rightHandAimRig;
@@ -229,8 +227,8 @@ namespace Vi.ProceduralAnimations
         [Header("Animation Rotation Offset Settings")]
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
         [SerializeField] private Axis rotationOffsetAxis = Axis.Z;
-        [Header("Weapon Swapping")]
-        [SerializeField] private Transform stowedWeaponParent;
+        [Header("Rest Of Assignments")]
+        [SerializeField] private Transform middleSpine;
 
         public const float rotationConstraintOffsetSpeed = 12;
         public void SetMeleeVerticalAimConstraintOffset(float zAngle)
@@ -281,26 +279,12 @@ namespace Vi.ProceduralAnimations
             Z
         }
 
-        [Header("For Generic Rigs")]
+        public Transform Hips { get { return hips; } }
+        [SerializeField] private Transform hips;
+
+        [Header("For Weapon Parenting")]
         [SerializeField] private Weapon.WeaponBone[] keys = new Weapon.WeaponBone[0];
         [SerializeField] private Transform[] values = new Transform[0];
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (keys.Length != values.Length) { Debug.LogError("Keys and Values must be the same length!"); }
-
-            if (!hips)
-            {
-                Transform root = transform.Find("root");
-                if (root)
-                {
-                    hips = root.Find("pelvis");
-                    if (hips) { UnityEditor.EditorUtility.SetDirty(this); }
-                }
-            }
-        }
-#endif
 
         public Transform GetBoneTransform(Weapon.WeaponBone weaponBone)
         {
@@ -310,12 +294,111 @@ namespace Vi.ProceduralAnimations
             }
             else
             {
+                if (animator.avatar)
+                {
+                    if (animator.avatar.isHuman)
+                    {
+                        return animator.GetBoneTransform((HumanBodyBones)weaponBone);
+                    }
+                }
                 Debug.LogError("Weapon bone not present in mapping! " + weaponBone + " " + name);
             }
             return null;
         }
 
-        public Transform Hips { get { return hips; } }
-        [SerializeField] private Transform hips;
+        [System.Serializable]
+        private struct StowedWeaponParent
+        {
+            public Weapon.WeaponClass weaponClass;
+            public Transform bone;
+        }
+
+        [SerializeField] private StowedWeaponParent[] stowedWeaponParents;
+        public Transform GetStowedWeaponParent(Weapon.WeaponClass weaponClass)
+        {
+            if (System.Array.Exists(stowedWeaponParents, item => item.weaponClass == weaponClass))
+            {
+                StowedWeaponParent stowedWeaponParent = System.Array.Find(stowedWeaponParents, item => item.weaponClass == weaponClass);
+                return stowedWeaponParent.bone;
+            }
+            return middleSpine;
+        }
+
+#if UNITY_EDITOR
+        [ContextMenu("Call On Validate")]
+        private void CallOnValidate() { OnValidate(); }
+
+        private void OnValidate()
+        {
+            if (Application.isPlaying) { return; }
+
+            if (keys.Length != values.Length) { Debug.LogError("Keys and Values must be the same length!"); }
+
+            if (!hips)
+            {
+                Transform root = transform.Find("root");
+                if (!root) { root = transform.Find("Root"); }
+                if (root)
+                {
+                    hips = root.Find("pelvis");
+                    if (!hips) { hips = root.Find("Pelvis"); }
+                    if (hips) { UnityEditor.EditorUtility.SetDirty(this); }
+                }
+            }
+
+            if (!aimTargetIKSolver) { aimTargetIKSolver = transform.Find("AimTarget")?.GetComponent<AimTargetIKSolver>(); }
+
+            if (!rightHandAimRig) { rightHandAimRig = transform.Find("RightAimRig")?.GetComponent<RigWeightTarget>(); }
+            if (!rightHandAimBodyConstraint) { rightHandAimBodyConstraint = transform.Find("RightAimRig")?.Find("BodyAim")?.GetComponent<MultiAimConstraint>(); }
+            if (!rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint = transform.Find("RightAimRig")?.Find("BodyAimInverted")?.GetComponent<MultiAimConstraint>(); }
+            if (!rightHandAimConstraint) { rightHandAimConstraint = transform.Find("RightAimRig")?.Find("RightHandAimConstraint")?.GetComponent<MultiAimConstraint>(); }
+
+            if (!leftHandAimRig) { leftHandAimRig = transform.Find("LeftAimRig")?.GetComponent<RigWeightTarget>(); }
+            if (!leftHandAimBodyConstraint) { leftHandAimBodyConstraint = transform.Find("LeftAimRig")?.Find("BodyAim")?.GetComponent<MultiAimConstraint>(); }
+            if (!leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint = transform.Find("LeftAimRig")?.Find("BodyAimInverted")?.GetComponent<MultiAimConstraint>(); }
+            if (!leftHandAimConstraint) { leftHandAimConstraint = transform.Find("LeftAimRig")?.Find("LeftHandAimConstraint")?.GetComponent<MultiAimConstraint>(); }
+
+            if (!meleeVerticalAimRig) { meleeVerticalAimRig = transform.Find("MeleeVerticalAimRig")?.GetComponent<RigWeightTarget>(); }
+            if (!meleeVerticalAimConstraint) { meleeVerticalAimConstraint = transform.Find("MeleeVerticalAimRig")?.Find("VerticalAimRotationConstraint")?.GetComponent<MultiRotationConstraint>(); }
+
+            if (!rightHandReachRig) { rightHandReachRig = transform.Find("RightReachRig")?.GetComponent<RigWeightTarget>(); }
+            if (!leftHandReachRig) { leftHandReachRig = transform.Find("LeftReachRig")?.GetComponent<RigWeightTarget>(); }
+
+            if (!rotationOffsetConstraint) { rotationOffsetConstraint = transform.Find("RotationOffsetRig")?.Find("RotationOffsetConstraint")?.GetComponent<MultiRotationConstraint>(); }
+
+            if (TryGetComponent(out Animator animator))
+            {
+                if (animator.avatar)
+                {
+                    if (animator.avatar.isHuman)
+                    {
+                        middleSpine = animator.GetBoneTransform(HumanBodyBones.Spine).GetChild(0);
+
+                        if (rightHandReachRig)
+                        {
+                            rightHandReachRig.GetComponentInChildren<TwoBoneIKConstraint>().data.tip = animator.GetBoneTransform(HumanBodyBones.RightHand);
+                        }
+
+                        if (leftHandReachRig)
+                        {
+                            leftHandReachRig.GetComponentInChildren<TwoBoneIKConstraint>().data.tip = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+                        }
+
+                        if (rotationOffsetConstraint) { rotationOffsetConstraint.data.constrainedObject = transform.Find("Root") ? transform.Find("Root") : transform.Find("root"); }
+
+                        if (meleeVerticalAimConstraint) { meleeVerticalAimConstraint.data.constrainedObject = middleSpine; }
+
+                        if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
+                        if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
+                        if (rightHandAimConstraint) { rightHandAimConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.RightHand); }
+
+                        if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
+                        if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
+                        if (leftHandAimConstraint) { leftHandAimConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.LeftHand); }
+                    }
+                }
+            }
+        }
+#endif
     }
 }

@@ -64,7 +64,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 222
+  pooledObjectIndex: 167
   isPrewarmObject: 1
 --- !u!65 &154801820968417853
 BoxCollider:
@@ -168,7 +168,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7233714174293532611, guid: b377d7121bc1a754f8256a1398f4960d,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 4fa85779a52604b4ea0e29ed2f677156, type: 2}
     - target: {fileID: -5151492872390713093, guid: b377d7121bc1a754f8256a1398f4960d,

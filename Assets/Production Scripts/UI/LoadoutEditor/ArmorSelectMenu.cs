@@ -43,16 +43,13 @@ namespace Vi.UI
         {
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
+            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             if (!previewObject)
             {
                 // Instantiate the player model
                 Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerDataId);
-                if (playerModelOptionList[characterIndex].playerPrefab.TryGetComponent(out PooledObject pooledObject))
+                if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledObject))
                 {
                     previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
                         basePos,
@@ -60,7 +57,7 @@ namespace Vi.UI
                 }
                 else
                 {
-                    previewObject = Instantiate(playerModelOptionList[characterIndex].playerPrefab,
+                    previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab,
                         basePos,
                         Quaternion.Euler(SpawnPoints.previewCharacterRotation));
                 }

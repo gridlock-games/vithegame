@@ -1,11 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Unity.Collections;
+using System.Linq;
+using UnityEngine;
 
 namespace Vi.Utility
 {
     public static class StringUtility
     {
+        public static T Random<T>(this List<T> enumerable)
+        {
+            if (enumerable == null)
+            {
+                throw new System.ArgumentNullException(nameof(enumerable));
+            }
+
+            // note: creating a Random instance each call may not be correct for you,
+            // consider a thread-safe static instance
+            var list = enumerable as IList<T> ?? enumerable.ToList();
+            return list.Count == 0 ? default(T) : list[UnityEngine.Random.Range(0, list.Count)];
+        }
+
         /// <summary>
         ///     Calculate the difference between 2 strings using the Levenshtein distance algorithm
         /// </summary>

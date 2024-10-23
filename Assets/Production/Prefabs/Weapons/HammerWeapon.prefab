@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 21
+  pooledObjectIndex: 19
   isPrewarmObject: 1
 --- !u!1001 &1879497685494162846
 PrefabInstance:
@@ -181,7 +181,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 94a5888e387569b408e49e63d63d720c, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 684a7d934a73ec64183525250a6ab827, type: 2}
     - target: {fileID: 2300002, guid: 94a5888e387569b408e49e63d63d720c, type: 3}
@@ -189,11 +189,11 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2300002, guid: 94a5888e387569b408e49e63d63d720c, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 684a7d934a73ec64183525250a6ab827, type: 2}
     - target: {fileID: 2300002, guid: 94a5888e387569b408e49e63d63d720c, type: 3}
-      propertyPath: m_Materials.Array.data[1]
+      propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: e43ac0636386b274d9c3fbd2a4e670e7, type: 2}
     m_RemovedComponents: []

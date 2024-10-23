@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vfxPositionOffset: {x: 0.3, y: 1, z: 0.2}
+  baseRotationOnRoot: 0
   vfxRotationOffset: {x: 0, y: 0, z: 0}
   vfxSpawnType: 0
   transformType: 1
@@ -157,7 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 58
+  pooledObjectIndex: 56
   isPrewarmObject: 1
 --- !u!114 &5892318185150929868
 MonoBehaviour:

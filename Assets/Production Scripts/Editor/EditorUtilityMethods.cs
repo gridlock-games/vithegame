@@ -17,7 +17,7 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
-        [MenuItem("Tools/Production/Remove Missing Scripts From Prefabs")]
+        [MenuItem("Tools/Production/W.Remove Missing Scripts From Prefabs")]
         private static void FindAndRemoveMissingInSelected()
         {
             List<string> files = new List<string>();
@@ -81,7 +81,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Production/Organize Addressable Groups")]
+        [MenuItem("Tools/Production/V.Organize Addressable Groups")]
         private static void OrganizeAddressables()
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -128,7 +128,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Production/Perform Build Sanity Check")]
+        [MenuItem("Tools/Production/0.Perform Build Sanity Check")]
         static void PerformBuildSanityCheck()
         {
             SetTextureImportOverrides();
@@ -141,7 +141,7 @@ namespace Vi.Editor
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
         }
 
-        [MenuItem("Tools/Production/Add Unregistered Pooled Objects")]
+        [MenuItem("Tools/Production/5.Add Unregistered Pooled Objects")]
         static void AddUnregisteredPooledObjects()
         {
             List<ActionClip> actionClips = new List<ActionClip>();
@@ -204,7 +204,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Set Network Prefabs As Dirty")]
+        [MenuItem("Tools/Production/Z.Set Network Prefabs As Dirty")]
         static void SetNetworkPrefabsAsDirty()
         {
             foreach (NetworkPrefabsList networkPrefabList in GetNetworkPrefabsLists())
@@ -217,7 +217,7 @@ namespace Vi.Editor
             AssetDatabase.SaveAssets();
         }
 
-        private static string networkPrefabListFolderPath = @"Assets\Production\NetworkPrefabLists";
+        private static string networkPrefabListFolderPath = @"Assets\Production";
         static List<NetworkPrefabsList> GetNetworkPrefabsLists()
         {
             List<NetworkPrefabsList> networkPrefabsLists = new List<NetworkPrefabsList>();
@@ -241,7 +241,7 @@ namespace Vi.Editor
             return AssetDatabase.LoadAssetAtPath<PooledObjectList>(pooledObjectListAssetPath);
         }
 
-        [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]
+        [MenuItem("Tools/Production/2.Generate Dropped Weapon Variants")]
         static void GenerateDroppedWeaponVariants()
         {
             List<CharacterReference.WeaponOption> weaponOptions = new List<CharacterReference.WeaponOption>();
@@ -295,7 +295,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Remove Components From Weapon Previews")]
+        [MenuItem("Tools/Production/3.Remove Components From Weapon Previews")]
         static void RemoveComponentsFromWeaponPreviews()
         {
             int index = 0;
@@ -328,7 +328,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Generate Exploded Meshes")]
+        [MenuItem("Tools/Production/X.Generate Exploded Meshes")]
         static void GenerateExplodedMeshes()
         {
             Mesh mesh = (Mesh)Selection.activeObject;
@@ -393,7 +393,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Production/Validate Network Prefabs Lists")]
+        [MenuItem("Tools/Production/6.Validate Network Prefabs Lists")]
         static void ValidateNetworkPrefabsLists()
         {
             string baseFolder = @"Assets\Production\Prefabs";
@@ -441,7 +441,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Set Action VFX Layers")]
+        [MenuItem("Tools/Production/4.Set Action VFX Layers")]
         static void SetActionVFXLayers()
         {
             List<string> files = new List<string>();
@@ -478,7 +478,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Set Video Clip Import Overrides")]
+        [MenuItem("Tools/Production/Y.Set Video Clip Import Overrides")]
         static void SetVideoClipImportOverrides()
         {
             string[] videoClips = AssetDatabase.FindAssets("t:VideoClip");
@@ -512,7 +512,7 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Tools/Production/Set Texture Import Overrides")]
+        [MenuItem("Tools/Production/1.Set Texture Import Overrides")]
         static void SetTextureImportOverrides()
         {
             string[] textures = AssetDatabase.FindAssets("t:Texture");

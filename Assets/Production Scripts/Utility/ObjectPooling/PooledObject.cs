@@ -7,6 +7,7 @@ using Unity.Netcode;
 
 namespace Vi.Utility
 {
+    [DisallowMultipleComponent]
     public class PooledObject : MonoBehaviour
     {
         [SerializeField] private int numberOfObjectsToPool = 5;

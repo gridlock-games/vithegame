@@ -21,6 +21,11 @@ namespace Vi.UI
         [SerializeField] private Text webRequestStatusText;
         [SerializeField] private Text gameVersionText;
 
+        [Header("Character Preview")]
+        [SerializeField] private Camera characterPreviewCamera;
+        [SerializeField] private SpawnPoints.TransformData defaultCameraOrientation;
+        [SerializeField] private SpawnPoints.TransformData headCameraOrientation;
+
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
 
@@ -49,7 +54,8 @@ namespace Vi.UI
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
 
-        [SerializeField] private Transform customizationRowsParent;
+        [SerializeField] private Transform customizationRowsParentLeft;
+        [SerializeField] private Transform customizationRowsParentRight;
         [SerializeField] private CharacterCustomizationRow characterCustomizationRowPrefab;
         [SerializeField] private CharacterCustomizationButton characterCustomizationButtonPrefab;
         [SerializeField] private InputField characterNameInputField;
@@ -198,6 +204,27 @@ namespace Vi.UI
 
             deleteCharacterButton.onClick.RemoveAllListeners();
             deleteCharacterButton.onClick.AddListener(() => StartCoroutine(DeleteCharacterCoroutine(selectedCharacter)));
+
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent += OnCharPreviewDrag;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent -= OnCharPreviewDrag;
+            }
+        }
+
+        private void OnCharPreviewDrag(Vector2 delta)
+        {
+            if (previewObject)
+            {
+                previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+            }
         }
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
@@ -241,7 +268,7 @@ namespace Vi.UI
         }
 
         private readonly int leftStartOffset = 400;
-        private readonly int rightStartOffset = 450;
+        private readonly int rightStartOffset = 400;
         private readonly int spacing = -110;
         private int leftYLocalPosition;
         private int rightYLocalPosition;
@@ -300,6 +327,59 @@ namespace Vi.UI
             leftQueuedSpacing = 0;
             rightQueuedSpacing = 0;
 
+            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
+            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
+            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
+            leftYLocalPosition += spacing + leftQueuedSpacing;
+            int raceCount = 2;
+            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
+            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
+            raceRowElement.rowHeaderText.text = "Race";
+            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
+
+            foreach (string race in new List<string>() { "Human" })
+            {
+                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
+
+                switch (race)
+                {
+                    case "Human":
+                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
+                        break;
+
+                    case "Orc":
+                        buttonElement.InitializeAsColor(Color.green);
+                        break;
+
+                    default:
+                        Debug.LogError("Not sure how to handle race string " + race);
+                        break;
+                }
+
+                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
+                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
+            }
+
+            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
+            CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
+            otherCustomizationRowParents.Add(genderButtonParent.gameObject);
+            leftYLocalPosition += spacing + leftQueuedSpacing;
+            int genderCount = 2;
+            leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
+            genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
+            genderRowElement.rowHeaderText.text = "Gender";
+            genderButtonParent = genderRowElement.GetLayoutGroup().transform;
+
+            CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
+            boyButtonElement.InitializeAsColor(Color.blue);
+            boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
+            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
+
+            CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
+            girlButtonElement.InitializeAsColor(Color.magenta);
+            girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
+            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
+
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
@@ -308,9 +388,10 @@ namespace Vi.UI
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
-
                     bool isOnLeftSide = true;
+
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
+
                     //isOnLeftSide = !isOnLeftSide;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).Count(item => item.materialApplicationLocation == characterMaterial.materialApplicationLocation);
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
@@ -322,7 +403,11 @@ namespace Vi.UI
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition += new Vector3(300, 0, 0);
+                        RectTransform rt = (RectTransform)headerText.transform;
+                        rt.anchorMin = Vector2.one;
+                        rt.anchorMax = Vector2.one;
+                        rt.pivot = Vector2.one;
+                        rt.anchoredPosition = Vector2.zero;
                         headerText.alignment = TextAnchor.MiddleLeft;
                     }
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
@@ -348,9 +433,11 @@ namespace Vi.UI
                 CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
+                    bool isOnLeftSide = false;
 
-                    bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
+                    buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
+
+                    //bool isOnLeftSide = equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType);
                     //isOnLeftSide = !isOnLeftSide;
                     int equipmentCount = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Count(item => item.equipmentType == equipmentOption.equipmentType);
                     if (isOnLeftSide) { leftYLocalPosition += spacing + leftQueuedSpacing; leftQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; } else { rightYLocalPosition += spacing + rightQueuedSpacing; rightQueuedSpacing = equipmentCount / 11 * customizationRowSpacing; }
@@ -358,13 +445,20 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
-                    rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
+                    rowElement.SetAsArrowGroup(PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Where(item => item.equipmentType == equipmentOption.equipmentType));
+                    //rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    //rowElement.GetLayoutGroup().startCorner = isOnLeftSide ? GridLayoutGroup.Corner.UpperLeft : GridLayoutGroup.Corner.UpperRight;
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = equipmentOption.equipmentType.ToString();
                     if (!isOnLeftSide)
                     {
-                        headerText.transform.localPosition += new Vector3(300, 0, 0);
-                        headerText.alignment = TextAnchor.MiddleLeft;
+                        RectTransform rt = (RectTransform)headerText.transform;
+                        rt.anchorMin = Vector2.one;
+                        rt.anchorMax = Vector2.one;
+                        rt.pivot = Vector2.one;
+                        rt.anchoredPosition = Vector2.zero;
+                        headerText.alignment = TextAnchor.MiddleRight;
                     }
                     characterEquipmentParents.Add(new EquipmentCustomizationParent() { equipmentType = equipmentOption.equipmentType, parent = buttonParent });
 
@@ -380,65 +474,7 @@ namespace Vi.UI
                     rowElement = buttonParent.GetComponentInParent<CharacterCustomizationRow>();
                     buttonParent = rowElement.GetLayoutGroup().transform;
                 }
-
-                CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
-                buttonElement.InitializeAsEquipment(equipmentOption, raceAndGender);
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(equipmentOption, raceAndGender); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, equipmentOption.equipmentType.ToString(), equipmentOption.GetModel(raceAndGender, PlayerDataManager.Singleton.GetCharacterReference().GetEmptyWearableEquipment()).name));
             }
-
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
-            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int raceCount = 2;
-            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
-            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
-            raceRowElement.rowHeaderText.text = "Race";
-            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
-
-            foreach (string race in new List<string>() { "Human" })
-            {
-                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
-
-                switch (race)
-                {
-                    case "Human":
-                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
-                        break;
-
-                    case "Orc":
-                        buttonElement.InitializeAsColor(Color.green);
-                        break;
-
-                    default:
-                        Debug.Log("Not sure how to handle race string " + race);
-                        break;
-                }
-
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
-            }
-
-            Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParent).transform;
-            CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(genderButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int genderCount = 2;
-            leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
-            genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
-            genderRowElement.rowHeaderText.text = "Gender";
-            genderButtonParent = genderRowElement.GetLayoutGroup().transform;
-
-            CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
-            boyButtonElement.InitializeAsColor(Color.blue);
-            boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
-
-            CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
-            girlButtonElement.InitializeAsColor(Color.magenta);
-            girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
         }
 
         private const int customizationRowSpacing = -2000;
@@ -526,14 +562,12 @@ namespace Vi.UI
 
         public void UpdateSelectedCharacter(WebRequestManager.Character character)
         {
+            shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
-            var playerModelOptionList = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions();
-            KeyValuePair<int, int> kvp = PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptionIndices(character.model.ToString());
-            int characterIndex = kvp.Key;
-            int skinIndex = kvp.Value;
 
-            if (characterIndex == -1)
+            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+            if (string.IsNullOrWhiteSpace(character.model.ToString()))
             {
                 if (previewObject)
                 {
@@ -551,11 +585,8 @@ namespace Vi.UI
                 RefreshButtonInteractability();
                 return;
             }
-
-            CharacterReference.PlayerModelOption playerModelOption = playerModelOptionList[characterIndex];
-
-            bool shouldCreateNewModel = selectedCharacter.model != character.model;
-
+            
+            bool shouldCreateNewModel = selectedCharacter.raceAndGender != character.raceAndGender | selectedCharacter.model != character.model;
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -572,7 +603,7 @@ namespace Vi.UI
                     }
                 }
                 // Instantiate the player model
-                previewObject = ObjectPoolingManager.SpawnObject(playerModelOptionList[characterIndex].playerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
+                previewObject = ObjectPoolingManager.SpawnObject(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.GetComponent<PooledObject>(), previewCharacterPosition, Quaternion.Euler(previewCharacterRotation)).gameObject;
                 SceneManager.MoveGameObjectToScene(previewObject, gameObject.scene);
             }
 
@@ -607,12 +638,12 @@ namespace Vi.UI
                     equipmentImageValues[i].gameObject.SetActive(false);
                 }
 
-                if (previewObject) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
+                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
-            if (shouldCreateNewModel) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
+            if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
-            selectedCharacter = previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(character);
+            selectedCharacter = character;
             selectedCharacter.raceAndGender = raceAndGender;
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
@@ -622,7 +653,7 @@ namespace Vi.UI
         }
 
         private string selectedRace = "Human";
-        private string selectedGender = "Male";
+        private string selectedGender = "Female";
 
         public void ChangeCharacterModel(string stringChange, bool isRace)
         {
@@ -631,23 +662,47 @@ namespace Vi.UI
             else
                 selectedGender = stringChange;
 
-            CharacterReference.PlayerModelOption option = System.Array.Find(PlayerDataManager.Singleton.GetCharacterReference().GetPlayerModelOptions(), item => item.raceAndGender == System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender));
+            var raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+            CharacterReference.PlayerModelOption option = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(raceAndGender);
             if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
             WebRequestManager.Character character = selectedCharacter;
-            character.model = option.skinOptions[0].name;
+            character.model = option.model.name;
+            character.raceAndGender = raceAndGender;
+            character.bodyColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name;
+            character.eyeColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name;
+            if (raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
+            {
+                character.brows = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name;
+            }
             UpdateSelectedCharacter(character);
         }
 
+        private bool shouldUseHeadCameraOrientation;
         public void ChangeCharacterMaterial(CharacterReference.CharacterMaterial characterMaterial)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyCharacterMaterial(characterMaterial);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
+            shouldUseHeadCameraOrientation = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes
+                | characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows;
+
+            if (shouldUseHeadCameraOrientation)
+            {
+                previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
+            }
         }
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
         {
             previewObject.GetComponent<AnimationHandler>().ApplyWearableEquipment(wearableEquipmentOption.equipmentType, wearableEquipmentOption, raceAndGender);
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
+            shouldUseHeadCameraOrientation = wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Hair
+                | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Beard
+                | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Brows;
+
+            if (shouldUseHeadCameraOrientation)
+            {
+                previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
+            }
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
@@ -676,8 +731,12 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private bool lastClientState;
 
+        private const float cameraLerpSpeed = 2;
         private void Update()
         {
+            characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
+            characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
             statsParent.SetActive(statsSelected);
             gearParent.SetActive(!statsSelected);
@@ -800,6 +859,9 @@ namespace Vi.UI
 
         public void OpenCharacterCustomization()
         {
+            selectedRace = "Human";
+            selectedGender = "Female";
+
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(false);
             characterCustomizationParent.SetActive(true);
@@ -808,7 +870,7 @@ namespace Vi.UI
             returnButton.onClick.AddListener(OpenCharacterSelect);
 
             selectedCharacter = new WebRequestManager.Character();
-            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter());
+            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
 
@@ -835,9 +897,16 @@ namespace Vi.UI
 
         public void OpenCharacterSelect()
         {
+            shouldUseHeadCameraOrientation = false;
+            characterPreviewCamera.transform.position = defaultCameraOrientation.position;
+            characterPreviewCamera.transform.rotation = defaultCameraOrientation.rotation;
+
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
             StartCoroutine(RefreshCharacterCards());
+
+            selectedRace = "Human";
+            selectedGender = "Female";
 
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(true);

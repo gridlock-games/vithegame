@@ -134,7 +134,7 @@ namespace Vi.Utility
         [ContextMenu("Find Duplicates")]
         private void FindDuplicates()
         {
-            pooledObjectReferences.RemoveAll(item => item == null);
+            pooledObjectReferences.RemoveAll(item => item.editorAsset == null);
 
             List<string> query = pooledObjectReferences.GroupBy(x => x.AssetGUID)
               .Where(g => g.Count() > 1)

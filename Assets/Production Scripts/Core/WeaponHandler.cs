@@ -90,7 +90,7 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent());
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(weapon.GetWeaponClass()));
                         instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
@@ -184,14 +184,7 @@ namespace Vi.Core
                                 bone = transform;
                                 break;
                             default:
-                                if (combatAgent.AnimationHandler.Animator.avatar.isHuman)
-                                {
-                                    bone = combatAgent.AnimationHandler.Animator.GetBoneTransform((HumanBodyBones)modelData.weaponBone);
-                                }
-                                else
-                                {
-                                    bone = combatAgent.AnimationHandler.LimbReferences.GetBoneTransform(modelData.weaponBone);
-                                }
+                                bone = combatAgent.AnimationHandler.LimbReferences.GetBoneTransform(modelData.weaponBone);
                                 break;
                         }
 
@@ -424,7 +417,7 @@ namespace Vi.Core
                             if (weaponInstances[weaponBone].TryGetComponent(out ShooterWeapon shooterWeapon))
                             {
                                 orientation.position = shooterWeapon.GetProjectileSpawnPoint().position;
-                                orientation.rotation = shooterWeapon.GetProjectileSpawnPoint().rotation * Quaternion.Euler(actionVFX.vfxRotationOffset);
+                                orientation.rotation = shooterWeapon.GetProjectileSpawnRotation() * Quaternion.Euler(actionVFX.vfxRotationOffset);
                                 orientation.position += orientation.rotation * actionVFX.vfxPositionOffset;
                                 parent = isPreviewVFX ? shooterWeapon.GetProjectileSpawnPoint() : null;
                                 break;

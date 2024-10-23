@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Utility;
 using UnityEngine.Assertions;
+using MagicaCloth2;
+using System.Linq;
 
 namespace Vi.ScriptableObjects
 {
@@ -15,16 +17,25 @@ namespace Vi.ScriptableObjects
         public bool shouldDisableCharSkinRenderer;
 
         private const bool shouldDebugWarnings = false;
+        public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
         private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
         public SkinnedMeshRenderer[] GetRenderList() { return renderList; }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
-            renderList = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (Application.isPlaying) { return; }
+            SkinnedMeshRenderer[] changes = GetComponentsInChildren<SkinnedMeshRenderer>();
+            if (!changes.SequenceEqual(renderList))
+            {
+                renderList = changes;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
         }
+#endif
 
         private void Awake()
         {
@@ -41,16 +52,17 @@ namespace Vi.ScriptableObjects
 
             NetworkObject networkObject = GetComponentInParent<NetworkObject>();
 
-            Transform target = animator.transform;
-            FindRootBone(ref target, target);
-
             var boneMap = new Dictionary<string, Transform>();
-            GetAllSkinnedMeshRenderers(ref boneMap, target);
+            GetAllSkinnedMeshRenderers(ref boneMap, animator.avatarRoot);
 
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {
-                if (srenderer.GetComponent<MagicaCloth2.MagicaCloth>())
+                if (srenderer.TryGetComponent(out MagicaCloth magicaCloth))
                 {
+                    ClothSerializeData sdata = magicaCloth.SerializeData;
+                    sdata.colliderCollisionConstraint.colliderList.Clear();
+                    sdata.colliderCollisionConstraint.colliderList.AddRange(animator.GetComponentsInChildren<ColliderComponent>());
+
                     foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {
                         bool shouldSkip = false;
@@ -103,21 +115,6 @@ namespace Vi.ScriptableObjects
                 renderList[i].bones = originalBones;
             }
             boneMapToFollow.Clear();
-        }
-
-        private void FindRootBone(ref Transform target, Transform start)
-        {
-            if (start.gameObject.layer != LayerMask.NameToLayer("Character")) { return; }
-
-            foreach (Transform child in start)
-            {
-                if (child.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
-                {
-                    target = skinnedMeshRenderer.rootBone;
-                    return;
-                }
-                FindRootBone(ref target, child);
-            }
         }
 
         private void GetAllSkinnedMeshRenderers(ref Dictionary<string, Transform> map, Transform target)
