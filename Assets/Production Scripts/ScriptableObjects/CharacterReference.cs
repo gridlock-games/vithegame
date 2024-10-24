@@ -521,7 +521,7 @@ namespace Vi.ScriptableObjects
 
                 "Hu_M_Helm_NRanger_Bl",
                 "Hu_M_Shoulders_NRanger_Bl",
-                //"Hu_M_Chest_NRanger_Bl",
+                "Hu_M_Chest_NRanger_Bl",
                 "Hu_M_Cape_NRanger_Bl",
                 //"Hu_M_Gloves_NRanger_Bl",
                 "Hu_M_Belt_NRanger_Bl",
@@ -529,6 +529,7 @@ namespace Vi.ScriptableObjects
 
                 "Hu_F_Helm_NRanger_Bl",
                 "Hu_F_Shoulders_NRanger_Bl",
+                "Hu_F_Chest_NRanger_Bl",
                 "Hu_F_Cape_NRanger_Bl",
                 //"Hu_F_Gloves_NRanger_Bl",
                 "Hu_F_Belt_NRanger_Bl",
