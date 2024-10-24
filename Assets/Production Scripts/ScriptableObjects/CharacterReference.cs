@@ -161,6 +161,11 @@ namespace Vi.ScriptableObjects
 
             public void AddIcon(RaceAndGender raceAndGender, Sprite icon)
             {
+                if (!icon) { Debug.LogError("Icon is null"); }
+
+                int index = raceAndGenders.IndexOf(raceAndGender);
+                if (index == -1) { Debug.LogError("Race and gender index is -1"); return; }
+
                 if (equipmentIcons.Count != raceAndGenders.Count)
                 {
                     equipmentIcons = new List<Sprite>();
@@ -169,9 +174,6 @@ namespace Vi.ScriptableObjects
                         equipmentIcons.Add(null);
                     }
                 }
-
-                int index = raceAndGenders.IndexOf(raceAndGender);
-                if (index == -1) { Debug.LogError("Index is -1"); return; }
 
                 equipmentIcons[index] = icon;
             }
@@ -521,35 +523,36 @@ namespace Vi.ScriptableObjects
 
                 "Hu_M_Helm_NRanger_Bl",
                 "Hu_M_Shoulders_NRanger_Bl",
-                //"Hu_M_Chest_NRanger_Bl",
+                "Hu_M_Chest_NRanger_Bl",
                 "Hu_M_Cape_NRanger_Bl",
-                //"Hu_M_Gloves_NRanger_Bl",
+                "Hu_M_Gloves_NRanger_Bl",
                 "Hu_M_Belt_NRanger_Bl",
                 "Hu_M_Boots_NRanger_Bl",
 
                 "Hu_F_Helm_NRanger_Bl",
                 "Hu_F_Shoulders_NRanger_Bl",
+                "Hu_F_Chest_NRanger_Bl",
                 "Hu_F_Cape_NRanger_Bl",
-                //"Hu_F_Gloves_NRanger_Bl",
+                "Hu_F_Gloves_NRanger_Bl",
                 "Hu_F_Belt_NRanger_Bl",
                 "Hu_F_Boots_NRanger_Bl",
 
                 "Hu_M_Shoulders_NWarrior_Rd",
                 "Hu_M_Helm_NWarrior_Rd",
-                //"Hu_M_Chest_NWarrior_Rd",
+                "Hu_M_Chest_NWarrior_Rd",
                 "Hu_M_Cape_NWarrior_Rd",
-                //"Hu_M_Gloves_NWarrior_Rd",
+                "Hu_M_Gloves_NWarrior_Rd",
                 "Hu_M_Belt_NWarrior_Rd",
-                //"Hu_M_Pants_NWarrior_Rd",
+                "Hu_M_Pants_NWarrior_Rd",
                 "Hu_M_Boots_NWarrior_Rd",
 
                 "Hu_F_Shoulders_NWarrior_Rd",
                 "Hu_F_Helm_NWarrior_Rd",
-                //"Hu_F_Chest_NWarrior_Rd",
+                "Hu_F_Chest_NWarrior_Rd",
                 "Hu_F_Cape_NWarrior_Rd",
-                //"Hu_F_Gloves_NWarrior_Rd",
+                "Hu_F_Gloves_NWarrior_Rd",
                 "Hu_F_Belt_NWarrior_Rd",
-                //"Hu_F_Pants_NWarrior_Rd",
+                "Hu_F_Pants_NWarrior_Rd",
                 "Hu_F_Boots_NWarrior_Rd"
             };
 
@@ -698,8 +701,11 @@ namespace Vi.ScriptableObjects
                 RaceAndGender raceAndGender = System.Enum.Parse<RaceAndGender>(splitString[1]);
 
                 TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(armorIconPath);
-                importer.textureType = TextureImporterType.Sprite;
-                importer.SaveAndReimport();
+                if (importer.textureType != TextureImporterType.Sprite)
+                {
+                    importer.textureType = TextureImporterType.Sprite;
+                    importer.SaveAndReimport();
+                }
 
                 equipmentOptions[equipmentOptionIndex].AddIcon(raceAndGender, AssetDatabase.LoadAssetAtPath<Sprite>(armorIconPath));
             }

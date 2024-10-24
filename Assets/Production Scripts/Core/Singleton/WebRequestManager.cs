@@ -1150,10 +1150,10 @@ namespace Vi.Core
 
             return new Loadout("1",
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "NRangerBl").itemWebId,
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots).itemWebId,
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots & item.groupName == "NRangerBl").itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants & item.groupName == "NRangerBl").itemWebId,
                 "",
                 "",
                 "",
@@ -1209,6 +1209,7 @@ namespace Vi.Core
                 int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
 
                 int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
+                if (i == 1) { weapon1Index = System.Array.FindIndex(weaponOptions, item => item.name == "Flintblade"); }
                 possibleWeaponIndicies.Remove(weapon1Index);
 
                 var weaponOptionsOfDifferentClass = System.Array.FindAll(weaponOptions, item => item.weapon.GetWeaponClass() != weaponOptions[weapon1Index].weapon.GetWeaponClass());

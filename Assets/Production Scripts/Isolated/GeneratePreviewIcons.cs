@@ -170,6 +170,17 @@ namespace Vi.Editor
 
                         GameObject instance = Instantiate(model.gameObject);
                         SkinnedMeshRenderer skinnedMeshRenderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
+                        foreach (SkinnedMeshRenderer smr in instance.GetComponentsInChildren<SkinnedMeshRenderer>())
+                        {
+                            if (smr.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                            {
+                                smr.enabled = false;
+                            }
+                            else
+                            {
+                                skinnedMeshRenderer = smr;
+                            }
+                        }
                         instance.transform.localScale = new Vector3(instance.transform.localScale.x / skinnedMeshRenderer.transform.localScale.x, instance.transform.localScale.y / skinnedMeshRenderer.transform.localScale.y, instance.transform.localScale.z / skinnedMeshRenderer.transform.localScale.z);
                         instance.transform.localScale = Vector3.ClampMagnitude(instance.transform.localScale, 173);
                         instance.transform.eulerAngles = equipmentTypeRotations[equipmentOption.equipmentType];
@@ -242,76 +253,7 @@ namespace Vi.Editor
                         yield return null;
                     }
                 }
-
-                foreach (CharacterReference.WearableEquipmentOption equipmentOption in characterReference.GetCharacterEquipmentOptions(raceAndGender))
-                {
-                    WearableEquipment model = equipmentOption.GetModel(raceAndGender, null);
-                    if (model)
-                    {
-                        if (!model.GetComponentInChildren<SkinnedMeshRenderer>()) { Debug.LogError(model.name + " has no skinned mesh renderer"); continue; }
-
-                        string destinationPath = Path.Join("Assets/Production/Images/Equipment Icons", equipmentOption.name + "-" + raceAndGender.ToString() + ".png");
-                        if (File.Exists(destinationPath)) { continue; }
-
-                        cam.clearFlags = CameraClearFlags.Skybox;
-
-                        GameObject instance = Instantiate(model.gameObject);
-                        SkinnedMeshRenderer skinnedMeshRenderer = instance.GetComponentInChildren<SkinnedMeshRenderer>();
-                        instance.transform.localScale = new Vector3(instance.transform.localScale.x / skinnedMeshRenderer.transform.localScale.x, instance.transform.localScale.y / skinnedMeshRenderer.transform.localScale.y, instance.transform.localScale.z / skinnedMeshRenderer.transform.localScale.z);
-                        instance.transform.localScale = Vector3.ClampMagnitude(instance.transform.localScale, 173);
-                        instance.transform.eulerAngles = equipmentTypeRotations[equipmentOption.equipmentType];
-
-                        float multiplierOffset = 0;
-
-                        yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
-                        while (true)
-                        {
-                            if (Keyboard.current.spaceKey.isPressed) { break; }
-
-                            if (Keyboard.current.wKey.isPressed) { multiplierOffset -= 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
-                            if (Keyboard.current.sKey.isPressed) { multiplierOffset += 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
-
-                            if (Keyboard.current.upArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(45, 0, 0); }
-                            yield return new WaitUntil(() => !Keyboard.current.upArrowKey.isPressed);
-                            if (Keyboard.current.downArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(-45, 0, 0); }
-                            yield return new WaitUntil(() => !Keyboard.current.downArrowKey.isPressed);
-
-                            if (Keyboard.current.leftArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(0, 45, 0); }
-                            yield return new WaitUntil(() => !Keyboard.current.leftArrowKey.isPressed);
-                            if (Keyboard.current.rightArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(0, -45, 0); }
-                            yield return new WaitUntil(() => !Keyboard.current.rightArrowKey.isPressed);
-
-                            Vector3 camOffset = new Vector3(skinnedMeshRenderer.bounds.center.x, skinnedMeshRenderer.bounds.center.y, instance.transform.position.z);
-                            camOffset.x -= Mathf.Max(Mathf.Max(skinnedMeshRenderer.bounds.extents.x, skinnedMeshRenderer.bounds.extents.y), skinnedMeshRenderer.bounds.extents.z) * (2 + multiplierOffset);
-
-                            transform.position = startPosition + camOffset;
-
-                            yield return null;
-                        }
-
-                        yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
-
-                        cam.clearFlags = CameraClearFlags.Depth;
-
-                        yield return new WaitForEndOfFrame();
-
-                        int width = Screen.width;
-                        int height = Screen.height;
-                        Texture2D screenshotTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
-                        Rect rect = new Rect(0, 0, width, height);
-                        screenshotTexture.ReadPixels(rect, 0, 0);
-                        screenshotTexture.Apply();
-
-                        byte[] byteArray = screenshotTexture.EncodeToPNG();
-                        File.WriteAllBytes(destinationPath, byteArray);
-
-                        Destroy(instance);
-
-                        yield return null;
-                    }
-                }
             }
-
             transform.position = startPosition;
         }
     }
