@@ -177,7 +177,6 @@ namespace Vi.ScriptableObjects
                 }
 
                 equipmentIcons[index] = icon;
-                Debug.Log(icon);
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)
