@@ -1150,10 +1150,10 @@ namespace Vi.Core
 
             return new Loadout("1",
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "NRangerBl").itemWebId,
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots).itemWebId,
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants).itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots & item.groupName == "NRangerBl").itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants & item.groupName == "NRangerBl").itemWebId,
                 "",
                 "",
                 "",
