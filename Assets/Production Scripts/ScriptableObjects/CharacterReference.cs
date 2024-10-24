@@ -140,9 +140,10 @@ namespace Vi.ScriptableObjects
 
             public Sprite GetIcon(RaceAndGender raceAndGender)
             {
-                int index = raceAndGenders.IndexOf(raceAndGender);
-                if (index == -1 | index >= equipmentIcons.Count) { return null; }
-                return equipmentIcons[index];
+                return null;
+                //int index = raceAndGenders.IndexOf(raceAndGender);
+                //if (index == -1 | index >= equipmentIcons.Count) { return null; }
+                //return equipmentIcons[index];
             }
 
             public WearableEquipmentOption(string name, string groupName, EquipmentType equipmentType)
@@ -161,6 +162,11 @@ namespace Vi.ScriptableObjects
 
             public void AddIcon(RaceAndGender raceAndGender, Sprite icon)
             {
+                if (!icon) { Debug.LogError("Icon is null"); }
+
+                int index = raceAndGenders.IndexOf(raceAndGender);
+                if (index == -1) { Debug.LogError("Race and gender index is -1"); return; }
+
                 if (equipmentIcons.Count != raceAndGenders.Count)
                 {
                     equipmentIcons = new List<Sprite>();
@@ -170,10 +176,8 @@ namespace Vi.ScriptableObjects
                     }
                 }
 
-                int index = raceAndGenders.IndexOf(raceAndGender);
-                if (index == -1) { Debug.LogError("Index is -1"); return; }
-
                 equipmentIcons[index] = icon;
+                Debug.Log(icon);
             }
 
             public WearableEquipmentOption(EquipmentType equipmentType)
@@ -699,8 +703,11 @@ namespace Vi.ScriptableObjects
                 RaceAndGender raceAndGender = System.Enum.Parse<RaceAndGender>(splitString[1]);
 
                 TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(armorIconPath);
-                importer.textureType = TextureImporterType.Sprite;
-                importer.SaveAndReimport();
+                if (importer.textureType != TextureImporterType.Sprite)
+                {
+                    importer.textureType = TextureImporterType.Sprite;
+                    importer.SaveAndReimport();
+                }
 
                 equipmentOptions[equipmentOptionIndex].AddIcon(raceAndGender, AssetDatabase.LoadAssetAtPath<Sprite>(armorIconPath));
             }
