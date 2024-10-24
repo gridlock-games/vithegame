@@ -468,6 +468,9 @@ namespace Vi.UI
                     removeButton.Button.onClick.RemoveAllListeners();
                     removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
                     customizationButtonReference.Add(new ButtonInfo(removeButton.Button, equipmentOption.equipmentType.ToString(), "Remove"));
+
+                    customizationButtonReference.Add(new ButtonInfo(rowElement.LeftArrowButton, "Arrow", "Arrow"));
+                    customizationButtonReference.Add(new ButtonInfo(rowElement.RightArrowButton, "Arrow", "Arrow"));
                 }
                 else
                 {
@@ -514,7 +517,10 @@ namespace Vi.UI
             {
                 if (disableAll)
                 {
-                    buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(true);
+                    if (buttonInfo.button.TryGetComponent(out CharacterCustomizationButton characterCustomizationButton))
+                    {
+                        characterCustomizationButton.SetSelectedState(true);
+                    }
                     buttonInfo.button.interactable = false;
                     continue;
                 }
@@ -547,6 +553,9 @@ namespace Vi.UI
 
                     case "Gender":
                         buttonInfo.button.GetComponent<CharacterCustomizationButton>().SetSelectedState(selectedGender != buttonInfo.value);
+                        break;
+
+                    case "Arrow":
                         break;
 
                     default:
