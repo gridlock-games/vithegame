@@ -140,10 +140,9 @@ namespace Vi.ScriptableObjects
 
             public Sprite GetIcon(RaceAndGender raceAndGender)
             {
-                return null;
-                //int index = raceAndGenders.IndexOf(raceAndGender);
-                //if (index == -1 | index >= equipmentIcons.Count) { return null; }
-                //return equipmentIcons[index];
+                int index = raceAndGenders.IndexOf(raceAndGender);
+                if (index == -1 | index >= equipmentIcons.Count) { return null; }
+                return equipmentIcons[index];
             }
 
             public WearableEquipmentOption(string name, string groupName, EquipmentType equipmentType)
