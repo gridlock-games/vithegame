@@ -190,25 +190,26 @@ namespace Vi.Editor
                         yield return new WaitUntil(() => !Keyboard.current.spaceKey.isPressed);
                         while (true)
                         {
+                            bool changePos = false;
                             if (Keyboard.current.spaceKey.isPressed) { break; }
+                            
+                            if (Keyboard.current.wKey.isPressed) { changePos = true; multiplierOffset -= 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
+                            if (Keyboard.current.sKey.isPressed) { changePos = true; multiplierOffset += 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
 
-                            if (Keyboard.current.wKey.isPressed) { multiplierOffset -= 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
-                            if (Keyboard.current.sKey.isPressed) { multiplierOffset += 1; if (!Keyboard.current.shiftKey.isPressed) yield return new WaitForSeconds(0.1f); }
-
-                            if (Keyboard.current.upArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(45, 0, 0); }
+                            if (Keyboard.current.upArrowKey.isPressed) { changePos = true; instance.transform.eulerAngles += new Vector3(45, 0, 0); }
                             yield return new WaitUntil(() => !Keyboard.current.upArrowKey.isPressed);
-                            if (Keyboard.current.downArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(-45, 0, 0); }
+                            if (Keyboard.current.downArrowKey.isPressed) { changePos = true; instance.transform.eulerAngles += new Vector3(-45, 0, 0); }
                             yield return new WaitUntil(() => !Keyboard.current.downArrowKey.isPressed);
 
-                            if (Keyboard.current.leftArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(0, 45, 0); }
+                            if (Keyboard.current.leftArrowKey.isPressed) { changePos = true; instance.transform.eulerAngles += new Vector3(0, 45, 0); }
                             yield return new WaitUntil(() => !Keyboard.current.leftArrowKey.isPressed);
-                            if (Keyboard.current.rightArrowKey.isPressed) { instance.transform.eulerAngles += new Vector3(0, -45, 0); }
+                            if (Keyboard.current.rightArrowKey.isPressed) { changePos = true; instance.transform.eulerAngles += new Vector3(0, -45, 0); }
                             yield return new WaitUntil(() => !Keyboard.current.rightArrowKey.isPressed);
 
                             Vector3 camOffset = new Vector3(skinnedMeshRenderer.bounds.center.x, skinnedMeshRenderer.bounds.center.y, instance.transform.position.z);
                             camOffset.x -= Mathf.Max(Mathf.Max(skinnedMeshRenderer.bounds.extents.x, skinnedMeshRenderer.bounds.extents.y), skinnedMeshRenderer.bounds.extents.z) * (2 + multiplierOffset);
 
-                            transform.position = startPosition + camOffset;
+                            if (changePos) { transform.position = startPosition + camOffset; }
 
                             yield return null;
                         }

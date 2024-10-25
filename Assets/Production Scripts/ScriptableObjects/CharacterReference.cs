@@ -703,9 +703,10 @@ namespace Vi.ScriptableObjects
                 RaceAndGender raceAndGender = System.Enum.Parse<RaceAndGender>(splitString[1]);
 
                 TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(armorIconPath);
-                if (importer.textureType != TextureImporterType.Sprite)
+                if (importer.textureType != TextureImporterType.Sprite | importer.spriteImportMode != SpriteImportMode.Single)
                 {
                     importer.textureType = TextureImporterType.Sprite;
+                    importer.spriteImportMode = SpriteImportMode.Single;
                     importer.SaveAndReimport();
                 }
 
