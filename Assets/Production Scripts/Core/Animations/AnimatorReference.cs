@@ -79,16 +79,17 @@ namespace Vi.Core
             {
                 if (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Boots))
                 {
-                    SkinnedMeshRenderer pantsRenderer = wearableEquipment.GetRenderList().FirstOrDefault(item => !item.CompareTag(WearableEquipment.equipmentBodyMaterialTag));
-                    if (pantsRenderer)
+                    if (!WearableEquipmentInstances[CharacterReference.EquipmentType.Boots].isShort)
                     {
-                        foreach (SkinnedMeshRenderer bootsRenderer in WearableEquipmentInstances[CharacterReference.EquipmentType.Boots].GetRenderList())
+                        SkinnedMeshRenderer pantsRenderer = wearableEquipment.GetRenderList().FirstOrDefault(item => !item.CompareTag(WearableEquipment.equipmentBodyMaterialTag));
+                        if (pantsRenderer)
                         {
-                            if (bootsRenderer.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                            foreach (SkinnedMeshRenderer bootsRenderer in WearableEquipmentInstances[CharacterReference.EquipmentType.Boots].GetRenderList())
                             {
-                                glowRenderer.UnregisterRenderer(bootsRenderer);
-                                bootsRenderer.material = pantsRenderer.material;
-                                glowRenderer.RegisterNewRenderer(bootsRenderer);
+                                if (bootsRenderer.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
+                                {
+                                    bootsRenderer.material = pantsRenderer.material;
+                                }
                             }
                         }
                     }
@@ -99,8 +100,7 @@ namespace Vi.Core
             {
                 if (smr.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
                 {
-                    glowRenderer.UnregisterRenderer(smr);
-                    if (wearableEquipment.equipmentType == CharacterReference.EquipmentType.Boots)
+                    if (wearableEquipment.equipmentType == CharacterReference.EquipmentType.Boots & !wearableEquipment.isShort)
                     {
                         if (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Pants))
                         {
@@ -108,7 +108,6 @@ namespace Vi.Core
                             if (pantsRenderer)
                             {
                                 smr.material = pantsRenderer.material;
-                                glowRenderer.RegisterNewRenderer(smr);
                                 break;
                             }
                         }
@@ -118,7 +117,6 @@ namespace Vi.Core
                     {
                         smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
                     }
-                    glowRenderer.RegisterNewRenderer(smr);
                 }
             }
         }
@@ -174,6 +172,14 @@ namespace Vi.Core
                 SetBodyMaterialsOnEquipmentInstance(WearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
             }
 
+            if (WearableEquipmentInstances.TryGetValue(wearableEquipmentOption.equipmentType, out WearableEquipment instance))
+            {
+                foreach (SkinnedMeshRenderer smr in instance.GetRenderList())
+                {
+                    glowRenderer.RegisterRenderer(smr);
+                }
+            }
+            
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
             if (wearableEquipmentRendererDefinition != null)
             {
@@ -183,7 +189,7 @@ namespace Vi.Core
                     {
                         if (WearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                         {
-                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer;
+                            wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer | (i > 0 ? model.isShort : false);
                         }
                         else
                         {
@@ -210,6 +216,12 @@ namespace Vi.Core
                 WearableEquipmentInstances[wearableEquipmentOption.equipmentType].enabled = true;
             }
             StartCoroutine(SetRendererStatusForCharacterCosmetics());
+
+            if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Chest
+                | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Gloves)
+            {
+                RefreshChestSleevesRendererDisplay();
+            }
         }
 
         public void ClearWearableEquipment(CharacterReference.EquipmentType equipmentType)
@@ -243,6 +255,12 @@ namespace Vi.Core
             }
             SetArmorType();
             if (gameObject.activeSelf) { StartCoroutine(SetRendererStatusForCharacterCosmetics()); }
+            
+            if (equipmentType == CharacterReference.EquipmentType.Chest
+                | equipmentType == CharacterReference.EquipmentType.Gloves)
+            {
+                RefreshChestSleevesRendererDisplay();
+            }
         }
 
         private IEnumerator SetRendererStatusForCharacterCosmetics()
@@ -251,10 +269,59 @@ namespace Vi.Core
             // Disable hair if we're wearing a helmet
             if (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair))
             {
-                bool shouldRenderHair = !WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Helm);
+                bool shouldRenderHair;
+                if (WearableEquipmentInstances.TryGetValue(CharacterReference.EquipmentType.Helm, out WearableEquipment helm))
+                {
+                    shouldRenderHair = !WearableEquipmentInstances[CharacterReference.EquipmentType.Helm].shouldDisableCharSkinRenderer;
+                }
+                else
+                {
+                    shouldRenderHair = true;
+                }
+
                 foreach (SkinnedMeshRenderer smr in WearableEquipmentInstances[CharacterReference.EquipmentType.Hair].GetRenderList())
                 {
                     smr.forceRenderingOff = !shouldRenderHair;
+                }
+            }
+        }
+
+        private void RefreshChestSleevesRendererDisplay()
+        {
+            if (WearableEquipmentInstances.TryGetValue(CharacterReference.EquipmentType.Chest, out WearableEquipment chestInstance))
+            {
+                WearableEquipmentRendererDefinition glovesEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == CharacterReference.EquipmentType.Gloves);
+                if (glovesEquipmentRendererDefinition != null)
+                {
+                    if (chestInstance.sleevesRenderer)
+                    {
+                        if (WearableEquipmentInstances.TryGetValue(CharacterReference.EquipmentType.Gloves, out WearableEquipment glovesInstance))
+                        {
+                            for (int i = 0; i < glovesEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                            {
+                                glovesEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !glovesInstance.shouldDisableCharSkinRenderer | (i > 0 ? glovesInstance.isShort : false);
+                            }
+                            chestInstance.sleevesRenderer.enabled = false;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < glovesEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                            {
+                                glovesEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = false;
+                            }
+                            chestInstance.sleevesRenderer.enabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (WearableEquipmentInstances.TryGetValue(CharacterReference.EquipmentType.Gloves, out WearableEquipment glovesInstance))
+                        {
+                            for (int i = 0; i < glovesEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
+                            {
+                                glovesEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !glovesInstance.shouldDisableCharSkinRenderer | (i > 0 ? glovesInstance.isShort : false);
+                            }
+                        }
+                    }
                 }
             }
         }

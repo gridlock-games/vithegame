@@ -445,7 +445,9 @@ namespace Vi.ScriptableObjects
 
                             if (!AssetDatabase.IsValidFolder(@"Assets\Production\Prefabs\WearableEquipment\" + groupName)) { AssetDatabase.CreateFolder(@"Assets\Production\Prefabs\WearableEquipment", groupName); }
 
-                            wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants;
+                            wearableEquipment.shouldDisableCharSkinRenderer = wearableEquipment.equipmentType == EquipmentType.Pants
+                                | wearableEquipment.equipmentType == EquipmentType.Chest
+                                | wearableEquipment.equipmentType == EquipmentType.Helm;
                             foreach (SkinnedMeshRenderer smr in wearableEquipment.GetRenderList())
                             {
                                 if (smr.name.ToLower().Contains("_body") | smr.name.ToLower().Contains("_naked"))
@@ -553,7 +555,41 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Gloves_NWarrior_Rd",
                 "Hu_F_Belt_NWarrior_Rd",
                 "Hu_F_Pants_NWarrior_Rd",
-                "Hu_F_Boots_NWarrior_Rd"
+                "Hu_F_Boots_NWarrior_Rd",
+
+                "Hu_M_Helm_DungPlate_Pe",
+                "Hu_M_Shoulders_DungPlate_Pe",
+                "Hu_M_Chest_DungPlate_Pe",
+                "Hu_M_Cape_DungPlate_Pe",
+                "Hu_M_Gloves_DungPlate_Pe",
+                "Hu_M_Belt_DungPlate_Pe",
+                "Hu_M_Pants_DungPlate_Pe",
+                "Hu_M_Boots_DungPlate_Pe",
+
+                "Hu_F_Helm_DungPlate_Pe",
+                "Hu_F_Shoulders_DungPlate_Pe",
+                "Hu_F_Chest_DungPlate_Pe",
+                "Hu_F_Cape_DungPlate_Pe",
+                "Hu_F_Gloves_DungPlate_Pe",
+                "Hu_F_Belt_DungPlate_Pe",
+                "Hu_F_Pants_DungPlate_Pe",
+                "Hu_F_Boots_DungPlate_Pe",
+
+                "Hu_M_Helm_SMage_03_Rd",
+                "Hu_M_Shoulders_SMage_Rd",
+                "Hu_M_Chest_SMage_Rd",
+                "Hu_M_Gloves_SMage_Rd",
+                "Hu_M_Belt_SMage_Rd",
+                "Hu_M_Robe_SMage_Rd",
+                "Hu_M_Boots_SMage_Rd",
+
+                "Hu_F_Helm_SMage_03_Rd",
+                "Hu_F_Shoulders_SMage_Rd",
+                "Hu_F_Chest_SMage_Rd",
+                "Hu_F_Gloves_SMage_Rd",
+                "Hu_F_Belt_SMage_Rd",
+                "Hu_F_Robe_SMage_Rd",
+                "Hu_F_Boots_SMage_Rd"
             };
 
             string[] folderPathsToAppend = new string[]
@@ -701,9 +737,10 @@ namespace Vi.ScriptableObjects
                 RaceAndGender raceAndGender = System.Enum.Parse<RaceAndGender>(splitString[1]);
 
                 TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(armorIconPath);
-                if (importer.textureType != TextureImporterType.Sprite)
+                if (importer.textureType != TextureImporterType.Sprite | importer.spriteImportMode != SpriteImportMode.Single)
                 {
                     importer.textureType = TextureImporterType.Sprite;
+                    importer.spriteImportMode = SpriteImportMode.Single;
                     importer.SaveAndReimport();
                 }
 

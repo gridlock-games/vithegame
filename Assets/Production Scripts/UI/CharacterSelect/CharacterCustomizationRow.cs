@@ -12,6 +12,10 @@ namespace Vi.UI
     {
         [SerializeField] private GridLayoutGroup buttonLayoutGroup;
         [SerializeField] private GridLayoutGroup arrowLayoutGroup;
+        public Button LeftArrowButton { get { return leftArrowButton; } }
+        [SerializeField] private Button leftArrowButton;
+        public Button RightArrowButton { get { return rightArrowButton; } }
+        [SerializeField] private Button rightArrowButton;
         [SerializeField] private CharacterCustomizationButton[] buttons;
         public Text rowHeaderText;
 
