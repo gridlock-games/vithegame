@@ -573,7 +573,23 @@ namespace Vi.ScriptableObjects
                 "Hu_F_Gloves_DungPlate_Pe",
                 "Hu_F_Belt_DungPlate_Pe",
                 "Hu_F_Pants_DungPlate_Pe",
-                "Hu_F_Boots_DungPlate_Pe"
+                "Hu_F_Boots_DungPlate_Pe",
+
+                "Hu_M_Helm_SMage_03_Rd",
+                "Hu_M_Shoulders_SMage_Rd",
+                "Hu_M_Chest_SMage_Rd",
+                "Hu_M_Gloves_SMage_Rd",
+                "Hu_M_Belt_SMage_Rd",
+                "Hu_M_Robe_SMage_Rd",
+                "Hu_M_Boots_SMage_Rd",
+
+                "Hu_F_Helm_SMage_03_Rd",
+                "Hu_F_Shoulders_SMage_Rd",
+                "Hu_F_Chest_SMage_Rd",
+                "Hu_F_Gloves_SMage_Rd",
+                "Hu_F_Belt_SMage_Rd",
+                "Hu_F_Robe_SMage_Rd",
+                "Hu_F_Boots_SMage_Rd"
             };
 
             string[] folderPathsToAppend = new string[]
