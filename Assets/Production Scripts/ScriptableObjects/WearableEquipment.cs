@@ -14,7 +14,9 @@ namespace Vi.ScriptableObjects
     {
         public CharacterReference.EquipmentType equipmentType;
         public Weapon.ArmorType armorType = Weapon.ArmorType.Cloth;
+        [Header("Renderer Presentation")]
         public bool shouldDisableCharSkinRenderer;
+        public bool isShort;
 
         private const bool shouldDebugWarnings = true;
         public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
