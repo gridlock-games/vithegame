@@ -187,12 +187,10 @@ namespace Vi.Core
                         if (WearableEquipmentInstances.ContainsKey(wearableEquipmentOption.equipmentType))
                         {
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = !model.shouldDisableCharSkinRenderer | (i > 0 ? model.isShort : false);
-                            if (animationHandler.IsSpawned) Debug.Log(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].name + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled);
                         }
                         else
                         {
                             wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
-                            if (animationHandler.IsSpawned) Debug.Log(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].name + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled);
                         }
                     }
                 }
@@ -201,7 +199,6 @@ namespace Vi.Core
                     for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
                     {
                         wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
-                        if (animationHandler.IsSpawned) Debug.Log(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].name + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled);
                     }
                 }
             }
@@ -245,7 +242,6 @@ namespace Vi.Core
                 for (int i = 0; i < wearableEquipmentRendererDefinition.skinnedMeshRenderers.Length; i++)
                 {
                     wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled = true;
-                    if (animationHandler.IsSpawned) Debug.Log(wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].name + " " + wearableEquipmentRendererDefinition.skinnedMeshRenderers[i].enabled);
                 }
             }
             SetArmorType();
