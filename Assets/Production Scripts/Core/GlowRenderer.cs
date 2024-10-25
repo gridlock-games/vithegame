@@ -57,14 +57,14 @@ namespace Vi.Core
             {
                 foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
                 {
-                    RegisterNewRenderer(renderer);
+                    RegisterRenderer(renderer);
                 }
             }
         }
 
         private Dictionary<Renderer, List<Material>> glowMaterialInstances = new Dictionary<Renderer, List<Material>>();
 
-        public void RegisterNewRenderer(Renderer renderer)
+        public void RegisterRenderer(Renderer renderer)
         {
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj.IsSpawned) { return; }

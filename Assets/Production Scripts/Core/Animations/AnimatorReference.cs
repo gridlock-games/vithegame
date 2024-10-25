@@ -88,9 +88,7 @@ namespace Vi.Core
                             {
                                 if (bootsRenderer.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
                                 {
-                                    glowRenderer.UnregisterRenderer(bootsRenderer);
                                     bootsRenderer.material = pantsRenderer.material;
-                                    glowRenderer.RegisterNewRenderer(bootsRenderer);
                                 }
                             }
                         }
@@ -102,7 +100,6 @@ namespace Vi.Core
             {
                 if (smr.CompareTag(WearableEquipment.equipmentBodyMaterialTag))
                 {
-                    glowRenderer.UnregisterRenderer(smr);
                     if (wearableEquipment.equipmentType == CharacterReference.EquipmentType.Boots & !wearableEquipment.isShort)
                     {
                         if (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Pants))
@@ -111,7 +108,6 @@ namespace Vi.Core
                             if (pantsRenderer)
                             {
                                 smr.material = pantsRenderer.material;
-                                glowRenderer.RegisterNewRenderer(smr);
                                 break;
                             }
                         }
@@ -121,7 +117,6 @@ namespace Vi.Core
                     {
                         smr.material = appliedCharacterMaterials[CharacterReference.MaterialApplicationLocation.Body];
                     }
-                    glowRenderer.RegisterNewRenderer(smr);
                 }
             }
         }
@@ -177,6 +172,14 @@ namespace Vi.Core
                 SetBodyMaterialsOnEquipmentInstance(WearableEquipmentInstances[wearableEquipmentOption.equipmentType]);
             }
 
+            if (WearableEquipmentInstances.TryGetValue(wearableEquipmentOption.equipmentType, out WearableEquipment instance))
+            {
+                foreach (SkinnedMeshRenderer smr in instance.GetRenderList())
+                {
+                    glowRenderer.RegisterRenderer(smr);
+                }
+            }
+            
             WearableEquipmentRendererDefinition wearableEquipmentRendererDefinition = System.Array.Find(wearableEquipmentRendererDefinitions, item => item.equipmentType == wearableEquipmentOption.equipmentType);
             if (wearableEquipmentRendererDefinition != null)
             {
