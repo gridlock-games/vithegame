@@ -261,9 +261,25 @@ namespace Vi.ScriptableObjects
                 public WeaponBone weaponBone = WeaponBone.RightHand;
                 public Vector3 weaponPositionOffset;
                 public Vector3 weaponRotationOffset;
+                public StowedWeaponParentType stowedParentType = StowedWeaponParentType.Back_M;
                 public Vector3 stowedWeaponPositionOffset;
                 public Vector3 stowedWeaponRotationOffset;
             }
+        }
+
+        public enum StowedWeaponParentType
+        {
+            Hip_L,
+            Hip_R,
+            LegPlate_L,
+            LegPlate_R,
+            Back_2HL,
+            Back_Bow,
+            Back_L,
+            Back_M,
+            Back_R,
+            Back_Quiver,
+
         }
 
         [SerializeField] private List<WeaponModelData> weaponModelData = new List<WeaponModelData>();

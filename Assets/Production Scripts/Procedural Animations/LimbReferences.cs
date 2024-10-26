@@ -309,16 +309,16 @@ namespace Vi.ProceduralAnimations
         [System.Serializable]
         private struct StowedWeaponParent
         {
-            public Weapon.WeaponClass weaponClass;
+            public Weapon.StowedWeaponParentType stowedWeaponParentType;
             public Transform bone;
         }
 
         [SerializeField] private StowedWeaponParent[] stowedWeaponParents;
-        public Transform GetStowedWeaponParent(Weapon.WeaponClass weaponClass)
+        public Transform GetStowedWeaponParent(Weapon.StowedWeaponParentType stowedWeaponParentType)
         {
-            if (System.Array.Exists(stowedWeaponParents, item => item.weaponClass == weaponClass))
+            if (System.Array.Exists(stowedWeaponParents, item => item.stowedWeaponParentType == stowedWeaponParentType))
             {
-                StowedWeaponParent stowedWeaponParent = System.Array.Find(stowedWeaponParents, item => item.weaponClass == weaponClass);
+                StowedWeaponParent stowedWeaponParent = System.Array.Find(stowedWeaponParents, item => item.stowedWeaponParentType == stowedWeaponParentType);
                 return stowedWeaponParent.bone;
             }
             return middleSpine;

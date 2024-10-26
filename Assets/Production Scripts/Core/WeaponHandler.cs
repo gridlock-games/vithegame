@@ -90,7 +90,7 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(weapon.GetWeaponClass()));
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(modelData.stowedParentType));
                         instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
