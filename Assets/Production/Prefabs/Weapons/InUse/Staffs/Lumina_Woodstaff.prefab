@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 3240593576062081041}
   - component: {fileID: 8998743424204234098}
   - component: {fileID: 102408958681105487}
+  - component: {fileID: 8988427402896958932}
   m_Layer: 6
   m_Name: Lumina_Woodstaff
   m_TagString: Untagged
@@ -123,6 +124,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 149
   isPrewarmObject: 1
+--- !u!114 &8988427402896958932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2860689685286978219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  size: {x: 0.1, y: 0.001, z: 2}
+  direction: 2
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1001 &6619310853197152991
 PrefabInstance:
   m_ObjectHideFlags: 0

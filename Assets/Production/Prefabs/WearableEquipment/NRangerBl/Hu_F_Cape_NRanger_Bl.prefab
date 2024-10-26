@@ -2865,6 +2865,8 @@ MonoBehaviour:
   equipmentType: 2
   armorType: 0
   shouldDisableCharSkinRenderer: 0
+  isShort: 0
+  sleevesRenderer: {fileID: 0}
   renderList:
   - {fileID: 5389177362877862599}
 --- !u!1 &4642840542089489616
@@ -5177,7 +5179,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     radius:
-      value: 0.25
+      value: 0.3
       useCurve: 1
       curve:
         serializedVersion: 2

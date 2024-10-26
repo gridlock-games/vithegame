@@ -25,6 +25,10 @@ namespace Vi.ScriptableObjects
         public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
+
+        public List<MagicaCloth> ClothInstances { get { return _clothInstances; } }
+        private List<MagicaCloth> _clothInstances = new List<MagicaCloth>();
+        
         private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
         public SkinnedMeshRenderer[] GetRenderList() { return renderList; }
@@ -47,6 +51,11 @@ namespace Vi.ScriptableObjects
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {
                 originalRenderData.Add((srenderer.rootBone, srenderer.bones));
+
+                if (srenderer.TryGetComponent(out MagicaCloth cloth))
+                {
+                    _clothInstances.Add(cloth);
+                }
             }
         }
 
