@@ -13,6 +13,8 @@ namespace Vi.Utility
 
         public const bool shouldDiscardMessageQueueOnNetworkShutdown = true;
 
+        public const string persistentDiscordInviteLink = "https://discord.gg/2JxDqfpHQk";
+
         public static bool IsQuitting { get; private set; }
         public static void QuitGame()
         {
