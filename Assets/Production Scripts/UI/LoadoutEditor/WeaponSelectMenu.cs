@@ -17,6 +17,22 @@ namespace Vi.UI
         [SerializeField] private Image[] abilityImages;
         [SerializeField] private List<AbilityPreviewVideo> abilityPreviewVideos = new List<AbilityPreviewVideo>();
 
+        private void Awake()
+        {
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent += OnCharPreviewDrag;
+            }
+        }
+
+        private void OnCharPreviewDrag(Vector2 delta)
+        {
+            if (weaponPreviewObject)
+            {
+                //weaponPreviewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+            }
+        }
+
         [System.Serializable]
         private class AbilityPreviewVideo
         {
@@ -104,7 +120,17 @@ namespace Vi.UI
                 }
             }
 
-            if (weaponOption.weaponPreviewPrefab) { weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab); }
+            if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
+
+            if (weaponOption.weaponPreviewPrefab)
+            {
+                weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab);
+                weaponPreviewCamera = weaponPreviewObject.GetComponentInChildren<Camera>();
+                if (weaponPreviewCamera)
+                {
+                    weaponPreviewCamera.transform.SetParent(null, true);
+                }
+            }
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
@@ -199,8 +225,14 @@ namespace Vi.UI
         }
 
         private GameObject weaponPreviewObject;
+        private Camera weaponPreviewCamera;
         private void OnDestroy()
         {
+            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            {
+                data.OnDragEvent -= OnCharPreviewDrag;
+            }
+
             if (weaponPreviewObject)
             {
                 if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
@@ -216,6 +248,8 @@ namespace Vi.UI
                     Destroy(weaponPreviewObject);
                 }
             }
+
+            if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
         }
     }
 }
