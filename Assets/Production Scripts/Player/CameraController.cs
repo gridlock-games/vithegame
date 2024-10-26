@@ -176,6 +176,7 @@ namespace Vi.Player
                 Vector2 lookInput = IsAnimating ? Vector2.zero : movementHandler.GetLookInput();
                 targetRotationX += lookInput.y;
                 targetRotationY += lookInput.x;
+                if (orbitalCam.enabled) { targetRotationX = 0; }
             }
 
             targetRotationX %= 360f;
