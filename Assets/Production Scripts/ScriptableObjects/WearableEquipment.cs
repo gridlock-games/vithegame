@@ -76,6 +76,7 @@ namespace Vi.ScriptableObjects
                     ClothSerializeData sdata = magicaCloth.SerializeData;
                     sdata.colliderCollisionConstraint.colliderList.Clear();
                     sdata.colliderCollisionConstraint.colliderList.AddRange(animator.GetComponentsInChildren<ColliderComponent>());
+                    magicaCloth.SetParameterChange();
 
                     foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {

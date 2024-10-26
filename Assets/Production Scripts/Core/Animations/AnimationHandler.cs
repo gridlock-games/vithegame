@@ -73,6 +73,7 @@ namespace Vi.Core
                             if (!cloth.SerializeData.colliderCollisionConstraint.colliderList.Contains(magicaCapsuleCollider))
                             {
                                 cloth.SerializeData.colliderCollisionConstraint.colliderList.Add(magicaCapsuleCollider);
+                                cloth.SetParameterChange();
                             }
                         }
                     }
@@ -91,6 +92,7 @@ namespace Vi.Core
                         foreach (MagicaCloth2.MagicaCloth cloth in kvp.Value.ClothInstances)
                         {
                             cloth.SerializeData.colliderCollisionConstraint.colliderList.Remove(magicaCapsuleCollider);
+                            cloth.SetParameterChange();
                         }
                     }
                 }
