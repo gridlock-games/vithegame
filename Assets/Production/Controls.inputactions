@@ -234,7 +234,7 @@
                     "name": "TimeScaleChange",
                     "type": "Button",
                     "id": "278c55b5-e282-4818-8540-62980d72c28e",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -243,7 +243,7 @@
                     "name": "AddForce",
                     "type": "Button",
                     "id": "c17c26bf-db90-4a59-90cc-91f1870a38a6",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -252,7 +252,16 @@
                     "name": "Upgrade",
                     "type": "Value",
                     "id": "af71d483-82dc-44c2-ad87-8a216f600e6a",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "OrbitalCam",
+                    "type": "Value",
+                    "id": "d13de1ca-9715-424a-9fab-bd2cb81ea917",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -872,6 +881,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Upgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "430cef85-e0b6-4589-9d5f-2170212e754b",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard & Mouse",
+                    "action": "OrbitalCam",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -614,7 +614,8 @@ namespace Vi.Player
                 cameraController.gameObject.tag = "MainCamera";
                 cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
-                cameraController.Camera.enabled = true;
+
+                cameraController.SetActive(true);
 
                 playerInput.enabled = true;
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
@@ -625,7 +626,9 @@ namespace Vi.Player
             else
             {
                 cameraController.gameObject.SetActive(false);
-                cameraController.Camera.enabled = false;
+
+                cameraController.SetActive(false);
+
                 playerInput.enabled = false;
 
                 actionMapHandler.enabled = false;
@@ -654,7 +657,8 @@ namespace Vi.Player
             {
                 Destroy(audioListener);
             }
-            cameraController.Camera.enabled = false;
+
+            cameraController.SetActive(false);
 
             playerInput.enabled = false;
             actionMapHandler.enabled = false;

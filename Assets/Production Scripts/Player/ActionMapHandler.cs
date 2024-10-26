@@ -47,12 +47,12 @@ namespace Vi.Player
         }
 
         private NetworkObject networkObject;
-        private Camera playerCamera;
+        private CameraController playerCamera;
         private void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
             networkObject = GetComponent<NetworkObject>();
-            playerCamera = GetComponentInChildren<Camera>();
+            playerCamera = GetComponentInChildren<CameraController>();
         }
 
         private void OnEnable()
@@ -234,6 +234,18 @@ namespace Vi.Player
             textChatIsOpen = false;
             if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+        }
+
+        private void OnOrbitalCam(InputValue value)
+        {
+            if (!playerCamera) { return; }
+            if (externalUI != null) { return; }
+            if (scoreboardInstance) { return; }
+            if (pauseInstance) { return; }
+            if (inventoryInstance) { return; }
+            if (textChatIsOpen) { return; }
+
+            playerCamera.SetOrbitalCameraState(value.isPressed);
         }
     }
 }
