@@ -280,9 +280,25 @@ namespace Vi.UI
 
             MVPPresentationCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
             MVPPresentationCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
-            MVPPresentationCamera.enabled = true;
 
             yield return new WaitUntil(() => animationHandler.Animator);
+
+            GameObject lightInstance = new GameObject("PreviewLight");
+            lightInstance.transform.SetParent(MVPPreviewObject.transform, true);
+            lightInstance.transform.localPosition = new Vector3(0, 3, 4);
+            lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
+            lightInstance.layer = MVPPreviewObject.layer;
+            Light light = lightInstance.AddComponent<Light>();
+            light.type = LightType.Spot;
+            light.lightmapBakeType = LightmapBakeType.Realtime;
+            light.innerSpotAngle = 60;
+            light.spotAngle = 80;
+            light.color = Color.white;
+            light.intensity = 20;
+            light.range = 8;
+            light.cullingMask = light.gameObject.layer;
+
+            MVPPresentationCamera.enabled = true;
 
             animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
 
