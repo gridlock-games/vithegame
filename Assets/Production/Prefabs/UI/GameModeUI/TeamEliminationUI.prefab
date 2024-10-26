@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -159,6 +160,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3608509046203378177, guid: 7314c07a3d8a63949ae8ae9b21ff2076, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7757707048149690173, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5653742109521134430}
   m_SourcePrefab: {fileID: 100100000, guid: 7314c07a3d8a63949ae8ae9b21ff2076, type: 3}
 --- !u!114 &857272660121023587 stripped
 MonoBehaviour:
@@ -284,6 +292,8 @@ MonoBehaviour:
   MVPKillsText: {fileID: 4114120739792431792}
   MVPDeathsText: {fileID: 2776132887464886629}
   MVPAssistsText: {fileID: 1798353379686992843}
+  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
+    type: 3}
   viLogoImage: {fileID: 4829998238901348818}
   viEssenceIcon: {fileID: 21300000, guid: 4cef6eae1d34f7148af1b6854cf5bc47, type: 3}
 --- !u!225 &4025985339453722787 stripped

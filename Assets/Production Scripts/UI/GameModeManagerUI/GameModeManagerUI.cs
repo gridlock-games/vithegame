@@ -31,6 +31,7 @@ namespace Vi.UI
         [SerializeField] private Text MVPKillsText;
         [SerializeField] private Text MVPDeathsText;
         [SerializeField] private Text MVPAssistsText;
+        [SerializeField] private Light previewLightPrefab;
 
         protected GameModeManager gameModeManager;
         protected void Start()
@@ -288,21 +289,11 @@ namespace Vi.UI
 
             yield return new WaitUntil(() => animationHandler.Animator);
 
-            lightInstance = new GameObject("PreviewLight");
+            lightInstance = Instantiate(previewLightPrefab.gameObject);
             lightInstance.transform.SetParent(MVPPreviewObject.transform, true);
             lightInstance.transform.localPosition = new Vector3(0, 3, 4);
             lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
-            lightInstance.layer = MVPPreviewObject.layer;
-            Light light = lightInstance.AddComponent<Light>();
-            light.type = LightType.Spot;
-            light.lightmapBakeType = LightmapBakeType.Realtime;
-            light.innerSpotAngle = 60;
-            light.spotAngle = 80;
-            light.color = Color.white;
-            light.intensity = 20;
-            light.range = 8;
-            light.cullingMask = light.gameObject.layer;
-
+            
             MVPPresentationCamera.enabled = true;
 
             animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
