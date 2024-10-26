@@ -56,6 +56,7 @@ namespace Vi.UI
         private void OnDestroy()
         {
             gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
+            if (lightInstance) { Destroy(lightInstance); }
             if (MVPPreviewObject)
             {
                 if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
@@ -202,6 +203,7 @@ namespace Vi.UI
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
                     {
+                        if (lightInstance) { Destroy(lightInstance); }
                         if (MVPPreviewObject)
                         {
                             if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
@@ -228,6 +230,7 @@ namespace Vi.UI
         private const float opacityTransitionSpeed = 2;
 
         private GameObject MVPPreviewObject;
+        private GameObject lightInstance;
         private bool MVPPreviewInProgress;
         private IEnumerator CreateMVPPreview()
         {
@@ -245,6 +248,8 @@ namespace Vi.UI
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+
+            if (lightInstance) { Destroy(lightInstance); }
 
             if (MVPPreviewObject)
             {
@@ -283,7 +288,7 @@ namespace Vi.UI
 
             yield return new WaitUntil(() => animationHandler.Animator);
 
-            GameObject lightInstance = new GameObject("PreviewLight");
+            lightInstance = new GameObject("PreviewLight");
             lightInstance.transform.SetParent(MVPPreviewObject.transform, true);
             lightInstance.transform.localPosition = new Vector3(0, 3, 4);
             lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);

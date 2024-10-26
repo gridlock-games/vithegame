@@ -728,12 +728,12 @@ namespace Vi.UI
                 if (killerCombatAgent)
                 {
                     killerCard.Initialize(killerCombatAgent);
-                    killedByText.text = "Killed by";
+                    killedByText.text = "KO'd by";
                 }
                 else
                 {
                     killerCard.Initialize(null);
-                    killedByText.text = "Killed by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
+                    killedByText.text = "KO'd by " + (killerNetObj ? killerNetObj.name.Replace("(Clone)", "") : "Unknown");
                 }
 
                 bool isGameOver = false;
