@@ -47,12 +47,14 @@ namespace Vi.Player
         }
 
         private NetworkObject networkObject;
-        private CameraController playerCamera;
+        private CameraController playerCameraController;
+        private CombatAgent combatAgent;
         private void Awake()
         {
             weaponHandler = GetComponent<WeaponHandler>();
             networkObject = GetComponent<NetworkObject>();
-            playerCamera = GetComponentInChildren<CameraController>();
+            playerCameraController = GetComponentInChildren<CameraController>();
+            combatAgent = GetComponent<CombatAgent>();
         }
 
         private void OnEnable()
@@ -238,14 +240,24 @@ namespace Vi.Player
 
         private void OnOrbitalCam(InputValue value)
         {
-            if (!playerCamera) { return; }
+            if (!playerCameraController) { return; }
             if (externalUI != null) { return; }
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
             if (textChatIsOpen) { return; }
+            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { return; }
 
-            playerCamera.SetOrbitalCameraState(value.isPressed);
+            if (combatAgent)
+            {
+                if (combatAgent.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { return; }
+            }
+            else
+            {
+                return;
+            }
+
+            playerCameraController.SetOrbitalCameraState(value.isPressed);
         }
     }
 }

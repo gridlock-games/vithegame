@@ -54,10 +54,10 @@ namespace Vi.Player
             targetRotationY += rotationY;
         }
 
-        public void SetOrbitalCameraState(bool isPressed)
+        public void SetOrbitalCameraState(bool isActive)
         {
-            thisCam.enabled = !isPressed;
-            orbitalCam.enabled = isPressed;
+            thisCam.enabled = !isActive;
+            orbitalCam.enabled = isActive;
         }
 
         public void SetActive(bool isActive)
@@ -160,6 +160,8 @@ namespace Vi.Player
         private float followCamAngleOffset;
         public void UpdateCamera()
         {
+            if (attributes.GetAilment() == ActionClip.Ailment.Death) { SetOrbitalCameraState(false); }
+
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
