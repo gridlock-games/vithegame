@@ -2,7 +2,10 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Player;
 using Vi.ScriptableObjects;
-using static Vi.ScriptableObjects.CharacterReference;
+using Unity.Netcode;
+using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Vi.UI
 {
@@ -13,6 +16,8 @@ namespace Vi.UI
         [SerializeField] private ShopKeeperItem shopKeeperItemPrefab;
         [SerializeField] private Transform armorParent;
         [SerializeField] private Transform weaponParent;
+        [SerializeField] private Text purchaseErrorText;
+        [SerializeField] private Selectable[] selectablesThatRespondToPurchaseRpc;
 
         private GameObject invoker;
         public override void Interact(GameObject invoker)
@@ -25,19 +30,69 @@ namespace Vi.UI
             {
                 // If this weapon option is in our inventory, continue
                 if (WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
-                Instantiate(shopKeeperItemPrefab, weaponParent).GetComponent<ShopKeeperItem>().InitializeAsWeapon(weaponOption);
+                GameObject g = Instantiate(shopKeeperItemPrefab.gameObject, weaponParent);
+                g.GetComponent<ShopKeeperItem>().InitializeAsWeapon(weaponOption);
+
+                string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+                string itemId = weaponOption.itemWebId;
+                g.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
             }
 
             foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
             {
                 // If this armor option is in our inventory, continue
                 if (WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == wearableEquipmentOption.itemWebId)) { continue; }
-                Instantiate(shopKeeperItemPrefab, armorParent).GetComponent<ShopKeeperItem>().InitializeAsArmor(wearableEquipmentOption);
+                GameObject g = Instantiate(shopKeeperItemPrefab.gameObject, armorParent);
+                g.GetComponent<ShopKeeperItem>().InitializeAsArmor(wearableEquipmentOption);
+
+                string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+                string itemId = wearableEquipmentOption.itemWebId;
+                g.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+            }
+        }
+
+        private bool waitingForPurchase;
+
+        private void Purchase(string characterId, string itemId)
+        {
+            if (!IsClient) { Debug.LogError("Calling Purchase() while not being a client!"); return; }
+
+            waitingForPurchase = true;
+            purchaseErrorText.text = "Approving Purchase...";
+            PurchaseServerRpc(NetworkManager.LocalClientId, characterId, itemId);
+        }
+
+        [Rpc(SendTo.Server)]
+        private void PurchaseServerRpc(ulong clientId, string characterId, string itemId)
+        {
+            StartCoroutine(PurchaseOnServer(clientId, characterId, itemId));
+        }
+
+        private IEnumerator PurchaseOnServer(ulong clientId, string characterId, string itemId)
+        {
+            Debug.Log("Purchasing item " + itemId + " for char " + characterId);
+            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
+            yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
+            PurchaseClientRpc(true, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void PurchaseClientRpc(bool purchaseSuccessful, RpcParams rpcParams)
+        {
+            waitingForPurchase = false;
+            if (purchaseSuccessful)
+            {
+                purchaseErrorText.text = "Purchase successful!";
+            }
+            else
+            {
+                purchaseErrorText.text = "There was a problem.";
             }
         }
 
         public void OnPause()
         {
+            if (waitingForPurchase) { return; }
             CloseShop();
         }
 
@@ -49,6 +104,7 @@ namespace Vi.UI
             }
             invoker = null;
             UICanvas.gameObject.SetActive(false);
+            waitingForPurchase = false;
 
             foreach (Transform child in armorParent)
             {
@@ -86,6 +142,7 @@ namespace Vi.UI
             originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UICanvas.gameObject.SetActive(false);
+            purchaseErrorText.text = "";
         }
 
         private const float scalingSpeed = 8;
@@ -114,6 +171,11 @@ namespace Vi.UI
             if (mainCamera)
             {
                 worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
+            }
+
+            foreach (Selectable selectable in selectablesThatRespondToPurchaseRpc)
+            {
+                selectable.interactable = !waitingForPurchase;
             }
         }
     }

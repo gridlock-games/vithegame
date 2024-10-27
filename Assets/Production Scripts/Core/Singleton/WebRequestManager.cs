@@ -894,7 +894,7 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator AddItemToInventory(string charId, string itemId)
+        public IEnumerator AddItemToInventory(string charId, string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) { Debug.LogWarning("You are trying to add an item to a character's inventory that has an id of null or whitespace"); yield break; }
 
@@ -919,6 +919,7 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
             }
 
+            Debug.Log(postRequest.downloadHandler.text);
             postRequest.Dispose();
         }
 
@@ -3011,43 +3012,6 @@ namespace Vi.Core
         }
 #endif
 
-        public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
-        {
-            AddItemPayload payload = new AddItemPayload(characterId, itemId);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
-            }
-            postRequest.Dispose();
-        }
-
-        private struct AddItemPayload
-        {
-            public string charId;
-            public string itemId;
-
-            public AddItemPayload(string characterId, string itemId)
-            {
-                charId = characterId;
-                this.itemId = itemId;
-            }
-        }
-
         public void CheckGameVersion(bool force)
         {
             if (!force)
@@ -3164,7 +3128,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.SetGameVersion()" + postRequest.error);
             }
             postRequest.Dispose();
         }

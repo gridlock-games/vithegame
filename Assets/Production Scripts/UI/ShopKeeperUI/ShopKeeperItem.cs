@@ -18,9 +18,6 @@ namespace Vi.UI
             itemName.text = wearableEquipmentOption.name;
             price.text = "2";
             Price = 2;
-
-            GetComponent<Button>().onClick.AddListener(() => PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.AddItemToCharacterInventory(
-                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), wearableEquipmentOption.itemWebId)));
         }
 
         public void InitializeAsWeapon(CharacterReference.WeaponOption weaponOption)
@@ -29,9 +26,6 @@ namespace Vi.UI
             itemName.text = weaponOption.name;
             price.text = "3";
             Price = 3;
-
-            GetComponent<Button>().onClick.AddListener(() => PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.AddItemToCharacterInventory(
-                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), weaponOption.itemWebId)));
         }
     }
 }
