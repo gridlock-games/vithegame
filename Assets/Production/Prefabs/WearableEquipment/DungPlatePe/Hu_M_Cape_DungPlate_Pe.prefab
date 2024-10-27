@@ -1799,18 +1799,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.26568925
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: f13ea55d
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: DungPlate_Pe_Male
+      preBuildScriptableObject: {fileID: 11400000, guid: b535cb64631b1824f8fec18b2e8cfa87,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 3947846038798318181}
+            - {fileID: 4315486205719246941}
+            - {fileID: 2619117215708041597}
+            - {fileID: 5386713098701781913}
+            - {fileID: 1590479784283777351}
+            - {fileID: 6239647686571920320}
         renderMeshList: []
   gizmoSerializeData:
     always: 0

@@ -152,19 +152,14 @@ namespace Vi.ScriptableObjects
             return _rootBone;
         }
 
-        private bool bonesCanMove;
         private Dictionary<Transform, Transform> boneMapToFollow = new Dictionary<Transform, Transform>();
         private void LateUpdate()
         {
-            if (bonesCanMove)
+            foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
             {
-                foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
-                {
-                    kvp.Value.position = kvp.Key.position;
-                    kvp.Value.rotation = kvp.Key.rotation;
-                }
+                kvp.Value.position = kvp.Key.position;
+                kvp.Value.rotation = kvp.Key.rotation;
             }
-            bonesCanMove = true;
         }
     }
 }

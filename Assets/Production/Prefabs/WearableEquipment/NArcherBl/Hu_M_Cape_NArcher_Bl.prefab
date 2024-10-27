@@ -5936,18 +5936,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.26568925
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: 04a615ed
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: NArcher_Bl_Male
+      preBuildScriptableObject: {fileID: 11400000, guid: 1f7e4a857d397154ca0252358ad6dbea,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 7649379347189709507}
+            - {fileID: 9139588637008814026}
+            - {fileID: 5588557475023910942}
+            - {fileID: 5287819004960832996}
+            - {fileID: 1512926067497820568}
+            - {fileID: 6955157919014747304}
         renderMeshList: []
   gizmoSerializeData:
     always: 0

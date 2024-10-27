@@ -5043,18 +5043,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.25529122
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: cc3ce22d
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: NWarrior_Rd_Female
+      preBuildScriptableObject: {fileID: 11400000, guid: a75d48985572a7c4fa9bcc72073aca2d,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 1461042444134705135}
+            - {fileID: 5899164015144258081}
+            - {fileID: 6556325428254037889}
+            - {fileID: 8097681125483324102}
+            - {fileID: 2040136816448131966}
+            - {fileID: 1120434355908194835}
         renderMeshList: []
   gizmoSerializeData:
     always: 0

@@ -1004,18 +1004,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.26568925
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: 2fea9c76
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: NMage_Gn_Male
+      preBuildScriptableObject: {fileID: 11400000, guid: ebb74463edebb4f4cb6b6fae5ba3b502,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 2679893616503659440}
+            - {fileID: 8209452109080466596}
+            - {fileID: 1999021994179601294}
+            - {fileID: 5289832176496529446}
+            - {fileID: 7029783749268677604}
+            - {fileID: 3914770837725686469}
         renderMeshList: []
   gizmoSerializeData:
     always: 0
