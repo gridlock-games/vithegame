@@ -25,6 +25,10 @@ namespace Vi.ScriptableObjects
         public const string equipmentBodyMaterialTag = "EquipmentMimicsBase";
 
         [SerializeField] private SkinnedMeshRenderer[] renderList = new SkinnedMeshRenderer[0];
+
+        public List<MagicaCloth> ClothInstances { get { return _clothInstances; } }
+        private List<MagicaCloth> _clothInstances = new List<MagicaCloth>();
+        
         private List<(Transform, Transform[])> originalRenderData = new List<(Transform, Transform[])>();
 
         public SkinnedMeshRenderer[] GetRenderList() { return renderList; }
@@ -47,6 +51,11 @@ namespace Vi.ScriptableObjects
             foreach (SkinnedMeshRenderer srenderer in renderList)
             {
                 originalRenderData.Add((srenderer.rootBone, srenderer.bones));
+
+                if (srenderer.TryGetComponent(out MagicaCloth cloth))
+                {
+                    _clothInstances.Add(cloth);
+                }
             }
         }
 
@@ -67,6 +76,7 @@ namespace Vi.ScriptableObjects
                     ClothSerializeData sdata = magicaCloth.SerializeData;
                     sdata.colliderCollisionConstraint.colliderList.Clear();
                     sdata.colliderCollisionConstraint.colliderList.AddRange(animator.GetComponentsInChildren<ColliderComponent>());
+                    magicaCloth.SetParameterChange();
 
                     foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
                     {
@@ -142,19 +152,14 @@ namespace Vi.ScriptableObjects
             return _rootBone;
         }
 
-        private bool bonesCanMove;
         private Dictionary<Transform, Transform> boneMapToFollow = new Dictionary<Transform, Transform>();
         private void LateUpdate()
         {
-            if (bonesCanMove)
+            foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
             {
-                foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
-                {
-                    kvp.Value.position = kvp.Key.position;
-                    kvp.Value.rotation = kvp.Key.rotation;
-                }
+                kvp.Value.position = kvp.Key.position;
+                kvp.Value.rotation = kvp.Key.rotation;
             }
-            bonesCanMove = true;
         }
     }
 }

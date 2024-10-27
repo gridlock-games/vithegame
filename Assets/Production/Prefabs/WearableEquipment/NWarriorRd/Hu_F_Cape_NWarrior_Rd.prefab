@@ -4698,28 +4698,64 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     radius:
-      value: 0.25
+      value: 0.3
       useCurve: 1
       curve:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.5
-          inSlope: 0
-          outSlope: 0
+          value: 0.30234987
+          inSlope: -0.04633671
+          outSlope: -0.04633671
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0
+          outWeight: 0.55895865
+        - serializedVersion: 3
+          time: 0.2
+          value: 0.3
+          inSlope: 0.08049292
+          outSlope: 0.08049292
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.43950996
+        - serializedVersion: 3
+          time: 0.4
+          value: 0.4
+          inSlope: 0.99859995
+          outSlope: 0.99859995
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.3353752
+        - serializedVersion: 3
+          time: 0.6
+          value: 0.6
+          inSlope: 0.5919224
+          outSlope: 0.5919224
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.43032143
+        - serializedVersion: 3
+          time: 0.8
+          value: 0.9
+          inSlope: -0.016923876
+          outSlope: -0.016923876
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.3935683
+          outWeight: 0.4180703
         - serializedVersion: 3
           time: 1
           value: 1
-          inSlope: 0
-          outSlope: 0
+          inSlope: 0.017434772
+          outSlope: 0.017434772
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0
+          inWeight: 0.40581945
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -5007,18 +5043,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.25529122
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: cc3ce22d
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: NWarrior_Rd_Female
+      preBuildScriptableObject: {fileID: 11400000, guid: a75d48985572a7c4fa9bcc72073aca2d,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 1461042444134705135}
+            - {fileID: 5899164015144258081}
+            - {fileID: 6556325428254037889}
+            - {fileID: 8097681125483324102}
+            - {fileID: 2040136816448131966}
+            - {fileID: 1120434355908194835}
         renderMeshList: []
   gizmoSerializeData:
     always: 0
@@ -5422,6 +5465,8 @@ MonoBehaviour:
   equipmentType: 2
   armorType: 0
   shouldDisableCharSkinRenderer: 0
+  isShort: 0
+  sleevesRenderer: {fileID: 0}
   renderList:
   - {fileID: 8042448543592984313}
 --- !u!1 &8340949094862903905

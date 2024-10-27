@@ -14,7 +14,7 @@ namespace Vi.UI
         private new void Start()
         {
             base.Start();
-            killsToWinRoundThresholdText.text = "Kills To Win Round: " + gameModeManager.GetComponent<FreeForAllManager>().GetKillsToWinRound();
+            killsToWinRoundThresholdText.text = "KOs To Win Round: " + gameModeManager.GetComponent<FreeForAllManager>().GetKillsToWinRound();
         }
 
         private new void Update()

@@ -1171,6 +1171,7 @@ GameObject:
   - component: {fileID: 4180851082165939938}
   - component: {fileID: 3898536951535850952}
   - component: {fileID: 3783706475528049946}
+  - component: {fileID: 3866278923695217611}
   m_Layer: 5
   m_Name: char_preview
   m_TagString: Untagged
@@ -1219,7 +1220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1232,6 +1233,18 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &3866278923695217611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993054859251107470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add4b85a21055ad46a60e2db995001ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1044890873534725133
 GameObject:
   m_ObjectHideFlags: 0

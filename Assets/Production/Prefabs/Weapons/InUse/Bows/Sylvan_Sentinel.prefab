@@ -74,6 +74,7 @@ GameObject:
   - component: {fileID: 3240593576062081041}
   - component: {fileID: 8998743424204234098}
   - component: {fileID: 102408958681105487}
+  - component: {fileID: -5698560294716272748}
   m_Layer: 6
   m_Name: Sylvan_Sentinel
   m_TagString: Untagged
@@ -112,6 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 0
   dropWeaponPrefab: {fileID: 6723547920205086022, guid: 6d62015ef099c94458f737b2ff5ea916,
     type: 3}
   canADS: 1
@@ -156,6 +158,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 110
   isPrewarmObject: 1
+--- !u!114 &-5698560294716272748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2860689685286978219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0.15, z: 0}
+  size: {x: 0.2, y: 0.001, z: 1.75}
+  direction: 2
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1 &5838638584495257002
 GameObject:
   m_ObjectHideFlags: 0

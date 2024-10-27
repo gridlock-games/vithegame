@@ -10,6 +10,7 @@ using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Core.GameModeManagers;
+using MagicaCloth2;
 
 namespace Vi.Core
 {
@@ -80,6 +81,10 @@ namespace Vi.Core
             if (!weapon) { return; }
             foreach (PooledObject g in stowedWeaponInstances)
             {
+                if (g.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                {
+                    combatAgent.AnimationHandler.RemoveClothCapsuleCollider(weaponCapsuleCollider);
+                }
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
@@ -90,11 +95,17 @@ namespace Vi.Core
                 {
                     foreach (Weapon.WeaponModelData.Data modelData in data.data)
                     {
-                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(), combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(weapon.GetWeaponClass()));
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(modelData.weaponPrefab.GetComponent<PooledObject>(),
+                            combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(modelData.stowedParentType));
                         instance.GetComponent<RuntimeWeapon>().SetIsStowed(true);
                         instance.transform.localPosition = modelData.stowedWeaponPositionOffset;
                         instance.transform.localRotation = Quaternion.Euler(modelData.stowedWeaponRotationOffset);
                         stowedWeaponInstances.Add(instance);
+
+                        if (instance.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                        {
+                            combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
+                        }
                     }
                 }
             }
@@ -126,11 +137,19 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
+                if (kvp.Value.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                {
+                    combatAgent.AnimationHandler.RemoveClothCapsuleCollider(weaponCapsuleCollider);
+                }
                 ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
             }
             weaponInstances.Clear();
             foreach (PooledObject g in stowedWeaponInstances)
             {
+                if (g.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                {
+                    combatAgent.AnimationHandler.RemoveClothCapsuleCollider(weaponCapsuleCollider);
+                }
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
@@ -162,6 +181,10 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
+                if (kvp.Value.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                {
+                    combatAgent.AnimationHandler.RemoveClothCapsuleCollider(weaponCapsuleCollider);
+                }
                 ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
             }
             weaponInstances.Clear();
@@ -213,6 +236,11 @@ namespace Vi.Core
                             shooterWeapons.Add(shooterWeapon);
                             CanAim = true;
                             CanADS = shooterWeapon.CanADS() | CanADS;
+                        }
+
+                        if (instance.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
+                        {
+                            combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
                         }
                     }
                     broken = true;

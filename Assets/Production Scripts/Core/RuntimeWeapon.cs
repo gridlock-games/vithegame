@@ -10,6 +10,7 @@ namespace Vi.Core
     public class RuntimeWeapon : MonoBehaviour
     {
         [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
+        [SerializeField] private bool collidesWithClothWhileStowed = true;
 
         public Weapon.WeaponMaterial GetWeaponMaterial() { return weaponMaterial; }
 
@@ -195,6 +196,11 @@ namespace Vi.Core
                 renderer.gameObject.layer = LayerMask.NameToLayer(parentCombatAgent.IsSpawned ? "NetworkPrediction" : "Preview");
             }
             StartCoroutine(EnableRenderersAfterOneFrame());
+
+            if (TryGetComponent(out MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider))
+            {
+                magicaCapsuleCollider.enabled = true;
+            }
         }
 
         private IEnumerator EnableRenderersAfterOneFrame()
@@ -225,6 +231,11 @@ namespace Vi.Core
                 }
                 ObjectPoolingManager.ReturnObjectToPool(ref dropWeaponInstance);
             }
+
+            if (TryGetComponent(out MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider))
+            {
+                magicaCapsuleCollider.enabled = true;
+            }
         }
 
         private bool lastIsActiveCall = true;
@@ -249,6 +260,13 @@ namespace Vi.Core
         public void SetIsStowed(bool isStowed)
         {
             this.isStowed = isStowed;
+            if (isStowed & !collidesWithClothWhileStowed)
+            {
+                if (TryGetComponent(out MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider))
+                {
+                    magicaCapsuleCollider.enabled = false;
+                }
+            }
         }
 
 #if UNITY_EDITOR

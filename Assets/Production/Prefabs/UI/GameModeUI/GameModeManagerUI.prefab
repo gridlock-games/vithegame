@@ -890,7 +890,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Kills
+  m_Text: KOs
 --- !u!114 &5425118761599342767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1950,6 +1950,8 @@ MonoBehaviour:
   MVPKillsText: {fileID: 7331267047892496993}
   MVPDeathsText: {fileID: 8800985494278265268}
   MVPAssistsText: {fileID: 4922618374310089498}
+  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
+    type: 3}
 --- !u!225 &7744647505305684082
 CanvasGroup:
   m_ObjectHideFlags: 0

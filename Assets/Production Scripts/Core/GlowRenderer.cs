@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using Vi.Utility;
+using MagicaCloth2;
 
 namespace Vi.Core
 {
@@ -66,6 +67,8 @@ namespace Vi.Core
 
         public void RegisterRenderer(Renderer renderer)
         {
+            if (renderer.GetComponent<MagicaCloth>()) { return; }
+
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj.IsSpawned) { return; }
 

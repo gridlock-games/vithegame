@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 3240593576062081041}
   - component: {fileID: 8998743424204234098}
   - component: {fileID: 102408958681105487}
+  - component: {fileID: -4362444221357224115}
   m_Layer: 6
   m_Name: Sapphire_Strike
   m_TagString: Untagged
@@ -79,6 +80,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 0
   dropWeaponPrefab: {fileID: 1765567925222051047, guid: 6603d764a27d3ad40ac64a9086bebdd7,
     type: 3}
   canADS: 1
@@ -123,6 +125,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 106
   isPrewarmObject: 1
+--- !u!114 &-4362444221357224115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2860689685286978219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0.15, z: 0}
+  size: {x: 0.2, y: 0.001, z: 1.75}
+  direction: 2
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1001 &2885139340991264937
 PrefabInstance:
   m_ObjectHideFlags: 0

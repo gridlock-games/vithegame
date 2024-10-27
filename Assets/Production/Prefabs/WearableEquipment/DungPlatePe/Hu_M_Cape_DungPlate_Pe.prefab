@@ -1454,28 +1454,64 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     radius:
-      value: 0.35
+      value: 0.43
       useCurve: 1
       curve:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.5
-          inSlope: 0
-          outSlope: 0
+          value: 0.2023499
+          inSlope: -0.04633671
+          outSlope: -0.04633671
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0
+          outWeight: 0.55895865
+        - serializedVersion: 3
+          time: 0.2
+          value: 0.2
+          inSlope: 0.08049292
+          outSlope: 0.08049292
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.43950996
+        - serializedVersion: 3
+          time: 0.4
+          value: 0.3
+          inSlope: 0.99859995
+          outSlope: 0.99859995
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.3353752
+        - serializedVersion: 3
+          time: 0.6
+          value: 0.5
+          inSlope: 0.5919224
+          outSlope: 0.5919224
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.43032143
+        - serializedVersion: 3
+          time: 0.8
+          value: 0.8
+          inSlope: -0.016923876
+          outSlope: -0.016923876
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.3935683
+          outWeight: 0.4180703
         - serializedVersion: 3
           time: 1
           value: 1
-          inSlope: 0
-          outSlope: 0
+          inSlope: 0.017434772
+          outSlope: 0.017434772
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0
+          inWeight: 0.40581945
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -1763,18 +1799,25 @@ MonoBehaviour:
       maxConnectionDistance: 0.26568925
       userEdit: 0
     preBuildData:
-      enabled: 0
-      buildId: f13ea55d
-      preBuildScriptableObject: {fileID: 0}
+      enabled: 1
+      buildId: DungPlate_Pe_Male
+      preBuildScriptableObject: {fileID: 11400000, guid: b535cb64631b1824f8fec18b2e8cfa87,
+        type: 2}
       uniquePreBuildData:
-        version: 0
+        version: 2
         buildResult:
-          result: 0
+          result: 2
           warning: 0
         renderSetupDataList: []
         proxyMesh:
           transformData:
-            transformArray: []
+            transformArray:
+            - {fileID: 3947846038798318181}
+            - {fileID: 4315486205719246941}
+            - {fileID: 2619117215708041597}
+            - {fileID: 5386713098701781913}
+            - {fileID: 1590479784283777351}
+            - {fileID: 6239647686571920320}
         renderMeshList: []
   gizmoSerializeData:
     always: 0

@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 3810151032540306558}
   - component: {fileID: 4680130829139896736}
   - component: {fileID: 7832904479943354126}
+  - component: {fileID: 479601084767687917}
   m_Layer: 6
   m_Name: Cerulean_Glaive
   m_TagString: Untagged
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 0
   dropWeaponPrefab: {fileID: 649712489630177569, guid: 5cbb9a20374ca824ea7a1938867e8213,
     type: 3}
   weaponTrailVFX: {fileID: 8004191872501301918}
@@ -337,6 +339,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 139
   isPrewarmObject: 1
+--- !u!114 &479601084767687917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233962304293885144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  size: {x: 0.1, y: 0.001, z: 2}
+  direction: 2
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1001 &2677669884618675041
 PrefabInstance:
   m_ObjectHideFlags: 0

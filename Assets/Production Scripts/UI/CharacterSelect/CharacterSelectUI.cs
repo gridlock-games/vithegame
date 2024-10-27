@@ -80,7 +80,7 @@ namespace Vi.UI
         }
 
         [Header("Server Browser")]
-        [SerializeField] private GameObject alertBoxPrefab;
+        [SerializeField] private AlertBox alertBoxPrefab;
 
         [SerializeField] private ServerListElement serverListElement;
         [SerializeField] private Transform serverListElementParent;
@@ -1094,7 +1094,7 @@ namespace Vi.UI
             }
             else
             {
-                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "No Hub Server Online.";
+                Instantiate(alertBoxPrefab.gameObject).GetComponent<AlertBox>().SetText("Servers are currently offline for maintenance.");
             }
 
             selectCharacterButton.interactable = true;
@@ -1113,7 +1113,7 @@ namespace Vi.UI
 
         public void OpenViDiscord()
         {
-            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
+            Application.OpenURL(FasterPlayerPrefs.persistentDiscordInviteLink);
         }
 
         public void OpenServerBrowser()

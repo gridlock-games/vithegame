@@ -60,6 +60,45 @@ namespace Vi.Core
             return 2;
         }
 
+        public void AddClothCapsuleCollider(MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider)
+        {
+            if (animatorReference)
+            {
+                foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (MagicaCloth2.MagicaCloth cloth in kvp.Value.ClothInstances)
+                        {
+                            if (!cloth.SerializeData.colliderCollisionConstraint.colliderList.Contains(magicaCapsuleCollider))
+                            {
+                                cloth.SerializeData.colliderCollisionConstraint.colliderList.Add(magicaCapsuleCollider);
+                                cloth.SetParameterChange();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void RemoveClothCapsuleCollider(MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider)
+        {
+            if (animatorReference)
+            {
+                foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in animatorReference.WearableEquipmentInstances)
+                {
+                    if (kvp.Value)
+                    {
+                        foreach (MagicaCloth2.MagicaCloth cloth in kvp.Value.ClothInstances)
+                        {
+                            cloth.SerializeData.colliderCollisionConstraint.colliderList.Remove(magicaCapsuleCollider);
+                            cloth.SetParameterChange();
+                        }
+                    }
+                }
+            }
+        }
+
         public bool IsActionClipPlaying(ActionClip actionClip)
         {
             string animationStateName = GetActionClipAnimationStateName(actionClip);

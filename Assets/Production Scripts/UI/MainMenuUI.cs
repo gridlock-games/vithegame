@@ -910,7 +910,7 @@ namespace Vi.UI
 
         public void OpenViDiscord()
         {
-            Application.OpenURL("https://discord.gg/2JxDqfpHQk");
+            Application.OpenURL(FasterPlayerPrefs.persistentDiscordInviteLink);
         }
 
         // Used for forgot password button

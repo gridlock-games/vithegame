@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5576339091817654752}
   - component: {fileID: 6554653358381698096}
   - component: {fileID: 589001715679275257}
+  - component: {fileID: 3687415776380562846}
   m_Layer: 6
   m_Name: Doomskull_Reaver
   m_TagString: Untagged
@@ -49,6 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 0
   dropWeaponPrefab: {fileID: 8318594015092837733, guid: e9dd6df50d0dee849bf4f83a349f8e55,
     type: 3}
   weaponTrailVFX: {fileID: 7777117957715073062}
@@ -88,6 +90,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 131
   isPrewarmObject: 1
+--- !u!114 &3687415776380562846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6488801974244004234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0.2}
+  size: {x: 0.1, y: 0.001, z: 1.9}
+  direction: 2
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1001 &2436934589384247769
 PrefabInstance:
   m_ObjectHideFlags: 0

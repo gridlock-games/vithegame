@@ -31,6 +31,7 @@ namespace Vi.UI
         [SerializeField] private Text MVPKillsText;
         [SerializeField] private Text MVPDeathsText;
         [SerializeField] private Text MVPAssistsText;
+        [SerializeField] private Light previewLightPrefab;
 
         protected GameModeManager gameModeManager;
         protected void Start()
@@ -56,6 +57,7 @@ namespace Vi.UI
         private void OnDestroy()
         {
             gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
+            if (lightInstance) { Destroy(lightInstance); }
             if (MVPPreviewObject)
             {
                 if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
@@ -202,6 +204,7 @@ namespace Vi.UI
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
                     {
+                        if (lightInstance) { Destroy(lightInstance); }
                         if (MVPPreviewObject)
                         {
                             if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
@@ -228,6 +231,7 @@ namespace Vi.UI
         private const float opacityTransitionSpeed = 2;
 
         private GameObject MVPPreviewObject;
+        private GameObject lightInstance;
         private bool MVPPreviewInProgress;
         private IEnumerator CreateMVPPreview()
         {
@@ -245,6 +249,8 @@ namespace Vi.UI
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+
+            if (lightInstance) { Destroy(lightInstance); }
 
             if (MVPPreviewObject)
             {
@@ -280,9 +286,15 @@ namespace Vi.UI
 
             MVPPresentationCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
             MVPPresentationCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
-            MVPPresentationCamera.enabled = true;
 
             yield return new WaitUntil(() => animationHandler.Animator);
+
+            lightInstance = Instantiate(previewLightPrefab.gameObject);
+            lightInstance.transform.SetParent(MVPPreviewObject.transform, true);
+            lightInstance.transform.localPosition = new Vector3(0, 3, 4);
+            lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
+            
+            MVPPresentationCamera.enabled = true;
 
             animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
 

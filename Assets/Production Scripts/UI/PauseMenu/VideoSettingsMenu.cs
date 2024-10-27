@@ -27,7 +27,6 @@ namespace Vi.UI
         [SerializeField] private Slider renderScaleSlider;
         [SerializeField] private TMP_Dropdown renderScalingModeDropdown;
         [SerializeField] private Toggle vsyncToggle;
-        [SerializeField] private TMP_Dropdown msaaDropdown;
         [SerializeField] private Toggle hdrToggle;
         [SerializeField] private Toggle postProcessingToggle;
         [Header("Action Buttons")]
@@ -175,9 +174,6 @@ namespace Vi.UI
 
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
 
-            msaaDropdown.AddOptions(msaaCrosswalk.Keys.ToList());
-            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
-
             hdrToggle.isOn = pipeline.supportsHDR;
 
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
@@ -196,14 +192,6 @@ namespace Vi.UI
             FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", sliderValue);
         }
 
-        private readonly Dictionary<string, int> msaaCrosswalk = new Dictionary<string, int>()
-        {
-            { "Disabled", 1 },
-            { "2x", 2 },
-            { "4x", 4 },
-            { "8x", 8 }
-        };
-
         private void Update()
         {
             bool changesPresent = originalFullScreenMode != fsModes[fullscreenModeDropdown.value]
@@ -214,7 +202,6 @@ namespace Vi.UI
                 | originalRenderScaleValue != renderScaleSlider.value
                 | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
                 | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
-                | originalMSAASampleCount != msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text]
                 | originalHDR != hdrToggle.isOn
                 | originalPostProcessing != postProcessingToggle.isOn;
 
@@ -230,7 +217,6 @@ namespace Vi.UI
         private float originalRenderScaleValue;
         private UpscalingFilterSelection originalScalingFilter;
         private int originalVSyncState;
-        private int originalMSAASampleCount;
         private bool originalHDR;
         private bool originalPostProcessing;
         private void SetOriginalVariables()
@@ -242,7 +228,6 @@ namespace Vi.UI
             originalRenderScaleValue = pipeline.renderScale;
             originalScalingFilter = pipeline.upscalingFilter;
             originalVSyncState = QualitySettings.vSyncCount;
-            originalMSAASampleCount = pipeline.msaaSampleCount;
             originalHDR = pipeline.supportsHDR;
             originalPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
@@ -266,7 +251,6 @@ namespace Vi.UI
             pipeline.renderScale = renderScaleSlider.value;
             pipeline.upscalingFilter = (UpscalingFilterSelection)renderScalingModeDropdown.value;
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
-            pipeline.msaaSampleCount = msaaCrosswalk[msaaDropdown.options[msaaDropdown.value].text];
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
 
@@ -317,7 +301,6 @@ namespace Vi.UI
             renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
             vsyncToggle.interactable = true;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
-            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
         }
@@ -330,7 +313,6 @@ namespace Vi.UI
             renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
             vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
-            msaaDropdown.value = msaaCrosswalk.Keys.ToList().IndexOf(msaaCrosswalk.FirstOrDefault(x => x.Value == pipeline.msaaSampleCount).Key);
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
         }

@@ -840,6 +840,7 @@ GameObject:
   - component: {fileID: 1039857683160312426}
   - component: {fileID: 176043177884684608}
   - component: {fileID: 65689342122922386}
+  - component: {fileID: 5214299705676895104}
   m_Layer: 5
   m_Name: armor_preview
   m_TagString: Untagged
@@ -888,7 +889,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -901,6 +902,18 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &5214299705676895104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4153170736469934598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: add4b85a21055ad46a60e2db995001ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5475240975836810200
 GameObject:
   m_ObjectHideFlags: 0
