@@ -33,7 +33,7 @@ namespace Vi.Core.MovementHandlers
         {
             base.OnNetworkSpawn();
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
-            rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+            rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
             rb.isKinematic = !IsServer & !IsOwner;
         }
 

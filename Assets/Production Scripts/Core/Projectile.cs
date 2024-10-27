@@ -50,9 +50,11 @@ namespace Vi.Core
         }
 
         private Rigidbody rb;
+        private Renderer[] renderers;
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            renderers = GetComponentsInChildren<Renderer>();
         }
 
         private Vector3 startPosition;
@@ -60,6 +62,11 @@ namespace Vi.Core
         private void OnEnable()
         {
             startPosition = transform.position;
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = true;
+            }
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
 
@@ -88,6 +95,17 @@ namespace Vi.Core
 
             rb.interpolation = IsClient ? RigidbodyInterpolation.Extrapolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+
+            StartCoroutine(ShowRenderers());
+        }
+
+        private IEnumerator ShowRenderers()
+        {
+            yield return new WaitForFixedUpdate();
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = false;
+            }
         }
 
         private bool nearbyWhooshPlayed;

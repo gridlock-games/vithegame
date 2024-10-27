@@ -8,7 +8,6 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
-using static Vi.Player.PlayerMovementHandler;
 
 namespace Vi.Player
 {

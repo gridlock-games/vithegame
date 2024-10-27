@@ -119,7 +119,7 @@ namespace Vi.Core
                 {
                     PooledObject projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
                         GetProjectileSpawnRotation());
-                    
+
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
                     netObj.Spawn(true);
                     lastProjectileSpawnTime = Time.time;
