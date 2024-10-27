@@ -19,6 +19,8 @@ namespace Vi.UI
         [SerializeField] private Text purchaseErrorText;
         [SerializeField] private Selectable[] selectablesThatRespondToPurchaseRpc;
 
+        private List<ShopKeeperItem> shopKeeperItemInstances = new List<ShopKeeperItem>();
+
         private GameObject invoker;
         public override void Interact(GameObject invoker)
         {
@@ -28,26 +30,16 @@ namespace Vi.UI
 
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
-                // If this weapon option is in our inventory, continue
-                if (WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
-                GameObject g = Instantiate(shopKeeperItemPrefab.gameObject, weaponParent);
-                g.GetComponent<ShopKeeperItem>().InitializeAsWeapon(weaponOption);
-
-                string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
-                string itemId = weaponOption.itemWebId;
-                g.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                // If this weapon option is in our inventory, make it inactive in the UI
+                bool isInInventory = WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId);
+                shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
 
             foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
             {
-                // If this armor option is in our inventory, continue
-                if (WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == wearableEquipmentOption.itemWebId)) { continue; }
-                GameObject g = Instantiate(shopKeeperItemPrefab.gameObject, armorParent);
-                g.GetComponent<ShopKeeperItem>().InitializeAsArmor(wearableEquipmentOption);
-
-                string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
-                string itemId = wearableEquipmentOption.itemWebId;
-                g.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                // If this armor option is in our inventory, make it inactive in the UI
+                bool isInInventory = WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == wearableEquipmentOption.itemWebId);
+                shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
         }
 
@@ -63,21 +55,20 @@ namespace Vi.UI
         }
 
         [Rpc(SendTo.Server)]
-        private void PurchaseServerRpc(ulong clientId, string characterId, string itemId)
+        private void PurchaseServerRpc(ulong purchaserClientId, string characterId, string itemId)
         {
-            StartCoroutine(PurchaseOnServer(clientId, characterId, itemId));
+            StartCoroutine(PurchaseOnServer(purchaserClientId, characterId, itemId));
         }
 
-        private IEnumerator PurchaseOnServer(ulong clientId, string characterId, string itemId)
+        private IEnumerator PurchaseOnServer(ulong purchaserClientId, string characterId, string itemId)
         {
-            Debug.Log("Purchasing item " + itemId + " for char " + characterId);
             yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
             yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
-            PurchaseClientRpc(true, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            PurchaseClientRpc(true, characterId);
         }
 
-        [Rpc(SendTo.SpecifiedInParams)]
-        private void PurchaseClientRpc(bool purchaseSuccessful, RpcParams rpcParams)
+        [Rpc(SendTo.NotServer)]
+        private void PurchaseClientRpc(bool purchaseSuccessful, string characterId)
         {
             waitingForPurchase = false;
             if (purchaseSuccessful)
@@ -88,6 +79,7 @@ namespace Vi.UI
             {
                 purchaseErrorText.text = "There was a problem.";
             }
+            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
         }
 
         public void OnPause()
@@ -105,16 +97,6 @@ namespace Vi.UI
             invoker = null;
             UICanvas.gameObject.SetActive(false);
             waitingForPurchase = false;
-
-            foreach (Transform child in armorParent)
-            {
-                Destroy(child.gameObject);
-            }
-
-            foreach (Transform child in weaponParent)
-            {
-                Destroy(child.gameObject);
-            }
         }
 
         private bool localPlayerInRange;
@@ -132,6 +114,35 @@ namespace Vi.UI
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
                 if (networkCollider.CombatAgent.IsLocalPlayer) { localPlayerInRange = false; }
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (IsClient)
+            {
+                foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
+                {
+                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, weaponParent).GetComponent<ShopKeeperItem>();
+                    shopKeeperItemInstances.Add(shopKeeperItem);
+                    shopKeeperItem.InitializeAsWeapon(weaponOption);
+
+                    string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+                    string itemId = weaponOption.itemWebId;
+                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                }
+
+                foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
+                {
+                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, armorParent).GetComponent<ShopKeeperItem>();
+                    shopKeeperItemInstances.Add(shopKeeperItem);
+                    shopKeeperItem.InitializeAsArmor(wearableEquipmentOption);
+
+                    string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+                    string itemId = wearableEquipmentOption.itemWebId;
+                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                }
             }
         }
 
@@ -176,6 +187,14 @@ namespace Vi.UI
             foreach (Selectable selectable in selectablesThatRespondToPurchaseRpc)
             {
                 selectable.interactable = !waitingForPurchase;
+            }
+
+            foreach (ShopKeeperItem shopKeeperItem in shopKeeperItemInstances)
+            {
+                foreach (Selectable selectable in shopKeeperItem.Selectables)
+                {
+                    selectable.interactable = !waitingForPurchase;
+                }
             }
         }
     }

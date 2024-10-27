@@ -919,7 +919,6 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
             }
 
-            Debug.Log(postRequest.downloadHandler.text);
             postRequest.Dispose();
         }
 
@@ -1543,6 +1542,24 @@ namespace Vi.Core
                     { CharacterReference.EquipmentType.Gloves, glovesGearItemId },
                     { CharacterReference.EquipmentType.Cape, capeGearItemId },
                     { CharacterReference.EquipmentType.Robe, robeGearItemId }
+                };
+            }
+
+            public string[] GetLoadoutItemIDsAsArray()
+            {
+                return new string[]
+                {
+                    helmGearItemId.ToString(),
+                    chestArmorGearItemId.ToString(),
+                    shouldersGearItemId.ToString(),
+                    bootsGearItemId.ToString(),
+                    pantsGearItemId.ToString(),
+                    beltGearItemId.ToString(),
+                    glovesGearItemId.ToString(),
+                    capeGearItemId.ToString(),
+                    robeGearItemId.ToString(),
+                    weapon1ItemId.ToString(),
+                    weapon2ItemId.ToString()
                 };
             }
 
