@@ -7,6 +7,7 @@ using Vi.Utility;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -111,6 +112,8 @@ namespace Vi.Core
         private bool nearbyWhooshPlayed;
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
             if (IsClient)
             {
                 if (whooshNearbySound.Length > 0)
@@ -133,7 +136,7 @@ namespace Vi.Core
 
             if (!IsServer) { return; }
 
-            if (Vector3.Distance(transform.position, startPosition) > killDistance)
+            if (Vector3.Distance(transform.position, startPosition) > killDistance | GameModeManager.Singleton.ShouldDisplayNextGameAction())
             {
                 if (IsSpawned)
                 {

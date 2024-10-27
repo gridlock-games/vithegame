@@ -117,8 +117,8 @@ namespace Vi.Core
             {
                 if (Time.time - lastProjectileSpawnTime > parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed))
                 {
-                    PooledObject projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
-                        GetProjectileSpawnRotation());
+                    Projectile projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
+                        GetProjectileSpawnRotation()).GetComponent<Projectile>();
 
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
                     netObj.Spawn(true);
@@ -127,14 +127,14 @@ namespace Vi.Core
                     if (shouldUseAmmo)
                     {
                         int damageMultiplerIndex = parentCombatAgent.WeaponHandler.GetMaxAmmoCount() - parentCombatAgent.WeaponHandler.GetAmmoCount();
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce,
+                        projectileInstance.Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce,
                             ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1);
 
                         parentCombatAgent.WeaponHandler.UseAmmo();
                     }
                     else
                     {
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce, 1);
+                        projectileInstance.Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce, 1);
                     }
                     //StartCoroutine(SetProjectileNetworkVisibility(netObj));
                 }
