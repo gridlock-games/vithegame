@@ -80,6 +80,7 @@ namespace Vi.Core
             {
                 if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
                 RaycastHit hit = projectileRotationRaycastingResults[i];
+                if (Mathf.Abs(hit.normal.y) >= 0.9f) { continue; }
                 if (hit.transform.root == parentCombatAgent.WeaponHandler.transform.root) { continue; }
                 if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
