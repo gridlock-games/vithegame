@@ -25,7 +25,6 @@ namespace Vi.Core.VFX
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
 
-        private ParticleSystem[] particleSystems = new ParticleSystem[0];
         private new void Awake()
         {
             base.Awake();
@@ -33,7 +32,6 @@ namespace Vi.Core.VFX
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
-                particleSystems = GetComponentsInChildren<ParticleSystem>();
                 foreach (ParticleSystem ps in particleSystems)
                 {
                     if (ps.trigger.enabled)

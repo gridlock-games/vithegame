@@ -7,8 +7,6 @@ namespace Vi.Utility
 {
     public class NetworkPhysicsSimulation : MonoBehaviour
     {
-        private static List<Rigidbody> activeRigidbodies = new List<Rigidbody>();
-
         private struct RigidbodyData
         {
             private Rigidbody rb;
@@ -38,6 +36,7 @@ namespace Vi.Utility
             }
         }
 
+        private static List<Rigidbody> activeRigidbodies = new List<Rigidbody>();
         public static void AddRigidbody(Rigidbody rb)
         {
             if (activeRigidbodies.Contains(rb))
@@ -71,6 +70,12 @@ namespace Vi.Utility
                 }
             }
 
+            List<ParticleSystemData> particleSystemDataBeforeSimulation = new List<ParticleSystemData>();
+            foreach (ParticleSystem ps in activeParticleSystems)
+            {
+                particleSystemDataBeforeSimulation.Add(new ParticleSystemData(ps));
+            }
+
             if (changeSimulationMode) { Physics.simulationMode = SimulationMode.Script; }
             Physics.Simulate(Time.fixedDeltaTime);
             if (changeSimulationMode) { Physics.simulationMode = SimulationMode.FixedUpdate; }
@@ -78,6 +83,49 @@ namespace Vi.Utility
             foreach (RigidbodyData rigidbodyData in rigidbodyDataBeforeSimulation)
             {
                 rigidbodyData.ApplyDataToBody();
+            }
+
+            foreach (ParticleSystemData particleSystemData in particleSystemDataBeforeSimulation)
+            {
+                particleSystemData.ApplyDataToParticleSystem();
+            }
+        }
+
+        private struct ParticleSystemData
+        {
+            public ParticleSystem ps;
+            public float time;
+
+            public ParticleSystemData(ParticleSystem particleSystem)
+            {
+                ps = particleSystem;
+                time = particleSystem.time;
+            }
+
+            public void ApplyDataToParticleSystem()
+            {
+                ps.time = time;
+            }
+        }
+
+        private static List<ParticleSystem> activeParticleSystems = new List<ParticleSystem>();
+        public static void AddParticleSystem(ParticleSystem ps)
+        {
+            if (activeParticleSystems.Contains(ps))
+            {
+                Debug.LogWarning("Trying to add a particle system " + ps.name + " but it is already present in list");
+            }
+            else
+            {
+                activeParticleSystems.Add(ps);
+            }
+        }
+
+        public static void RemoveParticleSystem(ParticleSystem ps)
+        {
+            if (!activeParticleSystems.Remove(ps))
+            {
+                Debug.LogWarning("Trying to remove a particle system " + ps.name + " but it is not present in list");
             }
         }
     }
