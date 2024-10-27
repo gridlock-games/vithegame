@@ -60,6 +60,7 @@ namespace Vi.Core
 
         public override void ResetHitCounter()
         {
+            base.ResetHitCounter();
             projectileSpawnCount = 0;
             lastProjectileSpawnTime = Mathf.NegativeInfinity;
         }
