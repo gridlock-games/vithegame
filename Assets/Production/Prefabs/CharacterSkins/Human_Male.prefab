@@ -2504,6 +2504,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4297880717048736934}
+    - targetCorrespondingSourceObject: {fileID: 5367195894158875762, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5747082373659534400}
     - targetCorrespondingSourceObject: {fileID: 5485912289612397900, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       insertIndex: -1
@@ -2528,6 +2532,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4117110047918177404}
+    - targetCorrespondingSourceObject: {fileID: -7322360762355356352, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4567153459499488238}
     - targetCorrespondingSourceObject: {fileID: 3728003990371410725, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       insertIndex: -1
@@ -2721,6 +2729,23 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &5747082373659534400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239084154063075790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  size: {x: 0.075, y: 0.001, z: 0.4}
+  direction: 0
+  radiusSeparation: 0
+  alignedOnCenter: 0
 --- !u!1 &363834817371379952 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5485912289612397900, guid: b8e1729aa66c4542b0dfb77c151371ff,
@@ -3778,6 +3803,23 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &4567153459499488238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6002390456712825084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0.3, y: 0, z: 0}
+  size: {x: 0.075, y: 0.001, z: 0.4}
+  direction: 0
+  radiusSeparation: 0
+  alignedOnCenter: 0
 --- !u!1 &6298981320203939572 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2181716792082123592, guid: b8e1729aa66c4542b0dfb77c151371ff,

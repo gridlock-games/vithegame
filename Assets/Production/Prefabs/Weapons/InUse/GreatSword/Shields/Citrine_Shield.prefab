@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -2139034630885355068}
   - component: {fileID: 8938107322807556597}
   - component: {fileID: 6868807613564413644}
+  - component: {fileID: 5356625748075252165}
   m_Layer: 6
   m_Name: Citrine_Shield
   m_TagString: Untagged
@@ -69,6 +70,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 1
   dropWeaponPrefab: {fileID: 607646315254580230, guid: af3e973e7fccfca4f86652ea95b819ce,
     type: 3}
   weaponTrailVFX: {fileID: 0}
@@ -87,6 +89,23 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 155
   isPrewarmObject: 1
+--- !u!114 &5356625748075252165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5275617305407401058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0.075, y: 0, z: 0}
+  size: {x: 0.25, y: 0.001, z: 1}
+  direction: 1
+  radiusSeparation: 0
+  alignedOnCenter: 1
 --- !u!1001 &1419958511574671185
 PrefabInstance:
   m_ObjectHideFlags: 0

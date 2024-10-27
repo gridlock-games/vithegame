@@ -139,6 +139,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8938107322807556597}
+    - targetCorrespondingSourceObject: {fileID: 6408962593607273158, guid: db0a7040c757dec4c80d62a6a180e4da,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9204776048658711641}
   m_SourcePrefab: {fileID: 100100000, guid: db0a7040c757dec4c80d62a6a180e4da, type: 3}
 --- !u!1 &5275617305407401058 stripped
 GameObject:
@@ -195,6 +199,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 1
   dropWeaponPrefab: {fileID: 9118392115649297814, guid: 5fba720f9b8320343b8f2a57d45e74e5,
     type: 3}
   weaponTrailVFX: {fileID: 0}
+--- !u!114 &9204776048658711641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5275617305407401058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0.075, y: 0, z: 0}
+  size: {x: 0.25, y: 0.001, z: 1}
+  direction: 1
+  radiusSeparation: 0
+  alignedOnCenter: 1
