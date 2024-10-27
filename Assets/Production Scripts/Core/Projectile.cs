@@ -166,15 +166,21 @@ namespace Vi.Core
                 if (other.isTrigger) { return; }
                 if (networkCollider.CombatAgent == attacker) { return; }
 
-                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), networkCollider.MovementHandler.GetPosition()) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
+
+                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack,
+                    other.ClosestPointOnBounds(transform.position), hitSourcePos, damageMultiplier);
                 if (!hitSuccess) { return; }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                if ((Object)hittable == attacker) { return; }
+                if (other.transform.root == attacker) { return; }
+
+                Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), other.transform.position) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position),
+                    hitSourcePos, damageMultiplier);
             }
             else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
             {
