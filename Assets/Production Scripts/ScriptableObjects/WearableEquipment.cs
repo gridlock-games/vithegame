@@ -78,20 +78,25 @@ namespace Vi.ScriptableObjects
                     sdata.colliderCollisionConstraint.colliderList.AddRange(animator.GetComponentsInChildren<ColliderComponent>());
                     magicaCloth.SetParameterChange();
 
-                    foreach (Transform potentialBone in animator.GetComponentsInChildren<Transform>())
+                    List<Transform> bonesReservedForClothSimulation = new List<Transform>();
+                    foreach (Transform rootBone in magicaCloth.SerializeData.rootBones)
                     {
-                        bool shouldSkip = false;
-                        foreach (KeyValuePair<Transform, Transform> kvp in boneMapToFollow)
+                        bonesReservedForClothSimulation.AddRange(rootBone.GetComponentsInChildren<Transform>());
+                    }
+
+                    for (int i = 0; i < srenderer.bones.Length; i++)
+                    {
+                        Transform clothBone = srenderer.bones[i];
+                        if (boneMap.TryGetValue(clothBone.name, out Transform animatorBone))
                         {
-                            if (kvp.Key.name == potentialBone.name) { shouldSkip = true; break; }
+                            if (!bonesReservedForClothSimulation.Contains(clothBone))
+                            {
+                                boneMapToFollow.Add(animatorBone, clothBone);
+                            }
                         }
-
-                        if (shouldSkip) { break; }
-
-                        Transform boneToMap = System.Array.Find(srenderer.bones, item => item.name == potentialBone.name);
-                        if (boneToMap)
+                        else if (Application.isEditor & shouldDebugWarnings)
                         {
-                            boneMapToFollow.Add(potentialBone, boneToMap);
+                            Debug.LogWarning(name + " Unable to map bone \"" + clothBone.name + "\" to target skeleton.");
                         }
                     }
                     srenderer.updateWhenOffscreen = networkObject ? networkObject.IsLocalPlayer : true;
@@ -99,11 +104,9 @@ namespace Vi.ScriptableObjects
                 else // If this is not a cloth
                 {
                     Transform[] newBones = new Transform[srenderer.bones.Length];
-
                     for (int i = 0; i < srenderer.bones.Length; ++i)
                     {
-                        GameObject bone = srenderer.bones[i].gameObject;
-
+                        Transform bone = srenderer.bones[i];
                         if (!boneMap.TryGetValue(bone.name, out newBones[i]))
                         {
                             if (Application.isEditor & shouldDebugWarnings) { Debug.LogWarning(name + " Unable to map bone \"" + bone.name + "\" to target skeleton."); }
