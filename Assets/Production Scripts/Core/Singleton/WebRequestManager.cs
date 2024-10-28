@@ -894,6 +894,7 @@ namespace Vi.Core
             }
         }
 
+        public bool InventoryAddWasSuccessful { get; private set; }
         public IEnumerator AddItemToInventory(string charId, string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) { Debug.LogWarning("You are trying to add an item to a character's inventory that has an id of null or whitespace"); yield break; }
@@ -914,9 +915,11 @@ namespace Vi.Core
                 yield return postRequest.SendWebRequest();
             }
 
+            InventoryAddWasSuccessful = true;
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
+                InventoryAddWasSuccessful = false;
             }
 
             postRequest.Dispose();

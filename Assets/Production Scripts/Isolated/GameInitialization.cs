@@ -57,7 +57,8 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 6); }
+            FasterPlayerPrefs.Singleton.SetInt("Tokens", 6);
+            //if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 6); }
             //if (!FasterPlayerPrefs.Singleton.HasString("LastLoginTime")) { FasterPlayerPrefs.Singleton.SetString("LastLoginTime", System.DateTime.UtcNow.ToString()); }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }

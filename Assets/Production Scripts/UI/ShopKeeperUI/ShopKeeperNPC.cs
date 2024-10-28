@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -17,6 +18,7 @@ namespace Vi.UI
         [SerializeField] private Transform armorParent;
         [SerializeField] private Transform weaponParent;
         [SerializeField] private Text purchaseErrorText;
+        [SerializeField] private Text currencyCountText;
         [SerializeField] private Selectable[] selectablesThatRespondToPurchaseRpc;
 
         private List<ShopKeeperItem> shopKeeperItemInstances = new List<ShopKeeperItem>();
@@ -26,6 +28,7 @@ namespace Vi.UI
         {
             this.invoker = invoker;
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
+            currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
             UICanvas.gameObject.SetActive(true);
 
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
@@ -45,41 +48,50 @@ namespace Vi.UI
 
         private bool waitingForPurchase;
 
-        private void Purchase(string characterId, string itemId)
+        private void Purchase(string itemId, int price)
         {
             if (!IsClient) { Debug.LogError("Calling Purchase() while not being a client!"); return; }
 
+            if (FasterPlayerPrefs.Singleton.GetInt("Tokens") < price)
+            {
+                purchaseErrorText.text = "Not Enough Vi Essence!";
+                return;
+            }
+
             waitingForPurchase = true;
             purchaseErrorText.text = "Approving Purchase...";
-            PurchaseServerRpc(NetworkManager.LocalClientId, characterId, itemId);
+            PurchaseServerRpc(NetworkManager.LocalClientId, PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), itemId, price);
         }
 
         [Rpc(SendTo.Server)]
-        private void PurchaseServerRpc(ulong purchaserClientId, string characterId, string itemId)
+        private void PurchaseServerRpc(ulong purchaserClientId, string characterId, string itemId, int price)
         {
-            StartCoroutine(PurchaseOnServer(purchaserClientId, characterId, itemId));
+            StartCoroutine(PurchaseOnServer(purchaserClientId, characterId, itemId, price));
         }
 
-        private IEnumerator PurchaseOnServer(ulong purchaserClientId, string characterId, string itemId)
+        private IEnumerator PurchaseOnServer(ulong purchaserClientId, string characterId, string itemId, int price)
         {
             yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
-            yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
-            PurchaseClientRpc(true, characterId);
+            bool success = WebRequestManager.Singleton.InventoryAddWasSuccessful;
+            if (success) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
+            PurchaseClientRpc(success, characterId, price);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void PurchaseClientRpc(bool purchaseSuccessful, string characterId)
+        private void PurchaseClientRpc(bool purchaseSuccessful, string characterId, int price)
         {
             waitingForPurchase = false;
             if (purchaseSuccessful)
             {
                 purchaseErrorText.text = "Purchase successful!";
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
+                FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") - price);
+                currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
             }
             else
             {
                 purchaseErrorText.text = "There was a problem.";
             }
-            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
         }
 
         public void OnPause()
@@ -128,9 +140,8 @@ namespace Vi.UI
                     shopKeeperItemInstances.Add(shopKeeperItem);
                     shopKeeperItem.InitializeAsWeapon(weaponOption);
 
-                    string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
                     string itemId = weaponOption.itemWebId;
-                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(itemId, shopKeeperItem.Price));
                 }
 
                 foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
@@ -139,9 +150,8 @@ namespace Vi.UI
                     shopKeeperItemInstances.Add(shopKeeperItem);
                     shopKeeperItem.InitializeAsArmor(wearableEquipmentOption);
 
-                    string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
                     string itemId = wearableEquipmentOption.itemWebId;
-                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(characterId, itemId));
+                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(itemId, shopKeeperItem.Price));
                 }
             }
         }
