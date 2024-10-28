@@ -8,6 +8,7 @@ namespace Vi.Core
     {
         [SerializeField] private bool followWhileAiming = true;
         [SerializeField] private Weapon.WeaponBone weaponBoneToFollow;
+        [SerializeField] private ChildWeaponBone[] childWeaponBones;
 
         private Vector3 originalLocalPosition;
         private Quaternion originalLocalRotation;
@@ -43,6 +44,9 @@ namespace Vi.Core
             return (value - minValue) / (maxValue - minValue);
         }
 
+        private Vector3 TargetPosition { get { return target ? target.position + target.rotation * positionOffset : Vector3.zero; } }
+        [SerializeField] private Vector3 positionOffset;
+
         private void LateUpdate()
         {
             if (!combatAgent) { return; }
@@ -61,15 +65,28 @@ namespace Vi.Core
                     {
                         if (weight >= maxRigWeight)
                         {
-                            transform.position = target.position;
+                            transform.position = TargetPosition;
+                            foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                            {
+                                childWeaponBone.Lerp(true, 1);
+                            }
                         }
                         else if (weight > minRigWeight)
                         {
-                            transform.position = Vector3.Lerp(transform.position, target.position, NormalizeValue(weight));
+                            float t = NormalizeValue(weight);
+                            transform.position = Vector3.Lerp(transform.position, TargetPosition, t);
+                            foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                            {
+                                childWeaponBone.Lerp(true, t);
+                            }
                         }
                         else
                         {
                             transform.localPosition = originalLocalPosition;
+                            foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                            {
+                                childWeaponBone.Lerp(false, 1);
+                            }
                         }
                         isAiming = true;
                     }
@@ -79,26 +96,43 @@ namespace Vi.Core
                 {
                     if (weight >= maxRigWeight)
                     {
-                        transform.position = target.position;
+                        transform.position = TargetPosition;
+                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                        {
+                            childWeaponBone.Lerp(true, 1);
+                        }
                     }
                     else if (weight > minRigWeight)
                     {
-                        transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, 1 - NormalizeValue(weight));
+                        float t = 1 - NormalizeValue(weight);
+                        transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, t);
+                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                        {
+                            childWeaponBone.Lerp(false, t);
+                        }
                     }
                     else
                     {
                         transform.localPosition = originalLocalPosition;
+                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                        {
+                            childWeaponBone.Lerp(false, 1);
+                        }
                     }
                 }
                 evaluated = true;
             }
             else
             {
-                transform.position = target.position;
+                foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                {
+                    childWeaponBone.Lerp(true, 1);
+                }
+                transform.position = TargetPosition;
                 evaluated = true;
             }
             
-            if (!evaluated) { transform.position = target.position; }
+            if (!evaluated) { transform.position = TargetPosition; }
         }
     }
 }

@@ -60,7 +60,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7109037, y: -0, z: -0, w: 0.70328945}
   m_LocalPosition: {x: 0, y: 0.08730882, z: 0.08637399}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3485536206510866851}
@@ -81,6 +81,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponMaterial: 0
   collidesWithClothWhileStowed: 0
+  weaponBoneFollowTargets: []
   dropWeaponPrefab: {fileID: 7112369087395922072, guid: 1987286a0437232429a430686a61fab2,
     type: 3}
   canADS: 1
@@ -240,6 +241,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 7558423578869861257, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 8035947316402702571, guid: f31c17f4f4bb4da48b540b60ec7627bb,
         type: 3}
       propertyPath: m_Layer
@@ -249,7 +255,19 @@ PrefabInstance:
     - {fileID: 4690395442519832675, guid: f31c17f4f4bb4da48b540b60ec7627bb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 364319842269841736, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8299487479905344958}
+    - targetCorrespondingSourceObject: {fileID: 4392862144606172569, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5266983342775065941}
+    - targetCorrespondingSourceObject: {fileID: 1171344718966177318, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3887120940598466795}
   m_SourcePrefab: {fileID: 100100000, guid: f31c17f4f4bb4da48b540b60ec7627bb, type: 3}
 --- !u!4 &3485536206510866851 stripped
 Transform:
@@ -257,3 +275,65 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8557406669295574569}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5347057942051498928 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4392862144606172569, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+    type: 3}
+  m_PrefabInstance: {fileID: 8557406669295574569}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5266983342775065941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5347057942051498928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe0e311ea1804e4f8ad4af29bd5177d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLocalRotation: {x: -30, y: 0, z: 0}
+--- !u!1 &7386879574999162895 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1171344718966177318, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+    type: 3}
+  m_PrefabInstance: {fileID: 8557406669295574569}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3887120940598466795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7386879574999162895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 322f796dfe33194469a29caa83ee8ee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followWhileAiming: 1
+  weaponBoneToFollow: 18
+  childWeaponBones:
+  - {fileID: 8299487479905344958}
+  - {fileID: 5266983342775065941}
+  positionOffset: {x: 0, y: 0, z: 0.1}
+--- !u!1 &8344139805096220513 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 364319842269841736, guid: f31c17f4f4bb4da48b540b60ec7627bb,
+    type: 3}
+  m_PrefabInstance: {fileID: 8557406669295574569}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8299487479905344958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344139805096220513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe0e311ea1804e4f8ad4af29bd5177d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLocalRotation: {x: 30, y: 0, z: 0}
