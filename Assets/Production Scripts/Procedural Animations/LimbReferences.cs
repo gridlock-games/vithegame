@@ -207,8 +207,20 @@ namespace Vi.ProceduralAnimations
 
         private Dictionary<Weapon.WeaponBone, Transform> weaponBoneMapping = new Dictionary<Weapon.WeaponBone, Transform>();
 
-        public RigWeightTarget GetRightHandReachRig() { return rightHandReachRig; }
-        public RigWeightTarget GetLeftHandReachRig() { return leftHandReachRig; }
+        public RigWeightTarget GetAimRigByHand(LimbReferences.Hand hand)
+        {
+            switch (hand)
+            {
+                case Hand.LeftHand:
+                    return leftHandAimRig;
+                case Hand.RightHand:
+                    return rightHandAimRig;
+                default:
+                    Debug.LogError("Unsure how to handle hand for GetAimRigWeight()" + hand);
+                    break;
+            }
+            return null;
+        }
 
         [Header("IK Settings")]
         public AimTargetIKSolver aimTargetIKSolver;

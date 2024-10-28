@@ -11,6 +11,7 @@ namespace Vi.Core
     {
         [SerializeField] private Weapon.WeaponMaterial weaponMaterial;
         [SerializeField] private bool collidesWithClothWhileStowed = true;
+        [SerializeField] private WeaponBoneFollowTarget[] weaponBoneFollowTargets;
 
         public Weapon.WeaponMaterial GetWeaponMaterial() { return weaponMaterial; }
 
@@ -196,6 +197,11 @@ namespace Vi.Core
                 renderer.gameObject.layer = LayerMask.NameToLayer(parentCombatAgent.IsSpawned ? "NetworkPrediction" : "Preview");
             }
             StartCoroutine(EnableRenderersAfterOneFrame());
+
+            foreach (WeaponBoneFollowTarget weaponBoneFollowTarget in weaponBoneFollowTargets)
+            {
+                weaponBoneFollowTarget.Initialize(parentCombatAgent);
+            }
 
             if (TryGetComponent(out MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider))
             {
