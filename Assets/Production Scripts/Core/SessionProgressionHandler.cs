@@ -160,7 +160,7 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             experience.OnValueChanged -= OnExperienceChanged;
-            if (IsLocalPlayer)
+            if (IsLocalPlayer & GameModeManager.Singleton)
             {
                 if (GameModeManager.Singleton.LevelingEnabled)
                 {
