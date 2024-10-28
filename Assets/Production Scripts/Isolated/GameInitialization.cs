@@ -57,7 +57,7 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 10); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 5); }
 
             if (FasterPlayerPrefs.Singleton.HasString("LastLoginTime"))
             {
@@ -65,7 +65,7 @@ namespace Vi.Core
                 {
                     if (lastLoginTime.Day != System.DateTime.UtcNow.Day)
                     {
-                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + 10);
+                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + 5);
                     }
                 }
                 else
