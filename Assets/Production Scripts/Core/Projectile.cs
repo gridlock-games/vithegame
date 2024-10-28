@@ -7,6 +7,7 @@ using Vi.Utility;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Core
 {
@@ -50,9 +51,11 @@ namespace Vi.Core
         }
 
         private Rigidbody rb;
+        private Renderer[] renderers;
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            renderers = GetComponentsInChildren<Renderer>();
         }
 
         private Vector3 startPosition;
@@ -60,6 +63,11 @@ namespace Vi.Core
         private void OnEnable()
         {
             startPosition = transform.position;
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = true;
+            }
 
             if (!pooledObject) { pooledObject = GetComponent<PooledObject>(); }
 
@@ -88,11 +96,24 @@ namespace Vi.Core
 
             rb.interpolation = IsClient ? RigidbodyInterpolation.Extrapolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
+
+            StartCoroutine(ShowRenderers());
+        }
+
+        private IEnumerator ShowRenderers()
+        {
+            yield return new WaitForFixedUpdate();
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.forceRenderingOff = false;
+            }
         }
 
         private bool nearbyWhooshPlayed;
         private void Update()
         {
+            if (!IsSpawned) { return; }
+
             if (IsClient)
             {
                 if (whooshNearbySound.Length > 0)
@@ -115,7 +136,7 @@ namespace Vi.Core
 
             if (!IsServer) { return; }
 
-            if (Vector3.Distance(transform.position, startPosition) > killDistance)
+            if (Vector3.Distance(transform.position, startPosition) > killDistance | GameModeManager.Singleton.ShouldDisplayNextGameAction())
             {
                 if (IsSpawned)
                 {
@@ -145,15 +166,21 @@ namespace Vi.Core
                 if (other.isTrigger) { return; }
                 if (networkCollider.CombatAgent == attacker) { return; }
 
-                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), networkCollider.MovementHandler.GetPosition()) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
+
+                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack,
+                    other.ClosestPointOnBounds(transform.position), hitSourcePos, damageMultiplier);
                 if (!hitSuccess) { return; }
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                if ((Object)hittable == attacker) { return; }
+                if (other.transform.root == attacker) { return; }
+
+                Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), other.transform.position) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce * 5, damageMultiplier);
+                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position),
+                    hitSourcePos, damageMultiplier);
             }
             else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))
             {

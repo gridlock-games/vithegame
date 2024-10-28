@@ -60,6 +60,7 @@ namespace Vi.Core
 
         public override void ResetHitCounter()
         {
+            base.ResetHitCounter();
             projectileSpawnCount = 0;
             lastProjectileSpawnTime = Mathf.NegativeInfinity;
         }
@@ -79,6 +80,7 @@ namespace Vi.Core
             {
                 if (projectileRotationRaycastingResults[i].distance > minDistance & minDistanceInitialized) { continue; }
                 RaycastHit hit = projectileRotationRaycastingResults[i];
+                if (Mathf.Abs(hit.normal.y) >= 0.9f) { continue; }
                 if (hit.transform.root == parentCombatAgent.WeaponHandler.transform.root) { continue; }
                 if (hit.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
@@ -117,9 +119,9 @@ namespace Vi.Core
             {
                 if (Time.time - lastProjectileSpawnTime > parentCombatAgent.WeaponHandler.CurrentActionClip.GetTimeBetweenHits(parentCombatAgent.AnimationHandler.Animator.speed))
                 {
-                    PooledObject projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
-                        GetProjectileSpawnRotation());
-                    
+                    Projectile projectileInstance = ObjectPoolingManager.SpawnObject(projectile.GetComponent<PooledObject>(), projectileSpawnPoint.transform.position,
+                        GetProjectileSpawnRotation()).GetComponent<Projectile>();
+
                     NetworkObject netObj = projectileInstance.GetComponent<NetworkObject>();
                     netObj.Spawn(true);
                     lastProjectileSpawnTime = Time.time;
@@ -127,14 +129,14 @@ namespace Vi.Core
                     if (shouldUseAmmo)
                     {
                         int damageMultiplerIndex = parentCombatAgent.WeaponHandler.GetMaxAmmoCount() - parentCombatAgent.WeaponHandler.GetAmmoCount();
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce,
+                        projectileInstance.Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce,
                             ammoCountDamageMultipliers.Length > damageMultiplerIndex ? ammoCountDamageMultipliers[damageMultiplerIndex] : 1);
 
                         parentCombatAgent.WeaponHandler.UseAmmo();
                     }
                     else
                     {
-                        projectileInstance.GetComponent<Projectile>().Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce, 1);
+                        projectileInstance.Initialize(parentCombatAgent, this, parentCombatAgent.WeaponHandler.CurrentActionClip, projectileForce, 1);
                     }
                     //StartCoroutine(SetProjectileNetworkVisibility(netObj));
                 }

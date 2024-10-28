@@ -63,8 +63,11 @@ namespace Vi.ScriptableObjects
             "ProjectileCollider"
         };
 
+        protected ParticleSystem[] particleSystems { get { return _particleSystems; } }
+        private ParticleSystem[] _particleSystems = new ParticleSystem[0];
         protected virtual void Awake()
         {
+            _particleSystems = GetComponentsInChildren<ParticleSystem>();
             colliders = GetComponentsInChildren<Collider>();
         }
 
@@ -77,8 +80,9 @@ namespace Vi.ScriptableObjects
                 Debug.LogError("Action VFX " + name + " should not have an audio source component!");
             }
 #endif
-            foreach (ParticleSystem ps in GetComponentsInChildren<ParticleSystem>())
+            foreach (ParticleSystem ps in particleSystems)
             {
+                NetworkPhysicsSimulation.AddParticleSystem(ps);
                 ParticleSystem.MainModule main = ps.main;
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
             }
@@ -113,7 +117,7 @@ namespace Vi.ScriptableObjects
 
             bool componentFound = false;
 
-            ParticleSystem particleSystem = GetComponentInChildren<ParticleSystem>();
+            ParticleSystem particleSystem = particleSystems.Length > 0 ? particleSystems[0] : null;
             if (particleSystem)
             {
                 componentFound = true;
@@ -174,6 +178,11 @@ namespace Vi.ScriptableObjects
             if (TryGetComponent(out Rigidbody rb))
             {
                 NetworkPhysicsSimulation.RemoveRigidbody(rb);
+            }
+
+            foreach (ParticleSystem ps in particleSystems)
+            {
+                NetworkPhysicsSimulation.RemoveParticleSystem(ps);
             }
 
             if (pooledObject.IsPrewarmObject()) { return; }

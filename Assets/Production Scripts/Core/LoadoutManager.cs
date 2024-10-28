@@ -185,7 +185,25 @@ namespace Vi.Core
 
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
-            if (!string.IsNullOrWhiteSpace(characterId) & !WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId)) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
+            if (!string.IsNullOrWhiteSpace(characterId))
+            {
+                if (!WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId))
+                {
+                    yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
+                }
+                else if (IsSpawned) // When spawned, changes to a character's loadout may occur at runtime, therefore we need to refresh the character's inventory if an item doesn't exist on this instance
+                {
+                    foreach (string inventoryID in loadout.GetLoadoutItemIDsAsArray())
+                    {
+                        if (string.IsNullOrWhiteSpace(inventoryID)) { continue; }
+                        if (!WebRequestManager.Singleton.InventoryItems[characterId].Exists(item => item.id == inventoryID))
+                        {
+                            yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
+                        }
+                    }
+                }
+            }
+            
             if (WebRequestManager.Singleton.InventoryItems.ContainsKey(characterId))
             {
                 if (weaponOptions.TryGetValue(WebRequestManager.Singleton.InventoryItems[characterId].Find(item => item.id == loadout.weapon1ItemId.ToString()).itemId, out CharacterReference.WeaponOption weaponOption))

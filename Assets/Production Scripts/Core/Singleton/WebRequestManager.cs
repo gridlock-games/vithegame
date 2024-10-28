@@ -736,6 +736,25 @@ namespace Vi.Core
                 yield return GetCharacterInventory(character);
             }
 
+# if UNITY_EDITOR
+            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            foreach (Character character in Characters)
+            {
+                foreach (var weaponOption in weaponOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
+                    {
+                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+                    }
+                }
+            }
+
+            foreach (Character character in Characters)
+            {
+                yield return GetCharacterInventory(character);
+            }
+# endif
+
             IsRefreshingCharacters = false;
         }
 
@@ -894,7 +913,8 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator AddItemToInventory(string charId, string itemId)
+        public bool InventoryAddWasSuccessful { get; private set; }
+        public IEnumerator AddItemToInventory(string charId, string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) { Debug.LogWarning("You are trying to add an item to a character's inventory that has an id of null or whitespace"); yield break; }
 
@@ -914,9 +934,11 @@ namespace Vi.Core
                 yield return postRequest.SendWebRequest();
             }
 
+            InventoryAddWasSuccessful = true;
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
+                InventoryAddWasSuccessful = false;
             }
 
             postRequest.Dispose();
@@ -1150,10 +1172,10 @@ namespace Vi.Core
 
             return new Loadout("1",
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "NRangerBl").itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "Winterstalk").itemWebId,
                 "",
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots & item.groupName == "NRangerBl").itemWebId,
-                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants & item.groupName == "NRangerBl").itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Boots & item.groupName == "Winterstalk").itemWebId,
+                armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Pants & item.groupName == "Winterstalk").itemWebId,
                 "",
                 "",
                 "",
@@ -1542,6 +1564,24 @@ namespace Vi.Core
                     { CharacterReference.EquipmentType.Gloves, glovesGearItemId },
                     { CharacterReference.EquipmentType.Cape, capeGearItemId },
                     { CharacterReference.EquipmentType.Robe, robeGearItemId }
+                };
+            }
+
+            public string[] GetLoadoutItemIDsAsArray()
+            {
+                return new string[]
+                {
+                    helmGearItemId.ToString(),
+                    chestArmorGearItemId.ToString(),
+                    shouldersGearItemId.ToString(),
+                    bootsGearItemId.ToString(),
+                    pantsGearItemId.ToString(),
+                    beltGearItemId.ToString(),
+                    glovesGearItemId.ToString(),
+                    capeGearItemId.ToString(),
+                    robeGearItemId.ToString(),
+                    weapon1ItemId.ToString(),
+                    weapon2ItemId.ToString()
                 };
             }
 
@@ -3011,43 +3051,6 @@ namespace Vi.Core
         }
 #endif
 
-        public IEnumerator AddItemToCharacterInventory(string characterId, string itemId)
-        {
-            AddItemPayload payload = new AddItemPayload(characterId, itemId);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
-            }
-            postRequest.Dispose();
-        }
-
-        private struct AddItemPayload
-        {
-            public string charId;
-            public string itemId;
-
-            public AddItemPayload(string characterId, string itemId)
-            {
-                charId = characterId;
-                this.itemId = itemId;
-            }
-        }
-
         public void CheckGameVersion(bool force)
         {
             if (!force)
@@ -3164,7 +3167,7 @@ namespace Vi.Core
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Post request error in WebRequestManager.AddItemToCharacterInventory()" + postRequest.error);
+                Debug.LogError("Post request error in WebRequestManager.SetGameVersion()" + postRequest.error);
             }
             postRequest.Dispose();
         }
