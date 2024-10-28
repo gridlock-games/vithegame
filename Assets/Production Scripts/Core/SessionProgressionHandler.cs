@@ -160,6 +160,10 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             experience.OnValueChanged -= OnExperienceChanged;
+            if (IsLocalPlayer)
+            {
+                FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + essences.Value);
+            }
         }
 
         [SerializeField] private VisualEffect levelUpVisualEffect;

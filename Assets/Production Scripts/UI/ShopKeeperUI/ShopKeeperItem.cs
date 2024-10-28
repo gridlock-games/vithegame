@@ -11,6 +11,8 @@ namespace Vi.UI
         [SerializeField] private Text price;
         [SerializeField] private Image previewIcon;
 
+        public string ItemId { get; private set; }
+
         public bool IsWeapon { get; private set; }
         public CharacterReference.WeaponOption weaponOption { get; private set; }
 
@@ -27,6 +29,7 @@ namespace Vi.UI
 
             IsArmor = true;
             equipmentOption = wearableEquipmentOption;
+            ItemId = wearableEquipmentOption.itemWebId;
         }
 
         public void InitializeAsWeapon(CharacterReference.WeaponOption weaponOption)
@@ -38,6 +41,7 @@ namespace Vi.UI
 
             IsWeapon = true;
             this.weaponOption = weaponOption;
+            ItemId = weaponOption.itemWebId;
         }
 
         public Selectable[] Selectables { get { return _selectables; } }
