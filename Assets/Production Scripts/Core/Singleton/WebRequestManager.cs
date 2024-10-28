@@ -736,6 +736,25 @@ namespace Vi.Core
                 yield return GetCharacterInventory(character);
             }
 
+# if UNITY_EDITOR
+            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            foreach (Character character in Characters)
+            {
+                foreach (var weaponOption in weaponOptions)
+                {
+                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
+                    {
+                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+                    }
+                }
+            }
+
+            foreach (Character character in Characters)
+            {
+                yield return GetCharacterInventory(character);
+            }
+# endif
+
             IsRefreshingCharacters = false;
         }
 
