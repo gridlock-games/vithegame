@@ -633,6 +633,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2746140334173953837}
   - component: {fileID: 8993202996390418907}
+  - component: {fileID: 768816707382391555}
   m_Layer: 7
   m_Name: BodyAim
   m_TagString: Untagged
@@ -709,6 +710,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &768816707382391555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6815757448603594342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &6886078838938112736
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,6 +847,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1127060651906471199}
   - component: {fileID: 932263596438501880}
+  - component: {fileID: 4186586425900600630}
   m_Layer: 7
   m_Name: BodyAimInverted
   m_TagString: Untagged
@@ -908,6 +924,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &4186586425900600630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7821811630657201271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &8001678233543269005
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,6 +948,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5152742272552405283}
   - component: {fileID: 6072613722491190326}
+  - component: {fileID: 1164208008809468329}
   m_Layer: 7
   m_Name: BodyAim
   m_TagString: Untagged
@@ -994,6 +1025,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &1164208008809468329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8001678233543269005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &8093176122127455213
 GameObject:
   m_ObjectHideFlags: 0
@@ -1241,6 +1286,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9037108501454839706}
   - component: {fileID: 8733124273415831871}
+  - component: {fileID: 9142279083735411251}
   m_Layer: 7
   m_Name: BodyAimInverted
   m_TagString: Untagged
@@ -1317,6 +1363,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &9142279083735411251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9031330189650058605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &9138397249508481190
 GameObject:
   m_ObjectHideFlags: 0

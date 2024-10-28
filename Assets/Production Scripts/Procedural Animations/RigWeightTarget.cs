@@ -30,19 +30,10 @@ namespace Vi.ProceduralAnimations
 
         private void Update()
         {
-            if (rig.weight == weight) { return; }
+            if (Mathf.Approximately(rig.weight, weight)) { return; }
             if (instantWeight) { rig.weight = weight; return; }
 
             rig.weight = Mathf.MoveTowards(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
-
-            //if (Mathf.Abs(weight - rig.weight) > 0.1)
-            //{
-            //    rig.weight = Mathf.Lerp(rig.weight, weight, Time.deltaTime * weightSpeed * animator.speed);
-            //}
-            //else
-            //{
-            //    rig.weight = Mathf.MoveTowards(rig.weight, weight, Time.deltaTime * animator.speed);
-            //}
         }
     }
 }

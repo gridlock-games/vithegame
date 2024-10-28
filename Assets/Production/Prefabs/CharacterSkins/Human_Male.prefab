@@ -530,6 +530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6407885699880080341}
   - component: {fileID: 3477474448627293245}
+  - component: {fileID: 8000345553173227310}
   m_Layer: 7
   m_Name: BodyAimInverted
   m_TagString: Untagged
@@ -606,6 +607,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &8000345553173227310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4981088457378442295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &5111584371557588828
 GameObject:
   m_ObjectHideFlags: 0
@@ -843,6 +858,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4191043235150045147}
   - component: {fileID: 4938065748819157262}
+  - component: {fileID: 1420906847076997759}
   m_Layer: 7
   m_Name: BodyAim
   m_TagString: Untagged
@@ -919,6 +935,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &1420906847076997759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5657072440044671518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &6130389754326158802
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,6 +959,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3467199090638760808}
   - component: {fileID: 4244092407985975708}
+  - component: {fileID: 1677524022981470555}
   m_Layer: 7
   m_Name: BodyAimInverted
   m_TagString: Untagged
@@ -1005,6 +1036,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &1677524022981470555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6130389754326158802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &6286997185021477717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,6 +1273,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2719812158212590499}
   - component: {fileID: 6568028928760922200}
+  - component: {fileID: 1941426338219382624}
   m_Layer: 7
   m_Name: BodyAim
   m_TagString: Untagged
@@ -1304,6 +1350,20 @@ MonoBehaviour:
       x: 1
       y: 1
       z: 1
+--- !u!114 &1941426338219382624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8225954940631384199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e007c517413864fb346c7c3f687e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 0
+  instantWeight: 0
 --- !u!1 &8273419216658654953
 GameObject:
   m_ObjectHideFlags: 0
@@ -3717,8 +3777,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72d6a73e8d1fdd14d9c87270810811e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blinkFrequency: 1.5
-  blinkSpeed: 7
   blinkCurve:
     serializedVersion: 2
     m_Curve:
