@@ -24,8 +24,8 @@ namespace Vi.UI
         {
             previewIcon.sprite = wearableEquipmentOption.GetIcon(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender);
             itemName.text = wearableEquipmentOption.name;
-            price.text = "2";
-            Price = 2;
+            Price = 3;
+            price.text = Price.ToString();
 
             IsArmor = true;
             equipmentOption = wearableEquipmentOption;
@@ -36,8 +36,8 @@ namespace Vi.UI
         {
             previewIcon.sprite = weaponOption.weaponIcon;
             itemName.text = weaponOption.name;
-            price.text = "3";
-            Price = 3;
+            Price = 5;
+            price.text = Price.ToString();
 
             IsWeapon = true;
             this.weaponOption = weaponOption;
