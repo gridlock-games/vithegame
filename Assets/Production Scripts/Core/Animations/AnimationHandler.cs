@@ -1034,17 +1034,20 @@ namespace Vi.Core
             }
         }
 
+        private const float animationLayerWeightSpeed = 6;
         private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)
         {
             switch (avatarLayer)
             {
                 case ActionClip.AvatarLayer.FullBody:
-                    Animator.SetLayerWeight(actionsLayerIndex, 1);
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 0);
+                    Animator.SetLayerWeight(actionsLayerIndex, Mathf.Lerp(Animator.GetLayerWeight(actionsLayerIndex), 1, Time.deltaTime * animationLayerWeightSpeed));
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"),
+                        Mathf.Lerp(Animator.GetLayerWeight(Animator.GetLayerIndex("Aiming Actions")), 0, Time.deltaTime * animationLayerWeightSpeed));
                     break;
                 case ActionClip.AvatarLayer.Aiming:
-                    Animator.SetLayerWeight(actionsLayerIndex, 0);
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 1);
+                    Animator.SetLayerWeight(actionsLayerIndex, Mathf.Lerp(Animator.GetLayerWeight(actionsLayerIndex), 0, Time.deltaTime * animationLayerWeightSpeed));
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"),
+                        Mathf.Lerp(Animator.GetLayerWeight(Animator.GetLayerIndex("Aiming Actions")), 1, Time.deltaTime * animationLayerWeightSpeed));
                     break;
                 default:
                     Debug.LogError(avatarLayer + " has not been implemented yet!");
@@ -1358,6 +1361,14 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (IsAtRest())
+            {
+                UpdateAnimationLayerWeights(ActionClip.AvatarLayer.FullBody);
+            }
+            else
+            {
+                UpdateAnimationLayerWeights(lastClipPlayed.avatarLayer);
+            }
             RefreshAimPoint();
         }
 
