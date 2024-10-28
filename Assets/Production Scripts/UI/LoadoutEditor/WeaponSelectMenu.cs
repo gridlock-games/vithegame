@@ -16,20 +16,24 @@ namespace Vi.UI
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
         [SerializeField] private Image[] abilityImages;
         [SerializeField] private List<AbilityPreviewVideo> abilityPreviewVideos = new List<AbilityPreviewVideo>();
+        [SerializeField] private Light previewLightPrefab;
 
+        private GameObject weaponPreviewParent;
         private void Awake()
         {
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             {
                 data.OnDragEvent += OnCharPreviewDrag;
             }
+
+            weaponPreviewParent = new GameObject("WeaponPreviewParent");
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
         {
-            if (weaponPreviewObject)
+            if (weaponPreviewObject & weaponPreviewParent)
             {
-                //weaponPreviewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+                weaponPreviewParent.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
             }
         }
 
@@ -124,7 +128,21 @@ namespace Vi.UI
 
             if (weaponOption.weaponPreviewPrefab)
             {
-                weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab);
+                if (weaponOption.weaponPreviewPrefab.TryGetComponent(out PooledObject pooledObject))
+                {
+                    weaponPreviewObject = ObjectPoolingManager.SpawnObject(pooledObject, weaponPreviewParent.transform).gameObject;
+                }
+                else
+                {
+                    weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab, weaponPreviewParent.transform);
+                }
+
+                GameObject lightInstance = Instantiate(previewLightPrefab.gameObject);
+                lightInstance.transform.SetParent(weaponPreviewObject.transform, true);
+                lightInstance.transform.localPosition = new Vector3(0, 3, 4);
+                lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
+                lightInstance.transform.SetParent(null, true);
+
                 weaponPreviewCamera = weaponPreviewObject.GetComponentInChildren<Camera>();
                 if (weaponPreviewCamera)
                 {
@@ -228,6 +246,8 @@ namespace Vi.UI
         private Camera weaponPreviewCamera;
         private void OnDestroy()
         {
+            if (weaponPreviewParent) { Destroy(weaponPreviewParent); }
+            
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             {
                 data.OnDragEvent -= OnCharPreviewDrag;
