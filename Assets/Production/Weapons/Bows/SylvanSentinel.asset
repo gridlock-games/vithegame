@@ -232,7 +232,10 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-      persistentNonWeaponPrefabs: []
+      persistentNonWeaponPrefabs:
+      - parentType: 9
+        prefab: {fileID: 5503700758869661585, guid: 0bf58d457d33ef64596919bc81004301,
+          type: 3}
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}

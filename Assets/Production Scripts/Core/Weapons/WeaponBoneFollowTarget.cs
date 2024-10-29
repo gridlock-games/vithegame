@@ -10,6 +10,14 @@ namespace Vi.Core.Weapons
         [SerializeField] private Weapon.WeaponBone weaponBoneToFollow;
         [SerializeField] private ChildWeaponBone[] childWeaponBones;
         [SerializeField] private Vector3 attackingLocalPosition;
+        [SerializeField] private OffsetData[] offsetData;
+
+        [System.Serializable]
+        private struct OffsetData
+        {
+            public CharacterReference.RaceAndGender raceAndGender;
+            public Vector3 offset;
+        }
 
         private Vector3 originalLocalPosition;
         private Quaternion originalLocalRotation;
@@ -45,8 +53,7 @@ namespace Vi.Core.Weapons
             return (value - minValue) / (maxValue - minValue);
         }
 
-        private Vector3 TargetPosition { get { return target ? target.position + target.rotation * positionOffset : Vector3.zero; } }
-        [SerializeField] private Vector3 positionOffset;
+        private Vector3 TargetPosition { get { return target ? target.position + target.rotation * System.Array.Find(offsetData, item => item.raceAndGender == combatAgent.GetRaceAndGender()).offset : Vector3.zero; } }
 
         [SerializeField] private float lerpSpeed = 8;
         [SerializeField] private float moveTowardsSpeed = 6;

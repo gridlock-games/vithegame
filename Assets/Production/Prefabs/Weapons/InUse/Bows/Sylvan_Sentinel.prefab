@@ -138,9 +138,9 @@ MonoBehaviour:
     bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
     offHandIKOffset: {x: 0, y: 0, z: 47}
   - raceAndGender: 1
-    aimHandIKOffset: {x: 0, y: 0, z: 0}
-    bodyAimIKOffset: {x: 0, y: 0, z: 0}
-    offHandIKOffset: {x: 0, y: 0, z: 0}
+    aimHandIKOffset: {x: -4, y: 0, z: 0}
+    bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 30}
   - raceAndGender: 2
     aimHandIKOffset: {x: 0, y: 0, z: 0}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
@@ -449,6 +449,10 @@ MonoBehaviour:
   - {fileID: 3637484760598325827}
   - {fileID: 3566917912066928904}
   attackingLocalPosition: {x: 0.000000001027588, y: 0.032, z: 0}
-  positionOffset: {x: 0.01, y: 0, z: 0.09}
+  offsetData:
+  - raceAndGender: 0
+    offset: {x: 0.01, y: 0, z: 0.09}
+  - raceAndGender: 1
+    offset: {x: 0, y: 0.015, z: 0}
   lerpSpeed: 8
   moveTowardsSpeed: 6
