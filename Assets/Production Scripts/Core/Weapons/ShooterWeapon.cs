@@ -103,7 +103,7 @@ namespace Vi.Core.Weapons
         private RaycastHit[] projectileRotationRaycastingResults = new RaycastHit[10];
         private void LateUpdate()
         {
-            if (isStowed) { return; }
+            if (IsStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }

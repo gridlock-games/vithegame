@@ -221,7 +221,7 @@ namespace Vi.Core.Weapons
         protected void OnDisable()
         {
             parentCombatAgent = null;
-            isStowed = false;
+            IsStowed = false;
             associatedRuntimeWeapons.Clear();
             hitCounter.Clear();
 
@@ -262,10 +262,10 @@ namespace Vi.Core.Weapons
             lastIsActiveCall = isActive;
         }
 
-        protected bool isStowed;
+        public bool IsStowed { get; private set; }
         public void SetIsStowed(bool isStowed)
         {
-            this.isStowed = isStowed;
+            this.IsStowed = isStowed;
             if (isStowed & !collidesWithClothWhileStowed)
             {
                 if (TryGetComponent(out MagicaCloth2.MagicaCapsuleCollider magicaCapsuleCollider))
