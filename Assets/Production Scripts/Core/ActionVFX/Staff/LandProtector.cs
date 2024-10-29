@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Utility;
 using Unity.Netcode;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX.Staff
 {

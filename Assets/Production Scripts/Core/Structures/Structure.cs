@@ -6,6 +6,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using Vi.Core.MeshSlicing;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.Structures
 {

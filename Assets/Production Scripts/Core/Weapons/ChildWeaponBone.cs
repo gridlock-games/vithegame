@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Vi.ProceduralAnimations
+namespace Vi.Core.Weapons
 {
     public class ChildWeaponBone : MonoBehaviour
     {

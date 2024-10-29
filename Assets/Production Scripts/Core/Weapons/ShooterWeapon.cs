@@ -7,7 +7,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.ProceduralAnimations;
 
-namespace Vi.Core
+namespace Vi.Core.Weapons
 {
     public class ShooterWeapon : RuntimeWeapon
     {

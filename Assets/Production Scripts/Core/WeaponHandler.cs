@@ -11,6 +11,7 @@ using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Core.GameModeManagers;
 using MagicaCloth2;
+using Vi.Core.Weapons;
 
 namespace Vi.Core
 {

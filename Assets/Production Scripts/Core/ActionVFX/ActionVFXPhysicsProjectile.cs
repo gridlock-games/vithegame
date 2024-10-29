@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX
 {

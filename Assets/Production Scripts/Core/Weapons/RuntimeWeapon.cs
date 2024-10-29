@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 
-namespace Vi.Core
+namespace Vi.Core.Weapons
 {
     [RequireComponent(typeof(PooledObject))]
     public class RuntimeWeapon : MonoBehaviour

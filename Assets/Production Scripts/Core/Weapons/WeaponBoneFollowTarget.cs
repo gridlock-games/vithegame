@@ -2,7 +2,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.ProceduralAnimations;
 
-namespace Vi.Core
+namespace Vi.Core.Weapons
 {
     public class WeaponBoneFollowTarget : MonoBehaviour
     {

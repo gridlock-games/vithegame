@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Vi.Core.MovementHandlers;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX
 {

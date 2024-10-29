@@ -10,6 +10,7 @@ using Vi.Core.VFX;
 using Vi.Core.GameModeManagers;
 using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.Core.Weapons;
 
 namespace Vi.Core
 {

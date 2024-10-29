@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine.VFX;
 using Vi.ScriptableObjects;
 
-namespace Vi.Core
+namespace Vi.Core.Weapons
 {
     public class ColliderWeapon : RuntimeWeapon
     {

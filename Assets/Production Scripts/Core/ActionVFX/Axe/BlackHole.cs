@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
 using Vi.Core.MovementHandlers;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX.Axe
 {

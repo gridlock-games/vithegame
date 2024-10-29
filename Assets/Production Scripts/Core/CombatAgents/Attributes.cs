@@ -7,6 +7,7 @@ using Vi.Core.GameModeManagers;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.VFX;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.CombatAgents
 {

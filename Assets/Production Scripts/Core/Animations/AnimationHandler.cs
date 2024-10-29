@@ -8,6 +8,7 @@ using Vi.ProceduralAnimations;
 using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
+using Vi.Core.Weapons;
 
 namespace Vi.Core
 {
