@@ -294,7 +294,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6238447385306542594}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0015434854, y: 0.009790456, z: 0.1703299}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -314,6 +314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: -30, y: 0, z: 0}
+  attackingLocalRotation: {x: 10, y: 0, z: 0}
 --- !u!1 &7022147164955025644
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,7 +374,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8028700941277794003}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0015434517, y: 0.00979052, z: -0.17018062}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -393,6 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: 30, y: 0, z: 0}
+  attackingLocalRotation: {x: -10, y: 0, z: 0}
 --- !u!1 &8801315497760651709
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,4 +444,7 @@ MonoBehaviour:
   childWeaponBones:
   - {fileID: 3637484760598325827}
   - {fileID: 3566917912066928904}
+  attackingLocalPosition: {x: 0.000000001027588, y: 0.032, z: 0}
   positionOffset: {x: 0, y: 0, z: 0.1}
+  lerpSpeed: 8
+  moveTowardsSpeed: 4

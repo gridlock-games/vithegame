@@ -5,6 +5,7 @@ namespace Vi.ProceduralAnimations
     public class ChildWeaponBone : MonoBehaviour
     {
         [SerializeField] private Vector3 targetLocalRotation;
+        [SerializeField] private Vector3 attackingLocalRotation;
         private Quaternion originalLocalRotation;
 
         private void Awake()
@@ -12,9 +13,43 @@ namespace Vi.ProceduralAnimations
             originalLocalRotation = transform.localRotation;
         }
 
-        public void Lerp(bool isActive, float t)
+        public enum TargetRotationMode
         {
-            transform.localRotation = Quaternion.Lerp(transform.localRotation, isActive ? Quaternion.Euler(targetLocalRotation) : originalLocalRotation, t);
+            None,
+            Attacking,
+            Target
+        }
+
+        private Quaternion GetTargetRotation(TargetRotationMode targetRotationMode)
+        {
+            switch (targetRotationMode)
+            {
+                case TargetRotationMode.None:
+                    return originalLocalRotation;
+                case TargetRotationMode.Attacking:
+                    return Quaternion.Euler(attackingLocalRotation);
+                case TargetRotationMode.Target:
+                    return Quaternion.Euler(targetLocalRotation);
+                default:
+                    Debug.LogError("Unsure how to handle target rotation mode " + targetRotationMode);
+                    break;
+            }
+            return Quaternion.identity;
+        }
+
+        public void Lerp(TargetRotationMode targetRotationMode, float t)
+        {
+            transform.localRotation = Quaternion.Lerp(transform.localRotation, GetTargetRotation(targetRotationMode), t);
+        }
+
+        public void LerpProgressive(TargetRotationMode targetRotationMode, float deltaTime)
+        {
+            transform.localRotation = Quaternion.Lerp(transform.localRotation, GetTargetRotation(targetRotationMode), deltaTime);
+        }
+
+        public void MoveTowards(TargetRotationMode targetRotationMode, float deltaTime)
+        {
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, GetTargetRotation(targetRotationMode), deltaTime * Mathf.Rad2Deg);
         }
     }
 }

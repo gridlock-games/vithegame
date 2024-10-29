@@ -9,6 +9,7 @@ namespace Vi.Core
         [SerializeField] private bool followWhileAiming = true;
         [SerializeField] private Weapon.WeaponBone weaponBoneToFollow;
         [SerializeField] private ChildWeaponBone[] childWeaponBones;
+        [SerializeField] private Vector3 attackingLocalPosition;
 
         private Vector3 originalLocalPosition;
         private Quaternion originalLocalRotation;
@@ -47,6 +48,11 @@ namespace Vi.Core
         private Vector3 TargetPosition { get { return target ? target.position + target.rotation * positionOffset : Vector3.zero; } }
         [SerializeField] private Vector3 positionOffset;
 
+        [SerializeField] private float lerpSpeed = 8;
+        [SerializeField] private float moveTowardsSpeed = 4;
+
+        private Vector3 lastShooterWeaponPosition;
+
         private void LateUpdate()
         {
             if (!combatAgent) { return; }
@@ -56,28 +62,81 @@ namespace Vi.Core
             bool evaluated = false;
             if (followWhileAiming)
             {
-                RigWeightTarget rigWeightTarget = combatAgent.AnimationHandler.LimbReferences.GetAimRigByHand(shooterWeapon.GetAimHand());
-                float weight = rigWeightTarget ? rigWeightTarget.GetRig().weight : 0;
-                bool isAiming = false;
-                if (rigWeightTarget)
+                Vector3 weaponPositionDelta = shooterWeapon.transform.position - lastShooterWeaponPosition;
+                lastShooterWeaponPosition = shooterWeapon.transform.position;
+
+                if (combatAgent.WeaponHandler.IsAttacking)
                 {
-                    if (Mathf.Approximately(rigWeightTarget.weight, 1))
+                    transform.localPosition = Vector3.Lerp(transform.localPosition, attackingLocalPosition, Time.deltaTime * lerpSpeed);
+                    foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                    {
+                        childWeaponBone.LerpProgressive(ChildWeaponBone.TargetRotationMode.Attacking, Time.deltaTime * lerpSpeed);
+                    }
+                }
+                else if (combatAgent.WeaponHandler.IsInRecovery)
+                {
+                    transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, Time.deltaTime * lerpSpeed);
+                    foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                    {
+                        childWeaponBone.LerpProgressive(ChildWeaponBone.TargetRotationMode.None, Time.deltaTime * lerpSpeed);
+                    }
+                }
+                else // Animations at rest
+                {
+                    RigWeightTarget rigWeightTarget = combatAgent.AnimationHandler.LimbReferences.GetAimRigByHand(shooterWeapon.GetAimHand());
+                    float weight = rigWeightTarget ? rigWeightTarget.GetRig().weight : 0;
+
+                    bool isAiming = false;
+                    if (rigWeightTarget)
+                    {
+                        if (Mathf.Approximately(rigWeightTarget.weight, 1))
+                        {
+                            if (weight >= maxRigWeight)
+                            {
+                                transform.position = Vector3.MoveTowards(transform.position, TargetPosition, Time.deltaTime * moveTowardsSpeed + weaponPositionDelta.magnitude);
+                                foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                                {
+                                    childWeaponBone.MoveTowards(ChildWeaponBone.TargetRotationMode.Target, Time.deltaTime * moveTowardsSpeed);
+                                }
+                            }
+                            else if (weight > minRigWeight)
+                            {
+                                float t = NormalizeValue(weight);
+                                transform.position = Vector3.Lerp(transform.position, TargetPosition, t);
+                                foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                                {
+                                    childWeaponBone.Lerp(ChildWeaponBone.TargetRotationMode.Target, t);
+                                }
+                            }
+                            else
+                            {
+                                transform.localPosition = originalLocalPosition;
+                                foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
+                                {
+                                    childWeaponBone.Lerp(ChildWeaponBone.TargetRotationMode.None, 1);
+                                }
+                            }
+                            isAiming = true;
+                        }
+                    }
+
+                    if (!isAiming)
                     {
                         if (weight >= maxRigWeight)
                         {
-                            transform.position = TargetPosition;
+                            transform.position = Vector3.MoveTowards(transform.position, TargetPosition, Time.deltaTime * moveTowardsSpeed + weaponPositionDelta.magnitude);
                             foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                             {
-                                childWeaponBone.Lerp(true, 1);
+                                childWeaponBone.MoveTowards(ChildWeaponBone.TargetRotationMode.Target, Time.deltaTime * moveTowardsSpeed);
                             }
                         }
                         else if (weight > minRigWeight)
                         {
-                            float t = NormalizeValue(weight);
-                            transform.position = Vector3.Lerp(transform.position, TargetPosition, t);
+                            float t = 1 - NormalizeValue(weight);
+                            transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, t);
                             foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                             {
-                                childWeaponBone.Lerp(true, t);
+                                childWeaponBone.Lerp(ChildWeaponBone.TargetRotationMode.None, t);
                             }
                         }
                         else
@@ -85,38 +144,8 @@ namespace Vi.Core
                             transform.localPosition = originalLocalPosition;
                             foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                             {
-                                childWeaponBone.Lerp(false, 1);
+                                childWeaponBone.Lerp(ChildWeaponBone.TargetRotationMode.None, 1);
                             }
-                        }
-                        isAiming = true;
-                    }
-                }
-
-                if (!isAiming)
-                {
-                    if (weight >= maxRigWeight)
-                    {
-                        transform.position = TargetPosition;
-                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
-                        {
-                            childWeaponBone.Lerp(true, 1);
-                        }
-                    }
-                    else if (weight > minRigWeight)
-                    {
-                        float t = 1 - NormalizeValue(weight);
-                        transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, t);
-                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
-                        {
-                            childWeaponBone.Lerp(false, t);
-                        }
-                    }
-                    else
-                    {
-                        transform.localPosition = originalLocalPosition;
-                        foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
-                        {
-                            childWeaponBone.Lerp(false, 1);
                         }
                     }
                 }
@@ -126,7 +155,7 @@ namespace Vi.Core
             {
                 foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                 {
-                    childWeaponBone.Lerp(true, 1);
+                    childWeaponBone.Lerp(ChildWeaponBone.TargetRotationMode.Target, 1);
                 }
                 transform.position = TargetPosition;
                 evaluated = true;

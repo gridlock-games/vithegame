@@ -160,10 +160,6 @@ namespace Vi.Core
             {
                 normalizedTime = animatorReference.NextActionsAnimatorStateInfo.normalizedTime;
             }
-
-            float floor = Mathf.FloorToInt(normalizedTime);
-            if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
-
             return normalizedTime;
         }
 
