@@ -20,6 +20,9 @@ namespace Vi.Core
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
         private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
+        private List<PooledObject> equippedPersistentNonWeapons = new List<PooledObject>();
+        private List<PooledObject> stowedPersistentNonWeapons = new List<PooledObject>();
+
         public Weapon GetWeapon() { return weaponInstance; }
 
         public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
@@ -89,6 +92,12 @@ namespace Vi.Core
             }
             stowedWeaponInstances.Clear();
 
+            foreach (PooledObject pooledObject in stowedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            stowedPersistentNonWeapons.Clear();
+
             foreach (Weapon.WeaponModelData data in weapon.GetWeaponModelData())
             {
                 if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
@@ -106,9 +115,28 @@ namespace Vi.Core
                         {
                             combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
                         }
+
+                        if (modelData.persistentNonWeaponPrefabs != null)
+                        {
+                            foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
+                            {
+                                stowedPersistentNonWeapons.Add(CreatePersistentNonWeapons(persistentNonWeaponData));
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        private PooledObject CreatePersistentNonWeapons(Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData)
+        {
+            PooledObject nonWeapon = ObjectPoolingManager.SpawnObject(persistentNonWeaponData.prefab,
+                combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(persistentNonWeaponData.parentType));
+            foreach (Renderer renderer in nonWeapon.GetComponentsInChildren<Renderer>())
+            {
+                renderer.gameObject.layer = LayerMask.NameToLayer(IsSpawned ? "NetworkPrediction" : "Preview");
+            }
+            return nonWeapon;
         }
 
         public bool ShouldUseAmmo()
@@ -144,6 +172,13 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
             }
             weaponInstances.Clear();
+
+            foreach (PooledObject pooledObject in equippedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            equippedPersistentNonWeapons.Clear();
+
             foreach (PooledObject g in stowedWeaponInstances)
             {
                 if (g.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
@@ -153,6 +188,12 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
+
+            foreach (PooledObject pooledObject in stowedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            stowedPersistentNonWeapons.Clear();
 
             inputHistory.Clear();
 
@@ -190,6 +231,12 @@ namespace Vi.Core
             weaponInstances.Clear();
             shooterWeapons.Clear();
 
+            foreach (PooledObject pooledObject in equippedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            equippedPersistentNonWeapons.Clear();
+
             CanAim = false;
             CanADS = false;
 
@@ -215,6 +262,10 @@ namespace Vi.Core
                         if (modelData.weaponPrefab.TryGetComponent(out PooledObject pooledObject))
                         {
                             instance = ObjectPoolingManager.SpawnObject(pooledObject, bone).GetComponent<RuntimeWeapon>();
+                        }
+                        else
+                        {
+                            Debug.LogError(modelData.weaponPrefab + " does not have a pooled object component!");
                         }
 
                         if (!instance)
@@ -242,7 +293,16 @@ namespace Vi.Core
                         {
                             combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
                         }
+
+                        if (modelData.persistentNonWeaponPrefabs != null)
+                        {
+                            foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
+                            {
+                                equippedPersistentNonWeapons.Add(CreatePersistentNonWeapons(persistentNonWeaponData));
+                            }
+                        }
                     }
+
                     broken = true;
                     break;
                 }

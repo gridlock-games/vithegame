@@ -264,6 +264,14 @@ namespace Vi.ScriptableObjects
                 public StowedWeaponParentType stowedParentType = StowedWeaponParentType.Back_M;
                 public Vector3 stowedWeaponPositionOffset;
                 public Vector3 stowedWeaponRotationOffset;
+                public PersistentNonWeaponData[] persistentNonWeaponPrefabs = new PersistentNonWeaponData[0];
+            }
+
+            [System.Serializable]
+            public struct PersistentNonWeaponData
+            {
+                public StowedWeaponParentType parentType;
+                public PooledObject prefab;
             }
         }
 
