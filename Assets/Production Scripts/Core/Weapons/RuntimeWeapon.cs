@@ -282,7 +282,29 @@ namespace Vi.Core.Weapons
             if (!GetComponentInChildren<Renderer>()) { return; }
 
             string variantAssetPath = UnityEditor.AssetDatabase.GetAssetPath(gameObject).Replace(".prefab", "") + "_dropped.prefab";
-            if (System.IO.File.Exists(variantAssetPath)) { return; }
+            if (System.IO.File.Exists(variantAssetPath))
+            {
+                bool componentDestroyed = false;
+                GameObject prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(variantAssetPath);
+                foreach (Component component in prefab.GetComponentsInChildren<Component>())
+                {
+                    if (component is not Transform
+                        & component is not Renderer
+                        & component is not Rigidbody
+                        & component is not PooledObject
+                        & component is not Collider)
+                    {
+                        DestroyImmediate(component, true);
+                        componentDestroyed = true;
+                    }
+                }
+
+                if (componentDestroyed)
+                {
+                    UnityEditor.EditorUtility.SetDirty(prefab);
+                }
+                return;
+            }
 
             Debug.Log("Creating dropped weapon variant at path " + variantAssetPath);
             GameObject objSource = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(gameObject);

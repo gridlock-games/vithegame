@@ -81,7 +81,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponMaterial: 0
   collidesWithClothWhileStowed: 0
-  weaponBoneFollowTargets: []
+  weaponBoneFollowTargets:
+  - {fileID: 3887120940598466795}
   dropWeaponPrefab: {fileID: 7112369087395922072, guid: 1987286a0437232429a430686a61fab2,
     type: 3}
   canADS: 1
@@ -100,17 +101,21 @@ MonoBehaviour:
   bodyAimType: 0
   IKData:
   - raceAndGender: 0
-    aimHandIKOffset: {x: 0, y: 0, z: 0}
-    bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    aimHandIKOffset: {x: -14.01, y: 0, z: 0}
+    bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 47}
   - raceAndGender: 1
-    aimHandIKOffset: {x: 0, y: 0, z: 0}
-    bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    aimHandIKOffset: {x: -4, y: 0, z: 0}
+    bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 30}
   - raceAndGender: 2
     aimHandIKOffset: {x: 0, y: 0, z: 0}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 3
     aimHandIKOffset: {x: 0, y: 0, z: 0}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &102408958681105487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: -30, y: 0, z: 0}
+  attackingLocalRotation: {x: 10, y: 0, z: 0}
 --- !u!1 &7386879574999162895 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1171344718966177318, guid: f31c17f4f4bb4da48b540b60ec7627bb,
@@ -317,7 +323,14 @@ MonoBehaviour:
   childWeaponBones:
   - {fileID: 8299487479905344958}
   - {fileID: 5266983342775065941}
-  positionOffset: {x: 0, y: 0, z: 0.1}
+  attackingLocalPosition: {x: 0.000000001027588, y: 0.068, z: 0}
+  offsetData:
+  - raceAndGender: 0
+    offset: {x: 0.01, y: 0, z: 0.09}
+  - raceAndGender: 1
+    offset: {x: 0, y: 0.015, z: 0}
+  lerpSpeed: 8
+  moveTowardsSpeed: 6
 --- !u!1 &8344139805096220513 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 364319842269841736, guid: f31c17f4f4bb4da48b540b60ec7627bb,
@@ -337,3 +350,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: 30, y: 0, z: 0}
+  attackingLocalRotation: {x: -10, y: 0, z: 0}
