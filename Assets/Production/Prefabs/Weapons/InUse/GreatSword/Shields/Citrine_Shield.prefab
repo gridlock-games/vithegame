@@ -70,7 +70,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
-  collidesWithClothWhileStowed: 1
+  collidesWithClothWhileStowed: 0
+  weaponBoneFollowTargets: []
   dropWeaponPrefab: {fileID: 607646315254580230, guid: af3e973e7fccfca4f86652ea95b819ce,
     type: 3}
   weaponTrailVFX: {fileID: 0}
