@@ -1377,6 +1377,7 @@ namespace Vi.Core
             if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
+        private static readonly Vector3 aimTargetOffset = new Vector3(0, 0, 10);
         private void RefreshAimPoint()
         {
             FindMainCamera();
@@ -1388,12 +1389,12 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject & mainCamera)
                 {
-                    aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * aimTargetOffset;
                     cameraForwardDir.Value = mainCamera.transform.forward;
                 }
                 else
                 {
-                    aimPoint.Value = GetCameraPivotPoint() + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    aimPoint.Value = GetCameraPivotPoint() + transform.rotation * aimTargetOffset;
                 }
             }
 
