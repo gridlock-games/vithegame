@@ -293,7 +293,10 @@ MonoBehaviour:
   childWeaponBones:
   - {fileID: 9147590272234104742}
   - {fileID: 6378954125340556505}
-  positionOffset: {x: 0, y: 0, z: 0.1}
+  attackingLocalPosition: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0.01, y: 0, z: 0.09}
+  lerpSpeed: 8
+  moveTowardsSpeed: 6
 --- !u!1 &6053412313970961243 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 424844453643419574, guid: 1f108f4506b8a774eb530aa565daba11,
@@ -313,6 +316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: 30, y: 0, z: 0}
+  attackingLocalRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &7924871080813713290 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4331794236919366503, guid: 1f108f4506b8a774eb530aa565daba11,
@@ -332,3 +336,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLocalRotation: {x: -30, y: 0, z: 0}
+  attackingLocalRotation: {x: 0, y: 0, z: 0}

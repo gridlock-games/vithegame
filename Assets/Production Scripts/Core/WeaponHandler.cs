@@ -1278,7 +1278,11 @@ namespace Vi.Core
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
                 CharacterReference.RaceAndGender raceAndGender = combatAgent.GetRaceAndGender();
-                combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+
+                combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender),
+                    isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody,
+                    shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType(), shooterWeapon.GetOffHandIKOffset(raceAndGender));
+
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 combatAgent.AnimationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (combatAgent.AnimationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !combatAgent.AnimationHandler.IsReloading());
             }

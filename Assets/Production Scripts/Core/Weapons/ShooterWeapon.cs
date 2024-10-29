@@ -28,6 +28,7 @@ namespace Vi.Core.Weapons
         public LimbReferences.Hand GetAimHand() { return aimHand; }
         public Vector3 GetAimHandIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).aimHandIKOffset; }
         public Vector3 GetBodyAimIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).bodyAimIKOffset; }
+        public Vector3 GetOffHandIKOffset(CharacterReference.RaceAndGender raceAndGender) { return IKData.Find(item => item.raceAndGender == raceAndGender).offHandIKOffset; }
         public LimbReferences.BodyAimType GetBodyAimType() { return bodyAimType; }
         public OffHandInfo GetOffHandInfo()
         {
@@ -56,6 +57,7 @@ namespace Vi.Core.Weapons
             public CharacterReference.RaceAndGender raceAndGender;
             public Vector3 aimHandIKOffset;
             public Vector3 bodyAimIKOffset;
+            public Vector3 offHandIKOffset;
         }
 
         public override void ResetHitCounter()

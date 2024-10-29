@@ -19,7 +19,7 @@ namespace Vi.ProceduralAnimations
         public bool IsAiming(Hand hand) { return aimingDictionary[hand]; }
 
         private Dictionary<Hand, bool> aimingDictionary = new Dictionary<Hand, bool>();
-        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType)
+        public void AimHand(Hand hand, Vector3 handAimIKOffset, bool isAiming, bool shouldAimBody, Vector3 bodyAimIKOffset, BodyAimType bodyAimType, Vector3 offHandIKOffset)
         {
             float weight = isAiming ? 1 : 0;
             shouldAimBody = shouldAimBody & isAiming;
@@ -28,6 +28,8 @@ namespace Vi.ProceduralAnimations
                 if (!rightHandAimRig.GetRig()) { return; }
                 rightHandAimRig.weight = weight;
                 rightHandAimConstraint.data.offset = handAimIKOffset;
+
+                rightAimOffHandRotationConstraint.data.offset = offHandIKOffset;
 
                 switch (bodyAimType)
                 {
@@ -68,6 +70,8 @@ namespace Vi.ProceduralAnimations
                 if (!leftHandAimRig.GetRig()) { return; }
                 leftHandAimRig.weight = weight;
                 leftHandAimConstraint.data.offset = handAimIKOffset;
+
+                leftAimOffHandRotationConstraint.data.offset = offHandIKOffset;
 
                 switch (bodyAimType)
                 {
@@ -239,10 +243,12 @@ namespace Vi.ProceduralAnimations
         [SerializeField] private MultiAimConstraint rightHandAimBodyConstraint;
         [SerializeField] private MultiAimConstraint rightHandAimBodyInvertedConstraint;
         [SerializeField] private MultiAimConstraint rightHandAimConstraint;
+        [SerializeField] private MultiRotationConstraint rightAimOffHandRotationConstraint;
         [SerializeField] private RigWeightTarget leftHandAimRig;
         [SerializeField] private MultiAimConstraint leftHandAimBodyConstraint;
         [SerializeField] private MultiAimConstraint leftHandAimBodyInvertedConstraint;
         [SerializeField] private MultiAimConstraint leftHandAimConstraint;
+        [SerializeField] private MultiRotationConstraint leftAimOffHandRotationConstraint;
         [SerializeField] private RigWeightTarget rightHandReachRig;
         [SerializeField] private RigWeightTarget leftHandReachRig;
         [SerializeField] private RigWeightTarget meleeVerticalAimRig;
@@ -375,11 +381,13 @@ namespace Vi.ProceduralAnimations
             if (!rightHandAimBodyConstraint) { rightHandAimBodyConstraint = transform.Find("RightAimRig")?.Find("BodyAim")?.GetComponent<MultiAimConstraint>(); }
             if (!rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint = transform.Find("RightAimRig")?.Find("BodyAimInverted")?.GetComponent<MultiAimConstraint>(); }
             if (!rightHandAimConstraint) { rightHandAimConstraint = transform.Find("RightAimRig")?.Find("RightHandAimConstraint")?.GetComponent<MultiAimConstraint>(); }
+            if (!rightAimOffHandRotationConstraint) { rightAimOffHandRotationConstraint = transform.Find("RightAimRig")?.Find("OffHandRotationOffset")?.GetComponent<MultiRotationConstraint>(); }
 
             if (!leftHandAimRig) { leftHandAimRig = transform.Find("LeftAimRig")?.GetComponent<RigWeightTarget>(); }
             if (!leftHandAimBodyConstraint) { leftHandAimBodyConstraint = transform.Find("LeftAimRig")?.Find("BodyAim")?.GetComponent<MultiAimConstraint>(); }
             if (!leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint = transform.Find("LeftAimRig")?.Find("BodyAimInverted")?.GetComponent<MultiAimConstraint>(); }
             if (!leftHandAimConstraint) { leftHandAimConstraint = transform.Find("LeftAimRig")?.Find("LeftHandAimConstraint")?.GetComponent<MultiAimConstraint>(); }
+            if (!leftAimOffHandRotationConstraint) { leftAimOffHandRotationConstraint = transform.Find("LeftAimRig")?.Find("OffHandRotationOffset")?.GetComponent<MultiRotationConstraint>(); }
 
             if (!meleeVerticalAimRig) { meleeVerticalAimRig = transform.Find("MeleeVerticalAimRig")?.GetComponent<RigWeightTarget>(); }
             if (!meleeVerticalAimConstraint) { meleeVerticalAimConstraint = transform.Find("MeleeVerticalAimRig")?.Find("VerticalAimRotationConstraint")?.GetComponent<MultiRotationConstraint>(); }
@@ -414,10 +422,12 @@ namespace Vi.ProceduralAnimations
                         if (rightHandAimBodyConstraint) { rightHandAimBodyConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
                         if (rightHandAimBodyInvertedConstraint) { rightHandAimBodyInvertedConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
                         if (rightHandAimConstraint) { rightHandAimConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.RightHand); }
+                        if (rightAimOffHandRotationConstraint) { rightAimOffHandRotationConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.LeftHand); }
 
                         if (leftHandAimBodyConstraint) { leftHandAimBodyConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
                         if (leftHandAimBodyInvertedConstraint) { leftHandAimBodyInvertedConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.Spine); }
                         if (leftHandAimConstraint) { leftHandAimConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.LeftHand); }
+                        if (leftAimOffHandRotationConstraint) { leftAimOffHandRotationConstraint.data.constrainedObject = animator.GetBoneTransform(HumanBodyBones.RightHand); }
                     }
                 }
             }
