@@ -49,7 +49,7 @@ namespace Vi.Core
         [SerializeField] private Vector3 positionOffset;
 
         [SerializeField] private float lerpSpeed = 8;
-        [SerializeField] private float moveTowardsSpeed = 4;
+        [SerializeField] private float moveTowardsSpeed = 6;
 
         private Vector3 lastShooterWeaponPosition;
 
