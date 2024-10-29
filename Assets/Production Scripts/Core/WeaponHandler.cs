@@ -153,7 +153,7 @@ namespace Vi.Core
 
             if (nonWeapon.TryGetComponent(out Quiver quiver))
             {
-                quiver.Initialize(combatAgent.LoadoutManager, combatAgent.LoadoutManager.GetWeaponInSlot(weaponSlotType));
+                quiver.Initialize(combatAgent, combatAgent.LoadoutManager.GetWeaponInSlot(weaponSlotType));
             }
 
             return nonWeapon;

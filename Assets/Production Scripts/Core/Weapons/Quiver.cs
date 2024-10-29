@@ -7,29 +7,37 @@ namespace Vi.Core.Weapons
     {
         [SerializeField] private Renderer[] projectileRenderers;
 
-        public void Initialize(LoadoutManager loadoutManager, Weapon weapon)
+        public void Initialize(CombatAgent combatAgent, Weapon weapon)
         {
-            this.loadoutManager = loadoutManager;
+            this.combatAgent = combatAgent;
             shooterWeapon = weapon;
         }
 
         private void OnDisable()
         {
             lastAmmoCount = -1;
-            loadoutManager = null;
+            combatAgent = null;
             shooterWeapon = null;
         }
 
-        private LoadoutManager loadoutManager;
+        private CombatAgent combatAgent;
         private Weapon shooterWeapon;
         private int lastAmmoCount = -1;
         private void Update()
         {
-            if (!loadoutManager) { return; }
+            if (!combatAgent) { return; }
             if (!shooterWeapon) { return; }
-            if (!loadoutManager.IsSpawned) { return; }
+            if (!combatAgent.IsSpawned) { return; }
 
-            int ammoCount = loadoutManager.GetAmmoCount(shooterWeapon);
+            int ammoCount = combatAgent.LoadoutManager.GetAmmoCount(shooterWeapon);
+            if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Reload)
+            {
+                if (combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip))
+                {
+                    ammoCount = combatAgent.WeaponHandler.GetMaxAmmoCount();
+                }
+            }
+
             if (lastAmmoCount != ammoCount)
             {
                 for (int i = 0; i < projectileRenderers.Length; i++)
