@@ -15,14 +15,12 @@ namespace Vi.Core.Weapons
 
         private void OnDisable()
         {
-            lastAmmoCount = -1;
             combatAgent = null;
             shooterWeapon = null;
         }
 
         private CombatAgent combatAgent;
         private Weapon shooterWeapon;
-        private int lastAmmoCount = -1;
         private void Update()
         {
             if (!combatAgent) { return; }
@@ -38,13 +36,9 @@ namespace Vi.Core.Weapons
                 }
             }
 
-            if (lastAmmoCount != ammoCount)
+            for (int i = 0; i < projectileRenderers.Length; i++)
             {
-                for (int i = 0; i < projectileRenderers.Length; i++)
-                {
-                    projectileRenderers[i].forceRenderingOff = i >= ammoCount;
-                }
-                lastAmmoCount = ammoCount;
+                projectileRenderers[i].forceRenderingOff = i >= ammoCount;
             }
         }
     }
