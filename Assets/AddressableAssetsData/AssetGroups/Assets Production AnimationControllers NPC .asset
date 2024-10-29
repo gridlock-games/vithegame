@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: 'Assets Production AnimationControllers NPC '
+  m_EditorClassIdentifier: 
+  m_GroupName: 'Assets Production AnimationControllers NPC '
+  m_GUID: 8f22d11fb245c9b40b24ea71e18377d9
+  m_SerializeEntries:
+  - m_GUID: 2bb71d63f065dc44d95493a4d2f51458
+    m_Address: Assets/Production/AnimationControllers/NPC/NPC.controller
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58a20e33df0a9dd42b8e88770cc2bd4f
+    m_Address: Assets/Production/AnimationControllers/NPC/MalakasLeaderboard.overrideController
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99294f101aacac943b1a1c1bf62e200c
+    m_Address: Assets/Production/AnimationControllers/NPC/TogaShopKeeper.overrideController
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4888de5a41d3419429a2dc7c14b9614f, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9d5e039c30a53e54ea69cd62770701ef, type: 2}
+    - {fileID: 11400000, guid: e5b22adf4215d5a40a43a22b354a7e6b, type: 2}
