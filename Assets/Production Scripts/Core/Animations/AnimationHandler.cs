@@ -765,7 +765,7 @@ namespace Vi.Core
                 if (combatAgent.WeaponHandler.IsAttacking)
                 {
                     weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
-                    RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
+                    RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.WeaponInstances[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
 
                     bool hitSucesss = grabVictim.ProcessMeleeHit(combatAgent, grabAttackClip, runtimeWeapon,
                         runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);

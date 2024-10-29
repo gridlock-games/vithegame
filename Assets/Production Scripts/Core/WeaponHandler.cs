@@ -18,7 +18,10 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class WeaponHandler : NetworkBehaviour
     {
+        public Dictionary<Weapon.WeaponBone, RuntimeWeapon> WeaponInstances { get { return weaponInstances; } }
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
+
+        public List<ShooterWeapon> ShooterWeapons { get { return shooterWeapons; } }
         private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
         private List<PooledObject> equippedPersistentNonWeapons = new List<PooledObject>();
@@ -26,7 +29,6 @@ namespace Vi.Core
 
         public Weapon GetWeapon() { return weaponInstance; }
 
-        public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
 
         private Weapon weaponInstance;
         private CombatAgent combatAgent;
@@ -121,7 +123,20 @@ namespace Vi.Core
                         {
                             foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
                             {
-                                stowedPersistentNonWeapons.Add(CreatePersistentNonWeapons(persistentNonWeaponData));
+                                LoadoutManager.WeaponSlotType weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
+                                switch (combatAgent.LoadoutManager.GetEquippedSlotType())
+                                {
+                                    case LoadoutManager.WeaponSlotType.Primary:
+                                        weaponSlotType = LoadoutManager.WeaponSlotType.Secondary;
+                                        break;
+                                    case LoadoutManager.WeaponSlotType.Secondary:
+                                        weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
+                                        break;
+                                    default:
+                                        Debug.LogError("Unsure how to handle weapon slot type " + combatAgent.LoadoutManager.GetEquippedSlotType());
+                                        break;
+                                }
+                                stowedPersistentNonWeapons.Add(CreatePersistentNonWeapons(weaponSlotType, persistentNonWeaponData));
                             }
                         }
                     }
@@ -129,15 +144,33 @@ namespace Vi.Core
             }
         }
 
-        private PooledObject CreatePersistentNonWeapons(Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData)
+        private PooledObject CreatePersistentNonWeapons(LoadoutManager.WeaponSlotType weaponSlotType, Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData)
         {
             PooledObject nonWeapon = ObjectPoolingManager.SpawnObject(persistentNonWeaponData.prefab,
                 combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(persistentNonWeaponData.parentType));
-            foreach (Renderer renderer in nonWeapon.GetComponentsInChildren<Renderer>())
+
+            PersistentLocalObjects.Singleton.StartCoroutine(InitializeNonWeaponRenderers(nonWeapon.GetComponentsInChildren<Renderer>()));
+
+            if (nonWeapon.TryGetComponent(out Quiver quiver))
             {
-                renderer.gameObject.layer = LayerMask.NameToLayer(IsSpawned ? "NetworkPrediction" : "Preview");
+                quiver.Initialize(combatAgent.LoadoutManager, combatAgent.LoadoutManager.GetWeaponInSlot(weaponSlotType));
             }
+
             return nonWeapon;
+        }
+
+        private IEnumerator InitializeNonWeaponRenderers(Renderer[] renderers)
+        {
+            foreach (Renderer r in renderers)
+            {
+                r.forceRenderingOff = true;
+                r.gameObject.layer = LayerMask.NameToLayer(IsSpawned ? "NetworkPrediction" : "Preview");
+            }
+            yield return null;
+            foreach (Renderer r in renderers)
+            {
+                r.forceRenderingOff = false;
+            }
         }
 
         public bool ShouldUseAmmo()
@@ -299,7 +332,7 @@ namespace Vi.Core
                         {
                             foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
                             {
-                                equippedPersistentNonWeapons.Add(CreatePersistentNonWeapons(persistentNonWeaponData));
+                                equippedPersistentNonWeapons.Add(CreatePersistentNonWeapons(combatAgent.LoadoutManager.GetEquippedSlotType(), persistentNonWeaponData));
                             }
                         }
                     }
