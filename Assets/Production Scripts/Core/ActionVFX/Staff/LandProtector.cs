@@ -38,7 +38,7 @@ namespace Vi.Core.VFX.Staff
                 if (PlayerDataManager.Singleton.CanHit(GetAttacker(), projectile.GetAttacker()))
                 {
                     PlayEffects(projectile.transform.position);
-                    projectile.canHitPlayers = false;
+                    projectile.CanHitPlayers = false;
                     projectile.NetworkObject.Despawn(true);
                 }
             }

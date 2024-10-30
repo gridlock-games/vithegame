@@ -152,13 +152,13 @@ namespace Vi.Core.Weapons
             rb.MoveRotation(rb.linearVelocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.linearVelocity));
         }
 
-        [HideInInspector] public bool canHitPlayers = true;
+        public bool CanHitPlayers { get; set; } = true;
         private void OnTriggerEnter(Collider other)
         {
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
-            if (!canHitPlayers) { return; }
+            if (!CanHitPlayers) { return; }
 
             bool shouldDestroy = false;
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
@@ -174,7 +174,7 @@ namespace Vi.Core.Weapons
             }
             else if (other.transform.root.TryGetComponent(out IHittable hittable))
             {
-                if (other.transform.root == attacker) { return; }
+                if ((Object)hittable == attacker) { return; }
 
                 Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), other.transform.position) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
 
@@ -197,7 +197,7 @@ namespace Vi.Core.Weapons
 
         private void OnDisable()
         {
-            canHitPlayers = true;
+            CanHitPlayers = true;
 
             attacker = null;
             shooterWeapon = null;

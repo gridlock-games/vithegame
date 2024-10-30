@@ -514,13 +514,10 @@ namespace Vi.Player
             }
 
             bool evaluateForce = true;
-            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity & shouldApplyRootMotion)
             {
-                if (combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
-                {
-                    Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
-                    evaluateForce = false;
-                }
+                Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
+                evaluateForce = false;
             }
 
             if (evaluateForce)
@@ -539,7 +536,6 @@ namespace Vi.Player
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
-            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
         }
