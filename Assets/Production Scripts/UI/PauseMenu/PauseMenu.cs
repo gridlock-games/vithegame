@@ -71,7 +71,7 @@ namespace Vi.UI
         private void Start()
         {
             returnToCharSelectButton.onClick.AddListener(delegate { PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect()); });
-            returnToCharSelectButton.GetComponentInChildren<Text>().text = "RETURN TO CHARACTER SELECT";
+            returnToCharSelectButton.GetComponentInChildren<Text>().text = "CHARACTER SELECT";
             returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
 
             applicationVersionText.text = "Version: " + Application.version;
