@@ -1,17 +1,16 @@
+using MagicaCloth2;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
-using Vi.ScriptableObjects;
 using System.Linq;
+using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using Vi.Utility;
-using Vi.Core.VFX;
-using Vi.Core.CombatAgents;
-using Vi.ProceduralAnimations;
 using Vi.Core.GameModeManagers;
-using MagicaCloth2;
+using Vi.Core.VFX;
 using Vi.Core.Weapons;
+using Vi.ProceduralAnimations;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -238,7 +237,8 @@ namespace Vi.Core
 
             actionSoundEffectIdTracker.Clear();
 
-            actionVFXTracker.Clear();
+            actionVFXPrefabTracker.Clear();
+            DespawnActionVFXInstances();
 
             IsInAnticipation = false;
             isAboutToAttack = false;
@@ -410,7 +410,8 @@ namespace Vi.Core
                 weaponInstance.StartDodgeCooldown();
             }
 
-            actionVFXTracker.Clear();
+            actionVFXPrefabTracker.Clear();
+            actionVFXInstanceTracker.Clear();
             actionSoundEffectIdTracker.Clear();
 
             // Action sound effect logic here for normalized time of 0
@@ -613,12 +614,13 @@ namespace Vi.Core
             return (orientation, parent);
         }
 
-        private List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
+        private List<ActionVFX> actionVFXPrefabTracker = new List<ActionVFX>();
+        private List<ActionVFX> actionVFXInstanceTracker = new List<ActionVFX>();
         public GameObject SpawnActionVFX(ActionClip actionClip, ActionVFX actionVFXPrefab, Transform attackerTransform, Transform victimTransform = null)
         {
             if (!IsServer) { Debug.LogError("Trying to spawn an action vfx when we aren't the server! " + actionClip); return null; }
 
-            if (actionVFXTracker.Contains(actionVFXPrefab)) { return null; }
+            if (actionVFXPrefabTracker.Contains(actionVFXPrefab)) { return null; }
 
             GameObject vfxInstance;
             (SpawnPoints.TransformData orientation, Transform parent) = GetActionVFXOrientation(actionClip, actionVFXPrefab, false, attackerTransform, victimTransform);
@@ -668,8 +670,9 @@ namespace Vi.Core
                 Debug.LogError("No vfx instance spawned for this prefab! " + actionVFXPrefab);
             }
 
-            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXTracker.Add(actionVFXPrefab); }
+            if (actionVFXPrefab.vfxSpawnType == ActionVFX.VFXSpawnType.OnActivate) { actionVFXPrefabTracker.Add(actionVFXPrefab); }
 
+            actionVFXInstanceTracker.Add(vfxInstance.GetComponent<ActionVFX>());
             return vfxInstance;
         }
 
@@ -903,6 +906,21 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
+            DespawnActionVFXInstances();
+        }
+
+        private void DespawnActionVFXInstances()
+        {
+            if (NetworkManager.Singleton.IsServer)
+            {
+                foreach (ActionVFX actionVFX in actionVFXInstanceTracker)
+                {
+                    if (!actionVFX) { continue; }
+                    Debug.Log(actionVFX.name + " " + actionVFX.IsSpawned);
+                    if (actionVFX.IsSpawned) { actionVFX.NetworkObject.Despawn(true); }
+                }
+            }
+            actionVFXInstanceTracker.Clear();
         }
 
         public void LightAttack(bool isPressed)
