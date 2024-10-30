@@ -44,6 +44,8 @@ namespace Vi.UI
 
         public Button GetScoreboardButton() { return scoreboardButton; }
 
+        public RectTransform GetOrbitalCameraButton() { return orbitalCameraButton; }
+
         private bool shouldFadeToBlack;
         public void SetFadeToBlack(bool shouldFade) { shouldFadeToBlack = shouldFade; }
 
@@ -88,6 +90,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
+        [SerializeField] private RectTransform orbitalCameraButton;
         [SerializeField] private Image mobileDodgeCooldownImage;
         [Header("Text Chat")]
         [SerializeField] private Canvas textChatButtonCanvas;
@@ -281,6 +284,12 @@ namespace Vi.UI
             attributes.WeaponHandler.Reload();
         }
 
+        public void SetOrbitalCamState(bool isPressed)
+        {
+            if (!actionMapHandler) { return; }
+            actionMapHandler.SetOrbitalCamState(isPressed);
+        }
+
         private InputAction dodgeAction;
         public void Dodge()
         {
@@ -340,6 +349,8 @@ namespace Vi.UI
             {
                 textChatButtonCanvas.enabled = unreadMessageCount > 0;
             }
+
+            GetOrbitalCameraButton().gameObject.SetActive(ActionMapHandler.CanUseOrbitalCamera());
         }
 
         private Vector2 equippedWeaponCardTargetAnchoredPosition;

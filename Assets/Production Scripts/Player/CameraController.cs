@@ -132,6 +132,8 @@ namespace Vi.Player
         {
             if (cameraInterp) { cameraInterp.SetActive(false); }
             if (CameraPositionClone) { CameraPositionClone.SetActive(false); }
+            thisCam.enabled = false;
+            orbitalCam.enabled = false;
         }
 
         private void OnDestroy()

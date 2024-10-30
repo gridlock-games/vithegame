@@ -85,7 +85,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasFloat("MobileLookJoystickSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
             if (!FasterPlayerPrefs.Singleton.HasString("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
-            
+            if (!FasterPlayerPrefs.Singleton.HasString("OrbitalCameraMode")) { FasterPlayerPrefs.Singleton.SetString("OrbitalCameraMode", "HOLD"); }
+
             if (!FasterPlayerPrefs.Singleton.HasFloat("FieldOfView")) { FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", 60); }
 
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
