@@ -241,7 +241,7 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                if (latestServerState.Value.tick > 0)
+                if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                 {
                     if (!latestServerState.Equals(default(StatePayload)) &&
                         (lastProcessedState.Equals(default(StatePayload)) ||
