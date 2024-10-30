@@ -35,6 +35,12 @@ namespace Vi.Core
         {
             statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
+
+            if (IsServer)
+            {
+                statuses.Clear();
+                activeStatuses.Clear();
+            }
         }
 
         public override void OnNetworkDespawn()

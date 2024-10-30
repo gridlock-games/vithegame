@@ -610,6 +610,8 @@ namespace Vi.Player
             base.OnNetworkSpawn();
             if (IsLocalPlayer)
             {
+                inputBuffer.Clear();
+
                 cameraController.gameObject.tag = "MainCamera";
                 cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
@@ -675,7 +677,7 @@ namespace Vi.Player
             {
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
-            else
+            else if (networkListEvent.Type != NetworkListEvent<InputPayload>.EventType.Clear)
             {
                 Debug.LogError("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }

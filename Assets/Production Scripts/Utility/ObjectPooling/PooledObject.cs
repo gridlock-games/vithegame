@@ -80,14 +80,22 @@ namespace Vi.Utility
             gameObject.hideFlags = HideFlags.HideInHierarchy;
         }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
+            if (Application.isPlaying) { return; }
+
             if (TryGetComponent(out NetworkObject networkObject))
             {
-                networkObject.AutoObjectParentSync = false;
+                if (networkObject.AutoObjectParentSync | networkObject.SceneMigrationSynchronization | networkObject.ActiveSceneSynchronization)
+                {
+                    networkObject.SceneMigrationSynchronization = false;
+                    networkObject.ActiveSceneSynchronization = false;
+                    networkObject.AutoObjectParentSync = false;
+                    UnityEditor.EditorUtility.SetDirty(networkObject);
+                }
             }
 
-#if UNITY_EDITOR
             //PooledObjectList pooledObjectList = UnityEditor.AssetDatabase.LoadAssetAtPath<PooledObjectList>(@"Assets\Production\PooledObjectList.asset");
             //var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
             //if (prefabStage)
@@ -97,7 +105,7 @@ namespace Vi.Utility
             //        SetPooledObjectIndex(-1);
             //    }
             //}
-#endif
         }
+#endif
     }
 }

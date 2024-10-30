@@ -54,6 +54,20 @@ namespace Vi.Player
             targetRotationY += rotationY;
         }
 
+        public void ToggleOrbitalCameraState()
+        {
+            if (orbitalCam.enabled)
+            {
+                thisCam.enabled = true;
+                orbitalCam.enabled = false;
+            }
+            else
+            {
+                thisCam.enabled = false;
+                orbitalCam.enabled = true;
+            }
+        }
+
         public void SetOrbitalCameraState(bool isActive)
         {
             thisCam.enabled = !isActive;
