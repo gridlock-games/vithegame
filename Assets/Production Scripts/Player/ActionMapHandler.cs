@@ -238,7 +238,7 @@ namespace Vi.Player
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
 
-        private void OnOrbitalCam(InputValue value)
+        public void SetOrbitalCamState(bool isPressed)
         {
             if (!playerCameraController) { return; }
             if (externalUI != null) { return; }
@@ -260,16 +260,21 @@ namespace Vi.Player
             string orbitalCamMode = FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode");
             if (orbitalCamMode == "HOLD")
             {
-                playerCameraController.SetOrbitalCameraState(value.isPressed);
+                playerCameraController.SetOrbitalCameraState(isPressed);
             }
             else if (orbitalCamMode == "TOGGLE")
             {
-                if (value.isPressed) { playerCameraController.ToggleOrbitalCameraState(); }
+                if (isPressed) { playerCameraController.ToggleOrbitalCameraState(); }
             }
             else
             {
                 Debug.LogError("Unsure how to handle orbital camera mode " + orbitalCamMode);
             }
+        }
+
+        private void OnOrbitalCam(InputValue value)
+        {
+            SetOrbitalCamState(value.isPressed);
         }
     }
 }
