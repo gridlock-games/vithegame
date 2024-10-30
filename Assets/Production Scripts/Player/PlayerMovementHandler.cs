@@ -432,9 +432,11 @@ namespace Vi.Player
                 }
                 else if (latestServerState.Value.usedRootMotion) // If we are not the server
                 {
-                    if (combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip) > 0.7f)
+                    float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
+                    normalizedTime = StringUtility.NormalizeValue(normalizedTime, 0, 1 - combatAgent.WeaponHandler.CurrentActionClip.transitionTime - 0.1f);
+                    if (normalizedTime > 0.9f)
                     {
-                        movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                        movement = Vector3.Lerp(Vector3.zero, latestServerState.Value.position - GetPosition(), normalizedTime) / Time.fixedDeltaTime;
                     }
                     else
                     {
