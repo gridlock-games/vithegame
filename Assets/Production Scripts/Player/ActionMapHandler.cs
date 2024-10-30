@@ -238,6 +238,11 @@ namespace Vi.Player
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
 
+        public static bool CanUseOrbitalCamera()
+        {
+            return PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+        }
+
         public void SetOrbitalCamState(bool isPressed)
         {
             if (!playerCameraController) { return; }
@@ -246,7 +251,7 @@ namespace Vi.Player
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
             if (textChatIsOpen) { return; }
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { return; }
+            if (!CanUseOrbitalCamera()) { return; }
 
             if (combatAgent)
             {

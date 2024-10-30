@@ -349,6 +349,8 @@ namespace Vi.UI
             {
                 textChatButtonCanvas.enabled = unreadMessageCount > 0;
             }
+
+            GetOrbitalCameraButton().gameObject.SetActive(ActionMapHandler.CanUseOrbitalCamera());
         }
 
         private Vector2 equippedWeaponCardTargetAnchoredPosition;
