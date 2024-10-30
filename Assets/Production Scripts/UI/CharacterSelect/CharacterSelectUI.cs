@@ -188,7 +188,7 @@ namespace Vi.UI
             {
                 finishCharacterCustomizationButton.interactable = false;
             }
-            else if (characterNameInputField.text.Length > 12)
+            else if (characterNameInputField.text.Length > 10)
             {
                 finishCharacterCustomizationButton.interactable = false;
             }
@@ -843,9 +843,9 @@ namespace Vi.UI
                 characterNameInputErrorText.text = "Name must be longer than 5 characters";
                 finishCharacterCustomizationButton.interactable = false;
             }
-            else if (characterNameInputField.text.Length > 12)
+            else if (characterNameInputField.text.Length > 10)
             {
-                characterNameInputErrorText.text = "Name must be shorter than 13 characters";
+                characterNameInputErrorText.text = "Name must be shorter than 11 characters";
                 finishCharacterCustomizationButton.interactable = false;
             }
             else

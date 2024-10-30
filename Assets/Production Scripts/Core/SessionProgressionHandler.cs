@@ -160,6 +160,19 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             experience.OnValueChanged -= OnExperienceChanged;
+            if (IsLocalPlayer & GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.LevelingEnabled)
+                {
+                    FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + essences.Value);
+                }
+                else
+                {
+                    FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens")
+                        + GameModeManager.Singleton.GetPlayerScore((int)OwnerClientId).cumulativeKills
+                        + GameModeManager.Singleton.GetPlayerScore((int)OwnerClientId).cumulativeAssists);
+                }
+            }
         }
 
         [SerializeField] private VisualEffect levelUpVisualEffect;

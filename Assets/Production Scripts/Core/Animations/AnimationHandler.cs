@@ -8,6 +8,7 @@ using Vi.ProceduralAnimations;
 using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
+using Vi.Core.Weapons;
 
 namespace Vi.Core
 {
@@ -160,10 +161,6 @@ namespace Vi.Core
             {
                 normalizedTime = animatorReference.NextActionsAnimatorStateInfo.normalizedTime;
             }
-
-            float floor = Mathf.FloorToInt(normalizedTime);
-            if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
-
             return normalizedTime;
         }
 
@@ -768,7 +765,7 @@ namespace Vi.Core
                 if (combatAgent.WeaponHandler.IsAttacking)
                 {
                     weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
-                    RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.GetWeaponInstances()[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
+                    RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.WeaponInstances[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
 
                     bool hitSucesss = grabVictim.ProcessMeleeHit(combatAgent, grabAttackClip, runtimeWeapon,
                         runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);
@@ -1034,17 +1031,20 @@ namespace Vi.Core
             }
         }
 
+        private const float animationLayerWeightSpeed = 6;
         private void UpdateAnimationLayerWeights(ActionClip.AvatarLayer avatarLayer)
         {
             switch (avatarLayer)
             {
                 case ActionClip.AvatarLayer.FullBody:
-                    Animator.SetLayerWeight(actionsLayerIndex, 1);
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 0);
+                    Animator.SetLayerWeight(actionsLayerIndex, Mathf.Lerp(Animator.GetLayerWeight(actionsLayerIndex), 1, Time.deltaTime * animationLayerWeightSpeed));
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"),
+                        Mathf.Lerp(Animator.GetLayerWeight(Animator.GetLayerIndex("Aiming Actions")), 0, Time.deltaTime * animationLayerWeightSpeed));
                     break;
                 case ActionClip.AvatarLayer.Aiming:
-                    Animator.SetLayerWeight(actionsLayerIndex, 0);
-                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"), 1);
+                    Animator.SetLayerWeight(actionsLayerIndex, Mathf.Lerp(Animator.GetLayerWeight(actionsLayerIndex), 0, Time.deltaTime * animationLayerWeightSpeed));
+                    Animator.SetLayerWeight(Animator.GetLayerIndex("Aiming Actions"),
+                        Mathf.Lerp(Animator.GetLayerWeight(Animator.GetLayerIndex("Aiming Actions")), 1, Time.deltaTime * animationLayerWeightSpeed));
                     break;
                 default:
                     Debug.LogError(avatarLayer + " has not been implemented yet!");
@@ -1358,6 +1358,14 @@ namespace Vi.Core
 
         private void Update()
         {
+            if (IsAtRest())
+            {
+                UpdateAnimationLayerWeights(ActionClip.AvatarLayer.FullBody);
+            }
+            else
+            {
+                UpdateAnimationLayerWeights(lastClipPlayed.avatarLayer);
+            }
             RefreshAimPoint();
         }
 
@@ -1366,6 +1374,7 @@ namespace Vi.Core
             if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
+        private static readonly Vector3 aimTargetOffset = new Vector3(0, 0, 10);
         private void RefreshAimPoint()
         {
             FindMainCamera();
@@ -1377,12 +1386,12 @@ namespace Vi.Core
             {
                 if (NetworkObject.IsPlayerObject & mainCamera)
                 {
-                    aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * aimTargetOffset;
                     cameraForwardDir.Value = mainCamera.transform.forward;
                 }
                 else
                 {
-                    aimPoint.Value = GetCameraPivotPoint() + transform.rotation * LimbReferences.aimTargetIKSolver.offset;
+                    aimPoint.Value = GetCameraPivotPoint() + transform.rotation * aimTargetOffset;
                 }
             }
 

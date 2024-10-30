@@ -11,18 +11,24 @@ using Vi.Core.CombatAgents;
 using Vi.ProceduralAnimations;
 using Vi.Core.GameModeManagers;
 using MagicaCloth2;
+using Vi.Core.Weapons;
 
 namespace Vi.Core
 {
     [DisallowMultipleComponent]
     public class WeaponHandler : NetworkBehaviour
     {
+        public Dictionary<Weapon.WeaponBone, RuntimeWeapon> WeaponInstances { get { return weaponInstances; } }
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
+
+        public List<ShooterWeapon> ShooterWeapons { get { return shooterWeapons; } }
         private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
+
+        private List<PooledObject> equippedPersistentNonWeapons = new List<PooledObject>();
+        private List<PooledObject> stowedPersistentNonWeapons = new List<PooledObject>();
 
         public Weapon GetWeapon() { return weaponInstance; }
 
-        public Dictionary<Weapon.WeaponBone, RuntimeWeapon> GetWeaponInstances() { return weaponInstances; }
 
         private Weapon weaponInstance;
         private CombatAgent combatAgent;
@@ -89,6 +95,12 @@ namespace Vi.Core
             }
             stowedWeaponInstances.Clear();
 
+            foreach (PooledObject pooledObject in stowedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            stowedPersistentNonWeapons.Clear();
+
             foreach (Weapon.WeaponModelData data in weapon.GetWeaponModelData())
             {
                 if (data.skinPrefab.name == combatAgent.AnimationHandler.LimbReferences.name.Replace("(Clone)", ""))
@@ -106,8 +118,58 @@ namespace Vi.Core
                         {
                             combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
                         }
+
+                        if (modelData.persistentNonWeaponPrefabs != null)
+                        {
+                            foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
+                            {
+                                LoadoutManager.WeaponSlotType weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
+                                switch (combatAgent.LoadoutManager.GetEquippedSlotType())
+                                {
+                                    case LoadoutManager.WeaponSlotType.Primary:
+                                        weaponSlotType = LoadoutManager.WeaponSlotType.Secondary;
+                                        break;
+                                    case LoadoutManager.WeaponSlotType.Secondary:
+                                        weaponSlotType = LoadoutManager.WeaponSlotType.Primary;
+                                        break;
+                                    default:
+                                        Debug.LogError("Unsure how to handle weapon slot type " + combatAgent.LoadoutManager.GetEquippedSlotType());
+                                        break;
+                                }
+                                stowedPersistentNonWeapons.Add(CreatePersistentNonWeapons(weaponSlotType, persistentNonWeaponData));
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        private PooledObject CreatePersistentNonWeapons(LoadoutManager.WeaponSlotType weaponSlotType, Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData)
+        {
+            PooledObject nonWeapon = ObjectPoolingManager.SpawnObject(persistentNonWeaponData.prefab,
+                combatAgent.AnimationHandler.LimbReferences.GetStowedWeaponParent(persistentNonWeaponData.parentType));
+
+            PersistentLocalObjects.Singleton.StartCoroutine(InitializeNonWeaponRenderers(nonWeapon.GetComponentsInChildren<Renderer>()));
+
+            if (nonWeapon.TryGetComponent(out Quiver quiver))
+            {
+                quiver.Initialize(combatAgent, combatAgent.LoadoutManager.GetWeaponInSlot(weaponSlotType));
+            }
+
+            return nonWeapon;
+        }
+
+        private IEnumerator InitializeNonWeaponRenderers(Renderer[] renderers)
+        {
+            foreach (Renderer r in renderers)
+            {
+                r.forceRenderingOff = true;
+                r.gameObject.layer = LayerMask.NameToLayer(IsSpawned ? "NetworkPrediction" : "Preview");
+            }
+            yield return null;
+            foreach (Renderer r in renderers)
+            {
+                r.forceRenderingOff = false;
             }
         }
 
@@ -144,6 +206,13 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(kvp.Value.GetComponent<PooledObject>());
             }
             weaponInstances.Clear();
+
+            foreach (PooledObject pooledObject in equippedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            equippedPersistentNonWeapons.Clear();
+
             foreach (PooledObject g in stowedWeaponInstances)
             {
                 if (g.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
@@ -153,6 +222,12 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(g);
             }
             stowedWeaponInstances.Clear();
+
+            foreach (PooledObject pooledObject in stowedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            stowedPersistentNonWeapons.Clear();
 
             inputHistory.Clear();
 
@@ -190,6 +265,12 @@ namespace Vi.Core
             weaponInstances.Clear();
             shooterWeapons.Clear();
 
+            foreach (PooledObject pooledObject in equippedPersistentNonWeapons)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            }
+            equippedPersistentNonWeapons.Clear();
+
             CanAim = false;
             CanADS = false;
 
@@ -215,6 +296,10 @@ namespace Vi.Core
                         if (modelData.weaponPrefab.TryGetComponent(out PooledObject pooledObject))
                         {
                             instance = ObjectPoolingManager.SpawnObject(pooledObject, bone).GetComponent<RuntimeWeapon>();
+                        }
+                        else
+                        {
+                            Debug.LogError(modelData.weaponPrefab + " does not have a pooled object component!");
                         }
 
                         if (!instance)
@@ -242,7 +327,16 @@ namespace Vi.Core
                         {
                             combatAgent.AnimationHandler.AddClothCapsuleCollider(weaponCapsuleCollider);
                         }
+
+                        if (modelData.persistentNonWeaponPrefabs != null)
+                        {
+                            foreach (Weapon.WeaponModelData.PersistentNonWeaponData persistentNonWeaponData in modelData.persistentNonWeaponPrefabs)
+                            {
+                                equippedPersistentNonWeapons.Add(CreatePersistentNonWeapons(combatAgent.LoadoutManager.GetEquippedSlotType(), persistentNonWeaponData));
+                            }
+                        }
                     }
+
                     broken = true;
                     break;
                 }
@@ -1184,7 +1278,11 @@ namespace Vi.Core
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {
                 CharacterReference.RaceAndGender raceAndGender = combatAgent.GetRaceAndGender();
-                combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender), isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody, shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType());
+
+                combatAgent.AnimationHandler.LimbReferences.AimHand(shooterWeapon.GetAimHand(), shooterWeapon.GetAimHandIKOffset(raceAndGender),
+                    isAiming & !combatAgent.AnimationHandler.IsReloading(), combatAgent.AnimationHandler.IsAtRest() || CurrentActionClip.shouldAimBody,
+                    shooterWeapon.GetBodyAimIKOffset(raceAndGender), shooterWeapon.GetBodyAimType(), shooterWeapon.GetOffHandIKOffset(raceAndGender));
+
                 ShooterWeapon.OffHandInfo offHandInfo = shooterWeapon.GetOffHandInfo();
                 combatAgent.AnimationHandler.LimbReferences.ReachHand(offHandInfo.offHand, offHandInfo.offHandTarget, (combatAgent.AnimationHandler.IsAtRest() ? isAiming : CurrentActionClip.shouldAimOffHand & isAiming) & !combatAgent.AnimationHandler.IsReloading());
             }

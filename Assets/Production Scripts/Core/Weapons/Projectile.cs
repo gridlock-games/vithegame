@@ -9,7 +9,7 @@ using Vi.Core.CombatAgents;
 using Unity.Netcode.Components;
 using Vi.Core.GameModeManagers;
 
-namespace Vi.Core
+namespace Vi.Core.Weapons
 {
     [RequireComponent(typeof(PooledObject))]
     [RequireComponent(typeof(Rigidbody))]

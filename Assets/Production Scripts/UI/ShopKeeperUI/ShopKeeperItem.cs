@@ -11,6 +11,8 @@ namespace Vi.UI
         [SerializeField] private Text price;
         [SerializeField] private Image previewIcon;
 
+        public string ItemId { get; private set; }
+
         public bool IsWeapon { get; private set; }
         public CharacterReference.WeaponOption weaponOption { get; private set; }
 
@@ -22,22 +24,24 @@ namespace Vi.UI
         {
             previewIcon.sprite = wearableEquipmentOption.GetIcon(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender);
             itemName.text = wearableEquipmentOption.name;
-            price.text = "2";
-            Price = 2;
+            Price = 3;
+            price.text = Price.ToString();
 
             IsArmor = true;
             equipmentOption = wearableEquipmentOption;
+            ItemId = wearableEquipmentOption.itemWebId;
         }
 
         public void InitializeAsWeapon(CharacterReference.WeaponOption weaponOption)
         {
             previewIcon.sprite = weaponOption.weaponIcon;
             itemName.text = weaponOption.name;
-            price.text = "3";
-            Price = 3;
+            Price = 5;
+            price.text = Price.ToString();
 
             IsWeapon = true;
             this.weaponOption = weaponOption;
+            ItemId = weaponOption.itemWebId;
         }
 
         public Selectable[] Selectables { get { return _selectables; } }

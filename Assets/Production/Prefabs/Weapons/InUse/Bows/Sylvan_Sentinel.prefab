@@ -92,7 +92,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7109037, y: -0, z: -0, w: 0.70328945}
   m_LocalPosition: {x: 0, y: 0.08730882, z: 0.08637399}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4643620497025800912}
@@ -114,6 +114,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponMaterial: 0
   collidesWithClothWhileStowed: 0
+  weaponBoneFollowTargets:
+  - {fileID: 2144866516220628681}
   dropWeaponPrefab: {fileID: 6723547920205086022, guid: 6d62015ef099c94458f737b2ff5ea916,
     type: 3}
   canADS: 1
@@ -132,17 +134,21 @@ MonoBehaviour:
   bodyAimType: 0
   IKData:
   - raceAndGender: 0
-    aimHandIKOffset: {x: 0, y: 0, z: 0}
-    bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    aimHandIKOffset: {x: -14.01, y: 0, z: 0}
+    bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 47}
   - raceAndGender: 1
-    aimHandIKOffset: {x: 0, y: 0, z: 0}
-    bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    aimHandIKOffset: {x: -4, y: 0, z: 0}
+    bodyAimIKOffset: {x: -7.97, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 30}
   - raceAndGender: 2
     aimHandIKOffset: {x: 0, y: 0, z: 0}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 3
     aimHandIKOffset: {x: 0, y: 0, z: 0}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &102408958681105487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,6 +282,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6349243682310192788}
+  - component: {fileID: 3566917912066928904}
   m_Layer: 6
   m_Name: Arm_Up
   m_TagString: Untagged
@@ -291,13 +298,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6238447385306542594}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0015434854, y: 0.009790456, z: 0.1703299}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5334977438326925611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3566917912066928904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6238447385306542594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe0e311ea1804e4f8ad4af29bd5177d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLocalRotation: {x: -30, y: 0, z: 0}
+  attackingLocalRotation: {x: 10, y: 0, z: 0}
 --- !u!1 &7022147164955025644
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +362,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 180447666727177234}
+  - component: {fileID: 3637484760598325827}
   m_Layer: 6
   m_Name: Arm_Low
   m_TagString: Untagged
@@ -356,13 +378,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8028700941277794003}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0015434517, y: 0.00979052, z: -0.17018062}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5334977438326925611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3637484760598325827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8028700941277794003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe0e311ea1804e4f8ad4af29bd5177d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLocalRotation: {x: 30, y: 0, z: 0}
+  attackingLocalRotation: {x: -10, y: 0, z: 0}
 --- !u!1 &8801315497760651709
 GameObject:
   m_ObjectHideFlags: 0
@@ -372,6 +408,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4673639772460144686}
+  - component: {fileID: 2144866516220628681}
   m_Layer: 6
   m_Name: String
   m_TagString: Untagged
@@ -394,3 +431,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5334977438326925611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2144866516220628681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8801315497760651709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 322f796dfe33194469a29caa83ee8ee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followWhileAiming: 1
+  weaponBoneToFollow: 18
+  childWeaponBones:
+  - {fileID: 3637484760598325827}
+  - {fileID: 3566917912066928904}
+  attackingLocalPosition: {x: 0.000000001027588, y: 0.032, z: 0}
+  offsetData:
+  - raceAndGender: 0
+    offset: {x: 0.01, y: 0, z: 0.09}
+  - raceAndGender: 1
+    offset: {x: 0, y: 0.015, z: 0}
+  lerpSpeed: 8
+  moveTowardsSpeed: 6

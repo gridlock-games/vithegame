@@ -12,6 +12,7 @@ using Vi.Core.CombatAgents;
 using Vi.Utility;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+using Vi.Core.Weapons;
 
 namespace Vi.Editor
 {

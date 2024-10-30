@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX.Staff
 {

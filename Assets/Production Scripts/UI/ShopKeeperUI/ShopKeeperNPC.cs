@@ -20,6 +20,8 @@ namespace Vi.UI
         [SerializeField] private Text purchaseErrorText;
         [SerializeField] private Text currencyCountText;
         [SerializeField] private Selectable[] selectablesThatRespondToPurchaseRpc;
+        [SerializeField] private AudioClip[] purchaseSuccessfulSounds;
+        [SerializeField] private AudioClip[] purchaseUnsuccessfulSounds;
 
         private List<ShopKeeperItem> shopKeeperItemInstances = new List<ShopKeeperItem>();
 
@@ -55,6 +57,7 @@ namespace Vi.UI
             if (FasterPlayerPrefs.Singleton.GetInt("Tokens") < price)
             {
                 purchaseErrorText.text = "Not Enough Vi Essence!";
+                AudioManager.Singleton.Play2DClip(gameObject, purchaseUnsuccessfulSounds[Random.Range(0, purchaseUnsuccessfulSounds.Length)], 0.3f);
                 return;
             }
 
@@ -74,23 +77,30 @@ namespace Vi.UI
             yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
             bool success = WebRequestManager.Singleton.InventoryAddWasSuccessful;
             if (success) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
-            PurchaseClientRpc(success, characterId, price);
+            PurchaseClientRpc(purchaserClientId, success, characterId, itemId, price);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void PurchaseClientRpc(bool purchaseSuccessful, string characterId, int price)
+        private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, string characterId, string itemId, int price)
         {
-            waitingForPurchase = false;
-            if (purchaseSuccessful)
+            shopKeeperItemInstances.Find(item => item.ItemId == itemId).gameObject.SetActive(false);
+            if (purchaserClientId == NetworkManager.LocalClientId)
             {
-                purchaseErrorText.text = "Purchase successful!";
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
-                FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") - price);
-                currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
-            }
-            else
-            {
-                purchaseErrorText.text = "There was a problem.";
+                waitingForPurchase = false;
+                if (purchaseSuccessful)
+                {
+                    purchaseErrorText.text = "Purchase successful!";
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
+                    FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") - price);
+                    currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
+
+                    AudioManager.Singleton.Play2DClip(gameObject, purchaseSuccessfulSounds[Random.Range(0, purchaseSuccessfulSounds.Length)], 0.3f);
+                }
+                else
+                {
+                    purchaseErrorText.text = "There was a problem.";
+                    AudioManager.Singleton.Play2DClip(gameObject, purchaseUnsuccessfulSounds[Random.Range(0, purchaseUnsuccessfulSounds.Length)], 0.3f);
+                }
             }
         }
 

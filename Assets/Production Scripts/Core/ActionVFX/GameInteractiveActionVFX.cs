@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.Weapons;
 
 namespace Vi.Core.VFX
 {

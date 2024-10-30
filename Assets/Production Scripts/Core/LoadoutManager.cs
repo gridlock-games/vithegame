@@ -77,6 +77,20 @@ namespace Vi.Core
             }
         }
 
+        public Weapon GetWeaponInSlot(LoadoutManager.WeaponSlotType weaponSlotType)
+        {
+            switch (weaponSlotType)
+            {
+                case WeaponSlotType.Primary:
+                    return primaryWeaponInstance;
+                case WeaponSlotType.Secondary:
+                    return secondaryWeaponInstance;
+                default:
+                    Debug.LogError("Unsure how to handle weapon slot type "+ weaponSlotType);
+                    return null;
+            }
+        }
+
         private CombatAgent combatAgent;
         private AnimationHandler animationHandler;
         private InputAction switchWeaponAction;

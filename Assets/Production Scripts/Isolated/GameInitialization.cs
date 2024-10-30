@@ -57,9 +57,26 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            FasterPlayerPrefs.Singleton.SetInt("Tokens", 6);
-            //if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 6); }
-            //if (!FasterPlayerPrefs.Singleton.HasString("LastLoginTime")) { FasterPlayerPrefs.Singleton.SetString("LastLoginTime", System.DateTime.UtcNow.ToString()); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 5); }
+
+            if (FasterPlayerPrefs.Singleton.HasString("LastLoginTime"))
+            {
+                if (System.DateTime.TryParse(FasterPlayerPrefs.Singleton.GetString("LastLoginTime"), out System.DateTime lastLoginTime))
+                {
+                    if (lastLoginTime.Day != System.DateTime.UtcNow.Day)
+                    {
+                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + 5);
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Erorr while parsing datetime string " + FasterPlayerPrefs.Singleton.GetString("LastLoginTime"));
+                }
+            }
+            else
+            {
+                FasterPlayerPrefs.Singleton.SetString("LastLoginTime", System.DateTime.UtcNow.ToString());
+            }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }

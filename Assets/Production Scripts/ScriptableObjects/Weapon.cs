@@ -62,26 +62,26 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
 
-        public bool IsWalking(bool isBlocking)
+        public float GetMovementSpeed(bool isBlocking, bool isAiming)
         {
-            if (blockingLocomotion == BlockingLocomotion.CanWalk & isBlocking) { return true; }
-            return false;
-        }
-
-        public float GetMovementSpeed(bool isBlocking)
-        {
-            switch (blockingLocomotion)
+            if (isBlocking)
             {
-                case BlockingLocomotion.NoMovement:
-                    return isBlocking ? 0 : runSpeed;
-                case BlockingLocomotion.CanWalk:
-                    return isBlocking ? walkSpeed : runSpeed;
-                case BlockingLocomotion.CanRun:
-                    return runSpeed;
-                default:
-                    Debug.LogError("Unsure how to handle blocking locomotion type - " + blockingLocomotion);
-                    break;
+                switch (blockingLocomotion)
+                {
+                    case BlockingLocomotion.NoMovement:
+                        return isBlocking ? 0 : runSpeed;
+                    case BlockingLocomotion.CanWalk:
+                        return isBlocking ? walkSpeed : runSpeed;
+                    case BlockingLocomotion.CanRun:
+                        return runSpeed;
+                    default:
+                        Debug.LogError("Unsure how to handle blocking locomotion type - " + blockingLocomotion);
+                        break;
+                }
             }
+
+            if (isAiming) { return walkSpeed; }
+
             return runSpeed;
         }
 
@@ -264,6 +264,14 @@ namespace Vi.ScriptableObjects
                 public StowedWeaponParentType stowedParentType = StowedWeaponParentType.Back_M;
                 public Vector3 stowedWeaponPositionOffset;
                 public Vector3 stowedWeaponRotationOffset;
+                public PersistentNonWeaponData[] persistentNonWeaponPrefabs = new PersistentNonWeaponData[0];
+            }
+
+            [System.Serializable]
+            public struct PersistentNonWeaponData
+            {
+                public StowedWeaponParentType parentType;
+                public PooledObject prefab;
             }
         }
 
