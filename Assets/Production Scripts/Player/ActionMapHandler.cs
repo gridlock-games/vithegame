@@ -238,7 +238,12 @@ namespace Vi.Player
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
 
-        private void OnOrbitalCam(InputValue value)
+        public static bool CanUseOrbitalCamera()
+        {
+            return PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
+        }
+
+        public void SetOrbitalCamState(bool isPressed)
         {
             if (!playerCameraController) { return; }
             if (externalUI != null) { return; }
@@ -246,7 +251,7 @@ namespace Vi.Player
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
             if (textChatIsOpen) { return; }
-            if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { return; }
+            if (!CanUseOrbitalCamera()) { return; }
 
             if (combatAgent)
             {
@@ -257,11 +262,24 @@ namespace Vi.Player
                 return;
             }
 
-            //playerCameraController.SetOrbitalCameraState(value.isPressed);
-            if (value.isPressed)
+            string orbitalCamMode = FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode");
+            if (orbitalCamMode == "HOLD")
             {
-                playerCameraController.ToggleOrbitalCameraState();
+                playerCameraController.SetOrbitalCameraState(isPressed);
             }
+            else if (orbitalCamMode == "TOGGLE")
+            {
+                if (isPressed) { playerCameraController.ToggleOrbitalCameraState(); }
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle orbital camera mode " + orbitalCamMode);
+            }
+        }
+
+        private void OnOrbitalCam(InputValue value)
+        {
+            SetOrbitalCamState(value.isPressed);
         }
     }
 }

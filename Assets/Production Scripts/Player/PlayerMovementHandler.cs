@@ -618,6 +618,8 @@ namespace Vi.Player
 
                 cameraController.SetActive(true);
 
+                cameraController.SetOrbitalCameraState(false);
+
                 playerInput.enabled = true;
                 string rebinds = FasterPlayerPrefs.Singleton.GetString("Rebinds");
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
