@@ -124,18 +124,19 @@ namespace Vi.Player
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return;
             }
-            if (latestServerState.Value.usedRootMotion | combatAgent.AnimationHandler.ShouldApplyRootMotion())
+            
+            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
+            if (latestServerState.Value.usedRootMotion | combatAgent.AnimationHandler.ShouldApplyRootMotion() | stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return;
             }
 
-            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -224,6 +225,7 @@ namespace Vi.Player
                         {
                             if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
                             {
+                                Debug.Log("Skipping input " + serverInputQueue.Count);
                                 continue;
                             }
                         }
@@ -239,7 +241,7 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                if (latestServerState.Value.tick > 0)
+                if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                 {
                     if (!latestServerState.Equals(default(StatePayload)) &&
                         (lastProcessedState.Equals(default(StatePayload)) ||
@@ -430,14 +432,20 @@ namespace Vi.Player
                 }
                 else if (latestServerState.Value.usedRootMotion) // If we are not the server
                 {
-                    if (combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip) > 0.7f)
+                    float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
+                    normalizedTime = StringUtility.NormalizeValue(normalizedTime, 0, 1 - combatAgent.WeaponHandler.CurrentActionClip.transitionTime - 0.1f);
+                    if (normalizedTime > 0.9f)
                     {
-                        movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                        movement = Vector3.Lerp(Vector3.zero, latestServerState.Value.position - GetPosition(), normalizedTime) / Time.fixedDeltaTime;
                     }
                     else
                     {
                         movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
                     }
+                }
+                else if (shouldApplyRootMotion)
+                {
+                    movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
                 }
                 else
                 {

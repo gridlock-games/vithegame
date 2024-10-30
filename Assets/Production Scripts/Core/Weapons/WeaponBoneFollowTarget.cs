@@ -1,6 +1,7 @@
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.ProceduralAnimations;
+using Vi.Utility;
 
 namespace Vi.Core.Weapons
 {
@@ -44,21 +45,15 @@ namespace Vi.Core.Weapons
             target = combatAgent.AnimationHandler.LimbReferences.GetBoneTransform(weaponBoneToFollow);
         }
 
-        private const float maxRigWeight = 1;
-        private const float minRigWeight = 0.7f;
-        float NormalizeValue(float value)
-        {
-            float minValue = minRigWeight;
-            float maxValue = maxRigWeight;
-            return (value - minValue) / (maxValue - minValue);
-        }
-
         private Vector3 TargetPosition { get { return target ? target.position + target.rotation * System.Array.Find(offsetData, item => item.raceAndGender == combatAgent.GetRaceAndGender()).offset : Vector3.zero; } }
 
         [SerializeField] private float lerpSpeed = 8;
         [SerializeField] private float moveTowardsSpeed = 6;
 
         private Vector3 lastShooterWeaponPosition;
+
+        private const float maxRigWeight = 1;
+        private const float minRigWeight = 0.7f;
 
         private void LateUpdate()
         {
@@ -112,7 +107,7 @@ namespace Vi.Core.Weapons
                             }
                             else if (weight > minRigWeight)
                             {
-                                float t = NormalizeValue(weight);
+                                float t = StringUtility.NormalizeValue(weight, minRigWeight, maxRigWeight);
                                 transform.position = Vector3.Lerp(transform.position, TargetPosition, t);
                                 foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                                 {
@@ -143,7 +138,7 @@ namespace Vi.Core.Weapons
                         }
                         else if (weight > minRigWeight)
                         {
-                            float t = 1 - NormalizeValue(weight);
+                            float t = 1 - StringUtility.NormalizeValue(weight, minRigWeight, maxRigWeight);
                             transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, t);
                             foreach (ChildWeaponBone childWeaponBone in childWeaponBones)
                             {
