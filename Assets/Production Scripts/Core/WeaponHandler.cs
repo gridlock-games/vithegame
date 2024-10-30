@@ -925,7 +925,6 @@ namespace Vi.Core
                 foreach (ActionVFX actionVFX in actionVFXInstanceTracker)
                 {
                     if (!actionVFX) { continue; }
-                    Debug.Log(actionVFX.name + " " + actionVFX.IsSpawned);
                     if (actionVFX.IsSpawned) { actionVFX.NetworkObject.Despawn(true); }
                 }
             }
