@@ -124,18 +124,19 @@ namespace Vi.Player
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return;
             }
-            if (latestServerState.Value.usedRootMotion | combatAgent.AnimationHandler.ShouldApplyRootMotion())
+            
+            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
+            if (latestServerState.Value.usedRootMotion | combatAgent.AnimationHandler.ShouldApplyRootMotion() | stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return;
             }
 
-            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -224,6 +225,7 @@ namespace Vi.Player
                         {
                             if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
                             {
+                                Debug.Log("Skipping input " + serverInputQueue.Count);
                                 continue;
                             }
                         }
@@ -438,6 +440,10 @@ namespace Vi.Player
                     {
                         movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
                     }
+                }
+                else if (shouldApplyRootMotion)
+                {
+                    movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
                 }
                 else
                 {
