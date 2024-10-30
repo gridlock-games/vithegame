@@ -136,7 +136,7 @@ namespace Vi.Core.Weapons
 
             if (!IsServer) { return; }
 
-            if (Vector3.Distance(transform.position, startPosition) > killDistance | GameModeManager.Singleton.ShouldDisplayNextGameAction())
+            if (Vector3.Distance(transform.position, startPosition) > killDistance | (GameModeManager.Singleton.ShouldDisplayNextGameAction() & GameModeManager.Singleton.DespawnProjectilesInBetweenRounds))
             {
                 if (IsSpawned)
                 {

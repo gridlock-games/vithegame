@@ -20,7 +20,7 @@ namespace Vi.Core.Weapons
             if (!weaponTrailVFX) { return; }
             if (!parentCombatAgent) { return; }
 
-            if (parentCombatAgent.WeaponHandler.IsAttacking & parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone) & !isStowed)
+            if (parentCombatAgent.WeaponHandler.IsAttacking & parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone) & !IsStowed)
             {
                 weaponTrailVFX.gameObject.SetActive(true);
                 lastWeaponTrailActiveTime = Time.time;
@@ -36,7 +36,7 @@ namespace Vi.Core.Weapons
 
         private void ProcessTriggerEvent(Collider other)
         {
-            if (isStowed) { return; }
+            if (IsStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
             if (!parentCombatAgent) { return; }

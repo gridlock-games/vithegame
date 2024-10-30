@@ -22,6 +22,8 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] protected int numberOfRoundsWinsToWinGame = 2;
         [SerializeField] protected float roundDuration = 30;
         [SerializeField] private float nextGameActionDuration = 10;
+        public bool DespawnProjectilesInBetweenRounds { get { return despawnProjectilesInBetweenRounds; } }
+        [SerializeField] private bool despawnProjectilesInBetweenRounds = true;
         [Header("Leave respawn time as 0 to disable respawns during a round")]
         [SerializeField] private float respawnTime = 5;
         [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;

@@ -69,6 +69,10 @@ namespace Vi.Core.Weapons
             bool evaluated = false;
             if (followWhileAiming)
             {
+                if (!shooterWeapon) { Debug.LogError("No shooter weapon found!"); return; }
+
+                if (shooterWeapon.IsStowed) { return; }
+
                 Vector3 weaponPositionDelta = shooterWeapon.transform.position - lastShooterWeaponPosition;
                 lastShooterWeaponPosition = shooterWeapon.transform.position;
 

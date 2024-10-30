@@ -769,6 +769,12 @@ namespace Vi.Core
                 if (combatAgent.AnimationHandler.IsActionClipPlaying(CurrentActionClip))
                 {
                     float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
+                    if (CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                    {
+                        float floor = Mathf.FloorToInt(normalizedTime);
+                        if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
+                    }
+
                     IsInRecovery = normalizedTime >= CurrentActionClip.recoveryNormalizedTime;
                     IsAttacking = normalizedTime >= CurrentActionClip.attackingNormalizedTime & !IsInRecovery;
                     IsInAnticipation = !IsAttacking & !IsInRecovery;
