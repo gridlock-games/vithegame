@@ -328,11 +328,11 @@ namespace Vi.Core
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
             }
             
-            CancelAllActionsClientRpc(transitionTime);
+            CancelAllActionsClientRpc(transitionTime, resetGameplayVariables);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void CancelAllActionsClientRpc(float transitionTime)
+        private void CancelAllActionsClientRpc(float transitionTime, bool resetGameplayVariables)
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
@@ -341,9 +341,12 @@ namespace Vi.Core
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
-            Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
-            Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
-            combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            if (resetGameplayVariables)
+            {
+                Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
+                Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
+                combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+            }
         }
 
         // Stores the type of the last action clip played

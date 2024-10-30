@@ -257,7 +257,11 @@ namespace Vi.Player
                 return;
             }
 
-            playerCameraController.SetOrbitalCameraState(value.isPressed);
+            //playerCameraController.SetOrbitalCameraState(value.isPressed);
+            if (value.isPressed)
+            {
+                playerCameraController.ToggleOrbitalCameraState();
+            }
         }
     }
 }
