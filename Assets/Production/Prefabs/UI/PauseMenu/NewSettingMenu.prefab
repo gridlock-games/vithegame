@@ -330,8 +330,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -665.81, y: -14.903015}
-  m_SizeDelta: {x: 1331.6, y: -29.807}
+  m_AnchoredPosition: {x: -863.12823, y: -14.903015}
+  m_SizeDelta: {x: 1653.9243, y: -29.807}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1622492131363083100
 GameObject:
@@ -1604,7 +1604,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -60.571045, y: -35}
-  m_SizeDelta: {x: 264, y: 48}
+  m_SizeDelta: {x: 260.56073, y: 47.056072}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &9058069777172967608
 CanvasRenderer:
@@ -3722,6 +3722,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2109656416002388522, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
+      propertyPath: m_Size
+      value: 0.43404254
+      objectReference: {fileID: 0}
+    - target: {fileID: 2109656416002388522, guid: f4765ff7f7167214f86b02cb1995750e,
+        type: 3}
       propertyPath: m_Value
       value: 1
       objectReference: {fileID: 0}
@@ -4013,12 +4018,12 @@ PrefabInstance:
     - target: {fileID: 4224338536348053640, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4224338536348053640, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4625491340545900349, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
@@ -4098,6 +4103,11 @@ PrefabInstance:
     - target: {fileID: 6655096586461811236, guid: f4765ff7f7167214f86b02cb1995750e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7304548137300297667, guid: f4765ff7f7167214f86b02cb1995750e,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7583172408512459165, guid: f4765ff7f7167214f86b02cb1995750e,
