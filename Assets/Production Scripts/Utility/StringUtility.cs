@@ -22,6 +22,12 @@ namespace Vi.Utility
             return list.Count == 0 ? default(T) : list[UnityEngine.Random.Range(0, list.Count)];
         }
 
+        public static float NormalizeValue(float value, float min, float max)
+        {
+            value = Mathf.Clamp(value, min, max);
+            return (value - min) / (max - min);
+        }
+
         /// <summary>
         ///     Calculate the difference between 2 strings using the Levenshtein distance algorithm
         /// </summary>
