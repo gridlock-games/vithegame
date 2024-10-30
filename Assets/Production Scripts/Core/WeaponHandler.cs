@@ -36,6 +36,11 @@ namespace Vi.Core
         {
             combatAgent = GetComponent<CombatAgent>();
             RefreshStatus();
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
         private void OnEnable()
@@ -194,6 +199,11 @@ namespace Vi.Core
             combatAgent.LoadoutManager.UseAmmo(weaponInstance);
         }
 
+        private void OnReturnToPool()
+        {
+            DespawnActionVFXInstances();
+        }
+
         private void OnDisable()
         {
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
@@ -238,7 +248,6 @@ namespace Vi.Core
             actionSoundEffectIdTracker.Clear();
 
             actionVFXPrefabTracker.Clear();
-            DespawnActionVFXInstances();
 
             IsInAnticipation = false;
             isAboutToAttack = false;
