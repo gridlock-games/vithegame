@@ -257,10 +257,18 @@ namespace Vi.Player
                 return;
             }
 
-            //playerCameraController.SetOrbitalCameraState(value.isPressed);
-            if (value.isPressed)
+            string orbitalCamMode = FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode");
+            if (orbitalCamMode == "HOLD")
             {
-                playerCameraController.ToggleOrbitalCameraState();
+                playerCameraController.SetOrbitalCameraState(value.isPressed);
+            }
+            else if (orbitalCamMode == "TOGGLE")
+            {
+                if (value.isPressed) { playerCameraController.ToggleOrbitalCameraState(); }
+            }
+            else
+            {
+                Debug.LogError("Unsure how to handle orbital camera mode " + orbitalCamMode);
             }
         }
     }

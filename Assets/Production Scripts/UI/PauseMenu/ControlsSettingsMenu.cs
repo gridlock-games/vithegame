@@ -21,6 +21,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown lightAttackModeDropdown;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
+        [SerializeField] private TMP_Dropdown orbitalCameraModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
         [Header("Key Rebinding")]
@@ -67,6 +68,9 @@ namespace Vi.UI
 
             blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
+
+            orbitalCameraModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
+            orbitalCameraModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
@@ -222,6 +226,11 @@ namespace Vi.UI
         public void ChangeBlockingMode()
         {
             FasterPlayerPrefs.Singleton.SetString("BlockingMode", WeaponHandler.GetHoldToggleOptions()[blockingModeDropdown.value]);
+        }
+
+        public void ChangeOrbitalCameraMode()
+        {
+            FasterPlayerPrefs.Singleton.SetString("OrbitalCameraMode", WeaponHandler.GetHoldToggleOptions()[orbitalCameraModeDropdown.value]);
         }
 
         public void ChangeMobileLookJoystickSensitivity()
