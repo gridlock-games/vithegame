@@ -361,6 +361,9 @@ namespace Vi.Core
 
         public void CancelGrab()
         {
+            if (!IsSpawned) { Debug.LogError("CombatAgent.CancelGrab() should only be called when spawned!"); return; }
+            if (!IsServer) { Debug.LogError("CombatAgent.CancelGrab() should only be called on the server!"); return; }
+
             if (IsGrabbed | IsGrabbing)
             {
                 if (grabResetCoroutine != null) { StopCoroutine(grabResetCoroutine); }
