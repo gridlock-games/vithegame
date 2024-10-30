@@ -77,7 +77,7 @@ namespace Vi.Utility
         {
             ObjectPoolingManager.RemoveSpawnedObjectFromActivePool(this);
             IsSpawned = false;
-            //gameObject.hideFlags = HideFlags.HideInHierarchy;
+            gameObject.hideFlags = HideFlags.HideInHierarchy;
         }
 
 #if UNITY_EDITOR
