@@ -33,6 +33,7 @@ namespace Vi.Isolated
 
         private IEnumerator LoadMainMenu()
         {
+            yield return new WaitUntil(() => AudioManager.AudioConfigurationApplied);
             NetworkManagerLoadingOperation = networkManagerPrefab.InstantiateAsync();
             yield return NetworkManagerLoadingOperation;
             yield return new WaitUntil(() => NetworkManager.Singleton);

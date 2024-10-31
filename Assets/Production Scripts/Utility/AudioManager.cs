@@ -221,9 +221,23 @@ namespace Vi.Utility
             if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
+        public static bool AudioConfigurationApplied { get; private set; }
         private void Awake()
         {
             _singleton = this;
+            AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChange;
+
+            AudioConfiguration audioConfiguration = AudioSettings.GetConfiguration();
+            if (FasterPlayerPrefs.Singleton.HasInt("SpeakerMode")) { audioConfiguration.speakerMode = (AudioSpeakerMode)FasterPlayerPrefs.Singleton.GetInt("SpeakerMode"); }
+            if (FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { audioConfiguration.sampleRate = FasterPlayerPrefs.Singleton.GetInt("SampleRate"); }
+            AudioSettings.Reset(audioConfiguration);
+            AudioConfigurationApplied = true;
+        }
+
+        private static void OnAudioConfigurationChange(bool deviceWasChanged)
+        {
+            FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode);
+            FasterPlayerPrefs.Singleton.SetInt("SampleRate", AudioSettings.GetConfiguration().sampleRate);
         }
 
         private void OnEnable()

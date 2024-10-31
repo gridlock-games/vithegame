@@ -5,6 +5,7 @@ using Vi.Core;
 using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Isolated;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -121,6 +122,10 @@ namespace Vi.UI
             }
 
             bool mainMenuLoading = false;
+            if (!AudioManager.AudioConfigurationApplied)
+            {
+                mainMenuLoading = true;
+            }
             if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
             {
                 mainMenuLoading = true;
@@ -163,6 +168,11 @@ namespace Vi.UI
             scenesLeftText.text = "";
             if (mainMenuLoading)
             {
+                if (!AudioManager.AudioConfigurationApplied)
+                {
+                    progressBarText.text = "Applying Audio Configuration";
+                    progressBarImage.fillAmount = 0;
+                }
                 if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
                 {
                     progressBarText.text = "Loading Network Manager " + (networkCallbackManager.NetworkManagerLoadingOperation.PercentComplete * 100).ToString("F0") + "%";

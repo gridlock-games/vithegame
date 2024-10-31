@@ -57,6 +57,9 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasInt("SpeakerMode")) { FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { FasterPlayerPrefs.Singleton.SetInt("SampleRate", AudioSettings.GetConfiguration().sampleRate); }
+
             if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 5); }
 
             if (FasterPlayerPrefs.Singleton.HasString("LastLoginTime"))
