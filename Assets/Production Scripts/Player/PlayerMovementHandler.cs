@@ -433,6 +433,10 @@ namespace Vi.Player
                         movement = newRotation * rootMotion * GetRootMotionSpeed();
                     }
                 }
+                else if (combatAgent.StatusAgent.IsRooted() & combatAgent.GetAilment() != ActionClip.Ailment.Knockup & combatAgent.GetAilment() != ActionClip.Ailment.Knockdown)
+                {
+                    movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                }
                 else if (latestServerState.Value.usedRootMotion) // If we are not the server
                 {
                     float rootMotionNormalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
