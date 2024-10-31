@@ -450,9 +450,17 @@ namespace Vi.Player
                         movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
                     }
                 }
-                else if (shouldApplyRootMotion)
+                else if (shouldApplyRootMotion & inputPayload.tick > 0)
                 {
-                    movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                    int lastTickIndex = (inputPayload.tick - 1) % BUFFER_SIZE;
+                    if (stateBuffer[lastTickIndex].usedRootMotion)
+                    {
+                        movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
+                    }
+                    else // Didn't use root motion on the previous tick
+                    {
+                        movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
+                    }
                 }
                 else
                 {
