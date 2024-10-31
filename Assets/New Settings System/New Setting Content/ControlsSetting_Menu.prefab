@@ -629,7 +629,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 28771014061788789}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -784,10 +784,10 @@ RectTransform:
   - {fileID: 5560112523505359455}
   m_Father: {fileID: 8089800137959491880}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1283.5146, y: 311.7308}
+  m_SizeDelta: {x: 0, y: 1184.9238}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &8671323078502619792
 MonoBehaviour:
@@ -803,7 +803,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 0
-    m_Right: 0
+    m_Right: 100
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
@@ -972,7 +972,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7583614748884552518}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.7367591
+  m_Size: 0.7369191
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1168,7 +1168,17 @@ PrefabInstance:
     - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_Text
-      value: Zoom Sensitivity
+      value: ZOOM SENSITIVITY
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1695200802953921941, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -1379,7 +1389,12 @@ PrefabInstance:
     - target: {fileID: 7491675272732639847, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       propertyPath: m_Text
-      value: Invert Look
+      value: INVERT LOOK
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491675272732639847, guid: 1889e6e410ae9e8448da9f0f5b18b130,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1520,7 +1535,17 @@ PrefabInstance:
     - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_Text
-      value: X-Axis Sensitivity
+      value: X-AXIS SENSITIVITY
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1695200802953921941, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -1621,7 +1646,17 @@ PrefabInstance:
     - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_Text
-      value: Light Attack Mode
+      value: LIGHT ATTACK MODE
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
@@ -1832,7 +1867,17 @@ PrefabInstance:
     - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_Text
-      value: Blocking Mode
+      value: BLOCKING MODE
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
@@ -2108,7 +2153,17 @@ PrefabInstance:
     - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_Text
-      value: Look Joystick Sensitivity
+      value: LOOK JOYSTICK SENSITIVITY
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1695200802953921941, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -2139,6 +2194,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: ChangeMobileLookJoystickSensitivity
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572695131631847823, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 537.6121
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572695131631847823, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 268.806
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2279,7 +2344,17 @@ PrefabInstance:
     - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
       propertyPath: m_Text
-      value: Y-Axis Sensitivity
+      value: Y-AXIS SENSITIVITY
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1092361538497157724, guid: b584b32942ede4640a5c7dd33b18b3d1,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1695200802953921941, guid: b584b32942ede4640a5c7dd33b18b3d1,
         type: 3}
@@ -2385,7 +2460,17 @@ PrefabInstance:
     - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_Text
-      value: Orbital Camera Mode
+      value: ORBITAL CAMERA MODE
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
@@ -2566,7 +2651,12 @@ PrefabInstance:
     - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
       propertyPath: m_Text
-      value: Reset To Default
+      value: RESET SETTINGS
+      objectReference: {fileID: 0}
+    - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 4137011179810408883, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
@@ -2745,7 +2835,17 @@ PrefabInstance:
     - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
       propertyPath: m_Text
-      value: Zoom Mode
+      value: ADS MODE
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5691881578897967985, guid: 16624a645a66f9a47bed9a0dc2423e9a,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6777598006824414592, guid: 16624a645a66f9a47bed9a0dc2423e9a,
         type: 3}
