@@ -126,7 +126,7 @@ namespace Vi.Player
             }
 
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
-            if (latestServerState.Value.usedRootMotion | combatAgent.AnimationHandler.ShouldApplyRootMotion() | stateBuffer[serverStateBufferIndex].usedRootMotion)
+            if (latestServerState.Value.usedRootMotion | stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return Vector3.zero;
@@ -136,7 +136,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError + " " + stateBuffer[serverStateBufferIndex].usedRootMotion);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -228,11 +228,7 @@ namespace Vi.Player
                     {
                         if (serverInputQueue.Count > 3)
                         {
-                            if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
-                            {
-                                Debug.Log("Skipping input " + serverInputQueue.Count);
-                                continue;
-                            }
+                            if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero) { continue; }
                         }
 
                         StatePayload statePayload = Move(inputPayload);
@@ -440,13 +436,15 @@ namespace Vi.Player
                 else if (latestServerState.Value.usedRootMotion) // If we are not the server
                 {
                     float rootMotionNormalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
-                    float normalizedTime = StringUtility.NormalizeValue(rootMotionNormalizedTime, 0, 1 - combatAgent.WeaponHandler.CurrentActionClip.transitionTime - 0.1f);
-                    if (normalizedTime > 0.8f)
+                    float normalizedTime = StringUtility.NormalizeValue(rootMotionNormalizedTime, 0, 1 - combatAgent.WeaponHandler.CurrentActionClip.transitionTime);
+                    if (normalizedTime > 0.9f)
                     {
-                        movement = Vector3.Lerp(Vector3.zero, latestServerState.Value.position - GetPosition(), normalizedTime) / Time.fixedDeltaTime;
+                        //Debug.Log(inputPayload.tick + " 1 " + normalizedTime);
+                        movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
                     }
                     else
                     {
+                        //Debug.Log(inputPayload.tick + " 2 " + normalizedTime);
                         movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
                     }
                 }
@@ -455,10 +453,12 @@ namespace Vi.Player
                     int lastTickIndex = (inputPayload.tick - 1) % BUFFER_SIZE;
                     if (stateBuffer[lastTickIndex].usedRootMotion)
                     {
+                        //Debug.Log(inputPayload.tick + " 3");
                         movement = (latestServerState.Value.position - GetPosition()) / Time.fixedDeltaTime;
                     }
-                    else // Didn't use root motion on the previous tick
+                    else // Didn't use root motion on the previous tick, this acts as the start of the animation clip and prevents a jitter right away
                     {
+                        //Debug.Log(inputPayload.tick + " 4");
                         movement = latestServerState.Value.rotation * rootMotion * GetRootMotionSpeed();
                     }
                 }
@@ -545,7 +545,7 @@ namespace Vi.Player
                         Rigidbody.AddForce(new Vector3(0, -Rigidbody.linearVelocity.y, 0), ForceMode.VelocityChange);
                     }
                 }
-                else // Decelerate horizontal movement while aiRigidbodyorne
+                else // Decelerate horizontal movement while airborne
                 {
                     Vector3 counterForce = Vector3.Slerp(Vector3.zero, new Vector3(-Rigidbody.linearVelocity.x, 0, -Rigidbody.linearVelocity.z), airborneHorizontalDragMultiplier);
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
