@@ -33,7 +33,7 @@ RectTransform:
   m_Father: {fileID: 6933918611517604294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.9999999, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -179,7 +179,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8728884847211660846
 RectTransform:
   m_ObjectHideFlags: 0
@@ -305,7 +305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5246628851132116571
 RectTransform:
   m_ObjectHideFlags: 0
@@ -407,7 +407,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1261214062526225662}
   m_HandleRect: {fileID: 1844381918805040185}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -446,7 +446,7 @@ RectTransform:
   m_Father: {fileID: 7623344083550883371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -614,10 +614,10 @@ RectTransform:
   - {fileID: 5246628851132116571}
   m_Father: {fileID: 558260825068086952}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0024719, y: 7.3238}
-  m_SizeDelta: {x: 1317.1, y: 820.1375}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -16.14325, y: 0}
+  m_SizeDelta: {x: -32.2865, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4206438395702491903
 CanvasRenderer:
@@ -762,7 +762,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00024414062}
+  m_AnchoredPosition: {x: 0, y: 0.000061035156}
   m_SizeDelta: {x: 0, y: 817.79}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6318891282819489379
@@ -779,7 +779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 0
-    m_Right: 350
+    m_Right: 50
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
@@ -799,6 +799,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 205958961986521540}
     m_Modifications:
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 342.2478
+      objectReference: {fileID: 0}
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 171.1239
+      objectReference: {fileID: 0}
     - target: {fileID: 5340513924555545166, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: playerPrefKey
@@ -807,7 +817,7 @@ PrefabInstance:
     - target: {fileID: 7393573842998034136, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Name
-      value: OptionItem_ColorInput (1)
+      value: Teammate_ColorInput
       objectReference: {fileID: 0}
     - target: {fileID: 8289854115863410029, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
@@ -917,7 +927,17 @@ PrefabInstance:
     - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Text
-      value: Teammate Color
+      value: TEAMMATE COLOR
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -938,6 +958,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 205958961986521540}
     m_Modifications:
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 342.2478
+      objectReference: {fileID: 0}
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 171.1239
+      objectReference: {fileID: 0}
     - target: {fileID: 5340513924555545166, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: playerPrefKey
@@ -946,7 +976,7 @@ PrefabInstance:
     - target: {fileID: 7393573842998034136, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Name
-      value: OptionItem_ColorInput (2)
+      value: Self_ColorInput
       objectReference: {fileID: 0}
     - target: {fileID: 8289854115863410029, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
@@ -1056,7 +1086,17 @@ PrefabInstance:
     - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Text
-      value: Self Color
+      value: SELF COLOR
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1095,7 +1135,12 @@ PrefabInstance:
     - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
       propertyPath: m_Text
-      value: Customize UI Layout
+      value: CUSTOMIZE UI LAYOUT
+      objectReference: {fileID: 0}
+    - target: {fileID: 3664866454563225763, guid: de1f78cd1029a2645ab2c9168a1a73e3,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 4603325232576156895, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
@@ -1202,6 +1247,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5407896653966578544, guid: de1f78cd1029a2645ab2c9168a1a73e3,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 585.5114
+      objectReference: {fileID: 0}
+    - target: {fileID: 5407896653966578544, guid: de1f78cd1029a2645ab2c9168a1a73e3,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 292.82858
+      objectReference: {fileID: 0}
     - target: {fileID: 8405006058714071163, guid: de1f78cd1029a2645ab2c9168a1a73e3,
         type: 3}
       propertyPath: m_Name
@@ -1259,7 +1314,22 @@ PrefabInstance:
     - target: {fileID: 6094864676719529127, guid: 91dde3dbef81b2740a06a91449299650,
         type: 3}
       propertyPath: m_Text
-      value: UI Opacity
+      value: UI OPACITY
+      objectReference: {fileID: 0}
+    - target: {fileID: 6094864676719529127, guid: 91dde3dbef81b2740a06a91449299650,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 6243820781581273636, guid: 91dde3dbef81b2740a06a91449299650,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 342.2478
+      objectReference: {fileID: 0}
+    - target: {fileID: 6243820781581273636, guid: 91dde3dbef81b2740a06a91449299650,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 171.1239
       objectReference: {fileID: 0}
     - target: {fileID: 7719527422745944116, guid: 91dde3dbef81b2740a06a91449299650,
         type: 3}
@@ -1385,10 +1455,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 205958961986521540}
     m_Modifications:
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 342.2478
+      objectReference: {fileID: 0}
+    - target: {fileID: 569006989286437570, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 171.1239
+      objectReference: {fileID: 0}
     - target: {fileID: 7393573842998034136, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Name
-      value: OptionItem_ColorInput
+      value: Enemy_ColorInput
       objectReference: {fileID: 0}
     - target: {fileID: 8289854115863410029, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
@@ -1498,7 +1578,17 @@ PrefabInstance:
     - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
         type: 3}
       propertyPath: m_Text
-      value: Enemy Color
+      value: ENEMY COLOR
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094184998880076049, guid: 87b25198674ba3344913db0d985f3797,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1519,6 +1609,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 205958961986521540}
     m_Modifications:
+    - target: {fileID: 2250395561431924402, guid: 1889e6e410ae9e8448da9f0f5b18b130,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 342.2478
+      objectReference: {fileID: 0}
+    - target: {fileID: 2250395561431924402, guid: 1889e6e410ae9e8448da9f0f5b18b130,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 171.1239
+      objectReference: {fileID: 0}
     - target: {fileID: 5700680649975087458, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1632,7 +1732,12 @@ PrefabInstance:
     - target: {fileID: 7491675272732639847, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       propertyPath: m_Text
-      value: Show Developer Console
+      value: DEVELOPER CONSOLE
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491675272732639847, guid: 1889e6e410ae9e8448da9f0f5b18b130,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
