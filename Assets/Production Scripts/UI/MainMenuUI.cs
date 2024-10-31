@@ -1,5 +1,5 @@
 using Firebase.Auth;
-// using jomarcentermjm.PlatformAPI;
+using jomarcentermjm.PlatformAPI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -901,11 +901,11 @@ namespace Vi.UI
         public void HandlePlatformAPI()
         {
             //Rich presence
-            // if (PlatformRichPresence.instance != null)
-            // {
-            //     //Change logic here that would handle scenario where the player is host.
-            //     PlatformRichPresence.instance.UpdatePlatformStatus("Logging to Vi", "Login Menu");
-            // }
+            if (PlatformRichPresence.instance != null)
+            {
+                //Change logic here that would handle scenario where the player is host.
+                PlatformRichPresence.instance.UpdatePlatformStatus("Logging to Vi", "Login Menu");
+            }
         }
 
         public void OpenViDiscord()
