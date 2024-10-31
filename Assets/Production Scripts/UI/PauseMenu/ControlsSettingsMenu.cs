@@ -98,7 +98,7 @@ namespace Vi.UI
                 if (rebindableActionGroup.Length > 0)
                 {
                     rebindingElementObjects.Add(Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent));
-                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString();
+                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString().ToUpper();
 
                     rebindingElementParent.sizeDelta += new Vector2(0, elementSpacing);
 

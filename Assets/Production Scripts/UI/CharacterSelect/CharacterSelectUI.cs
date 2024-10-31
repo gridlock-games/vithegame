@@ -693,11 +693,6 @@ namespace Vi.UI
             UpdateSelectedCharacter(previewObject.GetComponentInChildren<AnimatorReference>().GetCharacterWebInfo(selectedCharacter));
             shouldUseHeadCameraOrientation = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes
                 | characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows;
-
-            if (shouldUseHeadCameraOrientation)
-            {
-                previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
-            }
         }
 
         public void ChangeCharacterEquipment(CharacterReference.WearableEquipmentOption wearableEquipmentOption, CharacterReference.RaceAndGender raceAndGender)
@@ -707,11 +702,6 @@ namespace Vi.UI
             shouldUseHeadCameraOrientation = wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Hair
                 | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Beard
                 | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Brows;
-
-            if (shouldUseHeadCameraOrientation)
-            {
-                previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
-            }
         }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
