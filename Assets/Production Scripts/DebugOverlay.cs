@@ -172,7 +172,7 @@ public class DebugOverlay : MonoBehaviour
         }
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
-        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled;
+        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled | packetLossEnabled | jitterEnabled;
         consoleParent.enabled = consoleEnabled;
 
         if (!fpsEnabled) { fpsText.text = ""; }
