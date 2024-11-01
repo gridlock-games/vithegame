@@ -45,7 +45,7 @@ public class gameModeManagement : MonoBehaviour
 
         StartCoroutine(FadeIn());
 
-        _gameMode.targetGameModeDesc.text = gameMode.gameModeDesc;
+        _gameMode.targetGameModeDesc.text = gameMode.gameModeTitle + "\n" + gameMode.gameModeDesc;
         _gameMode.targetVideoPlayer.clip = gameMode.VideoPlayer.clip;
         _gameMode.targetVideoPlayer.targetTexture = gameMode.VideoPlayer.targetTexture;
         _gameMode.gamemodeImg.texture = gameMode.renderTexture;
