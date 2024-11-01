@@ -131,6 +131,12 @@ namespace Vi.ScriptableObjects
                 (Transform originalRootBone, Transform[] originalBones) = originalRenderData[i];
                 renderList[i].rootBone = originalRootBone;
                 renderList[i].bones = originalBones;
+
+                if (!renderList[i].enabled)
+                {
+                    Debug.LogWarning("Wearable equipment renderer is disabled on disable. Make sure this is intentional");
+                    renderList[i].enabled = true;
+                }
             }
             boneMapToFollow.Clear();
         }
