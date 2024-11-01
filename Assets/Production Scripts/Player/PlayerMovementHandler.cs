@@ -573,12 +573,12 @@ namespace Vi.Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            networkTransform.SetPositionMaximumInterpolationTime(0.025f);
             networkTransform.SyncPositionX = !IsOwner;
             networkTransform.SyncPositionY = !IsOwner;
             networkTransform.SyncPositionZ = !IsOwner;
             if (IsLocalPlayer)
             {
-                networkTransform.SetMaxInterpolationBound(0);
                 inputBuffer.Clear();
 
                 cameraController.gameObject.tag = "MainCamera";
@@ -619,7 +619,7 @@ namespace Vi.Player
 
         public override void OnNetworkDespawn()
         {
-            networkTransform.SetMaxInterpolationBound(3);
+            networkTransform.SetPositionMaximumInterpolationTime(0.1f);
             networkTransform.SyncPositionX = true;
             networkTransform.SyncPositionY = true;
             networkTransform.SyncPositionZ = true;
