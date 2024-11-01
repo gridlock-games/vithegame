@@ -12,6 +12,7 @@ namespace Vi.UI
     {
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private HubServerBrowser UI;
+        [SerializeField] private GameObject gameModePreviewUI;
 
         private GameObject invoker;
 
@@ -19,6 +20,13 @@ namespace Vi.UI
         {
             this.invoker = invoker;
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
+            gameModePreviewUI.gameObject.SetActive(true);
+        }
+
+        public void ShowServerBrowser() {
+            this.invoker = invoker;
+            invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
+            gameModePreviewUI.gameObject.SetActive(false);
             UI.gameObject.SetActive(true);
         }
 
@@ -32,6 +40,7 @@ namespace Vi.UI
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(null);
             invoker = null;
             UI.gameObject.SetActive(false);
+            gameModePreviewUI.gameObject.SetActive(false);
         }
 
         private bool localPlayerInRange;
@@ -68,6 +77,7 @@ namespace Vi.UI
             originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UI.gameObject.SetActive(false);
+            gameModePreviewUI.gameObject.SetActive(false);
             networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
             currentLobbyCount = LobbyServers.Length;
