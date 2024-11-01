@@ -406,19 +406,13 @@ namespace Vi.Player
 
             if (IsOwner & !IsServer)
             {
-                bool normalizedTimeIsAboveThreshold = false;
-                if (shouldApplyRootMotion)
-                {
-                    normalizedTimeIsAboveThreshold = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip) > 0.7f;
-                }
-
-                if (!networkTransform.SyncPositionX & shouldApplyRootMotion & normalizedTimeIsAboveThreshold)
+                if (!networkTransform.SyncPositionX & shouldApplyRootMotion)
                 {
                     networkTransform.ResetPositionInterpolator(GetPosition());
                 }
-                networkTransform.SyncPositionX = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
-                networkTransform.SyncPositionY = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
-                networkTransform.SyncPositionZ = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
+                networkTransform.SyncPositionX = shouldApplyRootMotion;
+                networkTransform.SyncPositionY = shouldApplyRootMotion;
+                networkTransform.SyncPositionZ = shouldApplyRootMotion;
 
                 if (networkTransform.SyncPositionX)
                 {
@@ -584,6 +578,7 @@ namespace Vi.Player
             networkTransform.SyncPositionZ = !IsOwner;
             if (IsLocalPlayer)
             {
+                networkTransform.SetMaxInterpolationBound(0);
                 inputBuffer.Clear();
 
                 cameraController.gameObject.tag = "MainCamera";
@@ -624,6 +619,7 @@ namespace Vi.Player
 
         public override void OnNetworkDespawn()
         {
+            networkTransform.SetMaxInterpolationBound(3);
             networkTransform.SyncPositionX = true;
             networkTransform.SyncPositionY = true;
             networkTransform.SyncPositionZ = true;
