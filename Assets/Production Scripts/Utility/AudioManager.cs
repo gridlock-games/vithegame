@@ -221,10 +221,16 @@ namespace Vi.Utility
             if (audioSource) { ObjectPoolingManager.ReturnObjectToPool(audioSource.GetComponent<PooledObject>()); }
         }
 
+#if UNITY_SERVER
+        public static bool AudioConfigurationApplied { get; private set; } = true;
+#else
         public static bool AudioConfigurationApplied { get; private set; }
+#endif
         private void Awake()
         {
             _singleton = this;
+
+#if !UNITY_SERVER
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChange;
 
             AudioConfiguration audioConfiguration = AudioSettings.GetConfiguration();
@@ -232,13 +238,16 @@ namespace Vi.Utility
             if (FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { audioConfiguration.sampleRate = FasterPlayerPrefs.Singleton.GetInt("SampleRate"); }
             AudioSettings.Reset(audioConfiguration);
             AudioConfigurationApplied = true;
+#endif
         }
 
+#if !UNITY_SERVER
         private static void OnAudioConfigurationChange(bool deviceWasChanged)
         {
             FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode);
             FasterPlayerPrefs.Singleton.SetInt("SampleRate", AudioSettings.GetConfiguration().sampleRate);
         }
+#endif
 
         private void OnEnable()
         {
