@@ -404,8 +404,12 @@ namespace Vi.Player
                 movement = combatAgent.StatusAgent.IsRooted() | combatAgent.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
-            if (IsOwner)
+            if (IsOwner & !IsServer)
             {
+                if (!networkTransform.SyncPositionX)
+                {
+                    networkTransform.ResetPositionInterpolator(GetPosition());
+                }
                 networkTransform.SyncPositionX = shouldApplyRootMotion;
                 networkTransform.SyncPositionY = shouldApplyRootMotion;
                 networkTransform.SyncPositionZ = shouldApplyRootMotion;
