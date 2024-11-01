@@ -134,11 +134,11 @@ namespace Vi.ScriptableObjects
 
                 if (!renderList[i].enabled)
                 {
-                    Debug.LogWarning("Wearable equipment renderer is disabled on disable. Make sure this is intentional");
+                    Debug.LogError("Wearable equipment renderer is disabled on disable. This shouldn't be happening");
                     renderList[i].enabled = true;
                 }
 
-                if (!renderList[i].forceRenderingOff)
+                if (renderList[i].forceRenderingOff)
                 {
                     Debug.LogWarning("Wearable equipment renderer has force rendering off set to true on disable. Make sure this is intentional");
                     renderList[i].forceRenderingOff = false;
