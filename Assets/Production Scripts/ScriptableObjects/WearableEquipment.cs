@@ -131,6 +131,18 @@ namespace Vi.ScriptableObjects
                 (Transform originalRootBone, Transform[] originalBones) = originalRenderData[i];
                 renderList[i].rootBone = originalRootBone;
                 renderList[i].bones = originalBones;
+
+                if (!renderList[i].enabled)
+                {
+                    Debug.LogWarning("Wearable equipment renderer is disabled on disable. Make sure this is intentional");
+                    renderList[i].enabled = true;
+                }
+
+                if (!renderList[i].forceRenderingOff)
+                {
+                    Debug.LogWarning("Wearable equipment renderer has force rendering off set to true on disable. Make sure this is intentional");
+                    renderList[i].forceRenderingOff = false;
+                }
             }
             boneMapToFollow.Clear();
         }

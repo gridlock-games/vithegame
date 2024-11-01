@@ -231,6 +231,8 @@ namespace Vi.Core
                 foreach (SkinnedMeshRenderer smr in WearableEquipmentInstances[equipmentType].GetRenderList())
                 {
                     glowRenderer.UnregisterRenderer(smr);
+                    smr.enabled = true;
+                    smr.forceRenderingOff = false;
                 }
 
                 if (WearableEquipmentInstances[equipmentType].TryGetComponent(out PooledObject pooledObject))
