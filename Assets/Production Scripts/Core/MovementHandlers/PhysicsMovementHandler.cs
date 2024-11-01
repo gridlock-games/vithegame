@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Unity.Netcode.Components;
 
 namespace Vi.Core.MovementHandlers
 {
+    [RequireComponent(typeof(NetworkTransform))]
     public abstract class PhysicsMovementHandler : MovementHandler
     {
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
