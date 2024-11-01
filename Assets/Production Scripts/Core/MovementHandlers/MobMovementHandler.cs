@@ -100,8 +100,6 @@ namespace Vi.Core.MovementHandlers
             HighestKillPlayer
         }
 
-        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
-
         private void FixedUpdate()
         {
             EvaluateTargetingLogic();
@@ -109,11 +107,10 @@ namespace Vi.Core.MovementHandlers
             {
                 EvaluateAction();
                 Move();
-                currentPosition.Value = Rigidbody.position;
             }
             else
             {
-                Rigidbody.MovePosition(currentPosition.Value);
+                Rigidbody.MovePosition(transform.position);
             }
         }
 

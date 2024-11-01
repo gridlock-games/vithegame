@@ -42,7 +42,6 @@ namespace Vi.ArtificialIntelligence
             }
 
             SetAnimationMoveInput(GetPathMoveInput(true));
-            if (IsServer) { currentRotation.Value = transform.rotation; }
         }
 
         private Quaternion EvaluateRotation()
@@ -73,7 +72,7 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                return Quaternion.Slerp(transform.rotation, currentRotation.Value, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * 15);
+                return transform.rotation;
             }
         }
 
@@ -276,20 +275,16 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private NetworkVariable<Vector3> currentPosition = new NetworkVariable<Vector3>();
-        private NetworkVariable<Quaternion> currentRotation = new NetworkVariable<Quaternion>();
-
         void FixedUpdate()
         {
             if (IsServer)
             {
                 EvaluateBotLogic();
                 Move();
-                currentPosition.Value = Rigidbody.position;
             }
             else
             {
-                Rigidbody.MovePosition(currentPosition.Value);
+                Rigidbody.MovePosition(transform.position);
             }
         }
 

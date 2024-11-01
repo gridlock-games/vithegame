@@ -503,10 +503,14 @@ namespace Vi.Editor
                 defaultSettings.enableTranscoding = true;
 
                 importer.defaultTargetSettings = defaultSettings;
+
                 VideoImporterTargetSettings androidSettings = defaultSettings;
                 androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
-
                 importer.SetTargetSettings("Android", androidSettings);
+
+                VideoImporterTargetSettings iPhoneSettings = defaultSettings;
+                iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                importer.SetTargetSettings("iPhone", iPhoneSettings);
 
                 importer.SaveAndReimport();
             }
@@ -521,7 +525,7 @@ namespace Vi.Editor
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Overriding Textures For Android",
                     i.ToString() + " out of " + textures.Length.ToString() + " textures completed",
-                    i / textures.Length)) { break; }
+                    i / (float)textures.Length)) { break; }
 
                 string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
                 if (assetPath.Contains("com.unity.")) { continue; }

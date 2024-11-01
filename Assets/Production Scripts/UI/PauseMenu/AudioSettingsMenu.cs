@@ -36,7 +36,16 @@ namespace Vi.UI
         {
             AudioConfiguration audioConfiguration = AudioSettings.GetConfiguration();
             audioConfiguration.speakerMode = validSpeakerModes[speakerModeDropdown.value];
-            if (!AudioSettings.Reset(audioConfiguration)) { errorText.text = errorMessage; }
+            if (!AudioSettings.Reset(audioConfiguration))
+            {
+                errorText.text = errorMessage;
+                int currentIndex = 0;
+                for (int i = 0; i < validSpeakerModes.Length; i++)
+                {
+                    if (validSpeakerModes[i] == audioConfiguration.speakerMode) { currentIndex = i; }
+                }
+                speakerModeDropdown.SetValueWithoutNotify(currentIndex);
+            }
         }
 
         public void ChangeDSPBufferSize()
@@ -49,8 +58,17 @@ namespace Vi.UI
         public void ChangeSampleRate()
         {
             AudioConfiguration audioConfiguration = AudioSettings.GetConfiguration();
-            audioConfiguration.sampleRate = validDSPBufferSizes[sampleRateDropdown.value];
-            if (!AudioSettings.Reset(audioConfiguration)) { errorText.text = errorMessage; }
+            audioConfiguration.sampleRate = validSampleRates[sampleRateDropdown.value];
+            if (!AudioSettings.Reset(audioConfiguration))
+            {
+                errorText.text = errorMessage;
+                int currentIndex = 0;
+                for (int i = 0; i < validSampleRates.Length; i++)
+                {
+                    if (validSampleRates[i] == audioConfiguration.sampleRate) { currentIndex = i; }
+                }
+                sampleRateDropdown.SetValueWithoutNotify(currentIndex);
+            }
         }
 
         public void ChangeNumRealVoices()
@@ -113,7 +131,7 @@ namespace Vi.UI
             for (int i = 0; i < validSampleRates.Length; i++)
             {
                 sampleRateOptions.Add(validSampleRates[i].ToString());
-                if (validSampleRates[i] == currentAudioConfiguration.dspBufferSize) { currentIndex = i; }
+                if (validSampleRates[i] == currentAudioConfiguration.sampleRate) { currentIndex = i; }
             }
             sampleRateDropdown.ClearOptions();
             sampleRateDropdown.AddOptions(sampleRateOptions);
@@ -140,6 +158,15 @@ namespace Vi.UI
             numVirtualVoicesDropdown.ClearOptions();
             numVirtualVoicesDropdown.AddOptions(sampleRateOptions);
             numVirtualVoicesDropdown.SetValueWithoutNotify(currentIndex);
+        }
+
+        private void Update()
+        {
+            dspBufferSizeDropdown.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            numRealVoicesDropdown.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            numVirtualVoicesDropdown.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            sampleRateDropdown.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            speakerModeDropdown.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
         }
 
         static AudioSpeakerMode[] validSpeakerModes =

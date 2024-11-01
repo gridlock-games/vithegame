@@ -209,6 +209,35 @@ namespace Vi.ScriptableObjects
             }
             if (shouldDirty) { UnityEditor.EditorUtility.SetDirty(this); }
         }
+
+        private void OnValidate()
+        {
+            if (Application.isPlaying) { return; }
+
+            if (TryGetComponent(out NetworkTransform networkTransform))
+            {
+                bool shouldSetDirty = false;
+                if (networkTransform.SyncScaleX)
+                {
+                    networkTransform.SyncScaleX = false;
+                    shouldSetDirty = true;
+                }
+
+                if (networkTransform.SyncScaleY)
+                {
+                    networkTransform.SyncScaleY = false;
+                    shouldSetDirty = true;
+                }
+
+                if (networkTransform.SyncScaleZ)
+                {
+                    networkTransform.SyncScaleZ = false;
+                    shouldSetDirty = true;
+                }
+
+                if (shouldSetDirty) { UnityEditor.EditorUtility.SetDirty(networkTransform); }
+            }
+        }
 #endif
     }
 }
