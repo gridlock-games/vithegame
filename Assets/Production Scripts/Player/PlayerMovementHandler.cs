@@ -134,13 +134,13 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
-            if (latestServerState.Value.usedRootMotion | stateBuffer[serverStateBufferIndex].usedRootMotion)
+            if (stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
                 if (Rigidbody.isKinematic)
                 {
                     Rigidbody.MovePosition(latestServerState.Value.position);
-                    return Vector3.zero;
                 }
+                return Vector3.zero;
             }
 
             if (positionError > serverReconciliationThreshold)
@@ -394,7 +394,7 @@ namespace Vi.Player
             }
             else if (shouldApplyRootMotion)
             {
-                movement = newRotation * rootMotion * GetRootMotionSpeed();
+                movement = (IsServer ? newRotation : latestServerState.Value.rotation) * rootMotion * GetRootMotionSpeed();
             }
             else
             {
@@ -406,15 +406,21 @@ namespace Vi.Player
 
             if (IsOwner & !IsServer)
             {
-                if (!networkTransform.SyncPositionX)
+                bool normalizedTimeIsAboveThreshold = false;
+                if (shouldApplyRootMotion)
+                {
+                    normalizedTimeIsAboveThreshold = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip) > 0.7f;
+                }
+
+                if (!networkTransform.SyncPositionX & shouldApplyRootMotion & normalizedTimeIsAboveThreshold)
                 {
                     networkTransform.ResetPositionInterpolator(GetPosition());
                 }
-                networkTransform.SyncPositionX = shouldApplyRootMotion;
-                networkTransform.SyncPositionY = shouldApplyRootMotion;
-                networkTransform.SyncPositionZ = shouldApplyRootMotion;
+                networkTransform.SyncPositionX = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
+                networkTransform.SyncPositionY = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
+                networkTransform.SyncPositionZ = shouldApplyRootMotion & normalizedTimeIsAboveThreshold;
 
-                if (shouldApplyRootMotion)
+                if (networkTransform.SyncPositionX)
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(transform.position);
