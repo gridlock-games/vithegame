@@ -510,7 +510,7 @@ namespace Vi.Core
             if (!combatAgent) { return false; }
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
-            return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRest();
+            return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRestIgnoringTransition();
         }
 
         private void Update()

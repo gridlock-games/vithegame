@@ -134,13 +134,13 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
 
-            if (latestServerState.Value.usedRootMotion | stateBuffer[serverStateBufferIndex].usedRootMotion)
+            if (stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
                 if (Rigidbody.isKinematic)
                 {
                     Rigidbody.MovePosition(latestServerState.Value.position);
-                    return Vector3.zero;
                 }
+                return Vector3.zero;
             }
 
             if (positionError > serverReconciliationThreshold)
@@ -394,7 +394,7 @@ namespace Vi.Player
             }
             else if (shouldApplyRootMotion)
             {
-                movement = newRotation * rootMotion * GetRootMotionSpeed();
+                movement = (IsServer ? newRotation : latestServerState.Value.rotation) * rootMotion * GetRootMotionSpeed();
             }
             else
             {
@@ -406,7 +406,7 @@ namespace Vi.Player
 
             if (IsOwner & !IsServer)
             {
-                if (!networkTransform.SyncPositionX)
+                if (!networkTransform.SyncPositionX & shouldApplyRootMotion)
                 {
                     networkTransform.ResetPositionInterpolator(GetPosition());
                 }
@@ -414,7 +414,7 @@ namespace Vi.Player
                 networkTransform.SyncPositionY = shouldApplyRootMotion;
                 networkTransform.SyncPositionZ = shouldApplyRootMotion;
 
-                if (shouldApplyRootMotion)
+                if (networkTransform.SyncPositionX)
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(transform.position);
@@ -578,6 +578,7 @@ namespace Vi.Player
             networkTransform.SyncPositionZ = !IsOwner;
             if (IsLocalPlayer)
             {
+                networkTransform.SetMaxInterpolationBound(0);
                 inputBuffer.Clear();
 
                 cameraController.gameObject.tag = "MainCamera";
@@ -618,6 +619,7 @@ namespace Vi.Player
 
         public override void OnNetworkDespawn()
         {
+            networkTransform.SetMaxInterpolationBound(3);
             networkTransform.SyncPositionX = true;
             networkTransform.SyncPositionY = true;
             networkTransform.SyncPositionZ = true;
