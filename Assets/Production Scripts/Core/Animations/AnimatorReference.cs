@@ -232,6 +232,7 @@ namespace Vi.Core
                 {
                     glowRenderer.UnregisterRenderer(smr);
                     smr.enabled = true;
+                    smr.forceRenderingOff = false;
                 }
 
                 if (WearableEquipmentInstances[equipmentType].TryGetComponent(out PooledObject pooledObject))
