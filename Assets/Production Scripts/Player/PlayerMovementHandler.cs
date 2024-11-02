@@ -9,7 +9,6 @@ using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
-using System.Runtime.CompilerServices;
 
 namespace Vi.Player
 {
@@ -222,9 +221,14 @@ namespace Vi.Player
                 if (rootMotionTick != -1)
                 {
                     Quaternion newRotation = latestServerState.Value.rotation;
-                    while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+                    while (serverInputQueue.Count > 1)
                     {
-                        newRotation = inputPayload.rotation;
+                        newRotation = serverInputQueue.Dequeue().rotation;
+                    }
+
+                    if (serverInputQueue.TryPeek(out InputPayload inputPayload))
+                    {
+                        newRotation = inputPayload.rotation; 
                     }
 
                     StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick, Vector2.zero, newRotation),
