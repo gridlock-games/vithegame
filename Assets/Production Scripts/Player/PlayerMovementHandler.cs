@@ -235,7 +235,7 @@ namespace Vi.Player
                         newRotation = inputPayload.rotation; 
                     }
 
-                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick, Vector2.zero, newRotation),
+                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, newRotation),
                         combatAgent.AnimationHandler.ApplyRootMotion(),
                         true);
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -285,6 +285,10 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
+                else if (latestServerState.Value.usedRootMotion)
+                {
+                    moveInput = Vector2.zero;
+                }
                 else if (!CanMove())
                 {
                     moveInput = Vector2.zero;
@@ -299,15 +303,8 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
-                if (IsServer) // we're the host here
-                {
-                    movementTick++;
-                }
-                else
-                {
-                    if (!shouldApplyRootMotion) { movementTick++; }
-                }
-                
+                movementTick++;
+
                 StatePayload statePayload = Move(inputPayload,
                     combatAgent.AnimationHandler.ApplyRootMotion(),
                     shouldApplyRootMotion);
