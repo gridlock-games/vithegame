@@ -155,6 +155,18 @@ namespace Vi.Core.Weapons
         public bool CanHitPlayers { get; set; } = true;
         private void OnTriggerEnter(Collider other)
         {
+            //if (other.attachedRigidbody)
+            //{
+            //    if (other.gameObject.layer == LayerMask.NameToLayer("Character"))
+            //    {
+            //        if (!other.transform.root.GetComponent<NetworkObject>())
+            //        {
+            //            other.attachedRigidbody.AddForceAtPosition(rb.linearVelocity, other.ClosestPointOnBounds(transform.position), ForceMode.Impulse);
+            //            return;
+            //        }
+            //    }
+            //}
+
             if (!initialized) { return; }
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }

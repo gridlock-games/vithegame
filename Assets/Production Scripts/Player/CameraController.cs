@@ -181,6 +181,7 @@ namespace Vi.Player
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 
             IsAnimating = animator.IsInTransition(0) ? !animator.GetNextAnimatorStateInfo(0).IsName("Empty") : !animator.GetCurrentAnimatorStateInfo(0).IsName("Empty");
+            attributes.AnimationHandler.UseGenericAimPoint = IsAnimating;
 
             // Update camera interp transform
             if (movementHandler.TargetToLockOn)
