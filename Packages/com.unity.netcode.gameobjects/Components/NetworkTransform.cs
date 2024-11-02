@@ -1329,9 +1329,22 @@ namespace Unity.Netcode.Components
         private Quaternion m_CurrentRotation;
         private Vector3 m_TargetRotation;
 
-        public void ResetPositionInterpolator(Vector3 position)
+        /// <summary>
+        /// Use this to reset the position interpolator's initial state. Useful for when reactivating position syncing at runtime
+        /// </summary>
+        /// <param name="startPosition"></param>
+        public void ResetPositionInterpolator(Vector3 startPosition)
         {
-            m_PositionInterpolator.ResetTo(position, NetworkManager.ServerTime.Time);
+            m_PositionInterpolator.ResetTo(startPosition, NetworkManager.ServerTime.Time);
+        }
+
+        /// <summary>
+        /// There's two factors affecting interpolation: buffering (set in NetworkManager's NetworkTimeSystem) and interpolation time, which is the amount of time it'll take to reach the target. This is to affect the second one.
+        /// </summary>
+        /// <param name="maxTime"></param>
+        public void SetPositionMaximumInterpolationTime(float maxTime)
+        {
+            m_PositionInterpolator.MaximumInterpolationTime = maxTime;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

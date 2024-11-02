@@ -24,6 +24,7 @@ namespace Vi.Editor
         private SerializedProperty spRootMotionForwardMultiplier;
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
+        private SerializedProperty spMaxInterpTime;
 
         private SerializedProperty spAttackRootMotionForwardMultiplier;
         private SerializedProperty spAttackRootMotionSidesMultiplier;
@@ -139,6 +140,7 @@ namespace Vi.Editor
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
+            spMaxInterpTime = serializedObject.FindProperty("maxInterpTime");
 
             spAttackRootMotionForwardMultiplier = serializedObject.FindProperty("attackRootMotionForwardMultiplier");
             spAttackRootMotionSidesMultiplier = serializedObject.FindProperty("attackRootMotionSidesMultiplier");
@@ -342,6 +344,12 @@ namespace Vi.Editor
                         (weapon, animatorOverrideController, animationClip) = FindAnimationClip();
                     }
                 }
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Interp time determines the time in seconds to reach the target position.", EditorStyles.whiteLabel);
+                EditorGUILayout.LabelField("This will only take affect on the local player connected to a remote server.", EditorStyles.whiteLabel);
+                EditorGUILayout.LabelField("Values must be between 0.1 and 0.001. The default is 0.07.", EditorStyles.whiteLabel);
+                EditorGUILayout.PropertyField(spMaxInterpTime);
             }
             EditorGUILayout.Space();
 

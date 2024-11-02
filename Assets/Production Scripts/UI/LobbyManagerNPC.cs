@@ -23,9 +23,8 @@ namespace Vi.UI
             gameModePreviewUI.gameObject.SetActive(true);
         }
 
-        public void ShowServerBrowser() {
-            this.invoker = invoker;
-            invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
+        public void ShowServerBrowser()
+        {
             gameModePreviewUI.gameObject.SetActive(false);
             UI.gameObject.SetActive(true);
         }
@@ -151,9 +150,9 @@ namespace Vi.UI
             {
                 path = @"C:\Users\patse\OneDrive\Desktop\Windows Build\Vi The Game.exe";
 
-                #if UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX
                     path = @"/Users/odaleroxas/Documents/Builds/mac/headless/Vi The Game";
-                #endif
+#endif
             }
             else
             {
@@ -161,9 +160,9 @@ namespace Vi.UI
                 path = path.Substring(0, path.LastIndexOf('/'));
                 path = Path.Join(path, Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer ? "Vi The Game.exe" : "Vi The Game.x86_64");
 
-                #if UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX
                     path = @"/Users/odaleroxas/Documents/Builds/mac/headless/Vi The Game";
-                #endif
+#endif
             }
 
             System.Diagnostics.Process.Start(path, "-launch-as-lobby-server");
