@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
+using System.Runtime.CompilerServices;
 
 namespace Vi.Player
 {
@@ -125,6 +126,7 @@ namespace Vi.Player
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 return Vector3.zero;
             }
+
             if (!CanMove())
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
@@ -264,18 +266,10 @@ namespace Vi.Player
                         HandleServerReconciliation();
                     }
                 }
-
+                
                 Vector2 moveInput;
-                bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
-                if (latestServerState.Value.usedRootMotion)
-                {
-                    moveInput = Vector2.zero;
-                }
+                bool shouldApplyRootMotion = IsHost ? combatAgent.AnimationHandler.ShouldApplyRootMotion() : rootMotionTick != -1;
                 if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (latestServerState.Value.usedRootMotion)
                 {
                     moveInput = Vector2.zero;
                 }
@@ -301,18 +295,18 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
-                if (IsServer)
+                if (IsServer) // we're the host here
                 {
                     movementTick++;
                 }
                 else
                 {
-                    if (!shouldApplyRootMotion & !latestServerState.Value.usedRootMotion) { movementTick++; }
+                    if (!shouldApplyRootMotion) { movementTick++; }
                 }
                 
                 StatePayload statePayload = Move(inputPayload,
                     combatAgent.AnimationHandler.ApplyRootMotion(),
-                    IsHost ? shouldApplyRootMotion : rootMotionTick != -1);
+                    shouldApplyRootMotion);
                 
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
@@ -420,7 +414,6 @@ namespace Vi.Player
                     if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
                     if (rootMotionTick >= data.Length)
                     {
-                        Debug.Log("END " + data.Length + " " + rootMotionTick);
                         rootMotionTick = -1;
                     }
                     else
@@ -433,7 +426,6 @@ namespace Vi.Player
                 if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
                 if (rootMotionTick >= data.Length)
                 {
-                    Debug.Log("END " + data.Length + " " + rootMotionTick);
                     rootMotionTick = -1;
                 }
                 else
@@ -476,40 +468,13 @@ namespace Vi.Player
                 movement = combatAgent.StatusAgent.IsRooted() | combatAgent.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
             }
 
-            if (IsOwner & !IsServer)
+            if (shouldApplyRootMotion)
             {
-                if (!isServerAuthoritative & shouldApplyRootMotion)
-                {
-                    Debug.Log("START " + inputPayload.tick);
-                    //networkTransform.ResetPositionInterpolator(GetPosition());
-                }
-
-                if (shouldApplyRootMotion)
-                {
-                    isServerAuthoritative = true;
-                    //rootMotionTick++;
-                    //networkTransform.SyncPositionX = true;
-                    //networkTransform.SyncPositionY = true;
-                    //networkTransform.SyncPositionZ = true;
-
-                    //Rigidbody.isKinematic = true;
-                    //Rigidbody.MovePosition(latestServerState.Value.position);
-                    //return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
-                }
-                else if (isServerAuthoritative)
-                {
-                    isServerAuthoritative = false;
-
-                    //networkTransform.SyncPositionX = false;
-                    //networkTransform.SyncPositionY = false;
-                    //networkTransform.SyncPositionZ = false;
-
-                    //Rigidbody.position = latestServerState.Value.position;
-
-                    //Rigidbody.isKinematic = true;
-                    //Rigidbody.MovePosition(latestServerState.Value.position);
-                    //return new StatePayload(inputPayload, Rigidbody, newRotation, false);
-                }
+                isServerAuthoritative = true;
+            }
+            else if (isServerAuthoritative)
+            {
+                isServerAuthoritative = false;
             }
 
             Rigidbody.isKinematic = false;
