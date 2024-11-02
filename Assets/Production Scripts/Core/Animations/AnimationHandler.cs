@@ -1337,6 +1337,11 @@ namespace Vi.Core
             SetRagdollActive(false);
         }
 
+        private void OnDisable()
+        {
+            UseGenericAimPoint = false;
+        }
+
         public Vector3 GetAimPoint() { return aimPoint.Value; }
         private NetworkVariable<Vector3> aimPoint = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -1377,6 +1382,7 @@ namespace Vi.Core
             if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
         }
 
+        public bool UseGenericAimPoint { get; set; }
         private static readonly Vector3 aimTargetOffset = new Vector3(0, 0, 10);
         private void RefreshAimPoint()
         {
@@ -1387,7 +1393,7 @@ namespace Vi.Core
 
             if (IsOwner)
             {
-                if (NetworkObject.IsPlayerObject & mainCamera)
+                if (NetworkObject.IsPlayerObject & mainCamera & !UseGenericAimPoint)
                 {
                     aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * aimTargetOffset;
                     cameraForwardDir.Value = mainCamera.transform.forward;
