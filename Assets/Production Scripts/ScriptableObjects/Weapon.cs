@@ -783,7 +783,7 @@ namespace Vi.ScriptableObjects
         }
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
-        private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
+        private Dictionary<string, AnimationData> animationClipLookup = new Dictionary<string, AnimationData>();
         private void Awake()
         {
             actionClipLookup = GetActionClipLookup();
@@ -980,18 +980,31 @@ namespace Vi.ScriptableObjects
         {
             if (animationClipLookup.ContainsKey(animationStateNameWithoutLayer))
             {
-                return animationClipLookup[animationStateNameWithoutLayer];
+                return animationClipLookup[animationStateNameWithoutLayer].clip;
             }
             else
             {
-                Debug.LogError("Couldn't find an animation clip with state name: " + animationStateNameWithoutLayer);
+                Debug.LogError("Couldn't find an animation clip with state name: " + animationStateNameWithoutLayer + " on weapon: " + this);
                 return null;
             }
         }
 
         [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
         [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
-        [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
+        [SerializeField] private List<AnimationData> animationClipLookupValues = new List<AnimationData>();
+
+        [System.Serializable]
+        private struct AnimationData
+        {
+            public AnimationClip clip;
+            public Vector3[] rootMotion;
+
+            public AnimationData(AnimationClip clip, List<Vector3> rootMotion)
+            {
+                this.clip = clip;
+                this.rootMotion = rootMotion.ToArray();
+            }
+        }
 
 #if UNITY_EDITOR
         [ContextMenu("Find Animations")]
@@ -1025,7 +1038,7 @@ namespace Vi.ScriptableObjects
                                         if (!ovride.Value) { continue; }
                                         overrideFound = true;
                                         animationClipLookupKeys.Add(state.state.name);
-                                        animationClipLookupValues.Add(ovride.Value);
+                                        animationClipLookupValues.Add(new AnimationData(ovride.Value, new List<Vector3>()));
                                         break;
                                     }
                                 }
@@ -1033,7 +1046,7 @@ namespace Vi.ScriptableObjects
                                 if (!overrideFound)
                                 {
                                     animationClipLookupKeys.Add(state.state.name);
-                                    animationClipLookupValues.Add(animationClip);
+                                    animationClipLookupValues.Add(new AnimationData(animationClip, new List<Vector3>()));
                                 }
                             }
                         }
@@ -1043,6 +1056,62 @@ namespace Vi.ScriptableObjects
             }
             EditorUtility.SetDirty(this);
         }
+
+        public bool SetRootMotionData(AnimationClip clip, List<Vector3> rootMotion)
+        {
+            int index = animationClipLookupValues.FindIndex(item => item.clip == clip);
+            if (index != -1)
+            {
+                if (animationClipLookupValues[index].rootMotion.Length == rootMotion.Count) { return false; }
+
+                if (animationClipLookupValues[index].clip)
+                {
+                    animationClipLookupValues[index] = new AnimationData(animationClipLookupValues[index].clip, rootMotion);
+                    UnityEditor.EditorUtility.SetDirty(this);
+                    return true;
+                }
+                else
+                {
+                    Debug.LogError("No clip!");
+                }
+            }
+            else
+            {
+                Debug.LogError("Clip not in values " + clip + " " + this);
+            }
+            return false;
+        }
 #endif
+        public Vector3 GetRootMotionData(AnimationClip clip, int tickIndex)
+        {
+            int index = animationClipLookupValues.FindIndex(item => item.clip == clip);
+            if (index != -1)
+            {
+                if (animationClipLookupValues[index].clip)
+                {
+                    if (animationClipLookupValues[index].rootMotion.Length == 0)
+                    {
+                        Debug.LogError(clip + " has no root motion data on " + this);
+                    }
+                    else if (animationClipLookupValues[index].rootMotion.Length <= tickIndex)
+                    {
+                        Debug.LogError(clip + " root motion tick index is out of bounds " + this + " " + tickIndex + " / " + animationClipLookupValues[index].rootMotion.Length);
+                    }
+                    else
+                    {
+                        return animationClipLookupValues[index].rootMotion[tickIndex];
+                    }
+                }
+                else
+                {
+                    Debug.LogError("No clip!");
+                }
+            }
+            else
+            {
+                Debug.LogError("Clip not in values " + clip + " " + this);
+            }
+            return Vector3.zero;
+        }
     }
 }

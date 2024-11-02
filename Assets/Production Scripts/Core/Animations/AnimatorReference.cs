@@ -512,7 +512,8 @@ namespace Vi.Core
             if (!combatAgent) { return false; }
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
-            return combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion & !IsAtRestIgnoringTransition();
+            if (!combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion) { return false; }
+            return animationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
         }
 
         private void Update()
@@ -572,7 +573,8 @@ namespace Vi.Core
                         worldSpaceRootMotion.z *= combatAgent.WeaponHandler.CurrentActionClip.GetRootMotionForwardMultiplier().EvaluateNormalizedTime(normalizedTime);
                     }
                 }
-                accumulatedRootMotion += new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z) / Time.fixedDeltaTime;
+                worldSpaceRootMotion = new Vector3(worldSpaceRootMotion.x / transform.lossyScale.x, worldSpaceRootMotion.y / transform.lossyScale.y, worldSpaceRootMotion.z / transform.lossyScale.z);
+                accumulatedRootMotion += worldSpaceRootMotion / Time.fixedDeltaTime;
             }
 
             if (animationHandler) { animationHandler.ProcessNextActionClip(); }

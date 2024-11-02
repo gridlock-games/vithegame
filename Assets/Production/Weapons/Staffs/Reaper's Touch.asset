@@ -191,6 +191,7 @@ MonoBehaviour:
       stowedParentType: 4
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -199,6 +200,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
@@ -207,6 +209,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
   - skinPrefab: {fileID: 843674584058609724, guid: 12eef0bb7292ab64492a79a373eb9f17,
       type: 3}
     data:
@@ -218,6 +221,7 @@ MonoBehaviour:
       stowedParentType: 4
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -226,6 +230,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
@@ -234,6 +239,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -366,62 +372,119 @@ MonoBehaviour:
   - Defeat
   - Defeat_Loop
   - MVP
+  - Reload
   - FlinchFront
   - FlinchBack
   - FlinchLeft
   - FlinchRight
   animationClipLookupValues:
-  - {fileID: 7400002, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: -6504758406798758543, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
-  - {fileID: 7400002, guid: 6e6ce5d65c303fc47a58c7f861d21ac9, type: 3}
-  - {fileID: 7400002, guid: 80faaeb97f1383e40bfc96db2ba11cb1, type: 3}
-  - {fileID: -998496362607748373, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
-  - {fileID: 3060872287085348379, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
-  - {fileID: -4468087431016886167, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: 5358811729250995527, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: 6955343387180132933, guid: 687d93e81f02efc41acf7d2dcf63852c, type: 3}
-  - {fileID: 4537801217732188732, guid: 371cda2edb4a01145903487c1a24366c, type: 3}
-  - {fileID: 2963970302439079583, guid: dbaef1234891403e80b8b5084ecf43ff, type: 3}
-  - {fileID: 7400000, guid: 8367ee4be4545e9448fd4313ac6cac40, type: 2}
-  - {fileID: 7400000, guid: d7a2242191e80184982893d17c589b01, type: 2}
-  - {fileID: 7400000, guid: 9f1a48fc70f7d7044b23d26a9d9cb246, type: 2}
-  - {fileID: 5946708163653373921, guid: 23ac97b0ca1da304ea74a9e2665a8e2b, type: 3}
-  - {fileID: -3956867891349528864, guid: 07f71c652b45d554090a68a0ec905095, type: 3}
-  - {fileID: -6653626607407162414, guid: 857b261f0ff539e409b54ed70c3b154f, type: 3}
-  - {fileID: -5115221373887988638, guid: 3566015ea8ac5124cbd1abc982241815, type: 3}
-  - {fileID: 7400000, guid: 3fa93ee0b7124a24cbc0754309a910a6, type: 3}
-  - {fileID: 7400000, guid: 40c14bd126dfab64991c2cf49294f4b9, type: 3}
-  - {fileID: 7400000, guid: 2aa0778da020842429a140394f1ecd42, type: 3}
-  - {fileID: 7400000, guid: f6e0e5e00ac57fd45ab117b57b83946e, type: 3}
-  - {fileID: 1827226128182048838, guid: d67d190bd183281448c5cc4a94a34cbf, type: 3}
-  - {fileID: 7400000, guid: f6e0e5e00ac57fd45ab117b57b83946e, type: 3}
-  - {fileID: -1221901192422697714, guid: 85ba1e9eb4b365b46963f4ad70a255ec, type: 3}
-  - {fileID: 4015405306748693238, guid: a844a4678ac41364593c89ad1426ed64, type: 3}
-  - {fileID: -2672296789729649518, guid: 7f99692aa390b5745a293104b261cb4d, type: 3}
-  - {fileID: 7400002, guid: 70594db4927d9b24388589a3fb5bc798, type: 3}
-  - {fileID: -4313103264971521817, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 6272265793401184741, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 1827226128182048838, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 1827226128182048838, guid: e23d449a40597844190df759c225f62e, type: 3}
-  - {fileID: 2316002837178987326, guid: 6713abf4720841e4da4abb9bb7a5e1bb, type: 3}
-  - {fileID: -3663496089398541614, guid: 293d298a89df0a242aa0f1e7d386f144, type: 3}
-  - {fileID: 232913842055860772, guid: 986a33a9ee7c4f94a99222ebcfbed12b, type: 3}
-  - {fileID: 4162653470157221463, guid: 470ba8b1cb289864780e28b38e96c70b, type: 3}
-  - {fileID: 7400000, guid: ac05568f0eed7fc46aa1c23636627e79, type: 2}
-  - {fileID: -7025446936273946436, guid: 9c4116b4d684b6b4dabcb237e755b487, type: 3}
-  - {fileID: 7400000, guid: f14adb14f34250a4eaba9e29a0212179, type: 2}
-  - {fileID: 7400000, guid: 945cfbda073f9074e865709f9506ab93, type: 2}
-  - {fileID: 6262450931850653393, guid: 82d79cbe7bcbe2d4795d20f0ce6c3b44, type: 3}
-  - {fileID: 7400000, guid: d1002a1f7ac45e344803053c08365287, type: 2}
-  - {fileID: 7400000, guid: 2f11fc082406c434d8a1ab8038f243fa, type: 2}
-  - {fileID: 7400000, guid: cbde0a7eee0b4cf44ac310e317b680d0, type: 2}
-  - {fileID: 7400000, guid: d387b280600f7f04ca092edbd5221556, type: 3}
-  - {fileID: 7400000, guid: af6b5d4f432877a489f433b3d12d925a, type: 2}
-  - {fileID: -7318286948739659002, guid: ca16077f9eab4a54e928187f2640e23d, type: 3}
-  - {fileID: -1221901192422697714, guid: 85ba1e9eb4b365b46963f4ad70a255ec, type: 3}
-  - {fileID: 4015405306748693238, guid: a844a4678ac41364593c89ad1426ed64, type: 3}
-  - {fileID: 7400000, guid: 5f6e19c80664715428e6ac7c0d447912, type: 2}
-  - {fileID: 5946708163653373921, guid: 23ac97b0ca1da304ea74a9e2665a8e2b, type: 3}
-  - {fileID: -5115221373887988638, guid: 3566015ea8ac5124cbd1abc982241815, type: 3}
-  - {fileID: -3956867891349528864, guid: 07f71c652b45d554090a68a0ec905095, type: 3}
-  - {fileID: -6653626607407162414, guid: 857b261f0ff539e409b54ed70c3b154f, type: 3}
+  - clip: {fileID: 7400002, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: -6504758406798758543, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 6e6ce5d65c303fc47a58c7f861d21ac9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 80faaeb97f1383e40bfc96db2ba11cb1, type: 3}
+    rootMotion: []
+  - clip: {fileID: -998496362607748373, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
+    rootMotion: []
+  - clip: {fileID: 3060872287085348379, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
+    rootMotion: []
+  - clip: {fileID: -4468087431016886167, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: 5358811729250995527, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: 6955343387180132933, guid: 687d93e81f02efc41acf7d2dcf63852c, type: 3}
+    rootMotion: []
+  - clip: {fileID: 4537801217732188732, guid: 371cda2edb4a01145903487c1a24366c, type: 3}
+    rootMotion: []
+  - clip: {fileID: 2963970302439079583, guid: dbaef1234891403e80b8b5084ecf43ff, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 8367ee4be4545e9448fd4313ac6cac40, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: d7a2242191e80184982893d17c589b01, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 9f1a48fc70f7d7044b23d26a9d9cb246, type: 2}
+    rootMotion: []
+  - clip: {fileID: 5946708163653373921, guid: 23ac97b0ca1da304ea74a9e2665a8e2b, type: 3}
+    rootMotion: []
+  - clip: {fileID: -3956867891349528864, guid: 07f71c652b45d554090a68a0ec905095, type: 3}
+    rootMotion: []
+  - clip: {fileID: -6653626607407162414, guid: 857b261f0ff539e409b54ed70c3b154f, type: 3}
+    rootMotion: []
+  - clip: {fileID: -5115221373887988638, guid: 3566015ea8ac5124cbd1abc982241815, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 3fa93ee0b7124a24cbc0754309a910a6, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 40c14bd126dfab64991c2cf49294f4b9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 2aa0778da020842429a140394f1ecd42, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: f6e0e5e00ac57fd45ab117b57b83946e, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: d67d190bd183281448c5cc4a94a34cbf, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: f6e0e5e00ac57fd45ab117b57b83946e, type: 3}
+    rootMotion: []
+  - clip: {fileID: -1221901192422697714, guid: 85ba1e9eb4b365b46963f4ad70a255ec, type: 3}
+    rootMotion: []
+  - clip: {fileID: 4015405306748693238, guid: a844a4678ac41364593c89ad1426ed64, type: 3}
+    rootMotion: []
+  - clip: {fileID: -2672296789729649518, guid: 7f99692aa390b5745a293104b261cb4d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 70594db4927d9b24388589a3fb5bc798, type: 3}
+    rootMotion: []
+  - clip: {fileID: -4313103264971521817, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 6272265793401184741, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: e23d449a40597844190df759c225f62e, type: 3}
+    rootMotion: []
+  - clip: {fileID: 2316002837178987326, guid: 6713abf4720841e4da4abb9bb7a5e1bb, type: 3}
+    rootMotion: []
+  - clip: {fileID: -3663496089398541614, guid: 293d298a89df0a242aa0f1e7d386f144, type: 3}
+    rootMotion: []
+  - clip: {fileID: 232913842055860772, guid: 986a33a9ee7c4f94a99222ebcfbed12b, type: 3}
+    rootMotion: []
+  - clip: {fileID: 4162653470157221463, guid: 470ba8b1cb289864780e28b38e96c70b, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: ac05568f0eed7fc46aa1c23636627e79, type: 2}
+    rootMotion: []
+  - clip: {fileID: -7025446936273946436, guid: 9c4116b4d684b6b4dabcb237e755b487, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: f14adb14f34250a4eaba9e29a0212179, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 945cfbda073f9074e865709f9506ab93, type: 2}
+    rootMotion: []
+  - clip: {fileID: 6262450931850653393, guid: 82d79cbe7bcbe2d4795d20f0ce6c3b44, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: d1002a1f7ac45e344803053c08365287, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 2f11fc082406c434d8a1ab8038f243fa, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: cbde0a7eee0b4cf44ac310e317b680d0, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: d387b280600f7f04ca092edbd5221556, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: af6b5d4f432877a489f433b3d12d925a, type: 2}
+    rootMotion: []
+  - clip: {fileID: -7318286948739659002, guid: ca16077f9eab4a54e928187f2640e23d, type: 3}
+    rootMotion: []
+  - clip: {fileID: -1221901192422697714, guid: 85ba1e9eb4b365b46963f4ad70a255ec, type: 3}
+    rootMotion: []
+  - clip: {fileID: 4015405306748693238, guid: a844a4678ac41364593c89ad1426ed64, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 5f6e19c80664715428e6ac7c0d447912, type: 2}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: 5ea87bb647f6f2946bd8176537ab3d90, type: 3}
+    rootMotion: []
+  - clip: {fileID: 5946708163653373921, guid: 23ac97b0ca1da304ea74a9e2665a8e2b, type: 3}
+    rootMotion: []
+  - clip: {fileID: -5115221373887988638, guid: 3566015ea8ac5124cbd1abc982241815, type: 3}
+    rootMotion: []
+  - clip: {fileID: -3956867891349528864, guid: 07f71c652b45d554090a68a0ec905095, type: 3}
+    rootMotion: []
+  - clip: {fileID: -6653626607407162414, guid: 857b261f0ff539e409b54ed70c3b154f, type: 3}
+    rootMotion: []

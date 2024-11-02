@@ -174,6 +174,7 @@ MonoBehaviour:
       stowedParentType: 0
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: -60, y: 220, z: -220}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -182,6 +183,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 1759638753737419903, guid: bc922f42576d28a4c81060d33ec9a8d1,
         type: 3}
       weaponBone: 18
@@ -190,6 +192,7 @@ MonoBehaviour:
       stowedParentType: 1
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 130, y: 130, z: -40}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
@@ -198,6 +201,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
   - skinPrefab: {fileID: 843674584058609724, guid: 12eef0bb7292ab64492a79a373eb9f17,
       type: 3}
     data:
@@ -209,6 +213,7 @@ MonoBehaviour:
       stowedParentType: 0
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: -60, y: 220, z: -220}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
@@ -217,6 +222,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 1759638753737419903, guid: bc922f42576d28a4c81060d33ec9a8d1,
         type: 3}
       weaponBone: 18
@@ -225,6 +231,7 @@ MonoBehaviour:
       stowedParentType: 1
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 130, y: 130, z: -40}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 0a47bf4cca87be04fa7a157c9e363370,
         type: 3}
       weaponBone: 6
@@ -233,6 +240,7 @@ MonoBehaviour:
       stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -376,62 +384,119 @@ MonoBehaviour:
   - Defeat
   - Defeat_Loop
   - MVP
+  - Reload
   - FlinchFront
   - FlinchBack
   - FlinchLeft
   - FlinchRight
   animationClipLookupValues:
-  - {fileID: 7400002, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: 7400000, guid: 4473a7cc634b5d7409d21ab93d11dca2, type: 3}
-  - {fileID: 7400002, guid: 6e6ce5d65c303fc47a58c7f861d21ac9, type: 3}
-  - {fileID: 7400002, guid: 80faaeb97f1383e40bfc96db2ba11cb1, type: 3}
-  - {fileID: -998496362607748373, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
-  - {fileID: 3060872287085348379, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
-  - {fileID: -4468087431016886167, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: 5358811729250995527, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
-  - {fileID: 7400000, guid: 36807cae99d914347b778bb3240c61c8, type: 3}
-  - {fileID: 7400000, guid: 0d9d8f8b7ae325c4dba83ce3f21b6674, type: 3}
-  - {fileID: 7400000, guid: 985b87ae7dfce5d4c8cfb1ed540aa618, type: 3}
-  - {fileID: 7400000, guid: d09652e838e086b4194097df12a689b4, type: 3}
-  - {fileID: 7400000, guid: abd294efa63bc5e4aab4664e0d7ee167, type: 3}
-  - {fileID: 7400000, guid: 9f1a48fc70f7d7044b23d26a9d9cb246, type: 2}
-  - {fileID: 7400000, guid: c0e2cc1a79fc0a44d87231f7e8d2be3d, type: 3}
-  - {fileID: 7400000, guid: 34e0345fb64ba0e42841af2ab5e884e6, type: 3}
-  - {fileID: 7400000, guid: 519751f0aa9703547a0dff9200c7058d, type: 3}
-  - {fileID: 7400000, guid: 59c2faf5dbbe49d4982d5e423bb13996, type: 3}
-  - {fileID: 7400000, guid: 3fa93ee0b7124a24cbc0754309a910a6, type: 3}
-  - {fileID: 7400000, guid: 40c14bd126dfab64991c2cf49294f4b9, type: 3}
-  - {fileID: 7400000, guid: 2aa0778da020842429a140394f1ecd42, type: 3}
-  - {fileID: 7400002, guid: 7afd42795ea72aa4682b7cea1c5be454, type: 3}
-  - {fileID: 1827226128182048838, guid: d67d190bd183281448c5cc4a94a34cbf, type: 3}
-  - {fileID: 7400002, guid: 7afd42795ea72aa4682b7cea1c5be454, type: 3}
-  - {fileID: 7400000, guid: 8cd7721924d1b344ab61c3b6cb6c33f8, type: 3}
-  - {fileID: 7400000, guid: 59469e0ea90145346adc74683cb4150d, type: 3}
-  - {fileID: 7400000, guid: 28d8dd792dabd8e4d9280a3e3f2e0e6c, type: 3}
-  - {fileID: 7400002, guid: 70594db4927d9b24388589a3fb5bc798, type: 3}
-  - {fileID: -4313103264971521817, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 6272265793401184741, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 1827226128182048838, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
-  - {fileID: 1827226128182048838, guid: e23d449a40597844190df759c225f62e, type: 3}
-  - {fileID: 7400000, guid: 6d89dd7ac2cbe2f4299cad5e29e5ebd3, type: 3}
-  - {fileID: 7400000, guid: 963356abc9743e245bdffc4cde39d1f5, type: 3}
-  - {fileID: 7400000, guid: 6d89dd7ac2cbe2f4299cad5e29e5ebd3, type: 3}
-  - {fileID: 7400000, guid: 0e57465882ff4dc45bd3e6ec7557e3a9, type: 3}
-  - {fileID: 3802070710740760561, guid: 17958e2102014b148a47b2ae51fffc33, type: 3}
-  - {fileID: 7400000, guid: acb81f52429751f40abbc5b07a7b9aeb, type: 3}
-  - {fileID: 7400000, guid: 9af49fb59a6cec54f82cd89c65875a5c, type: 3}
-  - {fileID: 7400000, guid: 68c42ca5e72f5f248911ed84b1721d07, type: 3}
-  - {fileID: 7400000, guid: 5d494f268b6960747be40e6ff8a07d1f, type: 3}
-  - {fileID: 7400002, guid: 58fdc606305b4364fa55edf5c6ffaf21, type: 3}
-  - {fileID: 7400000, guid: 2f11fc082406c434d8a1ab8038f243fa, type: 2}
-  - {fileID: 7400000, guid: cbde0a7eee0b4cf44ac310e317b680d0, type: 2}
-  - {fileID: 7400000, guid: d387b280600f7f04ca092edbd5221556, type: 3}
-  - {fileID: 7400000, guid: af6b5d4f432877a489f433b3d12d925a, type: 2}
-  - {fileID: -7318286948739659002, guid: ca16077f9eab4a54e928187f2640e23d, type: 3}
-  - {fileID: 7400000, guid: 8cd7721924d1b344ab61c3b6cb6c33f8, type: 3}
-  - {fileID: 7400000, guid: 59469e0ea90145346adc74683cb4150d, type: 3}
-  - {fileID: 7400000, guid: 0e57465882ff4dc45bd3e6ec7557e3a9, type: 3}
-  - {fileID: 7400000, guid: 7041c14095a79f94ca8e516dabb71c71, type: 3}
-  - {fileID: 7400000, guid: 09e12bcca1bcf57429bc27fdae033e7f, type: 3}
-  - {fileID: 7400000, guid: bb856fd0f091dea43bfe4a16ceb4af1e, type: 3}
-  - {fileID: 7400000, guid: 19ae32c47f8e9604da5858ff02be6ef9, type: 3}
+  - clip: {fileID: 7400002, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 4473a7cc634b5d7409d21ab93d11dca2, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 6e6ce5d65c303fc47a58c7f861d21ac9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 80faaeb97f1383e40bfc96db2ba11cb1, type: 3}
+    rootMotion: []
+  - clip: {fileID: -998496362607748373, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
+    rootMotion: []
+  - clip: {fileID: 3060872287085348379, guid: c03f92c1a0355b44b8284b78ac5b9ae2, type: 3}
+    rootMotion: []
+  - clip: {fileID: -4468087431016886167, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: 5358811729250995527, guid: ab7be681e532ec94bbb6449262e2b168, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 36807cae99d914347b778bb3240c61c8, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 0d9d8f8b7ae325c4dba83ce3f21b6674, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 985b87ae7dfce5d4c8cfb1ed540aa618, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: d09652e838e086b4194097df12a689b4, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: abd294efa63bc5e4aab4664e0d7ee167, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 9f1a48fc70f7d7044b23d26a9d9cb246, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: c0e2cc1a79fc0a44d87231f7e8d2be3d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 34e0345fb64ba0e42841af2ab5e884e6, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 519751f0aa9703547a0dff9200c7058d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 59c2faf5dbbe49d4982d5e423bb13996, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 3fa93ee0b7124a24cbc0754309a910a6, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 40c14bd126dfab64991c2cf49294f4b9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 2aa0778da020842429a140394f1ecd42, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 7afd42795ea72aa4682b7cea1c5be454, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: d67d190bd183281448c5cc4a94a34cbf, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 7afd42795ea72aa4682b7cea1c5be454, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 8cd7721924d1b344ab61c3b6cb6c33f8, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 59469e0ea90145346adc74683cb4150d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 28d8dd792dabd8e4d9280a3e3f2e0e6c, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 70594db4927d9b24388589a3fb5bc798, type: 3}
+    rootMotion: []
+  - clip: {fileID: -4313103264971521817, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 6272265793401184741, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: c811f9771aca14c4eb9b441f361b7595, type: 3}
+    rootMotion: []
+  - clip: {fileID: 1827226128182048838, guid: e23d449a40597844190df759c225f62e, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 6d89dd7ac2cbe2f4299cad5e29e5ebd3, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 963356abc9743e245bdffc4cde39d1f5, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 6d89dd7ac2cbe2f4299cad5e29e5ebd3, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 0e57465882ff4dc45bd3e6ec7557e3a9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 3802070710740760561, guid: 17958e2102014b148a47b2ae51fffc33, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: acb81f52429751f40abbc5b07a7b9aeb, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 9af49fb59a6cec54f82cd89c65875a5c, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 68c42ca5e72f5f248911ed84b1721d07, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 5d494f268b6960747be40e6ff8a07d1f, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400002, guid: 58fdc606305b4364fa55edf5c6ffaf21, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 2f11fc082406c434d8a1ab8038f243fa, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: cbde0a7eee0b4cf44ac310e317b680d0, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: d387b280600f7f04ca092edbd5221556, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: af6b5d4f432877a489f433b3d12d925a, type: 2}
+    rootMotion: []
+  - clip: {fileID: -7318286948739659002, guid: ca16077f9eab4a54e928187f2640e23d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 8cd7721924d1b344ab61c3b6cb6c33f8, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 59469e0ea90145346adc74683cb4150d, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 0e57465882ff4dc45bd3e6ec7557e3a9, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 1e7b3d575e6071748b7248972f50c83b, type: 2}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 7041c14095a79f94ca8e516dabb71c71, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 09e12bcca1bcf57429bc27fdae033e7f, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: bb856fd0f091dea43bfe4a16ceb4af1e, type: 3}
+    rootMotion: []
+  - clip: {fileID: 7400000, guid: 19ae32c47f8e9604da5858ff02be6ef9, type: 3}
+    rootMotion: []

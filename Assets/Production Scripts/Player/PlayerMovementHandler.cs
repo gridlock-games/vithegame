@@ -176,24 +176,27 @@ namespace Vi.Player
             return Vector3.zero;
         }
 
-        public override void OnServerActionClipPlayed()
+        public override void OnActionClipPlayed()
         {
-            // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
-            while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+            if (IsServer)
             {
-                if (serverInputQueue.Count > 0)
+                // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
+                while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                 {
-                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
+                    if (serverInputQueue.Count > 0)
                     {
-                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
+                        if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
+                        {
+                            if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
+                        }
                     }
-                }
 
-                StatePayload statePayload = Move(inputPayload, combatAgent.AnimationHandler.ApplyRootMotion(), combatAgent.AnimationHandler.ShouldApplyRootMotion());
-                stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                latestServerState.Value = statePayload;
-                lastMoveInputProcessedOnServer = inputPayload.moveInput;
-                NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
+                    StatePayload statePayload = Move(inputPayload, combatAgent.AnimationHandler.ApplyRootMotion(), combatAgent.AnimationHandler.ShouldApplyRootMotion());
+                    stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
+                    latestServerState.Value = statePayload;
+                    lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                    NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
+                }
             }
         }
 
@@ -297,10 +300,17 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
-                if (!shouldApplyRootMotion) { movementTick++; }
+                if (IsServer)
+                {
+                    movementTick++;
+                }
+                else
+                {
+                    if (!shouldApplyRootMotion & !latestServerState.Value.usedRootMotion) { movementTick++; }
+                }
                 
                 StatePayload statePayload = Move(inputPayload,
-                    combatAgent.AnimationHandler.ApplyRootMotion(),
+                    shouldApplyRootMotion & latestServerState.Value.usedRootMotion ? combatAgent.AnimationHandler.ApplyRootMotion() : Vector3.zero,
                     shouldApplyRootMotion);
 
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
@@ -332,11 +342,13 @@ namespace Vi.Player
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         private Vector3 rtDebug;
+        private int rtCount;
         private bool IsServerAuthoritative;
+#if UNITY_EDITOR
+        private List<Vector3> bakedRootMotion = new List<Vector3>();
+#endif
         private StatePayload Move(InputPayload inputPayload, Vector3 rootMotion, bool shouldApplyRootMotion)
         {
-            rootMotion = latestServerState.Value.rotation * (Vector3.one * 3);
-
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (IsServer)
@@ -404,25 +416,76 @@ namespace Vi.Player
                 {
                     if (!latestServerState.Value.usedRootMotion)
                     {
-                        Debug.Log("CHECK " + inputPayload.tick);
+                        Debug.Log("START " + inputPayload.tick);
                     }
                 }
 
+                Weapon weapon = null;
+                if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary)
+                {
+                    weapon = combatAgent.LoadoutManager.PrimaryWeaponOption.weapon;
+                }
+                else if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Secondary)
+                {
+                    weapon = combatAgent.LoadoutManager.SecondaryWeaponOption.weapon;
+                }
+
+#if UNITY_EDITOR
+                if (IsHost) { bakedRootMotion.Add(rootMotion); }
+                else
+                {
+                    rootMotion = weapon.GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip), rtCount);
+                    Debug.Log(rootMotion + " " + rtCount);
+                }
+#else
+                rootMotion = weapon.GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip), rtCount);
+                Debug.Log(rootMotion + " " + rtCount);
+#endif
                 movement = (IsServer ? newRotation : latestServerState.Value.rotation) * rootMotion * GetRootMotionSpeed();
-                
+
                 if (IsServer)
                 {
                     rtDebug += movement;
+                    rtCount++;
                 }
             }
             else
             {
+#if UNITY_EDITOR
+                // For baking root motion in the training room
+                if (IsHost & latestServerState.Value.usedRootMotion)
+                {
+                    // Bake root motion into the weapon for determinism at runtime
+                    Weapon weapon = null;
+                    if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary)
+                    {
+                        weapon = combatAgent.LoadoutManager.PrimaryWeaponOption.weapon;
+                    }
+                    else if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Secondary)
+                    {
+                        weapon = combatAgent.LoadoutManager.SecondaryWeaponOption.weapon;
+                    }
+
+                    if (weapon)
+                    {
+                        if (weapon.SetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip), bakedRootMotion))
+                        {
+                            Debug.Log("Setting root motion data " + weapon + " " + combatAgent.WeaponHandler.CurrentActionClip);
+                        }
+                    }
+                    bakedRootMotion.Clear();
+                }
+#endif
+                // Debugging root motion
                 if (IsServer)
                 {
                     if (latestServerState.Value.usedRootMotion)
                     {
-                        Debug.Log(inputPayload.tick + " TOTAL: " + rtDebug);
+                        Debug.Log("TICK: " + inputPayload.tick
+                            + "\nTOTAL: " + rtDebug
+                            + "\nCOUNT: " + rtCount);
                         rtDebug = Vector3.zero;
+                        rtCount = 0;
                     }
                 }
 
@@ -434,16 +497,18 @@ namespace Vi.Player
 
             if (IsOwner & !IsServer)
             {
-                if (!IsServerAuthoritative & shouldApplyRootMotion)
+                if (!IsServerAuthoritative & shouldApplyRootMotion & latestServerState.Value.usedRootMotion)
                 {
-                    Debug.Log("CHECK " + inputPayload.tick);
+                    Debug.Log("START " + inputPayload.tick);
                     //networkTransform.ResetPositionInterpolator(GetPosition());
                 }
 
-                if (shouldApplyRootMotion)
+                if (shouldApplyRootMotion & latestServerState.Value.usedRootMotion)
                 {
                     IsServerAuthoritative = true;
                     rtDebug += movement;
+                    rtCount++;
+
                     //networkTransform.SyncPositionX = true;
                     //networkTransform.SyncPositionY = true;
                     //networkTransform.SyncPositionZ = true;
@@ -455,8 +520,11 @@ namespace Vi.Player
                 else if (IsServerAuthoritative & !latestServerState.Value.usedRootMotion)
                 {
                     IsServerAuthoritative = false;
-                    Debug.Log(inputPayload.tick + " TOTAL: " + rtDebug);
+                    Debug.Log("TICK: " + inputPayload.tick
+                            + "\nTOTAL: " + rtDebug
+                            + "\nCOUNT: " + rtCount);
                     rtDebug = Vector3.zero;
+                    rtCount = 0;
 
                     //networkTransform.SyncPositionX = false;
                     //networkTransform.SyncPositionY = false;
@@ -471,6 +539,9 @@ namespace Vi.Player
                 else if (IsServerAuthoritative)
                 {
                     Debug.Log("Shouldn't be here");
+
+                    Rigidbody.position = latestServerState.Value.position;
+
                     //Rigidbody.isKinematic = true;
                     //Rigidbody.MovePosition(latestServerState.Value.position);
                     //return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
@@ -866,9 +937,9 @@ namespace Vi.Player
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
         }
 
-# if UNITY_EDITOR
+#if UNITY_EDITOR
         private bool drawCasts;
-# endif
+#endif
 
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];

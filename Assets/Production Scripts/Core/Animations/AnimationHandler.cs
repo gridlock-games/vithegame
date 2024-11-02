@@ -39,9 +39,9 @@ namespace Vi.Core
             }
         }
 
-        public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
+        public AnimationClip GetAnimationClip(ActionClip actionClip)
         {
-            if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
+            if (!actionClip) { Debug.LogError("Calling GetAnimationClip with a null action clip! " + name); return null; }
 
             List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
             combatAgent.WeaponHandler.AnimatorOverrideControllerInstance.GetOverrides(overrides);
@@ -51,13 +51,22 @@ namespace Vi.Core
                 if (!@override.Key | !@override.Value) { continue; }
                 if (@override.Key.name == stateName)
                 {
-                    return @override.Value.length + actionClip.transitionTime;
+                    return @override.Value;
                 }
             }
 
             AnimationClip clip = combatAgent.WeaponHandler.GetWeapon().GetAnimationClip(stateName);
-            if (clip) { return clip.length; }
+            if (clip) { return clip; }
             Debug.LogError("Couldn't find an animation clip for action clip " + actionClip.name + " with weapon " + combatAgent.WeaponHandler.GetWeapon());
+            return null;
+        }
+
+        public float GetTotalActionClipLengthInSeconds(ActionClip actionClip)
+        {
+            if (!actionClip) { Debug.LogError("Calling GetTotalActionClipLengthInSeconds with a null action clip! " + name); return 2; }
+
+            AnimationClip clip = GetAnimationClip(actionClip);
+            if (clip) { return clip.length; }
             return 2;
         }
 
@@ -691,7 +700,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
+            combatAgent.MovementHandler.OnActionClipPlayed();
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
@@ -1097,6 +1106,8 @@ namespace Vi.Core
                     combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
                 }
             }
+
+            combatAgent.MovementHandler.OnActionClipPlayed();
 
             // Play the action clip based on its type
             switch (actionClip.GetClipType())
