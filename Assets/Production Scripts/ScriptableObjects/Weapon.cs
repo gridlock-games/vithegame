@@ -1062,7 +1062,7 @@ namespace Vi.ScriptableObjects
             int index = animationClipLookupValues.FindIndex(item => item.clip == clip);
             if (index != -1)
             {
-                if (animationClipLookupValues[index].rootMotion.Length == rootMotion.Count) { return false; }
+                if (Mathf.Abs(animationClipLookupValues[index].rootMotion.Length - rootMotion.Count) < 2) { return false; }
 
                 if (animationClipLookupValues[index].clip)
                 {
@@ -1082,24 +1082,24 @@ namespace Vi.ScriptableObjects
             return false;
         }
 #endif
-        public Vector3 GetRootMotionData(AnimationClip clip, int tickIndex)
+        public Vector3[] GetRootMotionData(AnimationClip clip)
         {
             int index = animationClipLookupValues.FindIndex(item => item.clip == clip);
             if (index != -1)
             {
                 if (animationClipLookupValues[index].clip)
                 {
-                    if (animationClipLookupValues[index].rootMotion.Length == 0)
+                    if (animationClipLookupValues[index].rootMotion == null)
                     {
                         Debug.LogError(clip + " has no root motion data on " + this);
                     }
-                    else if (animationClipLookupValues[index].rootMotion.Length <= tickIndex)
+                    else if (animationClipLookupValues[index].rootMotion.Length == 0)
                     {
-                        Debug.LogError(clip + " root motion tick index is out of bounds " + this + " " + tickIndex + " / " + animationClipLookupValues[index].rootMotion.Length);
+                        Debug.LogError(clip + " has no root motion data on " + this);
                     }
                     else
                     {
-                        return animationClipLookupValues[index].rootMotion[tickIndex];
+                        return animationClipLookupValues[index].rootMotion;
                     }
                 }
                 else
@@ -1111,7 +1111,7 @@ namespace Vi.ScriptableObjects
             {
                 Debug.LogError("Clip not in values " + clip + " " + this);
             }
-            return Vector3.zero;
+            return new Vector3[0];
         }
     }
 }

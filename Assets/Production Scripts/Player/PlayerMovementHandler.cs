@@ -115,7 +115,7 @@ namespace Vi.Player
         {
             lastProcessedState = latestServerState.Value;
 
-            if (IsServerAuthoritative)
+            if (isServerAuthoritative)
             {
                 return Vector3.zero;
             }
@@ -198,6 +198,7 @@ namespace Vi.Player
                     NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
                 }
             }
+            rootMotionTick = 0;
         }
 
         private Vector2 lastMoveInputProcessedOnServer;
@@ -216,7 +217,7 @@ namespace Vi.Player
 
             if (!IsClient)
             {
-                if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+                if (rootMotionTick != -1)
                 {
                     Quaternion newRotation = latestServerState.Value.rotation;
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
@@ -310,9 +311,9 @@ namespace Vi.Player
                 }
                 
                 StatePayload statePayload = Move(inputPayload,
-                    shouldApplyRootMotion & latestServerState.Value.usedRootMotion ? combatAgent.AnimationHandler.ApplyRootMotion() : Vector3.zero,
-                    shouldApplyRootMotion);
-
+                    combatAgent.AnimationHandler.ApplyRootMotion(),
+                    IsHost ? shouldApplyRootMotion : rootMotionTick != -1);
+                
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 else
@@ -341,9 +342,8 @@ namespace Vi.Player
 
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
-        private Vector3 rtDebug;
-        private int rtCount;
-        private bool IsServerAuthoritative;
+        private int rootMotionTick = -1;
+        private bool isServerAuthoritative;
 #if UNITY_EDITOR
         private List<Vector3> bakedRootMotion = new List<Vector3>();
 #endif
@@ -412,42 +412,36 @@ namespace Vi.Player
             }
             else if (shouldApplyRootMotion)
             {
-                if (IsServer)
-                {
-                    if (!latestServerState.Value.usedRootMotion)
-                    {
-                        Debug.Log("START " + inputPayload.tick);
-                    }
-                }
-
-                Weapon weapon = null;
-                if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Primary)
-                {
-                    weapon = combatAgent.LoadoutManager.PrimaryWeaponOption.weapon;
-                }
-                else if (combatAgent.LoadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Secondary)
-                {
-                    weapon = combatAgent.LoadoutManager.SecondaryWeaponOption.weapon;
-                }
-
 #if UNITY_EDITOR
                 if (IsHost) { bakedRootMotion.Add(rootMotion); }
                 else
                 {
-                    rootMotion = weapon.GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip), rtCount);
-                    Debug.Log(rootMotion + " " + rtCount);
+                    Vector3[] data = weaponHandler.GetWeapon().GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip));
+                    if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
+                    if (rootMotionTick >= data.Length)
+                    {
+                        Debug.Log("END " + data.Length + " " + rootMotionTick);
+                        rootMotionTick = -1;
+                    }
+                    else
+                    {
+                        rootMotionTick++;
+                    }
                 }
 #else
-                rootMotion = weapon.GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip), rtCount);
-                Debug.Log(rootMotion + " " + rtCount);
+                Vector3[] data = weaponHandler.GetWeapon().GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip));
+                if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
+                if (rootMotionTick >= data.Length)
+                {
+                    Debug.Log("END " + data.Length + " " + rootMotionTick);
+                    rootMotionTick = -1;
+                }
+                else
+                {
+                    rootMotionTick++;
+                }
 #endif
                 movement = (IsServer ? newRotation : latestServerState.Value.rotation) * rootMotion * GetRootMotionSpeed();
-
-                if (IsServer)
-                {
-                    rtDebug += movement;
-                    rtCount++;
-                }
             }
             else
             {
@@ -476,19 +470,6 @@ namespace Vi.Player
                     bakedRootMotion.Clear();
                 }
 #endif
-                // Debugging root motion
-                if (IsServer)
-                {
-                    if (latestServerState.Value.usedRootMotion)
-                    {
-                        Debug.Log("TICK: " + inputPayload.tick
-                            + "\nTOTAL: " + rtDebug
-                            + "\nCOUNT: " + rtCount);
-                        rtDebug = Vector3.zero;
-                        rtCount = 0;
-                    }
-                }
-
                 Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= GetRunSpeed();
@@ -497,18 +478,16 @@ namespace Vi.Player
 
             if (IsOwner & !IsServer)
             {
-                if (!IsServerAuthoritative & shouldApplyRootMotion & latestServerState.Value.usedRootMotion)
+                if (!isServerAuthoritative & shouldApplyRootMotion)
                 {
                     Debug.Log("START " + inputPayload.tick);
                     //networkTransform.ResetPositionInterpolator(GetPosition());
                 }
 
-                if (shouldApplyRootMotion & latestServerState.Value.usedRootMotion)
+                if (shouldApplyRootMotion)
                 {
-                    IsServerAuthoritative = true;
-                    rtDebug += movement;
-                    rtCount++;
-
+                    isServerAuthoritative = true;
+                    //rootMotionTick++;
                     //networkTransform.SyncPositionX = true;
                     //networkTransform.SyncPositionY = true;
                     //networkTransform.SyncPositionZ = true;
@@ -517,34 +496,19 @@ namespace Vi.Player
                     //Rigidbody.MovePosition(latestServerState.Value.position);
                     //return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
                 }
-                else if (IsServerAuthoritative & !latestServerState.Value.usedRootMotion)
+                else if (isServerAuthoritative)
                 {
-                    IsServerAuthoritative = false;
-                    Debug.Log("TICK: " + inputPayload.tick
-                            + "\nTOTAL: " + rtDebug
-                            + "\nCOUNT: " + rtCount);
-                    rtDebug = Vector3.zero;
-                    rtCount = 0;
+                    isServerAuthoritative = false;
 
                     //networkTransform.SyncPositionX = false;
                     //networkTransform.SyncPositionY = false;
                     //networkTransform.SyncPositionZ = false;
 
-                    Rigidbody.position = latestServerState.Value.position;
+                    //Rigidbody.position = latestServerState.Value.position;
 
                     //Rigidbody.isKinematic = true;
                     //Rigidbody.MovePosition(latestServerState.Value.position);
                     //return new StatePayload(inputPayload, Rigidbody, newRotation, false);
-                }
-                else if (IsServerAuthoritative)
-                {
-                    Debug.Log("Shouldn't be here");
-
-                    Rigidbody.position = latestServerState.Value.position;
-
-                    //Rigidbody.isKinematic = true;
-                    //Rigidbody.MovePosition(latestServerState.Value.position);
-                    //return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
                 }
             }
 
