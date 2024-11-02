@@ -7,6 +7,7 @@ using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.AI;
 using Vi.Core.Structures;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.MovementHandlers
 {
@@ -40,7 +41,7 @@ namespace Vi.Core.MovementHandlers
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
-		public virtual void OnActionClipPlayed() { }
+		public virtual void OnActionClipPlayed(ActionClip actionClip) { }
 
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
 		public virtual void ReceiveOnCollisionStayMessage(Collision collision) { }

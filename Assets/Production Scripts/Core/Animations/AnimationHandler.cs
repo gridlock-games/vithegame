@@ -700,7 +700,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
-            combatAgent.MovementHandler.OnActionClipPlayed();
+            combatAgent.MovementHandler.OnActionClipPlayed(actionClip);
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
@@ -1107,7 +1107,7 @@ namespace Vi.Core
                 }
             }
 
-            combatAgent.MovementHandler.OnActionClipPlayed();
+            combatAgent.MovementHandler.OnActionClipPlayed(actionClip);
 
             // Play the action clip based on its type
             switch (actionClip.GetClipType())

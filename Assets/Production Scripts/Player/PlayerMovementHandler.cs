@@ -177,8 +177,12 @@ namespace Vi.Player
             return Vector3.zero;
         }
 
-        public override void OnActionClipPlayed()
+        public override void OnActionClipPlayed(ActionClip actionClip)
         {
+            if (actionClip.ailment == ActionClip.Ailment.Grab) { return; }
+            if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
+            if (!actionClip.shouldApplyRootMotion) { return; }
+
             if (IsServer)
             {
                 // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
