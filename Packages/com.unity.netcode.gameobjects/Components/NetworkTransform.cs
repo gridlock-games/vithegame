@@ -1332,10 +1332,10 @@ namespace Unity.Netcode.Components
         /// <summary>
         /// Use this to reset the position interpolator's initial state. Useful for when reactivating position syncing at runtime
         /// </summary>
-        /// <param name="position"></param>
-        public void ResetPositionInterpolator(Vector3 position)
+        /// <param name="startPosition"></param>
+        public void ResetPositionInterpolator(Vector3 startPosition)
         {
-            m_PositionInterpolator.ResetTo(position, NetworkManager.ServerTime.Time);
+            m_PositionInterpolator.ResetTo(startPosition, NetworkManager.ServerTime.Time);
         }
 
         /// <summary>
