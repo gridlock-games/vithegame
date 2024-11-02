@@ -1110,6 +1110,24 @@ namespace Vi.ScriptableObjects
             }
             return false;
         }
+
+        public void DebugAnimationsThatNeedBaking()
+        {
+            for (int i = 0; i < animationClipLookupValues.Count; i++)
+            {
+                if (animationClipLookupKeys[i].Contains("Grab")) { continue; }
+                if (animationClipLookupKeys[i].Contains("Flinch")) { continue; }
+
+                if (animationClipLookupValues[i].rootMotion == null)
+                {
+                    Debug.Log(name + " " + animationClipLookupKeys[i] + " - " + animationClipLookupValues[i].clip);
+                }
+                else if (animationClipLookupValues[i].rootMotion.Length == 0)
+                {
+                    Debug.Log(name + " " + animationClipLookupKeys[i] + " - " + animationClipLookupValues[i].clip);
+                }
+            }
+        }
 #endif
         public Vector3[] GetRootMotionData(AnimationClip clip)
         {

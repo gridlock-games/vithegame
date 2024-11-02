@@ -767,6 +767,15 @@ namespace Vi.ScriptableObjects
             }
             AssetDatabase.SaveAssets();
         }
+
+        [ContextMenu("Debug All Animations That Need Baking")]
+        private void DebugAllAnimationsThatNeedBaking()
+        {
+            foreach (WeaponOption weaponOption in weaponOptions)
+            {
+                weaponOption.weapon.DebugAnimationsThatNeedBaking();
+            }
+        }
 #endif
     }
 }
