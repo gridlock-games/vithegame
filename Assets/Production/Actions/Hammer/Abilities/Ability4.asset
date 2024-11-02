@@ -2069,6 +2069,30 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  maxInterpTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.04
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.04
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   attackRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -6582,7 +6606,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
@@ -6653,3 +6679,8 @@ MonoBehaviour:
   shouldAimOffHand: 1
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0
