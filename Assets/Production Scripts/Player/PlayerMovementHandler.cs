@@ -606,7 +606,7 @@ namespace Vi.Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            networkTransform.SetPositionMaximumInterpolationTime(0.025f);
+            networkTransform.SetPositionMaximumInterpolationTime(ActionClip.defaultMaximumAnimationInterpolationTime);
             networkTransform.SyncPositionX = !IsOwner;
             networkTransform.SyncPositionY = !IsOwner;
             networkTransform.SyncPositionZ = !IsOwner;
@@ -652,7 +652,6 @@ namespace Vi.Player
 
         public override void OnNetworkDespawn()
         {
-            networkTransform.SetPositionMaximumInterpolationTime(0.1f);
             networkTransform.SyncPositionX = true;
             networkTransform.SyncPositionY = true;
             networkTransform.SyncPositionZ = true;
@@ -814,7 +813,11 @@ namespace Vi.Player
             }
 #endif
             UpdateTransform();
-            if (IsLocalPlayer) { cameraController.UpdateCamera(); }
+            if (IsLocalPlayer)
+            {
+                cameraController.UpdateCamera();
+                networkTransform.SetPositionMaximumInterpolationTime(combatAgent.WeaponHandler.CurrentActionClip.GetMaximumAnimationInterpolationTime(combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip)));
+            }
             AutoAim();
             SetAnimationMoveInput(IsOwner ? GetPlayerMoveInput() : latestServerState.Value.moveInput);
 
