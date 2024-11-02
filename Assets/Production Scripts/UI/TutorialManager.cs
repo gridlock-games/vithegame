@@ -7,7 +7,6 @@ using Vi.Player;
 using Vi.Utility;
 using UnityEngine.UI;
 using Unity.Netcode;
-using jomarcentermjm.PlatformAPI;
 using Vi.Core.CombatAgents;
 
 namespace Vi.UI
@@ -110,11 +109,6 @@ namespace Vi.UI
 
             backgroundImage.enabled = false;
             StartCoroutine(DisplayNextActionAfterPlayerInputFound());
-        }
-
-        private void Start()
-        {
-            HandlePlatformAPI();
         }
 
         private IEnumerator DisplayNextActionAfterPlayerInputFound()
@@ -844,7 +838,7 @@ namespace Vi.UI
                 {
                     if (botAttributes)
                     {
-                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, botAttributes.transform.rotation, botAttributes.transform);
+                        locationPingInstance = Instantiate(locationPingPrefab, botAttributes.transform.position + (botAttributes.transform.forward * forwardSpawnPosMultiplier) + (Vector3.up * 0.1f), botAttributes.transform.rotation, botAttributes.transform);
                     }
                 }
             }
@@ -918,14 +912,6 @@ namespace Vi.UI
             else
             {
                 Debug.LogError("Unsure how to handle current action index of " + currentActionIndex);
-            }
-        }
-
-        void HandlePlatformAPI()
-        {
-            if (PlatformRichPresence.instance != null)
-            {
-                PlatformRichPresence.instance.UpdatePlatformStatus("Learning the ropes", "Playing tutorial");
             }
         }
     }
