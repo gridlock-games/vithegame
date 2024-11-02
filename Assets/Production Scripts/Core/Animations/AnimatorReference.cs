@@ -513,7 +513,7 @@ namespace Vi.Core
             if (!combatAgent.WeaponHandler) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip) { return false; }
             if (!combatAgent.WeaponHandler.CurrentActionClip.shouldApplyRootMotion) { return false; }
-            return animationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
+            return !IsAtRest();
         }
 
         private void Update()

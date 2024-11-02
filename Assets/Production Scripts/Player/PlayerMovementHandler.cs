@@ -285,10 +285,6 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (shouldApplyRootMotion)
-                {
-                    moveInput = Vector2.zero;
-                }
                 else if (combatAgent.StatusAgent.IsRooted())
                 {
                     moveInput = Vector2.zero;
@@ -416,7 +412,7 @@ namespace Vi.Player
                 {
                     Vector3[] data = weaponHandler.GetWeapon().GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip));
                     if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
-                    if (rootMotionTick >= data.Length)
+                    if (rootMotionTick+1 >= data.Length)
                     {
                         rootMotionTick = -1;
                     }
@@ -428,7 +424,7 @@ namespace Vi.Player
 #else
                 Vector3[] data = weaponHandler.GetWeapon().GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip));
                 if (data.Length > 0 & rootMotionTick < data.Length) { rootMotion = data[rootMotionTick]; }
-                if (rootMotionTick >= data.Length)
+                if (rootMotionTick+1 >= data.Length)
                 {
                     rootMotionTick = -1;
                 }
