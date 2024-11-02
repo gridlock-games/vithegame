@@ -204,6 +204,10 @@ namespace Vi.Player
                 }
             }
             rootMotionTick = 0;
+
+#if UNITY_EDITOR
+            if (IsHost) { bakedRootMotion.Clear(); }
+#endif
         }
 
         private Vector2 lastMoveInputProcessedOnServer;
@@ -408,7 +412,10 @@ namespace Vi.Player
             else if (shouldApplyRootMotion)
             {
 #if UNITY_EDITOR
-                if (IsHost) { bakedRootMotion.Add(rootMotion); }
+                if (IsHost)
+                {
+                    bakedRootMotion.Add(rootMotion);
+                }
                 else
                 {
                     Vector3[] data = weaponHandler.GetWeapon().GetRootMotionData(combatAgent.AnimationHandler.GetAnimationClip(combatAgent.WeaponHandler.CurrentActionClip));
