@@ -1117,6 +1117,7 @@ namespace Vi.ScriptableObjects
             {
                 if (animationClipLookupKeys[i].Contains("Grab")) { continue; }
                 if (animationClipLookupKeys[i].Contains("Flinch")) { continue; }
+                if (UnityEditor.AssetDatabase.GetAssetPath(animationClipLookupValues[i].clip).Contains("Placeholder Animations")) { continue; }
 
                 if (animationClipLookupValues[i].rootMotion == null)
                 {
