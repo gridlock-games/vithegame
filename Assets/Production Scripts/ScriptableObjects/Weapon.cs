@@ -994,7 +994,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private List<AnimationData> animationClipLookupValues = new List<AnimationData>();
 
         [System.Serializable]
-        private struct AnimationData
+        private struct AnimationData : System.IEquatable<AnimationData>
         {
             public AnimationClip clip;
             public Vector3[] rootMotion;
@@ -1003,6 +1003,11 @@ namespace Vi.ScriptableObjects
             {
                 this.clip = clip;
                 this.rootMotion = rootMotion.ToArray();
+            }
+
+            public bool Equals(AnimationData other)
+            {
+                return other.clip == clip & other.rootMotion.SequenceEqual(rootMotion);
             }
         }
 
@@ -1055,6 +1060,30 @@ namespace Vi.ScriptableObjects
                 }
             }
             EditorUtility.SetDirty(this);
+        }
+
+        public void CopyRelevantAnimationDataFromOtherWeapons(CharacterReference.WeaponOption[] weaponOptions)
+        {
+            foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
+            {
+                if (weaponOption.weapon == this) { continue; }
+
+                foreach (AnimationData data in weaponOption.weapon.animationClipLookupValues)
+                {
+                    if (data.rootMotion == null) { continue; }
+                    if (data.rootMotion.Length == 0) { continue; }
+
+                    int thisIndex = animationClipLookupValues.FindIndex(item => item.clip == data.clip);
+                    if (thisIndex != -1)
+                    {
+                        if (!animationClipLookupValues[thisIndex].Equals(data))
+                        {
+                            animationClipLookupValues[thisIndex] = data;
+                            EditorUtility.SetDirty(this);
+                        }
+                    }
+                }
+            }
         }
 
         public bool SetRootMotionData(AnimationClip clip, List<Vector3> rootMotion)

@@ -755,6 +755,17 @@ namespace Vi.ScriptableObjects
             {
                 weaponOption.weapon.FindAnimations();
             }
+            AssetDatabase.SaveAssets();
+        }
+
+        [ContextMenu("Copy Animation Data Between Weapons")]
+        private void CopyAnimationDataBetweenWeapons()
+        {
+            foreach (WeaponOption weaponOption in weaponOptions)
+            {
+                weaponOption.weapon.CopyRelevantAnimationDataFromOtherWeapons(weaponOptions);
+            }
+            AssetDatabase.SaveAssets();
         }
 #endif
     }
