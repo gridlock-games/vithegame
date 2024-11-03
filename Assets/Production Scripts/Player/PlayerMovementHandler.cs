@@ -179,8 +179,8 @@ namespace Vi.Player
 
         public override void OnActionClipPlayed(ActionClip actionClip)
         {
-            if (actionClip.ailment == ActionClip.Ailment.Grab) { return; }
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
+            if (actionClip.ailment == ActionClip.Ailment.Grab & actionClip.GetClipType() == ActionClip.ClipType.HitReaction) { return; }
             if (!actionClip.shouldApplyRootMotion) { return; }
 
             if (IsServer)
