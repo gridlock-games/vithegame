@@ -100,7 +100,7 @@ namespace Vi.Player
 
         private void FixedUpdate()
         {
-            if (!IsSpawned)
+            if (!IsSpawned | !isSpawnedOnOwnerInstance.Value)
             {
                 Rigidbody.Sleep();
                 return;
@@ -149,11 +149,14 @@ namespace Vi.Player
             }
             else if (IsServer)
             {
+                Vector3 rt = combatAgent.AnimationHandler.ApplyRootMotion();
                 if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
                 {
                     Rigidbody.isKinematic = false;
+                    float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
+                    Vector3 toMotion = Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime;
                     Move(new InputPayload(0, Vector2.zero, transform.rotation),
-                        Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime,
+                        normalizedTime > 0.7f ? toMotion : rt,
                         true);
                 }
                 else
@@ -384,8 +387,6 @@ namespace Vi.Player
             networkTransform.SyncRotAngleY = !IsOwner;
             networkTransform.SyncRotAngleZ = !IsOwner;
 
-            networkTransform.Interpolate = !IsServer & !IsOwner;
-
             if (IsLocalPlayer)
             {
                 cameraController.gameObject.tag = "MainCamera";
@@ -405,6 +406,8 @@ namespace Vi.Player
                 ownerPosition.Value = transform.position;
                 ownerRotationEulerAngles.Value = transform.eulerAngles;
                 Rigidbody.position = ownerPosition.Value;
+
+                isSpawnedOnOwnerInstance.Value = true;
             }
             else
             {
@@ -458,6 +461,7 @@ namespace Vi.Player
 
         private NetworkVariable<Vector3> ownerPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> ownerRotationEulerAngles = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<bool> isSpawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private ActionMapHandler actionMapHandler;
         protected override void Awake()
