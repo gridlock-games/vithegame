@@ -34,6 +34,8 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            networkTransform.SetPositionMaximumInterpolationTime(0.07f);
+            networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
             rb.isKinematic = !IsServer & !IsOwner;
@@ -42,6 +44,7 @@ namespace Vi.Core.MovementHandlers
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
         protected CombatAgent combatAgent;
+        protected NetworkTransform networkTransform;
         protected override void Awake()
         {
             base.Awake();
@@ -50,6 +53,7 @@ namespace Vi.Core.MovementHandlers
             PooledObject pooledObject = GetComponent<PooledObject>();
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
+            networkTransform = GetComponent<NetworkTransform>();
         }
 
         protected virtual void OnSpawnFromPool()

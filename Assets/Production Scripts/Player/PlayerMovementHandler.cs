@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
+using static Vi.Player.PlayerMovementHandler;
 
 namespace Vi.Player
 {
@@ -152,7 +153,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = false;
                     Move(new InputPayload(0, Vector2.zero, transform.rotation),
-                        combatAgent.AnimationHandler.ApplyRootMotion(),
+                        Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime,
                         true);
                 }
                 else
@@ -164,7 +165,7 @@ namespace Vi.Player
             else
             {
                 Rigidbody.isKinematic = true;
-                Rigidbody.MovePosition(ownerPosition.Value);
+                Rigidbody.MovePosition(transform.position);
             }
         }
 
@@ -459,7 +460,6 @@ namespace Vi.Player
         private NetworkVariable<Vector3> ownerRotationEulerAngles = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private ActionMapHandler actionMapHandler;
-        private NetworkTransform networkTransform;
         protected override void Awake()
         {
             base.Awake();
@@ -470,7 +470,6 @@ namespace Vi.Player
             serverInputQueue = new Queue<InputPayload>();
 
             actionMapHandler = GetComponent<ActionMapHandler>();
-            networkTransform = GetComponent<NetworkTransform>();
         }
 
         private void Start()
