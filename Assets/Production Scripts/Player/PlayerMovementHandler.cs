@@ -97,181 +97,18 @@ namespace Vi.Player
             }
         }
 
-        protected override bool IsGrounded()
-        {
-            if (latestServerState.Value.tick == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return base.IsGrounded();
-            }
-        }
-
-        private const float serverReconciliationThreshold = 0.01f;
-        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
-        private Vector3 HandleServerReconciliation()
-        {
-            lastProcessedState = latestServerState.Value;
-
-            if (networkTransform.SyncPositionX | networkTransform.SyncPositionY | networkTransform.SyncPositionZ)
-            {
-                return Vector3.zero;
-            }
-
-            if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
-            {
-                if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
-                return Vector3.zero;
-            }
-            if (!CanMove())
-            {
-                if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
-                return Vector3.zero;
-            }
-
-            int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
-            float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
-
-            if (stateBuffer[serverStateBufferIndex].usedRootMotion | latestServerState.Value.usedRootMotion)
-            {
-                return Vector3.zero;
-            }
-
-            if (positionError > serverReconciliationThreshold)
-            {
-                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                lastServerReconciliationTime = Time.time;
-
-                // Update buffer at index of latest server state
-                stateBuffer[serverStateBufferIndex] = latestServerState.Value;
-
-                // Now re-simulate the rest of the ticks up to the current tick on the client
-                Physics.simulationMode = SimulationMode.Script;
-                Rigidbody.position = latestServerState.Value.position;
-                if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
-                NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
-
-                int tickToProcess = latestServerState.Value.tick + 1;
-                while (tickToProcess < movementTick)
-                {
-                    int bufferIndex = tickToProcess % BUFFER_SIZE;
-
-                    // Process new movement with reconciled state
-                    StatePayload statePayload = Move(inputBuffer[bufferIndex], Vector3.zero, stateBuffer[bufferIndex].usedRootMotion);
-                    NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
-
-                    // Update buffer with recalculated state
-                    stateBuffer[bufferIndex] = statePayload;
-
-                    tickToProcess++;
-                }
-                Physics.simulationMode = SimulationMode.FixedUpdate;
-            }
-            else if (Vector3.Distance(stateBuffer[serverStateBufferIndex].velocity, latestServerState.Value.velocity) > serverReconciliationThreshold)
-            {
-                return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
-            }
-            return Vector3.zero;
-        }
-
-        public override void OnServerActionClipPlayed()
-        {
-            // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
-            while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
-            {
-                if (serverInputQueue.Count > 0)
-                {
-                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
-                    {
-                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
-                    }
-                }
-
-                StatePayload statePayload = Move(inputPayload, combatAgent.AnimationHandler.ApplyRootMotion(), combatAgent.AnimationHandler.ShouldApplyRootMotion());
-                stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                latestServerState.Value = statePayload;
-                lastMoveInputProcessedOnServer = inputPayload.moveInput;
-                NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
-            }
-        }
-
-        private Vector2 lastMoveInputProcessedOnServer;
         private void FixedUpdate()
         {
-            if (!IsSpawned) { return; }
-
-            if (!IsOwner & !IsServer)
+            if (!IsSpawned)
             {
-                if (latestServerState.Value.tick > 0)
-                {
-                    // Sync position here with latest server state
-                    Rigidbody.MovePosition(transform.position);
-                }
-            }
-
-            if (!IsClient)
-            {
-                if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
-                {
-                    Quaternion newRotation = latestServerState.Value.rotation;
-                    while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
-                    {
-                        newRotation = inputPayload.rotation;
-                        break;
-                    }
-
-                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero, newRotation),
-                        combatAgent.AnimationHandler.ApplyRootMotion(),
-                        true);
-                    stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                    latestServerState.Value = statePayload;
-                    lastMoveInputProcessedOnServer = Vector2.zero;
-                }
-                else
-                {
-                    while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
-                    {
-                        if (serverInputQueue.Count > 3)
-                        {
-                            if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero) { continue; }
-                        }
-
-                        StatePayload statePayload = Move(inputPayload,
-                            combatAgent.AnimationHandler.ApplyRootMotion(),
-                            false);
-                        stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                        latestServerState.Value = statePayload;
-                        lastMoveInputProcessedOnServer = inputPayload.moveInput;
-                        break;
-                    }
-                }
+                Rigidbody.Sleep();
+                return;
             }
 
             if (IsOwner)
             {
-                Vector3 serverReconciliationVelocityError = Vector3.zero;
-                if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
-                {
-                    if (!latestServerState.Equals(default(StatePayload)) &&
-                        (lastProcessedState.Equals(default(StatePayload)) ||
-                        !latestServerState.Equals(lastProcessedState)))
-                    {
-                        serverReconciliationVelocityError = HandleServerReconciliation();
-                    }
-                }
-
                 Vector2 moveInput;
-                if (latestServerState.Value.usedRootMotion)
-                {
-                    moveInput = Vector2.zero;
-                }
                 if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (latestServerState.Value.usedRootMotion)
                 {
                     moveInput = Vector2.zero;
                 }
@@ -296,29 +133,42 @@ namespace Vi.Player
                     moveInput = GetPlayerMoveInput();
                 }
 
+                syncedMoveInput.Value = moveInput;
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput, EvaluateRotation());
+                inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 movementTick++;
 
                 StatePayload statePayload = Move(inputPayload,
                     combatAgent.AnimationHandler.ApplyRootMotion(),
                     combatAgent.AnimationHandler.ShouldApplyRootMotion());
 
-                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                else
-                    inputBuffer.Add(inputPayload);
-
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-                Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
 
-                if (IsServer) { latestServerState.Value = statePayload; }
+                ownerPosition.Value = statePayload.position;
             }
-
-            if (latestServerState.Value.tick == 0 & !IsServer)
+            else if (IsServer)
             {
-                Rigidbody.Sleep();
+                if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+                {
+                    Rigidbody.isKinematic = false;
+                    Move(new InputPayload(0, Vector2.zero, transform.rotation),
+                        combatAgent.AnimationHandler.ApplyRootMotion(),
+                        true);
+                }
+                else
+                {
+                    Rigidbody.isKinematic = true;
+                    Rigidbody.MovePosition(ownerPosition.Value);
+                }
+            }
+            else
+            {
+                Rigidbody.isKinematic = true;
+                Rigidbody.MovePosition(ownerPosition.Value);
             }
         }
+
+        private NetworkVariable<Vector3> serverRotation = new NetworkVariable<Vector3>();
 
         protected override void OnDisable()
         {
@@ -335,29 +185,13 @@ namespace Vi.Player
         {
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
-                if (IsServer)
-                {
-                    Rigidbody.Sleep();
-                }
-                else
-                {
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(latestServerState.Value.position);
-                }
+                Rigidbody.Sleep();
                 return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false);
             }
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
             {
-                if (IsServer)
-                {
-                    Rigidbody.isKinematic = false;
-                }
-                else
-                {
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(latestServerState.Value.position);
-                }
+                Rigidbody.isKinematic = false;
                 return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false);
             }
 
@@ -396,7 +230,7 @@ namespace Vi.Player
             }
             else if (shouldApplyRootMotion)
             {
-                movement = (IsServer ? newRotation : latestServerState.Value.rotation) * rootMotion * GetRootMotionSpeed();
+                movement = newRotation * rootMotion * GetRootMotionSpeed();
             }
             else
             {
@@ -404,41 +238,6 @@ namespace Vi.Player
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= GetRunSpeed();
                 movement = combatAgent.StatusAgent.IsRooted() | combatAgent.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
-            }
-
-            if (IsOwner & !IsServer)
-            {
-                if (!networkTransform.SyncPositionX & shouldApplyRootMotion)
-                {
-                    networkTransform.ResetPositionInterpolator(GetPosition());
-                }
-
-                if (shouldApplyRootMotion)
-                {
-                    networkTransform.SyncPositionX = true;
-                    networkTransform.SyncPositionY = true;
-                    networkTransform.SyncPositionZ = true;
-
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(transform.position);
-                    return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
-                }
-                else if (networkTransform.SyncPositionX & !latestServerState.Value.usedRootMotion)
-                {
-                    networkTransform.SyncPositionX = false;
-                    networkTransform.SyncPositionY = false;
-                    networkTransform.SyncPositionZ = false;
-
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(latestServerState.Value.position);
-                    return new StatePayload(inputPayload, Rigidbody, newRotation, false);
-                }
-                else if (networkTransform.SyncPositionX)
-                {
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(transform.position);
-                    return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
-                }
             }
 
             Rigidbody.isKinematic = false;
@@ -516,13 +315,14 @@ namespace Vi.Player
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
+            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             return new StatePayload(inputPayload, Rigidbody, newRotation, shouldApplyRootMotion);
         }
 
         private const float bodyRadius = 0.5f;
 
-        private Quaternion EvaluateRotation()
+        private Quaternion EvaluateRotation(bool sendOwnerRotation = false)
         {
             Quaternion rot = transform.rotation;
             if (IsOwner)
@@ -544,76 +344,49 @@ namespace Vi.Player
                         Quaternion.LookRotation(rel, Vector3.up);
                     }
                 }
+                else if (combatAgent.AnimationHandler.ShouldApplyRootMotion() & sendOwnerRotation)
+                {
+                    rot = Quaternion.Slerp(transform.rotation, Quaternion.Euler(serverRotation.Value), Time.deltaTime * CameraController.orbitSpeed);
+                    if (!combatAgent.ShouldPlayHitStop())
+                    {
+                        ownerRotationEulerAngles.Value = Quaternion.LookRotation(camDirection).eulerAngles;
+                    }
+                }
                 else if (!combatAgent.ShouldPlayHitStop())
                     rot = Quaternion.LookRotation(camDirection);
             }
-            else
+            else if (IsServer)
             {
-                rot = Quaternion.Slerp(transform.rotation, latestServerState.Value.rotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
+                return Quaternion.Euler(ownerRotationEulerAngles.Value);
             }
             return rot;
         }
-
-        private const float serverReconciliationLerpDuration = 1;
-        private const float serverReconciliationTeleportThreshold = 0.5f;
-        private const float serverReconciliationLerpSpeed = 8;
 
         private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
-
-            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
-            {
-                float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
-                if (dist > serverReconciliationTeleportThreshold)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else if (dist < 0.01f)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, Rigidbody.transform.position, Time.deltaTime * serverReconciliationLerpSpeed);
-                }
-            }
-            else
-            {
-                transform.position = Rigidbody.transform.position;
-            }
             
-            if (IsOwner)
-            {
-                if (latestServerState.Value.usedRootMotion & !combatAgent.ShouldApplyAilmentRotation() & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing & !combatAgent.ShouldPlayHitStop())
-                {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, latestServerState.Value.rotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
-                }
-                else
-                {
-                    transform.rotation = EvaluateRotation();
-                }
-            }
-            else
-            {
-                transform.rotation = EvaluateRotation();
-            }
+            transform.position = Rigidbody.transform.position;
+            transform.rotation = EvaluateRotation();
+            if (IsServer) { serverRotation.Value = transform.eulerAngles; }
+            if (IsOwner) { ownerRotationEulerAngles.Value = EvaluateRotation(true).eulerAngles; }
         }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            networkTransform.SetPositionMaximumInterpolationTime(ActionClip.defaultMaximumAnimationInterpolationTime);
             networkTransform.SyncPositionX = !IsOwner;
             networkTransform.SyncPositionY = !IsOwner;
             networkTransform.SyncPositionZ = !IsOwner;
+            networkTransform.SyncRotAngleX = !IsOwner;
+            networkTransform.SyncRotAngleY = !IsOwner;
+            networkTransform.SyncRotAngleZ = !IsOwner;
+
+            networkTransform.Interpolate = !IsServer & !IsOwner;
+
             if (IsLocalPlayer)
             {
-                inputBuffer.Clear();
-
                 cameraController.gameObject.tag = "MainCamera";
                 cameraController.gameObject.SetActive(true);
                 cameraController.gameObject.AddComponent<AudioListener>();
@@ -627,6 +400,10 @@ namespace Vi.Player
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 actionMapHandler.enabled = true;
+
+                ownerPosition.Value = transform.position;
+                ownerRotationEulerAngles.Value = transform.eulerAngles;
+                Rigidbody.position = ownerPosition.Value;
             }
             else
             {
@@ -638,23 +415,11 @@ namespace Vi.Player
 
                 actionMapHandler.enabled = false;
             }
-
-            if (!IsClient)
-            {
-                inputBuffer.OnListChanged += OnInputBufferChanged;
-            }
-
-            if (IsServer)
-            {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation), Rigidbody, transform.rotation, false);
-            }
+            Rigidbody.isKinematic = !IsOwner;
         }
 
         public override void OnNetworkDespawn()
         {
-            networkTransform.SyncPositionX = true;
-            networkTransform.SyncPositionY = true;
-            networkTransform.SyncPositionZ = true;
             if (IsLocalPlayer)
             {
                 Cursor.lockState = CursorLockMode.None;
@@ -671,23 +436,6 @@ namespace Vi.Player
             playerInput.enabled = false;
             actionMapHandler.enabled = false;
             cameraController.gameObject.tag = "Untagged";
-
-            if (!IsClient)
-            {
-                inputBuffer.OnListChanged -= OnInputBufferChanged;
-            }
-        }
-
-        private void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
-        {
-            if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
-            {
-                serverInputQueue.Enqueue(networkListEvent.Value);
-            }
-            else if (networkListEvent.Type != NetworkListEvent<InputPayload>.EventType.Clear)
-            {
-                Debug.LogError("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
-            }
         }
 
         protected override void OnReturnToPool()
@@ -701,10 +449,14 @@ namespace Vi.Player
         private const int BUFFER_SIZE = 1024;
 
         private StatePayload[] stateBuffer;
-        private NetworkList<InputPayload> inputBuffer;
-        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
+        private InputPayload[] inputBuffer;
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
+
+        private NetworkVariable<Vector2> syncedMoveInput = new NetworkVariable<Vector2>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        private NetworkVariable<Vector3> ownerPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private NetworkVariable<Vector3> ownerRotationEulerAngles = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         private ActionMapHandler actionMapHandler;
         private NetworkTransform networkTransform;
@@ -714,7 +466,7 @@ namespace Vi.Player
             Rigidbody.isKinematic = true;
 
             stateBuffer = new StatePayload[BUFFER_SIZE];
-            inputBuffer = new NetworkList<InputPayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            inputBuffer = new InputPayload[BUFFER_SIZE];
             serverInputQueue = new Queue<InputPayload>();
 
             actionMapHandler = GetComponent<ActionMapHandler>();
@@ -813,13 +565,9 @@ namespace Vi.Player
             }
 #endif
             UpdateTransform();
-            if (IsLocalPlayer)
-            {
-                cameraController.UpdateCamera();
-                networkTransform.SetPositionMaximumInterpolationTime(combatAgent.WeaponHandler.CurrentActionClip.GetMaximumAnimationInterpolationTime(combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip)));
-            }
+            if (IsLocalPlayer) { cameraController.UpdateCamera(); }
             AutoAim();
-            SetAnimationMoveInput(IsOwner ? GetPlayerMoveInput() : latestServerState.Value.moveInput);
+            SetAnimationMoveInput(IsOwner ? GetPlayerMoveInput() : syncedMoveInput.Value);
 
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
@@ -978,8 +726,8 @@ namespace Vi.Player
             base.OnDrawGizmos();
             if (!Application.isPlaying) { return; }
 
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(latestServerState.Value.position, 0.5f);
+            //Gizmos.color = Color.blue;
+            //Gizmos.DrawSphere(latestServerState.Value.position, 0.5f);
 
             //Gizmos.color = Color.yellow;
             //Gizmos.DrawSphere(Rigidbody.position, 0.3f);
