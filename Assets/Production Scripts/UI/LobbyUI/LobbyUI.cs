@@ -52,6 +52,7 @@ namespace Vi.UI
         [SerializeField] GameObject mapOptions;
         [SerializeField] GameObject settingsOptions;
         [SerializeField] Image mapPreview;
+        [SerializeField] private Text roomSettingsMapNameText;
 
         private GameObject pauseInstance;
         public void OpenSettingsMenu()
@@ -800,6 +801,8 @@ namespace Vi.UI
                 UpdateRichPresence();
             }
             mapText.text = PlayerDataManager.Singleton.GetMapName();
+            
+            roomSettingsMapNameText.text = mapText.text;
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
 
