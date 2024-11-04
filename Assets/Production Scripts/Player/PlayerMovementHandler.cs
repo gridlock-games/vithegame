@@ -150,8 +150,6 @@ namespace Vi.Player
 
                     statePayload = new StatePayload(inputPayload, Rigidbody,
                         combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation, false);
-
-                    SetIsServerAuthMode(false);
                 }
                 else
                 {
@@ -443,6 +441,23 @@ namespace Vi.Player
             rpcSent = false;
         }
 
+        private bool tickReached;
+        private void Tick()
+        {
+            if (!isServerAuthoritative.Value)
+            {
+                tickReached = false;
+            }
+            else if (tickReached)
+            {
+                SetIsServerAuthMode(false);
+            }
+            else
+            {
+                tickReached = true;
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -473,7 +488,7 @@ namespace Vi.Player
                 ownerRotationEulerAngles.Value = transform.eulerAngles;
                 Rigidbody.position = transform.position;
 
-                SetIsServerAuthMode(false);
+                NetworkManager.NetworkTickSystem.Tick += Tick;
             }
             else
             {
@@ -500,6 +515,7 @@ namespace Vi.Player
             if (IsLocalPlayer)
             {
                 Cursor.lockState = CursorLockMode.None;
+                NetworkManager.NetworkTickSystem.Tick -= Tick;
             }
 
             cameraController.gameObject.SetActive(false);
