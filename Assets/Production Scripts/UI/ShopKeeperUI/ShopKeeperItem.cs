@@ -48,7 +48,14 @@ namespace Vi.UI
             ItemId = weaponOption.itemWebId;
         }
 
-        public Selectable[] Selectables { get { return _selectables; } }
+        public Selectable[] Selectables
+        {
+            get
+            {
+                if (_selectables == null) { _selectables = GetComponentsInChildren<Selectable>(); }
+                return _selectables;
+            }
+        }
         private Selectable[] _selectables;
         private void Awake()
         {
