@@ -180,8 +180,7 @@ namespace Vi.Player
                         float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
                         Vector3 toMotion = Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime;
                         Move(new InputPayload(0, Vector2.zero, transform.rotation),
-                            normalizedTime > 0.7f ? toMotion : rt,
-                            true);
+                            toMotion, true);
                     }
                     else
                     {
