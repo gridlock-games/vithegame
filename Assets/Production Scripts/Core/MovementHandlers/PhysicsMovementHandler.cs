@@ -15,6 +15,7 @@ namespace Vi.Core.MovementHandlers
             {
                 rb.position = newPosition;
                 rb.Sleep();
+                networkTransform.Interpolate = false;
             }
             base.SetOrientation(newPosition, newRotation);
         }
@@ -38,6 +39,30 @@ namespace Vi.Core.MovementHandlers
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
             rb.isKinematic = !IsServer & !IsOwner;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            NetworkManager.NetworkTickSystem.Tick -= Tick;
+        }
+
+        private bool interpolateReached;
+        private void Tick()
+        {
+            if (networkTransform.Interpolate)
+            {
+                interpolateReached = false;
+            }
+            else if (interpolateReached)
+            {
+                networkTransform.Interpolate = true;
+            }
+            else
+            {
+                interpolateReached = true;
+            }
         }
 
         public Rigidbody Rigidbody { get { return rb; } }
@@ -70,6 +95,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+            interpolateReached = default;
         }
 
         protected float GetTickRateDeltaTime()
