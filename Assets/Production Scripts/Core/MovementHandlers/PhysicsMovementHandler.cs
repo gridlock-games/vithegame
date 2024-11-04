@@ -34,7 +34,7 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            networkTransform.SetPositionMaximumInterpolationTime(0.07f);
+            networkTransform.SetPositionMaximumInterpolationTime(0.05f);
             networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
