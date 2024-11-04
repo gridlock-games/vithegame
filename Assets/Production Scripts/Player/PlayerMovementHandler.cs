@@ -142,7 +142,7 @@ namespace Vi.Player
                 movementTick++;
 
                 StatePayload statePayload;
-                if (isServerAuthoritative.Value)
+                if (isServerAuthoritative.Value & !IsServer)
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(serverPosition.Value);
@@ -162,6 +162,7 @@ namespace Vi.Player
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
 
                 ownerPosition.Value = statePayload.position;
+                if (IsServer) { serverPosition.Value = statePayload.position; }
             }
             else if (IsServer)
             {
