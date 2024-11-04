@@ -586,7 +586,7 @@ namespace Vi.UI
             }
 
             gameModeSpecificSettingsTitleText.gameObject.SetActive(inputFieldCount > 0);
-            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
             List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
