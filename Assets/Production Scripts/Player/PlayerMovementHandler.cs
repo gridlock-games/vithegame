@@ -397,7 +397,20 @@ namespace Vi.Player
             {
                 if (isServerAuthoritative.Value)
                 {
-                    rot = transform.rotation;
+                    if (combatAgent.ShouldApplyAilmentRotation())
+                        rot = combatAgent.GetAilmentRotation();
+                    else if (combatAgent.IsGrabbing)
+                        return rot;
+                    else if (combatAgent.IsGrabbed)
+                    {
+                        CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                            rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                            Quaternion.LookRotation(rel, Vector3.up);
+                        }
+                    }
                 }
                 else
                 {
