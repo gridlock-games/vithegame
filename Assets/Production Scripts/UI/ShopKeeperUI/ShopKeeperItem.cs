@@ -10,6 +10,10 @@ namespace Vi.UI
         [SerializeField] private Text itemName;
         [SerializeField] private Text price;
         [SerializeField] private Image previewIcon;
+        public Button MainButton { get { return _mainButton; } }
+        [SerializeField] private Button _mainButton;
+        public Button CloseButton { get { return _closeButton; } }
+        [SerializeField] private Button _closeButton;
 
         public string ItemId { get; private set; }
 
