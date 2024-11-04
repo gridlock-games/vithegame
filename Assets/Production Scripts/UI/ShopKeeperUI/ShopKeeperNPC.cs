@@ -210,6 +210,10 @@ namespace Vi.UI
             originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UICanvas.gameObject.SetActive(false);
+        }
+
+        private void OnEnable()
+        {
             purchaseErrorText.text = "";
         }
 
