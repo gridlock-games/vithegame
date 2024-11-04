@@ -144,8 +144,8 @@ namespace Vi.Player
                 StatePayload statePayload;
                 if (isServerAuthoritative.Value & !IsServer)
                 {
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(serverPosition.Value);
+                    Rigidbody.isKinematic = false;
+                    Rigidbody.linearVelocity = Vector3.zero;
                     Rigidbody.position = serverPosition.Value;
 
                     statePayload = new StatePayload(inputPayload, Rigidbody,
