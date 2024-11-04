@@ -21,6 +21,7 @@ namespace Vi.Player
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             base.SetOrientation(newPosition, newRotation);
+            isServerAuthoritative.Value = true;
             if (IsSpawned)
             {
                 SetRotationClientRpc(newRotation);
@@ -98,9 +99,10 @@ namespace Vi.Player
             }
         }
 
+        private NetworkVariable<bool> isServerAuthoritative = new NetworkVariable<bool>(true);
         private void FixedUpdate()
         {
-            if (!IsSpawned | !isSpawnedOnOwnerInstance.Value)
+            if (!IsSpawned)
             {
                 Rigidbody.Sleep();
                 return;
@@ -139,10 +141,23 @@ namespace Vi.Player
                 inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
                 movementTick++;
 
-                StatePayload statePayload = Move(inputPayload,
-                    combatAgent.AnimationHandler.ApplyRootMotion(),
-                    combatAgent.AnimationHandler.ShouldApplyRootMotion());
+                StatePayload statePayload;
+                if (isServerAuthoritative.Value)
+                {
+                    Rigidbody.isKinematic = true;
+                    Rigidbody.MovePosition(serverPosition.Value);
 
+                    statePayload = new StatePayload(inputPayload, Rigidbody,
+                        combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation, false);
+
+                    SetIsServerAuthMode(false);
+                }
+                else
+                {
+                    statePayload = Move(inputPayload,
+                        combatAgent.AnimationHandler.ApplyRootMotion(),
+                        combatAgent.AnimationHandler.ShouldApplyRootMotion());
+                }
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
 
                 ownerPosition.Value = statePayload.position;
@@ -150,20 +165,31 @@ namespace Vi.Player
             else if (IsServer)
             {
                 Vector3 rt = combatAgent.AnimationHandler.ApplyRootMotion();
-                if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+                if (isServerAuthoritative.Value)
                 {
-                    Rigidbody.isKinematic = false;
-                    float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
-                    Vector3 toMotion = Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime;
-                    Move(new InputPayload(0, Vector2.zero, transform.rotation),
-                        normalizedTime > 0.7f ? toMotion : rt,
-                        true);
+                    if (!Rigidbody.isKinematic)
+                    {
+                        Rigidbody.linearVelocity = Vector3.zero;
+                    }
                 }
                 else
                 {
-                    Rigidbody.isKinematic = true;
-                    Rigidbody.MovePosition(ownerPosition.Value);
+                    if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+                    {
+                        Rigidbody.isKinematic = false;
+                        float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
+                        Vector3 toMotion = Quaternion.Inverse((combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : transform.rotation)) * (ownerPosition.Value - Rigidbody.position) / Time.fixedDeltaTime;
+                        Move(new InputPayload(0, Vector2.zero, transform.rotation),
+                            normalizedTime > 0.7f ? toMotion : rt,
+                            true);
+                    }
+                    else
+                    {
+                        Rigidbody.isKinematic = true;
+                        Rigidbody.MovePosition(ownerPosition.Value);
+                    }
                 }
+                serverPosition.Value = Rigidbody.position;
             }
             else
             {
@@ -172,6 +198,7 @@ namespace Vi.Player
             }
         }
 
+        private NetworkVariable<Vector3> serverPosition = new NetworkVariable<Vector3>();
         private NetworkVariable<Vector3> serverRotation = new NetworkVariable<Vector3>();
 
         protected override void OnDisable()
@@ -180,6 +207,7 @@ namespace Vi.Player
             movementTick = default;
             TargetToLockOn = default;
             CameraFollowTarget = default;
+            rpcSent = default;
             joysticks = new UIDeadZoneElement[0];
         }
 
@@ -331,37 +359,51 @@ namespace Vi.Player
             Quaternion rot = transform.rotation;
             if (IsOwner)
             {
-                Vector3 camDirection = cameraController.GetCamDirection();
-                camDirection.Scale(HORIZONTAL_PLANE);
+                if (isServerAuthoritative.Value)
+                {
+                    rot = Quaternion.Euler(serverRotation.Value);
+                }
+                else
+                {
+                    Vector3 camDirection = cameraController.GetCamDirection();
+                    camDirection.Scale(HORIZONTAL_PLANE);
 
-                if (combatAgent.ShouldApplyAilmentRotation())
-                    rot = combatAgent.GetAilmentRotation();
-                else if (combatAgent.IsGrabbing)
-                    return rot;
-                else if (combatAgent.IsGrabbed)
-                {
-                    CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
-                    if (grabAssailant)
+                    if (combatAgent.ShouldApplyAilmentRotation())
+                        rot = combatAgent.GetAilmentRotation();
+                    else if (combatAgent.IsGrabbing)
+                        return rot;
+                    else if (combatAgent.IsGrabbed)
                     {
-                        Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                        Quaternion.LookRotation(rel, Vector3.up);
+                        CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
+                        if (grabAssailant)
+                        {
+                            Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                            rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                            Quaternion.LookRotation(rel, Vector3.up);
+                        }
                     }
-                }
-                else if (combatAgent.AnimationHandler.ShouldApplyRootMotion() & sendOwnerRotation)
-                {
-                    rot = Quaternion.Slerp(transform.rotation, Quaternion.Euler(serverRotation.Value), Time.deltaTime * CameraController.orbitSpeed);
-                    if (!combatAgent.ShouldPlayHitStop())
+                    else if (combatAgent.AnimationHandler.ShouldApplyRootMotion() & sendOwnerRotation)
                     {
-                        ownerRotationEulerAngles.Value = Quaternion.LookRotation(camDirection).eulerAngles;
+                        rot = Quaternion.Slerp(transform.rotation, Quaternion.Euler(serverRotation.Value), Time.deltaTime * CameraController.orbitSpeed);
+                        if (!combatAgent.ShouldPlayHitStop())
+                        {
+                            ownerRotationEulerAngles.Value = Quaternion.LookRotation(camDirection).eulerAngles;
+                        }
                     }
+                    else if (!combatAgent.ShouldPlayHitStop())
+                        rot = Quaternion.LookRotation(camDirection);
                 }
-                else if (!combatAgent.ShouldPlayHitStop())
-                    rot = Quaternion.LookRotation(camDirection);
             }
             else if (IsServer)
             {
-                return Quaternion.Euler(ownerRotationEulerAngles.Value);
+                if (isServerAuthoritative.Value)
+                {
+                    rot = transform.rotation;
+                }
+                else
+                {
+                    rot = Quaternion.Euler(ownerRotationEulerAngles.Value);
+                }
             }
             return rot;
         }
@@ -375,6 +417,28 @@ namespace Vi.Player
             transform.rotation = EvaluateRotation();
             if (IsServer) { serverRotation.Value = transform.eulerAngles; }
             if (IsOwner) { ownerRotationEulerAngles.Value = EvaluateRotation(true).eulerAngles; }
+        }
+
+        private bool rpcSent;
+        private void SetIsServerAuthMode(bool isServerAuthoritative)
+        {
+            if (rpcSent) { return; }
+
+            rpcSent = true;
+            SetIsServerAuthoritativeModeRpc(isServerAuthoritative);
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = true)]
+        private void SetIsServerAuthoritativeModeRpc(bool isServerAuthoritative)
+        {
+            this.isServerAuthoritative.Value = isServerAuthoritative;
+            ResetRPCBoolRpc();
+        }
+
+        [Rpc(SendTo.Owner)]
+        private void ResetRPCBoolRpc()
+        {
+            rpcSent = false;
         }
 
         public override void OnNetworkSpawn()
@@ -405,12 +469,19 @@ namespace Vi.Player
 
                 ownerPosition.Value = transform.position;
                 ownerRotationEulerAngles.Value = transform.eulerAngles;
-                Rigidbody.position = ownerPosition.Value;
+                Rigidbody.position = transform.position;
 
-                isSpawnedOnOwnerInstance.Value = true;
+                SetIsServerAuthMode(false);
             }
             else
             {
+                if (IsServer)
+                {
+                    serverPosition.Value = transform.position;
+                    serverRotation.Value = transform.eulerAngles;
+                    Rigidbody.position = transform.position;
+                }
+
                 cameraController.gameObject.SetActive(false);
 
                 cameraController.SetActive(false);
@@ -461,8 +532,7 @@ namespace Vi.Player
 
         private NetworkVariable<Vector3> ownerPosition = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private NetworkVariable<Vector3> ownerRotationEulerAngles = new NetworkVariable<Vector3>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private NetworkVariable<bool> isSpawnedOnOwnerInstance = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
+        
         private ActionMapHandler actionMapHandler;
         protected override void Awake()
         {

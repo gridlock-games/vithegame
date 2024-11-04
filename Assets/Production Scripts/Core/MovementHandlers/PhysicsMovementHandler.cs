@@ -34,7 +34,6 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            networkTransform.SetPositionMaximumInterpolationTime(0.05f);
             networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
@@ -98,6 +97,7 @@ namespace Vi.Core.MovementHandlers
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
+            networkTransform.SetPositionMaximumInterpolationTime(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 0.05f : 0.1f);
         }
 
         protected virtual void LateUpdate()
