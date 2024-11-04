@@ -1045,7 +1045,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 817583095930369220}
-  - {fileID: 9167506922458595088}
   m_Father: {fileID: 4403998846585775865}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1578,15 +1577,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3515249584565302686}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3.43}
+  m_LocalPosition: {x: 0, y: 0, z: 3.4300003}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1871490034342213928}
+  m_Father: {fileID: 817583095930369220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.000012397766, y: 0.0000060796738}
   m_SizeDelta: {x: 1500, y: 550}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22459969732143339
@@ -1619,7 +1618,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: fd8b48b178d55804e9351227508f9866, type: 3}
-    m_FontSize: 180
+    m_FontSize: 100
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
@@ -1630,9 +1629,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Leaderboard
-
-    (tap me)'
+  m_Text: 'LEADERBOARDS [TAP]'
 --- !u!114 &3234133188728626232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2672,13 +2669,14 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 9167506922458595088}
   m_Father: {fileID: 1871490034342213928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 2}
-  m_SizeDelta: {x: 107.200005, y: 62.100002}
+  m_AnchoredPosition: {x: -0.00000071525574, y: 0}
+  m_SizeDelta: {x: 108.3, y: 24.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9023252568022750649
 CanvasRenderer:
@@ -4385,7 +4383,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 3}
+  m_AnchoredPosition: {x: 0, y: 2.32}
   m_SizeDelta: {x: 175, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5945708737335102188
@@ -4459,8 +4457,8 @@ MonoBehaviour:
   - platforms: 00000000010000000200000007000000100000000d000000190000001b000000260000002b0000002c0000002d000000
     textElement: {fileID: 446330172393254276}
     action: Interact
-    stringBeforeBinding: 'Leaderboard\n(press '
-    stringAfterBinding: )
+    stringBeforeBinding: LEADERBOARDS [
+    stringAfterBinding: ']'
   controlSchemeDefinitions: []
 --- !u!1 &8054756773531764559
 GameObject:
