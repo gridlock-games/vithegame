@@ -35,6 +35,7 @@ namespace Vi.UI
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
             currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
             UICanvas.gameObject.SetActive(true);
+            purchaseErrorText.text = "";
 
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
@@ -151,6 +152,7 @@ namespace Vi.UI
             invoker = null;
             UICanvas.gameObject.SetActive(false);
             waitingForPurchase = false;
+            purchaseErrorText.text = "";
         }
 
         private bool localPlayerInRange;
@@ -210,10 +212,6 @@ namespace Vi.UI
             originalScale = worldSpaceLabel.transform.localScale;
             worldSpaceLabel.transform.localScale = Vector3.zero;
             UICanvas.gameObject.SetActive(false);
-        }
-
-        private void OnEnable()
-        {
             purchaseErrorText.text = "";
         }
 
