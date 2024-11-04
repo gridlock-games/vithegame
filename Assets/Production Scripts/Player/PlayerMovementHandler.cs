@@ -146,6 +146,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(serverPosition.Value);
+                    Rigidbody.position = serverPosition.Value;
 
                     statePayload = new StatePayload(inputPayload, Rigidbody,
                         combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation, false);
