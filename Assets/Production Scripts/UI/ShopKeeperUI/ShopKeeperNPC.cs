@@ -56,9 +56,12 @@ namespace Vi.UI
         private List<ShopKeeperItem> cartContents = new List<ShopKeeperItem>();
         private void AddToCart(ShopKeeperItem shopKeeperItem)
         {
-            cartContents.Add(shopKeeperItem);
-            shopKeeperItem.transform.SetParent(cartParent, true);
-            shopKeeperItem.CloseButton.gameObject.SetActive(true);
+            if (!cartContents.Contains(shopKeeperItem))
+            {
+                cartContents.Add(shopKeeperItem);
+                shopKeeperItem.transform.SetParent(cartParent, true);
+                shopKeeperItem.CloseButton.gameObject.SetActive(true);
+            }
         }
 
         private void RemoveFromCart(ShopKeeperItem shopKeeperItem)
