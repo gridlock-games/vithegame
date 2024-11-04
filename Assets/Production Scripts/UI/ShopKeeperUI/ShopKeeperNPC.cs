@@ -15,10 +15,13 @@ namespace Vi.UI
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private Canvas UICanvas;
         [SerializeField] private ShopKeeperItem shopKeeperItemPrefab;
-        [SerializeField] private Transform armorParent;
-        [SerializeField] private Transform weaponParent;
+        [SerializeField] private Transform itemParent;
+        [SerializeField] private Transform cartParent;
+        [SerializeField] private GameObject youOwnEverythingObject;
         [SerializeField] private Text purchaseErrorText;
         [SerializeField] private Text currencyCountText;
+        [SerializeField] private Text cartCostText;
+        [SerializeField] private Button buyButton;
         [SerializeField] private Selectable[] selectablesThatRespondToPurchaseRpc;
         [SerializeField] private AudioClip[] purchaseSuccessfulSounds;
         [SerializeField] private AudioClip[] purchaseUnsuccessfulSounds;
@@ -49,6 +52,30 @@ namespace Vi.UI
         }
 
         private bool waitingForPurchase;
+
+        private List<ShopKeeperItem> cartContents = new List<ShopKeeperItem>();
+        private void AddToCart(ShopKeeperItem shopKeeperItem)
+        {
+            cartContents.Add(shopKeeperItem);
+            shopKeeperItem.transform.SetParent(cartParent, true);
+            shopKeeperItem.CloseButton.gameObject.SetActive(true);
+        }
+
+        private void RemoveFromCart(ShopKeeperItem shopKeeperItem)
+        {
+            cartContents.Remove(shopKeeperItem);
+            shopKeeperItem.transform.SetParent(itemParent, true);
+            shopKeeperItem.CloseButton.gameObject.SetActive(false);
+        }
+
+        public IEnumerator PurchaseCart()
+        {
+            foreach (ShopKeeperItem item in cartContents.ToArray())
+            {
+                Purchase(item.ItemId, item.Price);
+                yield return new WaitUntil(() => !item.gameObject.activeInHierarchy);
+            }
+        }
 
         private void Purchase(string itemId, int price)
         {
@@ -83,9 +110,11 @@ namespace Vi.UI
         [Rpc(SendTo.NotServer)]
         private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, string characterId, string itemId, int price)
         {
-            shopKeeperItemInstances.Find(item => item.ItemId == itemId).gameObject.SetActive(false);
             if (purchaserClientId == NetworkManager.LocalClientId)
             {
+                var instance = shopKeeperItemInstances.Find(item => item.ItemId == itemId);
+                RemoveFromCart(instance);
+                instance.gameObject.SetActive(false);
                 waitingForPurchase = false;
                 if (purchaseSuccessful)
                 {
@@ -146,23 +175,28 @@ namespace Vi.UI
             {
                 foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
                 {
-                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, weaponParent).GetComponent<ShopKeeperItem>();
+                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
                     shopKeeperItemInstances.Add(shopKeeperItem);
                     shopKeeperItem.InitializeAsWeapon(weaponOption);
 
                     string itemId = weaponOption.itemWebId;
-                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(itemId, shopKeeperItem.Price));
+                    shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
+                    shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
+                    shopKeeperItem.CloseButton.gameObject.SetActive(false);
                 }
 
                 foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
                 {
-                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, armorParent).GetComponent<ShopKeeperItem>();
+                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
                     shopKeeperItemInstances.Add(shopKeeperItem);
                     shopKeeperItem.InitializeAsArmor(wearableEquipmentOption);
 
                     string itemId = wearableEquipmentOption.itemWebId;
-                    shopKeeperItem.GetComponent<Button>().onClick.AddListener(() => Purchase(itemId, shopKeeperItem.Price));
+                    shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
+                    shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
+                    shopKeeperItem.CloseButton.gameObject.SetActive(false);
                 }
+                buyButton.onClick.AddListener(() => PersistentLocalObjects.Singleton.StartCoroutine(PurchaseCart()));
             }
         }
 
@@ -216,6 +250,21 @@ namespace Vi.UI
                     selectable.interactable = !waitingForPurchase;
                 }
             }
+
+            youOwnEverythingObject.SetActive(shopKeeperItemInstances.TrueForAll(item => !item.gameObject.activeInHierarchy));
+
+            int cartPriceSum = 0;
+            foreach (ShopKeeperItem item in cartContents)
+            {
+                if (!item.gameObject.activeInHierarchy) { continue; }
+                cartPriceSum += item.Price;
+            }
+
+            buyButton.interactable = !waitingForPurchase
+                & FasterPlayerPrefs.Singleton.GetInt("Tokens") >= cartPriceSum
+                & cartContents.Count > 0;
+
+            cartCostText.text = cartPriceSum.ToString();
         }
     }
 }
