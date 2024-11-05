@@ -506,6 +506,7 @@ namespace Vi.Player
             {
                 if (IsServer)
                 {
+                    isServerAuthoritative.Value = true;
                     serverPosition.Value = transform.position;
                     serverRotation.Value = transform.eulerAngles;
                     Rigidbody.position = transform.position;
