@@ -15,6 +15,7 @@ namespace Vi.Core.MovementHandlers
             {
                 rb.position = newPosition;
                 rb.Sleep();
+                networkTransform.Interpolate = false;
             }
             base.SetOrientation(newPosition, newRotation);
         }
@@ -34,14 +35,40 @@ namespace Vi.Core.MovementHandlers
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
             rb.isKinematic = !IsServer & !IsOwner;
+            NetworkManager.NetworkTickSystem.Tick += Tick;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            NetworkManager.NetworkTickSystem.Tick -= Tick;
+        }
+
+        private bool interpolateReached;
+        private void Tick()
+        {
+            if (networkTransform.Interpolate)
+            {
+                interpolateReached = false;
+            }
+            else if (interpolateReached)
+            {
+                networkTransform.Interpolate = true;
+            }
+            else
+            {
+                interpolateReached = true;
+            }
         }
 
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
         protected CombatAgent combatAgent;
+        protected NetworkTransform networkTransform;
         protected override void Awake()
         {
             base.Awake();
@@ -50,6 +77,7 @@ namespace Vi.Core.MovementHandlers
             PooledObject pooledObject = GetComponent<PooledObject>();
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
+            networkTransform = GetComponent<NetworkTransform>();
         }
 
         protected virtual void OnSpawnFromPool()
@@ -67,6 +95,7 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+            interpolateReached = default;
         }
 
         protected float GetTickRateDeltaTime()
@@ -94,6 +123,7 @@ namespace Vi.Core.MovementHandlers
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
+            networkTransform.SetPositionMaximumInterpolationTime(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 0.05f : 0.1f);
         }
 
         protected virtual void LateUpdate()

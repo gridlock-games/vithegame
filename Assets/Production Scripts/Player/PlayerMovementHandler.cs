@@ -75,7 +75,7 @@ namespace Vi.Player
             public Vector3 velocity;
             public Quaternion rotation;
             public bool usedRootMotion;
-            
+
             public StatePayload(InputPayload inputPayload, Rigidbody Rigidbody, Quaternion rotation, bool usedRootMotion)
             {
                 tick = inputPayload.tick;
@@ -141,7 +141,7 @@ namespace Vi.Player
 
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -585,7 +585,7 @@ namespace Vi.Player
             {
                 transform.position = Rigidbody.transform.position;
             }
-            
+
             if (IsOwner)
             {
                 if (latestServerState.Value.usedRootMotion & !combatAgent.ShouldApplyAilmentRotation() & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing & !combatAgent.ShouldPlayHitStop())
@@ -707,7 +707,6 @@ namespace Vi.Player
         private Queue<InputPayload> serverInputQueue;
 
         private ActionMapHandler actionMapHandler;
-        private NetworkTransform networkTransform;
         protected override void Awake()
         {
             base.Awake();
@@ -718,7 +717,6 @@ namespace Vi.Player
             serverInputQueue = new Queue<InputPayload>();
 
             actionMapHandler = GetComponent<ActionMapHandler>();
-            networkTransform = GetComponent<NetworkTransform>();
         }
 
         private void Start()
@@ -989,4 +987,3 @@ namespace Vi.Player
         }
     }
 }
-

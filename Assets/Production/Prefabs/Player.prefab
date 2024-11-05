@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 1238877169349753619}
   - component: {fileID: 9160700264388968167}
   - component: {fileID: 9172447631836445654}
-  - component: {fileID: 7216879431593407255}
+  - component: {fileID: 4527821149919050500}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -500,7 +500,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7b5328697392b45a8a23b60c6aeaeb21, type: 3}
   - {fileID: 8300000, guid: d9b20368f2a9744a68cc7dc05669e76f, type: 3}
   - {fileID: 8300000, guid: b46d4a4ff540040f5b7d50f52122f3a1, type: 3}
---- !u!114 &7216879431593407255
+--- !u!114 &4527821149919050500
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -529,7 +529,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
   SlerpPosition: 0
 --- !u!1 &3945128956232022066
 GameObject:

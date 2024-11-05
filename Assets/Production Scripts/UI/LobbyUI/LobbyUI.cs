@@ -48,6 +48,11 @@ namespace Vi.UI
         [SerializeField] private GameModeInfoUI gameModeInfoUI;
         [SerializeField] private CustomSettingsParent[] customSettingsParents;
         [SerializeField] private PauseMenu pauseMenu;
+        [SerializeField] GameObject modeOptions;
+        [SerializeField] GameObject mapOptions;
+        [SerializeField] GameObject settingsOptions;
+        [SerializeField] Image mapPreview;
+        [SerializeField] private Text roomSettingsMapNameText;
 
         private GameObject pauseInstance;
         public void OpenSettingsMenu()
@@ -128,6 +133,25 @@ namespace Vi.UI
         };
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
+
+        public void showMapOptions() {
+            modeOptions.SetActive(false);
+            settingsOptions.SetActive(false);
+            mapOptions.SetActive(true);
+        }
+
+        public void showModeOptions() {
+            modeOptions.SetActive(true);
+            settingsOptions.SetActive(false);
+            mapOptions.SetActive(false);
+        }
+
+        public void showSettingsOptions() {
+            modeOptions.SetActive(false);
+            settingsOptions.SetActive(true);
+            mapOptions.SetActive(false);
+        }
+
         private void Awake()
         {
             lockedClients = new NetworkList<ulong>();
@@ -563,7 +587,7 @@ namespace Vi.UI
             }
 
             gameModeSpecificSettingsTitleText.gameObject.SetActive(inputFieldCount > 0);
-            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode()) + " Specific Settings";
+            gameModeSpecificSettingsTitleText.text = PlayerDataManager.GetGameModeString(PlayerDataManager.Singleton.GetGameMode());
 
             List<PlayerDataManager.PlayerData> playerDataListWithSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithSpectators();
             List<PlayerDataManager.PlayerData> playerDataListWithoutSpectators = PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators();
@@ -777,10 +801,13 @@ namespace Vi.UI
                 UpdateRichPresence();
             }
             mapText.text = PlayerDataManager.Singleton.GetMapName();
+            
+            roomSettingsMapNameText.text = mapText.text;
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
 
             backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
+            mapPreview.sprite = backgroundImage.sprite;
         }
 
         private GameObject previewObject;
