@@ -443,6 +443,12 @@ namespace Vi.Player
         [Rpc(SendTo.Server, RequireOwnership = true)]
         private void SetIsServerAuthoritativeModeRpc(bool isServerAuthoritative)
         {
+            StartCoroutine(SetServerAuthAfterDelay(isServerAuthoritative));
+        }
+
+        private IEnumerator SetServerAuthAfterDelay(bool isServerAuthoritative)
+        {
+            yield return new WaitForSeconds(3);
             this.isServerAuthoritative.Value = isServerAuthoritative;
             ResetRPCBoolRpc();
         }
