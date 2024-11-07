@@ -936,6 +936,7 @@ namespace Vi.Core
             string animationStateName = GetActionClipAnimationStateName(actionClip).Replace("_Attack", "");
             Animator.CrossFadeInFixedTime(animationStateName + "_Start", actionClip.transitionTime, actionsLayerIndex);
             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Start;
+            rootMotionTime = 0;
 
             bool heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value;
 
@@ -957,6 +958,7 @@ namespace Vi.Core
                     {
                         Animator.SetBool("EnhanceHeavyAttack", true);
                         heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Enhance;
+                        rootMotionTime = 0;
                     }
                 }
 
@@ -978,6 +980,7 @@ namespace Vi.Core
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
                             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
+                            rootMotionTime = 0;
 
                             yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Attack"));
 
@@ -990,7 +993,11 @@ namespace Vi.Core
                                     if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= actionClip.chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                                     {
                                         Animator.SetTrigger("ProgressHeavyAttackState");
-                                        if (actionClip.chargeAttackHasEndAnimation) { heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd; }
+                                        if (actionClip.chargeAttackHasEndAnimation)
+                                        {
+                                            heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd;
+                                            rootMotionTime = 0;
+                                        }
                                         break;
                                     }
                                 }
@@ -1001,6 +1008,7 @@ namespace Vi.Core
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", true);
                             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Cancel;
+                            rootMotionTime = 0;
                         }
                         else // Return straight to idle
                         {
@@ -1027,6 +1035,8 @@ namespace Vi.Core
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", true);
+                heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Cancel;
+                rootMotionTime = 0;
             }
             else // Return straight to idle
             {
@@ -1047,6 +1057,8 @@ namespace Vi.Core
                     if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
+                        heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
+                        rootMotionTime = 0;
                         break;
                     }
                 }
@@ -1167,7 +1179,6 @@ namespace Vi.Core
                 string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
                 if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                 {
-                    Debug.Log(heavyAttackAnimationPhase);
                     stateName = stateName.Replace("_Attack", "");
                     switch (heavyAttackAnimationPhase)
                     {
@@ -1194,7 +1205,7 @@ namespace Vi.Core
                             break;
                     }
                 }
-                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - combatAgent.WeaponHandler.CurrentActionClip.transitionTime;
             }
             else
             {
@@ -1239,7 +1250,7 @@ namespace Vi.Core
                 Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime);
                 rootMotionTime += Time.fixedDeltaTime;
                 return animatorReference.ProcessMotionData((combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime) - prev),
-                    StringUtility.NormalizeValue(rootMotionTime, 0, combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName)));
+                    StringUtility.NormalizeValue(rootMotionTime, 0, combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - combatAgent.WeaponHandler.CurrentActionClip.transitionTime));
             }
             else
             {

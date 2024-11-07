@@ -1033,7 +1033,7 @@ namespace Vi.ScriptableObjects
             {
                 if (Application.isPlaying)
                 {
-                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Action Clip Not Found: " + stateName + " weapon name: " + name);
                     Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
                 }
                 return Vector3.zero;
@@ -1052,7 +1052,7 @@ namespace Vi.ScriptableObjects
             {
                 if (Application.isPlaying)
                 {
-                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Root Motion State Not Found: " + stateName + " weapon name: " + name);
                     Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
                 }
                 return default;
@@ -1117,7 +1117,22 @@ namespace Vi.ScriptableObjects
 
         private Vector3AnimationCurve GetRootMotionCurve(AnimationClip clip)
         {
-            UnityEditor.EditorCurveBinding[] curveBindings = UnityEditor.AnimationUtility.GetCurveBindings(clip);
+            ModelImporter modelImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(clip)) as ModelImporter;
+            if (modelImporter == null) { return default; }
+
+            float rotationOffset = 0;
+            if (modelImporter.clipAnimations != null)
+            {
+                foreach (ModelImporterClipAnimation modelImporterClipAnimation in modelImporter.clipAnimations)
+                {
+                    if (clip.name == modelImporterClipAnimation.name)
+                    {
+                        rotationOffset = modelImporterClipAnimation.rotationOffset;
+                    }
+                }
+            }
+
+            EditorCurveBinding[] curveBindings = AnimationUtility.GetCurveBindings(clip);
 
             Dictionary<string, AnimationCurve> curveDictionary = new Dictionary<string, AnimationCurve>()
             {
@@ -1129,15 +1144,62 @@ namespace Vi.ScriptableObjects
                 { "RootQ.z", null }
             };
 
-            foreach (UnityEditor.EditorCurveBinding curveBinding in curveBindings)
+            foreach (EditorCurveBinding curveBinding in curveBindings)
             {
                 if (curveDictionary.ContainsKey(curveBinding.propertyName))
                 {
-                    curveDictionary[curveBinding.propertyName] = UnityEditor.AnimationUtility.GetEditorCurve(clip, curveBinding);
+                    curveDictionary[curveBinding.propertyName] = AnimationUtility.GetEditorCurve(clip, curveBinding);
                 }
             }
 
-            return new Vector3AnimationCurve(curveDictionary["RootT.x"], curveDictionary["RootT.y"], curveDictionary["RootT.z"]);
+            AnimationCurve curveX = curveDictionary["RootT.x"];
+            AnimationCurve curveY = curveDictionary["RootT.y"];
+            AnimationCurve curveZ = curveDictionary["RootT.z"];
+            RotateAnimationCurves(ref curveX, ref curveY, ref curveZ, Quaternion.Euler(0, -rotationOffset, 0));
+
+            return new Vector3AnimationCurve(curveX, curveY, curveZ);
+        }
+
+        private static void RotateAnimationCurves(ref AnimationCurve curveX, ref AnimationCurve curveY, ref AnimationCurve curveZ, Quaternion rotation)
+        {
+            // Collect all unique times from the three curves
+            HashSet<float> timeSet = new HashSet<float>();
+            foreach (var key in curveX.keys) timeSet.Add(key.time);
+            foreach (var key in curveY.keys) timeSet.Add(key.time);
+            foreach (var key in curveZ.keys) timeSet.Add(key.time);
+
+            // Sort the times
+            List<float> times = new List<float>(timeSet);
+            times.Sort();
+
+            // Create new AnimationCurves for rotated data
+            AnimationCurve rotatedCurveX = new AnimationCurve();
+            AnimationCurve rotatedCurveY = new AnimationCurve();
+            AnimationCurve rotatedCurveZ = new AnimationCurve();
+
+            // Rotate each keyframe at each unique time
+            foreach (float time in times)
+            {
+                // Sample the original curves at the current time
+                float originalX = curveX.Evaluate(time);
+                float originalY = curveY.Evaluate(time);
+                float originalZ = curveZ.Evaluate(time);
+
+                Vector3 originalPosition = new Vector3(originalX, originalY, originalZ);
+
+                // Apply rotation
+                Vector3 rotatedPosition = rotation * originalPosition;
+
+                // Add new keyframes with rotated values
+                rotatedCurveX.AddKey(new Keyframe(time, rotatedPosition.x));
+                rotatedCurveY.AddKey(new Keyframe(time, rotatedPosition.y));
+                rotatedCurveZ.AddKey(new Keyframe(time, rotatedPosition.z));
+            }
+
+            // Replace original curves with rotated ones
+            curveX = rotatedCurveX;
+            curveY = rotatedCurveY;
+            curveZ = rotatedCurveZ;
         }
 #endif
     }
