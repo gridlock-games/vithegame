@@ -1171,41 +1171,44 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(GetTotalActionClipLengthInSeconds(actionClip) * 0.35f);
         }
 
+        private string GetHeavyAttackStateName(string baseStateName)
+        {
+            string stateName = baseStateName;
+            switch (heavyAttackAnimationPhase)
+            {
+                case HeavyAttackAnimationPhase.Start:
+                    stateName += "_Start";
+                    break;
+                case HeavyAttackAnimationPhase.Loop:
+                    stateName += "_Loop";
+                    break;
+                case HeavyAttackAnimationPhase.Cancel:
+                    stateName += "_Cancel";
+                    break;
+                case HeavyAttackAnimationPhase.Enhance:
+                    stateName += "_Enhance";
+                    break;
+                case HeavyAttackAnimationPhase.Attack:
+                    stateName += "_Attack";
+                    break;
+                case HeavyAttackAnimationPhase.AttackEnd:
+                    stateName += "_AttackEnd";
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle heavy attack animation phase " + heavyAttackAnimationPhase);
+                    break;
+            }
+            return stateName;
+        }
+
         private float rootMotionTime = 0;
         public bool ShouldApplyRootMotion()
         {
             if (NetworkObject.IsPlayerObject)
             {
                 string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
-                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
-                {
-                    stateName = stateName.Replace("_Attack", "");
-                    switch (heavyAttackAnimationPhase)
-                    {
-                        case HeavyAttackAnimationPhase.Start:
-                            stateName += "_Start";
-                            break;
-                        case HeavyAttackAnimationPhase.Loop:
-                            stateName += "_Loop";
-                            break;
-                        case HeavyAttackAnimationPhase.Cancel:
-                            stateName += "_Cancel";
-                            break;
-                        case HeavyAttackAnimationPhase.Enhance:
-                            stateName += "_Enhance";
-                            break;
-                        case HeavyAttackAnimationPhase.Attack:
-                            stateName += "_Attack";
-                            break;
-                        case HeavyAttackAnimationPhase.AttackEnd:
-                            stateName += "_AttackEnd";
-                            break;
-                        default:
-                            Debug.LogError("Unsure how to handle heavy attack animation phase " + heavyAttackAnimationPhase);
-                            break;
-                    }
-                }
-                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - combatAgent.WeaponHandler.CurrentActionClip.transitionTime;
+                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
+                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime * rootMotionTimeTransitionMultiplier);
             }
             else
             {
@@ -1213,44 +1216,31 @@ namespace Vi.Core
             }
         }
 
+        private const float rootMotionTimeTransitionMultiplier = 2.25f;
+
         public Vector3 ApplyRootMotion()
         {
             if (NetworkObject.IsPlayerObject)
             {
-                string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
-                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                if (ShouldApplyRootMotion())
                 {
-                    stateName = stateName.Replace("_Attack", "");
-                    switch (heavyAttackAnimationPhase)
-                    {
-                        case HeavyAttackAnimationPhase.Start:
-                            stateName += "_Start";
-                            break;
-                        case HeavyAttackAnimationPhase.Loop:
-                            stateName += "_Loop";
-                            break;
-                        case HeavyAttackAnimationPhase.Cancel:
-                            stateName += "_Cancel";
-                            break;
-                        case HeavyAttackAnimationPhase.Enhance:
-                            stateName += "_Enhance";
-                            break;
-                        case HeavyAttackAnimationPhase.Attack:
-                            stateName += "_Attack";
-                            break;
-                        case HeavyAttackAnimationPhase.AttackEnd:
-                            stateName += "_AttackEnd";
-                            break;
-                        default:
-                            Debug.LogError("Unsure how to handle heavy attack animation phase " + heavyAttackAnimationPhase);
-                            break;
-                    }
-                }
+                    string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
 
-                Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime);
-                rootMotionTime += Time.fixedDeltaTime;
-                return animatorReference.ProcessMotionData((combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime) - prev),
-                    StringUtility.NormalizeValue(rootMotionTime, 0, combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - combatAgent.WeaponHandler.CurrentActionClip.transitionTime));
+                    Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime);
+                    rootMotionTime += Time.fixedDeltaTime * Animator.speed;
+
+                    bool shouldApplyMultiplierCurves = true;
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack; }
+
+                    return animatorReference.ProcessMotionData((combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, rootMotionTime) - prev),
+                        StringUtility.NormalizeValue(rootMotionTime, 0, combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime * rootMotionTimeTransitionMultiplier)),
+                        shouldApplyMultiplierCurves);
+                }
+                else
+                {
+                    return Vector3.zero;
+                }
             }
             else
             {
