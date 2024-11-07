@@ -1021,38 +1021,38 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public Vector3 GetRootMotion(string clipName, float t)
+        public Vector3 GetRootMotion(string stateName, float t)
         {
-            if (string.IsNullOrWhiteSpace(clipName)) { return Vector3.zero; }
+            if (string.IsNullOrWhiteSpace(stateName)) { return Vector3.zero; }
 
-            if (rootMotionLookup.ContainsKey(clipName))
+            if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[clipName].EvaluateNormalized(t);
+                return rootMotionLookup[stateName].EvaluateNormalized(t);
             }
             else
             {
                 if (Application.isPlaying)
                 {
-                    Debug.LogError("Action clip Not Found: " + clipName + " weapon name: " + name);
+                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
                     Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
                 }
                 return Vector3.zero;
             }
         }
 
-        public float GetMaxRootMotionTime(string clipName)
+        public float GetMaxRootMotionTime(string stateName)
         {
-            if (string.IsNullOrWhiteSpace(clipName)) { return 0; }
+            if (string.IsNullOrWhiteSpace(stateName)) { return 0; }
 
-            if (rootMotionLookup.ContainsKey(clipName))
+            if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[clipName].GetMaxCurveTime();
+                return rootMotionLookup[stateName].GetMaxCurveTime();
             }
             else
             {
                 if (Application.isPlaying)
                 {
-                    Debug.LogError("Action clip Not Found: " + clipName + " weapon name: " + name);
+                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
                     Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
                 }
                 return default;

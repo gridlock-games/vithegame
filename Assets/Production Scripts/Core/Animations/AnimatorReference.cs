@@ -551,15 +551,15 @@ namespace Vi.Core
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
-                accumulatedRootMotion += ProcessMotionData(Quaternion.Inverse(animator.rootRotation) * animator.deltaPosition);
+                accumulatedRootMotion += ProcessMotionData(Quaternion.Inverse(animator.rootRotation) * animator.deltaPosition,
+                    combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip));
             }
 
             if (animationHandler) { animationHandler.ProcessNextActionClip(); }
         }
 
-        public Vector3 ProcessMotionData(Vector3 worldSpaceRootMotion)
+        public Vector3 ProcessMotionData(Vector3 worldSpaceRootMotion, float normalizedTime)
         {
-            float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip);
             bool shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
 
             if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
