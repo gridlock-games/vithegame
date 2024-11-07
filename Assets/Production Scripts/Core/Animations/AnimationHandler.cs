@@ -733,6 +733,7 @@ namespace Vi.Core
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            rootMotionTime = 0;
             return true;
         }
 
@@ -1131,6 +1132,7 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            rootMotionTime = 0;
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1139,8 +1141,32 @@ namespace Vi.Core
             combatAgent.SetInviniciblity(GetTotalActionClipLengthInSeconds(actionClip) * 0.35f);
         }
 
-        public bool ShouldApplyRootMotion() { return animatorReference.ShouldApplyRootMotion(); }
-        public Vector3 ApplyRootMotion() { return animatorReference.ApplyRootMotion(); }
+        private float rootMotionTime = 0;
+        public bool ShouldApplyRootMotion()
+        {
+            if (NetworkObject.IsPlayerObject)
+            {
+                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(combatAgent.WeaponHandler.CurrentActionClip.name);
+            }
+            else
+            {
+                return animatorReference.ShouldApplyRootMotion();
+            }
+        }
+
+        public Vector3 ApplyRootMotion()
+        {
+            if (NetworkObject.IsPlayerObject)
+            {
+                Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(combatAgent.WeaponHandler.CurrentActionClip.name, rootMotionTime);
+                rootMotionTime += Time.fixedDeltaTime;
+                return animatorReference.ProcessMotionData((combatAgent.WeaponHandler.GetWeapon().GetRootMotion(combatAgent.WeaponHandler.CurrentActionClip.name, rootMotionTime) - prev));
+            }
+            else
+            {
+                return animatorReference.ApplyRootMotion();
+            }
+        }
 
         private void SetLastActionClip(ActionClip actionClip)
         {
@@ -1340,6 +1366,7 @@ namespace Vi.Core
         private void OnDisable()
         {
             UseGenericAimPoint = false;
+            rootMotionTime = 1;
         }
 
         public Vector3 GetAimPoint() { return aimPoint.Value; }
