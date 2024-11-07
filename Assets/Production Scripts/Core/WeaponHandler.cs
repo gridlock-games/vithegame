@@ -56,6 +56,7 @@ namespace Vi.Core
         {
             if (IsOwner & IsSpawned) { aiming.Value = false; }
 
+            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
 
