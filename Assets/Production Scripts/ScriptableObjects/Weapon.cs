@@ -784,10 +784,12 @@ namespace Vi.ScriptableObjects
 
         private Dictionary<string, ActionClip> actionClipLookup = new Dictionary<string, ActionClip>();
         private Dictionary<string, AnimationClip> animationClipLookup = new Dictionary<string, AnimationClip>();
+        private Dictionary<string, Vector3AnimationCurve> rootMotionLookup = new Dictionary<string, Vector3AnimationCurve>();
         private void Awake()
         {
             actionClipLookup = GetActionClipLookup();
             animationClipLookup = animationClipLookupKeys.Zip(animationClipLookupValues, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
+            rootMotionLookup = animationClipLookupKeys.Zip(animationRootMotion, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
         }
 
         private Dictionary<string, ActionClip> GetActionClipLookup()
@@ -992,6 +994,70 @@ namespace Vi.ScriptableObjects
         [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
         [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
         [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
+        [SerializeField] private List<Vector3AnimationCurve> animationRootMotion = new List<Vector3AnimationCurve>();
+
+        [System.Serializable]
+        private class Vector3AnimationCurve
+        {
+            public AnimationCurve curveX;
+            public AnimationCurve curveY;
+            public AnimationCurve curveZ;
+
+            public Vector3AnimationCurve(AnimationCurve curveX, AnimationCurve curveY, AnimationCurve curveZ)
+            {
+                this.curveX = curveX;
+                this.curveY = curveY;
+                this.curveZ = curveZ;
+            }
+
+            public Vector3 EvaluateNormalized(float t)
+            {
+                return new Vector3(curveX.EvaluateNormalizedTime(t), curveY.EvaluateNormalizedTime(t), curveZ.EvaluateNormalizedTime(t));
+            }
+
+            public float GetMaxCurveTime()
+            {
+                return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
+            }
+        }
+
+        public Vector3 GetRootMotion(string stateName, float t)
+        {
+            if (string.IsNullOrWhiteSpace(stateName)) { return Vector3.zero; }
+
+            if (rootMotionLookup.ContainsKey(stateName))
+            {
+                return rootMotionLookup[stateName].EvaluateNormalized(t);
+            }
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
+                }
+                return Vector3.zero;
+            }
+        }
+
+        public float GetMaxRootMotionTime(string stateName)
+        {
+            if (string.IsNullOrWhiteSpace(stateName)) { return 0; }
+
+            if (rootMotionLookup.ContainsKey(stateName))
+            {
+                return rootMotionLookup[stateName].GetMaxCurveTime();
+            }
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    Debug.LogError("Action clip Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
+                }
+                return default;
+            }
+        }
 
 #if UNITY_EDITOR
         [ContextMenu("Find Animations")]
@@ -1004,6 +1070,7 @@ namespace Vi.ScriptableObjects
                 {
                     animationClipLookupKeys.Clear();
                     animationClipLookupValues.Clear();
+                    animationRootMotion.Clear();
                     string path = AssetDatabase.GetAssetPath(weaponOption.animationController.runtimeAnimatorController);
 
                     List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
@@ -1026,6 +1093,9 @@ namespace Vi.ScriptableObjects
                                         overrideFound = true;
                                         animationClipLookupKeys.Add(state.state.name);
                                         animationClipLookupValues.Add(ovride.Value);
+
+                                        // Need to account for importer rotation
+                                        animationRootMotion.Add(GetRootMotionCurve(ovride.Value));
                                         break;
                                     }
                                 }
@@ -1034,6 +1104,7 @@ namespace Vi.ScriptableObjects
                                 {
                                     animationClipLookupKeys.Add(state.state.name);
                                     animationClipLookupValues.Add(animationClip);
+                                    animationRootMotion.Add(GetRootMotionCurve(animationClip));
                                 }
                             }
                         }
@@ -1042,6 +1113,31 @@ namespace Vi.ScriptableObjects
                 }
             }
             EditorUtility.SetDirty(this);
+        }
+
+        private Vector3AnimationCurve GetRootMotionCurve(AnimationClip clip)
+        {
+            UnityEditor.EditorCurveBinding[] curveBindings = UnityEditor.AnimationUtility.GetCurveBindings(clip);
+
+            Dictionary<string, AnimationCurve> curveDictionary = new Dictionary<string, AnimationCurve>()
+            {
+                { "RootT.x", null },
+                { "RootT.y", null },
+                { "RootT.z", null },
+                { "RootQ.x", null },
+                { "RootQ.y", null },
+                { "RootQ.z", null }
+            };
+
+            foreach (UnityEditor.EditorCurveBinding curveBinding in curveBindings)
+            {
+                if (curveDictionary.ContainsKey(curveBinding.propertyName))
+                {
+                    curveDictionary[curveBinding.propertyName] = UnityEditor.AnimationUtility.GetEditorCurve(clip, curveBinding);
+                }
+            }
+
+            return new Vector3AnimationCurve(curveDictionary["RootT.x"], curveDictionary["RootT.y"], curveDictionary["RootT.z"]);
         }
 #endif
     }

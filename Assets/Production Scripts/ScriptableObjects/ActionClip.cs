@@ -128,29 +128,10 @@ namespace Vi.ScriptableObjects
 
         public bool shouldApplyRootMotion = true;
         public bool shouldIgnoreGravity;
+        
         [SerializeField] private AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
-        [SerializeField] private AnimationCurve maxInterpTime = new AnimationCurve(
-            new Keyframe(0, defaultMaximumAnimationInterpolationTime), new Keyframe(1, defaultMaximumAnimationInterpolationTime));
-
-        public const float defaultMaximumAnimationInterpolationTime = 0.07f;
-
-        public float GetMaximumAnimationInterpolationTime(float t)
-        {
-            float maxTime = maxInterpTime.EvaluateNormalizedTime(t);
-            if (maxTime > 0.1f)
-            {
-                Debug.LogWarning(this + " is returning a max interpolation time greater than 0.1, this is too high. I'm clamping it to the default value: " + defaultMaximumAnimationInterpolationTime);
-                return defaultMaximumAnimationInterpolationTime;
-            }
-            else if (maxTime <= 0)
-            {
-                Debug.LogWarning(this + " is returning a max interpolation time less than or equal to 0, this is too low. I'm clamping it to the default value: " + defaultMaximumAnimationInterpolationTime);
-                return defaultMaximumAnimationInterpolationTime;
-            }
-            return maxTime;
-        }
 
         public AnimationCurve GetRootMotionForwardMultiplier() { return rootMotionForwardMultiplier; }
         public AnimationCurve GetRootMotionSidesMultiplier() { return rootMotionSidesMultiplier; }
