@@ -1021,13 +1021,13 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public Vector3 GetRootMotion(string stateName, float t)
+        public Vector3 GetRootMotion(string stateName, float normalizedTime)
         {
             if (string.IsNullOrWhiteSpace(stateName)) { return Vector3.zero; }
 
             if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[stateName].EvaluateNormalized(t);
+                return rootMotionLookup[stateName].EvaluateNormalized(normalizedTime);
             }
             else
             {
@@ -1155,12 +1155,14 @@ namespace Vi.ScriptableObjects
             AnimationCurve curveX = curveDictionary["RootT.x"];
             AnimationCurve curveY = curveDictionary["RootT.y"];
             AnimationCurve curveZ = curveDictionary["RootT.z"];
-            RotateAnimationCurves(ref curveX, ref curveY, ref curveZ, Quaternion.Euler(0, -rotationOffset, 0));
+            RotateAnimationCurves(ref curveX, ref curveY, ref curveZ, Quaternion.Euler(0, -rotationOffset, 0),
+                curveDictionary["RootQ.x"], curveDictionary["RootQ.y"], curveDictionary["RootQ.z"]);
 
             return new Vector3AnimationCurve(curveX, curveY, curveZ);
         }
 
-        private static void RotateAnimationCurves(ref AnimationCurve curveX, ref AnimationCurve curveY, ref AnimationCurve curveZ, Quaternion rotation)
+        private static void RotateAnimationCurves(ref AnimationCurve curveX, ref AnimationCurve curveY, ref AnimationCurve curveZ, Quaternion rotation,
+            AnimationCurve rotX, AnimationCurve rotY, AnimationCurve rotZ)
         {
             // Collect all unique times from the three curves
             HashSet<float> timeSet = new HashSet<float>();
@@ -1186,6 +1188,7 @@ namespace Vi.ScriptableObjects
                 float originalZ = curveZ.Evaluate(time);
 
                 Vector3 originalPosition = new Vector3(originalX, originalY, originalZ);
+                //originalPosition = Quaternion.Euler(rotX.Evaluate(time), rotY.Evaluate(time), rotZ.Evaluate(time)) * originalPosition;
 
                 // Apply rotation
                 Vector3 rotatedPosition = rotation * originalPosition;
