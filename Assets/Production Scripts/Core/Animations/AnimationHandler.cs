@@ -734,7 +734,6 @@ namespace Vi.Core
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
-            rootMotionTime = 0;
             return true;
         }
 
@@ -1163,7 +1162,6 @@ namespace Vi.Core
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
-            rootMotionTime = 0;
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1208,6 +1206,7 @@ namespace Vi.Core
         {
             if (NetworkObject.IsPlayerObject)
             {
+                if (combatAgent.WeaponHandler.CurrentActionClip.ailment == ActionClip.Ailment.Death) { return false; }
                 string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
                 if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
                 return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime * rootMotionTimeTransitionMultiplier);
@@ -1260,6 +1259,7 @@ namespace Vi.Core
         private void SetLastActionClip(ActionClip actionClip)
         {
             lastClipPlayed = actionClip;
+            if (actionClip.ailment != ActionClip.Ailment.Death) { rootMotionTime = 0; }
         }
 
         public Animator Animator { get; private set; }
