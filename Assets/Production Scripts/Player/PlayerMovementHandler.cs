@@ -176,7 +176,7 @@ namespace Vi.Player
             }
             else
             {
-                return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
+                //return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
             }
             return Vector3.zero;
         }
