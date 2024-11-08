@@ -117,7 +117,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.01f;
+        private const float serverReconciliationThreshold = 0.5f;
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private Vector3 HandleServerReconciliation()
         {
@@ -147,7 +147,7 @@ namespace Vi.Player
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
                         Debug.Log("Root motion position error " + rootMotionPositionError);
-                        lastServerReconciliationTime = Time.time;
+                        //lastServerReconciliationTime = Time.time;
 
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
 
@@ -155,6 +155,18 @@ namespace Vi.Player
                         if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                         ReprocessInputs(latestServerState.Value.tick);
                     }
+                    else
+                    {
+                        return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
+                    }
+                }
+                else if (System.Array.Exists(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime))
+                {
+
+                }
+                else
+                {
+                    Debug.Log("Reached");
                 }
                 return Vector3.zero;
             }
@@ -168,7 +180,7 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                lastServerReconciliationTime = Time.time;
+                //lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -177,12 +189,13 @@ namespace Vi.Player
                 Rigidbody.position = latestServerState.Value.position;
                 if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 ReprocessInputs(latestServerState.Value.tick);
+
+                return Vector3.zero;
             }
             else
             {
-                //return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
+                return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
             }
-            return Vector3.zero;
         }
 
         private void ReprocessInputs(int latestServerTick)
