@@ -257,7 +257,7 @@ namespace Vi.Player
                 if (latestServerState.Value.tick > 0)
                 {
                     // Sync position here with latest server state
-                    Rigidbody.MovePosition(latestServerState.Value.position);
+                    Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
                 }
             }
 
@@ -723,7 +723,7 @@ namespace Vi.Player
 
         private StatePayload[] stateBuffer;
         private NetworkList<InputPayload> inputBuffer;
-        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
+        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
 
