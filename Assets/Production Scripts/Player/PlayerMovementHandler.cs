@@ -48,14 +48,16 @@ namespace Vi.Player
             public Quaternion rotation;
             public bool shouldUseRootMotion;
             public Vector3 rootMotion;
+            public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float stairMovement)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
                 this.rotation = rotation;
                 this.shouldUseRootMotion = shouldUseRootMotion;
                 this.rootMotion = rootMotion;
+                this.stairMovement = stairMovement;
             }
 
             public bool Equals(InputPayload other)
@@ -69,6 +71,7 @@ namespace Vi.Player
                 serializer.SerializeValue(ref shouldUseRootMotion);
                 if (!shouldUseRootMotion) { serializer.SerializeValue(ref moveInput); }
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref stairMovement);
             }
         }
 
@@ -81,6 +84,7 @@ namespace Vi.Player
             public Quaternion rotation;
             public bool usedRootMotion;
             public float rootMotionTime;
+            public float stairMovement;
 
             public StatePayload(InputPayload inputPayload, Rigidbody Rigidbody, Quaternion rotation, bool usedRootMotion, float rootMotionTime)
             {
@@ -91,6 +95,7 @@ namespace Vi.Player
                 this.rotation = rotation;
                 this.usedRootMotion = usedRootMotion;
                 this.rootMotionTime = rootMotionTime;
+                this.stairMovement = inputPayload.stairMovement;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -147,7 +152,7 @@ namespace Vi.Player
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
                         Debug.Log("Root motion position error " + rootMotionPositionError);
-                        //lastServerReconciliationTime = Time.time;
+                        lastServerReconciliationTime = Time.time;
 
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
 
@@ -162,11 +167,11 @@ namespace Vi.Player
                 }
                 else if (System.Array.Exists(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime))
                 {
-
+                    Debug.Log("Reached2");
                 }
                 else
                 {
-                    Debug.Log("Reached");
+                    Debug.Log("Reached1");
                 }
                 return Vector3.zero;
             }
@@ -180,7 +185,7 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                //lastServerReconciliationTime = Time.time;
+                lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -269,7 +274,7 @@ namespace Vi.Player
                     }
 
                     StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
-                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion()));
+                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(), 0));
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
                     lastMoveInputProcessedOnServer = Vector2.zero;
@@ -344,10 +349,11 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
-                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion());
+                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(), 0);
                 movementTick++;
 
                 StatePayload statePayload = Move(inputPayload);
+                inputPayload.stairMovement = statePayload.stairMovement;
 
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
@@ -456,25 +462,37 @@ namespace Vi.Player
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
+            // Stair Movement
             float stairMovement = 0;
-            Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
-            startPos.y += stairStepHeight;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            if (IsOwner)
             {
-                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
-                {
-                    break;
-                }
-#if UNITY_EDITOR
-                if (drawCasts) Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
-#endif
+                Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
                 startPos.y += stairStepHeight;
-                stairMovement += stairStepHeight;
+                while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                {
+                    if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                    {
+                        break;
+                    }
+#if UNITY_EDITOR
+                    if (drawCasts) Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
+                    startPos.y += stairStepHeight;
+                    stairMovement += stairStepHeight;
 
+                    if (stairMovement > maxStairStepHeight)
+                    {
+                        stairMovement = 0;
+                        break;
+                    }
+                }
+            }
+            else if (IsServer)
+            {
+                stairMovement = inputPayload.stairMovement;
                 if (stairMovement > maxStairStepHeight)
                 {
                     stairMovement = 0;
-                    break;
                 }
             }
 
@@ -527,7 +545,9 @@ namespace Vi.Player
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
+            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
+            inputPayload.stairMovement = stairMovement;
             return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionTime);
         }
 
@@ -576,21 +596,22 @@ namespace Vi.Player
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
-                float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
-                if (dist > serverReconciliationTeleportThreshold)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else if (dist < 0.01f)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, Rigidbody.transform.position, Time.deltaTime * serverReconciliationLerpSpeed);
-                }
+                //float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
+                //if (dist > serverReconciliationTeleportThreshold)
+                //{
+                //    transform.position = Rigidbody.transform.position;
+                //    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                //}
+                //else if (dist < 0.01f)
+                //{
+                //    transform.position = Rigidbody.transform.position;
+                //    lastServerReconciliationTime = Mathf.NegativeInfinity;
+                //}
+                //else
+                //{
+                //    transform.position = Vector3.MoveTowards(transform.position, Rigidbody.transform.position, Time.deltaTime * serverReconciliationLerpSpeed);
+                //}
+                transform.position = Rigidbody.transform.position;
             }
             else
             {
@@ -656,7 +677,7 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero),
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0),
                     Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.RootMotionTime);
             }
         }
