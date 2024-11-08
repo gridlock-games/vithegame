@@ -939,6 +939,7 @@ namespace Vi.Core
                 if (lightAttackMode == "PRESS")
                 {
                     ExecuteLightAttack(isPressed);
+                    //LightAttackHold(isPressed);
                 }
                 else if (lightAttackMode == "HOLD")
                 {
