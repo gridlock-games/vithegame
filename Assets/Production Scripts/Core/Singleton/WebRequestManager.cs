@@ -569,11 +569,7 @@ namespace Vi.Core
 
                 if (!IsLoggedIn)
                 {
-                    LogInErrorText = "Login Failed";
-                    if (postRequest.downloadHandler.text.Contains("isVerified"))
-                    {
-                        LogInErrorText = "Verify Your Email";
-                    }
+                    LogInErrorText = "Login Failed. This is probably a bug on our end.";
                 }
             }
 
@@ -1020,8 +1016,10 @@ namespace Vi.Core
             }
         }
 
+        public string CharacterCreationError { get; private set; } = "";
         public IEnumerator CharacterPostRequest(Character character)
         {
+            CharacterCreationError = "";
             CharacterPostPayload payload = new CharacterPostPayload(character);
 
             string json = JsonConvert.SerializeObject(payload);
@@ -1041,9 +1039,16 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                CharacterCreationError = "Server Error";
+                yield break;
             }
 
-            if (postRequest.downloadHandler.text == "false") { yield break; }
+            // TODO account for web request failure in UI
+            if (postRequest.downloadHandler.text == "false")
+            {
+                CharacterCreationError = "Failed To Create Character";
+                yield break;
+            }
 
             character._id = postRequest.downloadHandler.text;
 
