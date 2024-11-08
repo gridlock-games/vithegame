@@ -382,8 +382,7 @@ namespace Vi.Core
             // Validate input history for light attacks so that players can't cheat their light attack combos
             if (actionClip.GetClipType() == ActionClip.ClipType.LightAttack)
             {
-                // This breaks the 'press' mode of light attacks
-                //if (actionClip != combatAgent.WeaponHandler.SelectAttack(Weapon.InputAttackType.LightAttack, combatAgent.WeaponHandler.GetInputHistory())) { return default; }
+                if (actionClip != combatAgent.WeaponHandler.SelectAttack(Weapon.InputAttackType.LightAttack, combatAgent.WeaponHandler.GetInputHistory())) { return default; }
             }
 
             if (actionClip.summonableCount > 0)
