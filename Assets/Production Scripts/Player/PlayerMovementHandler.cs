@@ -230,7 +230,7 @@ namespace Vi.Player
             {
                 if (serverInputQueue.Count > 0)
                 {
-                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
+                    if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero)
                     {
                         if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
                     }
@@ -242,12 +242,12 @@ namespace Vi.Player
                 StatePayload statePayload = Move(inputPayload);
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                 latestServerState.Value = statePayload;
-                lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                lastInputPayloadProcessedOnServer = inputPayload;
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
             }
         }
 
-        private Vector2 lastMoveInputProcessedOnServer;
+        private InputPayload lastInputPayloadProcessedOnServer;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -271,19 +271,22 @@ namespace Vi.Player
                         newRotation = inputPayload.rotation;
                     }
 
-                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
-                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(), 0));
+                    InputPayload serverInputPayload = new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
+                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(), 0);
+
+                    StatePayload statePayload = Move(serverInputPayload);
+
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-                    lastMoveInputProcessedOnServer = Vector2.zero;
+                    lastInputPayloadProcessedOnServer = serverInputPayload;
                 }
-                else
+                else if (serverInputQueue.Count > 0)
                 {
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                     {
                         if (serverInputQueue.Count > 3)
                         {
-                            if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero) { continue; }
+                            if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero) { continue; }
                         }
 
                         inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
@@ -292,9 +295,13 @@ namespace Vi.Player
                         StatePayload statePayload = Move(inputPayload);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                         latestServerState.Value = statePayload;
-                        lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                        lastInputPayloadProcessedOnServer = inputPayload;
                         break;
                     }
+                }
+                else // Server input queue is 0 meaning we're waiting on the client to send inputs
+                {
+                    // TODO Not sure how to handle this case
                 }
             }
 
