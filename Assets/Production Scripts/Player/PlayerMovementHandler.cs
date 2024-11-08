@@ -139,7 +139,7 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             if (latestServerState.Value.usedRootMotion)
             {
-                StatePayload[] slice = stateBuffer[(serverStateBufferIndex - 5)..Mathf.Min(stateBuffer.Length, (serverStateBufferIndex + 5))];
+                StatePayload[] slice = stateBuffer[Mathf.Max(0, (serverStateBufferIndex - 5))..Mathf.Min(stateBuffer.Length, (serverStateBufferIndex + 5))];
                 if (System.Array.Exists(slice, item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime)))
                 {
                     StatePayload clientRootMotionState = System.Array.Find(slice, item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
