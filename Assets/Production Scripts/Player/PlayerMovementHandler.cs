@@ -228,6 +228,24 @@ namespace Vi.Player
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
+                // Have to double check these to prevent cheating
+                if (combatAgent.StatusAgent.IsRooted())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (!CanMove())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (!combatAgent.AnimationHandler.IsAtRest())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+
                 if (serverInputQueue.Count > 0)
                 {
                     if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero)
@@ -284,6 +302,24 @@ namespace Vi.Player
                 {
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                     {
+                        // Have to double check these to prevent cheating
+                        if (combatAgent.StatusAgent.IsRooted())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (!CanMove())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (!combatAgent.AnimationHandler.IsAtRest())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+
                         if (serverInputQueue.Count > 3)
                         {
                             if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero) { continue; }
@@ -328,10 +364,6 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (latestServerState.Value.usedRootMotion)
-                {
-                    moveInput = Vector2.zero;
-                }
                 else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
                 {
                     moveInput = Vector2.zero;
@@ -340,11 +372,15 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
+                else if (combatAgent.StatusAgent.IsRooted())
+                {
+                    moveInput = Vector2.zero;
+                }
                 else if (shouldApplyRootMotion)
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (combatAgent.StatusAgent.IsRooted())
+                else if (!combatAgent.AnimationHandler.IsAtRest())
                 {
                     moveInput = Vector2.zero;
                 }

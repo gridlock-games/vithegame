@@ -92,13 +92,13 @@ namespace Vi.UI
             cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
             abilityIcon.fillAmount = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
 
-            if (combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability))
+            if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
             {
-                borderImage.color = originalBorderImageColor;
+                borderImage.color = Color.red;
             }
             else
             {
-                borderImage.color = Color.red;
+                borderImage.color = originalBorderImageColor;
             }
 
             int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
