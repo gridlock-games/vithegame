@@ -160,6 +160,11 @@ namespace Vi.Player
                 return Vector3.zero;
             }
 
+            if (stateBuffer[serverStateBufferIndex].usedRootMotion)
+            {
+                return Vector3.zero;
+            }
+
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
             if (positionError > serverReconciliationThreshold)
             {
@@ -550,7 +555,7 @@ namespace Vi.Player
 
         private const float serverReconciliationLerpDuration = 1;
         private const float serverReconciliationTeleportThreshold = 0.5f;
-        private const float serverReconciliationLerpSpeed = 3;
+        private const float serverReconciliationLerpSpeed = 1;
 
         private void UpdateTransform()
         {
