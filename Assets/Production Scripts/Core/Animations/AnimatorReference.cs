@@ -551,20 +551,20 @@ namespace Vi.Core
             // Check if the current animator state is not "Empty" and update networkRootMotion and localRootMotion accordingly
             if (ShouldApplyRootMotion())
             {
+                bool shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
+                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
+
                 accumulatedRootMotion += ProcessMotionData(Quaternion.Inverse(animator.rootRotation) * animator.deltaPosition,
-                    combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip));
+                    combatAgent.AnimationHandler.GetActionClipNormalizedTime(combatAgent.WeaponHandler.CurrentActionClip),
+                    shouldApplyMultiplierCurves);
             }
 
             if (animationHandler) { animationHandler.ProcessNextActionClip(); }
         }
 
-        public Vector3 ProcessMotionData(Vector3 worldSpaceRootMotion, float normalizedTime)
+        public Vector3 ProcessMotionData(Vector3 worldSpaceRootMotion, float normalizedTime, bool shouldApplyMultiplierCurves)
         {
-            bool shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlaying(combatAgent.WeaponHandler.CurrentActionClip);
-
-            if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyCurves = combatAgent.AnimationHandler.IsActionClipPlayingInCurrentState(combatAgent.WeaponHandler.CurrentActionClip); }
-
-            if (shouldApplyCurves)
+            if (shouldApplyMultiplierCurves)
             {
                 if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
