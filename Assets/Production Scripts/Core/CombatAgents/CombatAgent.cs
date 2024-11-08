@@ -67,8 +67,12 @@ namespace Vi.Core
             }
         }
 
+        protected virtual bool ShouldUseSpirit() { return true; }
+
         public void AddSpirit(float amount)
         {
+            if (!ShouldUseSpirit()) { return; }
+
             if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
             if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
 
@@ -662,14 +666,14 @@ namespace Vi.Core
                     switch (ailment.Value)
                     {
                         case ActionClip.Ailment.Knockdown:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockdownDuration + ActionClip.HitStopEffectDuration, true, true));
                             break;
                         case ActionClip.Ailment.Knockup:
                             knockupHitCounter = 0;
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(knockupDuration + ActionClip.HitStopEffectDuration, false, true));
                             break;
                         case ActionClip.Ailment.Stun:
-                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false));
+                            ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterDuration(stunDuration + ActionClip.HitStopEffectDuration, false, this is Attributes));
                             break;
                         case ActionClip.Ailment.Stagger:
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
@@ -702,12 +706,12 @@ namespace Vi.Core
         }
 
         private const float recoveryTimeInvincibilityBuffer = 1;
-        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible)
+        private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible, bool shouldMakeInvincibleDuringRecovery)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
             if (shouldMakeInvincible) { SetInviniciblity(duration + recoveryTimeInvincibilityBuffer); }
             yield return new WaitForSeconds(duration);
-            SetInviniciblity(recoveryTimeInvincibilityBuffer);
+            if (shouldMakeInvincibleDuringRecovery) { SetInviniciblity(recoveryTimeInvincibilityBuffer); }
             ailment.Value = ActionClip.Ailment.None;
         }
 
@@ -1044,55 +1048,63 @@ namespace Vi.Core
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
-            bool shouldPlayHitReaction = false;
-            switch (hitReaction.GetHitReactionType())
+            bool shouldPlayHitReaction;
+            if (ShouldUseSpirit())
             {
-                case ActionClip.HitReactionType.Normal:
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
-                    {
-                        AddSpirit(HPDamage * 0.7f);
-                        HPDamage *= 0.7f;
-                    }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
-                    {
-                        AddSpirit(HPDamage * 0.7f);
-                        shouldPlayHitReaction = true;
-                        HPDamage *= 0.7f;
-                    }
-                    else // Spirit is at 0
-                    {
-                        AddSpirit(HPDamage);
-                        shouldPlayHitReaction = true;
-                    }
-                    break;
-                case ActionClip.HitReactionType.Blocking:
-                    if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
-                    {
-                        AddSpirit(HPDamage * 0.5f);
-                        HPDamage = 0;
-                    }
-                    else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
-                    {
-                        AddSpirit(-GetMaxSpirit());
-                        AddStamina(-GetMaxStamina() * 0.3f);
-                        shouldPlayHitReaction = true;
-                        HPDamage *= 0.7f;
-                    }
-                    else // Spirit is at 0
-                    {
-                        AddStamina(-GetMaxStamina() * 0.3f);
-                        AddSpirit(HPDamage);
-                        if (GetStamina() <= 0)
+                shouldPlayHitReaction = false;
+                switch (hitReaction.GetHitReactionType())
+                {
+                    case ActionClip.HitReactionType.Normal:
+                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
                         {
-                            if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
-                            hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value, false);
+                            AddSpirit(HPDamage * 0.7f);
+                            HPDamage *= 0.7f;
                         }
-                        shouldPlayHitReaction = true;
-                    }
-                    break;
-                default:
-                    Debug.LogError("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
-                    break;
+                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
+                        {
+                            AddSpirit(HPDamage * 0.7f);
+                            shouldPlayHitReaction = true;
+                            HPDamage *= 0.7f;
+                        }
+                        else // Spirit is at 0
+                        {
+                            AddSpirit(HPDamage);
+                            shouldPlayHitReaction = true;
+                        }
+                        break;
+                    case ActionClip.HitReactionType.Blocking:
+                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
+                        {
+                            AddSpirit(HPDamage * 0.5f);
+                            HPDamage = 0;
+                        }
+                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
+                        {
+                            AddSpirit(-GetMaxSpirit());
+                            AddStamina(-GetMaxStamina() * 0.3f);
+                            shouldPlayHitReaction = true;
+                            HPDamage *= 0.7f;
+                        }
+                        else // Spirit is at 0
+                        {
+                            AddStamina(-GetMaxStamina() * 0.3f);
+                            AddSpirit(HPDamage);
+                            if (GetStamina() <= 0)
+                            {
+                                if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
+                                hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, false, attackAilment, ailment.Value, false);
+                            }
+                            shouldPlayHitReaction = true;
+                        }
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to process hit for hit reaction type " + hitReaction.GetHitReactionType());
+                        break;
+                }
+            }
+            else
+            {
+                shouldPlayHitReaction = attack.shouldPlayHitReaction;
             }
 
             if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
