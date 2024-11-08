@@ -151,7 +151,7 @@ namespace Vi.Player
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
-                        //Debug.Log("Root motion position error " + rootMotionPositionError);
+                        Debug.Log("Root motion position error " + rootMotionPositionError);
                         lastServerReconciliationTime = Time.time;
 
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
@@ -182,7 +182,7 @@ namespace Vi.Player
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
             if (positionError > serverReconciliationThreshold)
             {
-                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
@@ -583,9 +583,8 @@ namespace Vi.Player
             return rot;
         }
 
-        private const float serverReconciliationLerpDuration = 1;
-        private const float serverReconciliationTeleportThreshold = 0.5f;
-        private const float serverReconciliationLerpSpeed = 1;
+        private const float serverReconciliationLerpDuration = 0.25f;
+        //private const float serverReconciliationTeleportThreshold = 0.5f;
 
         private void UpdateTransform()
         {
@@ -594,22 +593,7 @@ namespace Vi.Player
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
-                //float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
-                //if (dist > serverReconciliationTeleportThreshold)
-                //{
-                //    transform.position = Rigidbody.transform.position;
-                //    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                //}
-                //else if (dist < 0.01f)
-                //{
-                //    transform.position = Rigidbody.transform.position;
-                //    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                //}
-                //else
-                //{
-                //    transform.position = Vector3.MoveTowards(transform.position, Rigidbody.transform.position, Time.deltaTime * serverReconciliationLerpSpeed);
-                //}
-                transform.position = Rigidbody.transform.position;
+                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration);
             }
             else
             {
