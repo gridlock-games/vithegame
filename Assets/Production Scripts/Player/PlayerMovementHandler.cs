@@ -162,16 +162,14 @@ namespace Vi.Player
                     }
                     else
                     {
-                        return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
+                        return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
                     }
                 }
                 else if (System.Array.Exists(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime))
                 {
-                    Debug.Log("Reached2");
-                }
-                else
-                {
-                    Debug.Log("Reached1");
+                    StatePayload clientRootMotionState = System.Array.Find(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
+
+                    return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
                 }
                 return Vector3.zero;
             }
