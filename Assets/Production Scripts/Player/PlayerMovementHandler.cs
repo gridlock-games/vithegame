@@ -151,7 +151,7 @@ namespace Vi.Player
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
-                        Debug.Log("Root motion position error " + rootMotionPositionError);
+                        //Debug.Log("Root motion position error " + rootMotionPositionError);
                         lastServerReconciliationTime = Time.time;
 
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
@@ -182,7 +182,7 @@ namespace Vi.Player
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
                 lastServerReconciliationTime = Time.time;
 
                 // Update buffer at index of latest server state
