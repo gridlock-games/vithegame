@@ -935,14 +935,21 @@ namespace Vi.UI
 
             yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
 
-            webRequestStatusText.gameObject.SetActive(true);
+            webRequestStatusText.gameObject.SetActive(false);
 
             RefreshButtonInteractability();
             finishCharacterCustomizationButton.interactable = true;
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
 
-            OpenCharacterSelect();
+            if (string.IsNullOrWhiteSpace(WebRequestManager.Singleton.CharacterCreationError))
+            {
+                OpenCharacterSelect();
+            }
+            else
+            {
+                characterNameInputErrorText.text = WebRequestManager.Singleton.CharacterCreationError;
+            }
         }
 
         private IEnumerator DeleteCharacterCoroutine(WebRequestManager.Character character)

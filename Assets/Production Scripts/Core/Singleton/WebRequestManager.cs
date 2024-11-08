@@ -1016,8 +1016,10 @@ namespace Vi.Core
             }
         }
 
+        public string CharacterCreationError { get; private set; } = "";
         public IEnumerator CharacterPostRequest(Character character)
         {
+            CharacterCreationError = "";
             CharacterPostPayload payload = new CharacterPostPayload(character);
 
             string json = JsonConvert.SerializeObject(payload);
@@ -1037,10 +1039,16 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
+                CharacterCreationError = "Server Error";
+                yield break;
             }
 
             // TODO account for web request failure in UI
-            if (postRequest.downloadHandler.text == "false") { yield break; }
+            if (postRequest.downloadHandler.text == "false")
+            {
+                CharacterCreationError = "Failed To Create Character";
+                yield break;
+            }
 
             character._id = postRequest.downloadHandler.text;
 
