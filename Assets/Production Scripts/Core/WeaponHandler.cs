@@ -56,6 +56,7 @@ namespace Vi.Core
         {
             if (IsOwner & IsSpawned) { aiming.Value = false; }
 
+            CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
             weaponInstance = weapon;
             AnimatorOverrideControllerInstance = Instantiate(animatorOverrideController);
 
@@ -938,6 +939,7 @@ namespace Vi.Core
                 if (lightAttackMode == "PRESS")
                 {
                     ExecuteLightAttack(isPressed);
+                    //LightAttackHold(isPressed);
                 }
                 else if (lightAttackMode == "HOLD")
                 {
