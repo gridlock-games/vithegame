@@ -66,10 +66,9 @@ namespace Vi.Player
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref moveInput);
-                serializer.SerializeValue(ref rotation);
                 serializer.SerializeValue(ref shouldUseRootMotion);
-                if (shouldUseRootMotion) { serializer.SerializeValue(ref rootMotion); }
+                if (!shouldUseRootMotion) { serializer.SerializeValue(ref moveInput); }
+                serializer.SerializeValue(ref rotation);
             }
         }
 

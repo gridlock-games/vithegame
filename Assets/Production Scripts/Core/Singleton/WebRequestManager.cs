@@ -569,11 +569,7 @@ namespace Vi.Core
 
                 if (!IsLoggedIn)
                 {
-                    LogInErrorText = "Login Failed";
-                    if (postRequest.downloadHandler.text.Contains("isVerified"))
-                    {
-                        LogInErrorText = "Verify Your Email";
-                    }
+                    LogInErrorText = "Login Failed. This is probably a bug on our end.";
                 }
             }
 
@@ -1043,6 +1039,7 @@ namespace Vi.Core
                 Debug.LogError("Post request error in WebRequestManager.CharacterPostRequest()" + postRequest.error);
             }
 
+            // TODO account for web request failure in UI
             if (postRequest.downloadHandler.text == "false") { yield break; }
 
             character._id = postRequest.downloadHandler.text;
