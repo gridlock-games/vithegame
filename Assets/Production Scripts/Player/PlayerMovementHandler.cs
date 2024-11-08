@@ -155,7 +155,6 @@ namespace Vi.Player
                         Rigidbody.position = latestServerState.Value.position;
                         if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                         ReprocessInputs(latestServerState.Value.tick);
-
                     }
                 }
                 return Vector3.zero;
@@ -177,7 +176,7 @@ namespace Vi.Player
             }
             else
             {
-                //return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
+                return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
             }
             return Vector3.zero;
         }
