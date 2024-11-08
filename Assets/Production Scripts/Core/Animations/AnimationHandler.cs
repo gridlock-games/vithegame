@@ -1028,7 +1028,7 @@ namespace Vi.Core
             {
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", false);
-
+                heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
                 StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount));
             }
             else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
@@ -1057,7 +1057,7 @@ namespace Vi.Core
                     if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
-                        heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
+                        heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd;
                         rootMotionTime = 0;
                         break;
                     }
@@ -1208,8 +1208,12 @@ namespace Vi.Core
             {
                 if (combatAgent.WeaponHandler.CurrentActionClip.ailment == ActionClip.Ailment.Death) { return false; }
                 string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
-                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
-                return rootMotionTime <= combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime * rootMotionTimeTransitionMultiplier);
+                float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                {
+                    stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", ""));
+                }
+                return rootMotionTime <= maxRootMotionTime - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime);
             }
             else
             {
@@ -1217,13 +1221,15 @@ namespace Vi.Core
             }
         }
 
-        private const float rootMotionTimeTransitionMultiplier = 1;
-
         private float GetNormalizedRootMotionTime()
         {
             string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
-            if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
-            return StringUtility.NormalizeValue(rootMotionTime, 0, combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName) - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime * rootMotionTimeTransitionMultiplier));
+            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+            if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", ""));
+            }
+            return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime));
         }
 
         public Vector3 ApplyRootMotion()
@@ -1235,14 +1241,31 @@ namespace Vi.Core
                     string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", "")); }
 
-                    Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, GetNormalizedRootMotionTime());
+                    float prevNormalizedTime = GetNormalizedRootMotionTime();
+                    Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
                     rootMotionTime += Time.fixedDeltaTime * Animator.speed;
 
                     bool shouldApplyMultiplierCurves = true;
-                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack) { shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack; }
+                    float newNormalizedTime = GetNormalizedRootMotionTime();
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                    {
+                        shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack;
+                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
+                        {
+                            if (newNormalizedTime >= 1)
+                            {
+                                rootMotionTime = 0;
+                                prevNormalizedTime = GetNormalizedRootMotionTime();
+                                prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
+                                rootMotionTime += Time.fixedDeltaTime * Animator.speed;
+                                newNormalizedTime = GetNormalizedRootMotionTime();
+                            }
+                            Debug.Log(newNormalizedTime);
+                        }
+                    }
 
-                    Vector3 delta = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, GetNormalizedRootMotionTime()) - prev;
-                    delta = animatorReference.ProcessMotionData(delta, GetNormalizedRootMotionTime(), shouldApplyMultiplierCurves);
+                    Vector3 delta = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, newNormalizedTime) - prev;
+                    delta = animatorReference.ProcessMotionData(delta, newNormalizedTime, shouldApplyMultiplierCurves);
                     return delta;
                 }
                 else

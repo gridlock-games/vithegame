@@ -354,16 +354,19 @@ namespace Vi.Player
             if (IsOwner)
             {
                 Vector3 serverReconciliationVelocityError = Vector3.zero;
-                if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
+                if (!IsServer)
                 {
-                    if (!latestServerState.Equals(default(StatePayload)) &&
-                        (lastProcessedState.Equals(default(StatePayload)) ||
-                        !latestServerState.Equals(lastProcessedState)))
+                    if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
-                        serverReconciliationVelocityError = HandleServerReconciliation();
+                        if (!latestServerState.Equals(default(StatePayload)) &&
+                            (lastProcessedState.Equals(default(StatePayload)) ||
+                            !latestServerState.Equals(lastProcessedState)))
+                        {
+                            serverReconciliationVelocityError = HandleServerReconciliation();
+                        }
                     }
                 }
-
+                
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (latestServerState.Value.usedRootMotion)
