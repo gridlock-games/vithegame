@@ -143,15 +143,28 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             if (latestServerState.Value.usedRootMotion)
             {
-                StatePayload[] slice = stateBuffer[Mathf.Max(0, (serverStateBufferIndex - 5))..Mathf.Min(stateBuffer.Length, (serverStateBufferIndex + 5))];
-                if (System.Array.Exists(slice, item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime)))
+                // Check for 25 updates
+                int indexRange = 25;
+                List<StatePayload> slice = new List<StatePayload>();
+                for (int i = serverStateBufferIndex; i < (serverStateBufferIndex - indexRange); i--)
                 {
-                    StatePayload clientRootMotionState = System.Array.Find(slice, item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
+                    slice.Add(stateBuffer[i % stateBuffer.Length]);
+                }
+
+                for (int i = serverStateBufferIndex; i < (serverStateBufferIndex + indexRange); i++)
+                {
+                    slice.Add(stateBuffer[i % stateBuffer.Length]);
+                }
+
+                int exactTimeIndex = slice.FindIndex(item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
+                if (exactTimeIndex != -1)
+                {
+                    StatePayload clientRootMotionState = slice[exactTimeIndex];
                     
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
-                        Debug.Log("Root motion position error " + rootMotionPositionError);
+                        Debug.Log(latestServerState.Value.tick + " Root motion position error " + rootMotionPositionError + " " + clientRootMotionState.tick);
                         lastServerReconciliationTime = Time.time;
 
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
@@ -165,11 +178,14 @@ namespace Vi.Player
                         return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
                     }
                 }
-                else if (System.Array.Exists(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime))
+                else
                 {
-                    StatePayload clientRootMotionState = System.Array.Find(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
-
-                    return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
+                    int partialTimeIndex = slice.FindIndex(item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
+                    if (partialTimeIndex != -1)
+                    {
+                        StatePayload clientRootMotionState = slice[partialTimeIndex];
+                        return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
+                    }
                 }
                 return Vector3.zero;
             }
