@@ -22,6 +22,20 @@ namespace Vi.Core.CombatAgents
 
         public void SetTeam(PlayerDataManager.Team team) { this.team.Value = team; }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            foreach (ActionClip actionClip in weaponOption.weapon.GetAllActionClips())
+            {
+                if (!actionClip) { continue; }
+                if (actionClip.summonableCount > 0)
+                {
+                    useSpirit = true;
+                    break;
+                }
+            }
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -78,6 +92,9 @@ namespace Vi.Core.CombatAgents
 
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
+
+        private bool useSpirit;
+        protected override bool ShouldUseSpirit() { return useSpirit; }
 
         // Uncomment to make mobs respawn automatically
         //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)

@@ -48,14 +48,19 @@ namespace Vi.Player
             public Quaternion rotation;
             public bool shouldUseRootMotion;
             public Vector3 rootMotion;
+            public float runSpeed;
+            public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
                 this.rotation = rotation;
                 this.shouldUseRootMotion = shouldUseRootMotion;
                 this.rootMotion = rootMotion;
+                this.runSpeed = runSpeed;
+                // This is assigned after the input is processed
+                this.stairMovement = 0;
             }
 
             public bool Equals(InputPayload other)
@@ -66,9 +71,9 @@ namespace Vi.Player
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref tick);
-                serializer.SerializeValue(ref shouldUseRootMotion);
-                if (!shouldUseRootMotion) { serializer.SerializeValue(ref moveInput); }
+                serializer.SerializeValue(ref moveInput);
                 serializer.SerializeValue(ref rotation);
+                serializer.SerializeValue(ref stairMovement);
             }
         }
 
@@ -117,7 +122,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.01f;
+        private const float serverReconciliationThreshold = 0.3f;
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private Vector3 HandleServerReconciliation()
         {
@@ -155,6 +160,16 @@ namespace Vi.Player
                         if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                         ReprocessInputs(latestServerState.Value.tick);
                     }
+                    else
+                    {
+                        return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
+                    }
+                }
+                else if (System.Array.Exists(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime))
+                {
+                    StatePayload clientRootMotionState = System.Array.Find(slice, item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
+
+                    return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
                 }
                 return Vector3.zero;
             }
@@ -177,12 +192,13 @@ namespace Vi.Player
                 Rigidbody.position = latestServerState.Value.position;
                 if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 ReprocessInputs(latestServerState.Value.tick);
+
+                return Vector3.zero;
             }
             else
             {
-                //return latestServerState.Value.velocity - stateBuffer[serverStateBufferIndex].velocity;
+                return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
             }
-            return Vector3.zero;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -196,7 +212,8 @@ namespace Vi.Player
                 int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                 // Process new movement with reconciled state
-                StatePayload statePayload = Move(inputBuffer[bufferIndex]);
+                InputPayload inputPayload = inputBuffer[bufferIndex];
+                StatePayload statePayload = Move(ref inputPayload, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
                 // Update buffer with recalculated state
@@ -212,9 +229,31 @@ namespace Vi.Player
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
+                // Have to double check these to prevent cheating
+                if (combatAgent.StatusAgent.IsRooted())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (combatAgent.AnimationHandler.IsReloading())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (!CanMove())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+                else if (!combatAgent.AnimationHandler.IsAtRest())
+                {
+                    inputPayload.moveInput = Vector2.zero;
+                }
+
                 if (serverInputQueue.Count > 0)
                 {
-                    if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero)
+                    if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero)
                     {
                         if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
                     }
@@ -223,15 +262,15 @@ namespace Vi.Player
                 inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
 
-                StatePayload statePayload = Move(inputPayload);
+                StatePayload statePayload = Move(ref inputPayload, false);
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                 latestServerState.Value = statePayload;
-                lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                lastInputPayloadProcessedOnServer = inputPayload;
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
             }
         }
 
-        private Vector2 lastMoveInputProcessedOnServer;
+        private InputPayload lastInputPayloadProcessedOnServer;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -241,7 +280,7 @@ namespace Vi.Player
                 if (latestServerState.Value.tick > 0)
                 {
                     // Sync position here with latest server state
-                    Rigidbody.MovePosition(latestServerState.Value.position);
+                    Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
                 }
             }
 
@@ -255,46 +294,79 @@ namespace Vi.Player
                         newRotation = inputPayload.rotation;
                     }
 
-                    StatePayload statePayload = Move(new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
-                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion()));
+                    InputPayload serverInputPayload = new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
+                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(), GetRunSpeed());
+
+                    StatePayload statePayload = Move(ref serverInputPayload, false);
+
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
-                    lastMoveInputProcessedOnServer = Vector2.zero;
+                    lastInputPayloadProcessedOnServer = serverInputPayload;
                 }
-                else
+                else if (serverInputQueue.Count > 0)
                 {
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                     {
+                        // Have to double check these to prevent cheating
+                        if (combatAgent.StatusAgent.IsRooted())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (combatAgent.AnimationHandler.IsReloading())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (!CanMove())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+                        else if (!combatAgent.AnimationHandler.IsAtRest())
+                        {
+                            inputPayload.moveInput = Vector2.zero;
+                        }
+
                         if (serverInputQueue.Count > 3)
                         {
-                            if (inputPayload.moveInput == Vector2.zero & lastMoveInputProcessedOnServer == Vector2.zero) { continue; }
+                            if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero) { continue; }
                         }
 
                         inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                         inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
+                        inputPayload.runSpeed = GetRunSpeed();
 
-                        StatePayload statePayload = Move(inputPayload);
+                        StatePayload statePayload = Move(ref inputPayload, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                         latestServerState.Value = statePayload;
-                        lastMoveInputProcessedOnServer = inputPayload.moveInput;
+                        lastInputPayloadProcessedOnServer = inputPayload;
                         break;
                     }
+                }
+                else // Server input queue is 0 meaning we're waiting on the client to send inputs
+                {
+                    // TODO Not sure how to handle this case
                 }
             }
 
             if (IsOwner)
             {
                 Vector3 serverReconciliationVelocityError = Vector3.zero;
-                if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
+                if (!IsServer)
                 {
-                    if (!latestServerState.Equals(default(StatePayload)) &&
-                        (lastProcessedState.Equals(default(StatePayload)) ||
-                        !latestServerState.Equals(lastProcessedState)))
+                    if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
-                        serverReconciliationVelocityError = HandleServerReconciliation();
+                        if (!latestServerState.Equals(default(StatePayload)) &&
+                            (lastProcessedState.Equals(default(StatePayload)) ||
+                            !latestServerState.Equals(lastProcessedState)))
+                        {
+                            serverReconciliationVelocityError = HandleServerReconciliation();
+                        }
                     }
                 }
-
+                
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (latestServerState.Value.usedRootMotion)
@@ -305,7 +377,7 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (latestServerState.Value.usedRootMotion)
+                else if (combatAgent.AnimationHandler.IsReloading())
                 {
                     moveInput = Vector2.zero;
                 }
@@ -317,11 +389,15 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
+                else if (combatAgent.StatusAgent.IsRooted())
+                {
+                    moveInput = Vector2.zero;
+                }
                 else if (shouldApplyRootMotion)
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (combatAgent.StatusAgent.IsRooted())
+                else if (!combatAgent.AnimationHandler.IsAtRest())
                 {
                     moveInput = Vector2.zero;
                 }
@@ -331,10 +407,11 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
-                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion());
+                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(), GetRunSpeed());
+
                 movementTick++;
 
-                StatePayload statePayload = Move(inputPayload);
+                StatePayload statePayload = Move(ref inputPayload, false);
 
                 if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
                     inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
@@ -364,7 +441,7 @@ namespace Vi.Player
 
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
-        private StatePayload Move(InputPayload inputPayload)
+        private StatePayload Move(ref InputPayload inputPayload, bool isReprocessing)
         {
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -435,34 +512,43 @@ namespace Vi.Player
             {
                 Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
-                targetDirection *= GetRunSpeed();
-                movement = combatAgent.StatusAgent.IsRooted() | combatAgent.AnimationHandler.IsReloading() ? Vector3.zero : targetDirection;
+                targetDirection *= inputPayload.runSpeed;
+                movement = targetDirection;
             }
 
             Rigidbody.isKinematic = false;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
+            // Stair Movement
             float stairMovement = 0;
-            Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
-            startPos.y += stairStepHeight;
-            while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+            if (IsOwner & !isReprocessing)
             {
-                if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
-                {
-                    break;
-                }
-#if UNITY_EDITOR
-                if (drawCasts) Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
-#endif
+                Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
                 startPos.y += stairStepHeight;
-                stairMovement += stairStepHeight;
-
-                if (stairMovement > maxStairStepHeight)
+                while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
-                    stairMovement = 0;
-                    break;
+                    if (Vector3.Angle(movement.normalized, stairHit.normal) < 140)
+                    {
+                        break;
+                    }
+#if UNITY_EDITOR
+                    if (drawCasts) Debug.DrawRay(startPos, movement.normalized, Color.cyan, GetTickRateDeltaTime());
+#endif
+                    startPos.y += stairStepHeight;
+                    stairMovement += stairStepHeight;
+
+                    if (stairMovement > maxStairStepHeight)
+                    {
+                        stairMovement = 0;
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                stairMovement = inputPayload.stairMovement;
+                if (stairMovement > maxStairStepHeight) { stairMovement = 0; }
             }
 
             if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
@@ -514,7 +600,9 @@ namespace Vi.Player
                     Rigidbody.AddForce(counterForce, ForceMode.VelocityChange);
                 }
             }
+            Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
+            inputPayload.stairMovement = stairMovement;
             return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionTime);
         }
 
@@ -552,9 +640,8 @@ namespace Vi.Player
             return rot;
         }
 
-        private const float serverReconciliationLerpDuration = 1;
-        private const float serverReconciliationTeleportThreshold = 0.5f;
-        private const float serverReconciliationLerpSpeed = 1;
+        private const float serverReconciliationLerpDuration = 0.25f;
+        //private const float serverReconciliationTeleportThreshold = 0.5f;
 
         private void UpdateTransform()
         {
@@ -563,21 +650,7 @@ namespace Vi.Player
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
-                float dist = Vector3.Distance(transform.position, Rigidbody.transform.position);
-                if (dist > serverReconciliationTeleportThreshold)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else if (dist < 0.01f)
-                {
-                    transform.position = Rigidbody.transform.position;
-                    lastServerReconciliationTime = Mathf.NegativeInfinity;
-                }
-                else
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, Rigidbody.transform.position, Time.deltaTime * serverReconciliationLerpSpeed);
-                }
+                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration);
             }
             else
             {
@@ -643,7 +716,7 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero),
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0),
                     Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.RootMotionTime);
             }
         }
@@ -700,7 +773,7 @@ namespace Vi.Player
 
         private StatePayload[] stateBuffer;
         private NetworkList<InputPayload> inputBuffer;
-        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>();
+        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
 

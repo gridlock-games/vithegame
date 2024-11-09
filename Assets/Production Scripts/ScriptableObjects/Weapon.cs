@@ -862,6 +862,93 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public AnimationClip GetAnimationClip(string animationStateNameWithoutLayer)
+        {
+            if (animationClipLookup.ContainsKey(animationStateNameWithoutLayer))
+            {
+                return animationClipLookup[animationStateNameWithoutLayer];
+            }
+            else
+            {
+                Debug.LogError("Couldn't find an animation clip with state name: " + animationStateNameWithoutLayer);
+                return null;
+            }
+        }
+
+        public IEnumerable<ActionClip> GetAllActionClips()
+        {
+            return GetActionClipLookup().Values;
+        }
+
+        [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
+        [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
+        [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
+        [SerializeField] private List<Vector3AnimationCurve> animationRootMotion = new List<Vector3AnimationCurve>();
+
+        [System.Serializable]
+        private class Vector3AnimationCurve
+        {
+            public AnimationCurve curveX;
+            public AnimationCurve curveY;
+            public AnimationCurve curveZ;
+
+            public Vector3AnimationCurve(AnimationCurve curveX, AnimationCurve curveY, AnimationCurve curveZ)
+            {
+                this.curveX = curveX;
+                this.curveY = curveY;
+                this.curveZ = curveZ;
+            }
+
+            public Vector3 EvaluateNormalized(float t)
+            {
+                return new Vector3(curveX.EvaluateNormalizedTime(t), curveY.EvaluateNormalizedTime(t), curveZ.EvaluateNormalizedTime(t));
+            }
+
+            public float GetMaxCurveTime()
+            {
+                return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
+            }
+        }
+
+        public Vector3 GetRootMotion(string stateName, float normalizedTime)
+        {
+            if (string.IsNullOrWhiteSpace(stateName)) { return Vector3.zero; }
+
+            if (rootMotionLookup.ContainsKey(stateName))
+            {
+                return rootMotionLookup[stateName].EvaluateNormalized(normalizedTime);
+            }
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    Debug.LogError("Action Clip Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
+                }
+                return Vector3.zero;
+            }
+        }
+
+        public float GetMaxRootMotionTime(string stateName)
+        {
+            if (string.IsNullOrWhiteSpace(stateName)) { return 0; }
+
+            if (rootMotionLookup.ContainsKey(stateName))
+            {
+                return rootMotionLookup[stateName].GetMaxCurveTime();
+            }
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    Debug.LogError("Root Motion State Not Found: " + stateName + " weapon name: " + name);
+                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
+                }
+                return default;
+            }
+        }
+
+#if UNITY_EDITOR
         public ActionClip GetActionClipByNameUsingReflection(string clipName)
         {
             IEnumerable<FieldInfo> propertyList = typeof(Weapon).GetRuntimeFields();
@@ -978,88 +1065,6 @@ namespace Vi.ScriptableObjects
             return null;
         }
 
-        public AnimationClip GetAnimationClip(string animationStateNameWithoutLayer)
-        {
-            if (animationClipLookup.ContainsKey(animationStateNameWithoutLayer))
-            {
-                return animationClipLookup[animationStateNameWithoutLayer];
-            }
-            else
-            {
-                Debug.LogError("Couldn't find an animation clip with state name: " + animationStateNameWithoutLayer);
-                return null;
-            }
-        }
-
-        [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
-        [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
-        [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
-        [SerializeField] private List<Vector3AnimationCurve> animationRootMotion = new List<Vector3AnimationCurve>();
-
-        [System.Serializable]
-        private class Vector3AnimationCurve
-        {
-            public AnimationCurve curveX;
-            public AnimationCurve curveY;
-            public AnimationCurve curveZ;
-
-            public Vector3AnimationCurve(AnimationCurve curveX, AnimationCurve curveY, AnimationCurve curveZ)
-            {
-                this.curveX = curveX;
-                this.curveY = curveY;
-                this.curveZ = curveZ;
-            }
-
-            public Vector3 EvaluateNormalized(float t)
-            {
-                return new Vector3(curveX.EvaluateNormalizedTime(t), curveY.EvaluateNormalizedTime(t), curveZ.EvaluateNormalizedTime(t));
-            }
-
-            public float GetMaxCurveTime()
-            {
-                return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
-            }
-        }
-
-        public Vector3 GetRootMotion(string stateName, float normalizedTime)
-        {
-            if (string.IsNullOrWhiteSpace(stateName)) { return Vector3.zero; }
-
-            if (rootMotionLookup.ContainsKey(stateName))
-            {
-                return rootMotionLookup[stateName].EvaluateNormalized(normalizedTime);
-            }
-            else
-            {
-                if (Application.isPlaying)
-                {
-                    Debug.LogError("Action Clip Not Found: " + stateName + " weapon name: " + name);
-                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
-                }
-                return Vector3.zero;
-            }
-        }
-
-        public float GetMaxRootMotionTime(string stateName)
-        {
-            if (string.IsNullOrWhiteSpace(stateName)) { return 0; }
-
-            if (rootMotionLookup.ContainsKey(stateName))
-            {
-                return rootMotionLookup[stateName].GetMaxCurveTime();
-            }
-            else
-            {
-                if (Application.isPlaying)
-                {
-                    Debug.LogError("Root Motion State Not Found: " + stateName + " weapon name: " + name);
-                    Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
-                }
-                return default;
-            }
-        }
-
-#if UNITY_EDITOR
         [ContextMenu("Find Animations")]
         public void FindAnimations()
         {

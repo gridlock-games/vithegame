@@ -938,16 +938,15 @@ namespace Vi.Core
             {
                 if (lightAttackMode == "PRESS")
                 {
-                    ExecuteLightAttack(isPressed);
-                    //LightAttackHold(isPressed);
+                    if (isPressed) { LightAttackHold(isPressed, true); }
                 }
                 else if (lightAttackMode == "HOLD")
                 {
-                    LightAttackHold(isPressed);
+                    LightAttackHold(isPressed, false);
                 }
                 else
                 {
-                    Debug.LogError("Not sure how to handle player prefs Light Attack Mode - " + zoomMode);
+                    Debug.LogError("Not sure how to handle player prefs Light Attack Mode - " + lightAttackMode);
                 }
             }
             else
@@ -970,10 +969,24 @@ namespace Vi.Core
 
         private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private Coroutine lightAttackHoldCoroutine;
-        private void LightAttackHold(bool isPressed)
+        private void LightAttackHold(bool isPressed, bool resetAfterSent)
         {
             if (!IsOwner) { Debug.LogError("LightAttackHold() should only be called on the owner!"); return; }
             lightAttackIsPressed.Value = isPressed;
+
+            if (resetAfterSent)
+            {
+                if (!resetLightAttackIsRunning) { StartCoroutine(ResetLightAttackIsPressedAfterNotDirty()); }
+            }
+        }
+
+        private bool resetLightAttackIsRunning;
+        private IEnumerator ResetLightAttackIsPressedAfterNotDirty()
+        {
+            resetLightAttackIsRunning = true;
+            yield return new WaitUntil(() => !lightAttackIsPressed.IsDirty());
+            lightAttackIsPressed.Value = false;
+            resetLightAttackIsRunning = false;
         }
 
         private void OnLightAttackHoldChange(bool prev, bool current)

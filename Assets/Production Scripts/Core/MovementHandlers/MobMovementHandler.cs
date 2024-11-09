@@ -110,7 +110,7 @@ namespace Vi.Core.MovementHandlers
             }
             else
             {
-                Rigidbody.MovePosition(transform.position);
+                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
             }
         }
 

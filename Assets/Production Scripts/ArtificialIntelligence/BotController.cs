@@ -284,7 +284,7 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Rigidbody.MovePosition(transform.position);
+                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
             }
         }
 

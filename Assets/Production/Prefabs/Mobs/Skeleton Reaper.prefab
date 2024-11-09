@@ -3370,6 +3370,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2704874112877024975}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2605034511390130832 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 121409975320155231, guid: 368e8c08dda2eb249b91026d905804fa,
+    type: 3}
+  m_PrefabInstance: {fileID: 2704874112877024975}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2898162921087050612 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 986837519632266683, guid: 368e8c08dda2eb249b91026d905804fa,
@@ -3526,7 +3532,7 @@ MonoBehaviour:
   rotationOffsetConstraint: {fileID: 7327270099570198816}
   rotationOffsetAxis: 0
   middleSpine: {fileID: 0}
-  hips: {fileID: 2571105295258191034}
+  hips: {fileID: 2605034511390130832}
   keys: 1200000011000000
   values:
   - {fileID: 1320053257080332446}
@@ -5198,6 +5204,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: useSpirit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: raceAndGender
       value: 6
       objectReference: {fileID: 0}
@@ -5216,7 +5227,7 @@ PrefabInstance:
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3434561461
+      value: 1591347179
       objectReference: {fileID: 0}
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
