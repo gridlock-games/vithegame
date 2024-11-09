@@ -1254,7 +1254,6 @@ namespace Vi.Core
             if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
             {
                 stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", ""));
-                transitionTime = ActionClip.chargeAttackStateAnimatorTransitionDuration;
             }
 
             float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
@@ -1300,23 +1299,22 @@ namespace Vi.Core
                     // Account for animation transition
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                     {
-                        float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
-                        maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
+                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
+                        {
+                            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+                            maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
 
-                        float transitionTime = combatAgent.WeaponHandler.CurrentActionClip.transitionTime;
-                        if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
-                        {
-                            transitionTime = ActionClip.chargeAttackStateAnimatorTransitionDuration;
-                        }
-
-                        // Don't move if we're in a transition
-                        if (totalRootMotionTime < transitionTime & heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
-                        {
-                            delta = Vector3.zero;
-                        }
-                        else if (maxRootMotionTime - totalRootMotionTime < transitionTime & heavyAttackAnimationPhase == HeavyAttackAnimationPhase.AttackEnd)
-                        {
-                            delta = Vector3.zero;
+                            float transitionTime = combatAgent.WeaponHandler.CurrentActionClip.transitionTime;
+                            
+                            // Don't move if we're in a transition
+                            if (totalRootMotionTime < transitionTime)
+                            {
+                                delta = Vector3.zero;
+                            }
+                            else if (maxRootMotionTime - totalRootMotionTime < transitionTime & !combatAgent.WeaponHandler.CurrentActionClip.chargeAttackHasEndAnimation)
+                            {
+                                delta = Vector3.zero;
+                            }
                         }
                     }
                     return delta;
