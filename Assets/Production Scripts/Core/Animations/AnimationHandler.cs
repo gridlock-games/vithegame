@@ -1204,7 +1204,7 @@ namespace Vi.Core
         private float rootMotionTime = 0;
         public bool ShouldApplyRootMotion()
         {
-            if (NetworkObject.IsPlayerObject)
+            if (NetworkObject.IsPlayerObject & (IsOwner | IsServer))
             {
                 if (combatAgent.WeaponHandler.CurrentActionClip.ailment == ActionClip.Ailment.Death) { return false; }
                 string stateName = GetActionClipAnimationStateNameWithoutLayer(combatAgent.WeaponHandler.CurrentActionClip);
