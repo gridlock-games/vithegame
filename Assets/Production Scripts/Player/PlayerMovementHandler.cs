@@ -627,34 +627,34 @@ namespace Vi.Player
 
         private Quaternion EvaluateRotation()
         {
-            Quaternion rot = transform.rotation;
+            if (combatAgent.ShouldApplyAilmentRotation()) { return combatAgent.GetAilmentRotation(); }
+
+            if (combatAgent.IsGrabbed)
+            {
+                CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
+                if (grabAssailant)
+                {
+                    Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
+                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
+                    return Quaternion.LookRotation(rel, Vector3.up);
+                }
+            }
+
             if (IsOwner)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
                 camDirection.Scale(HORIZONTAL_PLANE);
 
-                if (combatAgent.ShouldApplyAilmentRotation())
-                    rot = combatAgent.GetAilmentRotation();
-                else if (combatAgent.IsGrabbing)
-                    return rot;
-                else if (combatAgent.IsGrabbed)
-                {
-                    CombatAgent grabAssailant = combatAgent.GetGrabAssailant();
-                    if (grabAssailant)
-                    {
-                        Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                        Quaternion.LookRotation(rel, Vector3.up);
-                    }
-                }
+                if (combatAgent.IsGrabbing)
+                    return transform.rotation;
                 else if (!combatAgent.ShouldPlayHitStop())
-                    rot = Quaternion.LookRotation(camDirection);
+                    return Quaternion.LookRotation(camDirection);
             }
             else
             {
-                rot = Quaternion.Slerp(transform.rotation, latestServerState.Value.rotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
+                return Quaternion.Slerp(transform.rotation, latestServerState.Value.rotation, (weaponHandler.IsAiming() ? GetTickRateDeltaTime() : Time.deltaTime) * CameraController.orbitSpeed);
             }
-            return rot;
+            return transform.rotation;
         }
 
         private const float serverReconciliationLerpDuration = 0.25f;

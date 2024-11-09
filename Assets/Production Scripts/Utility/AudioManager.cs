@@ -233,10 +233,28 @@ namespace Vi.Utility
 #if !UNITY_SERVER
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChange;
 
+            bool shouldReset = false;
             AudioConfiguration audioConfiguration = AudioSettings.GetConfiguration();
-            if (FasterPlayerPrefs.Singleton.HasInt("SpeakerMode")) { audioConfiguration.speakerMode = (AudioSpeakerMode)FasterPlayerPrefs.Singleton.GetInt("SpeakerMode"); }
-            if (FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { audioConfiguration.sampleRate = FasterPlayerPrefs.Singleton.GetInt("SampleRate"); }
-            AudioSettings.Reset(audioConfiguration);
+            if (FasterPlayerPrefs.Singleton.HasInt("SpeakerMode"))
+            {
+                AudioSpeakerMode newSpeakerMode = (AudioSpeakerMode)FasterPlayerPrefs.Singleton.GetInt("SpeakerMode");
+                if (newSpeakerMode != audioConfiguration.speakerMode)
+                {
+                    shouldReset = true;
+                    audioConfiguration.speakerMode = newSpeakerMode;
+                }
+            }
+            if (FasterPlayerPrefs.Singleton.HasInt("SampleRate"))
+            {
+                int newSampleRate = FasterPlayerPrefs.Singleton.GetInt("SampleRate");
+                if (audioConfiguration.sampleRate != newSampleRate)
+                {
+                    shouldReset = true;
+                    audioConfiguration.sampleRate = newSampleRate;
+                }
+
+            }
+            if (shouldReset) { AudioSettings.Reset(audioConfiguration); }
             AudioConfigurationApplied = true;
 #endif
         }
