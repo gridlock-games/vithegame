@@ -904,10 +904,10 @@ namespace Vi.ScriptableObjects
                 return new Vector3(curveX.EvaluateNormalizedTime(t), curveY.EvaluateNormalizedTime(t), curveZ.EvaluateNormalizedTime(t));
             }
 
-            public float GetMaxCurveTime()
+            public float GetMaxCurveTime(string stateNameForDebugging)
             {
-                if (curveX.keys == null | curveY.keys == null | curveZ.keys == null) { Debug.LogWarning("Curve doesn't have keys!"); return 0; }
-                if (curveX.keys.Length == 0 | curveY.keys.Length == 0 | curveZ.keys.Length == 0) { Debug.LogWarning("Curve doesn't have keys!"); return 0; }
+                if (curveX.keys == null | curveY.keys == null | curveZ.keys == null) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
+                if (curveX.keys.Length == 0 | curveY.keys.Length == 0 | curveZ.keys.Length == 0) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
 
                 return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
             }
@@ -938,7 +938,7 @@ namespace Vi.ScriptableObjects
 
             if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[stateName].GetMaxCurveTime();
+                return rootMotionLookup[stateName].GetMaxCurveTime(stateName);
             }
             else
             {

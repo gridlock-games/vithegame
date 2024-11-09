@@ -980,7 +980,7 @@ namespace Vi.Core
                     if (!heavyAttackPressed.Value & heavyAttackWasPressedInThisCoroutine)
                     {
                         HeavyAttackChargeTime = chargeTime;
-                        EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount);
+                        EvaluateChargeAttackClientRpc(chargeTime, animationStateName, actionClip.chargeAttackStateLoopCount, actionClip.chargeAttackHasEndAnimation);
                         if (chargeTime > ActionClip.chargeAttackTime) // Attack
                         {
                             Animator.SetTrigger("ProgressHeavyAttackState");
@@ -1027,7 +1027,7 @@ namespace Vi.Core
         }
 
         [Rpc(SendTo.NotServer)]
-        private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount)
+        private void EvaluateChargeAttackClientRpc(float chargeTime, string actionStateName, float chargeAttackStateLoopCount, bool hasEndAnim)
         {
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
             if (chargeTime > ActionClip.chargeAttackTime) // Attack
@@ -1036,7 +1036,7 @@ namespace Vi.Core
                 Animator.SetBool("CancelHeavyAttack", false);
                 heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
                 ResetRootMotionTime();
-                StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount));
+                StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount, hasEndAnim));
             }
             else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
             {
@@ -1051,7 +1051,7 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount)
+        private IEnumerator PlayChargeAttackOnClient(string actionStateName, float chargeAttackStateLoopCount, bool hasEndAnim)
         {
             yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.IsName(actionStateName + "_Attack"));
 
@@ -1064,8 +1064,11 @@ namespace Vi.Core
                     if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime >= chargeAttackStateLoopCount - ActionClip.chargeAttackStateAnimatorTransitionDuration)
                     {
                         Animator.SetTrigger("ProgressHeavyAttackState");
-                        heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd;
-                        ResetRootMotionTime();
+                        if (hasEndAnim)
+                        {
+                            heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd;
+                            ResetRootMotionTime();
+                        }
                         break;
                     }
                 }
