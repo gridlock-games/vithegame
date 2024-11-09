@@ -124,6 +124,7 @@ namespace Vi.Player
 
         private const float serverReconciliationThreshold = 0.3f;
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
+        private List<StatePayload> rootMotionReconciliationSlice = new List<StatePayload>();
         private Vector3 HandleServerReconciliation()
         {
             lastProcessedState = latestServerState.Value;
@@ -145,21 +146,21 @@ namespace Vi.Player
             {
                 // Check for 25 updates
                 int indexRange = 25;
-                List<StatePayload> slice = new List<StatePayload>();
+                rootMotionReconciliationSlice.Clear();
                 for (int i = serverStateBufferIndex; i < (serverStateBufferIndex - indexRange); i--)
                 {
-                    slice.Add(stateBuffer[i % stateBuffer.Length]);
+                    rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
                 }
 
                 for (int i = serverStateBufferIndex; i < (serverStateBufferIndex + indexRange); i++)
                 {
-                    slice.Add(stateBuffer[i % stateBuffer.Length]);
+                    rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
                 }
 
-                int exactTimeIndex = slice.FindIndex(item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
+                int exactTimeIndex = rootMotionReconciliationSlice.FindIndex(item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
                 if (exactTimeIndex != -1)
                 {
-                    StatePayload clientRootMotionState = slice[exactTimeIndex];
+                    StatePayload clientRootMotionState = rootMotionReconciliationSlice[exactTimeIndex];
                     
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
@@ -180,10 +181,10 @@ namespace Vi.Player
                 }
                 else
                 {
-                    int partialTimeIndex = slice.FindIndex(item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
+                    int partialTimeIndex = rootMotionReconciliationSlice.FindIndex(item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
                     if (partialTimeIndex != -1)
                     {
-                        StatePayload clientRootMotionState = slice[partialTimeIndex];
+                        StatePayload clientRootMotionState = rootMotionReconciliationSlice[partialTimeIndex];
                         return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
                     }
                 }
