@@ -1035,6 +1035,7 @@ namespace Vi.Core
                 Animator.SetTrigger("ProgressHeavyAttackState");
                 Animator.SetBool("CancelHeavyAttack", false);
                 heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
+                ResetRootMotionTime();
                 StartCoroutine(PlayChargeAttackOnClient(actionStateName, chargeAttackStateLoopCount));
             }
             else if (chargeTime > ActionClip.cancelChargeTime) // Play Cancel Anim
