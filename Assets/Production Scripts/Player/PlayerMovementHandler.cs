@@ -773,7 +773,7 @@ namespace Vi.Player
 
         private StatePayload[] stateBuffer;
         private NetworkList<InputPayload> inputBuffer;
-        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+        private NetworkVariable<StatePayload> latestServerState = new NetworkVariable<StatePayload>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private StatePayload lastProcessedState;
         private Queue<InputPayload> serverInputQueue;
 
