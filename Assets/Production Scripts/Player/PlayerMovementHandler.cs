@@ -157,6 +157,7 @@ namespace Vi.Player
                     rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
                 }
 
+                // TODO find closest tick to latest server state if there are multiple entries
                 int exactTimeIndex = rootMotionReconciliationSlice.FindIndex(item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
                 if (exactTimeIndex != -1)
                 {
@@ -471,7 +472,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.RootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
@@ -485,7 +486,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.RootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
             Vector2 moveInput = inputPayload.moveInput;
@@ -497,7 +498,7 @@ namespace Vi.Player
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
-                return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.RootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
             {
@@ -506,7 +507,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
-                    return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.RootMotionTime);
+                    return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
                 }
             }
             else if (combatAgent.ShouldPlayHitStop())
@@ -620,7 +621,7 @@ namespace Vi.Player
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
             inputPayload.stairMovement = stairMovement;
-            return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionTime);
+            return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
 
         private const float bodyRadius = 0.5f;
@@ -734,7 +735,7 @@ namespace Vi.Player
             if (IsServer)
             {
                 latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0),
-                    Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.RootMotionTime);
+                    Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
         }
 
