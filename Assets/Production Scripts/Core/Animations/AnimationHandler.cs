@@ -958,7 +958,7 @@ namespace Vi.Core
                     {
                         Animator.SetBool("EnhanceHeavyAttack", true);
                         heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Enhance;
-                        rootMotionTime = 0;
+                        rootMotionTime = Mathf.Infinity;
                     }
                 }
 
@@ -1232,6 +1232,7 @@ namespace Vi.Core
             return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime));
         }
 
+        private int loopCount;
         public Vector3 ApplyRootMotion()
         {
             if (NetworkObject.IsPlayerObject)
@@ -1259,13 +1260,13 @@ namespace Vi.Core
                                 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
                                 rootMotionTime += Time.fixedDeltaTime * Animator.speed;
                                 newNormalizedTime = GetNormalizedRootMotionTime();
+                                loopCount += 1;
                             }
-                            Debug.Log(newNormalizedTime);
                         }
                     }
 
                     Vector3 delta = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, newNormalizedTime) - prev;
-                    delta = animatorReference.ProcessMotionData(delta, newNormalizedTime, shouldApplyMultiplierCurves);
+                    delta = animatorReference.ProcessMotionData(delta, newNormalizedTime + loopCount, shouldApplyMultiplierCurves);
                     return delta;
                 }
                 else
@@ -1281,6 +1282,7 @@ namespace Vi.Core
 
         private void SetLastActionClip(ActionClip actionClip)
         {
+            loopCount = 0;
             lastClipPlayed = actionClip;
             if (actionClip.ailment != ActionClip.Ailment.Death) { rootMotionTime = 0; }
         }
@@ -1477,6 +1479,7 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            loopCount = 0;
             UseGenericAimPoint = false;
             rootMotionTime = 1;
         }
