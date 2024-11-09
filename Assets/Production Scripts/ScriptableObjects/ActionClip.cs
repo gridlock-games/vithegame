@@ -224,8 +224,26 @@ namespace Vi.ScriptableObjects
         public bool isFollowUpAttack;
         public Ailment ailment = Ailment.None;
         public AnimationClip grabAttackClip;
+        public Weapon.Vector3AnimationCurve grabAttackRootMotionData;
         public AnimationClip grabVictimClip;
+        public Weapon.Vector3AnimationCurve grabVictimRootMotionData;
         public bool[] ailmentHitDefinition = new bool[0];
+
+#if UNITY_EDITOR
+        [ContextMenu("Serialize Grab Root Motion Data")]
+        private void SerializeGrabRootMotionData()
+        {
+            if (grabAttackClip)
+            {
+                grabAttackRootMotionData = Weapon.GetRootMotionCurve(grabAttackClip);
+            }
+            
+            if (grabVictimClip)
+            {
+                grabVictimRootMotionData = Weapon.GetRootMotionCurve(grabVictimClip);
+            }
+        }
+#endif
 
         public const float HitStopEffectDuration = 0.1f;
         public float GetTimeBetweenHits(float animatorSpeed)

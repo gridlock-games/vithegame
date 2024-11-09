@@ -682,11 +682,17 @@ namespace Vi.Core
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = combatAgent.GetGrabReactionClip();
+                    ActionClip grabAttackClip = combatAgent.GetGrabReactionClip();
+                    if (!grabAttackClip.grabVictimClip) { Debug.LogError("No Grab Victim Clip Found!"); }
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = grabAttackClip.grabVictimClip;
+                    combatAgent.WeaponHandler.GetWeapon().OverrideRootMotionCurvesAtRuntime("GrabReaction",
+                        grabAttackClip.grabVictimRootMotionData);
                 }
                 else
                 {
                     combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
+                    combatAgent.WeaponHandler.GetWeapon().OverrideRootMotionCurvesAtRuntime("GrabAttack",
+                        actionClip.grabAttackRootMotionData);
                 }
             }
 
@@ -1120,12 +1126,17 @@ namespace Vi.Core
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
-                    yield return new WaitUntil(() => combatAgent.GetGrabAssailant());
-                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = combatAgent.GetGrabReactionClip();
+                    ActionClip grabAttackClip = combatAgent.GetGrabReactionClip();
+                    if (!grabAttackClip.grabVictimClip) { Debug.LogError("No Grab Victim Clip Found!"); }
+                    combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = grabAttackClip.grabVictimClip;
+                    combatAgent.WeaponHandler.GetWeapon().OverrideRootMotionCurvesAtRuntime("GrabReaction",
+                        grabAttackClip.grabVictimRootMotionData);
                 }
                 else
                 {
                     combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabAttack"] = actionClip.grabAttackClip;
+                    combatAgent.WeaponHandler.GetWeapon().OverrideRootMotionCurvesAtRuntime("GrabAttack",
+                        actionClip.grabAttackRootMotionData);
                 }
             }
 

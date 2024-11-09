@@ -77,7 +77,9 @@ namespace Vi.Editor
         private SerializedProperty spIsFollowUpAttack;
         private SerializedProperty spAilment;
         private SerializedProperty spGrabAttackClip;
+        private SerializedProperty spGrabAttackRootMotionData;
         private SerializedProperty spGrabVictimClip;
+        private SerializedProperty spGrabVictimRootMotionData;
         private SerializedProperty spAilmentHitDefinition;
         private SerializedProperty spDodgeLock;
 
@@ -190,8 +192,12 @@ namespace Vi.Editor
             spCanFlashAttack = serializedObject.FindProperty("canFlashAttack");
             spIsFollowUpAttack = serializedObject.FindProperty("isFollowUpAttack");
             spAilment = serializedObject.FindProperty("ailment");
+
             spGrabAttackClip = serializedObject.FindProperty("grabAttackClip");
+            spGrabAttackRootMotionData = serializedObject.FindProperty("grabAttackRootMotionData");
             spGrabVictimClip = serializedObject.FindProperty("grabVictimClip");
+            spGrabVictimRootMotionData = serializedObject.FindProperty("grabVictimRootMotionData");
+
             spAilmentHitDefinition = serializedObject.FindProperty("ailmentHitDefinition");
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
@@ -434,7 +440,9 @@ namespace Vi.Editor
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabAttackRootMotionData);
                     EditorGUILayout.PropertyField(spGrabVictimClip);
+                    EditorGUILayout.PropertyField(spGrabVictimRootMotionData);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.Space();
@@ -514,7 +522,9 @@ namespace Vi.Editor
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabAttackRootMotionData);
                     EditorGUILayout.PropertyField(spGrabVictimClip);
+                    EditorGUILayout.PropertyField(spGrabVictimRootMotionData);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
@@ -596,7 +606,9 @@ namespace Vi.Editor
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabAttackRootMotionData);
                     EditorGUILayout.PropertyField(spGrabVictimClip);
+                    EditorGUILayout.PropertyField(spGrabVictimRootMotionData);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.Space();
@@ -673,7 +685,9 @@ namespace Vi.Editor
                 if ((ActionClip.Ailment)spAilment.enumValueIndex == ActionClip.Ailment.Grab)
                 {
                     EditorGUILayout.PropertyField(spGrabAttackClip);
+                    EditorGUILayout.PropertyField(spGrabAttackRootMotionData);
                     EditorGUILayout.PropertyField(spGrabVictimClip);
+                    EditorGUILayout.PropertyField(spGrabVictimRootMotionData);
                 }
                 EditorGUILayout.PropertyField(spDodgeLock);
                 EditorGUILayout.PropertyField(spCanCancelLightAttacks);
