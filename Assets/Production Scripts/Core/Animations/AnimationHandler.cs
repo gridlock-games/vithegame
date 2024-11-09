@@ -1126,8 +1126,10 @@ namespace Vi.Core
             {
                 if (actionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
+                    yield return new WaitUntil(() => combatAgent.GetGrabAssailant());
                     ActionClip grabAttackClip = combatAgent.GetGrabReactionClip();
-                    if (!grabAttackClip.grabVictimClip) { Debug.LogError("No Grab Victim Clip Found!"); }
+                    if (!grabAttackClip) { Debug.LogError("No grab attack clip found!"); }
+                    if (!grabAttackClip.grabVictimClip) { Debug.LogError("No Grab Victim Animation Found!"); }
                     combatAgent.WeaponHandler.AnimatorOverrideControllerInstance["GrabReaction"] = grabAttackClip.grabVictimClip;
                     combatAgent.WeaponHandler.GetWeapon().OverrideRootMotionCurvesAtRuntime("GrabReaction",
                         grabAttackClip.grabVictimRootMotionData);
