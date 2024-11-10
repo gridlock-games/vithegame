@@ -886,7 +886,7 @@ namespace Vi.ScriptableObjects
         [SerializeField] private List<Vector3AnimationCurve> animationRootMotion = new List<Vector3AnimationCurve>();
 
         [System.Serializable]
-        private class Vector3AnimationCurve
+        public class Vector3AnimationCurve
         {
             public AnimationCurve curveX;
             public AnimationCurve curveY;
@@ -904,8 +904,11 @@ namespace Vi.ScriptableObjects
                 return new Vector3(curveX.EvaluateNormalizedTime(t), curveY.EvaluateNormalizedTime(t), curveZ.EvaluateNormalizedTime(t));
             }
 
-            public float GetMaxCurveTime()
+            public float GetMaxCurveTime(string stateNameForDebugging)
             {
+                if (curveX.keys == null | curveY.keys == null | curveZ.keys == null) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
+                if (curveX.keys.Length == 0 | curveY.keys.Length == 0 | curveZ.keys.Length == 0) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
+
                 return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
             }
         }
@@ -935,7 +938,7 @@ namespace Vi.ScriptableObjects
 
             if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[stateName].GetMaxCurveTime();
+                return rootMotionLookup[stateName].GetMaxCurveTime(stateName);
             }
             else
             {
@@ -945,6 +948,19 @@ namespace Vi.ScriptableObjects
                     Debug.LogError("Root Motion Lookup Dictionary Count: " + rootMotionLookup.Count);
                 }
                 return default;
+            }
+        }
+
+        public void OverrideRootMotionCurvesAtRuntime(string stateName, Vector3AnimationCurve vector3AnimationCurve)
+        {
+            if (!Application.isPlaying) { Debug.LogError("You shouldn't be setting root motion curves at edit time"); return; }
+            if (rootMotionLookup.ContainsKey(stateName))
+            {
+                rootMotionLookup[stateName] = vector3AnimationCurve;
+            }
+            else
+            {
+                Debug.LogError("Can't find state name to override " + stateName + " " + this);
             }
         }
 
@@ -1084,7 +1100,7 @@ namespace Vi.ScriptableObjects
                     AnimatorController animatorController = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
                     foreach (AnimatorControllerLayer layer in animatorController.layers)
                     {
-                        if (layer.name != "Actions" & layer.name != "Flinch") { continue; }
+                        if (layer.name != "Actions") { continue; }
                         foreach (ChildAnimatorState state in layer.stateMachine.states)
                         {
                             if (state.state.motion is AnimationClip animationClip)
@@ -1098,8 +1114,6 @@ namespace Vi.ScriptableObjects
                                         overrideFound = true;
                                         animationClipLookupKeys.Add(state.state.name);
                                         animationClipLookupValues.Add(ovride.Value);
-
-                                        // Need to account for importer rotation
                                         animationRootMotion.Add(GetRootMotionCurve(ovride.Value));
                                         break;
                                     }
@@ -1120,7 +1134,7 @@ namespace Vi.ScriptableObjects
             EditorUtility.SetDirty(this);
         }
 
-        private Vector3AnimationCurve GetRootMotionCurve(AnimationClip clip)
+        public static Vector3AnimationCurve GetRootMotionCurve(AnimationClip clip)
         {
             ModelImporter modelImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(clip)) as ModelImporter;
             if (modelImporter == null) { return default; }

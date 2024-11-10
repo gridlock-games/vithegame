@@ -352,15 +352,12 @@ namespace Vi.Core
             return networkObject.GetComponent<CombatAgent>();
         }
 
-        public AnimationClip GetGrabReactionClip()
+        public ActionClip GetGrabReactionClip()
         {
             CombatAgent grabAssailant = GetGrabAssailant();
             if (!grabAssailant) { Debug.LogError("No Grab Assailant Found!"); return null; }
-
             ActionClip grabAttackClip = grabAssailant.WeaponHandler.GetWeapon().GetActionClipByName(grabAttackClipName.Value.ToString());
-
-            if (!grabAttackClip.grabVictimClip) { Debug.LogError("Couldn't find grab reaction clip!"); }
-            return grabAttackClip.grabVictimClip;
+            return grabAttackClip;
         }
 
         public void CancelGrab()
