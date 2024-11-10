@@ -20,14 +20,12 @@ namespace Vi.Core
         public Dictionary<Weapon.WeaponBone, RuntimeWeapon> WeaponInstances { get { return weaponInstances; } }
         private Dictionary<Weapon.WeaponBone, RuntimeWeapon> weaponInstances = new Dictionary<Weapon.WeaponBone, RuntimeWeapon>();
 
-        public List<ShooterWeapon> ShooterWeapons { get { return shooterWeapons; } }
         private List<ShooterWeapon> shooterWeapons = new List<ShooterWeapon>();
 
         private List<PooledObject> equippedPersistentNonWeapons = new List<PooledObject>();
         private List<PooledObject> stowedPersistentNonWeapons = new List<PooledObject>();
 
         public Weapon GetWeapon() { return weaponInstance; }
-
 
         private Weapon weaponInstance;
         private CombatAgent combatAgent;
@@ -1066,6 +1064,14 @@ namespace Vi.Core
             {
                 aiming.Value = false;
             }
+
+            if (IsLocalPlayer)
+            {
+                if (deathVibrationsEnabled)
+                {
+                    Handheld.Vibrate();
+                }
+            }
         }
 
         public void ClearPreviewActionVFXInstances()
@@ -1339,12 +1345,14 @@ namespace Vi.Core
         private string blockingMode = "HOLD";
         private string lightAttackMode = Application.isMobilePlatform ? "HOLD" : "PRESS";
         private bool disableBots;
+        private bool deathVibrationsEnabled;
         private void RefreshStatus()
         {
             zoomMode = FasterPlayerPrefs.Singleton.GetString("ZoomMode");
             blockingMode = FasterPlayerPrefs.Singleton.GetString("BlockingMode");
             lightAttackMode = FasterPlayerPrefs.Singleton.GetString("LightAttackMode");
             disableBots = FasterPlayerPrefs.Singleton.GetBool("DisableBots");
+            deathVibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("DeathVibrationEnabled");
         }
 
         private void Update()
