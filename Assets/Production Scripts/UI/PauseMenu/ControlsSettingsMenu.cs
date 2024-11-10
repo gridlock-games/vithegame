@@ -98,7 +98,6 @@ namespace Vi.UI
         }
 
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
-        private Vector2 originalSizeDelta;
         private void RegenerateInputBindingMenu()
         {
             foreach (GameObject g in rebindingElementObjects)
