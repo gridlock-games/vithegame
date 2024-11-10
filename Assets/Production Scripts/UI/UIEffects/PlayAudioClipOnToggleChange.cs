@@ -49,7 +49,10 @@ namespace Vi.UI
         {
             AudioManager.Singleton.Play2DClip(null, audioClip, volume);
 #if UNITY_ANDROID || UNITY_IOS
-            HapticFeedback.LightFeedback();
+            if (UIVibrationsEnabled)
+            {
+                HapticFeedback.LightFeedback();
+            }
 #endif
         }
     }
