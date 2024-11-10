@@ -57,6 +57,10 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("UIVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("UIVibrationsEnabled", true); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("DeathVibrationEnabled")) { FasterPlayerPrefs.Singleton.SetBool("DeathVibrationEnabled", true); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("GameplayVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("GameplayVibrationsEnabled", true); }
+
             if (!FasterPlayerPrefs.Singleton.HasInt("SpeakerMode")) { FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode); }
             if (!FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { FasterPlayerPrefs.Singleton.SetInt("SampleRate", AudioSettings.GetConfiguration().sampleRate); }
 
