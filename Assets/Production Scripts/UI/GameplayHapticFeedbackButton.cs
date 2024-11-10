@@ -1,13 +1,13 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Vi.Utility;
 
 namespace Vi.UI
 {
     [RequireComponent(typeof(Button))]
-    public class GameplayHapticFeedbackButton : MonoBehaviour
+    public class GameplayHapticFeedbackButton : MonoBehaviour, IPointerDownHandler
     {
-# if UNITY_ANDROID || UNITY_IOS
         private Button button;
         private void Awake()
         {
@@ -17,12 +17,6 @@ namespace Vi.UI
         private void OnEnable()
         {
             RefreshStatus();
-            button.onClick.AddListener(PlayHapticFeedback);
-        }
-
-        private void OnDisable()
-        {
-            button.onClick.RemoveListener(PlayHapticFeedback);
         }
 
         private void Update()
@@ -40,9 +34,16 @@ namespace Vi.UI
         {
             if (vibrationsEnabled)
             {
+# if UNITY_ANDROID || UNITY_IOS
                 CandyCoded.HapticFeedback.HapticFeedback.LightFeedback();
+#endif
             }
         }
-#endif
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (!button.interactable) return;
+            PlayHapticFeedback();
+        }
     }
 }
