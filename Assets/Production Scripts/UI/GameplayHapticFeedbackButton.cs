@@ -33,7 +33,7 @@ namespace Vi.UI
         private bool vibrationsEnabled;
         private void RefreshStatus()
         {
-            vibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
+            vibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("GameplayVibrationsEnabled");
         }
 
         private void PlayHapticFeedback()
