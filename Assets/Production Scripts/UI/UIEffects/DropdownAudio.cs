@@ -23,14 +23,26 @@ namespace Vi.UI
             dropdown = GetComponent<TMP_Dropdown>();
         }
 
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+        }
+
         private void OnEnable()
         {
+            RefreshStatus();
             dropdown.onValueChanged.AddListener(Play2DAudio);
         }
 
         private void OnDisable()
         {
             dropdown.onValueChanged.RemoveListener(Play2DAudio);
+        }
+
+        private bool UIVibrationsEnabled;
+        private void RefreshStatus()
+        {
+            UIVibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
         }
 
         public void Play2DAudio(int value)

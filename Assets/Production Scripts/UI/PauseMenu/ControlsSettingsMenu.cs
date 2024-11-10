@@ -24,6 +24,9 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown orbitalCameraModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
+        [SerializeField] private Toggle UIVibrationsToggle;
+        [SerializeField] private Toggle deathVibrationToggle;
+        [SerializeField] private Toggle gameplayVibrationsToggle;
         [Header("Key Rebinding")]
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private RectTransform rebindingElementParent;
@@ -76,10 +79,24 @@ namespace Vi.UI
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
             if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(); }
 
-            originalSizeDelta = rebindingElementParent.sizeDelta;
+            UIVibrationsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
+            deathVibrationToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("DeathVibrationEnabled");
+            gameplayVibrationsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("GameplayVibrationsEnabled");
+
+            UIVibrationsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(UIVibrationsToggle, "UIVibrationsEnabled"); });
+            deathVibrationToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(deathVibrationToggle, "DeathVibrationEnabled"); });
+            gameplayVibrationsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(gameplayVibrationsToggle, "GameplayVibrationsEnabled"); });
+
+            UIVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
+            deathVibrationToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme != "Keyboard & Mouse");
+            gameplayVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
         }
 
-        private const float elementSpacing = 100;
+        private void SetPlayerPrefFromToggle(Toggle toggle, string playerPrefName)
+        {
+            FasterPlayerPrefs.Singleton.SetBool(playerPrefName, toggle.isOn);
+        }
+
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
         private Vector2 originalSizeDelta;
         private void RegenerateInputBindingMenu()
@@ -88,7 +105,6 @@ namespace Vi.UI
             {
                 Destroy(g);
             }
-            rebindingElementParent.sizeDelta = originalSizeDelta;
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
@@ -99,8 +115,6 @@ namespace Vi.UI
                 {
                     rebindingElementObjects.Add(Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent));
                     rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString().ToUpper();
-
-                    rebindingElementParent.sizeDelta += new Vector2(0, elementSpacing);
 
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {
@@ -117,7 +131,6 @@ namespace Vi.UI
                                 {
                                     rebindingElementObjects.Add(Instantiate(rebindingElementPrefab.gameObject, rebindingElementParent));
                                     RebindingElement rebindingElement = rebindingElementObjects[^1].GetComponent<RebindingElement>();
-                                    rebindingElementParent.sizeDelta += new Vector2(0, elementSpacing);
                                     rebindingElement.Initialize(playerInput, rebindableAction, controlScheme, bindingIndex);
                                     bindingFound = true;
                                     shouldBreak = !binding.isPartOfComposite;
@@ -175,6 +188,10 @@ namespace Vi.UI
 
             if (playerInput.currentControlScheme != lastControlScheme)
             {
+                UIVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
+                deathVibrationToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme != "Keyboard & Mouse");
+                gameplayVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
+
                 RegenerateInputBindingMenu();
             }
 

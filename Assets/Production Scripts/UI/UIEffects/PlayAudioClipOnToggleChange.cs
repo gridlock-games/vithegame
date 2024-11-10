@@ -23,14 +23,26 @@ namespace Vi.UI
             toggle = GetComponent<Toggle>();
         }
 
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+        }
+
         private void OnEnable()
         {
+            RefreshStatus();
             toggle.onValueChanged.AddListener(Play2DAudio);
         }
 
         private void OnDisable()
         {
             toggle.onValueChanged.RemoveListener(Play2DAudio);
+        }
+        
+        private bool UIVibrationsEnabled;
+        private void RefreshStatus()
+        {
+            UIVibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
         }
 
         public void Play2DAudio(bool isOn)

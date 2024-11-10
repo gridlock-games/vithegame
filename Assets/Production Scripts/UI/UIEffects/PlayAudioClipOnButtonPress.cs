@@ -23,14 +23,26 @@ namespace Vi.UI
             button = GetComponent<Button>();
         }
 
+        private void Update()
+        {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
+        }
+
         private void OnEnable()
         {
+            RefreshStatus();
             button.onClick.AddListener(Play2DAudio);
         }
 
         private void OnDisable()
         {
             button.onClick.RemoveListener(Play2DAudio);
+        }
+        
+        private bool UIVibrationsEnabled;
+        private void RefreshStatus()
+        {
+            UIVibrationsEnabled = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
         }
 
         public void Play2DAudio()
