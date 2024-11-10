@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Vi.Utility;
+using CandyCoded.HapticFeedback;
 
 namespace Vi.UI
 {
@@ -14,14 +15,26 @@ namespace Vi.UI
 
         private const float volume = 2;
 
-        private void Start()
+        private TMP_Dropdown dropdown;
+        private void Awake()
         {
-            GetComponent<TMP_Dropdown>().onValueChanged.AddListener(Play2DAudio);
+            dropdown = GetComponent<TMP_Dropdown>();
+        }
+
+        private void OnEnable()
+        {
+            dropdown.onValueChanged.AddListener(Play2DAudio);
+        }
+
+        private void OnDisable()
+        {
+            dropdown.onValueChanged.RemoveListener(Play2DAudio);
         }
 
         public void Play2DAudio(int value)
         {
             AudioManager.Singleton.Play2DClip(null, audioClip, volume);
+            HapticFeedback.HeavyFeedback();
         }
     }
 }
