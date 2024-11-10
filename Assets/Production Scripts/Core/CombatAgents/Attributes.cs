@@ -51,19 +51,6 @@ namespace Vi.Core.CombatAgents
 
             comboCounter.OnValueChanged += OnComboCounterChange;
 
-            if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
-            {
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                {
-                    foreach (Collider col in NetworkCollider.Colliders)
-                    {
-                        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
-                        {
-                            Physics.IgnoreCollision(col, otherCol, true);
-                        }
-                    }
-                }
-            }
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
         }
 
