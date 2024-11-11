@@ -210,7 +210,7 @@ namespace Vi.Core
             {
                 if (spawnPoint.gameModes.Contains(gameMode) & spawnPoint.teams.Contains(team))
                 {
-                    findMostClearSpawnPoint = gameMode == PlayerDataManager.GameMode.FreeForAll;
+                    findMostClearSpawnPoint = gameMode == PlayerDataManager.GameMode.FreeForAll & team != PlayerDataManager.Team.Spectator;
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         if (i < spawnPoint.spawnPriorities.Length)
