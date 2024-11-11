@@ -128,7 +128,6 @@ namespace Vi.ScriptableObjects
 
         public bool shouldApplyRootMotion = true;
         public bool shouldIgnoreGravity;
-        public float truncateRootMotionOffset;
 
         [SerializeField] private AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
@@ -205,7 +204,7 @@ namespace Vi.ScriptableObjects
         public const float enhanceChargeTime = 0.20f;
         public const float chargeAttackTime = 0.001f;
         public const float cancelChargeTime = 0.000f;
-        public const float chargeAttackStateAnimatorTransitionDuration = 0.25f;
+        public const float chargeAttackStateAnimatorTransitionDuration = 0.15f;
 
         public float attackingNormalizedTime = 0.25f;
         public float recoveryNormalizedTime = 0.75f;

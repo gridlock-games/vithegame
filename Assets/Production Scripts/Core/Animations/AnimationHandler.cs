@@ -168,13 +168,6 @@ namespace Vi.Core
         public bool IsAtRest()
         {
             if (!animatorReference) { return true; }
-            if (NetworkObject.IsPlayerObject)
-            {
-                if (!Mathf.Approximately(lastClipPlayed.truncateRootMotionOffset, 0))
-                {
-                    return !ShouldApplyRootMotion();
-                }
-            }
             return animatorReference.IsAtRest();
         }
 
@@ -1244,7 +1237,7 @@ namespace Vi.Core
                 {
                     stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", ""));
                 }
-                float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName, combatAgent.WeaponHandler.CurrentActionClip.truncateRootMotionOffset);
+                float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
                 if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
                 {
                     maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
@@ -1267,7 +1260,7 @@ namespace Vi.Core
                 stateName = GetHeavyAttackStateName(stateName.Replace("_Attack", ""));
             }
 
-            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName, 0);
+            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
             return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - transitionTime);
         }
 
@@ -1312,7 +1305,7 @@ namespace Vi.Core
                     {
                         if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
                         {
-                            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName, combatAgent.WeaponHandler.CurrentActionClip.truncateRootMotionOffset);
+                            float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
                             maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
 
                             float transitionTime = combatAgent.WeaponHandler.CurrentActionClip.transitionTime;

@@ -13,11 +13,34 @@ using Vi.Utility;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
+using UnityEditor.Animations;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Set Actions Layer Transition Times On Animation Controller")]
+        private static void SetActionsLayerTransitionTimes()
+        {
+            AnimatorController animatorController = (AnimatorController)Selection.activeObject;
+            foreach (AnimatorControllerLayer layer in animatorController.layers)
+            {
+                if (layer.name != "Actions" & layer.name != "Flinch") { continue; }
+                foreach (ChildAnimatorState state in layer.stateMachine.states)
+                {
+                    foreach (AnimatorStateTransition transition in state.state.transitions)
+                    {
+                        if (transition.hasExitTime)
+                        {
+                            transition.exitTime = 0.85f;
+                        }
+                        transition.duration = 0.15f;
+                    }
+                }
+            }
+            EditorUtility.SetDirty(animatorController);
+        }
+
         [MenuItem("Tools/Production/W.Remove Missing Scripts From Prefabs")]
         private static void FindAndRemoveMissingInSelected()
         {
