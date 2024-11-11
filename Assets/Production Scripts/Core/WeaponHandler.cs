@@ -393,6 +393,11 @@ namespace Vi.Core
         {
             if (actionClip.GetClipType() == ActionClip.ClipType.Flinch) { return; }
 
+            foreach (RuntimeWeapon runtimeWeapon in weaponInstances.Values)
+            {
+                runtimeWeapon.SetColliderMultiplier(actionClip.bladeSizeMultiplier);
+            }
+
             thisClipSummonablesCount = 0;
             if (IsInAnticipation)
             {

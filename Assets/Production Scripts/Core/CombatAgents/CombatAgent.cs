@@ -220,6 +220,8 @@ namespace Vi.Core
             {
                 StartCoroutine(InitStats());
             }
+
+            NetworkCollider.OnNetworkSpawn();
         }
 
         private IEnumerator WaitForAnimator()

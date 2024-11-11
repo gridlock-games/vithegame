@@ -339,7 +339,10 @@ namespace Vi.ScriptableObjects
         public float minLungeDistance = 2.5f;
         public float maxLungeDistance = 5;
 
-        // Only for shooter characters
+        // Only for melee weapons
+        public Vector3 bladeSizeMultiplier = new Vector3(1, 1, 1);
+
+        // Only for shooter weapons
         public bool aimDuringAnticipation;
         public bool aimDuringAttack;
         public bool aimDuringRecovery;

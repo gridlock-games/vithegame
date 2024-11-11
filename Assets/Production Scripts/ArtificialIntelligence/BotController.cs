@@ -388,13 +388,17 @@ namespace Vi.ArtificialIntelligence
             }
 
             bool evaluateForce = true;
-            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity)
+            if (weaponHandler.CurrentActionClip.shouldIgnoreGravity & combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
             {
-                if (combatAgent.AnimationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip))
+                if (movement.y >= 0)
                 {
                     Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
-                    evaluateForce = false;
                 }
+                else
+                {
+                    Rigidbody.AddForce(movement - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
+                }
+                evaluateForce = false;
             }
 
             if (evaluateForce)
