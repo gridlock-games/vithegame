@@ -19,6 +19,16 @@ namespace Vi.Core
         public CombatAgent CombatAgent { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
+        public Collider[] AllColliders
+        {
+            get
+            {
+                List<Collider> rt = new List<Collider>();
+                rt.AddRange(Colliders);
+                if (staticWallBody) { rt.AddRange(staticWallBody.GetComponentsInChildren<Collider>()); }
+                return rt.ToArray();
+            }
+        }
 
         private void Awake()
         {
@@ -44,8 +54,6 @@ namespace Vi.Core
         private List<Collider> GetNetworkColliders()
         {
             List<Collider> networkPredictionLayerColliders = new List<Collider>();
-            Collider[] staticWallColliders = new Collider[0];
-            if (staticWallBody) { staticWallBody.GetComponentsInChildren<Collider>(); }
             foreach (Collider col in GetComponentsInChildren<Collider>())
             {
                 if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
