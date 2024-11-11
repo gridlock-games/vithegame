@@ -398,7 +398,7 @@ MonoBehaviour:
   shouldFlinch: 1
   flinchAmountMin: {x: -10, y: -10}
   flinchAmountMax: {x: 10, y: 10}
-  shouldPlayHitReaction: 0
+  shouldPlayHitReaction: 1
   hitReactionRootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -1263,7 +1263,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
@@ -1296,9 +1298,47 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 0
-  ailment: 0
+  ailment: 4
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 
   dodgeLock: 0
   canCancelLightAttacks: 0
@@ -1324,6 +1364,7 @@ MonoBehaviour:
   canLunge: 1
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
@@ -1332,3 +1373,7 @@ MonoBehaviour:
   requireAmmo: 0
   requiredAmmoAmount: 1
   reloadNormalizedTime: 0.5
+  summonables: []
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 0
