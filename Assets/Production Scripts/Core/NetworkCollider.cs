@@ -4,6 +4,8 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
+using Vi.Utility;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -12,6 +14,7 @@ namespace Vi.Core
     public class NetworkCollider : MonoBehaviour
     {
         [SerializeField] private PhysicsMaterial physicMaterial;
+        [SerializeField] private Rigidbody staticWallBody;
 
         public CombatAgent CombatAgent { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
@@ -22,18 +25,93 @@ namespace Vi.Core
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
-            Colliders = GetComponentsInChildren<Collider>();
+            Colliders = GetNetworkColliders().ToArray();
 
-            List<Collider> networkPredictionLayerColliders = new List<Collider>();
             foreach (Collider col in Colliders)
+            {
+                col.enabled = false;
+
+                if (staticWallBody)
+                {
+                    foreach (Collider c in staticWallBody.GetComponentsInChildren<Collider>())
+                    {
+                        Physics.IgnoreCollision(col, c);
+                    }
+                }
+            }
+        }
+
+        private List<Collider> GetNetworkColliders()
+        {
+            List<Collider> networkPredictionLayerColliders = new List<Collider>();
+            foreach (Collider col in GetComponentsInChildren<Collider>())
             {
                 if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
                 {
                     networkPredictionLayerColliders.Add(col);
                 }
+            }
+            return networkPredictionLayerColliders;
+        }
+
+        private void OnEnable()
+        {
+            PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
+            if (staticWallBody)
+            {
+                NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
+                foreach (Collider col in staticWallBody.GetComponentsInChildren<Collider>())
+                {
+                    // Disable colliders on player hub
+                    if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    {
+                        col.enabled = true;
+                    }
+                    else
+                    {
+                        col.enabled = PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None;
+                    }
+                }
+            }
+        }
+
+        private void OnDisable()
+        {
+            PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
+            if (staticWallBody) { NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody); }
+
+            foreach (Collider col in Colliders)
+            {
                 col.enabled = false;
             }
-            Colliders = networkPredictionLayerColliders.ToArray();
+        }
+
+        private IEnumerator RemoveParentOfStaticWallBody()
+        {
+            yield return null;
+            if (!staticWallBody) { yield break; }
+            staticWallBody.transform.SetParent(null, true);
+        }
+
+        private IEnumerator ReparentStaticWallBody()
+        {
+            yield return null;
+            if (!staticWallBody) { yield break; }
+            staticWallBody.transform.SetParent(transform, true);
+            staticWallBody.transform.localPosition = Vector3.zero;
+            staticWallBody.transform.localRotation = Quaternion.identity;
+        }
+
+        private void OnDestroy()
+        {
+            if (staticWallBody) { Destroy(staticWallBody.gameObject); }
+        }
+
+        private void FixedUpdate()
+        {
+            if (!staticWallBody) { return; }
+            staticWallBody.MovePosition(MovementHandler.Rigidbody.position);
+            staticWallBody.MoveRotation(MovementHandler.Rigidbody.rotation);
         }
 
         private ActionClip.Ailment lastAilmentEvaluated = ActionClip.Ailment.None;
@@ -76,7 +154,7 @@ namespace Vi.Core
         [ContextMenu("Assign Physic Material To Colliders")]
         private void AssignPhysicMaterialToColliders()
         {
-            foreach (Collider col in GetComponentsInChildren<Collider>())
+            foreach (Collider col in GetNetworkColliders())
             {
                 if (col.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
                 {

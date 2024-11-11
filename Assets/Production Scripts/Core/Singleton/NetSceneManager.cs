@@ -419,6 +419,7 @@ namespace Vi.Core
         public bool IsSceneGroupLoaded(string sceneGroupName)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
+            if (sceneGroupIndex == -1) { Debug.LogError("Scene group index is -1! " + sceneGroupName); return false; }
             foreach (SceneReference scene in scenePayloads[sceneGroupIndex].sceneReferences)
             {
                 if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded) { return false; }

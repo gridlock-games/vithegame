@@ -569,32 +569,6 @@ namespace Vi.Player
                 if (stairMovement > maxStairStepHeight) { stairMovement = 0; }
             }
 
-            if (Physics.CapsuleCast(Rigidbody.position, Rigidbody.position + BodyHeightOffset, bodyRadius, movement.normalized, out RaycastHit playerHit, movement.magnitude * Time.fixedDeltaTime, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
-            {
-                bool collidersIgnoreEachOther = false;
-                foreach (Collider c in combatAgent.NetworkCollider.Colliders)
-                {
-                    if (Physics.GetIgnoreCollision(playerHit.collider, c))
-                    {
-                        collidersIgnoreEachOther = true;
-                        break;
-                    }
-                }
-
-                if (!collidersIgnoreEachOther)
-                {
-                    Quaternion targetRot = Quaternion.LookRotation(playerHit.transform.root.position - Rigidbody.position, Vector3.up);
-                    float angle = targetRot.eulerAngles.y - Quaternion.LookRotation(movement, Vector3.up).eulerAngles.y;
-
-                    if (angle > 180) { angle -= 360; }
-
-                    if (angle > -20 & angle < 20)
-                    {
-                        movement = Vector3.zero;
-                    }
-                }
-            }
-
             bool evaluateForce = true;
             if (weaponHandler.CurrentActionClip.shouldIgnoreGravity & inputPayload.shouldUseRootMotion)
             {
