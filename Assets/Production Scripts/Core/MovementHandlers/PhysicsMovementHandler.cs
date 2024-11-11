@@ -222,6 +222,7 @@ namespace Vi.Core.MovementHandlers
         ContactPoint[] stayContacts = new ContactPoint[3];
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
+            if (collision.collider.isTrigger) { return; }
             if (!layersToAccountForInMovement.Contains(LayerMask.LayerToName(collision.collider.gameObject.layer))) { return; }
             int contactCount = collision.GetContacts(stayContacts);
             for (int i = 0; i < contactCount; i++)
