@@ -3,6 +3,7 @@ using UnityEngine;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Unity.Netcode.Components;
+using System.Linq;
 
 namespace Vi.Core.MovementHandlers
 {
@@ -221,10 +222,12 @@ namespace Vi.Core.MovementHandlers
         ContactPoint[] stayContacts = new ContactPoint[3];
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
+            if (collision.collider.isTrigger) { return; }
+            if (!layersToAccountForInMovement.Contains(LayerMask.LayerToName(collision.collider.gameObject.layer))) { return; }
             int contactCount = collision.GetContacts(stayContacts);
             for (int i = 0; i < contactCount; i++)
             {
-                if (stayContacts[i].normal.y >= 0.9f)
+                if (stayContacts[i].normal.y >= 0.8f)
                 {
                     if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
                     break;
@@ -256,6 +259,8 @@ namespace Vi.Core.MovementHandlers
                 return Physics.CheckSphere(Rigidbody.position, isGroundedSphereCheckRadius, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore);
             }
         }
+
+        protected int GetGroundCollidersCount() { return groundColliders.Count; }
 
         protected const float stairStepHeight = 0.01f;
 

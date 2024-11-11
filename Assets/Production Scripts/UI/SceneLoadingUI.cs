@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Unity.Netcode;
 using Vi.Isolated;
 using Vi.Utility;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -126,7 +127,7 @@ namespace Vi.UI
             {
                 mainMenuLoading = true;
             }
-            if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
+            else if (!networkCallbackManager.NetworkManagerLoadingOperation.IsDone)
             {
                 mainMenuLoading = true;
             }
@@ -134,7 +135,11 @@ namespace Vi.UI
             {
                 mainMenuLoading = true;
             }
-
+            else if (networkCallbackManager.NetworkPrefabsLoading.Count(item => !item.IsDone | !item.IsValid()) > 0)
+            {
+                mainMenuLoading = true;
+            }
+            
             progressBarParent.SetActive(mainMenuLoading | NetSceneManager.IsBusyLoadingScenes() | spawningPlayerObjectParent.activeSelf);
 
             if (spawningPlayerObjectParent.activeSelf)
@@ -185,8 +190,9 @@ namespace Vi.UI
                 }
                 else
                 {
-                    progressBarText.text = "Cleaning up...";
-                    progressBarImage.fillAmount = 0;
+                    float percentComplete = networkCallbackManager.NetworkPrefabsLoading.Count(item => item.IsDone & item.IsValid()) / (float)networkCallbackManager.NetworkPrefabsLoading.Length;
+                    progressBarText.text = "Prepare Yourself, Lifeless " + (percentComplete * 100).ToString("F0") + "%";
+                    progressBarImage.fillAmount = percentComplete;
                 }
             }
             else if (PersistentLocalObjects.Singleton.LoadingOperations.Count == 0)
