@@ -14,6 +14,26 @@ namespace Vi.Core.Weapons
         private const float weaponTrailDeactivateDuration = 0.2f;
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
 
+        private BoxCollider[] boxColliders;
+        private Dictionary<BoxCollider, Vector3> boxColliderOriginalSizes = new Dictionary<BoxCollider, Vector3>();
+        protected override void Awake()
+        {
+            base.Awake();
+            boxColliders = GetComponentsInChildren<BoxCollider>();
+            foreach (BoxCollider box in boxColliders)
+            {
+                boxColliderOriginalSizes.Add(box, box.size);
+            }
+        }
+
+        public override void SetColliderMultiplier(Vector3 multiplier)
+        {
+            foreach (BoxCollider box in boxColliders)
+            {
+                box.size = Vector3.Scale(boxColliderOriginalSizes[box], multiplier);
+            }
+        }
+
         protected override void Update()
         {
             base.Update();

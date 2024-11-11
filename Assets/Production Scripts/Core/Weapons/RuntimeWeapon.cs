@@ -97,7 +97,7 @@ namespace Vi.Core.Weapons
 
         public Vector3 GetClosetPointFromAttributes(CombatAgent victim) { return victim.NetworkCollider.Colliders[0].ClosestPointOnBounds(transform.position); }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             renderers = GetComponentsInChildren<Renderer>(true);
             colliders = GetComponentsInChildren<Collider>(true);
@@ -110,6 +110,8 @@ namespace Vi.Core.Weapons
                 }
             }
         }
+
+        public virtual void SetColliderMultiplier(Vector3 multiplier) { }
 
         [SerializeField] private PooledObject dropWeaponPrefab;
         private PooledObject dropWeaponInstance;
