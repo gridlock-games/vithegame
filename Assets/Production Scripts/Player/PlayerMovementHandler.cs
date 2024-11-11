@@ -578,7 +578,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
+                    Rigidbody.AddForce(movement - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
                 }
                 evaluateForce = false;
             }
