@@ -17,9 +17,25 @@ namespace Vi.Isolated
         [SerializeField] private AssetReferenceGameObject networkManagerPrefab;
         [SerializeField] private AssetReferenceGameObject playerDataManagerPrefab;
         [SerializeField] private AssetReferenceGameObject networkSceneManagerPrefab;
+        [SerializeField] private AssetReferenceGameObject[] networkPrefabsToLoadAsynchronously;
+        [SerializeField] private NetworkPrefabHashOverride[] networkPrefabOverrides;
         [Header("Must be less than 60 seconds")]
         [SerializeField] private float clientConnectTimeoutThreshold = 30;
         [SerializeField] private GameObject alertBoxPrefab;
+
+        [System.Serializable]
+        private struct NetworkPrefabHashOverride
+        {
+            public int index;
+            public uint hashOverride;
+        }
+
+        public AsyncOperationHandle<GameObject>[] NetworkPrefabsLoading { get; private set; } = new AsyncOperationHandle<GameObject>[0];
+
+        private void Awake()
+        {
+            NetworkPrefabsLoading = new AsyncOperationHandle<GameObject>[networkPrefabsToLoadAsynchronously.Length];
+        }
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
         private void Start()
@@ -47,15 +63,35 @@ namespace Vi.Isolated
 
             LoadedNetSceneManagerPrefab = networkSceneManagerPrefab.LoadAssetAsync();
             yield return new WaitUntil(() => LoadedNetSceneManagerPrefab.IsDone);
+            NetworkManager.Singleton.AddNetworkPrefab(LoadedNetSceneManagerPrefab.Result);
             CreateNetSceneManager();
+
             yield return new WaitUntil(() => SceneManager.GetActiveScene().name == "Base");
             NetSceneManager.Singleton.LoadScene("Main Menu");
-
             yield return new WaitUntil(() => NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
-            loadedPlayerDataManagerPrefab = playerDataManagerPrefab.LoadAssetAsync();
 
+            loadedPlayerDataManagerPrefab = playerDataManagerPrefab.LoadAssetAsync();
             yield return new WaitUntil(() => loadedPlayerDataManagerPrefab.IsDone);
+            NetworkManager.Singleton.AddNetworkPrefab(loadedPlayerDataManagerPrefab.Result);
             CreatePlayerDataManager(false);
+
+            for (int i = 0; i < networkPrefabsToLoadAsynchronously.Length; i++)
+            {
+                NetworkPrefabsLoading[i] = networkPrefabsToLoadAsynchronously[i].LoadAssetAsync();
+                yield return NetworkPrefabsLoading[i];
+                NetworkManager.Singleton.AddNetworkPrefab(NetworkPrefabsLoading[i].Result);
+            }
+
+            foreach (NetworkPrefabHashOverride overide in networkPrefabOverrides)
+            {
+                NetworkPrefab netPref = new NetworkPrefab()
+                {
+                    Override = NetworkPrefabOverride.Hash,
+                    OverridingTargetPrefab = NetworkPrefabsLoading[overide.index].Result,
+                    SourceHashToOverride = overide.hashOverride
+                };
+                NetworkManager.Singleton.NetworkConfig.Prefabs.Add(netPref);
+            }
 
             ObjectPoolingManager.CanPool = true;
         }

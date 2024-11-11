@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -397,6 +394,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2613126926477622201, guid: 030cc18a9d9cba14184b6346d3165263,
+        type: 3}
+      propertyPath: m_ClearFlags
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3929702495192597990, guid: 030cc18a9d9cba14184b6346d3165263,
         type: 3}
       propertyPath: m_Name
@@ -1314,18 +1316,100 @@ MonoBehaviour:
   networkManagerPrefab:
     m_AssetGUID: d02f97087e411fc4b98b5a831936cfaf
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   playerDataManagerPrefab:
     m_AssetGUID: c0a6d2f345618574f8c13297b4fd9984
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   networkSceneManagerPrefab:
     m_AssetGUID: f26c0c230b5bef9408cbdfb5e06b4915
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  networkPrefabsToLoadAsynchronously:
+  - m_AssetGUID: e3e98f38ad6f45c4399dea9306d4b1fd
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: eb461fe47de532c4cb419a871bb082ca
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 59de1823536c3094ab5c82702b307275
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: fd03d34a75357524c8e999a0432ba087
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 7cc3d29439b96544ab468548ffee5b9b
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: a07cd3a62198b2641af457ddc633821f
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 136511f3b19e9a941b71dd06cae55b41
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 00d7c9bd0de1afc45af01619a72eaa45
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 5aa421ca51b0f314094fb0ee82e4cf70
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: cea0f97de135bb84abf6882313a01b85
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: f3ae40edfa5353b4290613bcc40b649a
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  networkPrefabOverrides:
+  - index: 1
+    hashOverride: 1226000951
+  - index: 2
+    hashOverride: 2362630170
+  - index: 3
+    hashOverride: 86830084
+  - index: 3
+    hashOverride: 3177992028
+  - index: 4
+    hashOverride: 1877422249
+  - index: 5
+    hashOverride: 2286965175
+  - index: 6
+    hashOverride: 2912729489
+  - index: 7
+    hashOverride: 109917921
+  - index: 8
+    hashOverride: 1479274336
+  - index: 9
+    hashOverride: 1519150957
+  - index: 10
+    hashOverride: 1061467458
   clientConnectTimeoutThreshold: 30
   alertBoxPrefab: {fileID: 1466119099563924269, guid: a6ff763b0d22aa248b76ad157516cae0,
     type: 3}
@@ -1527,6 +1611,7 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!114 &1668663851
 MonoBehaviour:
   m_ObjectHideFlags: 0
