@@ -600,7 +600,7 @@ namespace Vi.Player
                 }
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
-            Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
+            if (GetGroundCollidersCount() == 0) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
             return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.TotalRootMotionTime);
         }

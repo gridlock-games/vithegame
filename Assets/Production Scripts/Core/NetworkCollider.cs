@@ -157,7 +157,14 @@ namespace Vi.Core
 
         private void OnDestroy()
         {
-            if (staticWallBody) { Destroy(staticWallBody.gameObject); }
+            if (staticWallBody)
+            {
+                foreach (Collider staticWallCollider in staticWallColliders)
+                {
+                    colliderInstanceIDMap.Remove(staticWallCollider.GetInstanceID());
+                }
+                Destroy(staticWallBody.gameObject);
+            }
         }
 
         private void FixedUpdate()
