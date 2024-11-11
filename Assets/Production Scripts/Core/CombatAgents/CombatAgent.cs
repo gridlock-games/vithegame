@@ -220,17 +220,6 @@ namespace Vi.Core
             {
                 StartCoroutine(InitStats());
             }
-
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-            {
-                foreach (Collider col in NetworkCollider.Colliders)
-                {
-                    foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
-                    {
-                        Physics.IgnoreCollision(col, otherCol, true);
-                    }
-                }
-            }
         }
 
         private IEnumerator WaitForAnimator()
