@@ -1069,7 +1069,9 @@ namespace Vi.Core
             {
                 if (deathVibrationsEnabled)
                 {
+#if UNITY_IOS || UNITY_ANDROID
                     Handheld.Vibrate();
+#endif
                 }
             }
         }
@@ -1412,7 +1414,7 @@ namespace Vi.Core
             }
         }
 
-# if UNITY_EDITOR
+#if UNITY_EDITOR
         void OnTimeScaleChange()
         {
             if (Time.timeScale == 1)
@@ -1442,7 +1444,7 @@ namespace Vi.Core
         {
             combatAgent.MovementHandler.Rigidbody.AddForce((transform.forward + Vector3.up) * 50);
         }
-# endif
+#endif
         public List<Weapon.InputAttackType> GetInputHistory() { return inputHistory.ToList(); }
         private List<Weapon.InputAttackType> inputHistory = new List<Weapon.InputAttackType>();
         private ActionClip GetAttack(Weapon.InputAttackType inputAttackType)
