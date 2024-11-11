@@ -221,11 +221,11 @@ namespace Vi.Core
                 StartCoroutine(InitStats());
             }
 
-            foreach (CombatAgent combatAgent in PlayerDataManager.Singleton.GetActiveCombatAgents())
+            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
             {
                 foreach (Collider col in NetworkCollider.Colliders)
                 {
-                    foreach (Collider otherCol in combatAgent.NetworkCollider.Colliders)
+                    foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
                     {
                         Physics.IgnoreCollision(col, otherCol, true);
                     }
