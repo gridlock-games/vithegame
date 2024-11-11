@@ -22,6 +22,8 @@ namespace Vi.Core
 
         private Collider[] staticWallColliders = new Collider[0];
 
+        private static List<int> colliderInstanceIDMap = new List<int>();
+
         private void Awake()
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
@@ -36,12 +38,15 @@ namespace Vi.Core
             foreach (Collider col in Colliders)
             {
                 col.enabled = false;
+                col.hasModifiableContacts = true;
 
                 if (staticWallBody)
                 {
-                    foreach (Collider c in staticWallColliders)
+                    foreach (Collider staticWallCollider in staticWallColliders)
                     {
-                        Physics.IgnoreCollision(col, c);
+                        Physics.IgnoreCollision(col, staticWallCollider);
+                        colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID());
+                        staticWallCollider.hasModifiableContacts = true;
                     }
                 }
             }
@@ -66,6 +71,7 @@ namespace Vi.Core
             {
                 NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
                 PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
+                Physics.ContactModifyEvent += Physics_ContactModifyEvent;
                 foreach (Collider col in staticWallColliders)
                 {
                     col.enabled = false;
@@ -101,11 +107,35 @@ namespace Vi.Core
             {
                 NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
                 PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
+                Physics.ContactModifyEvent -= Physics_ContactModifyEvent;
             }
 
             foreach (Collider col in Colliders)
             {
                 col.enabled = false;
+            }
+        }
+
+        private void Physics_ContactModifyEvent(PhysicsScene scene, Unity.Collections.NativeArray<ModifiableContactPair> pairs)
+        {
+            if (MovementHandler.Rigidbody.isKinematic) { return; }
+
+            // For each contact pair, ignore the contact points that are close to origin
+            foreach (var pair in pairs)
+            {
+                for (int i = 0; i < pair.contactCount; ++i)
+                {
+                    if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                    {
+                        if (colliderInstanceIDMap.Contains(pair.otherColliderInstanceID))
+                        {
+                            if (!CombatAgent.AnimationHandler.IsAtRest())
+                            {
+                                pair.SetDynamicFriction(i, 1);
+                            }
+                        }
+                    }
+                }
             }
         }
 
