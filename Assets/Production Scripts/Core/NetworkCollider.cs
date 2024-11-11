@@ -19,16 +19,6 @@ namespace Vi.Core
         public CombatAgent CombatAgent { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
-        public Collider[] AllColliders
-        {
-            get
-            {
-                List<Collider> rt = new List<Collider>();
-                rt.AddRange(Colliders);
-                if (staticWallBody) { rt.AddRange(staticWallBody.GetComponentsInChildren<Collider>()); }
-                return rt.ToArray();
-            }
-        }
 
         private void Awake()
         {
@@ -67,7 +57,22 @@ namespace Vi.Core
         private void OnEnable()
         {
             PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
-            if (staticWallBody) { NetworkPhysicsSimulation.AddRigidbody(staticWallBody); }
+            if (staticWallBody)
+            {
+                NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
+                foreach (Collider col in staticWallBody.GetComponentsInChildren<Collider>())
+                {
+                    // Disable colliders on player hub
+                    if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    {
+                        col.enabled = true;
+                    }
+                    else
+                    {
+                        col.enabled = PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None;
+                    }
+                }
+            }
         }
 
         private void OnDisable()
