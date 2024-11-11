@@ -147,6 +147,22 @@ namespace Vi.Core
                 {
                     c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                 }
+
+                foreach (Collider c in staticWallColliders)
+                {
+                    if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
+                    {
+                        c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
+                    }
+                    else if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
+                    {
+                        c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
+                    }
+                    else
+                    {
+                        c.enabled = false;
+                    }
+                }
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
