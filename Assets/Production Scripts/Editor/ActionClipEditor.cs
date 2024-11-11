@@ -114,6 +114,8 @@ namespace Vi.Editor
         private SerializedProperty spMinLungeDistance;
         private SerializedProperty spMaxLungeDistance;
 
+        private SerializedProperty spBladeSizeMultiplier;
+
         private SerializedProperty spShouldAimBody;
         private SerializedProperty spShouldAimOffHand;
         private SerializedProperty spAimDuringAnticipation;
@@ -230,6 +232,8 @@ namespace Vi.Editor
             spCanLunge = serializedObject.FindProperty("canLunge");
             spMinLungeDistance = serializedObject.FindProperty("minLungeDistance");
             spMaxLungeDistance = serializedObject.FindProperty("maxLungeDistance");
+
+            spBladeSizeMultiplier = serializedObject.FindProperty("bladeSizeMultiplier");
 
             spShouldAimBody = serializedObject.FindProperty("shouldAimBody");
             spShouldAimOffHand = serializedObject.FindProperty("shouldAimOffHand");
@@ -452,6 +456,10 @@ namespace Vi.Editor
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
                 EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Melee Weapons", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spBladeSizeMultiplier);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
                 if (!spMustBeAiming.boolValue)
                 {
@@ -540,6 +548,10 @@ namespace Vi.Editor
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
 
                 EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Melee Weapons", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spBladeSizeMultiplier);
+
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
                 if (!spMustBeAiming.boolValue)
                 {
@@ -616,6 +628,10 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Melee Weapons", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spBladeSizeMultiplier);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Only for Shooter Weapons", EditorStyles.whiteLargeLabel);
@@ -702,6 +718,10 @@ namespace Vi.Editor
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);
                 spAttackingNormalizedTime.floatValue = EditorGUILayout.Slider("Attacking Normalized Time", spAttackingNormalizedTime.floatValue, 0, 1);
                 spRecoveryNormalizedTime.floatValue = EditorGUILayout.Slider("Recovery Normalized Time", spRecoveryNormalizedTime.floatValue, 0, 1);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Only for Melee Weapons", EditorStyles.whiteLargeLabel);
+                EditorGUILayout.PropertyField(spBladeSizeMultiplier);
 
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Only for Shooter Characters", EditorStyles.whiteLargeLabel);
