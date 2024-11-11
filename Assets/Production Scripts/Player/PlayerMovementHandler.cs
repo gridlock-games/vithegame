@@ -572,7 +572,14 @@ namespace Vi.Player
             bool evaluateForce = true;
             if (weaponHandler.CurrentActionClip.shouldIgnoreGravity & inputPayload.shouldUseRootMotion)
             {
-                Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
+                if (movement.y >= 0)
+                {
+                    Rigidbody.AddForce(movement - Rigidbody.linearVelocity, ForceMode.VelocityChange);
+                }
+                else
+                {
+                    Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
+                }
                 evaluateForce = false;
             }
 

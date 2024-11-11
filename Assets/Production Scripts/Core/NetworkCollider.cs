@@ -20,20 +20,26 @@ namespace Vi.Core
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public Collider[] Colliders { get; private set; }
 
+        private Collider[] staticWallColliders = new Collider[0];
+
         private void Awake()
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
             CombatAgent.SetNetworkCollider(this);
             Colliders = GetNetworkColliders().ToArray();
-
+            if (staticWallBody)
+            {
+                staticWallColliders = staticWallBody.GetComponentsInChildren<Collider>();
+            }
+            
             foreach (Collider col in Colliders)
             {
                 col.enabled = false;
 
                 if (staticWallBody)
                 {
-                    foreach (Collider c in staticWallBody.GetComponentsInChildren<Collider>())
+                    foreach (Collider c in staticWallColliders)
                     {
                         Physics.IgnoreCollision(col, c);
                     }
@@ -56,11 +62,25 @@ namespace Vi.Core
 
         private void OnEnable()
         {
-            PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
-                foreach (Collider col in staticWallBody.GetComponentsInChildren<Collider>())
+                PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
+                foreach (Collider col in staticWallColliders)
+                {
+                    col.enabled = false;
+                }
+                OnNetworkSpawn();
+            }
+        }
+
+        public void OnNetworkSpawn()
+        {
+            if (staticWallBody)
+            {
+                if (!CombatAgent.IsSpawned) { return; }
+
+                foreach (Collider col in staticWallColliders)
                 {
                     // Disable colliders on player hub
                     if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
@@ -77,8 +97,11 @@ namespace Vi.Core
 
         private void OnDisable()
         {
-            PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
-            if (staticWallBody) { NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody); }
+            if (staticWallBody)
+            {
+                NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
+                PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
+            }
 
             foreach (Collider col in Colliders)
             {
