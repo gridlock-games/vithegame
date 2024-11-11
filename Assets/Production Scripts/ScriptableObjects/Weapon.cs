@@ -932,13 +932,13 @@ namespace Vi.ScriptableObjects
             }
         }
 
-        public float GetMaxRootMotionTime(string stateName)
+        public float GetMaxRootMotionTime(string stateName, float truncateAmount)
         {
             if (string.IsNullOrWhiteSpace(stateName)) { return 0; }
 
             if (rootMotionLookup.ContainsKey(stateName))
             {
-                return rootMotionLookup[stateName].GetMaxCurveTime(stateName);
+                return rootMotionLookup[stateName].GetMaxCurveTime(stateName) - truncateAmount;
             }
             else
             {

@@ -128,7 +128,8 @@ namespace Vi.ScriptableObjects
 
         public bool shouldApplyRootMotion = true;
         public bool shouldIgnoreGravity;
-        
+        public float truncateRootMotionOffset;
+
         [SerializeField] private AnimationCurve rootMotionForwardMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve rootMotionSidesMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
         [SerializeField] private AnimationCurve rootMotionVerticalMultiplier = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));

@@ -21,6 +21,7 @@ namespace Vi.Editor
 
         private SerializedProperty spShouldApplyRootMotion;
         private SerializedProperty spShouldIgnoreGravity;
+        private SerializedProperty spTruncateRootMotionOffset;
         private SerializedProperty spRootMotionForwardMultiplier;
         private SerializedProperty spRootMotionSidesMultiplier;
         private SerializedProperty spRootMotionVerticalMultiplier;
@@ -140,6 +141,7 @@ namespace Vi.Editor
 
             spShouldApplyRootMotion = serializedObject.FindProperty("shouldApplyRootMotion");
             spShouldIgnoreGravity = serializedObject.FindProperty("shouldIgnoreGravity");
+            spTruncateRootMotionOffset = serializedObject.FindProperty("truncateRootMotionOffset");
             spRootMotionForwardMultiplier = serializedObject.FindProperty("rootMotionForwardMultiplier");
             spRootMotionSidesMultiplier = serializedObject.FindProperty("rootMotionSidesMultiplier");
             spRootMotionVerticalMultiplier = serializedObject.FindProperty("rootMotionVerticalMultiplier");
@@ -295,6 +297,10 @@ namespace Vi.Editor
             if (spShouldApplyRootMotion.boolValue)
             {
                 EditorGUILayout.PropertyField(spShouldIgnoreGravity);
+                if (((ActionClip.ClipType)spClipType.enumValueIndex) != ActionClip.ClipType.HitReaction)
+                {
+                    EditorGUILayout.PropertyField(spTruncateRootMotionOffset);
+                }
                 EditorGUILayout.LabelField("Curves are MULTIPLIERS of what is baked into the animation", EditorStyles.whiteLabel);
                 EditorGUILayout.PropertyField(spRootMotionForwardMultiplier);
                 EditorGUILayout.PropertyField(spRootMotionSidesMultiplier);
