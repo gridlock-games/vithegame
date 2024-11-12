@@ -242,9 +242,10 @@ namespace Vi.Player
             Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
-        public override void OnServerActionClipPlayed()
+        public override void OnBeforeServerActionClipPlayed()
         {
-            return;
+            if (combatAgent.AnimationHandler.ShouldApplyRootMotion()) { return; }
+
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {

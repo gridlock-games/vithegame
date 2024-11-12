@@ -698,7 +698,7 @@ namespace Vi.Core
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
 
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
+            combatAgent.MovementHandler.OnBeforeServerActionClipPlayed();
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
