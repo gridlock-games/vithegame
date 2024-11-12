@@ -51,9 +51,11 @@ namespace Vi.Player
             public Vector3 rootMotion;
             public float runSpeed;
             public bool isGrounded;
+            public bool shouldPlayHitStop;
             public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed, bool isGrounded)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed, bool isGrounded,
+                bool shouldPlayHitStop)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
@@ -62,6 +64,7 @@ namespace Vi.Player
                 this.rootMotion = rootMotion;
                 this.runSpeed = runSpeed;
                 this.isGrounded = isGrounded;
+                this.shouldPlayHitStop = shouldPlayHitStop;
                 // This is assigned after the input is processed
                 this.stairMovement = 0;
             }
@@ -90,13 +93,13 @@ namespace Vi.Player
             public bool usedRootMotion;
             public float rootMotionTime;
 
-            public StatePayload(InputPayload inputPayload, Rigidbody Rigidbody, Quaternion rotation, bool usedRootMotion, float rootMotionTime)
+            public StatePayload(InputPayload inputPayload, Rigidbody Rigidbody, bool usedRootMotion, float rootMotionTime)
             {
                 tick = inputPayload.tick;
                 moveInput = inputPayload.moveInput;
                 position = Rigidbody.position;
                 velocity = Rigidbody.linearVelocity;
-                this.rotation = rotation;
+                this.rotation = inputPayload.rotation;
                 this.usedRootMotion = usedRootMotion;
                 this.rootMotionTime = rootMotionTime;
             }
@@ -302,6 +305,7 @@ namespace Vi.Player
             inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
             inputPayload.runSpeed = GetRunSpeed();
             inputPayload.isGrounded = IsGrounded();
+            inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
         }
 
         private InputPayload lastInputPayloadProcessedOnServer;
@@ -441,7 +445,7 @@ namespace Vi.Player
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
-                    GetRunSpeed(), IsGrounded());
+                    GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
                 movementTick++;
 
@@ -488,7 +492,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
@@ -502,11 +506,8 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                return new StatePayload(inputPayload, Rigidbody, inputPayload.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
-
-            Vector2 moveInput = inputPayload.moveInput;
-            Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
             Vector3 movement = Vector3.zero;
@@ -514,7 +515,7 @@ namespace Vi.Player
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
-                return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
+                return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
             {
@@ -523,10 +524,10 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
-                    return new StatePayload(inputPayload, Rigidbody, newRotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
+                    return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.TotalRootMotionTime);
                 }
             }
-            else if (combatAgent.ShouldPlayHitStop())
+            else if (inputPayload.shouldPlayHitStop)
             {
                 movement = Vector3.zero;
             }
@@ -540,11 +541,11 @@ namespace Vi.Player
             }
             else if (inputPayload.shouldUseRootMotion)
             {
-                movement = (IsServer ? newRotation : latestServerState.Value.rotation) * inputPayload.rootMotion * GetRootMotionSpeed();
+                movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion * GetRootMotionSpeed();
             }
             else
             {
-                Vector3 targetDirection = newRotation * (new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
+                Vector3 targetDirection = inputPayload.rotation * (new Vector3(inputPayload.moveInput.x, 0, inputPayload.moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1));
                 targetDirection = Vector3.ClampMagnitude(Vector3.Scale(targetDirection, HORIZONTAL_PLANE), 1);
                 targetDirection *= inputPayload.runSpeed;
                 movement = targetDirection;
@@ -558,7 +559,7 @@ namespace Vi.Player
             float stairMovement = 0;
             if (IsOwner & !isReprocessing)
             {
-                Vector3 startPos = Rigidbody.position + newRotation * stairRaycastingStartOffset;
+                Vector3 startPos = Rigidbody.position + inputPayload.rotation * stairRaycastingStartOffset;
                 startPos.y += stairStepHeight;
                 while (Physics.Raycast(startPos, movement.normalized, out RaycastHit stairHit, 1, LayerMask.GetMask(layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
                 {
@@ -618,7 +619,7 @@ namespace Vi.Player
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetGroundCollidersCount() == 0) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
-            return new StatePayload(inputPayload, Rigidbody, newRotation, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.TotalRootMotionTime);
+            return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
 
         private const float bodyRadius = 0.5f;
@@ -731,8 +732,8 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, true),
-                    Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, true, false),
+                    Rigidbody, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
         }
 
