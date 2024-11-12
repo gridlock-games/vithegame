@@ -18,6 +18,7 @@ namespace Vi.Core.MovementHandlers
                 rb.Sleep();
                 networkTransform.Interpolate = false;
             }
+            groundColliders.Clear();
             base.SetOrientation(newPosition, newRotation);
         }
 
@@ -28,6 +29,7 @@ namespace Vi.Core.MovementHandlers
                 rb.position = newPosition;
                 rb.Sleep();
             }
+            groundColliders.Clear();
             base.TeleportPositionRpc(newPosition);
         }
 
@@ -219,15 +221,25 @@ namespace Vi.Core.MovementHandlers
         }
 
         List<Collider> groundColliders = new List<Collider>();
-        ContactPoint[] stayContacts = new ContactPoint[3];
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+            EvaluateGroundCollider(collision);
+        }
+
         public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            EvaluateGroundCollider(collision);
+        }
+
+        ContactPoint[] groundColliderContacts = new ContactPoint[3];
+        private void EvaluateGroundCollider(Collision collision)
         {
             if (collision.collider.isTrigger) { return; }
             if (!layersToAccountForInMovement.Contains(LayerMask.LayerToName(collision.collider.gameObject.layer))) { return; }
-            int contactCount = collision.GetContacts(stayContacts);
+            int contactCount = collision.GetContacts(groundColliderContacts);
             for (int i = 0; i < contactCount; i++)
             {
-                if (stayContacts[i].normal.y >= 0.8f)
+                if (groundColliderContacts[i].normal.y >= 0.8f)
                 {
                     if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
                     break;
