@@ -970,6 +970,7 @@ namespace Vi.Core
             }
         }
 
+        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value; } }
         private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private Coroutine lightAttackHoldCoroutine;
         private void LightAttackHold(bool isPressed, bool resetAfterSent)

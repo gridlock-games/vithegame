@@ -40,7 +40,7 @@ namespace Vi.Core.MovementHandlers
 
 		public virtual Quaternion GetRotation() { return transform.rotation; }
 
-		public virtual void OnServerActionClipPlayed() { }
+		public virtual Vector2[] GetMoveInputQueue() { return new Vector2[0]; }
 		public virtual void OnRootMotionTimeReset() { }
 
 		public virtual void ReceiveOnCollisionEnterMessage(Collision collision) { }
