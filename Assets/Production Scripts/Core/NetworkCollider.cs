@@ -49,6 +49,10 @@ namespace Vi.Core
                         staticWallCollider.hasModifiableContacts = true;
                     }
                 }
+                else
+                {
+                    colliderInstanceIDMap.Add(col.GetInstanceID());
+                }
             }
         }
 
@@ -118,8 +122,6 @@ namespace Vi.Core
 
         private void Physics_ContactModifyEvent(PhysicsScene scene, Unity.Collections.NativeArray<ModifiableContactPair> pairs)
         {
-            if (MovementHandler.Rigidbody.isKinematic) { return; }
-
             // For each contact pair, ignore the contact points that are close to origin
             foreach (var pair in pairs)
             {

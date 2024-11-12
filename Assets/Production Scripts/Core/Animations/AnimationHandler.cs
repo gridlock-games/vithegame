@@ -168,7 +168,7 @@ namespace Vi.Core
         public bool IsAtRest()
         {
             if (!animatorReference) { return true; }
-            return animatorReference.IsAtRest();
+            return animatorReference.IsAtRest;
         }
 
         public bool IsAtRestIgnoringTransition()
@@ -1225,6 +1225,7 @@ namespace Vi.Core
         {
             rootMotionTime = 0;
             totalRootMotionTime = 0;
+            combatAgent.MovementHandler.OnRootMotionTimeReset();
         }
 
         public bool ShouldApplyRootMotion()

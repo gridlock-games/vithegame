@@ -347,6 +347,7 @@ namespace Vi.Core
             NextActionsAnimatorStateInfo = default;
             CurrentFlinchAnimatorStateInfo = default;
             NextFlinchAnimatorStateInfo = default;
+            IsAtRest = true;
 
             appliedCharacterMaterials.Clear();
         }
@@ -488,10 +489,12 @@ namespace Vi.Core
             }
         }
 
-        public bool IsAtRest()
+        public bool IsAtRest { get; private set; } = true;
+
+        private bool RefreshIsAtRest()
         {
             if (!animator) { return false; }
-            if (animator.IsInTransition(animator.GetLayerIndex("Actions")))
+            if (animator.IsInTransition(actionsLayerIndex))
             {
                 return NextActionsAnimatorStateInfo.IsName("Empty");
             }
@@ -517,12 +520,14 @@ namespace Vi.Core
 
         private void Update()
         {
+            IsAtRest = RefreshIsAtRest();
+
             if (animationHandler)
             {
                 if (!animator.enabled) { animationHandler.ProcessNextActionClip(); }
             }
 
-            if (IsAtRest())
+            if (IsAtRest)
             {
                 limbReferences.SetRotationOffset(0, 0, 0);
             }

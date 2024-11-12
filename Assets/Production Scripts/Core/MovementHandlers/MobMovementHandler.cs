@@ -35,7 +35,7 @@ namespace Vi.Core.MovementHandlers
                 transform.position = Rigidbody.transform.position;
                 transform.rotation = EvaluateRotation();
             }
-            SetAnimationMoveInput(GetPathMoveInput(true));
+            SetAnimationMoveInput(IsGrounded() ? GetPathMoveInput(true) : Vector2.zero);
 
             if (IsServer & IsSpawned)
             {
