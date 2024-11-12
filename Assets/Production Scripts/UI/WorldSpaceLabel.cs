@@ -128,6 +128,9 @@ namespace Vi.UI
             transform.rotation = Quaternion.identity;
             transform.localScale = Vector3.zero;
             healthBarParent.localScale = Vector3.zero;
+
+            lastHP = -1;
+            lastMaxHP = -1;
         }
 
         private void RefreshStatus()
@@ -202,8 +205,8 @@ namespace Vi.UI
             FindMainCamera();
         }
 
-        private float lastHP;
-        private float lastMaxHP;
+        private float lastHP = -1;
+        private float lastMaxHP = -1;
 
         private void LateUpdate()
         {
