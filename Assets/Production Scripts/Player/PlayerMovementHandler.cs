@@ -9,7 +9,7 @@ using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
-using static Vi.Player.PlayerMovementHandler;
+using System.Linq;
 
 namespace Vi.Player
 {
@@ -102,7 +102,7 @@ namespace Vi.Player
                 velocity = Rigidbody.linearVelocity;
                 this.rotation = inputPayload.rotation;
                 this.usedRootMotion = usedRootMotion;
-                this.rootMotionId = 0;
+                this.rootMotionId = rootMotionId;
                 this.rootMotionTime = rootMotionTime;
             }
 
@@ -136,7 +136,6 @@ namespace Vi.Player
 
         private const float serverReconciliationThreshold = 0.3f;
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
-        private List<StatePayload> rootMotionReconciliationSlice = new List<StatePayload>();
         private Vector3 HandleServerReconciliation()
         {
             lastProcessedState = latestServerState.Value;
@@ -156,50 +155,36 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             if (latestServerState.Value.usedRootMotion)
             {
-                // Check for 25 updates before and after the current server tick
-                int indexRange = 25;
-                rootMotionReconciliationSlice.Clear();
-                for (int tickOffset = -indexRange; tickOffset < indexRange; tickOffset++)
-                {
-                    int index = (latestServerState.Value.tick + tickOffset) % BUFFER_SIZE;
-                    if (stateBuffer[index].usedRootMotion & stateBuffer[index].rootMotionId == latestServerState.Value.rootMotionId)
-                    {
-                        rootMotionReconciliationSlice.Add(stateBuffer[index]);
-                    }
-                }
+                StatePayload[] rootMotionReconciliationSlice = System.Array.FindAll(stateBuffer, item => item.rootMotionId == latestServerState.Value.rootMotionId)
+                    .Where(item => item.usedRootMotion & item.rootMotionTime >= latestServerState.Value.rootMotionTime | Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime))
+                    .OrderBy(item => item.rootMotionTime).ToArray();
 
-                // TODO find closest tick to latest server state if there are multiple entries
-                int exactTimeIndex = rootMotionReconciliationSlice.FindIndex(item => Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
-                if (exactTimeIndex != -1)
+                if (rootMotionReconciliationSlice.Length > 0)
                 {
-                    StatePayload clientRootMotionState = rootMotionReconciliationSlice[exactTimeIndex];
-                    
-                    float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
-                    if (rootMotionPositionError > serverReconciliationThreshold)
+                    if (Mathf.Approximately(rootMotionReconciliationSlice[0].rootMotionTime, latestServerState.Value.rootMotionTime))
                     {
-                        Debug.Log(latestServerState.Value.tick + " " + clientRootMotionState.tick + " Root motion position error " + rootMotionPositionError);
-                        lastServerReconciliationTime = Time.time;
+                        float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, rootMotionReconciliationSlice[0].position);
+                        int clientStateIndex = rootMotionReconciliationSlice[0].tick % BUFFER_SIZE;
+                        if (rootMotionPositionError > serverReconciliationThreshold)
+                        {
+                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick
+                                + "\nRoot Motion Position Error: " + rootMotionPositionError
+                                + "\n" + latestServerState.Value.rootMotionId + " " + rootMotionReconciliationSlice[0].rootMotionId
+                                + "\n" + latestServerState.Value.rootMotionTime + " " + rootMotionReconciliationSlice[0].rootMotionTime);
 
-                        // Change this
-                        stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
+                            StatePayload modifiedStatePayload = latestServerState.Value;
+                            modifiedStatePayload.tick = rootMotionReconciliationSlice[0].tick;
+                            stateBuffer[clientStateIndex] = modifiedStatePayload;
 
-                        Rigidbody.position = latestServerState.Value.position;
-                        if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
-                        ReprocessInputs(latestServerState.Value.tick);
+                            Rigidbody.position = modifiedStatePayload.position;
+                            if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
+                            ReprocessInputs(modifiedStatePayload.tick);
+                        }
+                        else
+                        {
+                            return (latestServerState.Value.position - rootMotionReconciliationSlice[0].position);
+                        }
                     }
-                    else
-                    {
-                        return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
-                    }
-                }
-                else
-                {
-                    //int partialTimeIndex = rootMotionReconciliationSlice.FindIndex(item => Mathf.Abs(item.rootMotionTime - latestServerState.Value.rootMotionTime) < Time.fixedDeltaTime);
-                    //if (partialTimeIndex != -1)
-                    //{
-                    //    StatePayload clientRootMotionState = rootMotionReconciliationSlice[partialTimeIndex];
-                    //    return (latestServerState.Value.position - stateBuffer[clientRootMotionState.tick % BUFFER_SIZE].position);
-                    //}
                 }
                 return Vector3.zero;
             }
