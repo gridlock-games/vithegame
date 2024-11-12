@@ -29,6 +29,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform healthBarParent;
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
+        [SerializeField] private Text healthText;
 
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
@@ -65,7 +66,7 @@ namespace Vi.UI
         {
             transform.localScale = Vector3.zero;
             healthBarParent.localScale = Vector3.zero;
-
+            
             if (!combatAgent)
             {
                 combatAgent = GetComponentInParent<CombatAgent>();
@@ -135,6 +136,7 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+            healthText.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("ShowHPTextInWorldSpaceLabels"));
         }
 
         private PlayerDataManager.Team team;
@@ -199,6 +201,9 @@ namespace Vi.UI
             FindLocalWeaponHandlerOrSpectator();
             FindMainCamera();
         }
+
+        private float lastHP;
+        private float lastMaxHP;
 
         private void LateUpdate()
         {
@@ -280,9 +285,22 @@ namespace Vi.UI
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
 
-            healthFillImage.fillAmount = combatAgent.GetHP() / combatAgent.GetMaxHP();
+
+            float HP = combatAgent.GetHP();
+            if (HP < 0.1f & HP > 0) { HP = 0.1f; }
+            float maxHP = combatAgent.GetMaxHP();
+
+            if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
+            {
+                healthText.text = "HP " + StringUtility.FormatDynamicFloatForUI(HP) + " / " + maxHP.ToString("F0");
+                healthFillImage.fillAmount = HP / maxHP;
+            }
+
+            lastHP = HP;
+            lastMaxHP = maxHP;
+
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, combatAgent.GetHP() / combatAgent.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
-            
+
             if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
                 List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
