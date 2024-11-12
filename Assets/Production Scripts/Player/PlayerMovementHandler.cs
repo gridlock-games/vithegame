@@ -159,20 +159,12 @@ namespace Vi.Player
                 // Check for 25 updates before and after the current server tick
                 int indexRange = 25;
                 rootMotionReconciliationSlice.Clear();
-                for (int i = serverStateBufferIndex; i < (serverStateBufferIndex - indexRange); i--)
+                for (int tickOffset = -indexRange; tickOffset < indexRange; tickOffset++)
                 {
-                    if (stateBuffer[i % stateBuffer.Length].usedRootMotion & stateBuffer[i % stateBuffer.Length].rootMotionId == latestServerState.Value.rootMotionId)
+                    int index = (latestServerState.Value.tick + tickOffset) % BUFFER_SIZE;
+                    if (stateBuffer[index].usedRootMotion & stateBuffer[index].rootMotionId == latestServerState.Value.rootMotionId)
                     {
-                        rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
-                    }
-                    rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
-                }
-
-                for (int i = serverStateBufferIndex; i < (serverStateBufferIndex + indexRange); i++)
-                {
-                    if (stateBuffer[i % stateBuffer.Length].usedRootMotion & stateBuffer[i % stateBuffer.Length].rootMotionId == latestServerState.Value.rootMotionId)
-                    {
-                        rootMotionReconciliationSlice.Add(stateBuffer[i % stateBuffer.Length]);
+                        rootMotionReconciliationSlice.Add(stateBuffer[index]);
                     }
                 }
 
@@ -185,9 +177,10 @@ namespace Vi.Player
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, clientRootMotionState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
-                        Debug.Log(latestServerState.Value.tick + " Root motion position error " + rootMotionPositionError + " " + clientRootMotionState.tick);
+                        Debug.Log(latestServerState.Value.tick + " " + clientRootMotionState.tick + " Root motion position error " + rootMotionPositionError);
                         lastServerReconciliationTime = Time.time;
 
+                        // Change this
                         stateBuffer[clientRootMotionState.tick % BUFFER_SIZE] = latestServerState.Value;
 
                         Rigidbody.position = latestServerState.Value.position;
@@ -263,6 +256,7 @@ namespace Vi.Player
 
         public override void OnServerActionClipPlayed()
         {
+            NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
