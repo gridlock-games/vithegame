@@ -49,9 +49,10 @@ namespace Vi.Player
             public bool shouldUseRootMotion;
             public Vector3 rootMotion;
             public float runSpeed;
+            public bool isGrounded;
             public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed, bool isGrounded)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
@@ -59,6 +60,7 @@ namespace Vi.Player
                 this.shouldUseRootMotion = shouldUseRootMotion;
                 this.rootMotion = rootMotion;
                 this.runSpeed = runSpeed;
+                this.isGrounded = isGrounded;
                 // This is assigned after the input is processed
                 this.stairMovement = 0;
             }
@@ -144,8 +146,8 @@ namespace Vi.Player
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             if (latestServerState.Value.usedRootMotion)
             {
-                // Check for 25 updates
-                int indexRange = 25;
+                // Check for 10 updates
+                int indexRange = 10;
                 rootMotionReconciliationSlice.Clear();
                 for (int i = serverStateBufferIndex; i < (serverStateBufferIndex - indexRange); i--)
                 {
@@ -193,6 +195,11 @@ namespace Vi.Player
             }
 
             if (stateBuffer[serverStateBufferIndex].usedRootMotion)
+            {
+                return Vector3.zero;
+            }
+
+            if (stateBuffer[(latestServerState.Value.tick - 1) % BUFFER_SIZE].usedRootMotion)
             {
                 return Vector3.zero;
             }
@@ -279,6 +286,8 @@ namespace Vi.Player
                 
                 inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
+                inputPayload.runSpeed = GetRunSpeed();
+                inputPayload.isGrounded = IsGrounded();
 
                 StatePayload statePayload = Move(ref inputPayload, false);
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -313,7 +322,8 @@ namespace Vi.Player
                     }
 
                     InputPayload serverInputPayload = new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
-                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(), GetRunSpeed());
+                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(),
+                        GetRunSpeed(), IsGrounded());
 
                     StatePayload statePayload = Move(ref serverInputPayload, false);
 
@@ -355,6 +365,7 @@ namespace Vi.Player
                         inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                         inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
                         inputPayload.runSpeed = GetRunSpeed();
+                        inputPayload.isGrounded = IsGrounded();
 
                         StatePayload statePayload = Move(ref inputPayload, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -425,7 +436,8 @@ namespace Vi.Player
                 }
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
-                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(), GetRunSpeed());
+                    EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
+                    GetRunSpeed(), IsGrounded());
 
                 movementTick++;
 
@@ -585,7 +597,7 @@ namespace Vi.Player
 
             if (evaluateForce)
             {
-                if (IsGrounded())
+                if (inputPayload.isGrounded)
                 {
                     Rigidbody.AddForce(new Vector3(movement.x, 0, movement.z) - new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z), ForceMode.VelocityChange);
                     if (Rigidbody.linearVelocity.y > 0 & Mathf.Approximately(stairMovement, 0)) // This is to prevent slope bounce
@@ -715,7 +727,7 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0),
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, true),
                     Rigidbody, transform.rotation, false, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
         }
