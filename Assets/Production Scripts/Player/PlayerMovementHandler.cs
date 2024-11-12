@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
+using static Vi.Player.PlayerMovementHandler;
 
 namespace Vi.Player
 {
@@ -283,11 +284,8 @@ namespace Vi.Player
                         if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
                     }
                 }
-                
-                inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
-                inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
-                inputPayload.runSpeed = GetRunSpeed();
-                inputPayload.isGrounded = IsGrounded();
+
+                SetInputPayloadVariablesOnServer(ref inputPayload);
 
                 StatePayload statePayload = Move(ref inputPayload, false);
                 stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -295,6 +293,15 @@ namespace Vi.Player
                 lastInputPayloadProcessedOnServer = inputPayload;
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
             }
+        }
+
+        private void SetInputPayloadVariablesOnServer(ref InputPayload inputPayload)
+        {
+            if (combatAgent.ShouldApplyAilmentRotation()) { inputPayload.rotation = combatAgent.GetAilmentRotation(); }
+            inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
+            inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
+            inputPayload.runSpeed = GetRunSpeed();
+            inputPayload.isGrounded = IsGrounded();
         }
 
         private InputPayload lastInputPayloadProcessedOnServer;
@@ -315,15 +322,15 @@ namespace Vi.Player
             {
                 if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
                 {
-                    Quaternion newRotation = latestServerState.Value.rotation;
-                    while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+                    InputPayload serverInputPayload;
+                    while (serverInputQueue.TryDequeue(out serverInputPayload))
                     {
-                        newRotation = inputPayload.rotation;
+                        break;
                     }
 
-                    InputPayload serverInputPayload = new InputPayload(latestServerState.Value.tick + 1, Vector2.zero,
-                        newRotation, combatAgent.AnimationHandler.ShouldApplyRootMotion(), combatAgent.AnimationHandler.ApplyRootMotion(),
-                        GetRunSpeed(), IsGrounded());
+                    serverInputPayload.tick = latestServerState.Value.tick + 1;
+                    serverInputPayload.moveInput = Vector2.zero;
+                    SetInputPayloadVariablesOnServer(ref serverInputPayload);
 
                     StatePayload statePayload = Move(ref serverInputPayload, false);
 
@@ -362,10 +369,7 @@ namespace Vi.Player
                             if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero) { continue; }
                         }
 
-                        inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
-                        inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
-                        inputPayload.runSpeed = GetRunSpeed();
-                        inputPayload.isGrounded = IsGrounded();
+                        SetInputPayloadVariablesOnServer(ref inputPayload);
 
                         StatePayload statePayload = Move(ref inputPayload, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
@@ -502,7 +506,7 @@ namespace Vi.Player
             }
 
             Vector2 moveInput = inputPayload.moveInput;
-            Quaternion newRotation = combatAgent.ShouldApplyAilmentRotation() ? combatAgent.GetAilmentRotation() : inputPayload.rotation;
+            Quaternion newRotation = inputPayload.rotation;
 
             // Apply movement
             Vector3 movement = Vector3.zero;
