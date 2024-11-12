@@ -2494,7 +2494,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 536213492490844772}
   m_HandleRect: {fileID: 536213492490844773}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4413,9 +4413,6 @@ GameObject:
   - component: {fileID: 8157511657368136266}
   - component: {fileID: 8584051944774833363}
   - component: {fileID: 4622696240617831643}
-  - component: {fileID: 6936704541496383213}
-  - component: {fileID: 7774819745471701903}
-  - component: {fileID: 6905175292767191929}
   m_Layer: 5
   m_Name: LookJoystick
   m_TagString: Untagged
@@ -4498,15 +4495,6 @@ MonoBehaviour:
   joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
   limits: {fileID: 4824479231797674246}
-  playerPrefForEnabling: RightJoystickEnabled
-  joystickBehaviors:
-  - {fileID: 8683863720847623009}
-  - {fileID: 7025002957918775141}
-  - {fileID: 6610426748883032910}
-  notJoystickBehaviors:
-  - {fileID: 6936704541496383213}
-  - {fileID: 7774819745471701903}
-  - {fileID: 6905175292767191929}
 --- !u!223 &8584051944774833363
 Canvas:
   m_ObjectHideFlags: 0
@@ -4547,107 +4535,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &6936704541496383213
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610452173114550401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 7667653797634952869}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &7774819745471701903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610452173114550401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a970316557296394f8bafd54de9dab4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onPointerDown:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: StartLightAttack
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onPointerUp:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7062514562923407540}
-        m_TargetAssemblyTypeName: Vi.UI.PlayerUI, Vi.UI
-        m_MethodName: StopLightAttack
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  whilePointerPressed:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &6905175292767191929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1610452173114550401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67fab24e1c93fb0478ddaac7edee13a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1822524930838224671
 GameObject:
   m_ObjectHideFlags: 0
@@ -7532,7 +7419,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -320, y: 21.199951}
+  m_AnchoredPosition: {x: -320, y: 21.2}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &5959355654910089170
@@ -8106,9 +7993,6 @@ MonoBehaviour:
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   limits: {fileID: 210338626573094431}
-  playerPrefForEnabling: 
-  joystickBehaviors: []
-  notJoystickBehaviors: []
 --- !u!223 &5516339031664653583
 Canvas:
   m_ObjectHideFlags: 0
@@ -8196,9 +8080,9 @@ GameObject:
   - component: {fileID: 4824479231797674246}
   - component: {fileID: 5383387173417415003}
   - component: {fileID: 4804493591946432725}
-  - component: {fileID: 8683863720847623009}
-  - component: {fileID: 7025002957918775141}
-  - component: {fileID: 6610426748883032910}
+  - component: {fileID: 3313541572956484735}
+  - component: {fileID: 7324584696504259253}
+  - component: {fileID: 1600435635928596721}
   m_Layer: 5
   m_Name: Look Joystick Limits
   m_TagString: Untagged
@@ -8263,7 +8147,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8683863720847623009
+--- !u!114 &3313541572956484735
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8282,7 +8166,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -8307,7 +8191,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7025002957918775141
+--- !u!114 &7324584696504259253
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8352,7 +8236,7 @@ MonoBehaviour:
   whilePointerPressed:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6610426748883032910
+--- !u!114 &1600435635928596721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12370,7 +12254,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 49.071663
+      value: 48.728813
       objectReference: {fileID: 0}
     - target: {fileID: 6117385750501809473, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
