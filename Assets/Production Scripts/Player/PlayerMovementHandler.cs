@@ -167,8 +167,7 @@ namespace Vi.Player
                         int clientStateIndex = rootMotionReconciliationSlice[0].tick % BUFFER_SIZE;
                         if (rootMotionPositionError > serverReconciliationThreshold)
                         {
-                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick
-                                + "\nRoot Motion Position Error: " + rootMotionPositionError
+                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError
                                 + "\n" + latestServerState.Value.rootMotionId + " " + rootMotionReconciliationSlice[0].rootMotionId
                                 + "\n" + latestServerState.Value.rootMotionTime + " " + rootMotionReconciliationSlice[0].rootMotionTime);
 
@@ -184,6 +183,10 @@ namespace Vi.Player
                         {
                             return (latestServerState.Value.position - rootMotionReconciliationSlice[0].position);
                         }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime);
                     }
                 }
                 return Vector3.zero;
@@ -241,7 +244,7 @@ namespace Vi.Player
 
         public override void OnServerActionClipPlayed()
         {
-            NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
+            return;
             // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
             while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
             {
@@ -535,7 +538,7 @@ namespace Vi.Player
             }
             else if (inputPayload.shouldUseRootMotion)
             {
-                movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion * GetRootMotionSpeed();
+                movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion;
             }
             else
             {

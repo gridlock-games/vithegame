@@ -1276,8 +1276,18 @@ namespace Vi.Core
 
                     float prevNormalizedTime = GetNormalizedRootMotionTime();
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
-                    rootMotionTime += Time.fixedDeltaTime * Animator.speed;
-                    totalRootMotionTime += Time.fixedDeltaTime * Animator.speed;
+
+                    float animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.animationSpeed;
+                    if (combatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                    {
+                        if (prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime)
+                        {
+                            animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed;
+                        }
+                    }
+                    
+                    rootMotionTime += Time.fixedDeltaTime * animationSpeed;
+                    totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
 
                     bool shouldApplyMultiplierCurves = true;
                     float newNormalizedTime = GetNormalizedRootMotionTime();
@@ -1292,7 +1302,7 @@ namespace Vi.Core
                                 rootMotionTime = 0;
                                 prevNormalizedTime = GetNormalizedRootMotionTime();
                                 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
-                                rootMotionTime += Time.fixedDeltaTime * Animator.speed;
+                                rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                                 newNormalizedTime = GetNormalizedRootMotionTime();
                             }
                         }
