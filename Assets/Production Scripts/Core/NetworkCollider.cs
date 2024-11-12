@@ -49,6 +49,10 @@ namespace Vi.Core
                         staticWallCollider.hasModifiableContacts = true;
                     }
                 }
+                else
+                {
+                    colliderInstanceIDMap.Add(col.GetInstanceID());
+                }
             }
         }
 
