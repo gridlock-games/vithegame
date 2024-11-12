@@ -368,11 +368,15 @@ namespace Vi.Player
                 
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
-                if (latestServerState.Value.usedRootMotion)
+                if (combatAgent.WeaponHandler.LightAttackIsPressed)
                 {
                     moveInput = Vector2.zero;
                 }
-                if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
+                else if (latestServerState.Value.usedRootMotion)
+                {
+                    moveInput = Vector2.zero;
+                }
+                else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
                     moveInput = Vector2.zero;
                 }

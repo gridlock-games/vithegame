@@ -1601,11 +1601,12 @@ namespace Vi.Core
             // Wait for move input queue to be empty before playing the action to avoid position errors on the owner client
             if (serverActionQueue.TryPeek(out ServerActionQueueElement serverActionQueueElement))
             {
-                if (serverActionQueueElement.wasCalledFromServerRpc)
+                ActionClip clip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(serverActionQueueElement.actionClipName);
+                if (serverActionQueueElement.wasCalledFromServerRpc | clip.GetClipType() == ActionClip.ClipType.LightAttack)
                 {
                     if (!System.Array.TrueForAll(combatAgent.MovementHandler.GetMoveInputQueue(), item => item == Vector2.zero))
                     {
-                        if (actionClipQueueWaitTime < 1)
+                        if (actionClipQueueWaitTime < 0.3f)
                         {
                             actionClipQueueWaitTime += Time.deltaTime;
                             return;
@@ -1620,7 +1621,7 @@ namespace Vi.Core
 
             actionClipQueueWaitTime = 0;
 
-            if (serverActionQueue.TryDequeue(out serverActionQueueElement))
+            while (serverActionQueue.TryDequeue(out serverActionQueueElement))
             {
                 PlayActionOnServer(serverActionQueueElement.actionClipName,
                     serverActionQueueElement.isFollowUpClip,
