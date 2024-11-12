@@ -94,6 +94,8 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             if (!FasterPlayerPrefs.Singleton.HasString("OrbitalCameraMode")) { FasterPlayerPrefs.Singleton.SetString("OrbitalCameraMode", "HOLD"); }
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("RightJoystickEnabled")) { FasterPlayerPrefs.Singleton.SetBool("RightJoystickEnabled", false); }
+
             if (!FasterPlayerPrefs.Singleton.HasFloat("FieldOfView")) { FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", 60); }
 
             FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);

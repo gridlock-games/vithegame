@@ -19,6 +19,9 @@ namespace Vi.UI
         [SerializeField] private string joystickValueMultiplierPlayerPref;
         [SerializeField] private float joystickValueMultiplier = 1;
         [SerializeField] private RectTransform limits;
+        [SerializeField] private string playerPrefForEnabling;
+        [SerializeField] private Behaviour[] joystickBehaviors;
+        [SerializeField] private Behaviour[] notJoystickBehaviors;
 
         public enum JoystickActionType
         {
@@ -54,7 +57,19 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
-            if (FasterPlayerPrefs.Singleton.HasFloat(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
+            limits.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool(playerPrefForEnabling));
+
+            foreach (Behaviour behaviour in joystickBehaviors)
+            {
+                behaviour.enabled = limits.gameObject.activeSelf;
+            }
+
+            foreach (Behaviour behaviour in notJoystickBehaviors)
+            {
+                behaviour.enabled = !limits.gameObject.activeSelf;
+            }
+
+            joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref);
         }
 
         private void Update()
