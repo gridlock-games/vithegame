@@ -242,52 +242,17 @@ namespace Vi.Player
             Physics.simulationMode = SimulationMode.FixedUpdate;
         }
 
-        public override void OnBeforeServerActionClipPlayed()
+        public override Vector2[] GetMoveInputQueue()
         {
-            return;
-            if (combatAgent.AnimationHandler.ShouldApplyRootMotion()) { return; }
+            InputPayload[] arr = new InputPayload[serverInputQueue.Count];
+            serverInputQueue.CopyTo(arr, 0);
 
-            // Empty the input queue and simulate the player up. This prevents the player from jumping backwards in time because the server simulation runs behind the owner simulation
-            while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
+            List<Vector2> result = new List<Vector2>();
+            foreach (InputPayload inputPayload in arr)
             {
-                // Have to double check these to prevent cheating
-                if (combatAgent.StatusAgent.IsRooted())
-                {
-                    inputPayload.moveInput = Vector2.zero;
-                }
-                else if (combatAgent.AnimationHandler.IsReloading())
-                {
-                    inputPayload.moveInput = Vector2.zero;
-                }
-                else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
-                {
-                    inputPayload.moveInput = Vector2.zero;
-                }
-                else if (!CanMove())
-                {
-                    inputPayload.moveInput = Vector2.zero;
-                }
-                else if (!combatAgent.AnimationHandler.IsAtRest())
-                {
-                    inputPayload.moveInput = Vector2.zero;
-                }
-
-                if (serverInputQueue.Count > 0)
-                {
-                    if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero)
-                    {
-                        if (!combatAgent.AnimationHandler.ShouldApplyRootMotion()) { continue; }
-                    }
-                }
-
-                SetInputPayloadVariablesOnServer(ref inputPayload);
-
-                StatePayload statePayload = Move(ref inputPayload, false);
-                stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
-                latestServerState.Value = statePayload;
-                lastInputPayloadProcessedOnServer = inputPayload;
-                NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody);
+                result.Add(inputPayload.moveInput);
             }
+            return result.ToArray();
         }
 
         public override void OnRootMotionTimeReset()
