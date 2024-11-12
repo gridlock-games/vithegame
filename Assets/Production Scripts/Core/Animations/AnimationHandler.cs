@@ -168,7 +168,7 @@ namespace Vi.Core
         public bool IsAtRest()
         {
             if (!animatorReference) { return true; }
-            return animatorReference.IsAtRest();
+            return animatorReference.IsAtRest;
         }
 
         public bool IsAtRestIgnoringTransition()
