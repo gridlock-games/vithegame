@@ -1225,6 +1225,7 @@ namespace Vi.Core
         {
             rootMotionTime = 0;
             totalRootMotionTime = 0;
+            combatAgent.MovementHandler.OnRootMotionTimeReset();
         }
 
         public bool ShouldApplyRootMotion()
