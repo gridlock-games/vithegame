@@ -86,10 +86,9 @@ namespace Vi.Core
 
         public void OnNetworkSpawn()
         {
+            if (!CombatAgent.IsSpawned) { return; }
             if (staticWallBody)
             {
-                if (!CombatAgent.IsSpawned) { return; }
-
                 foreach (Collider col in staticWallColliders)
                 {
                     // Disable colliders on player hub
@@ -101,6 +100,25 @@ namespace Vi.Core
                     {
                         col.enabled = PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None;
                     }
+                }
+            }
+
+            if (!CombatAgent.IsServer)
+            {
+                foreach (Collider col in Colliders)
+                {
+                    colliderInstanceIDMap.Add(col.GetInstanceID());
+                }
+            }
+        }
+
+        public void OnNetworkDespawn()
+        {
+            if (!CombatAgent.IsServer)
+            {
+                foreach (Collider col in Colliders)
+                {
+                    colliderInstanceIDMap.Remove(col.GetInstanceID());
                 }
             }
         }
