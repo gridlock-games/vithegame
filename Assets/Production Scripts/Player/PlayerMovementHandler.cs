@@ -446,6 +446,15 @@ namespace Vi.Player
             CameraFollowTarget = default;
             joysticks = new UIDeadZoneElement[0];
             rootMotionId = default;
+
+            lastServerReconciliationTime = Mathf.NegativeInfinity;
+
+            lastInputPayloadProcessedOnServer = default;
+            lastProcessedState = default;
+            stateBuffer = new StatePayload[BUFFER_SIZE];
+            lastProcessedState = default;
+            serverInputQueue.Clear();
+
         }
 
         private int movementTick;
@@ -589,7 +598,7 @@ namespace Vi.Player
                 }
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
-            if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
+            //if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
             return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, rootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
@@ -629,7 +638,6 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationLerpDuration = 0.25f;
-        //private const float serverReconciliationTeleportThreshold = 0.5f;
 
         private void UpdateTransform()
         {

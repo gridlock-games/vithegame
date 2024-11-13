@@ -96,7 +96,11 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+
             interpolateReached = default;
+            stairColliders.Clear();
+            groundColliders.Clear();
+            animationMoveInput = default;
         }
 
         protected float GetTickRateDeltaTime()
