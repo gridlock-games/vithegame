@@ -368,7 +368,7 @@ namespace Vi.Core.MovementHandlers
 
         private float flightTime;
 
-        private float LightAttackDistance { get { return stoppingDistance + 0.2f; } }
+        private float LightAttackDistance { get { return stoppingDistance + 0.5f; } }
 
         [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
