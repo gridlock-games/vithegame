@@ -25,6 +25,7 @@ namespace Vi.Utility
         public static float NormalizeValue(float value, float min, float max)
         {
             value = Mathf.Clamp(value, min, max);
+            if (Mathf.Approximately(max - min, 0)) { return 0; }
             return (value - min) / (max - min);
         }
 

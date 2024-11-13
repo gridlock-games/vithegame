@@ -258,6 +258,8 @@ namespace Vi.Core
             reloadFinished = false;
 
             IsBlocking = false;
+
+            waitingForLightAttackPressToPropogate = false;
         }
 
         private void EquipWeapon()
@@ -913,12 +915,12 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
+            lightAttackIsPressed.OnValueChanged += OnLightAttackIsPressedChanged;
         }
 
         public override void OnNetworkDespawn()
         {
-            lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
+            lightAttackIsPressed.OnValueChanged -= OnLightAttackIsPressedChanged;
             DespawnActionVFXInstances();
         }
 
@@ -970,13 +972,19 @@ namespace Vi.Core
             }
         }
 
-        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value; } }
+        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value | waitingForLightAttackPressToPropogate; } }
         private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private bool waitingForLightAttackPressToPropogate;
         private Coroutine lightAttackHoldCoroutine;
         private void LightAttackHold(bool isPressed, bool resetAfterSent)
         {
             if (!IsOwner) { Debug.LogError("LightAttackHold() should only be called on the owner!"); return; }
             lightAttackIsPressed.Value = isPressed;
+
+            if (!IsServer)
+            {
+                if (isPressed) { waitingForLightAttackPressToPropogate = true; }
+            }
 
             if (resetAfterSent)
             {
@@ -993,15 +1001,25 @@ namespace Vi.Core
             resetLightAttackIsRunning = false;
         }
 
-        private void OnLightAttackHoldChange(bool prev, bool current)
+        private void OnLightAttackIsPressedChanged(bool prev, bool current)
         {
             if (IsServer)
             {
                 if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
                 if (current) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
                 else { LightAttack(false); }
+
+                if (!IsClient)
+                {
+                    if (current)
+                    {
+                        ResetWaitingForLightAttackPropogationBoolRpc();
+                    }
+                }
             }
         }
+
+        [Rpc(SendTo.Owner)] private void ResetWaitingForLightAttackPropogationBoolRpc() { waitingForLightAttackPressToPropogate = false; }
 
         private IEnumerator LightAttackHold()
         {

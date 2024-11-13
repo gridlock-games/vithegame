@@ -418,7 +418,7 @@ namespace Vi.ArtificialIntelligence
                 }
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
-            if (GetGroundCollidersCount() == 0) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
+            if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
         }
 
         private const float bodyRadius = 0.5f;

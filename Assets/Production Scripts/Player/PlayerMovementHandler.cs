@@ -288,10 +288,14 @@ namespace Vi.Player
             {
                 if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
                 {
-                    InputPayload serverInputPayload;
-                    while (serverInputQueue.TryDequeue(out serverInputPayload))
+                    InputPayload serverInputPayload = new InputPayload();
+                    if (serverInputQueue.Count > 0)
                     {
-                        break;
+                        serverInputPayload = serverInputQueue.Dequeue();
+                    }
+                    else
+                    {
+                        serverInputPayload.rotation = latestServerState.Value.rotation;
                     }
 
                     serverInputPayload.tick = latestServerState.Value.tick + 1;
@@ -585,7 +589,7 @@ namespace Vi.Player
                 }
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
-            if (GetGroundCollidersCount() == 0) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
+            if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
             return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, rootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
         }

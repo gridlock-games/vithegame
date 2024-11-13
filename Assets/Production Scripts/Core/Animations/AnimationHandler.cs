@@ -1274,6 +1274,14 @@ namespace Vi.Core
             }
 
             float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+            float normalizedTime = StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime);
+
+            bool isInRecovery = normalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+            if (isInRecovery)
+            {
+                transitionTime = combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime;
+            }
+
             return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - transitionTime);
         }
 
@@ -1289,15 +1297,9 @@ namespace Vi.Core
                     float prevNormalizedTime = GetNormalizedRootMotionTime();
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
 
-                    float animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.animationSpeed;
-                    if (combatAgent.WeaponHandler.CurrentActionClip.IsAttack())
-                    {
-                        if (prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime)
-                        {
-                            animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed;
-                        }
-                    }
-                    
+                    bool isInRecovery = prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed);
+
                     rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                     totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
 
@@ -1344,6 +1346,11 @@ namespace Vi.Core
                             }
                         }
                     }
+
+                    if (float.IsNaN(delta.x)) { Debug.Log("x is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.x = 0; }
+                    if (float.IsNaN(delta.y)) { Debug.Log("y is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.y = 0; }
+                    if (float.IsNaN(delta.z)) { Debug.Log("z is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.z = 0; }
+
                     return delta;
                 }
                 else

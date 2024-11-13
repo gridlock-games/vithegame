@@ -258,6 +258,8 @@ namespace Vi.Core
             }
 
             isRaging.OnValueChanged -= OnIsRagingChanged;
+
+            NetworkCollider.OnNetworkDespawn();
         }
 
         protected virtual void OnEnable()
