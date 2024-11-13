@@ -1319,7 +1319,6 @@ namespace Vi.Core
                         {
                             if (newNormalizedTime >= 1)
                             {
-                                Debug.Log("CHECK");
                                 rootMotionTime = 0;
                                 prevNormalizedTime = GetNormalizedRootMotionTime();
                                 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
