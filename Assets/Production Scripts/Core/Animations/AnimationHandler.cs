@@ -1274,6 +1274,14 @@ namespace Vi.Core
             }
 
             float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+            float normalizedTime = StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime);
+
+            bool isInRecovery = normalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+            if (isInRecovery)
+            {
+                transitionTime = combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime;
+            }
+
             return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - transitionTime);
         }
 
@@ -1289,15 +1297,9 @@ namespace Vi.Core
                     float prevNormalizedTime = GetNormalizedRootMotionTime();
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
 
-                    float animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.animationSpeed;
-                    if (combatAgent.WeaponHandler.CurrentActionClip.IsAttack())
-                    {
-                        if (prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime)
-                        {
-                            animationSpeed = combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed;
-                        }
-                    }
-                    
+                    bool isInRecovery = prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed));
+
                     rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                     totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
 
