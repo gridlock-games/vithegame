@@ -1315,10 +1315,11 @@ namespace Vi.Core
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                     {
                         shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack;
-                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
+                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack & combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount > 1)
                         {
                             if (newNormalizedTime >= 1)
                             {
+                                Debug.Log("CHECK");
                                 rootMotionTime = 0;
                                 prevNormalizedTime = GetNormalizedRootMotionTime();
                                 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
