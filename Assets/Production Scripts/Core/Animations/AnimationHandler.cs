@@ -1298,7 +1298,9 @@ namespace Vi.Core
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
 
                     bool isInRecovery = prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
-                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed));
+                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed);
+                    // To account for floating point imprecision
+                    animationSpeed = (float)System.Math.Round(animationSpeed, 2);
 
                     rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                     totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
