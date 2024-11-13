@@ -288,10 +288,14 @@ namespace Vi.Player
             {
                 if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
                 {
-                    InputPayload serverInputPayload;
-                    while (serverInputQueue.TryDequeue(out serverInputPayload))
+                    InputPayload serverInputPayload = new InputPayload();
+                    if (serverInputQueue.Count > 0)
                     {
-                        break;
+                        serverInputPayload = serverInputQueue.Dequeue();
+                    }
+                    else
+                    {
+                        serverInputPayload.rotation = latestServerState.Value.rotation;
                     }
 
                     serverInputPayload.tick = latestServerState.Value.tick + 1;
