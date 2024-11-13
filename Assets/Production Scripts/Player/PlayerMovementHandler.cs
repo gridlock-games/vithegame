@@ -446,6 +446,15 @@ namespace Vi.Player
             CameraFollowTarget = default;
             joysticks = new UIDeadZoneElement[0];
             rootMotionId = default;
+
+            lastServerReconciliationTime = Mathf.NegativeInfinity;
+
+            lastInputPayloadProcessedOnServer = default;
+            lastProcessedState = default;
+            stateBuffer = new StatePayload[BUFFER_SIZE];
+            lastProcessedState = default;
+            serverInputQueue.Clear();
+
         }
 
         private int movementTick;
@@ -629,7 +638,6 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationLerpDuration = 0.25f;
-        //private const float serverReconciliationTeleportThreshold = 0.5f;
 
         private void UpdateTransform()
         {

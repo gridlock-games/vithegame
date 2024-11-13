@@ -28,12 +28,14 @@ namespace Vi.Core
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
             CombatAgent = GetComponentInParent<CombatAgent>();
-            CombatAgent.SetNetworkCollider(this);
+
             Colliders = GetNetworkColliders().ToArray();
             if (staticWallBody)
             {
                 staticWallColliders = staticWallBody.GetComponentsInChildren<Collider>();
             }
+
+            CombatAgent.SetNetworkCollider(this);
             
             foreach (Collider col in Colliders)
             {
@@ -74,6 +76,8 @@ namespace Vi.Core
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
+                staticWallBody.position = MovementHandler.Rigidbody.position;
+                staticWallBody.rotation = MovementHandler.Rigidbody.rotation;
                 PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
                 Physics.ContactModifyEvent += Physics_ContactModifyEvent;
                 foreach (Collider col in staticWallColliders)
@@ -130,11 +134,6 @@ namespace Vi.Core
                 NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
                 PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
                 Physics.ContactModifyEvent -= Physics_ContactModifyEvent;
-            }
-
-            foreach (Collider col in Colliders)
-            {
-                col.enabled = false;
             }
         }
 
