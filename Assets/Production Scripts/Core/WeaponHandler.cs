@@ -1096,7 +1096,7 @@ namespace Vi.Core
                 if (deathVibrationsEnabled)
                 {
 #if UNITY_IOS || UNITY_ANDROID
-                    Handheld.Vibrate();
+                    CandyCoded.HapticFeedback.HapticFeedback.HeavyFeedback();
 #endif
                 }
             }
