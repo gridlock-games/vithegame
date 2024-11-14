@@ -4355,8 +4355,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 3432423936
   InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 1
@@ -4364,8 +4362,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &3584783593542317162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4378,7 +4374,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a64fe3b751fa50b4a8c927c5350d5037, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   backgroundImage: {fileID: 8611956608753077096}
   roomSettingsParent: {fileID: 3966538676112215183}
   lobbyUIParent: {fileID: 7093096787426055015}

@@ -30,31 +30,34 @@ namespace Vi.Core
 
         private NetworkList<int> activeSceneGroupIndicies;
 
-        public void LoadScene(string sceneGroupName)
+        public void LoadScene(params string[] sceneGroupNames)
         {
-            if (IsSceneGroupLoaded(sceneGroupName) | IsSceneGroupLoading(sceneGroupName)) { return; }
-
-            int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
-            
-            if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return; }
-
-            switch (scenePayloads[sceneGroupIndex].sceneType)
+            foreach (string sceneGroupName in sceneGroupNames)
             {
-                case SceneType.LocalUI:
-                    LoadScenePayload(scenePayloads[sceneGroupIndex]);
-                    break;
-                case SceneType.SynchronizedUI:
-                case SceneType.Gameplay:
-                    if (!IsServer) { Debug.LogError("Should only call load scene with scene type " + SceneType.Gameplay + " on the server!"); return; }
-                    activeSceneGroupIndicies.Add(sceneGroupIndex);
-                    break;
-                case SceneType.Environment:
-                    if (!IsServer) { Debug.LogError("Should only call load scene with scene type " + SceneType.Environment + " on the server!"); return; }
-                    activeSceneGroupIndicies.Add(sceneGroupIndex);
-                    break;
-                default:
-                    Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
-                    break;
+                if (IsSceneGroupLoaded(sceneGroupName) | IsSceneGroupLoading(sceneGroupName)) { continue; }
+
+                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
+
+                if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); continue; }
+
+                switch (scenePayloads[sceneGroupIndex].sceneType)
+                {
+                    case SceneType.LocalUI:
+                        LoadScenePayload(scenePayloads[sceneGroupIndex]);
+                        break;
+                    case SceneType.SynchronizedUI:
+                    case SceneType.Gameplay:
+                        if (!IsServer) { Debug.LogError("Should only call load scene with scene type " + SceneType.Gameplay + " on the server!"); continue; }
+                        activeSceneGroupIndicies.Add(sceneGroupIndex);
+                        break;
+                    case SceneType.Environment:
+                        if (!IsServer) { Debug.LogError("Should only call load scene with scene type " + SceneType.Environment + " on the server!"); continue; }
+                        activeSceneGroupIndicies.Add(sceneGroupIndex);
+                        break;
+                    default:
+                        Debug.LogError("Scene type: " + scenePayloads[sceneGroupIndex].sceneType + " has not been implemented yet!");
+                        break;
+                }
             }
         }
 
@@ -108,10 +111,7 @@ namespace Vi.Core
                 case SceneType.SynchronizedUI:
                 case SceneType.Gameplay:
                     // Unload UI scenes
-                    UnloadAllScenePayloadsOfType(SceneType.LocalUI);
-                    UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
-                    UnloadAllScenePayloadsOfType(SceneType.Gameplay);
-                    UnloadAllScenePayloadsOfType(SceneType.Environment);
+                    UnloadAllScenePayloadsOfType(SceneType.LocalUI, SceneType.SynchronizedUI, SceneType.Gameplay, SceneType.Environment);
                     foreach (SceneReference scene in scenePayload.sceneReferences)
                     {
                         AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(scene, LoadSceneMode.Additive);
@@ -215,70 +215,73 @@ namespace Vi.Core
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
-        private void UnloadAllScenePayloadsOfType(SceneType sceneType)
+        private void UnloadAllScenePayloadsOfType(params SceneType[] sceneTypes)
         {
-            switch (sceneType)
+            foreach (SceneType sceneType in sceneTypes)
             {
-                case SceneType.LocalUI:
-                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
-                    {
-                        UnloadScenePayload(scenePayload);
-                    }
-                    break;
-                case SceneType.SynchronizedUI:
-                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
-                    {
-                        if (IsSpawned)
-                        {
-                            if (IsServer)
-                            {
-                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
-                            }
-                        }
-                        else
+                switch (sceneType)
+                {
+                    case SceneType.LocalUI:
+                        foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                         {
                             UnloadScenePayload(scenePayload);
                         }
-                    }
-                    break;
-                case SceneType.Gameplay:
-                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
-                    {
-                        if (IsSpawned)
+                        break;
+                    case SceneType.SynchronizedUI:
+                        foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                         {
-                            if (IsServer)
+                            if (IsSpawned)
                             {
-                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                                if (IsServer)
+                                {
+                                    int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                    activeSceneGroupIndicies.Remove(sceneGroupIndex);
+                                }
+                            }
+                            else
+                            {
+                                UnloadScenePayload(scenePayload);
                             }
                         }
-                        else
+                        break;
+                    case SceneType.Gameplay:
+                        foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                         {
-                            UnloadScenePayload(scenePayload);
-                        }
-                    }
-                    break;
-                case SceneType.Environment:
-                    foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
-                    {
-                        if (IsSpawned)
-                        {
-                            if (IsServer)
+                            if (IsSpawned)
                             {
-                                int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
-                                if (activeSceneGroupIndicies.Contains(sceneGroupIndex)) { activeSceneGroupIndicies.Remove(sceneGroupIndex); }
+                                if (IsServer)
+                                {
+                                    int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                    activeSceneGroupIndicies.Remove(sceneGroupIndex);
+                                }
+                            }
+                            else
+                            {
+                                UnloadScenePayload(scenePayload);
                             }
                         }
-                        else
+                        break;
+                    case SceneType.Environment:
+                        foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == sceneType))
                         {
-                            UnloadScenePayload(scenePayload);
+                            if (IsSpawned)
+                            {
+                                if (IsServer)
+                                {
+                                    int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == scenePayload.name);
+                                    activeSceneGroupIndicies.Remove(sceneGroupIndex);
+                                }
+                            }
+                            else
+                            {
+                                UnloadScenePayload(scenePayload);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    Debug.LogError("SceneType: " + sceneType + "has not been implemented yet!");
-                    break;
+                        break;
+                    default:
+                        Debug.LogError("SceneType: " + sceneType + "has not been implemented yet!");
+                        break;
+                }
             }
         }
 
@@ -380,9 +383,7 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
-            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI);
-            UnloadAllScenePayloadsOfType(SceneType.Gameplay);
-            UnloadAllScenePayloadsOfType(SceneType.Environment);
+            UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI, SceneType.Gameplay, SceneType.Environment);
 
             if (OnNetSceneManagerDespawn != null) { OnNetSceneManagerDespawn.Invoke(); }
         }

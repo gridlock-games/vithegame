@@ -2148,8 +2148,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 3213354428
   InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -2157,8 +2155,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &4586502681719147457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2171,7 +2167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 273c86efec0e792429985cc3c990e4fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   worldSpaceLabel: {fileID: 8044716102785443474}
   UI: {fileID: 3220911598652065846}
 --- !u!1 &4679715041158291794
