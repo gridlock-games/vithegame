@@ -454,11 +454,6 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
-        private void OnValidate()
-        {
-            UnityEditor.EditorUtility.SetDirty(this);
-        }
-
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
