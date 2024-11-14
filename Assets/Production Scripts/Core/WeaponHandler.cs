@@ -985,7 +985,7 @@ namespace Vi.Core
 
             if (!IsServer)
             {
-                if (isPressed) { lastLightAttackPressNetworkLatencyWait = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) * 2; }
+                if (isPressed) { lastLightAttackPressNetworkLatencyWait = NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat; }
             }
 
             if (resetAfterSent)
@@ -996,7 +996,7 @@ namespace Vi.Core
 
         private void LateUpdate()
         {
-            lastLightAttackPressNetworkLatencyWait -= Time.deltaTime;
+            lastLightAttackPressNetworkLatencyWait -= Time.unscaledDeltaTime;
         }
 
         private bool resetLightAttackIsRunning;
