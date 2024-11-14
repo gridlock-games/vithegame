@@ -14,11 +14,44 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
 using UnityEditor.Animations;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Set Network Object Settings")]
+        private static void SetNetworkObjectSettings()
+        {
+            string[] paths = AssetDatabase.GetAllAssetPaths();
+            int counter = -1;
+            foreach (string assetPath in paths)
+            {
+                counter++;
+                if (EditorUtility.DisplayCancelableProgressBar("Setting Network Object Settings: " + assetPath,
+                            counter.ToString() + " assets left - " + paths.Length,
+                            counter / (float)paths.Length))
+                { break; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkObject.AutoObjectParentSync | networkObject.SceneMigrationSynchronization | networkObject.ActiveSceneSynchronization)
+                        {
+                            networkObject.SceneMigrationSynchronization = false;
+                            networkObject.ActiveSceneSynchronization = false;
+                            networkObject.AutoObjectParentSync = false;
+                            UnityEditor.EditorUtility.SetDirty(networkObject);
+                        }
+                    }
+                }
+                EditorUtility.UnloadUnusedAssetsImmediate();
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
         [MenuItem("Tools/Production/Set Audio Compression Settings")]
         private static void SetAudioCompressionSettings()
         {

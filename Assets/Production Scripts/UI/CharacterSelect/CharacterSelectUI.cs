@@ -994,13 +994,11 @@ namespace Vi.UI
             {
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
-                    NetSceneManager.Singleton.LoadScene("Training Room");
-                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
+                    NetSceneManager.Singleton.LoadScene("Training Room", "Tutorial Map");
                 }
                 else
                 {
-                    NetSceneManager.Singleton.LoadScene("Tutorial Room");
-                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
+                    NetSceneManager.Singleton.LoadScene("Tutorial Room", "Tutorial Map");
                 }
             }
             else
@@ -1016,8 +1014,7 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(selectedCharacter._id.ToString());
             if (NetworkManager.Singleton.StartHost())
             {
-                NetSceneManager.Singleton.LoadScene("Tutorial Room");
-                NetSceneManager.Singleton.LoadScene("Tutorial Map");
+                NetSceneManager.Singleton.LoadScene("Tutorial Room", "Tutorial Map");
             }
             else
             {

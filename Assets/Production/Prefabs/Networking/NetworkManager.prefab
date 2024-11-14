@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 150821903034100078}
   - component: {fileID: 5050022971801080533}
-  - component: {fileID: 1211957999561559166}
+  - component: {fileID: 8027434367884889131}
   - component: {fileID: 2339720926279199631}
   m_Layer: 0
   m_Name: NetworkManager
@@ -46,9 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NetworkManagerExpanded: 0
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 1211957999561559166}
+    NetworkTransport: {fileID: 8027434367884889131}
     PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists: []
@@ -67,10 +68,14 @@ MonoBehaviour:
     LoadSceneTimeOut: 120
     SpawnTimeout: 1
     EnableNetworkLogs: 1
+    NetworkTopology: 0
+    UseCMBService: 0
+    AutoSpawnPlayerPrefabClientSide: 1
+    NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 0
---- !u!114 &1211957999561559166
+--- !u!114 &8027434367884889131
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85,8 +90,8 @@ MonoBehaviour:
   m_ProtocolType: 0
   m_UseWebSockets: 0
   m_UseEncryption: 0
-  m_MaxPacketQueueSize: 512
-  m_MaxPayloadSize: 50000
+  m_MaxPacketQueueSize: 2048
+  m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
   m_MaxConnectAttempts: 60

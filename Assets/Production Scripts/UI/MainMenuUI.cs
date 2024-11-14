@@ -138,8 +138,7 @@ namespace Vi.UI
             networkTransport.SetConnectionData(serverIP, hubPort, FasterPlayerPrefs.serverListenAddress);
 
             NetworkManager.Singleton.StartServer();
-            NetSceneManager.Singleton.LoadScene("Player Hub");
-            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
+            NetSceneManager.Singleton.LoadScene("Player Hub", "Player Hub Environment");
         }
 
         public void StartLobbyServerButton()

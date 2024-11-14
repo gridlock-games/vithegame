@@ -21,6 +21,30 @@ namespace Vi.Player
         private PlayerInput playerInput;
         private WeaponHandler weaponHandler;
 
+        private void Update()
+        {
+            string actionMapName = "";
+            if (playerInput.currentActionMap != null) { actionMapName = playerInput.currentActionMap.name; }
+
+            if (!string.IsNullOrWhiteSpace(actionMapName))
+            {
+                if (!IsAnyUIOpen() & actionMapName != "Base")
+                {
+                    Debug.Log("no UI open but the action map name isn't base");
+                }
+            }
+        }
+
+        private bool IsAnyUIOpen()
+        {
+            if (externalUI != null) { return true; }
+            if (scoreboardInstance != null) { return true; }
+            if (pauseInstance != null) { return true; }
+            if (inventoryInstance != null) { return true; }
+            if (textChatIsOpen) { return true; }
+            return false;
+        }
+
         public void SetExternalUI(ExternalUI externalUI)
         {
             this.externalUI = externalUI;
