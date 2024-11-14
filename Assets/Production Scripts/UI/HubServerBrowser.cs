@@ -97,8 +97,7 @@ namespace Vi.UI
             if (emptyLobbyServerList.Count > 0)
             {
                 WebRequestManager.Server server = emptyLobbyServerList[0];
-                networkTransport.ConnectionData.Address = server.ip;
-                networkTransport.ConnectionData.Port = ushort.Parse(server.port);
+                networkTransport.SetConnectionData(server.ip, ushort.Parse(server.port), FasterPlayerPrefs.serverListenAddress);
                 PersistentLocalObjects.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
             }
             else

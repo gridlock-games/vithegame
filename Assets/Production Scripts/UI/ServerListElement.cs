@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Vi.Core;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -29,8 +30,7 @@ namespace Vi.UI
 
         public void SetConnectionInfo()
         {
-            networkTransport.ConnectionData.Address = Server.ip;
-            networkTransport.ConnectionData.Port = ushort.Parse(Server.port);
+            networkTransport.SetConnectionData(Server.ip, ushort.Parse(Server.port), FasterPlayerPrefs.serverListenAddress);
         }
 
         public void Initialize(MonoBehaviour UIParent, WebRequestManager.Server server)

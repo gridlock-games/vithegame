@@ -136,9 +136,10 @@ namespace Vi.ArtificialIntelligence
             if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return; }
             if (combatAgent.StatusAgent.IsFeared()) { return; }
 
+            float dist = Vector3.Distance(Destination, transform.position);
             if (canOnlyLightAttack)
             {
-                if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
+                if (dist < lightAttackDistance)
                 {
                     if (weaponHandler.CanAim) { weaponHandler.HeavyAttack(true); }
                     else { weaponHandler.HeavyAttack(false); }
@@ -159,7 +160,7 @@ namespace Vi.ArtificialIntelligence
                 if (weaponHandler.CanADS)
                 {
                     weaponHandler.AimDownSights(true);
-                    if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
+                    if (dist < heavyAttackDistance)
                     {
                         EvaluateAbility();
                         weaponHandler.LightAttack(true);
@@ -167,7 +168,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    if (Vector3.Distance(Destination, transform.position) < lightAttackDistance)
+                    if (dist < lightAttackDistance)
                     {
                         if (!isHeavyAttacking)
                         {
@@ -175,7 +176,7 @@ namespace Vi.ArtificialIntelligence
                             weaponHandler.LightAttack(true);
                         }
                     }
-                    else if (Vector3.Distance(Destination, transform.position) < heavyAttackDistance)
+                    else if (dist < heavyAttackDistance)
                     {
                         EvaluateAbility();
                         if (!weaponHandler.CanADS)
@@ -428,6 +429,17 @@ namespace Vi.ArtificialIntelligence
             Vector2 moveInput = GetPathMoveInput(false);
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             combatAgent.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
+        }
+
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+            if (Application.isPlaying)
+            {
+                if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+                Gizmos.color = Vector3.Distance(Destination, transform.position) < lightAttackDistance ? Color.red : Color.white;
+                Gizmos.DrawSphere(transform.position + BodyHeightOffset, 0.3f);
+            }
         }
     }
 }

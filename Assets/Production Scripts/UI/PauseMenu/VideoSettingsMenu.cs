@@ -24,8 +24,6 @@ namespace Vi.UI
         [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
-        [SerializeField] private Slider renderScaleSlider;
-        [SerializeField] private TMP_Dropdown renderScalingModeDropdown;
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private Toggle hdrToggle;
         [SerializeField] private Toggle postProcessingToggle;
@@ -147,30 +145,6 @@ namespace Vi.UI
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
 
             pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
-            renderScaleSlider.value = pipeline.renderScale;
-
-            renderScalingModeDropdown.ClearOptions();
-            List<string> scalingModeOptions = new List<string>();
-            foreach (UpscalingFilterSelection scalingMode in Enum.GetValues(typeof(UpscalingFilterSelection)))
-            {
-                switch (scalingMode)
-                {
-                    case UpscalingFilterSelection.Auto:
-                        scalingModeOptions.Add("Automatic");
-                        break;
-                    case UpscalingFilterSelection.Linear:
-                        scalingModeOptions.Add("Bilinear");
-                        break;
-                    case UpscalingFilterSelection.Point:
-                        scalingModeOptions.Add("Nearest-Neighbor");
-                        break;
-                    case UpscalingFilterSelection.FSR:
-                        scalingModeOptions.Add("FidelityFX Super Resolution 1.0");
-                        break;
-                }
-            }
-            renderScalingModeDropdown.AddOptions(scalingModeOptions);
-            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
 
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
 
@@ -199,8 +173,6 @@ namespace Vi.UI
                 | originalResolution.height != supportedResolutions[resolutionDropdown.value].height
                 | originalResolution.refreshRateRatio.value != supportedResolutions[resolutionDropdown.value].refreshRateRatio.value
                 | originalGraphicsPreset != graphicsPresetDropdown.value
-                | originalRenderScaleValue != renderScaleSlider.value
-                | originalScalingFilter != (UpscalingFilterSelection)renderScalingModeDropdown.value
                 | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
                 | originalHDR != hdrToggle.isOn
                 | originalPostProcessing != postProcessingToggle.isOn;
@@ -215,7 +187,6 @@ namespace Vi.UI
         // Graphics settings
         private int originalGraphicsPreset;
         private float originalRenderScaleValue;
-        private UpscalingFilterSelection originalScalingFilter;
         private int originalVSyncState;
         private bool originalHDR;
         private bool originalPostProcessing;
@@ -226,7 +197,6 @@ namespace Vi.UI
 
             originalGraphicsPreset = graphicsPresetDropdown.value;
             originalRenderScaleValue = pipeline.renderScale;
-            originalScalingFilter = pipeline.upscalingFilter;
             originalVSyncState = QualitySettings.vSyncCount;
             originalHDR = pipeline.supportsHDR;
             originalPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
@@ -248,8 +218,6 @@ namespace Vi.UI
 
             // Graphics settings
             if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
-            pipeline.renderScale = renderScaleSlider.value;
-            pipeline.upscalingFilter = (UpscalingFilterSelection)renderScalingModeDropdown.value;
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
@@ -297,8 +265,6 @@ namespace Vi.UI
 
             // Graphics Settings
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
-            renderScaleSlider.value = pipeline.renderScale;
-            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
             vsyncToggle.interactable = true;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
@@ -309,8 +275,6 @@ namespace Vi.UI
         {
             UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
             
-            renderScaleSlider.value = pipeline.renderScale;
-            renderScalingModeDropdown.value = (int)pipeline.upscalingFilter;
             vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;

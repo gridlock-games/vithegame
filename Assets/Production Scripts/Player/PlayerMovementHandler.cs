@@ -765,7 +765,7 @@ namespace Vi.Player
             cameraController.transform.localRotation = Quaternion.identity;
         }
 
-        private const int BUFFER_SIZE = 512;
+        private const int BUFFER_SIZE = 256;
 
         private StatePayload[] stateBuffer;
         private NetworkList<InputPayload> inputBuffer;

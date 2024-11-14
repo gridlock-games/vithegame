@@ -1085,8 +1085,7 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
-                networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
-                networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 StartClient();
             }
             else

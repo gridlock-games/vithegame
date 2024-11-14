@@ -319,6 +319,8 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
+            totalRootMotionTime = Mathf.Infinity;
+            rootMotionTime = Mathf.Infinity;
 
             if (resetGameplayVariables)
             {
@@ -342,10 +344,13 @@ namespace Vi.Core
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
+            totalRootMotionTime = Mathf.Infinity;
+            rootMotionTime = Mathf.Infinity;
+
             if (resetGameplayVariables)
             {
-                Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
-                Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
             }
         }
@@ -976,6 +981,7 @@ namespace Vi.Core
                     {
                         Animator.SetBool("EnhanceHeavyAttack", true);
                         heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Enhance;
+                        totalRootMotionTime = Mathf.Infinity;
                         rootMotionTime = Mathf.Infinity;
                     }
                 }
@@ -1309,7 +1315,7 @@ namespace Vi.Core
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                     {
                         shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack;
-                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
+                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack & combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount > 1)
                         {
                             if (newNormalizedTime >= 1)
                             {
