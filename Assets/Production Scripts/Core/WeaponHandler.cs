@@ -259,7 +259,7 @@ namespace Vi.Core
 
             IsBlocking = false;
 
-            waitingForLightAttackPressToPropogate = false;
+            lastLightAttackPressNetworkLatencyWait = Mathf.NegativeInfinity;
         }
 
         private void EquipWeapon()
@@ -974,9 +974,9 @@ namespace Vi.Core
             }
         }
 
-        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value | waitingForLightAttackPressToPropogate; } }
+        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value | lastLightAttackPressNetworkLatencyWait > 0; } }
         private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private bool waitingForLightAttackPressToPropogate;
+        private float lastLightAttackPressNetworkLatencyWait = Mathf.NegativeInfinity;
         private Coroutine lightAttackHoldCoroutine;
         private void LightAttackHold(bool isPressed, bool resetAfterSent)
         {
@@ -985,13 +985,18 @@ namespace Vi.Core
 
             if (!IsServer)
             {
-                if (isPressed) { waitingForLightAttackPressToPropogate = true; }
+                if (isPressed) { lastLightAttackPressNetworkLatencyWait = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) * 2; }
             }
 
             if (resetAfterSent)
             {
                 if (!resetLightAttackIsRunning) { StartCoroutine(ResetLightAttackIsPressedAfterNotDirty()); }
             }
+        }
+
+        private void LateUpdate()
+        {
+            lastLightAttackPressNetworkLatencyWait -= Time.deltaTime;
         }
 
         private bool resetLightAttackIsRunning;
@@ -1010,18 +1015,8 @@ namespace Vi.Core
                 if (lightAttackHoldCoroutine != null) { StopCoroutine(lightAttackHoldCoroutine); }
                 if (current) { lightAttackHoldCoroutine = StartCoroutine(LightAttackHold()); }
                 else { LightAttack(false); }
-
-                if (!IsClient)
-                {
-                    if (current)
-                    {
-                        ResetWaitingForLightAttackPropogationBoolRpc();
-                    }
-                }
             }
         }
-
-        [Rpc(SendTo.Owner)] private void ResetWaitingForLightAttackPropogationBoolRpc() { waitingForLightAttackPressToPropogate = false; }
 
         private IEnumerator LightAttackHold()
         {
