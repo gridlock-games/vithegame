@@ -192,14 +192,14 @@ namespace Vi.UI
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
-            primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name;
+            primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name.ToUpper();
             bool canEditLoadout = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
             primaryWeaponButton.interactable = canEditLoadout;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
             secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
-            secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name;
+            secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name.ToUpper();
             secondaryWeaponButton.interactable = canEditLoadout;
 
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
