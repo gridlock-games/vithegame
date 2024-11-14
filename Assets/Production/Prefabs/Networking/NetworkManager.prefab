@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 150821903034100078}
   - component: {fileID: 5050022971801080533}
-  - component: {fileID: 4752024135261502671}
+  - component: {fileID: 1211957999561559166}
   - component: {fileID: 2339720926279199631}
   m_Layer: 0
   m_Name: NetworkManager
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 4752024135261502671}
+    NetworkTransport: {fileID: 1211957999561559166}
     PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists: []
@@ -70,7 +70,7 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!114 &4752024135261502671
+--- !u!114 &1211957999561559166
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

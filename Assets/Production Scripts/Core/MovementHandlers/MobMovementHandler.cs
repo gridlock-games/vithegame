@@ -368,7 +368,7 @@ namespace Vi.Core.MovementHandlers
 
         private float flightTime;
 
-        private float LightAttackDistance { get { return stoppingDistance + 0.5f; } }
+        private float LightAttackDistance { get { return stoppingDistance + 2.5f; } }
 
         [Header("Ability1")]
         [SerializeField] private bool canUseAbility1 = true;
@@ -438,11 +438,50 @@ namespace Vi.Core.MovementHandlers
                     }
                 }
 
-                if (dist < LightAttackDistance)
+                if (combatAgent.WeaponHandler.IsInRecovery)
+                {
+                    if (dist < LightAttackDistance)
+                    {
+                        weaponHandler.LightAttack(true);
+                        return;
+                    }
+                }
+                else if (dist < stoppingDistance)
                 {
                     weaponHandler.LightAttack(true);
                     return;
                 }
+            }
+        }
+
+        private void OnValidate()
+        {
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(transform.position + BodyHeightOffset / 2, transform.forward * LightAttackDistance);
+            if (Application.isPlaying)
+            {
+                if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+
+                Gizmos.color = Color.white;
+                float dist = Vector3.Distance(Destination, transform.position);
+                if (combatAgent.WeaponHandler.IsInRecovery)
+                {
+                    if (dist < LightAttackDistance)
+                    {
+                        Gizmos.color = Color.red;
+                    }
+                }
+                else if (dist < stoppingDistance)
+                {
+                    Gizmos.color = Color.red;
+                }
+                Gizmos.DrawSphere(transform.position + BodyHeightOffset, 0.3f);
             }
         }
     }

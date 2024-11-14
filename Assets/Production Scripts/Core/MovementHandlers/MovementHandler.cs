@@ -415,45 +415,49 @@ namespace Vi.Core.MovementHandlers
 
         protected virtual void OnDrawGizmos()
         {
-            if (Application.isPlaying) { return; }
-			Gizmos.color = Color.blue;
-			Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset, 0), 0.5f);
-
-			Gizmos.color = Color.red;
-			Gizmos.DrawRay(transform.position, transform.forward * stoppingDistance);
-        }
-
-        protected virtual void OnDrawGizmosSelected()
-		{
-			if (!Application.isPlaying) { return; }
-
-			Vector3 prevCorner = transform.position;
-			for (int i = 0; i < path.corners.Length; i++)
+			if (Application.isPlaying)
 			{
-				Vector3 corner = path.corners[i];
+				if (TryGetComponent(out CombatAgent combatAgent))
+				{
+					if (combatAgent.GetAilment() == ScriptableObjects.ActionClip.Ailment.Death) { return; }
+				}
 
-				Vector3 toTarget = corner - transform.position;
-				toTarget.y = 0;
+                Vector3 prevCorner = transform.position;
+                for (int i = 0; i < path.corners.Length; i++)
+                {
+                    Vector3 corner = path.corners[i];
 
-				Vector3 prevTo = corner - prevCorner;
-				prevTo.y = 0;
+                    Vector3 toTarget = corner - transform.position;
+                    toTarget.y = 0;
 
-				float angle = Vector3.Angle(prevTo, toTarget);
+                    Vector3 prevTo = corner - prevCorner;
+                    prevTo.y = 0;
 
-				Gizmos.color = Color.magenta;
-				Gizmos.DrawSphere(corner, 0.25f);
-				Gizmos.DrawLine(prevCorner, corner);
-				Gizmos.color = Color.black;
+                    float angle = Vector3.Angle(prevTo, toTarget);
+
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawSphere(corner, 0.25f);
+                    Gizmos.DrawLine(prevCorner, corner);
+                    Gizmos.color = Color.black;
 #if UNITY_EDITOR
-				UnityEditor.Handles.Label(corner + Vector3.up * 2, i + " | " + angle.ToString("F1"));
+                    UnityEditor.Handles.Label(corner + Vector3.up * 2, i + " | " + angle.ToString("F1"));
 #endif
-				prevCorner = corner;
-			}
-			Gizmos.color = Color.white;
-			Gizmos.DrawSphere(NextPosition, 0.3f);
+                    prevCorner = corner;
+                }
+                Gizmos.color = Color.white;
+                Gizmos.DrawSphere(NextPosition, 0.3f);
 
-			Gizmos.color = Color.yellow;
-			Gizmos.DrawSphere(Destination, 0.3f);
-		}
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(Destination, 0.3f);
+            }
+			else
+			{
+                Gizmos.color = Color.blue;
+                Gizmos.DrawSphere(transform.position + transform.rotation * new Vector3(0, bodyHeightOffset, 0), 0.5f);
+
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(transform.position, transform.forward * stoppingDistance);
+            }
+        }
 	}
 }

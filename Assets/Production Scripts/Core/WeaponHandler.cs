@@ -968,7 +968,13 @@ namespace Vi.Core
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
                 if (actionClip != null)
+                {
                     combatAgent.AnimationHandler.PlayAction(actionClip);
+                    if (combatAgent is Vi.Core.CombatAgents.Mob)
+                    {
+                        Debug.Log(combatAgent.GetName() + " " + actionClip.name + " " + Time.time);
+                    }
+                }
             }
         }
 
