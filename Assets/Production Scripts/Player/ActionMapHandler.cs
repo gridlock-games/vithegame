@@ -86,13 +86,11 @@ namespace Vi.Player
             playerInput = GetComponent<PlayerInput>();
             if (playerInput.defaultActionMap == "Base")
             {
-                playerInput.SwitchCurrentActionMap("Base");
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
                 if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
-                playerInput.SwitchCurrentActionMap("Spectator");
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
                 if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
             }
