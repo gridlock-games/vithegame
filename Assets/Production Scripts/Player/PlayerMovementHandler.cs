@@ -374,38 +374,47 @@ namespace Vi.Player
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (combatAgent.WeaponHandler.LightAttackIsPressed)
                 {
+                    Debug.Log("Light attack is pressed");
                     moveInput = Vector2.zero;
                 }
                 else if (latestServerState.Value.usedRootMotion)
                 {
+                    Debug.Log("server state used root motion");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
+                    Debug.Log("Waiting for action clip to play");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.AnimationHandler.IsReloading())
                 {
+                    Debug.Log("Reloading");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
                 {
+                    Debug.Log("Dead");
                     moveInput = Vector2.zero;
                 }
                 else if (!CanMove())
                 {
+                    Debug.Log("Cannot move");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.StatusAgent.IsRooted())
                 {
+                    Debug.Log("Rooted");
                     moveInput = Vector2.zero;
                 }
                 else if (shouldApplyRootMotion)
                 {
+                    Debug.Log("Applying root motion");
                     moveInput = Vector2.zero;
                 }
                 else if (!combatAgent.AnimationHandler.IsAtRest())
                 {
+                    Debug.Log("Not at rest");
                     moveInput = Vector2.zero;
                 }
                 else
