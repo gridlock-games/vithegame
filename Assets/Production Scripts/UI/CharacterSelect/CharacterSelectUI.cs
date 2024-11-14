@@ -994,8 +994,7 @@ namespace Vi.UI
             {
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
-                    NetSceneManager.Singleton.LoadScene("Training Room");
-                    NetSceneManager.Singleton.LoadScene("Tutorial Map");
+                    NetSceneManager.Singleton.LoadScene("Training Room", "Tutorial Map");
                 }
                 else
                 {
