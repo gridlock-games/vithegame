@@ -970,10 +970,6 @@ namespace Vi.Core
                 if (actionClip != null)
                 {
                     combatAgent.AnimationHandler.PlayAction(actionClip);
-                    if (combatAgent is Vi.Core.CombatAgents.Mob)
-                    {
-                        Debug.Log(combatAgent.GetName() + " " + actionClip.name + " " + Time.time);
-                    }
                 }
             }
         }
