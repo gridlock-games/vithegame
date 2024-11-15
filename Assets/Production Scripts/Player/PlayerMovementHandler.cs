@@ -10,6 +10,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
 using System.Linq;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Player
 {
@@ -417,15 +418,24 @@ namespace Vi.Player
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
                     GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
-                movementTick++;
-
                 StatePayload statePayload = Move(ref inputPayload, false);
 
-                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                else
-                    inputBuffer.Add(inputPayload);
+                movementTick++;
 
+                bool isGameOver = false;
+                if (GameModeManager.Singleton)
+                {
+                    if (GameModeManager.Singleton.IsGameOver()) { isGameOver = true; }
+                }
+
+                if (!isGameOver)
+                {
+                    if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                        inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                    else
+                        inputBuffer.Add(inputPayload);
+                }
+                
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
 
