@@ -10,6 +10,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
 using System.Linq;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Player
 {
@@ -421,11 +422,14 @@ namespace Vi.Player
 
                 StatePayload statePayload = Move(ref inputPayload, false);
 
-                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                else
-                    inputBuffer.Add(inputPayload);
-
+                if (!GameModeManager.Singleton.IsGameOver())
+                {
+                    if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                        inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                    else
+                        inputBuffer.Add(inputPayload);
+                }
+                
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
 

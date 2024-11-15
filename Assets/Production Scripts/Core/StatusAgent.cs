@@ -21,7 +21,7 @@ namespace Vi.Core
             stopAllStatuses = default;
             stopAllStatusesAssociatedWithWeapon = default;
 
-            DamageMultiplier = 1;
+            DamageMultiplier = 7;
             DamageReductionMultiplier = 1;
             DamageReceivedMultiplier = 1;
             HealingMultiplier = 1;
@@ -178,7 +178,7 @@ namespace Vi.Core
             return true;
         }
 
-        public float DamageMultiplier { get; private set; } = 1;
+        public float DamageMultiplier { get; private set; } = 7;
         public float DamageReductionMultiplier { get; private set; } = 1;
         public float DamageReceivedMultiplier { get; private set; } = 1;
         public float HealingMultiplier { get; private set; } = 1;
