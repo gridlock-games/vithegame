@@ -11011,15 +11011,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 477968765
+  GlobalObjectIdHash: 1297109677
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &341003221020181963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11032,6 +11036,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f893b49c9b5ceef4f83053f1d54c5768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   worldSpaceLabel: {fileID: 4195338354673226359}
   UICanvas: {fileID: 6300915653427985226}
   shopKeeperItemPrefab: {fileID: 4956002941003177154, guid: 7242b7f99a89f63469b91f78185816f2,

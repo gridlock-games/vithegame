@@ -303,7 +303,7 @@ namespace Vi.Core
                                 {
                                     if (networkObject.transform.parent)
                                     {
-                                        Debug.LogError(networkObject + " pooled network object that isn't a root object will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
+                                        Debug.LogWarning(networkObject + " pooled network object that isn't a root object will be destroyed on scene unload! " + loadedHandle.Result.Scene.name);
                                     }
                                     else
                                     {
@@ -314,18 +314,19 @@ namespace Vi.Core
                                     {
                                         if (networkObject.IsSpawned)
                                         {
+                                            Debug.Log("Despawning network object " + networkObject);
                                             networkObject.Despawn(true);
                                         }
                                         else
                                         {
-                                            Debug.LogError(networkObject + " is despawned and will be destroyed on scene unload! Why wasn't it moved to the base scene when it was despawned?");
+                                            Debug.LogWarning(networkObject + " is despawned and will be destroyed on scene unload! Why wasn't it moved to the base scene when it was despawned?");
                                             if (pooledObject.IsSpawned)
                                             {
                                                 ObjectPoolingManager.ReturnObjectToPool(pooledObject);
                                             }
                                             else
                                             {
-                                                Debug.LogError(pooledObject + " isn't spawned!");
+                                                Debug.LogWarning(pooledObject + " isn't spawned!");
                                             }
                                         }
                                     }
@@ -333,7 +334,7 @@ namespace Vi.Core
                                     {
                                         if (networkObject.IsSpawned)
                                         {
-                                            Debug.LogError("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
+                                            Debug.LogWarning("Client unsure how to handle unload event for network object " + networkObject + " is spawned " + networkObject.IsSpawned);
                                         }
                                         else
                                         {
@@ -444,6 +445,27 @@ namespace Vi.Core
 
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)
         {
+            PersistentLocalObjects.Singleton.StartCoroutine(PerformLoading(networkListEvent));
+            //if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
+            //{
+            //    LoadScenePayload(scenePayloads[networkListEvent.Value]);
+            //    if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
+            //}
+            //else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
+            //{
+            //    UnloadScenePayload(scenePayloads[networkListEvent.Value]);
+            //    if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
+            //}
+            //else
+            //{
+            //    Debug.LogWarning("Net Scene Manager Recieved a list event that is unsupported!");
+            //}
+        }
+
+        private IEnumerator PerformLoading(NetworkListEvent<int> networkListEvent)
+        {
+            Debug.Log("Network liste event " + networkListEvent.Type + " " + networkListEvent.Value);
+            yield return new WaitForSeconds(1);
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
@@ -453,6 +475,10 @@ namespace Vi.Core
             {
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
+            }
+            else
+            {
+                Debug.LogWarning("Net Scene Manager Recieved a list event that is unsupported!");
             }
         }
 

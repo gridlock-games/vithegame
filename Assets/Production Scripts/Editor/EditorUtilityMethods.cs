@@ -23,13 +23,15 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Set Network Object Settings")]
         private static void SetNetworkObjectSettings()
         {
-            string[] paths = AssetDatabase.GetAllAssetPaths();
+            List<string> files = new List<string>();
+            files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
+            string[] paths = files.ToArray();
             int counter = -1;
             foreach (string assetPath in paths)
             {
                 counter++;
                 if (EditorUtility.DisplayCancelableProgressBar("Setting Network Object Settings: " + assetPath,
-                            counter.ToString() + " assets left - " + paths.Length,
+                            counter.ToString() + " out of " + paths.Length,
                             counter / (float)paths.Length))
                 { break; }
 

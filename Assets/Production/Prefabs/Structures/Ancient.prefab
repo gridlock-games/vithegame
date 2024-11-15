@@ -65,6 +65,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -104,13 +107,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 656070470
   InScenePlacedSourceGlobalObjectIdHash: 656070470
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6502532454412844127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,6 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29fb8e5a71b4c1248a787fa719e179de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   maxHP: 1000
   team: 10
   deathSound: {fileID: 8300000, guid: cd27e58d1f4274b288e20f91fafcdcf5, type: 3}
@@ -139,6 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &873541634751960731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,6 +359,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

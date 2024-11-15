@@ -47,13 +47,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 437879850
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &5519423893761400348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,11 +70,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f7a50a6fc2eb741930d8e071d5c916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   UIPrefab: {fileID: 6554387962942687702, guid: b5f1c725c711ea04fb58ad2868d0dc3f,
     type: 3}
   numberOfRoundsWinsToWinGame: 3
   roundDuration: 180
   nextGameActionDuration: 10
+  despawnProjectilesInBetweenRounds: 1
   respawnTime: 5
   respawnType: 0
   levelingEnabled: 0

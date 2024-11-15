@@ -2703,13 +2703,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 2448939177
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &8564401863331919323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2722,6 +2726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40814a0fdd7b2064cb59b9a5042e6b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   worldSpaceLabel: {fileID: 73519393645535981}
   UI: {fileID: 7829688245395688192}
   gameModePreviewUI: {fileID: 4229541647828072647}
