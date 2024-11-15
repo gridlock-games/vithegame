@@ -168,9 +168,7 @@ namespace Vi.Player
                         int clientStateIndex = rootMotionReconciliationSlice[0].tick % BUFFER_SIZE;
                         if (rootMotionPositionError > serverReconciliationThreshold)
                         {
-                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError
-                                + "\n" + latestServerState.Value.rootMotionId + " " + rootMotionReconciliationSlice[0].rootMotionId
-                                + "\n" + latestServerState.Value.rootMotionTime + " " + rootMotionReconciliationSlice[0].rootMotionTime);
+                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError);
 
                             StatePayload modifiedStatePayload = latestServerState.Value;
                             modifiedStatePayload.tick = rootMotionReconciliationSlice[0].tick;
