@@ -373,7 +373,7 @@ namespace Vi.Core.MovementHandlers
 		{
 			if (moveAction != null)
 			{
-				if (!moveAction.enabled) { Debug.Log("Move action is disabled"); return Vector2.zero; }
+				if (!moveAction.enabled) { return Vector2.zero; }
 			}
 			return moveInput;
 		}
