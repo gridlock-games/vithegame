@@ -187,7 +187,7 @@ namespace Vi.Player
                     }
                     else
                     {
-                        Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime);
+                        Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime + " " + combatAgent.WeaponHandler.CurrentActionClip + " " + combatAgent.WeaponHandler.GetWeapon());
                     }
                 }
                 return Vector3.zero;
