@@ -1098,6 +1098,8 @@ namespace Vi.Core
                 {
                     foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
+                        if (combatAgent.NetworkObject.IsPlayerObject) { continue; }
+
                         if (combatAgent.IsSpawned) { combatAgent.NetworkObject.Despawn(true); }
                         else
                         {

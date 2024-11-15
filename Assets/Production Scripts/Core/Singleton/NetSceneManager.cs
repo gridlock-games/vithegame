@@ -196,6 +196,7 @@ namespace Vi.Core
                             }
                             else
                             {
+                                Debug.Log("Destroying " + g);
                                 Destroy(g);
                             }
                         }
@@ -314,7 +315,6 @@ namespace Vi.Core
                                     {
                                         if (networkObject.IsSpawned)
                                         {
-                                            Debug.Log("Despawning network object " + networkObject);
                                             networkObject.Despawn(true);
                                         }
                                         else
@@ -445,27 +445,7 @@ namespace Vi.Core
 
         private void OnActiveSceneGroupIndiciesChange(NetworkListEvent<int> networkListEvent)
         {
-            PersistentLocalObjects.Singleton.StartCoroutine(PerformLoading(networkListEvent));
-            //if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
-            //{
-            //    LoadScenePayload(scenePayloads[networkListEvent.Value]);
-            //    if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
-            //}
-            //else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
-            //{
-            //    UnloadScenePayload(scenePayloads[networkListEvent.Value]);
-            //    if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
-            //}
-            //else
-            //{
-            //    Debug.LogWarning("Net Scene Manager Recieved a list event that is unsupported!");
-            //}
-        }
-
-        private IEnumerator PerformLoading(NetworkListEvent<int> networkListEvent)
-        {
-            Debug.Log("Network liste event " + networkListEvent.Type + " " + networkListEvent.Value);
-            yield return new WaitForSeconds(1);
+            Debug.Log("Network list event " + networkListEvent.Type + " " + networkListEvent.Value);
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
@@ -476,9 +456,13 @@ namespace Vi.Core
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
+            else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Clear)
+            {
+                Debug.Log("Cleared active scene group indicies");
+            }
             else
             {
-                Debug.LogWarning("Net Scene Manager Recieved a list event that is unsupported!");
+                Debug.LogWarning("Net Scene Manager Recieved a list event that is unsupported! " + networkListEvent.Type);
             }
         }
 
