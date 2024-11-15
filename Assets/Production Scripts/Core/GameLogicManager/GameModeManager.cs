@@ -616,6 +616,7 @@ namespace Vi.Core.GameModeManagers
 
         public PlayerScore GetPlayerScore(int id)
         {
+            if (!IsSpawned) { return new PlayerScore(id); }
             int index = scoreList.IndexOf(new PlayerScore(id));
             if (index == -1) { Debug.LogError("Could not find player score with id: " + id); return new PlayerScore(); }
             return scoreList[index];

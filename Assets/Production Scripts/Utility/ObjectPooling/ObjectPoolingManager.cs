@@ -79,9 +79,16 @@ namespace Vi.Utility
 
             void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
             {
-                if (networkObject.GetComponent<PooledObject>().IsSpawned)
+                if (networkObject.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
+                    if (pooledObject.IsSpawned)
+                    {
+                        ReturnObjectToPool(pooledObject);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning(networkObject + " has no pooled object component but you're using the pooled prefab instance handler to despawn it");
                 }
             }
         }

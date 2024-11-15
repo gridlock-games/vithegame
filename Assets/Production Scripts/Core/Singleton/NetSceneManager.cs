@@ -196,7 +196,6 @@ namespace Vi.Core
                             }
                             else
                             {
-                                Debug.Log("Destroying " + g);
                                 Destroy(g);
                             }
                         }
