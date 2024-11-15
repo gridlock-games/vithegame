@@ -418,22 +418,25 @@ namespace Vi.Player
 
                 StatePayload statePayload = Move(ref inputPayload, false);
 
-                movementTick++;
-
                 bool isGameOver = false;
                 if (GameModeManager.Singleton)
                 {
                     if (GameModeManager.Singleton.IsGameOver()) { isGameOver = true; }
                 }
 
-                if (!isGameOver)
+                if (!NetSceneManager.IsBusyLoadingScenes() & !isGameOver)
                 {
-                    if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                        inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                    else
-                        inputBuffer.Add(inputPayload);
+                    movementTick++;
+
+                    if (!isGameOver)
+                    {
+                        if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                            inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                        else
+                            inputBuffer.Add(inputPayload);
+                    }
                 }
-                
+
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
 
