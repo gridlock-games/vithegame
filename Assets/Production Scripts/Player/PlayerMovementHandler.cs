@@ -718,7 +718,7 @@ namespace Vi.Player
                 actionMapHandler.enabled = false;
             }
 
-            if (!IsClient)
+            if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged += OnInputBufferChanged;
             }
@@ -752,7 +752,7 @@ namespace Vi.Player
             actionMapHandler.enabled = false;
             cameraController.gameObject.tag = "Untagged";
 
-            if (!IsClient)
+            if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
             }
@@ -762,11 +762,16 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
+                Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput);
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
-            else if (networkListEvent.Type != NetworkListEvent<InputPayload>.EventType.Clear)
+            else if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Clear)
             {
-                Debug.LogError("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
+                Debug.Log(combatAgent.GetName() + " Cleared input buffer");
+            }
+            else
+            {
+                Debug.LogWarning(combatAgent.GetName() + " Player input buffer shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }
         }
 
