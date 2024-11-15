@@ -523,6 +523,11 @@ namespace Vi.Player
             else if (inputPayload.shouldUseRootMotion)
             {
                 movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion;
+
+                if (IsLocalPlayer)
+                {
+                    Debug.Log(Time.time + " " + combatAgent.GetName() + " is using root motion " + combatAgent.WeaponHandler.CurrentActionClip);
+                }
             }
             else
             {
