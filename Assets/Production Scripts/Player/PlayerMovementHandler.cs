@@ -28,7 +28,18 @@ namespace Vi.Player
             }
         }
 
-        [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
+        [Rpc(SendTo.Owner)]
+        private void SetRotationClientRpc(Quaternion newRotation)
+        {
+            if (cameraController)
+            {
+                cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
+            }
+            else
+            {
+                Debug.LogError("Recieved a set rotation client RPC but there's no camera controller for " + combatAgent.GetName());
+            }
+        }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
