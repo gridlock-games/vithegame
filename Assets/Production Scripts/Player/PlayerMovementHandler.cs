@@ -762,7 +762,7 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
-                Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput);
+                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput); }
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
             else if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Clear)
