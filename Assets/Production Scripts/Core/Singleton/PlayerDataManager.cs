@@ -1075,7 +1075,7 @@ namespace Vi.Core
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
-                        playersToSpawnQueue.Enqueue(playerDataList[i]);
+                        AddPlayerToSpawnQueue(playerDataList[i]);
                     }
                 }
 
@@ -1088,6 +1088,30 @@ namespace Vi.Core
                     }
                 }
             }
+        }
+
+        private void AddPlayerToSpawnQueue(PlayerData playerData)
+        {
+            if (playerData.id > -1) // Player
+            {
+                StartCoroutine(WaitForClientSceneLoadToSpawn((ulong)playerData.id));
+            }
+            else // Bot
+            {
+                playersToSpawnQueue.Enqueue(playerData);
+            }
+        }
+
+        // TODO Add timeout here
+        private IEnumerator WaitForClientSceneLoadToSpawn(ulong id)
+        {
+            while (true)
+            {
+                if (!ContainsId((int)id)) { yield break; }
+                if (NetSceneManager.Singleton.AreClientScenesLoaded(id)) { break; }
+                yield return null;
+            }
+            playersToSpawnQueue.Enqueue(GetPlayerData((int)id));
         }
 
         void OnSceneUnload()
@@ -1245,7 +1269,7 @@ namespace Vi.Core
                     {
                         if (NetSceneManager.Singleton.ShouldSpawnPlayer)
                         {
-                            playersToSpawnQueue.Enqueue(networkListEvent.Value);
+                            AddPlayerToSpawnQueue(networkListEvent.Value);
                         }
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
@@ -1375,7 +1399,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
+                AddPlayerToSpawnQueue(GetPlayerData(kvp.Key));
             }
         }
 

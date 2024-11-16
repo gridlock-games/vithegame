@@ -29,6 +29,7 @@ namespace Vi.Core
         private static NetSceneManager _singleton;
 
         private NetworkList<int> activeSceneGroupIndicies;
+        private NetworkList<ulong> clientsThatCompletedLoading;
 
         public void LoadScene(params string[] sceneGroupNames)
         {
@@ -205,6 +206,17 @@ namespace Vi.Core
 
             ShouldSpawnPlayer = SetShouldSpawnPlayer();
 
+            if (IsSpawned)
+            {
+                if (IsServer)
+                {
+                    if (!ShouldSpawnPlayer)
+                    {
+                        clientsThatCompletedLoading.Clear();
+                    }
+                }
+            }
+            
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
         }
 
@@ -212,6 +224,16 @@ namespace Vi.Core
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
             ShouldSpawnPlayer = SetShouldSpawnPlayer();
+            if (IsSpawned)
+            {
+                if (IsServer)
+                {
+                    if (!ShouldSpawnPlayer)
+                    {
+                        clientsThatCompletedLoading.Clear();
+                    }
+                }
+            }
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
@@ -368,6 +390,7 @@ namespace Vi.Core
             if (IsServer)
             {
                 activeSceneGroupIndicies.Clear();
+                NetworkManager.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
             }
             else
             {
@@ -383,9 +406,19 @@ namespace Vi.Core
         {
             activeSceneGroupIndicies.OnListChanged -= OnActiveSceneGroupIndiciesChange;
 
+            if (IsServer)
+            {
+                NetworkManager.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
+            }
+            
             UnloadAllScenePayloadsOfType(SceneType.SynchronizedUI, SceneType.Gameplay, SceneType.Environment);
 
             if (OnNetSceneManagerDespawn != null) { OnNetSceneManagerDespawn.Invoke(); }
+        }
+
+        private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+        {
+            clientsThatCompletedLoading.Remove(clientId);
         }
 
         private const string defaultActiveSceneName = "Base";
@@ -394,6 +427,7 @@ namespace Vi.Core
         {
             _singleton = this;
             activeSceneGroupIndicies = new NetworkList<int>();
+            clientsThatCompletedLoading = new NetworkList<ulong>(default, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
         }
 
         public bool ShouldSpawnPlayer { get; private set; }
@@ -454,6 +488,35 @@ namespace Vi.Core
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
                 if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
+
+            if (IsClient)
+            {
+                if (!ClientLoadingRunning)
+                {
+                    ClientLoadingRunning = true;
+                    StartCoroutine(InformServerAboutClientLoadingCompleted());
+                }
+            }
+        }
+
+        private bool ClientLoadingRunning;
+        private IEnumerator InformServerAboutClientLoadingCompleted()
+        {
+            yield return new WaitUntil(() => !IsBusyLoadingScenes());
+            SetClientCompletedLoadingStateRpc(NetworkManager.LocalClientId);
+            ClientLoadingRunning = false;
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false, Delivery = RpcDelivery.Reliable)]
+        private void SetClientCompletedLoadingStateRpc(ulong clientId)
+        {
+            Debug.Log(clientId + " completed loading");
+            clientsThatCompletedLoading.Add(clientId);
+        }
+
+        public bool AreClientScenesLoaded(ulong clientId)
+        {
+            return clientsThatCompletedLoading.Contains(clientId);
         }
 
         public enum SceneType
