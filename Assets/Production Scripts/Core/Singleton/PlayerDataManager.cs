@@ -964,6 +964,7 @@ namespace Vi.Core
 
             EventDelegateManager.sceneLoaded += OnSceneLoad;
             EventDelegateManager.sceneUnloaded += OnSceneUnload;
+            EventDelegateManager.clientFinishedLoadingScenes += OnClientFinishedLoadingScenes;
 
             NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -973,6 +974,7 @@ namespace Vi.Core
         {
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
             EventDelegateManager.sceneUnloaded -= OnSceneUnload;
+            EventDelegateManager.clientFinishedLoadingScenes -= OnClientFinishedLoadingScenes;
 
             if (NetworkManager)
             {
@@ -1075,7 +1077,10 @@ namespace Vi.Core
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
-                        AddPlayerToSpawnQueue(playerDataList[i]);
+                        if (playerDataList[i].id < 0)
+                        {
+                            AddPlayerToSpawnQueue(playerDataList[i]);
+                        }
                     }
                 }
 
@@ -1092,26 +1097,35 @@ namespace Vi.Core
 
         private void AddPlayerToSpawnQueue(PlayerData playerData)
         {
-            if (playerData.id > -1) // Player
-            {
-                StartCoroutine(WaitForClientSceneLoadToSpawn((ulong)playerData.id));
-            }
-            else // Bot
-            {
-                playersToSpawnQueue.Enqueue(playerData);
-            }
+            Debug.Log("Adding player to spawn queue " + playerData.character.name.ToString());
+            playersToSpawnQueue.Enqueue(playerData);
         }
 
-        // TODO Add timeout here
-        private IEnumerator WaitForClientSceneLoadToSpawn(ulong id)
+        private void OnClientFinishedLoadingScenes(ulong clientId)
         {
+            StartCoroutine(WaitForPlayerDataToAddPlayerToSpawnQueue(clientId));
+        }
+
+        private IEnumerator WaitForPlayerDataToAddPlayerToSpawnQueue(ulong clientId)
+        {
+            float waitTime = 0;
             while (true)
             {
-                if (!ContainsId((int)id)) { yield break; }
-                if (NetSceneManager.Singleton.AreClientScenesLoaded(id)) { break; }
+                if (ContainsId((int)clientId)) { Debug.Log("Breaking"); break; }
+                waitTime += Time.unscaledDeltaTime;
+                if (waitTime > NetworkManager.NetworkConfig.ClientConnectionBufferTimeout)
+                {
+                    Debug.LogWarning("Timed out while waiting for player data after scene loading completed on client " + clientId);
+                    if (NetworkManager.ConnectedClientsIds.Contains(clientId))
+                    {
+                        NetworkManager.DisconnectClient((ulong)clientId, "Timed out while spawning player.");
+                    }
+                    yield break;
+                }
                 yield return null;
             }
-            playersToSpawnQueue.Enqueue(GetPlayerData((int)id));
+            Debug.Log("Adding player to spawn queue " + clientId);
+            AddPlayerToSpawnQueue(GetPlayerData((int)clientId));
         }
 
         void OnSceneUnload()
@@ -1183,10 +1197,10 @@ namespace Vi.Core
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
             teamNameOverridesJson.OnValueChanged += OnTeamNameOverridesJsonChange;
-            NetworkManager.NetworkTickSystem.Tick += Tick;
 
             if (IsServer)
             {
+                NetworkManager.NetworkTickSystem.Tick += ServerTick;
                 playerDataList.Clear();
             }
             SyncCachedPlayerDataList();
@@ -1202,7 +1216,11 @@ namespace Vi.Core
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
             teamNameOverridesJson.OnValueChanged -= OnTeamNameOverridesJsonChange;
-            NetworkManager.NetworkTickSystem.Tick -= Tick;
+
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick -= ServerTick;
+            }
 
             localPlayers.Clear();
             botClientId = 0;
@@ -1220,42 +1238,30 @@ namespace Vi.Core
             }
         }
 
-        private void Tick()
+        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
+        private void ServerTick()
         {
-            if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
+            if (!NetSceneManager.IsBusyLoadingScenes())
             {
-                spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
+                {
+                    if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                    {
+                        spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                    }
+                    else
+                    {
+                        playersToSpawnQueue.Clear();
+                    }
+                }
             }
-
+            
             if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold & spawnPlayerRunning)
             {
                 EndSpawnPlayerCoroutine();
             }
         }
 
-        //public void UpdateIgnoreCollisionsMatrix()
-        //{
-        //    foreach (Attributes player in localPlayers.Values)
-        //    {
-        //        if (!player) { continue; }
-
-        //        foreach (Attributes otherPlayer in localPlayers.Values)
-        //        {
-        //            if (!otherPlayer) { continue; }
-        //            if (otherPlayer == player) { continue; }
-
-        //            foreach (Collider col in player.NetworkCollider.Colliders)
-        //            {
-        //                foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
-        //                {
-        //                    Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
             SyncCachedPlayerDataList();
@@ -1267,7 +1273,8 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Add:
                     if (IsServer)
                     {
-                        if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                        // Spawn bots
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayer & networkListEvent.Value.id < 0)
                         {
                             AddPlayerToSpawnQueue(networkListEvent.Value);
                         }
@@ -1373,7 +1380,7 @@ namespace Vi.Core
                     attributesToRespawn.isWaitingForSpawnPoint = true;
                     (spawnPointFound, transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
                     yield return null;
-                    waitTime += Time.deltaTime;
+                    waitTime += Time.unscaledDeltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
             }
@@ -1476,7 +1483,7 @@ namespace Vi.Core
                         isWaitingForSpawnPoint.Value = true;
                         (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                         yield return null;
-                        waitTime += Time.deltaTime;
+                        waitTime += Time.unscaledDeltaTime;
                         if (waitTime > maxSpawnPointWaitTime) { break; }
                     }
                     isWaitingForSpawnPoint.Value = false;
