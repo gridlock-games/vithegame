@@ -1531,10 +1531,12 @@ namespace Vi.Core
             float spawnWaitTime = 0;
             while (true)
             {
-                if (spawnWaitTime > 1) { break; } //  | netObj.IsSpawned
+                if (spawnWaitTime > 5) { break; } //  | netObj.IsSpawned
                 spawnWaitTime += Time.unscaledDeltaTime;
                 yield return null;
             }
+
+            Debug.Log("Finished spawning player object for " + playerIdThatIsBeingSpawned + " " + GetPlayerData(playerIdThatIsBeingSpawned).character.name.ToString());
 
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;
