@@ -1073,7 +1073,7 @@ namespace Vi.Core
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
             {
-                if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                if (NetSceneManager.Singleton.ShouldSpawnPlayerCached)
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
@@ -1111,7 +1111,7 @@ namespace Vi.Core
             float waitTime = 0;
             while (true)
             {
-                if (ContainsId((int)clientId)) { Debug.Log("Breaking"); break; }
+                if (ContainsId((int)clientId)) { break; }
                 waitTime += Time.unscaledDeltaTime;
                 if (waitTime > NetworkManager.NetworkConfig.ClientConnectionBufferTimeout)
                 {
@@ -1124,7 +1124,6 @@ namespace Vi.Core
                 }
                 yield return null;
             }
-            Debug.Log("Adding player to spawn queue " + clientId);
             AddPlayerToSpawnQueue(GetPlayerData((int)clientId));
         }
 
@@ -1132,7 +1131,7 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
                 {
                     foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
@@ -1245,12 +1244,14 @@ namespace Vi.Core
             {
                 if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
                 {
-                    if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                    if (NetSceneManager.GetShouldSpawnPlayer())
                     {
                         spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                        Debug.Log("Dequeuing " + GetPlayerData(playerIdThatIsBeingSpawned).character.name);
                     }
                     else
                     {
+                        Debug.Log("Clearing spawn queue");
                         playersToSpawnQueue.Clear();
                     }
                 }
@@ -1274,7 +1275,7 @@ namespace Vi.Core
                     if (IsServer)
                     {
                         // Spawn bots
-                        if (NetSceneManager.Singleton.ShouldSpawnPlayer & networkListEvent.Value.id < 0)
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayerCached & networkListEvent.Value.id < 0)
                         {
                             AddPlayerToSpawnQueue(networkListEvent.Value);
                         }

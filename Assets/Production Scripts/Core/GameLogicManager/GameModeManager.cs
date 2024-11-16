@@ -690,10 +690,7 @@ namespace Vi.Core.GameModeManagers
         protected string roundAboutToStartPrefix = "Round ";
         protected string roundAboutToStartSuffix = " is About to Start ";
 
-        protected virtual void OnNextGameActionTimerThreeFourths()
-        {
-
-        }
+        protected virtual void OnNextGameActionTimerThreeFourths() { }
 
         protected virtual void OnNextGameActionTimerHalfway()
         {

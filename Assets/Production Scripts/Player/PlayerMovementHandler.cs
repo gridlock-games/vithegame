@@ -546,10 +546,10 @@ namespace Vi.Player
             {
                 movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion;
 
-                if (IsLocalPlayer)
-                {
-                    Debug.Log(Time.time + " " + combatAgent.GetName() + " is using root motion " + combatAgent.WeaponHandler.CurrentActionClip);
-                }
+                //if (IsLocalPlayer)
+                //{
+                //    Debug.Log(Time.time + " " + combatAgent.GetName() + " is using root motion " + combatAgent.WeaponHandler.CurrentActionClip);
+                //}
             }
             else
             {
@@ -776,7 +776,7 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
-                if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput); }
+                //if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput); }
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
             else if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Clear)
