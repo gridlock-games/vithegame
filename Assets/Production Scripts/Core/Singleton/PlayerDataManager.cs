@@ -1247,7 +1247,6 @@ namespace Vi.Core
                     if (NetSceneManager.GetShouldSpawnPlayer())
                     {
                         spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
-                        Debug.Log("Dequeuing " + GetPlayerData(playerIdThatIsBeingSpawned).character.name);
                     }
                     else
                     {
