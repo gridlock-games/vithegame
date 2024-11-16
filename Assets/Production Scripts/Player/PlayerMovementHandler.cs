@@ -705,7 +705,7 @@ namespace Vi.Player
             networkTransform.SyncPositionZ = !IsOwner;
             if (IsLocalPlayer)
             {
-                Debug.Log("LOCAL PLAYER SPAWN " + cameraController);
+                Debug.Log("LOCAL PLAYER SPAWN");
 
                 inputBuffer.Clear();
 

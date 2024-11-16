@@ -79,9 +79,20 @@ namespace Vi.Utility
 
             void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
             {
-                if (networkObject.GetComponent<PooledObject>().IsSpawned)
+                if (networkObject.TryGetComponent(out PooledObject pooledObject))
                 {
                     ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
+
+                    if (networkObject.IsPlayerObject & !networkObject.IsOwnedByServer)
+                    {
+                        Debug.Log("Destroying player object that isn't owned by server " + networkObject);
+                        pooledObject.MarkForDestruction();
+                        Destroy(networkObject.gameObject);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No pooled object attached to spawned network prefab instance " + networkObject);
                 }
             }
         }
