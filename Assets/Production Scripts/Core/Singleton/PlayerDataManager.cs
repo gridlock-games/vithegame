@@ -1457,8 +1457,10 @@ namespace Vi.Core
             spawnPlayerRunning = true;
             playerIdThatIsBeingSpawned = playerData.id;
             lastSpawnPlayerStartTime = Time.time;
+            Debug.Log("Spawning player object for " + playerData.character.name.ToString());
             if (playerData.id >= 0)
             {
+                // TODO Add a timeout here
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
             }
             if (localPlayers.ContainsKey(playerData.id))
@@ -1528,15 +1530,19 @@ namespace Vi.Core
                 netObj.Spawn(true);
             }
 
-            float spawnWaitTime = 0;
-            while (true)
+            if (!isSpectator)
             {
-                if (spawnWaitTime > 5) { break; } //  | netObj.IsSpawned
-                spawnWaitTime += Time.unscaledDeltaTime;
-                yield return null;
+                if (playerObjectToSpawn.TryGetComponent(out WeaponHandler weaponHandler))
+                {
+                    yield return new WaitUntil(() => weaponHandler.WeaponInitialized);
+                }
+                else
+                {
+                    Debug.LogWarning("Player object has no weapon handler component");
+                }
             }
 
-            Debug.Log("Finished spawning player object for " + playerIdThatIsBeingSpawned + " " + GetPlayerData(playerIdThatIsBeingSpawned).character.name.ToString());
+            Debug.Log("Finished spawning player object for " + playerData.character.name.ToString());
 
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;
