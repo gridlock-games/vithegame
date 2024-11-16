@@ -125,6 +125,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 0
+  collidesWithClothWhileStowed: 1
+  weaponBoneFollowTargets: []
   dropWeaponPrefab: {fileID: 6012548609011693553, guid: 511383bea5e11954a9aab3200a3c4a6d,
     type: 3}
   weaponTrailVFX: {fileID: 8919807229246518241}
@@ -155,8 +157,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6f5338a96461264fb9a1132c8509672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0, z: 0.4}
-  size: {x: 0.1, y: 0.001, z: 1.3}
+  center: {x: 0, y: 0, z: 0.49}
+  size: {x: 0.1, y: 0.001, z: 1}
   direction: 2
   radiusSeparation: 0
   alignedOnCenter: 1

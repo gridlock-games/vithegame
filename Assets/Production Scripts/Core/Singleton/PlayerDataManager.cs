@@ -964,6 +964,7 @@ namespace Vi.Core
 
             EventDelegateManager.sceneLoaded += OnSceneLoad;
             EventDelegateManager.sceneUnloaded += OnSceneUnload;
+            EventDelegateManager.clientFinishedLoadingScenes += OnClientFinishedLoadingScenes;
 
             NetworkManager.OnClientConnectedCallback += OnClientConnectCallback;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -973,6 +974,7 @@ namespace Vi.Core
         {
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
             EventDelegateManager.sceneUnloaded -= OnSceneUnload;
+            EventDelegateManager.clientFinishedLoadingScenes -= OnClientFinishedLoadingScenes;
 
             if (NetworkManager)
             {
@@ -1071,11 +1073,14 @@ namespace Vi.Core
             // Need to check singleton since this object may be despawned
             if (NetworkManager.Singleton.IsServer)
             {
-                if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                if (NetSceneManager.Singleton.ShouldSpawnPlayerCached)
                 {
                     for (int i = 0; i < playerDataList.Count; i++)
                     {
-                        playersToSpawnQueue.Enqueue(playerDataList[i]);
+                        if (playerDataList[i].id < 0)
+                        {
+                            AddPlayerToSpawnQueue(playerDataList[i]);
+                        }
                     }
                 }
 
@@ -1090,11 +1095,43 @@ namespace Vi.Core
             }
         }
 
+        private void AddPlayerToSpawnQueue(PlayerData playerData)
+        {
+            Debug.Log("Adding player to spawn queue " + playerData.character.name.ToString());
+            playersToSpawnQueue.Enqueue(playerData);
+        }
+
+        private void OnClientFinishedLoadingScenes(ulong clientId)
+        {
+            StartCoroutine(WaitForPlayerDataToAddPlayerToSpawnQueue(clientId));
+        }
+
+        private IEnumerator WaitForPlayerDataToAddPlayerToSpawnQueue(ulong clientId)
+        {
+            float waitTime = 0;
+            while (true)
+            {
+                if (ContainsId((int)clientId)) { break; }
+                waitTime += Time.unscaledDeltaTime;
+                if (waitTime > NetworkManager.NetworkConfig.ClientConnectionBufferTimeout)
+                {
+                    Debug.LogWarning("Timed out while waiting for player data after scene loading completed on client " + clientId);
+                    if (NetworkManager.ConnectedClientsIds.Contains(clientId))
+                    {
+                        NetworkManager.DisconnectClient((ulong)clientId, "Timed out while spawning player.");
+                    }
+                    yield break;
+                }
+                yield return null;
+            }
+            AddPlayerToSpawnQueue(GetPlayerData((int)clientId));
+        }
+
         void OnSceneUnload()
         {
             if (IsServer)
             {
-                if (!NetSceneManager.Singleton.ShouldSpawnPlayer)
+                if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
                 {
                     foreach (CombatAgent combatAgent in GetActiveCombatAgents())
                     {
@@ -1159,10 +1196,10 @@ namespace Vi.Core
             playerDataList.OnListChanged += OnPlayerDataListChange;
             gameMode.OnValueChanged += OnGameModeChange;
             teamNameOverridesJson.OnValueChanged += OnTeamNameOverridesJsonChange;
-            NetworkManager.NetworkTickSystem.Tick += Tick;
 
             if (IsServer)
             {
+                NetworkManager.NetworkTickSystem.Tick += ServerTick;
                 playerDataList.Clear();
             }
             SyncCachedPlayerDataList();
@@ -1178,7 +1215,11 @@ namespace Vi.Core
             playerDataList.OnListChanged -= OnPlayerDataListChange;
             gameMode.OnValueChanged -= OnGameModeChange;
             teamNameOverridesJson.OnValueChanged -= OnTeamNameOverridesJsonChange;
-            NetworkManager.NetworkTickSystem.Tick -= Tick;
+
+            if (IsServer)
+            {
+                NetworkManager.NetworkTickSystem.Tick -= ServerTick;
+            }
 
             localPlayers.Clear();
             botClientId = 0;
@@ -1196,42 +1237,31 @@ namespace Vi.Core
             }
         }
 
-        private void Tick()
+        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
+        private void ServerTick()
         {
-            if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
+            if (!NetSceneManager.IsBusyLoadingScenes())
             {
-                spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                if (playersToSpawnQueue.Count > 0 & !spawnPlayerRunning)
+                {
+                    if (NetSceneManager.GetShouldSpawnPlayer())
+                    {
+                        spawnPlayerCoroutine = StartCoroutine(SpawnPlayer(playersToSpawnQueue.Dequeue()));
+                    }
+                    else
+                    {
+                        Debug.Log("Clearing spawn queue");
+                        playersToSpawnQueue.Clear();
+                    }
+                }
             }
-
+            
             if (Time.time - lastSpawnPlayerStartTime > spawnPlayerTimeoutThreshold & spawnPlayerRunning)
             {
                 EndSpawnPlayerCoroutine();
             }
         }
 
-        //public void UpdateIgnoreCollisionsMatrix()
-        //{
-        //    foreach (Attributes player in localPlayers.Values)
-        //    {
-        //        if (!player) { continue; }
-
-        //        foreach (Attributes otherPlayer in localPlayers.Values)
-        //        {
-        //            if (!otherPlayer) { continue; }
-        //            if (otherPlayer == player) { continue; }
-
-        //            foreach (Collider col in player.NetworkCollider.Colliders)
-        //            {
-        //                foreach (Collider otherCol in otherPlayer.NetworkCollider.Colliders)
-        //                {
-        //                    Physics.IgnoreCollision(col, otherCol, !player.NetworkObject.IsNetworkVisibleTo(otherPlayer.NetworkObject.OwnerClientId));
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        private Queue<PlayerData> playersToSpawnQueue = new Queue<PlayerData>();
         private void OnPlayerDataListChange(NetworkListEvent<PlayerData> networkListEvent)
         {
             SyncCachedPlayerDataList();
@@ -1243,9 +1273,10 @@ namespace Vi.Core
                 case NetworkListEvent<PlayerData>.EventType.Add:
                     if (IsServer)
                     {
-                        if (NetSceneManager.Singleton.ShouldSpawnPlayer)
+                        // Spawn bots
+                        if (NetSceneManager.Singleton.ShouldSpawnPlayerCached & networkListEvent.Value.id < 0)
                         {
-                            playersToSpawnQueue.Enqueue(networkListEvent.Value);
+                            AddPlayerToSpawnQueue(networkListEvent.Value);
                         }
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
@@ -1349,7 +1380,7 @@ namespace Vi.Core
                     attributesToRespawn.isWaitingForSpawnPoint = true;
                     (spawnPointFound, transformData) = playerSpawnPoints.GetRespawnOrientation(gameMode.Value, attributesToRespawn.GetTeam(), attributesToRespawn);
                     yield return null;
-                    waitTime += Time.deltaTime;
+                    waitTime += Time.unscaledDeltaTime;
                     if (waitTime > maxSpawnPointWaitTime) { break; }
                 }
             }
@@ -1375,7 +1406,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
-                playersToSpawnQueue.Enqueue(GetPlayerData(kvp.Key));
+                AddPlayerToSpawnQueue(GetPlayerData(kvp.Key));
             }
         }
 
@@ -1425,8 +1456,10 @@ namespace Vi.Core
             spawnPlayerRunning = true;
             playerIdThatIsBeingSpawned = playerData.id;
             lastSpawnPlayerStartTime = Time.time;
+            Debug.Log("Spawning player object for " + playerData.character.name.ToString());
             if (playerData.id >= 0)
             {
+                // TODO Add a timeout here
                 yield return new WaitUntil(() => NetworkManager.ConnectedClientsIds.Contains((ulong)playerData.id));
             }
             if (localPlayers.ContainsKey(playerData.id))
@@ -1452,7 +1485,7 @@ namespace Vi.Core
                         isWaitingForSpawnPoint.Value = true;
                         (spawnPointFound, transformData) = playerSpawnPoints.GetSpawnOrientation(gameMode.Value, playerData.team, playerData.channel);
                         yield return null;
-                        waitTime += Time.deltaTime;
+                        waitTime += Time.unscaledDeltaTime;
                         if (waitTime > maxSpawnPointWaitTime) { break; }
                     }
                     isWaitingForSpawnPoint.Value = false;
@@ -1496,8 +1529,19 @@ namespace Vi.Core
                 netObj.Spawn(true);
             }
 
-            yield return null;
-            //yield return new WaitUntil(() => netObj.IsSpawned);
+            if (!isSpectator)
+            {
+                if (playerObjectToSpawn.TryGetComponent(out WeaponHandler weaponHandler))
+                {
+                    yield return new WaitUntil(() => weaponHandler.WeaponInitialized);
+                }
+                else
+                {
+                    Debug.LogWarning("Player object has no weapon handler component");
+                }
+            }
+
+            Debug.Log("Finished spawning player object for " + playerData.character.name.ToString());
 
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;

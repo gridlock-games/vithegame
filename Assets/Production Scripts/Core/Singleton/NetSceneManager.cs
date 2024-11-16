@@ -203,7 +203,7 @@ namespace Vi.Core
                 }
             }
 
-            ShouldSpawnPlayer = SetShouldSpawnPlayer();
+            ShouldSpawnPlayerCached = GetShouldSpawnPlayer();
 
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
         }
@@ -211,7 +211,7 @@ namespace Vi.Core
         private void SceneHandleUnloaded(AsyncOperationHandle<SceneInstance> sceneHandle)
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
-            ShouldSpawnPlayer = SetShouldSpawnPlayer();
+            ShouldSpawnPlayerCached = GetShouldSpawnPlayer();
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
@@ -396,9 +396,9 @@ namespace Vi.Core
             activeSceneGroupIndicies = new NetworkList<int>();
         }
 
-        public bool ShouldSpawnPlayer { get; private set; }
+        public bool ShouldSpawnPlayerCached { get; private set; }
 
-        private static bool SetShouldSpawnPlayer()
+        public static bool GetShouldSpawnPlayer()
         {
             bool gameplaySceneIsLoaded = false;
             foreach (ScenePayload scenePayload in PersistentLocalObjects.Singleton.CurrentlyLoadedScenePayloads.FindAll(item => item.sceneType == SceneType.Gameplay | item.sceneType == SceneType.Environment))
@@ -447,13 +447,37 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
+                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
+                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
             }
+
+            if (IsClient)
+            {
+                if (!isClientSceneLoading)
+                {
+                    isClientSceneLoading = true;
+                    StartCoroutine(WaitForClientSceneLoad());
+                }
+            }
+        }
+
+        private bool isClientSceneLoading;
+        private IEnumerator WaitForClientSceneLoad()
+        {
+            yield return new WaitUntil(() => !IsBusyLoadingScenes());
+            Debug.Log("Finished loading network scenes");
+            TellServerClientFinishedLoadingRpc(NetworkManager.LocalClientId);
+            isClientSceneLoading = false;
+        }
+
+        [Rpc(SendTo.Server, Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
+        private void TellServerClientFinishedLoadingRpc(ulong clientId)
+        {
+            EventDelegateManager.InvokeClientFinishedLoadingScenesEvent(clientId);
         }
 
         public enum SceneType

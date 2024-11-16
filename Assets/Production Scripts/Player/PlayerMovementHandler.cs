@@ -10,6 +10,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Unity.Netcode.Components;
 using System.Linq;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.Player
 {
@@ -27,7 +28,18 @@ namespace Vi.Player
             }
         }
 
-        [Rpc(SendTo.Owner)] private void SetRotationClientRpc(Quaternion newRotation) { cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y); }
+        [Rpc(SendTo.Owner)]
+        private void SetRotationClientRpc(Quaternion newRotation)
+        {
+            if (cameraController)
+            {
+                cameraController.SetRotation(newRotation.eulerAngles.x, newRotation.eulerAngles.y);
+            }
+            else
+            {
+                Debug.LogError("Recieved a set rotation client RPC but there's no camera controller for " + combatAgent.GetName());
+            }
+        }
 
         public bool IsCameraAnimating() { return cameraController.IsAnimating; }
 
@@ -167,9 +179,7 @@ namespace Vi.Player
                         int clientStateIndex = rootMotionReconciliationSlice[0].tick % BUFFER_SIZE;
                         if (rootMotionPositionError > serverReconciliationThreshold)
                         {
-                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError
-                                + "\n" + latestServerState.Value.rootMotionId + " " + rootMotionReconciliationSlice[0].rootMotionId
-                                + "\n" + latestServerState.Value.rootMotionTime + " " + rootMotionReconciliationSlice[0].rootMotionTime);
+                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError);
 
                             StatePayload modifiedStatePayload = latestServerState.Value;
                             modifiedStatePayload.tick = rootMotionReconciliationSlice[0].tick;
@@ -186,7 +196,7 @@ namespace Vi.Player
                     }
                     else
                     {
-                        Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime);
+                        Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime + " " + combatAgent.WeaponHandler.CurrentActionClip + " " + combatAgent.WeaponHandler.GetWeapon());
                     }
                 }
                 return Vector3.zero;
@@ -315,27 +325,22 @@ namespace Vi.Player
                         // Have to double check these to prevent cheating
                         if (combatAgent.StatusAgent.IsRooted())
                         {
-                            Debug.Log(combatAgent.GetName() + " Rooted");
                             inputPayload.moveInput = Vector2.zero;
                         }
                         else if (combatAgent.AnimationHandler.IsReloading())
                         {
-                            Debug.Log(combatAgent.GetName() + " Reloading");
                             inputPayload.moveInput = Vector2.zero;
                         }
                         else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
                         {
-                            Debug.Log(combatAgent.GetName() + " Dead");
                             inputPayload.moveInput = Vector2.zero;
                         }
                         else if (!CanMove())
                         {
-                            Debug.Log(combatAgent.GetName() + " Cannot move");
                             inputPayload.moveInput = Vector2.zero;
                         }
                         else if (!combatAgent.AnimationHandler.IsAtRest())
                         {
-                            Debug.Log(combatAgent.GetName() + " not at rest");
                             inputPayload.moveInput = Vector2.zero;
                         }
 
@@ -379,47 +384,38 @@ namespace Vi.Player
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (combatAgent.WeaponHandler.LightAttackIsPressed)
                 {
-                    Debug.Log("Light attack is pressed");
                     moveInput = Vector2.zero;
                 }
                 else if (latestServerState.Value.usedRootMotion)
                 {
-                    Debug.Log("server state used root motion");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
-                    Debug.Log("Waiting for action clip to play");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.AnimationHandler.IsReloading())
                 {
-                    Debug.Log("Reloading");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
                 {
-                    Debug.Log("Dead");
                     moveInput = Vector2.zero;
                 }
                 else if (!CanMove())
                 {
-                    Debug.Log("Cannot move");
                     moveInput = Vector2.zero;
                 }
                 else if (combatAgent.StatusAgent.IsRooted())
                 {
-                    Debug.Log("Rooted");
                     moveInput = Vector2.zero;
                 }
                 else if (shouldApplyRootMotion)
                 {
-                    Debug.Log("Applying root motion");
                     moveInput = Vector2.zero;
                 }
                 else if (!combatAgent.AnimationHandler.IsAtRest())
                 {
-                    Debug.Log("Not at rest");
                     moveInput = Vector2.zero;
                 }
                 else
@@ -431,14 +427,26 @@ namespace Vi.Player
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
                     GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
-                movementTick++;
-
                 StatePayload statePayload = Move(ref inputPayload, false);
 
-                if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
-                    inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
-                else
-                    inputBuffer.Add(inputPayload);
+                bool isGameOver = false;
+                if (GameModeManager.Singleton)
+                {
+                    if (GameModeManager.Singleton.IsGameOver()) { isGameOver = true; }
+                }
+
+                if (!NetSceneManager.IsBusyLoadingScenes() & !isGameOver)
+                {
+                    movementTick++;
+
+                    if (!isGameOver)
+                    {
+                        if (inputPayload.tick % BUFFER_SIZE < inputBuffer.Count)
+                            inputBuffer[inputPayload.tick % BUFFER_SIZE] = inputPayload;
+                        else
+                            inputBuffer.Add(inputPayload);
+                    }
+                }
 
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
                 Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
@@ -537,6 +545,11 @@ namespace Vi.Player
             else if (inputPayload.shouldUseRootMotion)
             {
                 movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion;
+
+                //if (IsLocalPlayer)
+                //{
+                //    Debug.Log(Time.time + " " + combatAgent.GetName() + " is using root motion " + combatAgent.WeaponHandler.CurrentActionClip);
+                //}
             }
             else
             {
@@ -719,7 +732,7 @@ namespace Vi.Player
                 actionMapHandler.enabled = false;
             }
 
-            if (!IsClient)
+            if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged += OnInputBufferChanged;
             }
@@ -753,7 +766,7 @@ namespace Vi.Player
             actionMapHandler.enabled = false;
             cameraController.gameObject.tag = "Untagged";
 
-            if (!IsClient)
+            if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
             }
@@ -763,11 +776,16 @@ namespace Vi.Player
         {
             if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Value | networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Add)
             {
+                //if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput); }
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
-            else if (networkListEvent.Type != NetworkListEvent<InputPayload>.EventType.Clear)
+            else if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Clear)
             {
-                Debug.LogError("We shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
+                Debug.Log(combatAgent.GetName() + " Cleared input buffer");
+            }
+            else
+            {
+                Debug.LogWarning(combatAgent.GetName() + " Player input buffer shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }
         }
 

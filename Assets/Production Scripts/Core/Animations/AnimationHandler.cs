@@ -439,32 +439,32 @@ namespace Vi.Core
                                     ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
                                     ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
 
-                                List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                                float minDistance = 0;
+                                bool minDistanceInitialized = false;
                                 for (int i = 0; i < allHitsCount; i++)
                                 {
                                     if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                                     {
-                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
+                                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent)) { continue; }
+
+                                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                        float angle = Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y);
+                                        if (angle >= ActionClip.maximumLungeAngle) { continue; }
+
+                                        if (allHits[i].distance >= actionClip.minLungeDistance & allHits[i].distance < lungeClip.maxLungeDistance)
                                         {
-                                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                                            angleList.Add((networkCollider,
-                                                Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
-                                                allHits[i]));
+                                            if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                                            minDistance = allHits[i].distance;
+                                            minDistanceInitialized = true;
                                         }
                                     }
                                 }
 
-                                angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                                foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                                if (minDistanceInitialized)
                                 {
-                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                                    float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
-                                    if (angle < ActionClip.maximumLungeAngle & dist >= actionClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
-                                    {
-                                        PlayAction(lungeClip);
-                                        waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
-                                        return default;
-                                    }
+                                    PlayAction(lungeClip);
+                                    waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
+                                    return default;
                                 }
                             }
                         }

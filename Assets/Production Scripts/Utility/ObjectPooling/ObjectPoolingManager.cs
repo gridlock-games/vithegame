@@ -79,9 +79,20 @@ namespace Vi.Utility
 
             void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject)
             {
-                if (networkObject.GetComponent<PooledObject>().IsSpawned)
+                if (networkObject.TryGetComponent(out PooledObject pooledObject))
                 {
-                    ReturnObjectToPool(networkObject.GetComponent<PooledObject>());
+                    ReturnObjectToPool(pooledObject);
+
+                    // We need to destroy the object if it was a remote player because NGO doesn't properly support pooling for objects not owned by the server
+                    if (networkObject.IsPlayerObject | !networkObject.IsOwnedByServer)
+                    {
+                        pooledObject.MarkForDestruction();
+                        Destroy(networkObject.gameObject);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No pooled object attached to spawned network prefab instance " + networkObject);
                 }
             }
         }

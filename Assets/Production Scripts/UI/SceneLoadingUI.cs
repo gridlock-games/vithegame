@@ -96,7 +96,7 @@ namespace Vi.UI
                 }
                 else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
                 {
-                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayer & !mainCamera);
+                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayerCached & !mainCamera);
 
                     if (PlayerDataManager.DoesExist())
                     {
