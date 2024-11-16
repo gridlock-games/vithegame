@@ -84,7 +84,7 @@ namespace Vi.Utility
                     ReturnObjectToPool(pooledObject);
 
                     // We need to destroy the object if it was a remote player because NGO doesn't properly support pooling for objects not owned by the server
-                    if (networkObject.IsPlayerObject & !networkObject.IsOwnedByServer)
+                    if (networkObject.IsPlayerObject | !networkObject.IsOwnedByServer)
                     {
                         pooledObject.MarkForDestruction();
                         Destroy(networkObject.gameObject);
