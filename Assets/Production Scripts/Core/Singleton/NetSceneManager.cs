@@ -212,6 +212,7 @@ namespace Vi.Core
                 {
                     if (!ShouldSpawnPlayer)
                     {
+                        Debug.Log("Clearing clients that completed loading on scene load");
                         clientsThatCompletedLoading.Clear();
                     }
                 }
@@ -230,6 +231,7 @@ namespace Vi.Core
                 {
                     if (!ShouldSpawnPlayer)
                     {
+                        Debug.Log("Clearing clients that completed loading on scene unload");
                         clientsThatCompletedLoading.Clear();
                     }
                 }
@@ -489,7 +491,7 @@ namespace Vi.Core
                 if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayer ? 0 : 1)); }
             }
 
-            if (IsClient)
+            if (IsClient & !IsServer)
             {
                 if (!ClientLoadingRunning)
                 {
@@ -510,12 +512,13 @@ namespace Vi.Core
         [Rpc(SendTo.Server, RequireOwnership = false, Delivery = RpcDelivery.Reliable)]
         private void SetClientCompletedLoadingStateRpc(ulong clientId)
         {
-            Debug.Log(clientId + " completed loading");
+            Debug.Log(clientId + " completed scene loading");
             clientsThatCompletedLoading.Add(clientId);
         }
 
         public bool AreClientScenesLoaded(ulong clientId)
         {
+            if (IsHost) { return !IsBusyLoadingScenes(); }
             return clientsThatCompletedLoading.Contains(clientId);
         }
 
