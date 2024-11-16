@@ -1528,8 +1528,13 @@ namespace Vi.Core
                 netObj.Spawn(true);
             }
 
-            yield return null;
-            //yield return new WaitUntil(() => netObj.IsSpawned);
+            float spawnWaitTime = 0;
+            while (true)
+            {
+                if (spawnWaitTime > 1) { break; } //  | netObj.IsSpawned
+                spawnWaitTime += Time.unscaledDeltaTime;
+                yield return null;
+            }
 
             playerObjectToSpawn = null;
             playerIdThatIsBeingSpawned = default;
