@@ -705,8 +705,6 @@ namespace Vi.Player
             networkTransform.SyncPositionZ = !IsOwner;
             if (IsLocalPlayer)
             {
-                Debug.Log("LOCAL PLAYER SPAWN");
-
                 inputBuffer.Clear();
 
                 cameraController.gameObject.tag = "MainCamera";
@@ -725,7 +723,6 @@ namespace Vi.Player
             }
             else
             {
-                Debug.Log("REMOTE PLAYER SPAWN");
                 cameraController.gameObject.SetActive(false);
 
                 cameraController.SetActive(false);
