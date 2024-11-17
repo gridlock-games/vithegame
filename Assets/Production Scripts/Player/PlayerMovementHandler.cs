@@ -386,10 +386,6 @@ namespace Vi.Player
                 {
                     moveInput = Vector2.zero;
                 }
-                else if (latestServerState.Value.usedRootMotion)
-                {
-                    moveInput = Vector2.zero;
-                }
                 else if (combatAgent.AnimationHandler.WaitingForActionClipToPlay)
                 {
                     moveInput = Vector2.zero;
