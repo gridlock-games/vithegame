@@ -16,26 +16,26 @@ namespace Vi.UI
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
         [SerializeField] private Image[] abilityImages;
         [SerializeField] private List<AbilityPreviewVideo> abilityPreviewVideos = new List<AbilityPreviewVideo>();
-        [SerializeField] private Light previewLightPrefab;
+        //[SerializeField] private Light previewLightPrefab;
 
-        private GameObject weaponPreviewParent;
+        //private GameObject weaponPreviewParent;
         private void Awake()
         {
-            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
-            {
-                data.OnDragEvent += OnCharPreviewDrag;
-            }
+            //foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            //{
+            //    data.OnDragEvent += OnCharPreviewDrag;
+            //}
 
-            weaponPreviewParent = new GameObject("WeaponPreviewParent");
+            //weaponPreviewParent = new GameObject("WeaponPreviewParent");
         }
 
-        private void OnCharPreviewDrag(Vector2 delta)
-        {
-            if (weaponPreviewObject & weaponPreviewParent)
-            {
-                weaponPreviewParent.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
-            }
-        }
+        //private void OnCharPreviewDrag(Vector2 delta)
+        //{
+        //    if (weaponPreviewObject & weaponPreviewParent)
+        //    {
+        //        weaponPreviewParent.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+        //    }
+        //}
 
         [System.Serializable]
         private class AbilityPreviewVideo
@@ -108,47 +108,47 @@ namespace Vi.UI
                     break;
             }
 
-            if (weaponPreviewObject)
-            {
-                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (pooledObject.IsSpawned)
-                    {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    }
-                    weaponPreviewObject = null;
-                }
-                else
-                {
-                    Destroy(weaponPreviewObject);
-                }
-            }
+            //if (weaponPreviewObject)
+            //{
+            //    if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+            //    {
+            //        if (pooledObject.IsSpawned)
+            //        {
+            //            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            //        }
+            //        weaponPreviewObject = null;
+            //    }
+            //    else
+            //    {
+            //        Destroy(weaponPreviewObject);
+            //    }
+            //}
 
-            if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
+            //if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
 
-            if (weaponOption.weaponPreviewPrefab)
-            {
-                if (weaponOption.weaponPreviewPrefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    weaponPreviewObject = ObjectPoolingManager.SpawnObject(pooledObject, weaponPreviewParent.transform).gameObject;
-                }
-                else
-                {
-                    weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab, weaponPreviewParent.transform);
-                }
+            //if (weaponOption.weaponPreviewPrefab)
+            //{
+            //    if (weaponOption.weaponPreviewPrefab.TryGetComponent(out PooledObject pooledObject))
+            //    {
+            //        weaponPreviewObject = ObjectPoolingManager.SpawnObject(pooledObject, weaponPreviewParent.transform).gameObject;
+            //    }
+            //    else
+            //    {
+            //        weaponPreviewObject = Instantiate(weaponOption.weaponPreviewPrefab, weaponPreviewParent.transform);
+            //    }
 
-                GameObject lightInstance = Instantiate(previewLightPrefab.gameObject);
-                lightInstance.transform.SetParent(weaponPreviewObject.transform, true);
-                lightInstance.transform.localPosition = new Vector3(0, 3, 4);
-                lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
-                lightInstance.transform.SetParent(null, true);
+            //    GameObject lightInstance = Instantiate(previewLightPrefab.gameObject);
+            //    lightInstance.transform.SetParent(weaponPreviewObject.transform, true);
+            //    lightInstance.transform.localPosition = new Vector3(0, 3, 4);
+            //    lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
+            //    lightInstance.transform.SetParent(null, true);
 
-                weaponPreviewCamera = weaponPreviewObject.GetComponentInChildren<Camera>();
-                if (weaponPreviewCamera)
-                {
-                    weaponPreviewCamera.transform.SetParent(null, true);
-                }
-            }
+            //    weaponPreviewCamera = weaponPreviewObject.GetComponentInChildren<Camera>();
+            //    if (weaponPreviewCamera)
+            //    {
+            //        weaponPreviewCamera.transform.SetParent(null, true);
+            //    }
+            //}
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
@@ -242,34 +242,34 @@ namespace Vi.UI
             if (abilityPreviewVideoPlayer.isPlaying) { abilityPreviewVideoPlayer.Stop(); }
         }
 
-        private GameObject weaponPreviewObject;
-        private Camera weaponPreviewCamera;
+        //private GameObject weaponPreviewObject;
+        //private Camera weaponPreviewCamera;
         private void OnDestroy()
         {
-            if (weaponPreviewParent) { Destroy(weaponPreviewParent); }
+            //if (weaponPreviewParent) { Destroy(weaponPreviewParent); }
             
-            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
-            {
-                data.OnDragEvent -= OnCharPreviewDrag;
-            }
+            //foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+            //{
+            //    data.OnDragEvent -= OnCharPreviewDrag;
+            //}
 
-            if (weaponPreviewObject)
-            {
-                if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                {
-                    if (pooledObject.IsSpawned)
-                    {
-                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    }
-                    weaponPreviewObject = null;
-                }
-                else
-                {
-                    Destroy(weaponPreviewObject);
-                }
-            }
+            //if (weaponPreviewObject)
+            //{
+            //    if (weaponPreviewObject.TryGetComponent(out PooledObject pooledObject))
+            //    {
+            //        if (pooledObject.IsSpawned)
+            //        {
+            //            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+            //        }
+            //        weaponPreviewObject = null;
+            //    }
+            //    else
+            //    {
+            //        Destroy(weaponPreviewObject);
+            //    }
+            //}
 
-            if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
+            //if (weaponPreviewCamera) { Destroy(weaponPreviewCamera.gameObject); }
         }
     }
 }

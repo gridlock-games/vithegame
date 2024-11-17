@@ -3281,7 +3281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   center: {x: -0.1, y: 0, z: 0}
-  size: {x: 0.13, y: 0.08, z: 0.4}
+  size: {x: 0.13, y: 0.13, z: 0.4}
   direction: 0
   radiusSeparation: 1
   alignedOnCenter: 1
@@ -3921,10 +3921,12 @@ MonoBehaviour:
   rightHandAimBodyConstraint: {fileID: 6568028928760922200}
   rightHandAimBodyInvertedConstraint: {fileID: 4244092407985975708}
   rightHandAimConstraint: {fileID: 1265055339252475544}
+  rightAimOffHandRotationConstraint: {fileID: 1623441598613340461}
   leftHandAimRig: {fileID: 6850429155502553585}
   leftHandAimBodyConstraint: {fileID: 4938065748819157262}
   leftHandAimBodyInvertedConstraint: {fileID: 3477474448627293245}
   leftHandAimConstraint: {fileID: 5737471672363527626}
+  leftAimOffHandRotationConstraint: {fileID: 6001152123871391329}
   rightHandReachRig: {fileID: 2729535749055224108}
   leftHandReachRig: {fileID: 2763309891445163993}
   meleeVerticalAimRig: {fileID: 5537876455313316901}
