@@ -72,6 +72,7 @@ namespace Vi.UI
             blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
 
+            orbitalCameraModeDropdown.transform.parent.parent.gameObject.SetActive(Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer);
             orbitalCameraModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             orbitalCameraModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode"));
 
