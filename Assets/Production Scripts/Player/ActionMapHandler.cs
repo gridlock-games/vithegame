@@ -32,7 +32,7 @@ namespace Vi.Player
                     return;
                 }
 
-                SetOrbitalCamState(false);
+                if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
                 Cursor.lockState = CursorLockMode.None;
                 if (playerUIInstance)
