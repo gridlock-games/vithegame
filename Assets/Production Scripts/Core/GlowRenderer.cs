@@ -49,6 +49,18 @@ namespace Vi.Core
             this.canFlashAttack = canFlashAttack;
         }
 
+        private void OnEnable()
+        {
+            lastBlockTime = -5;
+            lastHealTime = -5;
+            lastHitTime = -5;
+            isInvincible = false;
+            isUninterruptable = false;
+            canFlashAttack = false;
+            currentColor = default;
+            lastColor = default;
+        }
+
         private void Start()
         {
             if (!GetComponent<PooledObject>())
@@ -93,6 +105,7 @@ namespace Vi.Core
             {
                 if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
                 {
+                    m.SetColor(_Color, defaultColor);
                     if (glowMaterialInstances.ContainsKey(renderer))
                     {
                         glowMaterialInstances[renderer].Add(m);
