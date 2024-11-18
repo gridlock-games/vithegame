@@ -261,6 +261,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.5
   animationSpeed: 1
   recoveryAnimationSpeed: 1.15
   agentStaminaCost: 30
@@ -292,7 +293,45 @@ MonoBehaviour:
   isFollowUpAttack: 1
   ailment: 0
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 
   dodgeLock: 0
   canCancelLightAttacks: 1
@@ -324,6 +363,7 @@ MonoBehaviour:
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
