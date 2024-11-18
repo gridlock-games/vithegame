@@ -21,7 +21,7 @@ namespace Vi.UI
         [SerializeField] private Text characterNameText;
         [SerializeField] private Button openCharacterSectionButton;
         [SerializeField] private Button openGearsSectionButton;
-        [SerializeField] private GameObject underConstructionAlert;
+        [SerializeField] private Text underConstructionAlertText;
         [SerializeField] private Button[] buttonsThatOpenConstructionAlert;
 
         [Header("Weapon Select Menu")]
@@ -68,6 +68,7 @@ namespace Vi.UI
 
             OpenGearsSection();
 
+            underConstructionAlertText.text = "";
             foreach (Button button in buttonsThatOpenConstructionAlert)
             {
                 button.onClick.AddListener(OpenConstructionAlert);
@@ -76,7 +77,16 @@ namespace Vi.UI
 
         private void OpenConstructionAlert()
         {
-            underConstructionAlert.SetActive(true);
+            underConstructionAlertText.text = "Coming Soon!";
+            if (constructionAlertCoroutine != null) { StopCoroutine(constructionAlertCoroutine); }
+            constructionAlertCoroutine = StartCoroutine(ClearConstructionAlert());
+        }
+
+        private Coroutine constructionAlertCoroutine;
+        private IEnumerator ClearConstructionAlert()
+        {
+            yield return new WaitForSeconds(2);
+            underConstructionAlertText.text = "";
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
