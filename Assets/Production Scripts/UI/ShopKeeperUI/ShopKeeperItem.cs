@@ -27,8 +27,16 @@ namespace Vi.UI
         public void InitializeAsArmor(CharacterReference.WearableEquipmentOption wearableEquipmentOption)
         {
             previewIcon.sprite = wearableEquipmentOption.GetIcon(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender);
-            itemName.text = wearableEquipmentOption.name;
-            Price = 3;
+            itemName.text = wearableEquipmentOption.name.Replace(" Chest", " Body");
+
+            if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Chest)
+            {
+                Price = 15;
+            }
+            else
+            {
+                Price = 3;
+            }
             price.text = Price.ToString();
 
             IsArmor = true;
@@ -52,14 +60,15 @@ namespace Vi.UI
         {
             get
             {
-                if (_selectables == null) { _selectables = GetComponentsInChildren<Selectable>(); }
+                if (_selectables == null) { _selectables = GetComponentsInChildren<Selectable>(true); }
                 return _selectables;
             }
         }
+
         private Selectable[] _selectables;
         private void Awake()
         {
-            _selectables = GetComponentsInChildren<Selectable>();
+            _selectables = GetComponentsInChildren<Selectable>(true);
         }
     }
 }
