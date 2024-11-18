@@ -32,7 +32,7 @@ namespace Vi.UI
             {
                 iconImage.sprite = wearableEquipmentOption.GetIcon(raceAndGender);
                 iconImage.color = Color.white;
-                itemNameText.text = wearableEquipmentOption.name;
+                itemNameText.text = wearableEquipmentOption.name.Replace(" Chest", "");
             }
         }
     }

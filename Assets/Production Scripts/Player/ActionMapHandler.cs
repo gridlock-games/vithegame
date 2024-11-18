@@ -118,6 +118,7 @@ namespace Vi.Player
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
             if (textChatIsOpen) { return; }
+            if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
             if (isOn)
             {
@@ -159,7 +160,12 @@ namespace Vi.Player
                 return;
             }
             if (scoreboardInstance) { return; }
-            if (inventoryInstance) { return; }
+            if (inventoryInstance)
+            {
+                OnInventory();
+                return;
+            }
+            if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
             if (pauseInstance)
             {
@@ -191,6 +197,7 @@ namespace Vi.Player
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (textChatIsOpen) { return; }
+            if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
             if (inventoryInstance)
             {
@@ -220,6 +227,7 @@ namespace Vi.Player
             if (scoreboardInstance) { return; }
             if (pauseInstance) { return; }
             if (inventoryInstance) { return; }
+            if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
             if (playerUIInstance)
             {

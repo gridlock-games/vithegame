@@ -13,83 +13,83 @@ namespace Vi.UI
     {
         [SerializeField] private Transform weaponOptionScrollParent;
         [SerializeField] private LoadoutOptionElement loadoutOptionPrefab;
-        [SerializeField] private Camera characterPreviewCamera;
+        //[SerializeField] private Camera characterPreviewCamera;
 
-        private void Start()
-        {
-            CreatePreview();
+        //private void Start()
+        //{
+        //    CreatePreview();
 
-            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
-            {
-                data.OnDragEvent += OnCharPreviewDrag;
-            }
-        }
+        //    foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+        //    {
+        //        data.OnDragEvent += OnCharPreviewDrag;
+        //    }
+        //}
 
-        private void OnCharPreviewDrag(Vector2 delta)
-        {
-            if (previewObject)
-            {
-                previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
-            }
-        }
+        //private void OnCharPreviewDrag(Vector2 delta)
+        //{
+        //    if (previewObject)
+        //    {
+        //        previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+        //    }
+        //}
 
-        private void OnDestroy()
-        {
-            foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
-            {
-                data.OnDragEvent -= OnCharPreviewDrag;
-            }
+        //private void OnDestroy()
+        //{
+        //    foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
+        //    {
+        //        data.OnDragEvent -= OnCharPreviewDrag;
+        //    }
 
-            if (characterPreviewCamera) { Destroy(characterPreviewCamera.gameObject); }
+        //    if (characterPreviewCamera) { Destroy(characterPreviewCamera.gameObject); }
 
-            if (previewObject)
-            {
-                if (previewObject.TryGetComponent(out PooledObject pooledObject))
-                {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    previewObject = null;
-                }
-                else
-                {
-                    Destroy(previewObject);
-                }
-            }
-        }
+        //    if (previewObject)
+        //    {
+        //        if (previewObject.TryGetComponent(out PooledObject pooledObject))
+        //        {
+        //            ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+        //            previewObject = null;
+        //        }
+        //        else
+        //        {
+        //            Destroy(previewObject);
+        //        }
+        //    }
+        //}
 
-        private GameObject previewObject;
-        private void CreatePreview()
-        {
-            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+        //private GameObject previewObject;
+        //private void CreatePreview()
+        //{
+        //    WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
-            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+        //    var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
-            if (!previewObject)
-            {
-                // Instantiate the player model
-                Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerDataId);
-                if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledObject))
-                {
-                    previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
-                        basePos,
-                        Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
-                }
-                else
-                {
-                    previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab,
-                        basePos,
-                        Quaternion.Euler(SpawnPoints.previewCharacterRotation));
-                }
+        //    if (!previewObject)
+        //    {
+        //        // Instantiate the player model
+        //        Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerDataId);
+        //        if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledObject))
+        //        {
+        //            previewObject = ObjectPoolingManager.SpawnObject(pooledObject,
+        //                basePos,
+        //                Quaternion.Euler(SpawnPoints.previewCharacterRotation)).gameObject;
+        //        }
+        //        else
+        //        {
+        //            previewObject = Instantiate(PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab,
+        //                basePos,
+        //                Quaternion.Euler(SpawnPoints.previewCharacterRotation));
+        //        }
 
-                AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
-                animationHandler.ChangeCharacter(character);
+        //        AnimationHandler animationHandler = previewObject.GetComponent<AnimationHandler>();
+        //        animationHandler.ChangeCharacter(character);
 
-                characterPreviewCamera.transform.SetParent(null);
-                characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
-                characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
-            }
+        //        characterPreviewCamera.transform.SetParent(null);
+        //        characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
+        //        characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
+        //    }
             
-            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
-        }
+        //    previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+        //}
 
         private List<Button> buttonList = new List<Button>();
         private int playerDataId;
@@ -140,7 +140,7 @@ namespace Vi.UI
                 LoadoutOptionElement emptyEle = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 emptyEle.InitializeEquipment(null, playerData.character.raceAndGender);
                 Button emptyButton = emptyEle.GetComponentInChildren<Button>();
-                emptyButton.onClick.AddListener(delegate { ChangeArmor(emptyButton, equipmentType, null, loadoutSlot); });
+                emptyButton.onClick.AddListener(delegate { ChangeArmor(emptyButton, equipmentType, null, loadoutSlot, wearableEquipmentOptions); });
                 buttonList.Add(emptyButton);
 
                 invokeThis = emptyButton;
@@ -155,7 +155,7 @@ namespace Vi.UI
                 LoadoutOptionElement ele = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 ele.InitializeEquipment(wearableEquipmentOption, playerData.character.raceAndGender);
                 Button button = ele.GetComponentInChildren<Button>();
-                button.onClick.AddListener(delegate { ChangeArmor(button, equipmentType, wearableEquipmentOption, loadoutSlot); });
+                button.onClick.AddListener(delegate { ChangeArmor(button, equipmentType, wearableEquipmentOption, loadoutSlot, wearableEquipmentOptions); });
 
                 if (initialWearableEquipmentOption != null)
                 {
@@ -168,15 +168,15 @@ namespace Vi.UI
             invokeThis.onClick.Invoke();
         }
 
-        private void Update()
-        {
-            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
-            {
-                CreatePreview();
-            }
-        }
+        //private void Update()
+        //{
+        //    if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
+        //    {
+        //        CreatePreview();
+        //    }
+        //}
 
-        private void ChangeArmor(Button button, CharacterReference.EquipmentType equipmentType, CharacterReference.WearableEquipmentOption wearableEquipmentOption, int loadoutSlot)
+        private void ChangeArmor(Button button, CharacterReference.EquipmentType equipmentType, CharacterReference.WearableEquipmentOption wearableEquipmentOption, int loadoutSlot, List<CharacterReference.WearableEquipmentOption> allOptions)
         {
             foreach (Button b in buttonList)
             {
@@ -186,7 +186,8 @@ namespace Vi.UI
 
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
-            string inventoryItemId = wearableEquipmentOption == null ? "" : WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.itemId == wearableEquipmentOption.itemWebId).id;
+            var inventory = WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()];
+            string inventoryItemId = wearableEquipmentOption == null ? "" : inventory.Find(item => item.itemId == wearableEquipmentOption.itemWebId).id;
             switch (equipmentType)
             {
                 case CharacterReference.EquipmentType.Belt:
@@ -200,6 +201,43 @@ namespace Vi.UI
                     break;
                 case CharacterReference.EquipmentType.Chest:
                     newLoadout.chestArmorGearItemId = inventoryItemId;
+
+                    var pants = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Pants);
+                    string pantsId;
+                    if (pants == null)
+                    {
+                        pantsId = "";
+                    }
+                    else if (inventory.Exists(item => item.itemId == pants.itemWebId))
+                    {
+                        pantsId = inventory.Find(item => item.itemId == pants.itemWebId).id;
+                        newLoadout.pantsGearItemId = pantsId;
+                    }
+
+                    var boots = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Boots);
+                    string bootsId;
+                    if (boots == null)
+                    {
+                        bootsId = "";
+                    }
+                    else if (inventory.Exists(item => item.itemId == boots.itemWebId))
+                    {
+                        bootsId = inventory.Find(item => item.itemId == boots.itemWebId).id;
+                        newLoadout.bootsGearItemId = bootsId;
+                    }
+
+                    var belt = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Belt);
+                    string beltId;
+                    if (belt == null)
+                    {
+                        beltId = "";
+                    }
+                    else if (inventory.Exists(item => item.itemId == belt.itemWebId))
+                    {
+                        beltId = inventory.Find(item => item.itemId == belt.itemWebId).id;
+                        newLoadout.beltGearItemId = beltId;
+                    }
+
                     break;
                 case CharacterReference.EquipmentType.Gloves:
                     newLoadout.glovesGearItemId = inventoryItemId;
