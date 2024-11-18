@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Vi.Utility;
-using static UnityEditor.Progress;
 
 namespace Vi.UI
 {
