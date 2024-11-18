@@ -15,6 +15,7 @@ namespace Vi.Core.Weapons
         private float lastWeaponTrailActiveTime = Mathf.NegativeInfinity;
 
         private BoxCollider[] boxColliders;
+        private SphereCollider[] sphereColliders;
         private Dictionary<BoxCollider, Vector3> boxColliderOriginalSizes = new Dictionary<BoxCollider, Vector3>();
         protected override void Awake()
         {
@@ -24,9 +25,15 @@ namespace Vi.Core.Weapons
             {
                 boxColliderOriginalSizes.Add(box, box.size);
             }
+
+            sphereColliders = GetComponentsInChildren<SphereCollider>();
+
+#if UNITY_EDITOR
+            if (GetComponentInChildren<CapsuleCollider>(true)) { Debug.LogError(this + " colliders weapons don't support capsule colliders yet"); }
+#endif
         }
 
-        public override void SetColliderMultiplier(Vector3 multiplier)
+        public override void SetBoxColliderMultiplier(Vector3 multiplier)
         {
             foreach (BoxCollider box in boxColliders)
             {
@@ -51,11 +58,53 @@ namespace Vi.Core.Weapons
             }
         }
 
-        private void OnTriggerEnter(Collider other) { ProcessTriggerEvent(other); }
-        private void OnTriggerStay(Collider other) { ProcessTriggerEvent(other); }
+        private void LateUpdate()
+        {
+            PerformHitDetection();
+        }
+
+        private Collider[] hits = new Collider[10];
+        private void PerformHitDetection()
+        {
+            if (IsStowed) { return; }
+            if (!NetworkManager.Singleton.IsServer) { return; }
+
+            if (!parentCombatAgent) { return; }
+            if (parentCombatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
+            if (!parentCombatAgent.WeaponHandler.IsAttacking) { return; }
+            if (parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones == null) { return; }
+            if (!parentCombatAgent.WeaponHandler.CurrentActionClip.effectedWeaponBones.Contains(WeaponBone)) { return; }
+
+            foreach (BoxCollider box in boxColliders)
+            {
+                Vector3 worldCenter = box.transform.TransformPoint(box.center);
+                Vector3 worldHalfExtents = Vector3.Scale(box.size, box.transform.lossyScale) * 0.5f;
+
+                int hitCount = Physics.OverlapBoxNonAlloc(worldCenter, worldHalfExtents, hits, box.transform.rotation, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Collide);
+
+                for (int i = 0; i < hitCount; i++)
+                {
+                    ProcessTriggerEvent(hits[i]);
+                }
+            }
+
+            foreach (SphereCollider sphere in sphereColliders)
+            {
+                Vector3 worldCenter = sphere.transform.TransformPoint(sphere.center);
+                float worldRadius = sphere.radius * ((sphere.transform.lossyScale.x + sphere.transform.lossyScale.y + sphere.transform.lossyScale.z) / 3);
+
+                int hitCount = Physics.OverlapSphereNonAlloc(worldCenter, sphere.radius * worldRadius, hits, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Collide);
+
+                for (int i = 0; i < hitCount; i++)
+                {
+                    ProcessTriggerEvent(hits[i]);
+                }
+            }
+        }
 
         private void ProcessTriggerEvent(Collider other)
         {
+            if (!other) { return; }
             if (IsStowed) { return; }
             if (!NetworkManager.Singleton.IsServer) { return; }
 
