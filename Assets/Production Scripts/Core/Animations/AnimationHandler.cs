@@ -33,7 +33,7 @@ namespace Vi.Core
                 if (!canPlayActionClipResult.canPlay) { return; }
                 WaitingForActionClipToPlay = true;
                 PlayActionServerRpc(actionClip.name, isFollowUpClip);
-                if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                if (actionClip.IsMotionPredicted())
                 {
                     PlayPredictedActionOnClient(actionClip, canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime);
                 }
@@ -664,7 +664,11 @@ namespace Vi.Core
             if (!canPlayActionClipResult.canPlay)
             {
                 WaitingForActionClipToPlay = false;
-                if (wasCalledFromServerRpc) { ResetWaitingForActionToPlayClientRpc(); }
+                if (wasCalledFromServerRpc)
+                {
+                    ResetWaitingForActionToPlayClientRpc();
+                    if (actionClip.IsMotionPredicted()) { combatAgent.MovementHandler.OnRootMotionTimeReset(); }
+                }
                 return false;
             }
 
@@ -757,7 +761,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, actionClip.GetClipType() == ActionClip.ClipType.Dodge);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, actionClip.IsMotionPredicted());
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }

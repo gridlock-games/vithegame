@@ -299,7 +299,9 @@ namespace Vi.Player
 
             if (!IsClient)
             {
-                if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
+                bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
+                // This if statement should only be reached
+                if (shouldApplyRootMotion & !combatAgent.WeaponHandler.CurrentActionClip.IsMotionPredicted())
                 {
                     InputPayload serverInputPayload = new InputPayload();
                     if (serverInputQueue.Count > 0)
@@ -347,7 +349,7 @@ namespace Vi.Player
                             inputPayload.moveInput = Vector2.zero;
                         }
 
-                        if (serverInputQueue.Count > 3)
+                        if (serverInputQueue.Count > 3 & !shouldApplyRootMotion)
                         {
                             if (inputPayload.moveInput == Vector2.zero & lastInputPayloadProcessedOnServer.moveInput == Vector2.zero) { continue; }
                         }
@@ -543,12 +545,17 @@ namespace Vi.Player
             }
             else if (inputPayload.shouldUseRootMotion)
             {
-                movement = (IsServer ? inputPayload.rotation : latestServerState.Value.rotation) * inputPayload.rootMotion;
-
-                //if (IsLocalPlayer)
-                //{
-                //    Debug.Log(Time.time + " " + combatAgent.GetName() + " is using root motion " + combatAgent.WeaponHandler.CurrentActionClip);
-                //}
+                Quaternion rootMotionRotation;
+                // Dodges are predicted, meaning they don't wait for server confirmation before playing
+                if (combatAgent.WeaponHandler.CurrentActionClip.IsMotionPredicted())
+                {
+                    rootMotionRotation = inputPayload.rotation;
+                }
+                else
+                {
+                    rootMotionRotation = IsServer ? inputPayload.rotation : latestServerState.Value.rotation;
+                }
+                movement = rootMotionRotation * inputPayload.rootMotion;
             }
             else
             {

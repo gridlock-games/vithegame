@@ -1664,6 +1664,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1084103190731164790}
   - component: {fileID: 1746109490435250071}
+  - component: {fileID: 5137086681677470091}
   m_Layer: 0
   m_Name: HeadIKRig
   m_TagString: Untagged
@@ -1701,6 +1702,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Effectors: []
+--- !u!114 &5137086681677470091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8581642422917755526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f43ee48155ea45c4aa1eb4049bf3adbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weight: 1
+  instantWeight: 0
 --- !u!1 &8912633899157833977
 GameObject:
   m_ObjectHideFlags: 0
@@ -3931,6 +3946,7 @@ MonoBehaviour:
   leftHandReachRig: {fileID: 2763309891445163993}
   meleeVerticalAimRig: {fileID: 5537876455313316901}
   meleeVerticalAimConstraint: {fileID: 8158951797868863509}
+  headIKRig: {fileID: 5137086681677470091}
   rotationOffsetConstraint: {fileID: 8748341270363411130}
   rotationOffsetAxis: 1
   middleSpine: {fileID: 7089063272096612996}
@@ -3987,8 +4003,6 @@ MonoBehaviour:
   - m_Rig: {fileID: 4713047999326424009}
     m_Active: 1
   - m_Rig: {fileID: 1746109490435250071}
-    m_Active: 1
-  - m_Rig: {fileID: 0}
     m_Active: 1
   m_Effectors:
   - m_Transform: {fileID: 288682920222897091}

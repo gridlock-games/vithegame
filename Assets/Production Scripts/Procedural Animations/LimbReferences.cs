@@ -253,6 +253,7 @@ namespace Vi.ProceduralAnimations
         [SerializeField] private RigWeightTarget leftHandReachRig;
         [SerializeField] private RigWeightTarget meleeVerticalAimRig;
         [SerializeField] private MultiRotationConstraint meleeVerticalAimConstraint;
+        [SerializeField] private RigWeightTarget headIKRig;
         [Header("Animation Rotation Offset Settings")]
         [SerializeField] private MultiRotationConstraint rotationOffsetConstraint;
         [SerializeField] private Axis rotationOffsetAxis = Axis.Z;
@@ -292,6 +293,14 @@ namespace Vi.ProceduralAnimations
                     break;
             }
             rotationOffsetConstraint.data.offset = Vector3.Lerp(rotationOffsetConstraint.data.offset, targetOffset, Time.deltaTime * rotationConstraintOffsetSpeed);
+        }
+
+        public void SetHeadIKWeight(float newWeightTarget)
+        {
+            if (headIKRig)
+            {
+                headIKRig.weight = newWeightTarget;
+            }
         }
 
         public enum BodyAimType

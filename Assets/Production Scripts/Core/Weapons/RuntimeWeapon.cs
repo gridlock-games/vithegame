@@ -111,7 +111,7 @@ namespace Vi.Core.Weapons
             }
         }
 
-        public virtual void SetColliderMultiplier(Vector3 multiplier) { }
+        public virtual void SetBoxColliderMultiplier(Vector3 multiplier) { }
 
         [SerializeField] private PooledObject dropWeaponPrefab;
         private PooledObject dropWeaponInstance;

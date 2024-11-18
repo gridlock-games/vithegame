@@ -24,10 +24,16 @@ namespace Vi.Core
 
         private static List<int> colliderInstanceIDMap = new List<int>();
 
+        private PooledObject parentPooledObject;
+
         private void Awake()
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
-            CombatAgent = GetComponentInParent<CombatAgent>();
+            CombatAgent = MovementHandler.GetComponent<CombatAgent>();
+            parentPooledObject = MovementHandler.GetComponent<PooledObject>();
+
+            parentPooledObject.OnSpawnFromPool += OnSpawnFromPool;
+            parentPooledObject.OnReturnToPool += OnReturnToPool;
 
             Colliders = GetNetworkColliders().ToArray();
             if (staticWallBody)
@@ -71,14 +77,14 @@ namespace Vi.Core
             return networkPredictionLayerColliders;
         }
 
-        private void OnEnable()
+        private void OnSpawnFromPool()
         {
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.AddRigidbody(staticWallBody);
                 staticWallBody.position = MovementHandler.Rigidbody.position;
                 staticWallBody.rotation = MovementHandler.Rigidbody.rotation;
-                PersistentLocalObjects.Singleton.StartCoroutine(RemoveParentOfStaticWallBody());
+                staticWallBody.transform.SetParent(null, true);
                 Physics.ContactModifyEvent += Physics_ContactModifyEvent;
                 foreach (Collider col in staticWallColliders)
                 {
@@ -127,12 +133,14 @@ namespace Vi.Core
             }
         }
 
-        private void OnDisable()
+        private void OnReturnToPool()
         {
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
-                PersistentLocalObjects.Singleton.StartCoroutine(ReparentStaticWallBody());
+                staticWallBody.transform.SetParent(transform, true);
+                staticWallBody.transform.localPosition = Vector3.zero;
+                staticWallBody.transform.localRotation = Quaternion.identity;
                 Physics.ContactModifyEvent -= Physics_ContactModifyEvent;
             }
         }
@@ -156,22 +164,6 @@ namespace Vi.Core
                     }
                 }
             }
-        }
-
-        private IEnumerator RemoveParentOfStaticWallBody()
-        {
-            yield return null;
-            if (!staticWallBody) { yield break; }
-            staticWallBody.transform.SetParent(null, true);
-        }
-
-        private IEnumerator ReparentStaticWallBody()
-        {
-            yield return null;
-            if (!staticWallBody) { yield break; }
-            staticWallBody.transform.SetParent(transform, true);
-            staticWallBody.transform.localPosition = Vector3.zero;
-            staticWallBody.transform.localRotation = Quaternion.identity;
         }
 
         private void OnDestroy()

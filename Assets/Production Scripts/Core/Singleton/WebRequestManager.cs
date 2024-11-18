@@ -719,24 +719,25 @@ namespace Vi.Core
                 yield return GetCharacterInventory(character);
             }
 
-# if UNITY_EDITOR
-            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            foreach (Character character in Characters)
-            {
-                foreach (var weaponOption in weaponOptions)
-                {
-                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
-                    {
-                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-                    }
-                }
-            }
+            // This adds all weapons to the inventory if we're in the editor
+//# if UNITY_EDITOR
+//            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+//            foreach (Character character in Characters)
+//            {
+//                foreach (var weaponOption in weaponOptions)
+//                {
+//                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
+//                    {
+//                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+//                    }
+//                }
+//            }
 
-            foreach (Character character in Characters)
-            {
-                yield return GetCharacterInventory(character);
-            }
-# endif
+//            foreach (Character character in Characters)
+//            {
+//                yield return GetCharacterInventory(character);
+//            }
+//# endif
 
             IsRefreshingCharacters = false;
         }
@@ -922,6 +923,12 @@ namespace Vi.Core
             {
                 Debug.LogError("Post request error in WebRequestManager.AddItemToInventory()" + postRequest.error);
                 InventoryAddWasSuccessful = false;
+            }
+
+            if (postRequest.downloadHandler.text == "false")
+            {
+                InventoryAddWasSuccessful = false;
+                yield break;
             }
 
             postRequest.Dispose();
