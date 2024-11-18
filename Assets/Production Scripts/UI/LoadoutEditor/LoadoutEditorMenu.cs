@@ -16,6 +16,13 @@ namespace Vi.UI
         [Header("Loadout Editor Menu")]
         [SerializeField] private Button[] loadoutButtons;
         [SerializeField] private Camera characterPreviewCamera;
+        [SerializeField] private GameObject gearsSectionParent;
+        [SerializeField] private GameObject characterSectionParent;
+        [SerializeField] private Text characterNameText;
+        [SerializeField] private Button openCharacterSectionButton;
+        [SerializeField] private Button openGearsSectionButton;
+        [SerializeField] private GameObject underConstructionAlert;
+        [SerializeField] private Button[] buttonsThatOpenConstructionAlert;
 
         [Header("Weapon Select Menu")]
         [SerializeField] private WeaponSelectMenu weaponSelectMenu;
@@ -55,12 +62,45 @@ namespace Vi.UI
             }
         }
 
+        private void Start()
+        {
+            characterNameText.text = attributes.CachedPlayerData.character.name.ToString();
+
+            OpenGearsSection();
+
+            foreach (Button button in buttonsThatOpenConstructionAlert)
+            {
+                button.onClick.AddListener(OpenConstructionAlert);
+            }
+        }
+
+        private void OpenConstructionAlert()
+        {
+            underConstructionAlert.SetActive(true);
+        }
+
         private void OnCharPreviewDrag(Vector2 delta)
         {
             if (previewObject)
             {
                 previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
             }
+        }
+
+        public void OpenCharacterSection()
+        {
+            characterSectionParent.SetActive(true);
+            gearsSectionParent.SetActive(false);
+            openCharacterSectionButton.interactable = false;
+            openGearsSectionButton.interactable = true;
+        }
+
+        public void OpenGearsSection()
+        {
+            characterSectionParent.SetActive(false);
+            gearsSectionParent.SetActive(true);
+            openCharacterSectionButton.interactable = true;
+            openGearsSectionButton.interactable = false;
         }
 
         private GameObject previewObject;
@@ -192,14 +232,12 @@ namespace Vi.UI
             primaryWeaponButton.onClick.RemoveAllListeners();
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
-            primaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption1.name.ToUpper();
             bool canEditLoadout = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
             primaryWeaponButton.interactable = canEditLoadout;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
             secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
-            secondaryWeaponButton.GetComponentInChildren<Text>().text = weaponOption2.name.ToUpper();
             secondaryWeaponButton.interactable = canEditLoadout;
 
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);

@@ -31,8 +31,12 @@ namespace Vi.Core
             {
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
-                PlayActionServerRpc(actionClip.name, isFollowUpClip);
                 WaitingForActionClipToPlay = true;
+                PlayActionServerRpc(actionClip.name, isFollowUpClip);
+                if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                {
+                    PlayPredictedActionOnClient(actionClip, canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime);
+                }
             }
             else
             {
@@ -753,7 +757,7 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime);
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, actionClip.GetClipType() == ActionClip.ClipType.Dodge);
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
             if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
@@ -1114,13 +1118,27 @@ namespace Vi.Core
             }
         }
 
+        private void PlayPredictedActionOnClient(ActionClip actionClip, float transitionTime)
+        {
+            if (actionClip.GetClipType() != ActionClip.ClipType.Dodge) { Debug.LogWarning("Predicted action clips are not supported for non-dodge clips"); return; }
+
+            if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClip.name, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime));
+        }
+
         // Remote Procedure Call method for playing the action on the client
         [Rpc(SendTo.NotServer)]
-        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime)
+        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime, bool wasPredictedOnOwner)
         {
+            WaitingForActionClipToPlay = false;
+
+            if (wasPredictedOnOwner)
+            {
+                if (IsOwner) { return; }
+            }
+            
             if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
             playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
-            WaitingForActionClipToPlay = false;
         }
 
         private Coroutine playActionOnClientCoroutine;

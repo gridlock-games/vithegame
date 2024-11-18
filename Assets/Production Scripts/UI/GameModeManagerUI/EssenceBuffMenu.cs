@@ -26,7 +26,6 @@ namespace Vi.UI
         private ActionMapHandler actionMapHandler;
         public void Initialize(ActionMapHandler actionMapHandler)
         {
-            actionMapHandler.SetExternalUI(this);
             this.actionMapHandler = actionMapHandler;
             
             Dictionary<GameModeManager.EssenceBuffOption, int> indexCrosswalk = new Dictionary<GameModeManager.EssenceBuffOption, int>();
@@ -51,7 +50,11 @@ namespace Vi.UI
             }
 
             if (allNotInteractable) { CloseMenu(); }
-            else { canvas.enabled = true; }
+            else
+            {
+                canvas.enabled = true;
+                actionMapHandler.SetExternalUI(this);
+            }
         }
 
         public void OnEssenceBuffOptionSelected(int essenceBuffOptionIndex)

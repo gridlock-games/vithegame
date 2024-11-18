@@ -65,6 +65,7 @@ namespace Vi.Core.Structures
             if (prev > 0 & Mathf.Approximately(current, 0))
             {
                 IsDead = true;
+                StatusAgent.RemoveAllStatuses();
 
                 foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 {

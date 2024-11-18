@@ -85,6 +85,7 @@ namespace Vi.ScriptableObjects
                 NetworkPhysicsSimulation.AddParticleSystem(ps);
                 ParticleSystem.MainModule main = ps.main;
                 main.cullingMode = NetworkManager.Singleton.IsServer | ps.gameObject.CompareTag(ObjectPoolingManager.cullingOverrideTag) ? ParticleSystemCullingMode.AlwaysSimulate : ParticleSystemCullingMode.PauseAndCatchup;
+                ps.Play(false);
             }
 
             if (TryGetComponent(out Rigidbody rb))

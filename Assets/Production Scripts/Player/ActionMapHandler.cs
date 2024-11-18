@@ -26,6 +26,14 @@ namespace Vi.Player
             this.externalUI = externalUI;
             if (externalUI != null)
             {
+                if (textChatIsOpen)
+                {
+                    OnTextChat();
+                    return;
+                }
+
+                if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
+
                 Cursor.lockState = CursorLockMode.None;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);

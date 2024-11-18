@@ -81,7 +81,6 @@ namespace Vi.Core
             {
                 essences.Value -= GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount;
 
-                // TODO perform the action here
                 switch (GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title)
                 {
                     case "Heal The Ancient":
@@ -89,7 +88,7 @@ namespace Vi.Core
                         if (structures.Length > 0)
                         {
                             Structure structure = structures[0];
-                            structure.StatusAgent.TryAddStatus(ActionClip.Status.healing, 0.1f, buffDuration, 0, false);
+                            structure.StatusAgent.TryAddStatus(ActionClip.Status.healing, 1, buffDuration, 0, false);
                         }
                         break;
                     case "Rage":
@@ -102,7 +101,7 @@ namespace Vi.Core
                     case "Increased Move Speed":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedIncrease, 0.2f, buffDuration, 0, false);
+                            attributes.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedIncrease, 1, buffDuration, 0, false);
                         }
                         break;
                     case "Resist Ailments":
