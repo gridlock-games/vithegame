@@ -664,7 +664,11 @@ namespace Vi.Core
             if (!canPlayActionClipResult.canPlay)
             {
                 WaitingForActionClipToPlay = false;
-                if (wasCalledFromServerRpc) { ResetWaitingForActionToPlayClientRpc(); }
+                if (wasCalledFromServerRpc)
+                {
+                    ResetWaitingForActionToPlayClientRpc();
+                    if (actionClip.IsMotionPredicted()) { combatAgent.MovementHandler.OnRootMotionTimeReset(); }
+                }
                 return false;
             }
 
