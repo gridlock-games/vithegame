@@ -1283,7 +1283,14 @@ namespace Vi.Core
                 {
                     maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
                 }
-                return totalRootMotionTime <= maxRootMotionTime - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime);
+
+                float transitionOutTime = 0.15f;
+                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                {
+                    transitionOutTime = 0.25f;
+                }
+
+                return totalRootMotionTime <= maxRootMotionTime - transitionOutTime;
             }
             else
             {
