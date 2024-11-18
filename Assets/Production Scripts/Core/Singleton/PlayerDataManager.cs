@@ -1112,16 +1112,22 @@ namespace Vi.Core
             while (true)
             {
                 if (ContainsId((int)clientId)) { break; }
-                waitTime += Time.unscaledDeltaTime;
-                if (waitTime > NetworkManager.NetworkConfig.ClientConnectionBufferTimeout)
+
+                // Time out the player if they take too long
+                if (NetworkManager.LocalClientId != NetworkManager.ServerClientId)
                 {
-                    Debug.LogWarning("Timed out while waiting for player data after scene loading completed on client " + clientId);
-                    if (NetworkManager.ConnectedClientsIds.Contains(clientId))
+                    waitTime += Time.unscaledDeltaTime;
+                    if (waitTime > 120)
                     {
-                        NetworkManager.DisconnectClient((ulong)clientId, "Timed out while spawning player.");
+                        Debug.LogWarning("Timed out while waiting for player data after scene loading completed on client " + clientId);
+                        if (NetworkManager.ConnectedClientsIds.Contains(clientId))
+                        {
+                            NetworkManager.DisconnectClient((ulong)clientId, "Timed out while spawning player.");
+                        }
+                        yield break;
                     }
-                    yield break;
                 }
+                
                 yield return null;
             }
             AddPlayerToSpawnQueue(GetPlayerData((int)clientId));

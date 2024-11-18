@@ -172,6 +172,11 @@ namespace Vi.ScriptableObjects
             //hitReactionRootMotionVerticalMultiplier = attackClip.attackRootMotionVerticalMultiplier;
         }
 
+        public bool IsMotionPredicted()
+        {
+            return GetClipType() == ClipType.Dodge;
+        }
+
         [SerializeField] private AnimationCurve debugForwardMotion;
         [SerializeField] private AnimationCurve debugSidesMotion;
         [SerializeField] private AnimationCurve debugVerticalMotion;
