@@ -131,7 +131,7 @@ namespace Vi.Core
         private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
-        private const float defaultFresnelPower = 5;
+        private const float defaultFresnelPower = 2;
 
         private float currentFresnelPower;
         private float lastFresnelPower;
