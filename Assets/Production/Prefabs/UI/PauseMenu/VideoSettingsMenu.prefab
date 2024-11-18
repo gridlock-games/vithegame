@@ -518,8 +518,6 @@ MonoBehaviour:
   fieldOfViewSlider: {fileID: 0}
   renderDistanceInput: {fileID: 0}
   graphicsPresetDropdown: {fileID: 2216902278138982056}
-  renderScaleSlider: {fileID: 2937922531809025384}
-  renderScalingModeDropdown: {fileID: 2906081874980299670}
   vsyncToggle: {fileID: 7061632087943349254}
   hdrToggle: {fileID: 9143876529556342402}
   postProcessingToggle: {fileID: 5911158452186550708}
@@ -3318,30 +3316,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2906081874980299670 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 182703667454531677, guid: d84bd87d951bf1e48a90fa7342bbebf4,
-    type: 3}
-  m_PrefabInstance: {fileID: 3088732761975897035}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2937922531809025384 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 151146492419696291, guid: d84bd87d951bf1e48a90fa7342bbebf4,
-    type: 3}
-  m_PrefabInstance: {fileID: 3088732761975897035}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &3460763192806943846 stripped

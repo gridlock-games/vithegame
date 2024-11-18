@@ -22,7 +22,7 @@ namespace Vi.ArtificialIntelligence
 
         private IEnumerator SpawnMobs()
         {
-            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer);
+            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayerCached);
             foreach (MobDefinition mobDefinition in mobDefinitions)
             {
                 if (!mobDefinition.enabled) { continue; }

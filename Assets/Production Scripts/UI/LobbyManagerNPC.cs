@@ -63,11 +63,12 @@ namespace Vi.UI
         private Vector3 originalScale;
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
 
-#if UNITY_SERVER
         // The minimum number of EMPTY lobby instances we want to run at one time
+#if UNITY_EDITOR
+        private const int emptyLobbyServersRequired = 0;
+#elif UNITY_SERVER
         private const int emptyLobbyServersRequired = 2;
 #else
-        // The minimum number of EMPTY lobby instances we want to run at one time
         private const int emptyLobbyServersRequired = 1;
 #endif
 

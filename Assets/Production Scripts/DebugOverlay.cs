@@ -129,11 +129,11 @@ public class DebugOverlay : MonoBehaviour
 
         if (type.ToString() == LogType.Error.ToString() | logString.Contains("Exception") | type.ToString() == "Exception")
         {
-            myLog = type.ToString() + ": " + output + "\n" + stack + "\n" + myLog;
+            myLog = "[" + Time.time.ToString("F2") + "] " + type.ToString() + ": " + output + "\n" + stack + "\n" + myLog;
         }
         else
         {
-            myLog = type.ToString() + ": " + output + "\n" + myLog;
+            myLog = "[" + Time.time.ToString("F2") + "] " + type.ToString() + ": " + output + "\n" + myLog;
         }
 
         if (myLog.Length > 3000)

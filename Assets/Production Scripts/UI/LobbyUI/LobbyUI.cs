@@ -483,28 +483,27 @@ namespace Vi.UI
                     switch (PlayerDataManager.Singleton.GetGameMode())
                     {
                         case PlayerDataManager.GameMode.FreeForAll:
-                            NetSceneManager.Singleton.LoadScene("Free For All");
+                            NetSceneManager.Singleton.LoadScene("Free For All", PlayerDataManager.Singleton.GetMapName());
                             break;
                         case PlayerDataManager.GameMode.TeamElimination:
-                            NetSceneManager.Singleton.LoadScene("Team Elimination");
+                            NetSceneManager.Singleton.LoadScene("Team Elimination", PlayerDataManager.Singleton.GetMapName());
                             break;
                         case PlayerDataManager.GameMode.EssenceWar:
-                            NetSceneManager.Singleton.LoadScene("Essence War");
+                            NetSceneManager.Singleton.LoadScene("Essence War", PlayerDataManager.Singleton.GetMapName());
                             break;
                         case PlayerDataManager.GameMode.OutpostRush:
-                            NetSceneManager.Singleton.LoadScene("Outpost Rush");
+                            NetSceneManager.Singleton.LoadScene("Outpost Rush", PlayerDataManager.Singleton.GetMapName());
                             break;
                         case PlayerDataManager.GameMode.TeamDeathmatch:
-                            NetSceneManager.Singleton.LoadScene("Team Deathmatch");
+                            NetSceneManager.Singleton.LoadScene("Team Deathmatch", PlayerDataManager.Singleton.GetMapName());
                             break;
                         case PlayerDataManager.GameMode.HordeMode:
-                            NetSceneManager.Singleton.LoadScene("Horde Mode");
+                            NetSceneManager.Singleton.LoadScene("Horde Mode", PlayerDataManager.Singleton.GetMapName());
                             break;
                         default:
                             Debug.LogError("Not sure what scene to load for game mode: " + PlayerDataManager.Singleton.GetGameMode());
                             break;
                     }
-                    NetSceneManager.Singleton.LoadScene(PlayerDataManager.Singleton.GetMapName());
                 }
             }
         }
@@ -546,8 +545,7 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
-                networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }

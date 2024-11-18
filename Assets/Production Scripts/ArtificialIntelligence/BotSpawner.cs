@@ -24,7 +24,7 @@ namespace Vi.ArtificialIntelligence
 
         private IEnumerator SpawnBots()
         {
-            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayer);
+            yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayerCached);
             foreach (BotDefinition botDefinition in botDefinitions)
             {
                 if (!botDefinition.enabled) { continue; }

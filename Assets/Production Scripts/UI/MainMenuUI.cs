@@ -135,15 +135,10 @@ namespace Vi.UI
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = serverIP;
-
-            networkTransport.ConnectionData.Port = hubPort;
-
-            networkTransport.MaxPacketQueueSize = 512;
+            networkTransport.SetConnectionData(serverIP, hubPort, FasterPlayerPrefs.serverListenAddress);
 
             NetworkManager.Singleton.StartServer();
-            NetSceneManager.Singleton.LoadScene("Player Hub");
-            NetSceneManager.Singleton.LoadScene("Player Hub Environment");
+            NetSceneManager.Singleton.LoadScene("Player Hub", "Player Hub Environment");
         }
 
         public void StartLobbyServerButton()
@@ -197,11 +192,8 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
 
-            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = serverIP;
-
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address))
+            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == serverIP))
             {
                 portList.Add(int.Parse(server.port));
             }
@@ -213,10 +205,8 @@ namespace Vi.UI
                 lobbyPort--;
             }
 
-            networkTransport.ConnectionData.Port = (ushort)lobbyPort;
-
-            networkTransport.MaxPacketQueueSize = 512;
-            networkTransport.MaxSendQueueSize = 512;
+            var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.SetConnectionData(serverIP, (ushort)lobbyPort, FasterPlayerPrefs.serverListenAddress);
 
             NetworkManager.Singleton.StartServer();
             NetSceneManager.Singleton.LoadScene("Lobby");
@@ -263,9 +253,8 @@ namespace Vi.UI
             if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.ConnectionData.Address = WebRequestManager.Singleton.HubServers[0].ip;
-            networkTransport.ConnectionData.Port = ushort.Parse(WebRequestManager.Singleton.HubServers[0].port);
-
+            networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+            
             NetworkManager.Singleton.StartClient();
         }
 

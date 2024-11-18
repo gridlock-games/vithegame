@@ -15,6 +15,8 @@ namespace Vi.Utility
 
         public const string persistentDiscordInviteLink = "https://discord.gg/2JxDqfpHQk";
 
+        public const string serverListenAddress = "0.0.0.0";
+
         public static bool IsQuitting { get; private set; }
         public static void QuitGame()
         {

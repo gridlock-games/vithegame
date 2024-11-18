@@ -258,6 +258,8 @@ namespace Vi.Core
             reloadFinished = false;
 
             IsBlocking = false;
+
+            lastLightAttackPressNetworkLatencyWait = Mathf.NegativeInfinity;
         }
 
         private void EquipWeapon()
@@ -913,12 +915,12 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            lightAttackIsPressed.OnValueChanged += OnLightAttackHoldChange;
+            lightAttackIsPressed.OnValueChanged += OnLightAttackIsPressedChanged;
         }
 
         public override void OnNetworkDespawn()
         {
-            lightAttackIsPressed.OnValueChanged -= OnLightAttackHoldChange;
+            lightAttackIsPressed.OnValueChanged -= OnLightAttackIsPressedChanged;
             DespawnActionVFXInstances();
         }
 
@@ -966,21 +968,35 @@ namespace Vi.Core
             {
                 ActionClip actionClip = GetAttack(Weapon.InputAttackType.LightAttack);
                 if (actionClip != null)
+                {
                     combatAgent.AnimationHandler.PlayAction(actionClip);
+                }
             }
         }
 
+        public bool LightAttackIsPressed { get { return lightAttackIsPressed.Value | lastLightAttackPressNetworkLatencyWait > 0; } }
         private NetworkVariable<bool> lightAttackIsPressed = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private float lastLightAttackPressNetworkLatencyWait = Mathf.NegativeInfinity;
         private Coroutine lightAttackHoldCoroutine;
         private void LightAttackHold(bool isPressed, bool resetAfterSent)
         {
             if (!IsOwner) { Debug.LogError("LightAttackHold() should only be called on the owner!"); return; }
             lightAttackIsPressed.Value = isPressed;
 
+            if (!IsServer)
+            {
+                if (isPressed) { lastLightAttackPressNetworkLatencyWait = NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat; }
+            }
+
             if (resetAfterSent)
             {
                 if (!resetLightAttackIsRunning) { StartCoroutine(ResetLightAttackIsPressedAfterNotDirty()); }
             }
+        }
+
+        private void LateUpdate()
+        {
+            lastLightAttackPressNetworkLatencyWait -= Time.unscaledDeltaTime;
         }
 
         private bool resetLightAttackIsRunning;
@@ -992,7 +1008,7 @@ namespace Vi.Core
             resetLightAttackIsRunning = false;
         }
 
-        private void OnLightAttackHoldChange(bool prev, bool current)
+        private void OnLightAttackIsPressedChanged(bool prev, bool current)
         {
             if (IsServer)
             {
@@ -1075,7 +1091,7 @@ namespace Vi.Core
                 if (deathVibrationsEnabled)
                 {
 #if UNITY_IOS || UNITY_ANDROID
-                    Handheld.Vibrate();
+                    CandyCoded.HapticFeedback.HapticFeedback.HeavyFeedback();
 #endif
                 }
             }

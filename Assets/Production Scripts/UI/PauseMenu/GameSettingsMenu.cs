@@ -19,6 +19,7 @@ namespace Vi.UI
         [SerializeField] private Toggle showPacketLossToggle;
         [SerializeField] private Toggle showJitterToggle;
         [SerializeField] private Slider UIOpacitySlider;
+        [SerializeField] private Toggle showTextInWorldSpaceLabelsToggle;
         [SerializeField] private GameObject channelDropdownParent;
         [SerializeField] private TMP_Dropdown channelDropdown;
 
@@ -40,6 +41,7 @@ namespace Vi.UI
             showPingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
             showPacketLossToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
             showJitterToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
+            showTextInWorldSpaceLabelsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("ShowHPTextInWorldSpaceLabels");
 
             autoAimToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(autoAimToggle, "AutoAim"); });
             consoleToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(consoleToggle, "ConsoleEnabled"); });
@@ -47,6 +49,7 @@ namespace Vi.UI
             showPingToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showPingToggle, "PingEnabled"); });
             showPacketLossToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showPacketLossToggle, "PacketLossEnabled"); });
             showJitterToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showJitterToggle, "JitterEnabled"); });
+            showTextInWorldSpaceLabelsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showTextInWorldSpaceLabelsToggle, "ShowHPTextInWorldSpaceLabels"); });
 
             UIOpacitySlider.value = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             UIOpacitySlider.minValue = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.1f : 0;

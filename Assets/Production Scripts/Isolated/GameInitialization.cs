@@ -109,6 +109,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("ShowHPTextInWorldSpaceLabels")) { FasterPlayerPrefs.Singleton.SetBool("ShowHPTextInWorldSpaceLabels", false); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("UIOpacity")) { FasterPlayerPrefs.Singleton.SetFloat("UIOpacity", 1); }
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MasterVolume"))

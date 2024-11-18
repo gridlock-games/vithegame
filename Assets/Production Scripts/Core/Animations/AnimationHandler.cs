@@ -319,6 +319,8 @@ namespace Vi.Core
 
             Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
             Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
+            totalRootMotionTime = Mathf.Infinity;
+            rootMotionTime = Mathf.Infinity;
 
             if (resetGameplayVariables)
             {
@@ -342,10 +344,13 @@ namespace Vi.Core
 
             if (evaluateGrabAttackHitsCoroutine != null) { StopCoroutine(evaluateGrabAttackHitsCoroutine); }
 
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
+            Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
+            totalRootMotionTime = Mathf.Infinity;
+            rootMotionTime = Mathf.Infinity;
+
             if (resetGameplayVariables)
             {
-                Animator.CrossFadeInFixedTime("Empty", transitionTime, actionsLayerIndex);
-                Animator.CrossFadeInFixedTime("Empty", transitionTime, flinchLayerIndex);
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
             }
         }
@@ -434,32 +439,32 @@ namespace Vi.Core
                                     ActionClip.boxCastHalfExtents, transform.forward.normalized, allHits, transform.rotation,
                                     ActionClip.boxCastDistance, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore);
 
-                                List<(NetworkCollider, float, RaycastHit)> angleList = new List<(NetworkCollider, float, RaycastHit)>();
+                                float minDistance = 0;
+                                bool minDistanceInitialized = false;
                                 for (int i = 0; i < allHitsCount; i++)
                                 {
                                     if (allHits[i].transform.root.TryGetComponent(out NetworkCollider networkCollider))
                                     {
-                                        if (PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent) & !networkCollider.CombatAgent.IsInvincible)
+                                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent)) { continue; }
+
+                                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                        float angle = Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y);
+                                        if (angle >= ActionClip.maximumLungeAngle) { continue; }
+
+                                        if (allHits[i].distance >= actionClip.minLungeDistance & allHits[i].distance < lungeClip.maxLungeDistance)
                                         {
-                                            Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                                            angleList.Add((networkCollider,
-                                                Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y),
-                                                allHits[i]));
+                                            if (allHits[i].distance > minDistance & minDistanceInitialized) { continue; }
+                                            minDistance = allHits[i].distance;
+                                            minDistanceInitialized = true;
                                         }
                                     }
                                 }
 
-                                angleList.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-                                foreach ((NetworkCollider networkCollider, float angle, RaycastHit hit) in angleList)
+                                if (minDistanceInitialized)
                                 {
-                                    Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
-                                    float dist = Vector3.Distance(networkCollider.transform.position, transform.position);
-                                    if (angle < ActionClip.maximumLungeAngle & dist >= actionClip.minLungeDistance & dist < lungeClip.maxLungeDistance)
-                                    {
-                                        PlayAction(lungeClip);
-                                        waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
-                                        return default;
-                                    }
+                                    PlayAction(lungeClip);
+                                    waitForLungeThenPlayAttackCorountine = StartCoroutine(WaitForLungeThenPlayAttack(actionClip));
+                                    return default;
                                 }
                             }
                         }
@@ -623,10 +628,24 @@ namespace Vi.Core
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
-        private Queue<(string, bool, bool)> serverActionQueue = new Queue<(string, bool, bool)>();
+        private Queue<ServerActionQueueElement> serverActionQueue = new Queue<ServerActionQueueElement>();
         private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
         {
-            serverActionQueue.Enqueue((actionClipName, isFollowUpClip, wasCalledFromServerRpc));
+            serverActionQueue.Enqueue(new ServerActionQueueElement(actionClipName, isFollowUpClip, wasCalledFromServerRpc));
+        }
+
+        private struct ServerActionQueueElement
+        {
+            public string actionClipName;
+            public bool isFollowUpClip;
+            public bool wasCalledFromServerRpc;
+
+            public ServerActionQueueElement(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
+            {
+                this.actionClipName = actionClipName;
+                this.isFollowUpClip = isFollowUpClip;
+                this.wasCalledFromServerRpc = wasCalledFromServerRpc;
+            }
         }
 
         private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
@@ -697,8 +716,6 @@ namespace Vi.Core
             }
 
             if (actionClip.GetClipType() == ActionClip.ClipType.GrabAttack) { evaluateGrabAttackHitsCoroutine = StartCoroutine(EvaluateGrabAttackHits(actionClip)); }
-
-            combatAgent.MovementHandler.OnServerActionClipPlayed();
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
             float transitionTime = canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime;
@@ -964,6 +981,7 @@ namespace Vi.Core
                     {
                         Animator.SetBool("EnhanceHeavyAttack", true);
                         heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Enhance;
+                        totalRootMotionTime = Mathf.Infinity;
                         rootMotionTime = Mathf.Infinity;
                     }
                 }
@@ -1262,6 +1280,14 @@ namespace Vi.Core
             }
 
             float maxRootMotionTime = combatAgent.WeaponHandler.GetWeapon().GetMaxRootMotionTime(stateName);
+            float normalizedTime = StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime);
+
+            bool isInRecovery = normalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+            if (isInRecovery)
+            {
+                transitionTime = combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime;
+            }
+
             return StringUtility.NormalizeValue(rootMotionTime, 0, maxRootMotionTime - transitionTime);
         }
 
@@ -1276,8 +1302,12 @@ namespace Vi.Core
 
                     float prevNormalizedTime = GetNormalizedRootMotionTime();
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
-                    rootMotionTime += Time.fixedDeltaTime * Animator.speed;
-                    totalRootMotionTime += Time.fixedDeltaTime * Animator.speed;
+
+                    bool isInRecovery = prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
+                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed);
+
+                    rootMotionTime += Time.fixedDeltaTime * animationSpeed;
+                    totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
 
                     bool shouldApplyMultiplierCurves = true;
                     float newNormalizedTime = GetNormalizedRootMotionTime();
@@ -1285,14 +1315,14 @@ namespace Vi.Core
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
                     {
                         shouldApplyMultiplierCurves = heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack;
-                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack)
+                        if (heavyAttackAnimationPhase == HeavyAttackAnimationPhase.Attack & combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount > 1)
                         {
                             if (newNormalizedTime >= 1)
                             {
                                 rootMotionTime = 0;
                                 prevNormalizedTime = GetNormalizedRootMotionTime();
                                 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
-                                rootMotionTime += Time.fixedDeltaTime * Animator.speed;
+                                rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                                 newNormalizedTime = GetNormalizedRootMotionTime();
                             }
                         }
@@ -1322,6 +1352,11 @@ namespace Vi.Core
                             }
                         }
                     }
+
+                    if (float.IsNaN(delta.x)) { Debug.Log("x is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.x = 0; }
+                    if (float.IsNaN(delta.y)) { Debug.Log("y is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.y = 0; }
+                    if (float.IsNaN(delta.z)) { Debug.Log("z is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.z = 0; }
+
                     return delta;
                 }
                 else
@@ -1533,6 +1568,7 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
             ResetRootMotionTime();
         }
@@ -1572,9 +1608,38 @@ namespace Vi.Core
             RefreshAimPoint();
         }
 
+        private float actionClipQueueWaitTime;
         public void ProcessNextActionClip()
         {
-            if (serverActionQueue.TryDequeue(out (string, bool, bool) result)) { PlayActionOnServer(result.Item1, result.Item2, result.Item3); }
+            // Wait for move input queue to be empty before playing the action to avoid position errors on the owner client
+            if (serverActionQueue.TryPeek(out ServerActionQueueElement serverActionQueueElement))
+            {
+                ActionClip clip = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(serverActionQueueElement.actionClipName);
+                if (serverActionQueueElement.wasCalledFromServerRpc | clip.GetClipType() == ActionClip.ClipType.LightAttack)
+                {
+                    if (!System.Array.TrueForAll(combatAgent.MovementHandler.GetMoveInputQueue(), item => item == Vector2.zero))
+                    {
+                        if (actionClipQueueWaitTime < 0.3f)
+                        {
+                            actionClipQueueWaitTime += Time.deltaTime;
+                            return;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Waiting for action clip " + serverActionQueueElement.actionClipName + " took too long, so we're playing it regardless " + combatAgent.GetName());
+                        }
+                    }
+                }
+            }
+
+            actionClipQueueWaitTime = 0;
+
+            while (serverActionQueue.TryDequeue(out serverActionQueueElement))
+            {
+                PlayActionOnServer(serverActionQueueElement.actionClipName,
+                    serverActionQueueElement.isFollowUpClip,
+                    serverActionQueueElement.wasCalledFromServerRpc);
+            }
         }
 
         public bool UseGenericAimPoint { get; set; }

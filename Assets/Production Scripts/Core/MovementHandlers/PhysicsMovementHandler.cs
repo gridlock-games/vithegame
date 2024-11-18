@@ -18,7 +18,6 @@ namespace Vi.Core.MovementHandlers
                 rb.Sleep();
                 networkTransform.Interpolate = false;
             }
-            groundColliders.Clear();
             base.SetOrientation(newPosition, newRotation);
         }
 
@@ -29,7 +28,6 @@ namespace Vi.Core.MovementHandlers
                 rb.position = newPosition;
                 rb.Sleep();
             }
-            groundColliders.Clear();
             base.TeleportPositionRpc(newPosition);
         }
 
@@ -98,7 +96,11 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+
             interpolateReached = default;
+            stairColliders.Clear();
+            groundColliders.Clear();
+            animationMoveInput = default;
         }
 
         protected float GetTickRateDeltaTime()
@@ -126,7 +128,7 @@ namespace Vi.Core.MovementHandlers
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
-            networkTransform.SetPositionMaximumInterpolationTime(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 0.05f : 0.1f);
+            networkTransform.SetMaxInterpolationBound(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 1.5f : 3);
         }
 
         protected virtual void LateUpdate()
@@ -220,7 +222,6 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
-        List<Collider> groundColliders = new List<Collider>();
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             EvaluateGroundCollider(collision);
@@ -231,6 +232,8 @@ namespace Vi.Core.MovementHandlers
             EvaluateGroundCollider(collision);
         }
 
+        List<Collider> groundColliders = new List<Collider>();
+        List<Collider> stairColliders = new List<Collider>();
         ContactPoint[] groundColliderContacts = new ContactPoint[3];
         private void EvaluateGroundCollider(Collision collision)
         {
@@ -239,24 +242,28 @@ namespace Vi.Core.MovementHandlers
             int contactCount = collision.GetContacts(groundColliderContacts);
             for (int i = 0; i < contactCount; i++)
             {
-                if (groundColliderContacts[i].normal.y >= 0.8f)
+                if (groundColliderContacts[i].normal.y >= 0.9f)
                 {
                     if (!groundColliders.Contains(collision.collider)) { groundColliders.Add(collision.collider); }
                     break;
                 }
+                else if (groundColliderContacts[i].normal.y >= 0.8f) // This is stairs
+                {
+                    if (!stairColliders.Contains(collision.collider)) { stairColliders.Add(collision.collider); }
+                    break;
+                }
                 else // Normal is not pointing up
                 {
-                    if (groundColliders.Contains(collision.collider)) { groundColliders.Remove(collision.collider); }
+                    groundColliders.Remove(collision.collider);
+                    stairColliders.Remove(collision.collider);
                 }
             }
         }
 
         public override void ReceiveOnCollisionExitMessage(Collision collision)
         {
-            if (groundColliders.Contains(collision.collider))
-            {
-                groundColliders.Remove(collision.collider);
-            }
+            groundColliders.Remove(collision.collider);
+            stairColliders.Remove(collision.collider);
         }
 
         [SerializeField] private float isGroundedSphereCheckRadius = 0.6f;
@@ -272,7 +279,7 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
-        protected int GetGroundCollidersCount() { return groundColliders.Count; }
+        protected int GetStairCollidersCount() { return stairColliders.Count; }
 
         protected const float stairStepHeight = 0.01f;
 

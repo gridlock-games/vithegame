@@ -14,11 +14,140 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
 using UnityEditor.Animations;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Set Network Object Settings")]
+        private static void SetNetworkObjectSettings()
+        {
+            string[] paths = AssetDatabase.GetAllAssetPaths();
+            int counter = -1;
+            foreach (string assetPath in paths)
+            {
+                counter++;
+                if (EditorUtility.DisplayCancelableProgressBar("Setting Network Object Settings: " + assetPath,
+                            counter.ToString() + " assets left - " + paths.Length,
+                            counter / (float)paths.Length))
+                { break; }
+
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent(out NetworkObject networkObject))
+                    {
+                        if (networkObject.AutoObjectParentSync | networkObject.SceneMigrationSynchronization | networkObject.ActiveSceneSynchronization)
+                        {
+                            networkObject.SceneMigrationSynchronization = false;
+                            networkObject.ActiveSceneSynchronization = false;
+                            networkObject.AutoObjectParentSync = false;
+                            UnityEditor.EditorUtility.SetDirty(networkObject);
+                        }
+                    }
+                }
+                EditorUtility.UnloadUnusedAssetsImmediate();
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
+        [MenuItem("Tools/Production/Set Audio Compression Settings")]
+        private static void SetAudioCompressionSettings()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(@"Assets/Production/Prefabs/Networking/AudioManager.prefab");
+            
+            BuildTargetGroup[] buildTargetGroups = new BuildTargetGroup[]
+            {
+                BuildTargetGroup.Standalone,
+                BuildTargetGroup.Android,
+                BuildTargetGroup.iOS
+            };
+
+            if (prefab.TryGetComponent(out AudioManager audioManager))
+            {
+                foreach (string guid in AssetDatabase.FindAssets("t:audioclip"))
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    AudioImporter audioImporter = AssetImporter.GetAtPath(assetPath) as AudioImporter;
+                    if (audioImporter)
+                    {
+                        AudioClip clip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
+                        audioImporter.loadInBackground = true;
+                        if (clip)
+                        {
+                            foreach (BuildTargetGroup buildTargetGroup in buildTargetGroups)
+                            {
+                                AudioImporterSampleSettings sampleSettings;
+                                if (clip.length > 10) // Music/Long Audio Clips
+                                {
+                                    sampleSettings = new AudioImporterSampleSettings()
+                                    {
+                                        compressionFormat = AudioCompressionFormat.Vorbis,
+                                        loadType = AudioClipLoadType.Streaming,
+                                        preloadAudioData = false,
+                                        quality = 1,
+                                        sampleRateSetting = AudioSampleRateSetting.OptimizeSampleRate
+                                    };
+                                }
+                                else if (clip.name.ToUpper().Contains("FOOT")
+                                    | clip.name.ToUpper().Contains("IMPACT")
+                                    | clip.name.ToUpper().Contains("HIT")
+                                    | clip.name.ToUpper().Contains("WEAPON")
+                                    | clip.name.ToUpper().Contains("WPN")
+                                    | clip.name.ToUpper().Contains("WHOOSH")
+                                    | clip.name.ToUpper().Contains("PUNCH")
+                                    | clip.name.ToUpper().Contains("ARMOR")
+                                    | clip.name.ToUpper().Contains("ARMOUR")) // Frequently played sounds
+                                {
+                                    sampleSettings = new AudioImporterSampleSettings()
+                                    {
+                                        compressionFormat = AudioCompressionFormat.ADPCM,
+                                        loadType = AudioClipLoadType.DecompressOnLoad,
+                                        preloadAudioData = true,
+                                        quality = 1,
+                                        sampleRateSetting = AudioSampleRateSetting.OptimizeSampleRate
+                                    };
+                                }
+                                else
+                                {
+                                    sampleSettings = new AudioImporterSampleSettings()
+                                    {
+                                        compressionFormat = AudioCompressionFormat.PCM,
+                                        loadType = AudioClipLoadType.DecompressOnLoad,
+                                        preloadAudioData = true,
+                                        quality = 1,
+                                        sampleRateSetting = AudioSampleRateSetting.OptimizeSampleRate
+                                    };
+                                }
+
+                                if (buildTargetGroup == BuildTargetGroup.Android
+                                    | buildTargetGroup == BuildTargetGroup.iOS)
+                                {
+                                    sampleSettings.quality = 0.7f;
+                                }
+
+                                audioImporter.SetOverrideSampleSettings(buildTargetGroup, sampleSettings);
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Couldn't get audio clip at path: " + assetPath);
+                        }
+                        audioImporter.SaveAndReimport();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Couldn't get audio importer at path: " + assetPath);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("Audio Manager is null");
+            }
+        }
+
         [MenuItem("Tools/Production/Set Actions Layer Transition Times On Animation Controller")]
         private static void SetActionsLayerTransitionTimes()
         {

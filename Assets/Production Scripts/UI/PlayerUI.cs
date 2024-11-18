@@ -696,7 +696,7 @@ namespace Vi.UI
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
 
                     // Order player cards by distance
-                    List<CombatAgent> orderedTeammateAttributes = teammateAttributes.OrderBy(item => item.GetAilment() == ActionClip.Ailment.Death).ThenBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    List<CombatAgent> orderedTeammateAttributes = teammateAttributes.Where(item => item).OrderBy(item => item.GetAilment() == ActionClip.Ailment.Death).ThenBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < orderedTeammateAttributes.Count)
