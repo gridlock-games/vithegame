@@ -1326,7 +1326,6 @@ namespace Vi.Core
 
                     rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                     totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;
-                    Debug.Log(totalRootMotionTime + " " + combatAgent.WeaponHandler.CurrentActionClip);
 
                     bool shouldApplyMultiplierCurves = true;
                     float newNormalizedTime = GetNormalizedRootMotionTime();
