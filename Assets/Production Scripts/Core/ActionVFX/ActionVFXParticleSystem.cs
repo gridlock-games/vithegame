@@ -235,15 +235,17 @@ namespace Vi.Core.VFX
                 {
                     ps.trigger.RemoveCollider(i);
                 }
+                ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
         }
 
+        List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
+        List<ParticleSystem.Particle> inside = new List<ParticleSystem.Particle>();
         public void ProcessOnParticleEnterMessage(ParticleSystem ps)
         {
             if (!IsSpawned)
             if (!IsServer) { return; }
 
-            List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter, out ParticleSystem.ColliderData enterColliderData);
 
             for (int particleIndex = 0; particleIndex < numEnter; particleIndex++)
@@ -271,7 +273,6 @@ namespace Vi.Core.VFX
                 }
             }
 
-            List<ParticleSystem.Particle> inside = new List<ParticleSystem.Particle>();
             int numInside = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside, out ParticleSystem.ColliderData insideColliderData);
 
             for (int particleIndex = 0; particleIndex < numInside; particleIndex++)

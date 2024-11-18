@@ -150,57 +150,60 @@ namespace Vi.Player
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private Vector3 HandleServerReconciliation()
         {
-            lastProcessedState = latestServerState.Value;
-
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
+                lastProcessedState = latestServerState.Value;
                 return Vector3.zero;
             }
 
             if (!CanMove())
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
+                lastProcessedState = latestServerState.Value;
                 return Vector3.zero;
             }
 
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
             if (latestServerState.Value.usedRootMotion)
             {
-                StatePayload[] rootMotionReconciliationSlice = System.Array.FindAll(stateBuffer, item => item.rootMotionId == latestServerState.Value.rootMotionId)
-                    .Where(item => item.usedRootMotion & item.rootMotionTime >= latestServerState.Value.rootMotionTime | Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime))
-                    .OrderBy(item => item.rootMotionTime).ToArray();
+                int rootMotionReconciliationIndex = System.Array.FindIndex(stateBuffer, item => item.rootMotionId == latestServerState.Value.rootMotionId
+                    & Mathf.Approximately(item.rootMotionTime, latestServerState.Value.rootMotionTime));
 
-                if (rootMotionReconciliationSlice.Length > 0)
+                if (rootMotionReconciliationIndex == -1)
                 {
-                    if (Mathf.Approximately(rootMotionReconciliationSlice[0].rootMotionTime, latestServerState.Value.rootMotionTime))
-                    {
-                        float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, rootMotionReconciliationSlice[0].position);
-                        int clientStateIndex = rootMotionReconciliationSlice[0].tick % BUFFER_SIZE;
-                        if (rootMotionPositionError > serverReconciliationThreshold)
-                        {
-                            Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationSlice[0].tick + " Root Motion Position Error: " + rootMotionPositionError);
-
-                            StatePayload modifiedStatePayload = latestServerState.Value;
-                            modifiedStatePayload.tick = rootMotionReconciliationSlice[0].tick;
-                            stateBuffer[clientStateIndex] = modifiedStatePayload;
-
-                            Rigidbody.position = modifiedStatePayload.position;
-                            if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
-                            ReprocessInputs(modifiedStatePayload.tick);
-                        }
-                        else
-                        {
-                            return (latestServerState.Value.position - rootMotionReconciliationSlice[0].position);
-                        }
-                    }
-                    else
+                    if (lastProcessedState.rootMotionTime > latestServerState.Value.rootMotionTime & lastProcessedState.rootMotionId == latestServerState.Value.rootMotionId)
                     {
                         Debug.LogWarning("Root Motion State Not Found At Time: " + latestServerState.Value.rootMotionTime + " " + combatAgent.WeaponHandler.CurrentActionClip + " " + combatAgent.WeaponHandler.GetWeapon());
                     }
                 }
+                else // Root motion state found
+                {
+                    lastProcessedState = latestServerState.Value;
+
+                    StatePayload rootMotionReconciliationState = stateBuffer[rootMotionReconciliationIndex];
+                    float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, rootMotionReconciliationState.position);
+                    if (rootMotionPositionError > serverReconciliationThreshold)
+                    {
+                        Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
+
+                        StatePayload modifiedStatePayload = latestServerState.Value;
+                        modifiedStatePayload.tick = rootMotionReconciliationState.tick;
+                        stateBuffer[rootMotionReconciliationIndex] = modifiedStatePayload;
+
+                        Rigidbody.position = modifiedStatePayload.position;
+                        if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
+                        ReprocessInputs(modifiedStatePayload.tick);
+                    }
+                    else
+                    {
+                        return (latestServerState.Value.position - rootMotionReconciliationState.position);
+                    }
+                }
                 return Vector3.zero;
             }
+
+            lastProcessedState = latestServerState.Value;
 
             if (stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
@@ -383,10 +386,6 @@ namespace Vi.Player
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (combatAgent.WeaponHandler.LightAttackIsPressed)
-                {
-                    moveInput = Vector2.zero;
-                }
-                else if (latestServerState.Value.usedRootMotion)
                 {
                     moveInput = Vector2.zero;
                 }
