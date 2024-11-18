@@ -1290,7 +1290,7 @@ namespace Vi.Core
                     transitionOutTime = 0.25f;
                 }
 
-                return totalRootMotionTime <= maxRootMotionTime - transitionOutTime;
+                return totalRootMotionTime <= maxRootMotionTime - Mathf.Max(transitionOutTime, combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset);
             }
             else
             {
