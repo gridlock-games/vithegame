@@ -397,7 +397,7 @@ namespace Vi.Core
 
             foreach (RuntimeWeapon runtimeWeapon in weaponInstances.Values)
             {
-                runtimeWeapon.SetColliderMultiplier(actionClip.bladeSizeMultiplier);
+                runtimeWeapon.SetBoxColliderMultiplier(actionClip.bladeSizeMultiplier);
             }
 
             thisClipSummonablesCount = 0;

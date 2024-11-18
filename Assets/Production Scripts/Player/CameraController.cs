@@ -74,6 +74,8 @@ namespace Vi.Player
             orbitalCam.enabled = isActive;
         }
 
+        public bool GetOrbitalCamState() { return orbitalCam.enabled; }
+
         public void SetActive(bool isActive)
         {
             thisCam.enabled = isActive;

@@ -591,6 +591,11 @@ namespace Vi.UI
                     statusIcon.SetActive(false);
                 }
             }
+
+            if (attributes.WeaponHandler.WeaponInitialized)
+            {
+                canFadeIn = true;
+            }
         }
 
         public void ScrollToBottomOfTextChat()
