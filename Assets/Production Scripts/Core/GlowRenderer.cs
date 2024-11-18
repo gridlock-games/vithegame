@@ -128,24 +128,25 @@ namespace Vi.Core
         private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
-        private const float colorChangeSpeed = 2;
+        private const float colorChangeSpeed = 40;
 
+        private Color currentColor;
         private Color lastColor;
         private void Update()
         {
             Color colorTarget = defaultColor;
 
-            if (isInvincible)
+            if (Time.time - lastHitTime < 0.25f)
+            {
+                colorTarget = hitColor;
+            }
+            else if (isInvincible)
             {
                 colorTarget = invincibleColor;
             }
             else if (isUninterruptable)
             {
                 colorTarget = uninterruptableColor;
-            }
-            else if (Time.time - lastHitTime < 0.25f)
-            {
-                colorTarget = hitColor;
             }
             else if (Time.time - lastHealTime < 0.25f)
             {
@@ -159,20 +160,20 @@ namespace Vi.Core
             {
                 colorTarget = flashAttackColor;
             }
-            
-            if (lastColor != colorTarget)
+
+            currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
+            if (lastColor != currentColor)
             {
                 foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
                     foreach (Material glowMaterialInstance in materialList)
                     {
-                        if (lastColor != colorTarget)
-                            glowMaterialInstance.SetColor(_Color, colorTarget);
+                        glowMaterialInstance.SetColor(_Color, currentColor);
                     }
                 }
             }
             
-            lastColor = colorTarget;
+            lastColor = currentColor;
         }
 
         private readonly int _Color = Shader.PropertyToID("_Color");
