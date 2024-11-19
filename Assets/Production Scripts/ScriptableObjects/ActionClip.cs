@@ -195,25 +195,6 @@ namespace Vi.ScriptableObjects
         public float agentStaminaCost = 20;
         public float agentRageCost = 50;
 
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (Application.isPlaying) { return; }
-
-            float minTransitionOutTime = 0.15f;
-            if (GetClipType() == ClipType.Dodge)
-            {
-                minTransitionOutTime = 0.25f;
-            }
-
-            if (rootMotionTruncateOffset < minTransitionOutTime)
-            {
-                rootMotionTruncateOffset = minTransitionOutTime;
-                UnityEditor.EditorUtility.SetDirty(this);
-            }
-        }
-#endif
-
         public Weapon.WeaponBone[] effectedWeaponBones = new Weapon.WeaponBone[0];
         public Weapon.WeaponBone[] weaponBonesToHide = new Weapon.WeaponBone[0];
         public bool mustBeAiming;
