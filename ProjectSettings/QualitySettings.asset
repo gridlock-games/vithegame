@@ -164,11 +164,12 @@ QualitySettings:
     terrainBillboardStart: 50
     terrainFadeLength: 5
     terrainMaxTrees: 50
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
   m_TextureMipmapLimitGroupNames: []
   m_PerPlatformDefaultQuality:
     Android: 0
     Server: 1
     Standalone: 1
-    Windows Store Apps: 2
+    Windows Store Apps: 1
     iPhone: 0
