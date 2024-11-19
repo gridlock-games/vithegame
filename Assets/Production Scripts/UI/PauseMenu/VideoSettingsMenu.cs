@@ -278,7 +278,7 @@ namespace Vi.UI
             vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
+            postProcessingToggle.isOn = true;
         }
 
         public void ValidateRenderDistance()
