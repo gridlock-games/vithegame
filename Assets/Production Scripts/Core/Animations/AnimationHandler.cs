@@ -9,7 +9,6 @@ using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.Weapons;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Vi.Core
 {
@@ -1284,13 +1283,7 @@ namespace Vi.Core
                     maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
                 }
 
-                float transitionOutTime = 0.15f;
-                if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
-                {
-                    transitionOutTime = 0.25f;
-                }
-
-                return totalRootMotionTime <= maxRootMotionTime - Mathf.Max(transitionOutTime, combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset);
+                return totalRootMotionTime <= maxRootMotionTime - combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset;
             }
             else
             {
@@ -1385,6 +1378,17 @@ namespace Vi.Core
                     if (float.IsNaN(delta.x)) { Debug.Log("x is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.x = 0; }
                     if (float.IsNaN(delta.y)) { Debug.Log("y is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.y = 0; }
                     if (float.IsNaN(delta.z)) { Debug.Log("z is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.z = 0; }
+
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
+                    {
+                        if (combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset > 0.15f)
+                        {
+                            if (!ShouldApplyRootMotion())
+                            {
+                                Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.truncatedTransitionOutTime, actionsLayerIndex);
+                            }
+                        }
+                    }
 
                     return delta;
                 }

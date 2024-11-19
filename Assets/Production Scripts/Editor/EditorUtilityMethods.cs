@@ -159,22 +159,11 @@ namespace Vi.Editor
                 {
                     foreach (AnimatorStateTransition transition in state.state.transitions)
                     {
-                        if (state.state.name.Contains("Dodge"))
+                        if (transition.hasExitTime)
                         {
-                            if (transition.hasExitTime)
-                            {
-                                transition.exitTime = 0.75f;
-                            }
-                            transition.duration = 0.25f;
+                            transition.exitTime = 0.85f;
                         }
-                        else
-                        {
-                            if (transition.hasExitTime)
-                            {
-                                transition.exitTime = 0.85f;
-                            }
-                            transition.duration = 0.15f;
-                        }
+                        transition.duration = 0.15f;
                     }
                 }
             }
