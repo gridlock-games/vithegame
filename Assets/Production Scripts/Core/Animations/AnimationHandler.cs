@@ -9,7 +9,6 @@ using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.Weapons;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Vi.Core
 {
@@ -1379,6 +1378,14 @@ namespace Vi.Core
                     if (float.IsNaN(delta.x)) { Debug.Log("x is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.x = 0; }
                     if (float.IsNaN(delta.y)) { Debug.Log("y is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.y = 0; }
                     if (float.IsNaN(delta.z)) { Debug.Log("z is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.z = 0; }
+
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
+                    {
+                        if (!ShouldApplyRootMotion())
+                        {
+                            Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset, actionsLayerIndex);
+                        }
+                    }
 
                     return delta;
                 }
