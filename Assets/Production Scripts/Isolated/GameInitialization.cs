@@ -34,6 +34,10 @@ namespace Vi.Core
             Application.targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
             StartCoroutine(LoadScenes());
 
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+#endif
+
             if (!WebRequestManager.IsServerBuild())
             {
                 FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
