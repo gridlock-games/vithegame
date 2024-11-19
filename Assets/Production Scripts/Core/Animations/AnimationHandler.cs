@@ -1381,9 +1381,12 @@ namespace Vi.Core
 
                     if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
                     {
-                        if (!ShouldApplyRootMotion())
+                        if (combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset > 0.15f)
                         {
-                            Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.truncatedTransitionOutTime, actionsLayerIndex);
+                            if (!ShouldApplyRootMotion())
+                            {
+                                Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.truncatedTransitionOutTime, actionsLayerIndex);
+                            }
                         }
                     }
 
