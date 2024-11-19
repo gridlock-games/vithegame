@@ -286,7 +286,7 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spTransitionTime);
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }
             EditorGUILayout.PropertyField(spRootMotionTruncateOffset);
-            if (!Mathf.Approximately(spRootMotionTruncateOffset.floatValue, 0)) { EditorGUILayout.PropertyField(spTruncatedTransitionOutTime); }
+            if (spRootMotionTruncateOffset.floatValue > 0.15f) { EditorGUILayout.PropertyField(spTruncatedTransitionOutTime); }
             EditorGUILayout.PropertyField(spAnimationSpeed);
 
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }
