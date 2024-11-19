@@ -1700,7 +1700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Effectors: []
 --- !u!114 &5137086681677470091
 MonoBehaviour:
@@ -1714,7 +1714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f43ee48155ea45c4aa1eb4049bf3adbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weight: 1
+  weight: 0
   instantWeight: 0
 --- !u!1 &8912633899157833977
 GameObject:
@@ -2043,9 +2043,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3676377794900678027, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3676377794900678027, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: eda035b6f9f64a62b45284ffda0fdb66, type: 2}
+    - target: {fileID: -3676377794900678027, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
     - target: {fileID: -3598614551945499200, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       propertyPath: m_Layer
