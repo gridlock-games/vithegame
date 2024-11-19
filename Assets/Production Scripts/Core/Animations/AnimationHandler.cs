@@ -1383,7 +1383,7 @@ namespace Vi.Core
                     {
                         if (!ShouldApplyRootMotion())
                         {
-                            Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset, actionsLayerIndex);
+                            Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.truncatedTransitionOutTime, actionsLayerIndex);
                         }
                     }
 
