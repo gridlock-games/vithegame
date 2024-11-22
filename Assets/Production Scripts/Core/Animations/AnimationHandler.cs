@@ -1606,6 +1606,7 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            RootMotionId = default;
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
             ResetRootMotionTime();
