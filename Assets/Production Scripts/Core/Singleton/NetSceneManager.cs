@@ -290,7 +290,7 @@ namespace Vi.Core
         public static void SetTargetFrameRate()
         {
 #if UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR
-            if (Singleton)
+            if (DoesExist())
             {
                 if (Singleton.ShouldSpawnPlayerCached)
                 {
