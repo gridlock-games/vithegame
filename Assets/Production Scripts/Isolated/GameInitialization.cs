@@ -31,7 +31,7 @@ namespace Vi.Core
             InitializePlayerPrefs();
 
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Application.targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
+            NetSceneManager.SetTargetFrameRate();
             StartCoroutine(LoadScenes());
 
             if (!WebRequestManager.IsServerBuild())

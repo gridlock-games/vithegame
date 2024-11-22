@@ -204,6 +204,7 @@ namespace Vi.Core
             }
 
             ShouldSpawnPlayerCached = GetShouldSpawnPlayer();
+            SetTargetFrameRate();
 
             EventDelegateManager.InvokeSceneLoadedEvent(sceneHandle.Result.Scene);
         }
@@ -212,6 +213,7 @@ namespace Vi.Core
         {
             PersistentLocalObjects.Singleton.LoadingOperations.RemoveAll(item => item.asyncOperation.IsDone);
             ShouldSpawnPlayerCached = GetShouldSpawnPlayer();
+            SetTargetFrameRate();
             EventDelegateManager.InvokeSceneUnloadedEvent();
         }
 
@@ -283,6 +285,29 @@ namespace Vi.Core
                         break;
                 }
             }
+        }
+
+        public static void SetTargetFrameRate()
+        {
+#if UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR
+            if (Singleton)
+            {
+                if (Singleton.ShouldSpawnPlayerCached)
+                {
+                    Application.targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
+                }
+                else
+                {
+                    Application.targetFrameRate = 30;
+                }
+            }
+            else
+            {
+                Application.targetFrameRate = 30;
+            }
+#else
+            Application.targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
+#endif
         }
 
         private void UnloadScenePayload(ScenePayload scenePayload)
