@@ -1267,6 +1267,7 @@ namespace Vi.Core
         {
             rootMotionTime = 0;
             totalRootMotionTime = 0;
+            RootMotionId += 1;
         }
 
         public bool ShouldApplyRootMotion()
@@ -1410,8 +1411,8 @@ namespace Vi.Core
         private void SetLastActionClip(ActionClip actionClip, int rootMotionId)
         {
             lastClipPlayed = actionClip;
-            if (actionClip.ailment != ActionClip.Ailment.Death) { ResetRootMotionTime(); }
             RootMotionId = rootMotionId;
+            if (actionClip.ailment != ActionClip.Ailment.Death) { ResetRootMotionTime(); }
             Debug.Log(combatAgent.GetName() + " root motion id " + RootMotionId + " " + combatAgent.WeaponHandler.CurrentActionClip);
         }
 
