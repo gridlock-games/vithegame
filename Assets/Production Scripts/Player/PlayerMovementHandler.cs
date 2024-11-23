@@ -366,7 +366,7 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                Vector3 serverReconciliationVelocityError = Vector3.zero;
+                Vector3 serverReconciliationPositionOffset = Vector3.zero;
                 if (!IsServer)
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
@@ -375,7 +375,7 @@ namespace Vi.Player
                             (lastProcessedState.Equals(default(StatePayload)) ||
                             !latestServerState.Equals(lastProcessedState)))
                         {
-                            serverReconciliationVelocityError = HandleServerReconciliation();
+                            serverReconciliationPositionOffset = HandleServerReconciliation();
                         }
                     }
                 }
@@ -445,7 +445,7 @@ namespace Vi.Player
                 }
 
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-                Rigidbody.AddForce(serverReconciliationVelocityError, ForceMode.VelocityChange);
+                Rigidbody.position += serverReconciliationPositionOffset * Time.fixedDeltaTime;
 
                 if (IsServer) { latestServerState.Value = statePayload; }
             }
