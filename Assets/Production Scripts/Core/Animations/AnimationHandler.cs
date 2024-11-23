@@ -1413,7 +1413,6 @@ namespace Vi.Core
             lastClipPlayed = actionClip;
             RootMotionId = rootMotionId;
             if (actionClip.ailment != ActionClip.Ailment.Death) { ResetRootMotionTime(); }
-            Debug.Log(combatAgent.GetName() + " root motion id " + RootMotionId + " " + combatAgent.WeaponHandler.CurrentActionClip);
         }
 
         public Animator Animator { get; private set; }
