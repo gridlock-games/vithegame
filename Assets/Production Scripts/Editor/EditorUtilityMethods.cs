@@ -37,9 +37,19 @@ namespace Vi.Editor
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
                 if (mat)
                 {
-                    if (mat.IsKeywordEnabled("_SPECULARHIGHLIGHTS_OFF"))
+                    if (!mat.shader.name.Contains("Lit")) { Debug.Log("Skipping " + mat); continue; }
+
+                    if (!mat.IsKeywordEnabled("_SPECULARHIGHLIGHTS_OFF") | mat.GetFloat("_SpecularHighlights") != 0)
                     {
-                        mat.DisableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                        mat.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                        mat.SetFloat("_SpecularHighlights", 0);
+                        EditorUtility.SetDirty(mat);
+                    }
+
+                    if (mat.IsKeywordEnabled("_ENVIRONMENTREFLECTIONS_OFF") | mat.GetFloat("_EnvironmentReflections") != 1)
+                    {
+                        mat.DisableKeyword("_ENVIRONMENTREFLECTIONS_OFF");
+                        mat.SetFloat("_EnvironmentReflections", 1);
                         EditorUtility.SetDirty(mat);
                     }
                 }
@@ -49,6 +59,7 @@ namespace Vi.Editor
                 }
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
         }
 
         [MenuItem("Tools/Production/Set Network Object Settings")]
