@@ -1623,6 +1623,7 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            WasLastActionClipMotionPredicted = default;
             RootMotionId = default;
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
