@@ -146,7 +146,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.3f;
+        private const float serverReconciliationThreshold = 0.01f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -235,6 +235,7 @@ namespace Vi.Player
         private void StartSmoothenServerReconciliationPosition()
         {
             lastServerReconciliationTime = Time.time;
+            
             serverReconciliationLerpDuration = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) / 2;
         }
 
