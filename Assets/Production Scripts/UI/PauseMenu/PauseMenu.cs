@@ -70,19 +70,20 @@ namespace Vi.UI
 
         private void Start()
         {
-            returnToCharSelectButton.onClick.AddListener(delegate { PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect()); });
-            returnToCharSelectButton.GetComponentInChildren<Text>().text = "CHARACTER SELECT";
-            returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
+            //returnToCharSelectButton.onClick.AddListener(delegate { PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelect()); });
+            //returnToCharSelectButton.GetComponentInChildren<Text>().text = "CHARACTER SELECT";
+            //returnToCharSelectButton.gameObject.SetActive(!NetSceneManager.Singleton.IsSceneGroupLoaded("Main Menu"));
 
             applicationVersionText.text = "Version: " + Application.version;
         }
 
-        public IEnumerator ReturnToCharacterSelect()
+        private IEnumerator ReturnToCharacterSelect()
         {
             returnToCharSelectButton.interactable = false;
             if (NetworkManager.Singleton.IsListening)
             {
                 PlayerDataManager.Singleton.WasDisconnectedByClient = true;
+                Debug.Log("SHUTTING DOWN NETWORK MANAGER");
                 NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }

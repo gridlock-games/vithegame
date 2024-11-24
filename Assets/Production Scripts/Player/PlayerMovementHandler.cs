@@ -235,6 +235,7 @@ namespace Vi.Player
         private void StartSmoothenServerReconciliationPosition()
         {
             lastServerReconciliationTime = Time.time;
+            serverReconciliationLerpDuration = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) / 2;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -670,7 +671,7 @@ namespace Vi.Player
             return transform.rotation;
         }
 
-        private const float serverReconciliationLerpDuration = 0.25f;
+        private float serverReconciliationLerpDuration = 0.25f;
         private float lastServerReconciliationTime = Mathf.NegativeInfinity;
 
         private void UpdateTransform()
@@ -681,7 +682,6 @@ namespace Vi.Player
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
                 float t = (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration;
-                Debug.Log(t);
                 transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, t);
             }
             else
