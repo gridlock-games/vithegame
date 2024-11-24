@@ -303,7 +303,7 @@ namespace Vi.Player
             {
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 // This if statement should only be reached
-                if (shouldApplyRootMotion & !combatAgent.WeaponHandler.CurrentActionClip.IsMotionPredicted())
+                if (shouldApplyRootMotion & !combatAgent.AnimationHandler.WasLastActionClipMotionPredicted)
                 {
                     InputPayload serverInputPayload = new InputPayload();
                     if (serverInputQueue.Count > 0)
@@ -549,7 +549,7 @@ namespace Vi.Player
             {
                 Quaternion rootMotionRotation;
                 // Dodges are predicted, meaning they don't wait for server confirmation before playing
-                if (combatAgent.WeaponHandler.CurrentActionClip.IsMotionPredicted())
+                if (combatAgent.AnimationHandler.WasLastActionClipMotionPredicted)
                 {
                     rootMotionRotation = inputPayload.rotation;
                 }

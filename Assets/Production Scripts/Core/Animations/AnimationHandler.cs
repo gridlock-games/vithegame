@@ -23,7 +23,7 @@ namespace Vi.Core
 
             if (IsServer)
             {
-                AddActionToServerQueue(actionClip.name, isFollowUpClip, false);
+                AddActionToServerQueue(actionClip.name, isFollowUpClip, false, false);
                 WaitingForActionClipToPlay = true;
             }
             else if (IsOwner)
@@ -31,8 +31,10 @@ namespace Vi.Core
                 CanPlayActionClipResult canPlayActionClipResult = CanPlayActionClip(actionClip, isFollowUpClip);
                 if (!canPlayActionClipResult.canPlay) { return; }
                 WaitingForActionClipToPlay = true;
-                PlayActionServerRpc(actionClip.name, isFollowUpClip);
-                if (actionClip.IsMotionPredicted())
+
+                bool isMotionPredicted = actionClip.IsMotionPredicted(IsAtRest());
+                PlayActionServerRpc(actionClip.name, isFollowUpClip, isMotionPredicted);
+                if (isMotionPredicted)
                 {
                     PlayPredictedActionOnClient(actionClip, canPlayActionClipResult.shouldUseDodgeCancelTransitionTime ? actionClip.dodgeCancelTransitionTime : actionClip.transitionTime);
                 }
@@ -627,14 +629,14 @@ namespace Vi.Core
             return new CanPlayActionClipResult(true, shouldUseDodgeCancelTransitionTime);
         }
 
-        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip) { AddActionToServerQueue(actionClipName, isFollowUpClip, true); }
+        [Rpc(SendTo.Server)] private void PlayActionServerRpc(string actionClipName, bool isFollowUpClip, bool wasMotionPredicted) { AddActionToServerQueue(actionClipName, isFollowUpClip, true, wasMotionPredicted); }
 
         [Rpc(SendTo.Owner)] private void ResetWaitingForActionToPlayClientRpc() { WaitingForActionClipToPlay = false; }
 
         private Queue<ServerActionQueueElement> serverActionQueue = new Queue<ServerActionQueueElement>();
-        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
+        private void AddActionToServerQueue(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc, bool wasMotionPredicted)
         {
-            serverActionQueue.Enqueue(new ServerActionQueueElement(actionClipName, isFollowUpClip, wasCalledFromServerRpc));
+            serverActionQueue.Enqueue(new ServerActionQueueElement(actionClipName, isFollowUpClip, wasCalledFromServerRpc, wasMotionPredicted));
         }
 
         private struct ServerActionQueueElement
@@ -642,17 +644,20 @@ namespace Vi.Core
             public string actionClipName;
             public bool isFollowUpClip;
             public bool wasCalledFromServerRpc;
+            public bool wasMotionPredicted;
 
-            public ServerActionQueueElement(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
+            public ServerActionQueueElement(string actionClipName, bool isFollowUpClip,
+                bool wasCalledFromServerRpc, bool wasMotionPredicted)
             {
                 this.actionClipName = actionClipName;
                 this.isFollowUpClip = isFollowUpClip;
                 this.wasCalledFromServerRpc = wasCalledFromServerRpc;
+                this.wasMotionPredicted = wasMotionPredicted;
             }
         }
 
         private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip,
-            bool wasCalledFromServerRpc, int rootMotionId)
+            bool wasCalledFromServerRpc, int rootMotionId, bool wasMotionPredicted)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.PlayActionOnServer() should only be called on the server! " + actionClipName); return false; }
 
@@ -761,10 +766,13 @@ namespace Vi.Core
 
             // Invoke the PlayActionClientRpc method on the client side
             PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""),
-                transitionTime, actionClip.IsMotionPredicted(), rootMotionId);
+                transitionTime, wasMotionPredicted, rootMotionId);
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip, rootMotionId); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
+            {
+                SetLastActionClip(actionClip, rootMotionId, wasMotionPredicted);
+            }
             return true;
         }
 
@@ -1128,7 +1136,8 @@ namespace Vi.Core
 
             if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
             playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClip.name,
-                combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, RootMotionId + 1));
+                combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime,
+                RootMotionId + 1, true));
         }
 
         // Remote Procedure Call method for playing the action on the client
@@ -1144,11 +1153,13 @@ namespace Vi.Core
             }
             
             if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
-            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime, rootMotionId));
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName,
+                weaponName, transitionTime, rootMotionId, wasPredictedOnOwner));
         }
 
         private Coroutine playActionOnClientCoroutine;
-        private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime, int rootMotionId)
+        private IEnumerator PlayActionOnClient(string actionClipName, string weaponName,
+            float transitionTime, int rootMotionId, bool wasPredictedOnOwner)
         {
             // Retrieve the ActionClip based on the actionStateName
             if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
@@ -1220,7 +1231,10 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip, rootMotionId); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch)
+            {
+                SetLastActionClip(actionClip, rootMotionId, wasPredictedOnOwner);
+            }
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1408,11 +1422,13 @@ namespace Vi.Core
 
         public int RootMotionId { get; private set; }
 
-        private void SetLastActionClip(ActionClip actionClip, int rootMotionId)
+        public bool WasLastActionClipMotionPredicted { get; private set; }
+        private void SetLastActionClip(ActionClip actionClip, int rootMotionId, bool wasMotionPredicted)
         {
             lastClipPlayed = actionClip;
             RootMotionId = rootMotionId;
             if (actionClip.ailment != ActionClip.Ailment.Death) { ResetRootMotionTime(); }
+            WasLastActionClipMotionPredicted = wasMotionPredicted;
         }
 
         public Animator Animator { get; private set; }
@@ -1679,7 +1695,8 @@ namespace Vi.Core
                 PlayActionOnServer(serverActionQueueElement.actionClipName,
                     serverActionQueueElement.isFollowUpClip,
                     serverActionQueueElement.wasCalledFromServerRpc,
-                    RootMotionId + 1);
+                    RootMotionId + 1,
+                    serverActionQueueElement.wasMotionPredicted);
             }
         }
 
