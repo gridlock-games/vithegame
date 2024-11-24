@@ -4,16 +4,32 @@ public class MagnifyingObject : MonoBehaviour
 {
     Renderer _renderer;
     Camera _cam;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         _renderer = GetComponent<Renderer>();
         _cam = Camera.main;
     }
 
-    // Update is called once per frame
+    private Camera mainCamera;
+    private void FindMainCamera()
+    {
+        if (mainCamera)
+        {
+            if (mainCamera.gameObject.CompareTag("MainCamera"))
+            {
+                return;
+            }
+        }
+        mainCamera = Camera.main;
+    }
+
     void Update()
     {
+        FindMainCamera();
+
+        if (!_cam) { return; }
+
         Vector3 screenPoint = _cam.WorldToScreenPoint(transform.position);
         screenPoint.x = screenPoint.x / Screen.width;
         screenPoint.y = screenPoint.y / Screen.height;
