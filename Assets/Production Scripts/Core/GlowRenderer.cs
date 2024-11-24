@@ -13,9 +13,6 @@ namespace Vi.Core
     {
         [SerializeField] private Material glowMaterial;
 
-        private const float colorChangeSpeed = 2;
-        private const float fresnelPower = 2.0f;
-
         private float lastHitTime = -5;
         public void RenderHit()
         {
@@ -50,6 +47,18 @@ namespace Vi.Core
         public void RenderFlashAttack(bool canFlashAttack)
         {
             this.canFlashAttack = canFlashAttack;
+        }
+
+        private void OnEnable()
+        {
+            lastBlockTime = -5;
+            lastHealTime = -5;
+            lastHitTime = -5;
+            isInvincible = false;
+            isUninterruptable = false;
+            canFlashAttack = false;
+            currentColor = default;
+            lastColor = default;
         }
 
         private void Start()
@@ -96,6 +105,7 @@ namespace Vi.Core
             {
                 if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
                 {
+                    m.SetColor(_Color, defaultColor);
                     if (glowMaterialInstances.ContainsKey(renderer))
                     {
                         glowMaterialInstances[renderer].Add(m);
@@ -131,69 +141,54 @@ namespace Vi.Core
         private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
-        private const float defaultFresnelPower = 5;
+        private const float colorChangeSpeed = 40;
 
-        private float currentFresnelPower;
-        private float lastFresnelPower;
-
+        private Color currentColor;
         private Color lastColor;
         private void Update()
         {
             Color colorTarget = defaultColor;
-            float fresnelPowerTarget = defaultFresnelPower;
 
-            if (isInvincible)
+            if (Time.time - lastHitTime < 0.25f)
+            {
+                colorTarget = hitColor;
+            }
+            else if (isInvincible)
             {
                 colorTarget = invincibleColor;
-                fresnelPowerTarget = fresnelPower;
             }
             else if (isUninterruptable)
             {
                 colorTarget = uninterruptableColor;
-                fresnelPowerTarget = fresnelPower;
-            }
-            else if (Time.time - lastHitTime < 0.25f)
-            {
-                colorTarget = hitColor;
-                fresnelPowerTarget = fresnelPower;
             }
             else if (Time.time - lastHealTime < 0.25f)
             {
                 colorTarget = healColor;
-                fresnelPowerTarget = fresnelPower;
             }
             else if (Time.time - lastBlockTime < 0.25f)
             {
                 colorTarget = blockColor;
-                fresnelPowerTarget = fresnelPower;
             }
             else if (canFlashAttack)
             {
                 colorTarget = flashAttackColor;
-                fresnelPowerTarget = fresnelPower;
             }
-            
-            currentFresnelPower = Mathf.MoveTowards(currentFresnelPower, fresnelPowerTarget, colorChangeSpeed * Time.deltaTime);
-            if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower) | lastColor != colorTarget)
+
+            currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
+            if (lastColor != currentColor)
             {
                 foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
                     foreach (Material glowMaterialInstance in materialList)
                     {
-                        if (!Mathf.Approximately(currentFresnelPower, lastFresnelPower))
-                            glowMaterialInstance.SetFloat(_FresnelPower, currentFresnelPower);
-
-                        if (lastColor != colorTarget)
-                            glowMaterialInstance.SetColor(_Color, colorTarget);
+                        glowMaterialInstance.SetColor(_Color, currentColor);
                     }
                 }
             }
             
-            lastFresnelPower = currentFresnelPower;
-            lastColor = colorTarget;
+            lastColor = currentColor;
         }
 
-        private readonly int _FresnelPower = Shader.PropertyToID("_FresnelPower");
         private readonly int _Color = Shader.PropertyToID("_Color");
     }
 }

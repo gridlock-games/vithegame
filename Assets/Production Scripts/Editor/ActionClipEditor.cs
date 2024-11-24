@@ -41,6 +41,8 @@ namespace Vi.Editor
         private SerializedProperty spAvatarLayer;
         private SerializedProperty spTransitionTime;
         private SerializedProperty spDodgeCancelTransitionTime;
+        private SerializedProperty spRootMotionTruncateOffset;
+        private SerializedProperty spTruncatedTransitionOutTime;
         private SerializedProperty spAnimationSpeed;
         private SerializedProperty spRecoveryAnimationSpeed;
 
@@ -156,6 +158,8 @@ namespace Vi.Editor
             spAvatarLayer = serializedObject.FindProperty("avatarLayer");
             spTransitionTime = serializedObject.FindProperty("transitionTime");
             spDodgeCancelTransitionTime = serializedObject.FindProperty("dodgeCancelTransitionTime");
+            spRootMotionTruncateOffset = serializedObject.FindProperty("rootMotionTruncateOffset");
+            spTruncatedTransitionOutTime = serializedObject.FindProperty("truncatedTransitionOutTime");
             spAnimationSpeed = serializedObject.FindProperty("animationSpeed");
             spRecoveryAnimationSpeed = serializedObject.FindProperty("recoveryAnimationSpeed");
 
@@ -281,6 +285,8 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spClipType);
             EditorGUILayout.PropertyField(spTransitionTime);
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spDodgeCancelTransitionTime); }
+            EditorGUILayout.PropertyField(spRootMotionTruncateOffset);
+            if (spRootMotionTruncateOffset.floatValue > 0.15f) { EditorGUILayout.PropertyField(spTruncatedTransitionOutTime); }
             EditorGUILayout.PropertyField(spAnimationSpeed);
 
             if (actionClipAttackTypes.Contains((ActionClip.ClipType)spClipType.enumValueIndex)) { EditorGUILayout.PropertyField(spRecoveryAnimationSpeed); }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: DodgeBR
+  m_Name: DodgeF
   m_EditorClassIdentifier: 
   clipType: 0
   followUpActionClipsToPlay: []
@@ -3420,7 +3420,7 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
-  rootMotionTruncateOffset: 0.35
+  rootMotionTruncateOffset: 0.55
   truncatedTransitionOutTime: 0.15
   animationSpeed: 1.25
   recoveryAnimationSpeed: 1
@@ -3506,7 +3506,8 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList: []
+  actionVFXList:
+  - {fileID: 5575609125080847161, guid: dc1ba384bb78b4ffe885071a364474eb, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
