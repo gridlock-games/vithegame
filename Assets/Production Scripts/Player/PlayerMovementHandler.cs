@@ -147,7 +147,6 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationThreshold = 0.3f;
-        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -186,6 +185,7 @@ namespace Vi.Player
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
                         Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
+                        StartSmoothenServerReconciliationPosition();
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
                         modifiedStatePayload.tick = rootMotionReconciliationState.tick;
@@ -214,7 +214,7 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                lastServerReconciliationTime = Time.time;
+                StartSmoothenServerReconciliationPosition();
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -230,6 +230,11 @@ namespace Vi.Player
             {
                 return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
             }
+        }
+
+        private void StartSmoothenServerReconciliationPosition()
+        {
+            lastServerReconciliationTime = Time.time;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -445,7 +450,9 @@ namespace Vi.Player
                 }
 
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-                Rigidbody.position += serverReconciliationPositionOffset * Time.fixedDeltaTime;
+
+                serverReconciliationPositionOffset *= Time.fixedDeltaTime;
+                Rigidbody.position += serverReconciliationPositionOffset;
 
                 if (IsServer) { latestServerState.Value = statePayload; }
             }
@@ -664,6 +671,7 @@ namespace Vi.Player
         }
 
         private const float serverReconciliationLerpDuration = 0.25f;
+        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
 
         private void UpdateTransform()
         {
@@ -672,7 +680,9 @@ namespace Vi.Player
 
             if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
             {
-                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration);
+                float t = (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration;
+                Debug.Log(t);
+                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, t);
             }
             else
             {
