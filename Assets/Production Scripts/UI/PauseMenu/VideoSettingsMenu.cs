@@ -123,7 +123,7 @@ namespace Vi.UI
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
 
-            targetFrameRateInput.text = Application.targetFrameRate.ToString();
+            targetFrameRateInput.text = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate").ToString();
             renderDistanceInput.text = FasterPlayerPrefs.Singleton.GetInt("RenderDistance").ToString();
 
             // Full screen mode dropdown
@@ -278,7 +278,7 @@ namespace Vi.UI
             vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = graphicsPresetDropdown.value > 0;
+            postProcessingToggle.isOn = true;
         }
 
         public void ValidateRenderDistance()
@@ -312,8 +312,8 @@ namespace Vi.UI
                 targetFrameRateInput.text = "30";
             }
 
-            Application.targetFrameRate = targetFrameRate;
             FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
+            NetSceneManager.SetTargetFrameRate();
         }
     }
 }

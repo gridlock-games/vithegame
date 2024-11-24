@@ -44,7 +44,21 @@ namespace Vi.Utility
             intPrefs = JsonConvert.DeserializeObject<Dictionary<string, int>>(PlayerPrefs.GetString(intPrefKey));
             boolPrefs = JsonConvert.DeserializeObject<Dictionary<string, bool>>(PlayerPrefs.GetString(boolPrefKey));
             colorPrefs = JsonConvert.DeserializeObject<Dictionary<string, SerializableColor>>(PlayerPrefs.GetString(colorPrefKey));
+
+#if (UNITY_IOS || UNITY_ANDROID)
+            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+#endif
         }
+
+#if (UNITY_IOS || UNITY_ANDROID)
+        private void Update()
+        {
+            if (!UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
+            {
+                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+            }
+        }
+#endif
 
         private const string stringPrefKey = "StringPrefs";
         private const string floatPrefKey = "FloatPrefs";
