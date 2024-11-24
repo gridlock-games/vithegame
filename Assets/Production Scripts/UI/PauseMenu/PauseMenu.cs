@@ -83,7 +83,6 @@ namespace Vi.UI
             if (NetworkManager.Singleton.IsListening)
             {
                 PlayerDataManager.Singleton.WasDisconnectedByClient = true;
-                Debug.Log("SHUTTING DOWN NETWORK MANAGER");
                 NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
