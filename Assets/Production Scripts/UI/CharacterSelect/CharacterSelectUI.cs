@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
-using jomarcentermjm.PlatformAPI;
+// // using jomarcentermjm.PlatformAPI;
 
 namespace Vi.UI
 {
@@ -1142,13 +1142,13 @@ namespace Vi.UI
         public void HandlePlatformAPI(bool newCharacterCreation, string characterName = "XYZ")
         {
             //Rich presence
-            if (PlatformRichPresence.instance != null)
-            {
-                if (!newCharacterCreation)
-                    //Change logic here that would handle scenario where the player is host.
-                    PlatformRichPresence.instance.UpdatePlatformStatus("At Character Select", "Selecting a Character");
-                else PlatformRichPresence.instance.UpdatePlatformStatus("At Character Select", "Creating a New Character");
-            }
+            // if (PlatformRichPresence.instance != null)
+            // {
+            //     if (!newCharacterCreation)
+            //         //Change logic here that would handle scenario where the player is host.
+            //         PlatformRichPresence.instance.UpdatePlatformStatus("At Character Select", "Selecting a Character");
+            //     else PlatformRichPresence.instance.UpdatePlatformStatus("At Character Select", "Creating a New Character");
+            // }
         }
     }
 }

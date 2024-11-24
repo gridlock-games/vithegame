@@ -172,8 +172,9 @@ namespace Vi.ScriptableObjects
             //hitReactionRootMotionVerticalMultiplier = attackClip.attackRootMotionVerticalMultiplier;
         }
 
-        public bool IsMotionPredicted()
+        public bool IsMotionPredicted(bool isAtRest)
         {
+            if (!isAtRest) { return false; }
             return GetClipType() == ClipType.Dodge;
         }
 
