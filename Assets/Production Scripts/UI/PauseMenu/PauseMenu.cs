@@ -77,7 +77,7 @@ namespace Vi.UI
             applicationVersionText.text = "Version: " + Application.version;
         }
 
-        public IEnumerator ReturnToCharacterSelect()
+        private IEnumerator ReturnToCharacterSelect()
         {
             returnToCharSelectButton.interactable = false;
             if (NetworkManager.Singleton.IsListening)

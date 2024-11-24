@@ -14,12 +14,43 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
 using UnityEditor.Animations;
-using static UnityEngine.EventSystems.EventTrigger;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Set Environment Reflections On Weapons And Armor")]
+        private static void SetEnvironmentReflectionsOnWeaponsAndArmor()
+        {
+            string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
+
+            int counter = -1;
+            foreach (string path in paths)
+            {
+                counter++;
+                if (EditorUtility.DisplayCancelableProgressBar("Setting Environment Reflections: " + path,
+                            counter.ToString() + " out of " + paths.Length,
+                            counter / (float)paths.Length))
+                { break; }
+
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat)
+                {
+                    if (mat.IsKeywordEnabled("_SPECULARHIGHLIGHTS_OFF"))
+                    {
+                        mat.DisableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                        EditorUtility.SetDirty(mat);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No material at path " + path);
+                }
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
         [MenuItem("Tools/Production/Set Network Object Settings")]
         private static void SetNetworkObjectSettings()
         {
@@ -29,7 +60,7 @@ namespace Vi.Editor
             {
                 counter++;
                 if (EditorUtility.DisplayCancelableProgressBar("Setting Network Object Settings: " + assetPath,
-                            counter.ToString() + " assets left - " + paths.Length,
+                            counter.ToString() + " out of " + paths.Length,
                             counter / (float)paths.Length))
                 { break; }
 

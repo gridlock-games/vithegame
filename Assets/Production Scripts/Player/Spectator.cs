@@ -27,8 +27,6 @@ namespace Vi.Player
             {
                 gameObject.tag = "MainCamera";
 
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-
                 RefreshStatus();
 
                 GetComponent<PlayerInput>().enabled = true;
@@ -63,7 +61,6 @@ namespace Vi.Player
 
             if (IsLocalPlayer)
             {
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
                 Cursor.lockState = CursorLockMode.None;
             }
 
@@ -328,14 +325,6 @@ namespace Vi.Player
         {
             base.OnEnable();
             followTargetOffset = defaultFollowTargetOffset;
-            if (IsLocalPlayer)
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-        }
-
-        protected override void OnDisable()
-        {
-            if (IsLocalPlayer)
-                UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
         }
 
         private CombatAgent followTarget;
