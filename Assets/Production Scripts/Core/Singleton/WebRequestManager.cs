@@ -38,8 +38,8 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        //private string APIURL = "http://38.60.246.146:80/";
-        private string APIURL = "http://154.90.36.42:80/";
+        //private string APIURL = "http://38.60.246.146:80/"; // Prod
+        private string APIURL = "http://154.90.36.42:80/"; // Dev
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
@@ -1220,14 +1220,16 @@ namespace Vi.Core
             for (int i = 1; i < 5; i++)
             {
                 int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
-                int chestIndex = chestOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Chest) ? -1 : 0, chestOptions.Count);
                 int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
-                int bootsIndex = bootsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Boots) ? -1 : 0, bootsOptions.Count);
-                int pantsIndex = pantsOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Pants) ? -1 : 0, pantsOptions.Count);
-                int beltIndex = beltOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Belt) ? -1 : 0, beltOptions.Count);
                 int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
                 int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
                 int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
+                
+                // These must be in the same grouping
+                int chestIndex = Random.Range(0, chestOptions.Count);
+                int pantsIndex = pantsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
+                int bootsIndex = bootsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
+                int beltIndex = beltOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
 
                 int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
                 if (i == 1) { weapon1Index = System.Array.FindIndex(weaponOptions, item => item.name == "Flintblade"); }

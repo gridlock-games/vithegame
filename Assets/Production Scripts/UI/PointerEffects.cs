@@ -15,9 +15,6 @@ namespace Vi.UI
         private void Start()
         {
             clickParticleEmitSettings = new ParticleSystem.EmitParams();
-#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-#endif
         }
 
         private PlayerInput playerInput;

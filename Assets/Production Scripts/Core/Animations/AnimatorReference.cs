@@ -521,7 +521,7 @@ namespace Vi.Core
         private void Update()
         {
             IsAtRest = RefreshIsAtRest();
-            limbReferences.SetHeadIKWeight(IsAtRest ? 1 : 0);
+            limbReferences.SetHeadIKWeight(!combatAgent.WeaponHandler.IsAiming() & IsAtRest & combatAgent.IsSpawned ? 1 : 0);
 
             if (animationHandler)
             {

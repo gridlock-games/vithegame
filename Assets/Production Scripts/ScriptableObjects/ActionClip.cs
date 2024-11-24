@@ -188,6 +188,8 @@ namespace Vi.ScriptableObjects
         public AvatarLayer avatarLayer = AvatarLayer.FullBody;
         public float transitionTime = 0.15f;
         public float dodgeCancelTransitionTime = 0.15f;
+        public float rootMotionTruncateOffset = 0.15f;
+        public float truncatedTransitionOutTime = 0.15f;
         public float animationSpeed = 1;
         public float recoveryAnimationSpeed = 1;
 

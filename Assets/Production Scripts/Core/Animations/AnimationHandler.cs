@@ -9,7 +9,6 @@ using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.Weapons;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Vi.Core
 {
@@ -652,7 +651,8 @@ namespace Vi.Core
             }
         }
 
-        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip, bool wasCalledFromServerRpc)
+        private bool PlayActionOnServer(string actionClipName, bool isFollowUpClip,
+            bool wasCalledFromServerRpc, int rootMotionId)
         {
             if (!IsServer) { Debug.LogError("AnimationHandler.PlayActionOnServer() should only be called on the server! " + actionClipName); return false; }
 
@@ -667,7 +667,6 @@ namespace Vi.Core
                 if (wasCalledFromServerRpc)
                 {
                     ResetWaitingForActionToPlayClientRpc();
-                    if (actionClip.IsMotionPredicted()) { combatAgent.MovementHandler.OnRootMotionTimeReset(); }
                 }
                 return false;
             }
@@ -761,10 +760,11 @@ namespace Vi.Core
             }
 
             // Invoke the PlayActionClientRpc method on the client side
-            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, actionClip.IsMotionPredicted());
+            PlayActionClientRpc(actionClipName, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""),
+                transitionTime, actionClip.IsMotionPredicted(), rootMotionId);
             StartCoroutine(ResetWaitingForActionClipToPlayAfterOneFrame());
             // Update the lastClipType to the current action clip type
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip, rootMotionId); }
             return true;
         }
 
@@ -1127,12 +1127,14 @@ namespace Vi.Core
             if (actionClip.GetClipType() != ActionClip.ClipType.Dodge) { Debug.LogWarning("Predicted action clips are not supported for non-dodge clips"); return; }
 
             if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
-            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClip.name, combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime));
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClip.name,
+                combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", ""), transitionTime, RootMotionId + 1));
         }
 
         // Remote Procedure Call method for playing the action on the client
         [Rpc(SendTo.NotServer)]
-        private void PlayActionClientRpc(string actionClipName, string weaponName, float transitionTime, bool wasPredictedOnOwner)
+        private void PlayActionClientRpc(string actionClipName, string weaponName,
+            float transitionTime, bool wasPredictedOnOwner, int rootMotionId)
         {
             WaitingForActionClipToPlay = false;
 
@@ -1142,11 +1144,11 @@ namespace Vi.Core
             }
             
             if (playActionOnClientCoroutine != null) { StopCoroutine(playActionOnClientCoroutine); }
-            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime));
+            playActionOnClientCoroutine = StartCoroutine(PlayActionOnClient(actionClipName, weaponName, transitionTime, rootMotionId));
         }
 
         private Coroutine playActionOnClientCoroutine;
-        private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime)
+        private IEnumerator PlayActionOnClient(string actionClipName, string weaponName, float transitionTime, int rootMotionId)
         {
             // Retrieve the ActionClip based on the actionStateName
             if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
@@ -1218,7 +1220,7 @@ namespace Vi.Core
             combatAgent.WeaponHandler.SetActionClip(actionClip, combatAgent.WeaponHandler.GetWeapon().name);
             UpdateAnimationLayerWeights(actionClip.avatarLayer);
 
-            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip); }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Flinch) { SetLastActionClip(actionClip, rootMotionId); }
         }
 
         // Coroutine for setting invincibility status during a dodge
@@ -1265,7 +1267,7 @@ namespace Vi.Core
         {
             rootMotionTime = 0;
             totalRootMotionTime = 0;
-            combatAgent.MovementHandler.OnRootMotionTimeReset();
+            RootMotionId += 1;
         }
 
         public bool ShouldApplyRootMotion()
@@ -1283,7 +1285,8 @@ namespace Vi.Core
                 {
                     maxRootMotionTime *= combatAgent.WeaponHandler.CurrentActionClip.chargeAttackStateLoopCount;
                 }
-                return totalRootMotionTime <= maxRootMotionTime - (combatAgent.WeaponHandler.CurrentActionClip.transitionTime);
+
+                return totalRootMotionTime <= maxRootMotionTime - combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset;
             }
             else
             {
@@ -1379,6 +1382,17 @@ namespace Vi.Core
                     if (float.IsNaN(delta.y)) { Debug.Log("y is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.y = 0; }
                     if (float.IsNaN(delta.z)) { Debug.Log("z is nan! " + combatAgent.GetName() + " " + combatAgent.WeaponHandler.GetWeapon() + " " + combatAgent.WeaponHandler.CurrentActionClip); delta.z = 0; }
 
+                    if (combatAgent.WeaponHandler.CurrentActionClip.GetClipType() != ActionClip.ClipType.HeavyAttack)
+                    {
+                        if (combatAgent.WeaponHandler.CurrentActionClip.rootMotionTruncateOffset > 0.15f)
+                        {
+                            if (!ShouldApplyRootMotion())
+                            {
+                                Animator.CrossFadeInFixedTime("Empty", combatAgent.WeaponHandler.CurrentActionClip.truncatedTransitionOutTime, actionsLayerIndex);
+                            }
+                        }
+                    }
+
                     return delta;
                 }
                 else
@@ -1392,9 +1406,12 @@ namespace Vi.Core
             }
         }
 
-        private void SetLastActionClip(ActionClip actionClip)
+        public int RootMotionId { get; private set; }
+
+        private void SetLastActionClip(ActionClip actionClip, int rootMotionId)
         {
             lastClipPlayed = actionClip;
+            RootMotionId = rootMotionId;
             if (actionClip.ailment != ActionClip.Ailment.Death) { ResetRootMotionTime(); }
         }
 
@@ -1590,6 +1607,7 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            RootMotionId = default;
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
             ResetRootMotionTime();
@@ -1660,7 +1678,8 @@ namespace Vi.Core
             {
                 PlayActionOnServer(serverActionQueueElement.actionClipName,
                     serverActionQueueElement.isFollowUpClip,
-                    serverActionQueueElement.wasCalledFromServerRpc);
+                    serverActionQueueElement.wasCalledFromServerRpc,
+                    RootMotionId + 1);
             }
         }
 
