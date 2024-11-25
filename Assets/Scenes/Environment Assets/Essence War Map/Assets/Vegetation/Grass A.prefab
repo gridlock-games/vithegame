@@ -24,6 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8926669154169474574}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
@@ -31,7 +32,6 @@ Transform:
   m_Children:
   - {fileID: 1333775648866879661}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &745548179364004453
 LODGroup:
@@ -57,6 +57,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 976574560495198731}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
@@ -134,12 +135,30 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
+        type: 3}
+      propertyPath: m_ReceiveGI
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
         type: 3}
       propertyPath: m_Name
       value: Veg_TerrainGrass
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e, type: 3}
 --- !u!23 &200877744242373570 stripped
 MeshRenderer:
