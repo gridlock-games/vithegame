@@ -213,7 +213,8 @@ public class DebugOverlay : MonoBehaviour
             Color fpsTextColor;
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                if (fpsValue < 30)
+                float targetFrameRateToConsider = Application.targetFrameRate;
+                if (fpsValue < 28)
                 {
                     fpsTextColor = Color.red;
                 }
@@ -228,11 +229,12 @@ public class DebugOverlay : MonoBehaviour
             }
             else
             {
-                if (fpsValue >= Screen.currentResolution.refreshRateRatio.value)
+                float targetFrameRateToConsider = Mathf.Min((float)Screen.currentResolution.refreshRateRatio.value, Application.targetFrameRate);
+                if (fpsValue >= targetFrameRateToConsider)
                 {
                     fpsTextColor = Color.green;
                 }
-                else if (fpsValue >= Screen.currentResolution.refreshRateRatio.value / 2)
+                else if (fpsValue >= targetFrameRateToConsider / 2)
                 {
                     fpsTextColor = Color.yellow;
                 }

@@ -1,4 +1,4 @@
-using jomarcentermjm.PlatformAPI;
+// using jomarcentermjm.PlatformAPI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -63,11 +63,11 @@ namespace Vi.UI
         public void HandlePlatformAPI(string LScore, string RScore, string RoundNumber, string StageName = "Main Level", string GameModeName = "Mode Name")
         {
             //Rich presence
-            if (PlatformRichPresence.instance != null)
-            {
-                //Change logic here that would handle scenario where the player is host.
-                PlatformRichPresence.instance.UpdatePlatformStatus($"Round {RoundNumber} - {LScore} : {RScore}", $"{StageName} - {GameModeName} ", $"Round {RoundNumber} - {LScore} : {RScore}", "#StatusGeneral", gameModeDiscordInfoID, gameModeName);
-            }
+            // if (PlatformRichPresence.instance != null)
+            // {
+            //     //Change logic here that would handle scenario where the player is host.
+            //     PlatformRichPresence.instance.UpdatePlatformStatus($"Round {RoundNumber} - {LScore} : {RScore}", $"{StageName} - {GameModeName} ", $"Round {RoundNumber} - {LScore} : {RScore}", "#StatusGeneral", gameModeDiscordInfoID, gameModeName);
+            // }
         }
 
     }
