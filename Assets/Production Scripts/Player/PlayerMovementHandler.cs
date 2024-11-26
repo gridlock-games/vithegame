@@ -95,7 +95,7 @@ namespace Vi.Player
             }
         }
 
-        public struct StatePayload : INetworkSerializable
+        public struct StatePayload : INetworkSerializable, System.IEquatable<StatePayload>
         {
             public int tick;
             public Vector2 moveInput;
@@ -116,6 +116,11 @@ namespace Vi.Player
                 this.usedRootMotion = usedRootMotion;
                 this.rootMotionId = rootMotionId;
                 this.rootMotionTime = rootMotionTime;
+            }
+
+            public bool Equals(StatePayload other)
+            {
+                return tick == other.tick;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -228,6 +233,7 @@ namespace Vi.Player
             }
             else
             {
+                Debug.Log(latestServerState.Value.tick + " " + latestServerState.Value.position + " " + stateBuffer[serverStateBufferIndex].position);
                 return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
             }
         }
@@ -378,9 +384,7 @@ namespace Vi.Player
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
-                        if (!latestServerState.Equals(default(StatePayload)) &&
-                            (lastProcessedState.Equals(default(StatePayload)) ||
-                            !latestServerState.Equals(lastProcessedState)))
+                        if (latestServerState.Value.Equals(lastProcessedState))
                         {
                             serverReconciliationPositionOffset = HandleServerReconciliation();
                         }
@@ -565,7 +569,6 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
-            serverCorrectionOffset *= Time.fixedDeltaTime;
             Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
