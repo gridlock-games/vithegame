@@ -328,9 +328,10 @@ namespace Vi.UI
                 cartPriceSum += item.Price;
             }
 
-            buyButton.interactable = !waitingForPurchase
-                & FasterPlayerPrefs.Singleton.GetInt("Tokens") >= cartPriceSum
-                & cartContents.Count > 0;
+            //buyButton.interactable = !waitingForPurchase
+            //    & FasterPlayerPrefs.Singleton.GetInt("Tokens") >= cartPriceSum
+            //    & cartContents.Count > 0;
+            buyButton.interactable = false;
 
             cartCostText.text = cartPriceSum.ToString();
         }
