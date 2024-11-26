@@ -1450,6 +1450,8 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
+            // This check is for late joining clients
+            if (!GlowRenderer) { return; }
             GlowRenderer.RenderHit();
 
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))

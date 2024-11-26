@@ -95,7 +95,7 @@ namespace Vi.Player
             }
         }
 
-        public struct StatePayload : INetworkSerializable
+        public struct StatePayload : INetworkSerializable, System.IEquatable<StatePayload>
         {
             public int tick;
             public Vector2 moveInput;
@@ -116,6 +116,11 @@ namespace Vi.Player
                 this.usedRootMotion = usedRootMotion;
                 this.rootMotionId = rootMotionId;
                 this.rootMotionTime = rootMotionTime;
+            }
+
+            public bool Equals(StatePayload other)
+            {
+                return tick == other.tick;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -146,7 +151,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.15f;
+        private const float serverReconciliationThreshold = 0.3f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -250,7 +255,7 @@ namespace Vi.Player
 
                 // Process new movement with reconciled state
                 InputPayload inputPayload = inputBuffer[bufferIndex];
-                StatePayload statePayload = Move(ref inputPayload, true);
+                StatePayload statePayload = Move(ref inputPayload, Vector3.zero, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
                 // Update buffer with recalculated state
@@ -318,7 +323,7 @@ namespace Vi.Player
                     serverInputPayload.moveInput = Vector2.zero;
                     SetInputPayloadVariablesOnServer(ref serverInputPayload);
 
-                    StatePayload statePayload = Move(ref serverInputPayload, false);
+                    StatePayload statePayload = Move(ref serverInputPayload, Vector3.zero, false);
 
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
@@ -357,7 +362,7 @@ namespace Vi.Player
 
                         SetInputPayloadVariablesOnServer(ref inputPayload);
 
-                        StatePayload statePayload = Move(ref inputPayload, false);
+                        StatePayload statePayload = Move(ref inputPayload, Vector3.zero, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                         latestServerState.Value = statePayload;
                         lastInputPayloadProcessedOnServer = inputPayload;
@@ -378,9 +383,7 @@ namespace Vi.Player
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
-                        if (!latestServerState.Equals(default(StatePayload)) &&
-                            (lastProcessedState.Equals(default(StatePayload)) ||
-                            !latestServerState.Equals(lastProcessedState)))
+                        if (!latestServerState.Value.Equals(lastProcessedState))
                         {
                             serverReconciliationPositionOffset = HandleServerReconciliation();
                         }
@@ -430,7 +433,7 @@ namespace Vi.Player
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
                     GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
-                StatePayload statePayload = Move(ref inputPayload, false);
+                StatePayload statePayload = Move(ref inputPayload, serverReconciliationPositionOffset, false);
 
                 bool isGameOver = false;
                 if (GameModeManager.Singleton)
@@ -452,9 +455,6 @@ namespace Vi.Player
                 }
 
                 stateBuffer[inputPayload.tick % BUFFER_SIZE] = statePayload;
-
-                serverReconciliationPositionOffset *= Time.fixedDeltaTime;
-                Rigidbody.position += serverReconciliationPositionOffset;
 
                 if (IsServer) { latestServerState.Value = statePayload; }
             }
@@ -485,7 +485,7 @@ namespace Vi.Player
 
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
-        private StatePayload Move(ref InputPayload inputPayload, bool isReprocessing)
+        private StatePayload Move(ref InputPayload inputPayload, Vector3 serverCorrectionOffset, bool isReprocessing)
         {
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -568,6 +568,8 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
+            serverCorrectionOffset *= Time.fixedDeltaTime;
+            Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
