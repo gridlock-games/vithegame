@@ -383,7 +383,7 @@ namespace Vi.Player
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
-                        if (latestServerState.Value.Equals(lastProcessedState))
+                        if (!latestServerState.Value.Equals(lastProcessedState))
                         {
                             serverReconciliationPositionOffset = HandleServerReconciliation();
                         }
