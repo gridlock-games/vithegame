@@ -151,7 +151,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 2;
+        private const float serverReconciliationThreshold = 0.3f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -568,6 +568,7 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
+            serverCorrectionOffset *= Time.fixedDeltaTime;
             Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
