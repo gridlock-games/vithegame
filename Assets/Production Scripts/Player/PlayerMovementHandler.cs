@@ -233,7 +233,6 @@ namespace Vi.Player
             }
             else
             {
-                Debug.Log(latestServerState.Value.tick + " " + latestServerState.Value.position + " " + stateBuffer[serverStateBufferIndex].position);
                 return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
             }
         }
