@@ -45,11 +45,32 @@ namespace Vi.UI
 
         private IEnumerator PingServer()
         {
+            if (!pingText)
+            {
+                pingTime = 2;
+                yield break;
+            }
+
             Ping ping = new Ping(Server.ip);
-            yield return new WaitUntil(() => ping.isDone);
-            if (!pingText) { yield break; }
-            pingText.text = ping.time.ToString();
-            pingTime = ping.time;
+            float startTime = Time.time;
+
+            while (true)
+            {
+                if (ping.isDone)
+                {
+                    pingTime = ping.time;
+                    pingText.text = pingTime.ToString();
+                    break;
+                }
+
+                if (Time.time - startTime > 2)
+                {
+                    pingTime = 2;
+                    pingText.text = "N/A";
+                    break;
+                }
+                yield return null;
+            }
         }
 
         private void Update()
