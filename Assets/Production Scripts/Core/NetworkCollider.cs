@@ -22,7 +22,7 @@ namespace Vi.Core
 
         private Collider[] staticWallColliders = new Collider[0];
 
-        private static List<int> colliderInstanceIDMap = new List<int>();
+        private static Dictionary<int, NetworkCollider> colliderInstanceIDMap = new Dictionary<int, NetworkCollider>();
 
         private PooledObject parentPooledObject;
 
@@ -53,13 +53,13 @@ namespace Vi.Core
                     foreach (Collider staticWallCollider in staticWallColliders)
                     {
                         Physics.IgnoreCollision(col, staticWallCollider);
-                        colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID());
+                        colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
                         staticWallCollider.hasModifiableContacts = true;
                     }
                 }
                 else
                 {
-                    colliderInstanceIDMap.Add(col.GetInstanceID());
+                    colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace Vi.Core
             {
                 foreach (Collider col in Colliders)
                 {
-                    colliderInstanceIDMap.Add(col.GetInstanceID());
+                    colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 }
             }
         }
@@ -152,13 +152,21 @@ namespace Vi.Core
             {
                 for (int i = 0; i < pair.contactCount; ++i)
                 {
-                    if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                    if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
-                        if (colliderInstanceIDMap.Contains(pair.otherColliderInstanceID))
+                        if (CombatAgent.CanRecoveryDodge)
                         {
-                            if (!CombatAgent.AnimationHandler.IsAtRest())
+                            pair.IgnoreContact(i);
+                        }
+
+                        if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                        {
+                            if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
                             {
-                                pair.SetDynamicFriction(i, 1);
+                                if (!CombatAgent.AnimationHandler.IsAtRest())
+                                {
+                                    pair.SetDynamicFriction(i, 1);
+                                }
                             }
                         }
                     }
