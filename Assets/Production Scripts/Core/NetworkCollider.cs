@@ -46,6 +46,7 @@ namespace Vi.Core
             foreach (Collider col in Colliders)
             {
                 col.enabled = false;
+                colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 col.hasModifiableContacts = true;
 
                 if (staticWallBody)
@@ -56,10 +57,6 @@ namespace Vi.Core
                         colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
                         staticWallCollider.hasModifiableContacts = true;
                     }
-                }
-                else
-                {
-                    colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 }
             }
         }
@@ -159,7 +156,10 @@ namespace Vi.Core
                         {
                             if (CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
                             {
-                                pair.IgnoreContact(i);
+                                if (!CombatAgent.AnimationHandler.IsAtRest())
+                                {
+                                    pair.IgnoreContact(i);
+                                }
                             }
                         }
 
