@@ -386,6 +386,24 @@ namespace Vi.Player
                         if (!latestServerState.Value.Equals(lastProcessedState))
                         {
                             serverReconciliationPositionOffset = HandleServerReconciliation();
+
+                            if (serverReconciliationPositionOffset.magnitude > 0.01f)
+                            {
+                                Debug.Log(serverReconciliationPositionOffset);
+                            }
+
+                            // Modify the state positions of future ticks that we already processed so that we don't apply the same position error twice
+                            int tickToProcess = latestServerState.Value.tick + 1;
+                            while (tickToProcess < movementTick)
+                            {
+                                int bufferIndex = tickToProcess % BUFFER_SIZE;
+
+                                stateBuffer[bufferIndex].position += serverReconciliationPositionOffset;
+
+                                tickToProcess++;
+                            }
+
+                            serverReconciliationPositionOffset *= Time.fixedDeltaTime / 2;
                         }
                     }
                 }
@@ -568,7 +586,6 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
-            serverCorrectionOffset *= Time.fixedDeltaTime;
             Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
