@@ -706,8 +706,8 @@ namespace Vi.Core
             }
         }
 
-        // 3 second buffer after ailment is set to none to dodge and phase through enemies
-        public bool CanRecoveryDodge { get { return Time.time - lastRecoveryStartTime <= 3; } }
+        // 2 second buffer after ailment is set to none to dodge and phase through enemies
+        public bool CanRecoveryDodge { get { return Time.time - lastRecoveryStartTime <= 1.7f; } }
         private float lastRecoveryStartTime;
         private const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible, bool shouldMakeInvincibleDuringRecovery)

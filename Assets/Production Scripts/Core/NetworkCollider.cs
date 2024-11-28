@@ -154,9 +154,13 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
+                        // Phase through other players if we are dodging out of an ailment like knockdown
                         if (CombatAgent.CanRecoveryDodge)
                         {
-                            pair.IgnoreContact(i);
+                            if (CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                            {
+                                pair.IgnoreContact(i);
+                            }
                         }
 
                         if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
