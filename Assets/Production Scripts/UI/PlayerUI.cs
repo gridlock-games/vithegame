@@ -63,8 +63,9 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability2;
         [SerializeField] private AbilityCard ability3;
         [SerializeField] private AbilityCard ability4;
-        [SerializeField] private Image dodgeIconImageOnPC;
+        [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private Image dodgeCooldownImage;
+        [SerializeField] private Text dodgeStackText;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
@@ -86,12 +87,10 @@ namespace Vi.UI
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private RectTransform blockingButton;
-        [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private RectTransform lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private RectTransform orbitalCameraButton;
-        [SerializeField] private Image mobileDodgeCooldownImage;
         [Header("Text Chat")]
         [SerializeField] private Canvas textChatButtonCanvas;
         [SerializeField] private Canvas textChatParentCanvas;
@@ -669,13 +668,10 @@ namespace Vi.UI
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
             float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
-            mobileDodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
             dodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
 
             bool dodgeIsOnCooldown = !Mathf.Approximately(dodgeCooldownProgress, 1);
-            dodgeIconImageOnPC.enabled = dodgeIsOnCooldown;
             dodgeCooldownImage.enabled = dodgeIsOnCooldown;
-            mobileDodgeCooldownImage.enabled = dodgeIsOnCooldown;
 
             if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
