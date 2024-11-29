@@ -66,7 +66,7 @@ namespace Vi.UI
             serverListElementList = serverListElementList.OrderBy(item => item.pingTime).ToList();
             for (int i = 0; i < serverListElementList.Count; i++)
             {
-                serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime >= 0);
+                serverListElementList[i].gameObject.SetActive(serverListElementList[i].pingTime != -1);
                 serverListElementList[i].transform.SetSiblingIndex(i);
             }
 
