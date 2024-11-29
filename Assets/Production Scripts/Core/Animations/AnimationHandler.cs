@@ -580,7 +580,8 @@ namespace Vi.Core
                     // If we are in the middle of dodging, or playing a hit reaction, don't play this clip unless it's a hit reaction
                     if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return default; }
+                        // Allow double dodging
+                        if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < 0.55f) { return default; }
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return default; }
                     }
                 }
