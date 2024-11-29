@@ -667,11 +667,26 @@ namespace Vi.UI
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
-            float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
-            dodgeCooldownImage.fillAmount = 1 - dodgeCooldownProgress;
+            if (attributes.WeaponHandler.GetWeapon().IsDodgeOnCooldown())
+            {
+                float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
+                Color newColor = dodgeCooldownImage.color;
+                newColor.a = Mathf.Lerp(0.15f, 1, dodgeCooldownProgress);
+                dodgeCooldownImage.color = newColor;
+            }
+            else
+            {
+                Color newColor = dodgeCooldownImage.color;
+                newColor.a = 1;
+                dodgeCooldownImage.color = newColor;
+            }
 
-            bool dodgeIsOnCooldown = !Mathf.Approximately(dodgeCooldownProgress, 1);
-            dodgeCooldownImage.enabled = dodgeIsOnCooldown;
+            int numOfDodges = attributes.WeaponHandler.GetWeapon().GetNumberOfDodgesOffCooldown();
+            dodgeStackText.text = numOfDodges.ToString();
+            if (numOfDodges > 0)
+            {
+                dodgeStackText.text += "x";
+            }
 
             if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
