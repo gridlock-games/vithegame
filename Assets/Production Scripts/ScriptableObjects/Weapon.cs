@@ -704,7 +704,7 @@ namespace Vi.ScriptableObjects
 
         public float dodgeStaminaCost { get; private set; } = 0;
         [Header("Dodge Assignments")]
-        public float dodgeCooldownDuration = 5;
+        public float dodgeCooldownDuration = 5; // This should be cut in half for the first dodge
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;
@@ -714,13 +714,55 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
 
-        private float lastDodgeActivateTime = Mathf.NegativeInfinity;
+        private float lastDodge1ActivateTime = Mathf.NegativeInfinity;
+        private float lastDodge2ActivateTime = Mathf.NegativeInfinity;
 
-        public void StartDodgeCooldown() { lastDodgeActivateTime = Time.time; }
+        public void StartDodgeCooldown()
+        {
+            if (lastDodge1ActivateTime <= lastDodge2ActivateTime)
+            {
+                lastDodge1ActivateTime = Time.time;
+            }
+            else
+            {
+                lastDodge2ActivateTime = Time.time;
+            }
+        }
 
-        public bool IsDodgeOnCooldown() { return Time.time - lastDodgeActivateTime < dodgeCooldownDuration; }
+        public bool IsDodgeOnCooldown()
+        {
+            float timeToConsider = Mathf.Min(lastDodge1ActivateTime, lastDodge2ActivateTime);
+            return Time.time - timeToConsider < dodgeCooldownDuration;
+        }
 
-        public float GetDodgeCooldownProgress() { return Mathf.Clamp((Time.time - lastDodgeActivateTime) / dodgeCooldownDuration, 0, 1); }
+        public float GetDodgeCooldownProgress()
+        {
+            float cooldown1 = Mathf.Clamp((Time.time - lastDodge1ActivateTime) / dodgeCooldownDuration, 0, 1);
+            float cooldown2 = Mathf.Clamp((Time.time - lastDodge2ActivateTime) / dodgeCooldownDuration, 0, 1);
+
+            if (GetNumberOfDodgesOffCooldown() == 2)
+            {
+                return Mathf.Max(cooldown1, cooldown2);
+            }
+            else
+            {
+                return Mathf.Min(cooldown1, cooldown2);
+            }
+        }
+
+        public int GetNumberOfDodgesOffCooldown()
+        {
+            int numDodgesOfCooldown = 0;
+            if (Time.time - lastDodge1ActivateTime >= dodgeCooldownDuration)
+            {
+                numDodgesOfCooldown++;
+            }
+            if (Time.time - lastDodge2ActivateTime >= dodgeCooldownDuration)
+            {
+                numDodgesOfCooldown++;
+            }
+            return numDodgesOfCooldown;
+        }
 
         public ActionClip GetDodgeClip(float angle)
         {

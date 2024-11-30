@@ -128,7 +128,7 @@ namespace Vi.Core.MovementHandlers
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
-            networkTransform.SetMaxInterpolationBound(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 1.5f : 3);
+            networkTransform.SetMaxInterpolationBound(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 1 : 3);
         }
 
         protected virtual void LateUpdate()

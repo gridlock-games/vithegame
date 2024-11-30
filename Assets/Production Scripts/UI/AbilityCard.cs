@@ -13,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private Image inactiveAbilityIcon;
         [SerializeField] private Text cooldownText;
         [SerializeField] private Text keybindText;
+        [SerializeField] private Text staminaCostText;
         [SerializeField] private ActionClip previewAbility;
         [SerializeField] private Image upgradeIcon;
         [SerializeField] private RectTransform upgradeIconActivePosition;
@@ -53,22 +54,36 @@ namespace Vi.UI
             this.keybindText.text = keybindText;
 
             lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
+            
+            float staminaCost = combatAgent.AnimationHandler.GetStaminaCostOfClip(Ability);
+            staminaCostText.text = staminaCost.ToString("F0");
+            lastStaminaCost = staminaCost;
         }
 
         private Image borderImage;
         private Color originalBorderImageColor;
+        private Color originalStaminaCostColor;
         private CombatAgent combatAgent;
 
         private void Start()
         {
             originalBorderImageColor = borderImage.color;
+            originalStaminaCostColor = staminaCostText.color;
             keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
         }
 
         private int lastAbilityLevel = -1;
+        private float lastStaminaCost = -1;
         private void Update()
         {
             if (Ability == null) { return; }
+
+            float staminaCost = combatAgent.AnimationHandler.GetStaminaCostOfClip(Ability);
+            if (!Mathf.Approximately(lastStaminaCost, staminaCost))
+            {
+                staminaCostText.text = staminaCost.ToString("F0");
+            }
+            lastStaminaCost = staminaCost;
 
             bool canUpgrade = combatAgent.SessionProgressionHandler.CanUpgradeAbility(Ability, combatAgent.WeaponHandler.GetWeapon());
             upgradeIcon.rectTransform.position = Vector3.Lerp(upgradeIcon.transform.position,
@@ -82,6 +97,7 @@ namespace Vi.UI
                 if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
                 {
                     borderImage.color = originalBorderImageColor;
+                    staminaCostText.color = originalStaminaCostColor;
                     cooldownText.text = "";
                     abilityIcon.fillAmount = 1;
                     return;
@@ -95,10 +111,12 @@ namespace Vi.UI
             if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
             {
                 borderImage.color = Color.red;
+                staminaCostText.color = Color.red;
             }
             else
             {
                 borderImage.color = originalBorderImageColor;
+                staminaCostText.color = originalStaminaCostColor;
             }
 
             int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);

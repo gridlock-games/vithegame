@@ -18,6 +18,7 @@ namespace Vi.Player
     {
         [Header("Player Movement Handler")]
         [SerializeField] private CameraController cameraController;
+        [SerializeField] private Rigidbody interpolationRigidbody;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
@@ -151,7 +152,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.3f;
+        private const float serverReconciliationThreshold = 0.2f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -190,7 +191,6 @@ namespace Vi.Player
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
                         Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
-                        StartSmoothenServerReconciliationPosition();
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
                         modifiedStatePayload.tick = rootMotionReconciliationState.tick;
@@ -202,7 +202,7 @@ namespace Vi.Player
                     }
                     else
                     {
-                        return (latestServerState.Value.position - rootMotionReconciliationState.position);
+                        return latestServerState.Value.position - rootMotionReconciliationState.position;
                     }
                 }
                 return Vector3.zero;
@@ -219,7 +219,6 @@ namespace Vi.Player
             if (positionError > serverReconciliationThreshold)
             {
                 Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                StartSmoothenServerReconciliationPosition();
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -228,19 +227,12 @@ namespace Vi.Player
                 Rigidbody.position = latestServerState.Value.position;
                 if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 ReprocessInputs(latestServerState.Value.tick);
-
-                return Vector3.zero;
             }
             else
             {
-                return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
+                return latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position;
             }
-        }
-
-        private void StartSmoothenServerReconciliationPosition()
-        {
-            lastServerReconciliationTime = Time.time;
-            serverReconciliationLerpDuration = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) / 2;
+            return Vector3.zero;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -255,7 +247,7 @@ namespace Vi.Player
 
                 // Process new movement with reconciled state
                 InputPayload inputPayload = inputBuffer[bufferIndex];
-                StatePayload statePayload = Move(ref inputPayload, Vector3.zero, true);
+                StatePayload statePayload = Move(ref inputPayload, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
                 // Update buffer with recalculated state
@@ -284,15 +276,27 @@ namespace Vi.Player
             if (combatAgent.ShouldApplyAilmentRotation()) { inputPayload.rotation = combatAgent.GetAilmentRotation(); }
             inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
             inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
+
+            if (combatAgent.StatusAgent.IsRooted())
+            {
+                inputPayload.rootMotion.x = 0;
+                inputPayload.rootMotion.z = 0;
+            }
+
             inputPayload.runSpeed = GetRunSpeed();
             inputPayload.isGrounded = IsGrounded();
             inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
         }
 
+        private float timeWithoutInputs;
         private InputPayload lastInputPayloadProcessedOnServer;
         private void FixedUpdate()
         {
-            if (!IsSpawned) { return; }
+            if (!IsSpawned)
+            {
+                //interpolationRigidbody.position = Rigidbody.position;
+                return;
+            }
 
             if (!IsOwner & !IsServer)
             {
@@ -309,6 +313,7 @@ namespace Vi.Player
                 // This if statement should only be reached
                 if (shouldApplyRootMotion & !combatAgent.AnimationHandler.WasLastActionClipMotionPredicted)
                 {
+                    timeWithoutInputs = 0;
                     InputPayload serverInputPayload = new InputPayload();
                     if (serverInputQueue.Count > 0)
                     {
@@ -323,7 +328,7 @@ namespace Vi.Player
                     serverInputPayload.moveInput = Vector2.zero;
                     SetInputPayloadVariablesOnServer(ref serverInputPayload);
 
-                    StatePayload statePayload = Move(ref serverInputPayload, Vector3.zero, false);
+                    StatePayload statePayload = Move(ref serverInputPayload, false);
 
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
@@ -331,6 +336,7 @@ namespace Vi.Player
                 }
                 else if (serverInputQueue.Count > 0)
                 {
+                    timeWithoutInputs = 0;
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                     {
                         // Have to double check these to prevent cheating
@@ -362,7 +368,7 @@ namespace Vi.Player
 
                         SetInputPayloadVariablesOnServer(ref inputPayload);
 
-                        StatePayload statePayload = Move(ref inputPayload, Vector3.zero, false);
+                        StatePayload statePayload = Move(ref inputPayload, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                         latestServerState.Value = statePayload;
                         lastInputPayloadProcessedOnServer = inputPayload;
@@ -371,39 +377,37 @@ namespace Vi.Player
                 }
                 else // Server input queue is 0 meaning we're waiting on the client to send inputs
                 {
-                    // TODO Not sure how to handle this case
-                    Debug.Log(Time.time + " " + combatAgent.GetName() + " server input queue has no entries");
+                    timeWithoutInputs += Time.deltaTime;
+                    // Make the player descend to the ground if it has no inputs (they're lagging out)
+                    if (timeWithoutInputs > 1.5f)
+                    {
+                        Rigidbody.linearVelocity = Physics.gravity;
+                    }
                 }
             }
 
             if (IsOwner)
             {
-                Vector3 serverReconciliationPositionOffset = Vector3.zero;
                 if (!IsServer)
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
                         if (!latestServerState.Value.Equals(lastProcessedState))
                         {
-                            serverReconciliationPositionOffset = HandleServerReconciliation();
+                            Vector3 serverReconciliationOffset = HandleServerReconciliation();
+                            serverReconciliationOffset *= Time.fixedDeltaTime;
+                            Rigidbody.position += serverReconciliationOffset;
 
-                            if (serverReconciliationPositionOffset.magnitude > 0.01f)
-                            {
-                                Debug.Log(serverReconciliationPositionOffset);
-                            }
-
-                            // Modify the state positions of future ticks that we already processed so that we don't apply the same position error twice
                             int tickToProcess = latestServerState.Value.tick + 1;
                             while (tickToProcess < movementTick)
                             {
                                 int bufferIndex = tickToProcess % BUFFER_SIZE;
 
-                                stateBuffer[bufferIndex].position += serverReconciliationPositionOffset;
+                                // Update buffer with recalculated state
+                                stateBuffer[bufferIndex].position += serverReconciliationOffset;
 
                                 tickToProcess++;
                             }
-
-                            serverReconciliationPositionOffset *= Time.fixedDeltaTime / 2;
                         }
                     }
                 }
@@ -451,7 +455,13 @@ namespace Vi.Player
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
                     GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
-                StatePayload statePayload = Move(ref inputPayload, serverReconciliationPositionOffset, false);
+                if (combatAgent.StatusAgent.IsRooted())
+                {
+                    inputPayload.rootMotion.x = 0;
+                    inputPayload.rootMotion.z = 0;
+                }
+
+                StatePayload statePayload = Move(ref inputPayload, false);
 
                 bool isGameOver = false;
                 if (GameModeManager.Singleton)
@@ -481,6 +491,8 @@ namespace Vi.Player
             {
                 Rigidbody.Sleep();
             }
+
+            interpolationRigidbody.MovePosition(Rigidbody.position);
         }
 
         protected override void OnDisable()
@@ -490,8 +502,6 @@ namespace Vi.Player
             TargetToLockOn = default;
             CameraFollowTarget = default;
             joysticks = new UIDeadZoneElement[0];
-
-            lastServerReconciliationTime = Mathf.NegativeInfinity;
 
             lastInputPayloadProcessedOnServer = default;
             lastProcessedState = default;
@@ -503,7 +513,7 @@ namespace Vi.Player
 
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
-        private StatePayload Move(ref InputPayload inputPayload, Vector3 serverCorrectionOffset, bool isReprocessing)
+        private StatePayload Move(ref InputPayload inputPayload, bool isReprocessing)
         {
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -586,7 +596,6 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
-            Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
@@ -691,23 +700,12 @@ namespace Vi.Player
             return transform.rotation;
         }
 
-        private float serverReconciliationLerpDuration = 0.25f;
-        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
-
         private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
-            {
-                float t = (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration;
-                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, t);
-            }
-            else
-            {
-                transform.position = Rigidbody.transform.position;
-            }
+            transform.position = interpolationRigidbody.transform.position;
 
             if (IsOwner)
             {
@@ -818,9 +816,18 @@ namespace Vi.Player
             }
         }
 
+        protected override void OnSpawnFromPool()
+        {
+            base.OnSpawnFromPool();
+            interpolationRigidbody.transform.SetParent(null, true);
+            NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
+        }
+
         protected override void OnReturnToPool()
         {
             base.OnReturnToPool();
+            interpolationRigidbody.transform.SetParent(transform, true);
+            NetworkPhysicsSimulation.RemoveRigidbody(interpolationRigidbody);
             cameraController.transform.SetParent(transform);
             cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
             cameraController.transform.localRotation = Quaternion.identity;
@@ -1016,6 +1023,7 @@ namespace Vi.Player
 
         public void OnDodge()
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return; }
             if (combatAgent.AnimationHandler.IsReloading()) { return; }
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             combatAgent.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));

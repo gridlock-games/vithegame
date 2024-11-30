@@ -406,7 +406,12 @@ namespace Vi.Core
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (!combatAgent.MovementHandler.CanMove()) { return default; }
-            if ((combatAgent.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return default; }
+
+            if ((combatAgent.StatusAgent.IsRooted())
+                & actionClip.GetClipType() != ActionClip.ClipType.HitReaction
+                & actionClip.GetClipType() != ActionClip.ClipType.Flinch
+                & !actionClip.IsAttack()) { return default; }
+
             if (actionClip.mustBeAiming & !combatAgent.WeaponHandler.IsAiming()) { return default; }
             if (combatAgent.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return default; }
 
@@ -580,7 +585,12 @@ namespace Vi.Core
                     // If we are in the middle of dodging, or playing a hit reaction, don't play this clip unless it's a hit reaction
                     if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
                     {
-                        if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge) { return default; }
+                        // Allow double dodging
+                        if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                        {
+                            if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < 0.55f) { return default; }
+                        }
+
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return default; }
                     }
                 }
@@ -853,7 +863,7 @@ namespace Vi.Core
 
         private bool ShouldApplyStaminaCost(ActionClip actionClip) { return staminaCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
-        private float GetStaminaCostOfClip(ActionClip actionClip)
+        public float GetStaminaCostOfClip(ActionClip actionClip)
         {
             switch (actionClip.GetClipType())
             {
@@ -1158,9 +1168,17 @@ namespace Vi.Core
         }
 
         private Coroutine playActionOnClientCoroutine;
+        private bool clientActionWasCalledThisFrame;
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName,
             float transitionTime, int rootMotionId, bool wasPredictedOnOwner)
         {
+            // Prevent this being called on the same frame as another play action on client call
+            if (clientActionWasCalledThisFrame)
+            {
+                yield return new WaitUntil(() => !clientActionWasCalledThisFrame);
+            }
+
+            clientActionWasCalledThisFrame = true;
             // Retrieve the ActionClip based on the actionStateName
             if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
             {
@@ -1627,6 +1645,7 @@ namespace Vi.Core
             RootMotionId = default;
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
+            clientActionWasCalledThisFrame = false;
             ResetRootMotionTime();
         }
 
@@ -1668,6 +1687,8 @@ namespace Vi.Core
         private float actionClipQueueWaitTime;
         public void ProcessNextActionClip()
         {
+            clientActionWasCalledThisFrame = false;
+
             // Wait for move input queue to be empty before playing the action to avoid position errors on the owner client
             if (serverActionQueue.TryPeek(out ServerActionQueueElement serverActionQueueElement))
             {
