@@ -393,10 +393,10 @@ namespace Vi.Player
                         {
                             serverReconciliationPositionOffset = HandleServerReconciliation();
 
-                            if (serverReconciliationPositionOffset.magnitude > 0.01f)
-                            {
-                                Debug.Log(serverReconciliationPositionOffset);
-                            }
+                            //if (serverReconciliationPositionOffset.magnitude > 0.01f)
+                            //{
+                            //    Debug.Log(serverReconciliationPositionOffset);
+                            //}
 
                             // Modify the state positions of future ticks that we already processed so that we don't apply the same position error twice
                             int tickToProcess = latestServerState.Value.tick + 1;
@@ -409,7 +409,7 @@ namespace Vi.Player
                                 tickToProcess++;
                             }
 
-                            serverReconciliationPositionOffset *= Time.fixedDeltaTime / 2;
+                            serverReconciliationPositionOffset *= Time.fixedDeltaTime;
                         }
                     }
                 }
