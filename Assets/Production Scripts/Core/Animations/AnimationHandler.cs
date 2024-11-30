@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.Weapons;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -1604,6 +1605,8 @@ namespace Vi.Core
             {
                 animatorReference.OnNetworkSpawn();
             }
+            healthPotionUsesLeft = potionUsesPerGame;
+            staminaPotionUsesLeft = potionUsesPerGame;
         }
 
         private const string actionsLayerName = "Actions";
@@ -1637,6 +1640,8 @@ namespace Vi.Core
         private void OnEnable()
         {
             SetRagdollActive(false);
+            if (logoImage) { logoImage.color = Color.clear; }
+            if (logoEffectWorldSpaceLabel) { logoEffectWorldSpaceLabel.enabled = false; }
         }
 
         private void OnDisable()
@@ -1682,6 +1687,19 @@ namespace Vi.Core
                 UpdateAnimationLayerWeights(lastClipPlayed.avatarLayer);
             }
             RefreshAimPoint();
+
+            if (logoEffectWorldSpaceLabel)
+            {
+                if (mainCamera)
+                {
+                    logoEffectWorldSpaceLabel.enabled = true;
+                    logoEffectWorldSpaceLabel.transform.rotation = Quaternion.Slerp(logoEffectWorldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - logoEffectWorldSpaceLabel.transform.position), Time.deltaTime * 15);
+                }
+                else
+                {
+                    logoEffectWorldSpaceLabel.enabled = false;
+                }
+            }
         }
 
         private float actionClipQueueWaitTime;
@@ -1799,5 +1817,94 @@ namespace Vi.Core
             }
             sliceInstances.Clear();
         }
+
+        private Coroutine playLogoEffectCoroutine;
+        private IEnumerator PlayLogoEffectCoroutine()
+        {
+            logoImage.color = Color.white;
+            logoEffect.Play(true);
+            yield return new WaitForSeconds(1.25f);
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime * 2;
+                logoImage.color = Color.Lerp(Color.white, Color.clear, t);
+                yield return null;
+            }
+        }
+
+        private const int potionUsesPerGame = 10;
+        private int healthPotionUsesLeft;
+        private int staminaPotionUsesLeft;
+
+        public float GetHealthPotionCooldownProgress()
+        {
+            if (healthPotionUsesLeft <= 0) { return 0; }
+            return StringUtility.NormalizeValue(Time.time - lastHealthPotionTime, 0, 30);
+        }
+
+        public float GetStaminaPotionCooldownProgress()
+        {
+            if (staminaPotionUsesLeft <= 0) { return 0; }
+            return StringUtility.NormalizeValue(Time.time - lastStaminaPotionTime, 0, 30);
+        }
+
+        private float lastHealthPotionTime;
+        private float lastStaminaPotionTime;
+
+        public void UseHealthPotion()
+        {
+            if (!IsSpawned) { Debug.LogError("Should only call UseHealthPotion when spawned!"); return; }
+
+            if (GetHealthPotionCooldownProgress() < 1) { return; }
+            if (combatAgent.GetHP() >= combatAgent.GetMaxHP()) { return; }
+
+            if (IsServer)
+            {
+                combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
+                ExecuteLogoEffects(healthPotionSprite);
+                lastHealthPotionTime = Time.time;
+            }
+            else if (IsOwner)
+            {
+                HealthPotionServerRpc();
+            }
+            else
+            {
+                Debug.LogError("We aren't the owner or the server! UseHealthPotion");
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void HealthPotionServerRpc()
+        {
+            UseHealthPotion();
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void HealthPotionClientRpc()
+        {
+            ExecuteLogoEffects(healthPotionSprite);
+            lastHealthPotionTime = Time.time;
+        }
+
+        public void ExecuteLogoEffects(Sprite logo)
+        {
+            if (playLogoEffectCoroutine != null)
+            {
+                StopCoroutine(playLogoEffectCoroutine);
+                logoImage.color = Color.clear;
+                logoImage.sprite = logo;
+                logoEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+            playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+        }
+
+        [Header("Logo Effect")]
+        [SerializeField] private Canvas logoEffectWorldSpaceLabel;
+        [SerializeField] private Image logoImage;
+        [SerializeField] private ParticleSystem logoEffect;
+        [SerializeField] private Sprite healthPotionSprite;
+        [SerializeField] private Sprite staminaPotionSprite;
     }
 }
