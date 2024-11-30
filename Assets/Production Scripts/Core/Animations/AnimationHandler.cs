@@ -1886,10 +1886,10 @@ namespace Vi.Core
             switch (potionType)
             {
                 case PotionType.Health:
-                    //if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
+                    if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
                     break;
                 case PotionType.Stamina:
-                    //if (combatAgent.GetMaxStamina() - combatAgent.GetStamina() < 10) { return; }
+                    if (combatAgent.GetMaxStamina() - combatAgent.GetStamina() < 10) { return; }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle potion type " + potionType);
@@ -1902,14 +1902,12 @@ namespace Vi.Core
                 {
                     case PotionType.Health:
                         combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
-                        Debug.Log(healthPotionSprite);
                         ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab, healthPotionAudio);
                         lastHealthPotionTime = Time.time;
                         healthPotionUsesLeft--;
                         break;
                     case PotionType.Stamina:
                         combatAgent.AddStamina(10);
-                        Debug.Log(staminaPotionSprite);
                         ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab, staminaPotionAudio);
                         lastStaminaPotionTime = Time.time;
                         staminaPotionUsesLeft--;
@@ -1969,12 +1967,17 @@ namespace Vi.Core
             {
                 StopCoroutine(playLogoEffectCoroutine);
             }
+
             PooledObject instance = ObjectPoolingManager.SpawnObject(vfxPrefab, transform);
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance));
-            logoImage.color = Color.clear;
-            logoImage.sprite = logo;
             AudioManager.Singleton.PlayClipOnTransform(transform, audioClip, false, 1);
-            playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+
+            if (logoEffectWorldSpaceLabel)
+            {
+                logoImage.color = Color.clear;
+                logoImage.sprite = logo;
+                playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+            }
         }
 
         private Coroutine playLogoEffectCoroutine;
