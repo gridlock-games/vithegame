@@ -417,6 +417,7 @@ namespace Vi.UI
         {
             if (!APIURLInputField.gameObject.activeInHierarchy) { return; }
             WebRequestManager.Singleton.SetAPIURL(APIURLInputField.text);
+            OpenViLogin();
         }
 
         public void QuitGame()
