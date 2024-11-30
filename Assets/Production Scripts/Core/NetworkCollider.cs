@@ -109,26 +109,9 @@ namespace Vi.Core
                     }
                 }
             }
-
-            if (!CombatAgent.IsServer)
-            {
-                foreach (Collider col in Colliders)
-                {
-                    colliderInstanceIDMap.Add(col.GetInstanceID(), this);
-                }
-            }
         }
 
-        public void OnNetworkDespawn()
-        {
-            if (!CombatAgent.IsServer)
-            {
-                foreach (Collider col in Colliders)
-                {
-                    colliderInstanceIDMap.Remove(col.GetInstanceID());
-                }
-            }
-        }
+        public void OnNetworkDespawn() { }
 
         private void OnReturnToPool()
         {

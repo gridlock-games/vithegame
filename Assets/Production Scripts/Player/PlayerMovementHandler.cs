@@ -378,8 +378,7 @@ namespace Vi.Player
                 }
                 else // Server input queue is 0 meaning we're waiting on the client to send inputs
                 {
-                    // TODO Not sure how to handle this case
-                    Debug.Log(Time.time + " " + combatAgent.GetName() + " server input queue has no entries");
+                    Rigidbody.linearVelocity = Vector3.zero;
                 }
             }
 
