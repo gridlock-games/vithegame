@@ -995,6 +995,7 @@ namespace Vi.Player
 
         public void OnDodge()
         {
+            if (combatAgent.AnimationHandler.WaitingForActionClipToPlay) { return; }
             if (combatAgent.AnimationHandler.IsReloading()) { return; }
             float angle = Vector3.SignedAngle(transform.rotation * new Vector3(moveInput.x, 0, moveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1), transform.forward, Vector3.up);
             combatAgent.AnimationHandler.PlayAction(weaponHandler.GetWeapon().GetDodgeClip(angle));
