@@ -152,21 +152,21 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.01f;
-        private void HandleServerReconciliation()
+        private const float serverReconciliationThreshold = 0.2f;
+        private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 lastProcessedState = latestServerState.Value;
-                return;
+                return Vector3.zero;
             }
 
             if (!CanMove())
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 lastProcessedState = latestServerState.Value;
-                return;
+                return Vector3.zero;
             }
 
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
@@ -200,15 +200,19 @@ namespace Vi.Player
                         if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
                         ReprocessInputs(modifiedStatePayload.tick);
                     }
+                    else
+                    {
+                        return latestServerState.Value.position - rootMotionReconciliationState.position;
+                    }
                 }
-                return;
+                return Vector3.zero;
             }
 
             lastProcessedState = latestServerState.Value;
 
             if (stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
-                return;
+                return Vector3.zero;
             }
 
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
@@ -223,9 +227,12 @@ namespace Vi.Player
                 Rigidbody.position = latestServerState.Value.position;
                 if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 ReprocessInputs(latestServerState.Value.tick);
-
-                return;
             }
+            else
+            {
+                return latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position;
+            }
+            return Vector3.zero;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -379,7 +386,20 @@ namespace Vi.Player
                     {
                         if (!latestServerState.Value.Equals(lastProcessedState))
                         {
-                            HandleServerReconciliation();
+                            Vector3 serverReconciliationOffset = HandleServerReconciliation();
+                            serverReconciliationOffset *= Time.fixedDeltaTime;
+                            Rigidbody.position += serverReconciliationOffset;
+
+                            int tickToProcess = latestServerState.Value.tick + 1;
+                            while (tickToProcess < movementTick)
+                            {
+                                int bufferIndex = tickToProcess % BUFFER_SIZE;
+
+                                // Update buffer with recalculated state
+                                stateBuffer[bufferIndex].position += serverReconciliationOffset;
+
+                                tickToProcess++;
+                            }
                         }
                     }
                 }
