@@ -63,6 +63,8 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability2;
         [SerializeField] private AbilityCard ability3;
         [SerializeField] private AbilityCard ability4;
+        [SerializeField] private PotionCard healthPotionCard;
+        [SerializeField] private PotionCard staminaPotionCard;
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private Image dodgeCooldownImage;
         [SerializeField] private Text dodgeStackText;
@@ -516,6 +518,27 @@ namespace Vi.UI
             }
 
             if (!ability4Initialized) { ability4.Initialize(abilities[3], ""); }
+
+            bool healthPotionInitialized = false;
+            foreach (InputBinding binding in playerInput.actions["HealthPotion"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
+                    {
+                        healthPotionCard.Initialize(binding.ToDisplayString());
+                        healthPotionInitialized = true;
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            if (!healthPotionInitialized) { healthPotionCard.Initialize(""); }
 
             lastWeapon = attributes.WeaponHandler.GetWeapon();
 

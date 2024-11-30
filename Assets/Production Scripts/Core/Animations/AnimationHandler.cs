@@ -1837,55 +1837,139 @@ namespace Vi.Core
         private int healthPotionUsesLeft;
         private int staminaPotionUsesLeft;
 
-        public float GetHealthPotionCooldownProgress()
+        public int GetPotionUsesLeft(PotionType potionType)
         {
-            if (healthPotionUsesLeft <= 0) { return 0; }
-            return StringUtility.NormalizeValue(Time.time - lastHealthPotionTime, 0, 30);
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    return healthPotionUsesLeft;
+                case PotionType.Stamina:
+                    return staminaPotionUsesLeft;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
         }
 
-        public float GetStaminaPotionCooldownProgress()
+        private const float potionCooldownTime = 30;
+        public float GetPotionCooldownTimeLeft(PotionType potionType)
         {
-            if (staminaPotionUsesLeft <= 0) { return 0; }
-            return StringUtility.NormalizeValue(Time.time - lastStaminaPotionTime, 0, 30);
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    return potionCooldownTime - Mathf.Max(0, Time.time - lastHealthPotionTime);
+                case PotionType.Stamina:
+                    return potionCooldownTime - Mathf.Max(0, Time.time - lastStaminaPotionTime);
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
+        }
+
+        public float GetPotionProgress(PotionType potionType)
+        {
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    if (healthPotionUsesLeft <= 0) { return 0; }
+                    return StringUtility.NormalizeValue(Time.time - lastHealthPotionTime, 0, potionCooldownTime);
+                case PotionType.Stamina:
+                    if (staminaPotionUsesLeft <= 0) { return 0; }
+                    return StringUtility.NormalizeValue(Time.time - lastStaminaPotionTime, 0, potionCooldownTime);
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
         }
 
         private float lastHealthPotionTime = Mathf.NegativeInfinity;
         private float lastStaminaPotionTime = Mathf.NegativeInfinity;
 
-        public void UseHealthPotion()
+        public void UsePotion(PotionType potionType)
         {
-            if (!IsSpawned) { Debug.LogError("Should only call UseHealthPotion when spawned!"); return; }
+            if (!IsSpawned) { Debug.LogError("Should only call UsePotion when spawned!"); return; }
 
-            if (GetHealthPotionCooldownProgress() < 1) { return; }
-            if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
+            if (GetPotionProgress(potionType) < 1) { return; }
+            
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
+                    break;
+                case PotionType.Stamina:
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
 
             if (IsServer)
             {
-                combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
-                ExecuteLogoEffects(healthPotionSprite);
-                lastHealthPotionTime = Time.time;
+                switch (potionType)
+                {
+                    case PotionType.Health:
+                        combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
+                        ExecuteLogoEffects(healthPotionSprite);
+                        lastHealthPotionTime = Time.time;
+                        healthPotionUsesLeft--;
+                        break;
+                    case PotionType.Stamina:
+                        combatAgent.AddStamina(10);
+                        ExecuteLogoEffects(staminaPotionSprite);
+                        lastStaminaPotionTime = Time.time;
+                        staminaPotionUsesLeft--;
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle potion type " + potionType);
+                        break;
+                }
             }
             else if (IsOwner)
             {
-                HealthPotionServerRpc();
+                PotionServerRpc(potionType);
             }
             else
             {
-                Debug.LogError("We aren't the owner or the server! UseHealthPotion");
+                Debug.LogError("We aren't the owner or the server! UsePotion");
             }
         }
 
         [Rpc(SendTo.Server)]
-        private void HealthPotionServerRpc()
+        private void PotionServerRpc(PotionType potionType)
         {
-            UseHealthPotion();
+            UsePotion(potionType);
         }
 
         [Rpc(SendTo.NotServer)]
-        private void HealthPotionClientRpc()
+        private void PotionClientRpc(PotionType potionType)
         {
-            ExecuteLogoEffects(healthPotionSprite);
-            lastHealthPotionTime = Time.time;
+            Sprite sprite = null;
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    sprite = healthPotionSprite;
+                    lastHealthPotionTime = Time.time;
+                    healthPotionUsesLeft--;
+                    break;
+                case PotionType.Stamina:
+                    sprite = staminaPotionSprite;
+                    lastStaminaPotionTime = Time.time;
+                    staminaPotionUsesLeft--;
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            ExecuteLogoEffects(sprite);
+        }
+
+        public enum PotionType
+        {
+            Health,
+            Stamina
         }
 
         public void ExecuteLogoEffects(Sprite logo)
@@ -1902,7 +1986,12 @@ namespace Vi.Core
 
         private void OnHealthPotion()
         {
-            UseHealthPotion();
+            UsePotion(PotionType.Health);
+        }
+        
+        private void OnStaminaPotion()
+        {
+            UsePotion(PotionType.Stamina);
         }
 
         [Header("Logo Effect")]
