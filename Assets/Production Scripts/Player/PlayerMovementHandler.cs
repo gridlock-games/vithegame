@@ -18,6 +18,7 @@ namespace Vi.Player
     {
         [Header("Player Movement Handler")]
         [SerializeField] private CameraController cameraController;
+        [SerializeField] private Rigidbody interpolationRigidbody;
 
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
@@ -151,21 +152,21 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.3f;
-        private Vector3 HandleServerReconciliation()
+        private const float serverReconciliationThreshold = 0.01f;
+        private void HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 lastProcessedState = latestServerState.Value;
-                return Vector3.zero;
+                return;
             }
 
             if (!CanMove())
             {
                 if (Rigidbody.isKinematic) { Rigidbody.MovePosition(latestServerState.Value.position); }
                 lastProcessedState = latestServerState.Value;
-                return Vector3.zero;
+                return;
             }
 
             int serverStateBufferIndex = latestServerState.Value.tick % BUFFER_SIZE;
@@ -190,7 +191,6 @@ namespace Vi.Player
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
                         Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
-                        StartSmoothenServerReconciliationPosition();
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
                         modifiedStatePayload.tick = rootMotionReconciliationState.tick;
@@ -200,26 +200,21 @@ namespace Vi.Player
                         if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
                         ReprocessInputs(modifiedStatePayload.tick);
                     }
-                    else
-                    {
-                        return (latestServerState.Value.position - rootMotionReconciliationState.position);
-                    }
                 }
-                return Vector3.zero;
+                return;
             }
 
             lastProcessedState = latestServerState.Value;
 
             if (stateBuffer[serverStateBufferIndex].usedRootMotion)
             {
-                return Vector3.zero;
+                return;
             }
 
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
             if (positionError > serverReconciliationThreshold)
             {
                 Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
-                StartSmoothenServerReconciliationPosition();
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
@@ -229,18 +224,8 @@ namespace Vi.Player
                 if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
                 ReprocessInputs(latestServerState.Value.tick);
 
-                return Vector3.zero;
+                return;
             }
-            else
-            {
-                return (latestServerState.Value.position - stateBuffer[serverStateBufferIndex].position);
-            }
-        }
-
-        private void StartSmoothenServerReconciliationPosition()
-        {
-            lastServerReconciliationTime = Time.time;
-            serverReconciliationLerpDuration = (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) / 2;
         }
 
         private void ReprocessInputs(int latestServerTick)
@@ -255,7 +240,7 @@ namespace Vi.Player
 
                 // Process new movement with reconciled state
                 InputPayload inputPayload = inputBuffer[bufferIndex];
-                StatePayload statePayload = Move(ref inputPayload, Vector3.zero, true);
+                StatePayload statePayload = Move(ref inputPayload, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
                 // Update buffer with recalculated state
@@ -299,7 +284,11 @@ namespace Vi.Player
         private InputPayload lastInputPayloadProcessedOnServer;
         private void FixedUpdate()
         {
-            if (!IsSpawned) { return; }
+            if (!IsSpawned)
+            {
+                //interpolationRigidbody.position = Rigidbody.position;
+                return;
+            }
 
             if (!IsOwner & !IsServer)
             {
@@ -330,7 +319,7 @@ namespace Vi.Player
                     serverInputPayload.moveInput = Vector2.zero;
                     SetInputPayloadVariablesOnServer(ref serverInputPayload);
 
-                    StatePayload statePayload = Move(ref serverInputPayload, Vector3.zero, false);
+                    StatePayload statePayload = Move(ref serverInputPayload, false);
 
                     stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                     latestServerState.Value = statePayload;
@@ -369,7 +358,7 @@ namespace Vi.Player
 
                         SetInputPayloadVariablesOnServer(ref inputPayload);
 
-                        StatePayload statePayload = Move(ref inputPayload, Vector3.zero, false);
+                        StatePayload statePayload = Move(ref inputPayload, false);
                         stateBuffer[statePayload.tick % BUFFER_SIZE] = statePayload;
                         latestServerState.Value = statePayload;
                         lastInputPayloadProcessedOnServer = inputPayload;
@@ -384,32 +373,13 @@ namespace Vi.Player
 
             if (IsOwner)
             {
-                Vector3 serverReconciliationPositionOffset = Vector3.zero;
                 if (!IsServer)
                 {
                     if (latestServerState.Value.tick > 0 & latestServerState.Value.tick < movementTick)
                     {
                         if (!latestServerState.Value.Equals(lastProcessedState))
                         {
-                            serverReconciliationPositionOffset = HandleServerReconciliation();
-
-                            //if (serverReconciliationPositionOffset.magnitude > 0.01f)
-                            //{
-                            //    Debug.Log(serverReconciliationPositionOffset);
-                            //}
-
-                            // Modify the state positions of future ticks that we already processed so that we don't apply the same position error twice
-                            int tickToProcess = latestServerState.Value.tick + 1;
-                            while (tickToProcess < movementTick)
-                            {
-                                int bufferIndex = tickToProcess % BUFFER_SIZE;
-
-                                stateBuffer[bufferIndex].position += serverReconciliationPositionOffset;
-
-                                tickToProcess++;
-                            }
-
-                            serverReconciliationPositionOffset *= Time.fixedDeltaTime;
+                            HandleServerReconciliation();
                         }
                     }
                 }
@@ -463,7 +433,7 @@ namespace Vi.Player
                     inputPayload.rootMotion.z = 0;
                 }
 
-                StatePayload statePayload = Move(ref inputPayload, serverReconciliationPositionOffset, false);
+                StatePayload statePayload = Move(ref inputPayload, false);
 
                 bool isGameOver = false;
                 if (GameModeManager.Singleton)
@@ -493,6 +463,8 @@ namespace Vi.Player
             {
                 Rigidbody.Sleep();
             }
+
+            interpolationRigidbody.MovePosition(Rigidbody.position);
         }
 
         protected override void OnDisable()
@@ -502,8 +474,6 @@ namespace Vi.Player
             TargetToLockOn = default;
             CameraFollowTarget = default;
             joysticks = new UIDeadZoneElement[0];
-
-            lastServerReconciliationTime = Mathf.NegativeInfinity;
 
             lastInputPayloadProcessedOnServer = default;
             lastProcessedState = default;
@@ -515,7 +485,7 @@ namespace Vi.Player
 
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
-        private StatePayload Move(ref InputPayload inputPayload, Vector3 serverCorrectionOffset, bool isReprocessing)
+        private StatePayload Move(ref InputPayload inputPayload, bool isReprocessing)
         {
             if (!CanMove() | combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
@@ -598,7 +568,6 @@ namespace Vi.Player
             }
 
             Rigidbody.isKinematic = false;
-            Rigidbody.position += serverCorrectionOffset;
 
             if (combatAgent.AnimationHandler.IsFlinching()) { movement *= AnimationHandler.flinchingMovementSpeedMultiplier; }
 
@@ -703,23 +672,12 @@ namespace Vi.Player
             return transform.rotation;
         }
 
-        private float serverReconciliationLerpDuration = 0.25f;
-        private float lastServerReconciliationTime = Mathf.NegativeInfinity;
-
         private void UpdateTransform()
         {
             if (!IsSpawned) { return; }
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
 
-            if (Time.time - lastServerReconciliationTime < serverReconciliationLerpDuration & !weaponHandler.IsAiming())
-            {
-                float t = (Time.time - lastServerReconciliationTime) / serverReconciliationLerpDuration;
-                transform.position = Vector3.Lerp(transform.position, Rigidbody.transform.position, t);
-            }
-            else
-            {
-                transform.position = Rigidbody.transform.position;
-            }
+            transform.position = interpolationRigidbody.transform.position;
 
             if (IsOwner)
             {
@@ -830,9 +788,18 @@ namespace Vi.Player
             }
         }
 
+        protected override void OnSpawnFromPool()
+        {
+            base.OnSpawnFromPool();
+            interpolationRigidbody.transform.SetParent(null, true);
+            NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
+        }
+
         protected override void OnReturnToPool()
         {
             base.OnReturnToPool();
+            interpolationRigidbody.transform.SetParent(transform, true);
+            NetworkPhysicsSimulation.RemoveRigidbody(interpolationRigidbody);
             cameraController.transform.SetParent(transform);
             cameraController.transform.localPosition = new Vector3(0.34f, 1.73f, -2.49f);
             cameraController.transform.localRotation = Quaternion.identity;
