@@ -711,7 +711,13 @@ namespace Vi.UI
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
-            if (attributes.WeaponHandler.GetWeapon().IsDodgeOnCooldown())
+            if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
+            {
+                Color newColor = dodgeCooldownImage.color;
+                newColor.a = 0.15f;
+                dodgeCooldownImage.color = newColor;
+            }
+            else if (attributes.WeaponHandler.GetWeapon().IsDodgeOnCooldown())
             {
                 float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
                 Color newColor = dodgeCooldownImage.color;
