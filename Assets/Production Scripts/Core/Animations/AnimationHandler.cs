@@ -1849,15 +1849,15 @@ namespace Vi.Core
             return StringUtility.NormalizeValue(Time.time - lastStaminaPotionTime, 0, 30);
         }
 
-        private float lastHealthPotionTime;
-        private float lastStaminaPotionTime;
+        private float lastHealthPotionTime = Mathf.NegativeInfinity;
+        private float lastStaminaPotionTime = Mathf.NegativeInfinity;
 
         public void UseHealthPotion()
         {
             if (!IsSpawned) { Debug.LogError("Should only call UseHealthPotion when spawned!"); return; }
 
             if (GetHealthPotionCooldownProgress() < 1) { return; }
-            if (combatAgent.GetHP() >= combatAgent.GetMaxHP()) { return; }
+            if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
 
             if (IsServer)
             {
@@ -1898,6 +1898,11 @@ namespace Vi.Core
                 logoEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
             playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+        }
+
+        private void OnHealthPotion()
+        {
+            UseHealthPotion();
         }
 
         [Header("Logo Effect")]
