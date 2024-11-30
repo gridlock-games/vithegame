@@ -1822,21 +1822,6 @@ namespace Vi.Core
             sliceInstances.Clear();
         }
 
-        private Coroutine playLogoEffectCoroutine;
-        private IEnumerator PlayLogoEffectCoroutine()
-        {
-            logoImage.color = Color.white;
-            logoEffect.Play(true);
-            yield return new WaitForSeconds(1.25f);
-            float t = 0;
-            while (t < 1)
-            {
-                t += Time.deltaTime * 2;
-                logoImage.color = Color.Lerp(Color.white, Color.clear, t);
-                yield return null;
-            }
-        }
-
         private const int potionUsesPerGame = 10;
         private int healthPotionUsesLeft;
         private int staminaPotionUsesLeft;
@@ -1918,14 +1903,14 @@ namespace Vi.Core
                     case PotionType.Health:
                         combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
                         Debug.Log(healthPotionSprite);
-                        ExecuteLogoEffects(healthPotionSprite, healthPotionEffectColor);
+                        ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab);
                         lastHealthPotionTime = Time.time;
                         healthPotionUsesLeft--;
                         break;
                     case PotionType.Stamina:
                         combatAgent.AddStamina(10);
                         Debug.Log(staminaPotionSprite);
-                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionEffectColor);
+                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab);
                         lastStaminaPotionTime = Time.time;
                         staminaPotionUsesLeft--;
                         break;
@@ -1957,12 +1942,12 @@ namespace Vi.Core
             switch (potionType)
             {
                 case PotionType.Health:
-                    ExecuteLogoEffects(healthPotionSprite, healthPotionEffectColor);
+                    ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab);
                     lastHealthPotionTime = Time.time;
                     healthPotionUsesLeft--;
                     break;
                 case PotionType.Stamina:
-                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionEffectColor);
+                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab);
                     lastStaminaPotionTime = Time.time;
                     staminaPotionUsesLeft--;
                     break;
@@ -1978,18 +1963,31 @@ namespace Vi.Core
             Stamina
         }
 
-        public void ExecuteLogoEffects(Sprite logo, Color effectColor)
+        public void ExecuteLogoEffects(Sprite logo, PooledObject vfxPrefab)
         {
             if (playLogoEffectCoroutine != null)
             {
                 StopCoroutine(playLogoEffectCoroutine);
-                logoEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
+            PooledObject instance = ObjectPoolingManager.SpawnObject(vfxPrefab, transform);
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance));
             logoImage.color = Color.clear;
             logoImage.sprite = logo;
-            var main = logoEffect.main;
-            main.startColor = effectColor;
             playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+        }
+
+        private Coroutine playLogoEffectCoroutine;
+        private IEnumerator PlayLogoEffectCoroutine()
+        {
+            logoImage.color = Color.white;
+            yield return new WaitForSeconds(1.25f);
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime * 2;
+                logoImage.color = Color.Lerp(Color.white, Color.clear, t);
+                yield return null;
+            }
         }
 
         private void OnHealthPotion()
@@ -2007,8 +2005,7 @@ namespace Vi.Core
         [SerializeField] private Image logoImage;
         [SerializeField] private Sprite healthPotionSprite;
         [SerializeField] private Sprite staminaPotionSprite;
-        [SerializeField] private ParticleSystem logoEffect;
-        [SerializeField] private Color healthPotionEffectColor;
-        [SerializeField] private Color staminaPotionEffectColor;
+        [SerializeField] private PooledObject healthPotionVFXPrefab;
+        [SerializeField] private PooledObject staminaPotionVFXPrefab;
     }
 }
