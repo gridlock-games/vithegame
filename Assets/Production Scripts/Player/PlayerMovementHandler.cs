@@ -284,7 +284,13 @@ namespace Vi.Player
             if (combatAgent.ShouldApplyAilmentRotation()) { inputPayload.rotation = combatAgent.GetAilmentRotation(); }
             inputPayload.shouldUseRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
             inputPayload.rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
-            if (combatAgent.StatusAgent.IsRooted()) { inputPayload.rootMotion = Vector3.zero; }
+
+            if (combatAgent.StatusAgent.IsRooted())
+            {
+                inputPayload.rootMotion.x = 0;
+                inputPayload.rootMotion.z = 0;
+            }
+
             inputPayload.runSpeed = GetRunSpeed();
             inputPayload.isGrounded = IsGrounded();
             inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
@@ -452,7 +458,11 @@ namespace Vi.Player
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
                     GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
-                if (combatAgent.StatusAgent.IsRooted()) { inputPayload.rootMotion = Vector3.zero; }
+                if (combatAgent.StatusAgent.IsRooted())
+                {
+                    inputPayload.rootMotion.x = 0;
+                    inputPayload.rootMotion.z = 0;
+                }
 
                 StatePayload statePayload = Move(ref inputPayload, serverReconciliationPositionOffset, false);
 
