@@ -529,12 +529,27 @@ namespace Vi.Core
             ActivateRage();
         }
 
+        public bool CanTryActivateRageOrPotions()
+        {
+            if (GetAilment() == ActionClip.Ailment.Knockdown
+                | GetAilment() == ActionClip.Ailment.Knockup
+                | GetAilment() == ActionClip.Ailment.Stun
+                | GetAilment() == ActionClip.Ailment.Grab
+                | GetAilment() == ActionClip.Ailment.Death)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public const float ragingStaminaCostMultiplier = 1.25f;
         public bool IsRaging { get { return isRaging.Value; } }
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
         {
             if (!IsSpawned) { Debug.LogError("Calling CombatAgent.ActivateRage() before this object is spawned!"); return; }
+            
+            if (!CanTryActivateRageOrPotions()) { return; }
 
             if (IsServer)
             {

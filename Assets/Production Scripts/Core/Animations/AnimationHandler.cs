@@ -1881,6 +1881,7 @@ namespace Vi.Core
         {
             if (!IsSpawned) { Debug.LogError("Should only call UsePotion when spawned!"); return; }
 
+            if (!combatAgent.CanTryActivateRageOrPotions()) { return; }
             if (GetPotionProgress(potionType) < 1) { return; }
             
             switch (potionType)
