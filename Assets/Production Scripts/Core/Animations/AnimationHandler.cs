@@ -406,7 +406,12 @@ namespace Vi.Core
             string animationStateName = GetActionClipAnimationStateName(actionClip);
 
             if (!combatAgent.MovementHandler.CanMove()) { return default; }
-            if ((combatAgent.StatusAgent.IsRooted()) & actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch) { return default; }
+
+            if ((combatAgent.StatusAgent.IsRooted())
+                & actionClip.GetClipType() != ActionClip.ClipType.HitReaction
+                & actionClip.GetClipType() != ActionClip.ClipType.Flinch
+                & !actionClip.IsAttack()) { return default; }
+
             if (actionClip.mustBeAiming & !combatAgent.WeaponHandler.IsAiming()) { return default; }
             if (combatAgent.StatusAgent.IsSilenced() & actionClip.GetClipType() == ActionClip.ClipType.Ability) { return default; }
 

@@ -226,6 +226,7 @@ namespace Vi.Core.MovementHandlers
         private void Move()
         {
             Vector3 rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
+            if (combatAgent.StatusAgent.IsRooted()) { rootMotion = Vector3.zero; }
 
             if (!IsSpawned) { return; }
 
