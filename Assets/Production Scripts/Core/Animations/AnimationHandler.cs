@@ -1651,6 +1651,10 @@ namespace Vi.Core
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
             clientActionWasCalledThisFrame = false;
+
+            lastHealthPotionTime = Mathf.NegativeInfinity;
+            lastStaminaPotionTime = Mathf.NegativeInfinity;
+
             ResetRootMotionTime();
         }
 
@@ -1897,9 +1901,10 @@ namespace Vi.Core
             switch (potionType)
             {
                 case PotionType.Health:
-                    if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
+                    //if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
                     break;
                 case PotionType.Stamina:
+                    //if (combatAgent.GetMaxStamina() - combatAgent.GetStamina() < 10) { return; }
                     break;
                 default:
                     Debug.LogError("Unsure how to handle potion type " + potionType);
@@ -1912,13 +1917,15 @@ namespace Vi.Core
                 {
                     case PotionType.Health:
                         combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
-                        ExecuteLogoEffects(healthPotionSprite);
+                        Debug.Log(healthPotionSprite);
+                        ExecuteLogoEffects(healthPotionSprite, healthPotionEffectColor);
                         lastHealthPotionTime = Time.time;
                         healthPotionUsesLeft--;
                         break;
                     case PotionType.Stamina:
                         combatAgent.AddStamina(10);
-                        ExecuteLogoEffects(staminaPotionSprite);
+                        Debug.Log(staminaPotionSprite);
+                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionEffectColor);
                         lastStaminaPotionTime = Time.time;
                         staminaPotionUsesLeft--;
                         break;
@@ -1926,6 +1933,7 @@ namespace Vi.Core
                         Debug.LogError("Unsure how to handle potion type " + potionType);
                         break;
                 }
+                PotionClientRpc(potionType);
             }
             else if (IsOwner)
             {
@@ -1946,16 +1954,15 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void PotionClientRpc(PotionType potionType)
         {
-            Sprite sprite = null;
             switch (potionType)
             {
                 case PotionType.Health:
-                    sprite = healthPotionSprite;
+                    ExecuteLogoEffects(healthPotionSprite, healthPotionEffectColor);
                     lastHealthPotionTime = Time.time;
                     healthPotionUsesLeft--;
                     break;
                 case PotionType.Stamina:
-                    sprite = staminaPotionSprite;
+                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionEffectColor);
                     lastStaminaPotionTime = Time.time;
                     staminaPotionUsesLeft--;
                     break;
@@ -1963,7 +1970,6 @@ namespace Vi.Core
                     Debug.LogError("Unsure how to handle potion type " + potionType);
                     break;
             }
-            ExecuteLogoEffects(sprite);
         }
 
         public enum PotionType
@@ -1972,15 +1978,17 @@ namespace Vi.Core
             Stamina
         }
 
-        public void ExecuteLogoEffects(Sprite logo)
+        public void ExecuteLogoEffects(Sprite logo, Color effectColor)
         {
             if (playLogoEffectCoroutine != null)
             {
                 StopCoroutine(playLogoEffectCoroutine);
-                logoImage.color = Color.clear;
-                logoImage.sprite = logo;
                 logoEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
+            logoImage.color = Color.clear;
+            logoImage.sprite = logo;
+            var main = logoEffect.main;
+            main.startColor = effectColor;
             playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
         }
 
@@ -1997,8 +2005,10 @@ namespace Vi.Core
         [Header("Logo Effect")]
         [SerializeField] private Canvas logoEffectWorldSpaceLabel;
         [SerializeField] private Image logoImage;
-        [SerializeField] private ParticleSystem logoEffect;
         [SerializeField] private Sprite healthPotionSprite;
         [SerializeField] private Sprite staminaPotionSprite;
+        [SerializeField] private ParticleSystem logoEffect;
+        [SerializeField] private Color healthPotionEffectColor;
+        [SerializeField] private Color staminaPotionEffectColor;
     }
 }

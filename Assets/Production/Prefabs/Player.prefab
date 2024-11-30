@@ -283,7 +283,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f1f321ccaa5178d4ab1404a5234d9c52, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -632,10 +632,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logoEffectWorldSpaceLabel: {fileID: 943919110345141049}
   logoImage: {fileID: 1043475357778642453}
-  logoEffect: {fileID: 4251956062912014309}
-  healthPotionSprite: {fileID: 21300000, guid: f1f321ccaa5178d4ab1404a5234d9c52, type: 3}
-  staminaPotionSprite: {fileID: 21300000, guid: f1f321ccaa5178d4ab1404a5234d9c52,
+  healthPotionSprite: {fileID: 21300000, guid: 4c36357b27b4e4c32b533410dc0e47c6, type: 3}
+  staminaPotionSprite: {fileID: 21300000, guid: c0321a056b5f2437db531bd4d754fbcc,
     type: 3}
+  logoEffect: {fileID: 4251956062912014309}
+  healthPotionEffectColor: {r: 0.5647059, g: 1, b: 0, a: 1}
+  staminaPotionEffectColor: {r: 0, g: 0.5647059, b: 1, a: 1}
 --- !u!114 &3476549382923866366
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -540,6 +540,27 @@ namespace Vi.UI
 
             if (!healthPotionInitialized) { healthPotionCard.Initialize(""); }
 
+            bool staminaPotionInitialized = false;
+            foreach (InputBinding binding in playerInput.actions["StaminaPotion"].bindings)
+            {
+                bool shouldBreak = false;
+                foreach (InputDevice device in System.Array.FindAll(InputSystem.devices.ToArray(), item => controlScheme.SupportsDevice(item)))
+                {
+                    string deviceName = device.name.ToLower();
+                    deviceName = deviceName.Contains("controller") ? "gamepad" : deviceName;
+                    if (binding.path.ToLower().Contains(deviceName.ToLower()))
+                    {
+                        staminaPotionCard.Initialize(binding.ToDisplayString());
+                        staminaPotionInitialized = true;
+                        shouldBreak = true;
+                        break;
+                    }
+                }
+                if (shouldBreak) { break; }
+            }
+
+            if (!staminaPotionInitialized) { healthPotionCard.Initialize(""); }
+
             lastWeapon = attributes.WeaponHandler.GetWeapon();
 
             if (primaryWeaponCard.isActiveAndEnabled) { primaryWeaponCard.Initialize(attributes.LoadoutManager, attributes.LoadoutManager.PrimaryWeaponOption.weapon, LoadoutManager.WeaponSlotType.Primary, playerInput, controlsAsset); }
