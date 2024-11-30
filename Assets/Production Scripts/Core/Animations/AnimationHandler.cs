@@ -854,7 +854,7 @@ namespace Vi.Core
 
         private bool ShouldApplyStaminaCost(ActionClip actionClip) { return staminaCostActionClipTypes.Contains(actionClip.GetClipType()); }
 
-        private float GetStaminaCostOfClip(ActionClip actionClip)
+        public float GetStaminaCostOfClip(ActionClip actionClip)
         {
             switch (actionClip.GetClipType())
             {
