@@ -21,6 +21,8 @@ namespace Vi.Player
         private PlayerInput playerInput;
         private WeaponHandler weaponHandler;
 
+        private const CursorLockMode PlayerActiveLockMode = CursorLockMode.Locked;
+
         public void SetExternalUI(ExternalUI externalUI)
         {
             this.externalUI = externalUI;
@@ -47,7 +49,7 @@ namespace Vi.Player
             }
             else
             {
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
                 playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
@@ -71,12 +73,12 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else
             {
@@ -127,7 +129,7 @@ namespace Vi.Player
             }
             else
             {
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
                 if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
             }
 
@@ -169,7 +171,7 @@ namespace Vi.Player
 
             if (pauseInstance)
             {
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
                 pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
@@ -201,7 +203,7 @@ namespace Vi.Player
 
             if (inventoryInstance)
             {
-                if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
                 inventoryInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
@@ -250,7 +252,7 @@ namespace Vi.Player
         public void OnTextChatClose()
         {
             textChatIsOpen = false;
-            if (networkObject.IsSpawned) { Cursor.lockState = CursorLockMode.Locked; }
+            if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
         }
 

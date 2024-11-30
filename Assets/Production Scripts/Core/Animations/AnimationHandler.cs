@@ -9,6 +9,7 @@ using Vi.Utility;
 using Vi.Core.MeshSlicing;
 using System.Linq;
 using Vi.Core.Weapons;
+using UnityEngine.UI;
 
 namespace Vi.Core
 {
@@ -508,16 +509,17 @@ namespace Vi.Core
                         if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             // Dodge lock checks
-                            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                            if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
                             {
-                                if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
-                                {
-                                    return default;
-                                }
-                                else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
-                                {
-                                    if (combatAgent.WeaponHandler.IsInRecovery) { return default; }
-                                }
+                                return default;
+                            }
+                            else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
+                            {
+                                if (combatAgent.WeaponHandler.IsInRecovery) { return default; }
+                            }
+                            else if (lastClipPlayed.IsAttack())
+                            {
+                                shouldEvaluatePreviousState = false;
                             }
                         }
                         else if (animatorReference.CurrentActionsAnimatorStateInfo.IsTag("CanDodge") | animatorReference.NextActionsAnimatorStateInfo.IsTag("CanDodge"))
@@ -1604,6 +1606,8 @@ namespace Vi.Core
             {
                 animatorReference.OnNetworkSpawn();
             }
+            healthPotionUsesLeft = potionUsesPerGame;
+            staminaPotionUsesLeft = potionUsesPerGame;
         }
 
         private const string actionsLayerName = "Actions";
@@ -1637,6 +1641,8 @@ namespace Vi.Core
         private void OnEnable()
         {
             SetRagdollActive(false);
+            if (logoImage) { logoImage.color = Color.clear; }
+            if (logoEffectWorldSpaceLabel) { logoEffectWorldSpaceLabel.enabled = false; }
         }
 
         private void OnDisable()
@@ -1646,6 +1652,10 @@ namespace Vi.Core
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
             clientActionWasCalledThisFrame = false;
+
+            lastHealthPotionTime = Mathf.NegativeInfinity;
+            lastStaminaPotionTime = Mathf.NegativeInfinity;
+
             ResetRootMotionTime();
         }
 
@@ -1682,6 +1692,19 @@ namespace Vi.Core
                 UpdateAnimationLayerWeights(lastClipPlayed.avatarLayer);
             }
             RefreshAimPoint();
+
+            if (logoEffectWorldSpaceLabel)
+            {
+                if (mainCamera)
+                {
+                    logoEffectWorldSpaceLabel.enabled = true;
+                    logoEffectWorldSpaceLabel.transform.rotation = Quaternion.Slerp(logoEffectWorldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - logoEffectWorldSpaceLabel.transform.position), Time.deltaTime * 15);
+                }
+                else
+                {
+                    logoEffectWorldSpaceLabel.enabled = false;
+                }
+            }
         }
 
         private float actionClipQueueWaitTime;
@@ -1799,5 +1822,198 @@ namespace Vi.Core
             }
             sliceInstances.Clear();
         }
+
+        private const int potionUsesPerGame = 10;
+        private int healthPotionUsesLeft;
+        private int staminaPotionUsesLeft;
+
+        public int GetPotionUsesLeft(PotionType potionType)
+        {
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    return healthPotionUsesLeft;
+                case PotionType.Stamina:
+                    return staminaPotionUsesLeft;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
+        }
+
+        private const float potionCooldownTime = 30;
+        public float GetPotionCooldownTimeLeft(PotionType potionType)
+        {
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    return potionCooldownTime - Mathf.Max(0, Time.time - lastHealthPotionTime);
+                case PotionType.Stamina:
+                    return potionCooldownTime - Mathf.Max(0, Time.time - lastStaminaPotionTime);
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
+        }
+
+        public float GetPotionProgress(PotionType potionType)
+        {
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    if (healthPotionUsesLeft <= 0) { return 0; }
+                    return StringUtility.NormalizeValue(Time.time - lastHealthPotionTime, 0, potionCooldownTime);
+                case PotionType.Stamina:
+                    if (staminaPotionUsesLeft <= 0) { return 0; }
+                    return StringUtility.NormalizeValue(Time.time - lastStaminaPotionTime, 0, potionCooldownTime);
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+            return 0;
+        }
+
+        private float lastHealthPotionTime = Mathf.NegativeInfinity;
+        private float lastStaminaPotionTime = Mathf.NegativeInfinity;
+
+        public void UsePotion(PotionType potionType)
+        {
+            if (!IsSpawned) { Debug.LogError("Should only call UsePotion when spawned!"); return; }
+
+            if (!combatAgent.CanTryActivateRageOrPotions()) { return; }
+            if (GetPotionProgress(potionType) < 1) { return; }
+            
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    if (combatAgent.GetHP() > combatAgent.GetMaxHP() | Mathf.Approximately(combatAgent.GetHP(), combatAgent.GetMaxHP())) { return; }
+                    break;
+                case PotionType.Stamina:
+                    if (combatAgent.GetMaxStamina() - combatAgent.GetStamina() < 10) { return; }
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+
+            if (IsServer)
+            {
+                switch (potionType)
+                {
+                    case PotionType.Health:
+                        combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
+                        ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab, healthPotionAudio);
+                        lastHealthPotionTime = Time.time;
+                        healthPotionUsesLeft--;
+                        break;
+                    case PotionType.Stamina:
+                        combatAgent.AddStamina(10);
+                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab, staminaPotionAudio);
+                        lastStaminaPotionTime = Time.time;
+                        staminaPotionUsesLeft--;
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle potion type " + potionType);
+                        break;
+                }
+                PotionClientRpc(potionType);
+            }
+            else if (IsOwner)
+            {
+                PotionServerRpc(potionType);
+            }
+            else
+            {
+                Debug.LogError("We aren't the owner or the server! UsePotion");
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        private void PotionServerRpc(PotionType potionType)
+        {
+            UsePotion(potionType);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void PotionClientRpc(PotionType potionType)
+        {
+            switch (potionType)
+            {
+                case PotionType.Health:
+                    ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab, healthPotionAudio);
+                    lastHealthPotionTime = Time.time;
+                    healthPotionUsesLeft--;
+                    break;
+                case PotionType.Stamina:
+                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab, staminaPotionAudio);
+                    lastStaminaPotionTime = Time.time;
+                    staminaPotionUsesLeft--;
+                    break;
+                default:
+                    Debug.LogError("Unsure how to handle potion type " + potionType);
+                    break;
+            }
+        }
+
+        public enum PotionType
+        {
+            Health,
+            Stamina
+        }
+
+        public void ExecuteLogoEffects(Sprite logo, PooledObject vfxPrefab, AudioClip audioClip)
+        {
+            if (playLogoEffectCoroutine != null)
+            {
+                StopCoroutine(playLogoEffectCoroutine);
+            }
+
+            PooledObject instance = ObjectPoolingManager.SpawnObject(vfxPrefab, transform);
+            PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance));
+            AudioManager.Singleton.PlayClipOnTransform(transform, audioClip, false, 1);
+
+            if (logoEffectWorldSpaceLabel)
+            {
+                logoImage.color = Color.clear;
+                logoImage.sprite = logo;
+                playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
+            }
+        }
+
+        private Coroutine playLogoEffectCoroutine;
+        private IEnumerator PlayLogoEffectCoroutine()
+        {
+            logoImage.color = Color.white;
+            yield return new WaitForSeconds(1.25f);
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime * 2;
+                logoImage.color = Color.Lerp(Color.white, Color.clear, t);
+                yield return null;
+            }
+        }
+
+        private void OnHealthPotion()
+        {
+            UsePotion(PotionType.Health);
+        }
+        
+        private void OnStaminaPotion()
+        {
+            UsePotion(PotionType.Stamina);
+        }
+
+        [Header("Logo Effect")]
+        [SerializeField] private Canvas logoEffectWorldSpaceLabel;
+        [SerializeField] private Image logoImage;
+        [SerializeField] private Sprite healthPotionSprite;
+        [SerializeField] private Sprite staminaPotionSprite;
+        [SerializeField] private PooledObject healthPotionVFXPrefab;
+        [SerializeField] private PooledObject staminaPotionVFXPrefab;
+        [SerializeField] private AudioClip healthPotionAudio;
+        [SerializeField] private AudioClip staminaPotionAudio;
     }
 }

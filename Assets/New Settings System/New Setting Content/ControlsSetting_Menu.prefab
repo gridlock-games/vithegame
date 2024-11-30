@@ -310,6 +310,20 @@ MonoBehaviour:
     excludedControlSchemes:
     - Touchscreen
     - Gamepad
+  - overrideActionName: Use Health Potion
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: -4402296752487994509, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
+  - overrideActionName: Use Stamina Potion
+    actionGroup: 1
+    inputActionReferences:
+    - {fileID: 7790799559034792734, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
+    excludedControlSchemes:
+    - Touchscreen
+    - Gamepad
 --- !u!1 &1061705503343636783
 GameObject:
   m_ObjectHideFlags: 0

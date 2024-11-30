@@ -30,6 +30,11 @@ namespace Vi.Core
         private void Awake()
         {
             _singleton = this;
+
+            if (FasterPlayerPrefs.Singleton.HasString("APIURL"))
+            {
+                SetAPIURL(FasterPlayerPrefs.Singleton.GetString("APIURL"));
+            }
         }
 
         public static bool IsServerBuild()
@@ -38,16 +43,18 @@ namespace Vi.Core
             return excludedRuntimePlatforms.Contains(Application.platform);
         }
 
-        //private string APIURL = "http://38.60.246.146:80/"; // Prod
-        private string APIURL = "http://154.90.36.42:80/"; // Dev
+        private string APIURL = "http://38.60.246.146:80/"; // Prod
+        //private string APIURL = "http://154.90.36.42:80/"; // Dev
 
         public string GetAPIURL() { return APIURL[0..^1]; }
 
         public void SetAPIURL(string newAPIURL)
         {
             APIURL = newAPIURL + "/";
+            FasterPlayerPrefs.Singleton.SetString("APIURL", newAPIURL);
 
             CheckGameVersion(true);
+            Logout();
         }
 
         public string PublicIP { get; private set; }

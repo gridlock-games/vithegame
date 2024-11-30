@@ -69,6 +69,8 @@ namespace Vi.Core
 
         protected virtual bool ShouldUseSpirit() { return true; }
 
+        protected virtual bool ShouldUseRage() { return true; }
+
         public void AddSpirit(float amount)
         {
             if (!ShouldUseSpirit()) { return; }
@@ -98,6 +100,8 @@ namespace Vi.Core
 
         public void AddRage(float amount, bool clampPositive = true)
         {
+            if (!ShouldUseRage()) { return; }
+
             if (amount > 0)
             {
                 if (rage.Value < GetMaxRage())
@@ -159,13 +163,31 @@ namespace Vi.Core
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
             SessionProgressionHandler = GetComponent<SessionProgressionHandler>();
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
+        protected virtual void OnReturnToPool()
+        {
+            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
+            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+        }
+
+        [SerializeField] private AudioClip rageStartAudio;
         protected virtual void OnIsRagingChanged(bool prev, bool current)
         {
             if (current)
             {
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips); }
+                if (!ragingVFXInstance)
+                {
+                    ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips);
+                }
+
+                AnimationHandler.ExecuteLogoEffects(rageStartSprite, rageStartVFXPrefab, rageStartAudio);
+
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
             }
             else
@@ -282,11 +304,11 @@ namespace Vi.Core
         }
 
         [SerializeField] private PooledObject ragingVFXPrefab;
+        [SerializeField] private PooledObject rageStartVFXPrefab;
+        [SerializeField] private Sprite rageStartSprite;
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
-            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -511,12 +533,27 @@ namespace Vi.Core
             ActivateRage();
         }
 
+        public bool CanTryActivateRageOrPotions()
+        {
+            if (GetAilment() == ActionClip.Ailment.Knockdown
+                | GetAilment() == ActionClip.Ailment.Knockup
+                | GetAilment() == ActionClip.Ailment.Stun
+                | GetAilment() == ActionClip.Ailment.Grab
+                | GetAilment() == ActionClip.Ailment.Death)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public const float ragingStaminaCostMultiplier = 1.25f;
         public bool IsRaging { get { return isRaging.Value; } }
         protected NetworkVariable<bool> isRaging = new NetworkVariable<bool>();
         private void ActivateRage()
         {
             if (!IsSpawned) { Debug.LogError("Calling CombatAgent.ActivateRage() before this object is spawned!"); return; }
+            
+            if (!CanTryActivateRageOrPotions()) { return; }
 
             if (IsServer)
             {
