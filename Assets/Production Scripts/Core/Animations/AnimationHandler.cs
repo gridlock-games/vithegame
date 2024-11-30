@@ -586,7 +586,11 @@ namespace Vi.Core
                     if (actionClip.GetClipType() != ActionClip.ClipType.HitReaction & actionClip.GetClipType() != ActionClip.ClipType.Flinch)
                     {
                         // Allow double dodging
-                        if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < 0.55f) { return default; }
+                        if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                        {
+                            if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < 0.55f) { return default; }
+                        }
+
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return default; }
                     }
                 }
