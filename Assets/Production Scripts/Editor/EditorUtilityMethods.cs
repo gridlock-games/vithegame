@@ -14,12 +14,30 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
 using UnityEditor.Animations;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Mass Convert Material Shaders")]
+        private static void MassConvertMaterialShaders()
+        {
+            string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
+            Shader shader = Shader.Find("Shader Graphs/Master Material");
+            foreach (string path in paths)
+            {
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat)
+                {
+                    if (mat.shader != shader)
+                    {
+                        mat.shader = shader;
+                        EditorUtility.SetDirty(mat);
+                    }
+                }
+            }
+        }
+
         [MenuItem("Tools/Production/Set Environment Reflections On Weapons And Armor")]
         private static void SetEnvironmentReflectionsOnWeaponsAndArmor()
         {
