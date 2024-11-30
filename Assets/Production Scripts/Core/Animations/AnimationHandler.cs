@@ -1903,14 +1903,14 @@ namespace Vi.Core
                     case PotionType.Health:
                         combatAgent.AddHP(combatAgent.GetMaxHP() * 0.05f);
                         Debug.Log(healthPotionSprite);
-                        ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab);
+                        ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab, healthPotionAudio);
                         lastHealthPotionTime = Time.time;
                         healthPotionUsesLeft--;
                         break;
                     case PotionType.Stamina:
                         combatAgent.AddStamina(10);
                         Debug.Log(staminaPotionSprite);
-                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab);
+                        ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab, staminaPotionAudio);
                         lastStaminaPotionTime = Time.time;
                         staminaPotionUsesLeft--;
                         break;
@@ -1942,12 +1942,12 @@ namespace Vi.Core
             switch (potionType)
             {
                 case PotionType.Health:
-                    ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab);
+                    ExecuteLogoEffects(healthPotionSprite, healthPotionVFXPrefab, healthPotionAudio);
                     lastHealthPotionTime = Time.time;
                     healthPotionUsesLeft--;
                     break;
                 case PotionType.Stamina:
-                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab);
+                    ExecuteLogoEffects(staminaPotionSprite, staminaPotionVFXPrefab, staminaPotionAudio);
                     lastStaminaPotionTime = Time.time;
                     staminaPotionUsesLeft--;
                     break;
@@ -1963,7 +1963,7 @@ namespace Vi.Core
             Stamina
         }
 
-        public void ExecuteLogoEffects(Sprite logo, PooledObject vfxPrefab)
+        public void ExecuteLogoEffects(Sprite logo, PooledObject vfxPrefab, AudioClip audioClip)
         {
             if (playLogoEffectCoroutine != null)
             {
@@ -1973,6 +1973,7 @@ namespace Vi.Core
             PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance));
             logoImage.color = Color.clear;
             logoImage.sprite = logo;
+            AudioManager.Singleton.PlayClipOnTransform(transform, audioClip, false, 1);
             playLogoEffectCoroutine = StartCoroutine(PlayLogoEffectCoroutine());
         }
 
@@ -2007,5 +2008,7 @@ namespace Vi.Core
         [SerializeField] private Sprite staminaPotionSprite;
         [SerializeField] private PooledObject healthPotionVFXPrefab;
         [SerializeField] private PooledObject staminaPotionVFXPrefab;
+        [SerializeField] private AudioClip healthPotionAudio;
+        [SerializeField] private AudioClip staminaPotionAudio;
     }
 }

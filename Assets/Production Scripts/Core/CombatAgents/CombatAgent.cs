@@ -159,13 +159,31 @@ namespace Vi.Core
             WeaponHandler = GetComponent<WeaponHandler>();
             LoadoutManager = GetComponent<LoadoutManager>();
             SessionProgressionHandler = GetComponent<SessionProgressionHandler>();
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
+        protected virtual void OnReturnToPool()
+        {
+            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
+            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+        }
+
+        [SerializeField] private AudioClip rageStartAudio;
         protected virtual void OnIsRagingChanged(bool prev, bool current)
         {
             if (current)
             {
-                if (!ragingVFXInstance) { ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips); }
+                if (!ragingVFXInstance)
+                {
+                    ragingVFXInstance = ObjectPoolingManager.SpawnObject(ragingVFXPrefab, AnimationHandler.LimbReferences.Hips);
+                }
+
+                AnimationHandler.ExecuteLogoEffects(rageStartSprite, rageStartVFXPrefab, rageStartAudio);
+
                 if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
             }
             else
@@ -282,11 +300,11 @@ namespace Vi.Core
         }
 
         [SerializeField] private PooledObject ragingVFXPrefab;
+        [SerializeField] private PooledObject rageStartVFXPrefab;
+        [SerializeField] private Sprite rageStartSprite;
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
-            if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
-            if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -581,8 +599,8 @@ namespace Vi.Core
         protected const float stunDuration = 3;
         protected const float knockdownDuration = 2;
         protected const float knockupDuration = 4;
-        protected const float attackerRageToBeAddedOnHit = 2;
-        protected const float victimRageToBeAddedOnHit = 1;
+        protected const float attackerRageToBeAddedOnHit = 98;
+        protected const float victimRageToBeAddedOnHit = 98;
 
         protected CombatAgent lastAttackingCombatAgent;
         protected NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
