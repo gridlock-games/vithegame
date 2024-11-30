@@ -509,16 +509,17 @@ namespace Vi.Core
                         if (animatorReference.CurrentActionsAnimatorStateInfo.IsName(lastClipPlayedAnimationStateName))
                         {
                             // Dodge lock checks
-                            if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                            if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
                             {
-                                if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.EntireAnimation)
-                                {
-                                    return default;
-                                }
-                                else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
-                                {
-                                    if (combatAgent.WeaponHandler.IsInRecovery) { return default; }
-                                }
+                                return default;
+                            }
+                            else if (lastClipPlayed.dodgeLock == ActionClip.DodgeLock.Recovery)
+                            {
+                                if (combatAgent.WeaponHandler.IsInRecovery) { return default; }
+                            }
+                            else if (lastClipPlayed.IsAttack())
+                            {
+                                shouldEvaluatePreviousState = false;
                             }
                         }
                         else if (animatorReference.CurrentActionsAnimatorStateInfo.IsTag("CanDodge") | animatorReference.NextActionsAnimatorStateInfo.IsTag("CanDodge"))
