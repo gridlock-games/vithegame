@@ -4958,7 +4958,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &816331840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5481,7 +5481,7 @@ GameObject:
   - component: {fileID: 923882231}
   - component: {fileID: 923882233}
   - component: {fileID: 923882232}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Static Lighting (baked)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5574,9 +5574,9 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 18432
+    m_Bits: 4294967295
   m_RenderingLayerMask: 2
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
