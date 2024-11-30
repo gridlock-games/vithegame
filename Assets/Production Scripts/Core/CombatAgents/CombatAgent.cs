@@ -69,6 +69,8 @@ namespace Vi.Core
 
         protected virtual bool ShouldUseSpirit() { return true; }
 
+        protected virtual bool ShouldUseRage() { return true; }
+
         public void AddSpirit(float amount)
         {
             if (!ShouldUseSpirit()) { return; }
@@ -98,6 +100,8 @@ namespace Vi.Core
 
         public void AddRage(float amount, bool clampPositive = true)
         {
+            if (!ShouldUseRage()) { return; }
+
             if (amount > 0)
             {
                 if (rage.Value < GetMaxRage())
@@ -614,8 +618,8 @@ namespace Vi.Core
         protected const float stunDuration = 3;
         protected const float knockdownDuration = 2;
         protected const float knockupDuration = 4;
-        protected const float attackerRageToBeAddedOnHit = 98;
-        protected const float victimRageToBeAddedOnHit = 98;
+        protected const float attackerRageToBeAddedOnHit = 2;
+        protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
         protected NetworkVariable<ulong> killerNetObjId = new NetworkVariable<ulong>();
