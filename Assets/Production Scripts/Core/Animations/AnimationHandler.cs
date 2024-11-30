@@ -1168,9 +1168,17 @@ namespace Vi.Core
         }
 
         private Coroutine playActionOnClientCoroutine;
+        private bool clientActionWasCalledThisFrame;
         private IEnumerator PlayActionOnClient(string actionClipName, string weaponName,
             float transitionTime, int rootMotionId, bool wasPredictedOnOwner)
         {
+            // Prevent this being called on the same frame as another play action on client call
+            if (clientActionWasCalledThisFrame)
+            {
+                yield return new WaitUntil(() => !clientActionWasCalledThisFrame);
+            }
+
+            clientActionWasCalledThisFrame = true;
             // Retrieve the ActionClip based on the actionStateName
             if (combatAgent.WeaponHandler.GetWeapon().name.Replace("(Clone)", "") != weaponName.Replace("(Clone)", ""))
             {
@@ -1637,6 +1645,7 @@ namespace Vi.Core
             RootMotionId = default;
             actionClipQueueWaitTime = 0;
             UseGenericAimPoint = false;
+            clientActionWasCalledThisFrame = false;
             ResetRootMotionTime();
         }
 
@@ -1678,6 +1687,8 @@ namespace Vi.Core
         private float actionClipQueueWaitTime;
         public void ProcessNextActionClip()
         {
+            clientActionWasCalledThisFrame = false;
+
             // Wait for move input queue to be empty before playing the action to avoid position errors on the owner client
             if (serverActionQueue.TryPeek(out ServerActionQueueElement serverActionQueueElement))
             {
