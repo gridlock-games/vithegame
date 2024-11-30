@@ -288,6 +288,7 @@ namespace Vi.Player
             inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
         }
 
+        private float timeWithoutInputs;
         private InputPayload lastInputPayloadProcessedOnServer;
         private void FixedUpdate()
         {
@@ -312,6 +313,7 @@ namespace Vi.Player
                 // This if statement should only be reached
                 if (shouldApplyRootMotion & !combatAgent.AnimationHandler.WasLastActionClipMotionPredicted)
                 {
+                    timeWithoutInputs = 0;
                     InputPayload serverInputPayload = new InputPayload();
                     if (serverInputQueue.Count > 0)
                     {
@@ -334,6 +336,7 @@ namespace Vi.Player
                 }
                 else if (serverInputQueue.Count > 0)
                 {
+                    timeWithoutInputs = 0;
                     while (serverInputQueue.TryDequeue(out InputPayload inputPayload))
                     {
                         // Have to double check these to prevent cheating
@@ -374,7 +377,12 @@ namespace Vi.Player
                 }
                 else // Server input queue is 0 meaning we're waiting on the client to send inputs
                 {
-                    Rigidbody.linearVelocity = Vector3.zero;
+                    timeWithoutInputs += Time.deltaTime;
+                    // Make the player descend to the ground if it has no inputs (they're lagging out)
+                    if (timeWithoutInputs > 1.5f)
+                    {
+                        Rigidbody.linearVelocity = Physics.gravity;
+                    }
                 }
             }
 
