@@ -1412,6 +1412,7 @@ namespace Vi.Core
         {
             foreach (KeyValuePair<int, Attributes> kvp in localPlayers)
             {
+                kvp.Value.StopRespawnSelfCoroutine();
                 AddPlayerToSpawnQueue(GetPlayerData(kvp.Key));
             }
         }
