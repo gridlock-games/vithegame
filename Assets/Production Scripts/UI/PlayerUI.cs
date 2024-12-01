@@ -46,6 +46,9 @@ namespace Vi.UI
 
         public RectTransform GetOrbitalCameraButton() { return orbitalCameraButton; }
 
+        public PotionCard GetHealthPotionCard() { return healthPotionCard; }
+        public PotionCard GetStaminaPotionCard() { return staminaPotionCard; }
+
         private bool shouldFadeToBlack;
         public void SetFadeToBlack(bool shouldFade) { shouldFadeToBlack = shouldFade; }
 
@@ -559,7 +562,7 @@ namespace Vi.UI
                 if (shouldBreak) { break; }
             }
 
-            if (!staminaPotionInitialized) { healthPotionCard.Initialize(""); }
+            if (!staminaPotionInitialized) { staminaPotionCard.Initialize(""); }
 
             lastWeapon = attributes.WeaponHandler.GetWeapon();
 
