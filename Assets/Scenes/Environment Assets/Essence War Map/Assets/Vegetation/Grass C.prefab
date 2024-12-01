@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &976574560495198731
 Transform:
@@ -51,7 +51,7 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 200877744242373570}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1001 &1515527931134979910
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133,7 +133,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4fe2a7ebdb0303d40ba1c4d128cef14e,
         type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 1
+      value: 21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
