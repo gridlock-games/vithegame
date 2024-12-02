@@ -4687,6 +4687,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joystickActionType: 1
   movementRange: 125
+  shouldRepositionPlayerPref: 
   shouldReposition: 0
   joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
@@ -9580,6 +9581,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joystickActionType: 0
   movementRange: 125
+  shouldRepositionPlayerPref: MobileMoveJoystickShouldReposition
   shouldReposition: 1
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
