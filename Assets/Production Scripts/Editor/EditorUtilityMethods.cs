@@ -23,7 +23,7 @@ namespace Vi.Editor
         private static void MassConvertMaterialShaders()
         {
             string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
-            Shader shader = Shader.Find("Shader Graphs/Master Material");
+            Shader shader = Shader.Find("Shader Graphs/Asset Master Material");
             foreach (string path in paths)
             {
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -31,11 +31,22 @@ namespace Vi.Editor
                 {
                     if (mat.shader != shader)
                     {
+                        Texture baseMap = mat.GetTexture("_BaseMap");
+                        Texture normalMap = mat.GetTexture("_BumpMap");
+
+                        if (!baseMap) { Debug.LogWarning("No base map found " + mat); }
+                        if (!normalMap) { Debug.LogWarning("No normal map found " + mat); }
+
                         mat.shader = shader;
+
+                        mat.SetTexture("_Base_Color", baseMap);
+                        mat.SetTexture("_Normal_Map", normalMap);
+
                         EditorUtility.SetDirty(mat);
                     }
                 }
             }
+            AssetDatabase.SaveAssets();
         }
 
         [MenuItem("Tools/Production/Set Environment Reflections On Weapons And Armor")]
