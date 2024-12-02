@@ -24,6 +24,8 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown orbitalCameraModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
+        [SerializeField] private RectTransform shouldRepositionMoveJoystickParent;
+        [SerializeField] private Toggle shouldRepositionMoveJoystick;
         [SerializeField] private Toggle UIVibrationsToggle;
         [SerializeField] private Toggle deathVibrationToggle;
         [SerializeField] private Toggle gameplayVibrationsToggle;
@@ -61,7 +63,12 @@ namespace Vi.UI
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
             mobileLookJoystickSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
 
+            shouldRepositionMoveJoystick.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileMoveJoystickShouldReposition");
+            shouldRepositionMoveJoystick.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(shouldRepositionMoveJoystick, "MobileMoveJoystickShouldReposition"); });
+
             mobileLookJoystickInputParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
+
+            shouldRepositionMoveJoystickParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));

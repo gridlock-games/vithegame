@@ -15,10 +15,15 @@ namespace Vi.UI
     {
         [SerializeField] private JoystickActionType joystickActionType;
         [SerializeField] private float movementRange = 125;
+        [SerializeField] private string shouldRepositionPlayerPref;
         [SerializeField] private bool shouldReposition;
         [SerializeField] private string joystickValueMultiplierPlayerPref;
         [SerializeField] private float joystickValueMultiplier = 1;
         [SerializeField] private RectTransform limits;
+
+        private bool shouldRepositionPlayerPrefValue;
+
+        private bool ShouldReposition { get { return shouldReposition & shouldRepositionPlayerPrefValue; } }
 
         public enum JoystickActionType
         {
@@ -54,7 +59,9 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
+            // Need to check has in case it is the pref name is null
             if (FasterPlayerPrefs.Singleton.HasFloat(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
+            if (FasterPlayerPrefs.Singleton.HasBool(shouldRepositionPlayerPref)) { shouldRepositionPlayerPrefValue = FasterPlayerPrefs.Singleton.GetBool(shouldRepositionPlayerPref); }
         }
 
         private void Update()
@@ -84,7 +91,7 @@ namespace Vi.UI
                 {
                     if (interactingTouchId != -1 & touch.touchId != interactingTouchId) { continue; }
 
-                    if (shouldReposition)
+                    if (ShouldReposition)
                     {
                         if (touch.startScreenPosition.x > Screen.width / 2f) { continue; }
 

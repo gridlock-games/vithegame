@@ -57,6 +57,8 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 1); }
+
             if (!FasterPlayerPrefs.Singleton.HasBool("UIVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("UIVibrationsEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("DeathVibrationEnabled")) { FasterPlayerPrefs.Singleton.SetBool("DeathVibrationEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("GameplayVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("GameplayVibrationsEnabled", true); }
@@ -89,7 +91,10 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasFloat("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("MouseYSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", 0.2f); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("ZoomSensitivityMultiplier")) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", 1); }
+            
             if (!FasterPlayerPrefs.Singleton.HasFloat("MobileLookJoystickSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", 4); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("MobileMoveJoystickShouldReposition")) { FasterPlayerPrefs.Singleton.SetBool("MobileMoveJoystickShouldReposition", true); }
+
             if (!FasterPlayerPrefs.Singleton.HasString("ZoomMode")) { FasterPlayerPrefs.Singleton.SetString("ZoomMode", "TOGGLE"); }
             if (!FasterPlayerPrefs.Singleton.HasString("BlockingMode")) { FasterPlayerPrefs.Singleton.SetString("BlockingMode", "HOLD"); }
             if (!FasterPlayerPrefs.Singleton.HasString("OrbitalCameraMode")) { FasterPlayerPrefs.Singleton.SetString("OrbitalCameraMode", "HOLD"); }
