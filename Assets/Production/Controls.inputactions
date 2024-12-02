@@ -265,6 +265,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "HealthPotion",
+                    "type": "Button",
+                    "id": "8175daa1-f15a-470d-81e1-6e48bfbfd7d9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "StaminaPotion",
+                    "type": "Button",
+                    "id": "624d36df-f772-4bac-ba64-d1fe4b77e1e8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -892,6 +910,28 @@
                     "processors": "",
                     "groups": ";Keyboard & Mouse",
                     "action": "OrbitalCam",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5362368b-e4cb-4fb5-86c5-64904b9197b0",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard & Mouse",
+                    "action": "HealthPotion",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37c2a6d6-7ff3-41e8-b8db-e1e9dca3311c",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard & Mouse",
+                    "action": "StaminaPotion",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

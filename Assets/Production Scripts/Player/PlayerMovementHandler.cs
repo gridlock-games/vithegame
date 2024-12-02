@@ -806,11 +806,7 @@ namespace Vi.Player
                 //if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None) { Debug.Log(combatAgent.GetName() + " recieved input " + networkListEvent.Value.moveInput); }
                 serverInputQueue.Enqueue(networkListEvent.Value);
             }
-            else if (networkListEvent.Type == NetworkListEvent<InputPayload>.EventType.Clear)
-            {
-                Debug.Log(combatAgent.GetName() + " Cleared input buffer");
-            }
-            else
+            else if (networkListEvent.Type != NetworkListEvent<InputPayload>.EventType.Clear)
             {
                 Debug.LogWarning(combatAgent.GetName() + " Player input buffer shouldn't be receiving an event for a network list event type of: " + networkListEvent.Type);
             }

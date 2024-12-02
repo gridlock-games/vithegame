@@ -17,7 +17,7 @@ namespace Vi.UI
         [SerializeField] private Text pingText;
 
         public WebRequestManager.Server Server { get; private set; }
-        public float pingTime { get; private set; } = -1;
+        public float pingTime { get; private set; } = Mathf.Infinity;
 
         private Button button;
         private UnityTransport networkTransport;
@@ -39,18 +39,12 @@ namespace Vi.UI
             serverNameText.text = server.label;
             playerCountText.text = server.population.ToString();
             regionText.text = "MNL";
-            pingText.text = "";
+            pingText.text = "N/A";
             UIParent.StartCoroutine(PingServer());
         }
 
         private IEnumerator PingServer()
         {
-            if (!pingText)
-            {
-                pingTime = 2;
-                yield break;
-            }
-
             Ping ping = new Ping(Server.ip);
             float startTime = Time.time;
 

@@ -30,6 +30,11 @@ namespace Vi.Core
         private void Awake()
         {
             _singleton = this;
+
+            if (FasterPlayerPrefs.Singleton.HasString("APIURL"))
+            {
+                SetAPIURL(FasterPlayerPrefs.Singleton.GetString("APIURL"));
+            }
         }
 
         public static bool IsServerBuild()
@@ -46,8 +51,10 @@ namespace Vi.Core
         public void SetAPIURL(string newAPIURL)
         {
             APIURL = newAPIURL + "/";
+            FasterPlayerPrefs.Singleton.SetString("APIURL", newAPIURL);
 
             CheckGameVersion(true);
+            Logout();
         }
 
         public string PublicIP { get; private set; }
@@ -2790,7 +2797,7 @@ namespace Vi.Core
         {
             StartCoroutine(Initialize());
 #if UNITY_EDITOR
-            StartCoroutine(CreateItems());
+            //StartCoroutine(CreateItems());
 #endif
         }
 

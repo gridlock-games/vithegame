@@ -702,7 +702,20 @@ namespace Vi.ScriptableObjects
 
         [SerializeField] private GrabAttackCrosswalk[] grabAttackClipList = new GrabAttackCrosswalk[0];
 
-        public float dodgeStaminaCost { get; private set; } = 0;
+        public float dodgeStaminaCost
+        {
+            get
+            {
+                if (GetNumberOfDodgesOffCooldown() == 2)
+                {
+                    return 10;
+                }
+                else
+                {
+                    return 20;
+                }
+            }
+        }
         [Header("Dodge Assignments")]
         public float dodgeCooldownDuration = 5; // This should be cut in half for the first dodge
         [SerializeField] private ActionClip dodgeF;

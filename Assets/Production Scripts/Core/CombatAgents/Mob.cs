@@ -96,6 +96,9 @@ namespace Vi.Core.CombatAgents
         private bool useSpirit;
         protected override bool ShouldUseSpirit() { return useSpirit; }
 
+        [SerializeField] private bool useRage;
+        protected override bool ShouldUseRage() { return useRage; }
+
         // Uncomment to make mobs respawn automatically
         //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         //{

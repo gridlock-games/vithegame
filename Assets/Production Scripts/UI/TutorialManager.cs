@@ -84,6 +84,9 @@ namespace Vi.UI
                 playerUI.GetPauseMenuButton().gameObject.SetActive(false);
                 playerUI.GetScoreboardButton().gameObject.SetActive(false);
                 playerUI.GetLoadoutMenuButton().gameObject.SetActive(false);
+
+                playerUI.GetHealthPotionCard().gameObject.SetActive(false);
+                playerUI.GetStaminaPotionCard().gameObject.SetActive(false);
             }
         }
 
@@ -546,6 +549,9 @@ namespace Vi.UI
                 playerUI.GetPauseMenuButton().gameObject.SetActive(true);
                 playerUI.GetScoreboardButton().gameObject.SetActive(true);
                 playerUI.GetLoadoutMenuButton().gameObject.SetActive(true);
+
+                playerUI.GetHealthPotionCard().gameObject.SetActive(true);
+                playerUI.GetStaminaPotionCard().gameObject.SetActive(true);
             }
             else if (currentActionIndex == 11) // Fight with NPC
             {

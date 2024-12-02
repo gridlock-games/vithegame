@@ -227,6 +227,15 @@ namespace Vi.Core.CombatAgents
             if (Time.time - lastComboCounterChangeTime >= comboCounterResetTime) { comboCounter.Value = 0; }
         }
 
+        public void StopRespawnSelfCoroutine()
+        {
+            if (respawnCoroutine != null)
+            {
+                IsRespawning = false;
+                StopCoroutine(respawnCoroutine);
+            }
+        }
+
         protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             base.OnAilmentChanged(prev, current);
