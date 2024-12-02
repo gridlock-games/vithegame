@@ -44,6 +44,13 @@ namespace Vi.Editor
 
                         EditorUtility.SetDirty(mat);
                     }
+                    else
+                    {
+                        mat.SetFloat("_Alpha_cut", 1);
+                        mat.SetFloat("_Ambient_Strength", 1);
+                        mat.SetFloat("_Roughness", 0);
+                        EditorUtility.SetDirty(mat);
+                    }
                 }
             }
             AssetDatabase.SaveAssets();
