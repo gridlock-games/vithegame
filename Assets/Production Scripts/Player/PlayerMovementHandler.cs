@@ -892,6 +892,17 @@ namespace Vi.Player
                         if (playerInput.currentActionMap != null)
                         {
                             Vector2 lookInputToAdd = Vector2.zero;
+
+                            if (UnityEngine.InputSystem.Gyroscope.current != null)
+                            {
+                                if (UnityEngine.InputSystem.Gyroscope.current.enabled)
+                                {
+                                    Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
+                                    gyroVelocity *= gyroscopicRotationSensitivity;
+                                    lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
+                                }
+                            }
+
                             if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                             {
                                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
@@ -949,10 +960,31 @@ namespace Vi.Player
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { CameraFollowTarget = null; }
         }
 
+        private float gyroscopicRotationSensitivity;
+
         protected override void RefreshStatus()
         {
             base.RefreshStatus();
             autoAim = FasterPlayerPrefs.Singleton.GetBool("AutoAim");
+            gyroscopicRotationSensitivity = FasterPlayerPrefs.Singleton.GetFloat("GyroscopicRotationSensitivity");
+
+            if (UnityEngine.InputSystem.Gyroscope.current != null)
+            {
+                if (Mathf.Approximately(gyroscopicRotationSensitivity, 0))
+                {
+                    if (UnityEngine.InputSystem.Gyroscope.current.enabled)
+                    {
+                        UnityEngine.InputSystem.InputSystem.DisableDevice(UnityEngine.InputSystem.Gyroscope.current);
+                    }
+                }
+                else // Sensitivity is not equal to 0
+                {
+                    if (!UnityEngine.InputSystem.Gyroscope.current.enabled)
+                    {
+                        UnityEngine.InputSystem.InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
+                    }
+                }
+            }
         }
 
 # if UNITY_EDITOR

@@ -26,6 +26,8 @@ namespace Vi.UI
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
         [SerializeField] private RectTransform shouldRepositionMoveJoystickParent;
         [SerializeField] private Toggle shouldRepositionMoveJoystick;
+        [SerializeField] private InputField gyroSensitivityInput;
+        [SerializeField] private RectTransform gyroSensitivityParent;
         [SerializeField] private Toggle UIVibrationsToggle;
         [SerializeField] private Toggle deathVibrationToggle;
         [SerializeField] private Toggle gameplayVibrationsToggle;
@@ -66,9 +68,12 @@ namespace Vi.UI
             shouldRepositionMoveJoystick.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileMoveJoystickShouldReposition");
             shouldRepositionMoveJoystick.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(shouldRepositionMoveJoystick, "MobileMoveJoystickShouldReposition"); });
 
-            mobileLookJoystickInputParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
+            gyroSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("GyroscopicRotationSensitivity").ToString();
 
-            shouldRepositionMoveJoystickParent.gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
+            bool isMobilePlatform = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer;
+            mobileLookJoystickInputParent.gameObject.SetActive(isMobilePlatform);
+            shouldRepositionMoveJoystickParent.gameObject.SetActive(isMobilePlatform);
+            //gyroSensitivityParent.gameObject.SetActive(isMobilePlatform);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
@@ -263,6 +268,15 @@ namespace Vi.UI
             if (float.TryParse(mobileLookJoystickSensitivityInput.text, out float sensitivity))
             {
                 FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", sensitivity);
+            }
+        }
+
+        public void ChangeGyroSensitivity()
+        {
+            gyroSensitivityInput.text = Regex.Replace(gyroSensitivityInput.text, @"[^0-9|.]", "");
+            if (float.TryParse(gyroSensitivityInput.text, out float sensitivity))
+            {
+                FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", sensitivity);
             }
         }
     }
