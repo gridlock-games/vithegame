@@ -513,7 +513,7 @@ namespace Vi.Core
             AddSpirit(spiritRegenRate * Time.deltaTime);
         }
 
-        private const float rageDepletionRate = 1;
+        private float rageDepletionRate { get { return GetMaxRage() / 60; } }
         private float rageDelayCooldown;
         private void UpdateRage()
         {
