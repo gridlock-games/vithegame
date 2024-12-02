@@ -57,7 +57,7 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 0); }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("UIVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("UIVibrationsEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("DeathVibrationEnabled")) { FasterPlayerPrefs.Singleton.SetBool("DeathVibrationEnabled", true); }
