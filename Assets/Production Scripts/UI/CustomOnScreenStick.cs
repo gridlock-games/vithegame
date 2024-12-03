@@ -19,11 +19,16 @@ namespace Vi.UI
         [SerializeField] private bool shouldReposition;
         [SerializeField] private string joystickValueMultiplierPlayerPref;
         [SerializeField] private float joystickValueMultiplier = 1;
+        [SerializeField] private string actLikeButtonPlayerPref;
         [SerializeField] private RectTransform limits;
 
         private bool shouldRepositionPlayerPrefValue;
 
         private bool ShouldReposition { get { return shouldReposition & shouldRepositionPlayerPrefValue; } }
+
+        private bool actLikeButtonPlayerPrefValue;
+
+        private bool ShouldActLikeButton { get { return actLikeButtonPlayerPrefValue; } }
 
         public enum JoystickActionType
         {
@@ -62,6 +67,7 @@ namespace Vi.UI
             // Need to check has in case it is the pref name is null
             if (FasterPlayerPrefs.Singleton.HasFloat(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
             if (FasterPlayerPrefs.Singleton.HasBool(shouldRepositionPlayerPref)) { shouldRepositionPlayerPrefValue = FasterPlayerPrefs.Singleton.GetBool(shouldRepositionPlayerPref); }
+            if (FasterPlayerPrefs.Singleton.HasBool(actLikeButtonPlayerPref)) { actLikeButtonPlayerPrefValue = FasterPlayerPrefs.Singleton.GetBool(actLikeButtonPlayerPref); }
         }
 
         private void Update()

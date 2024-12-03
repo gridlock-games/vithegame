@@ -59,6 +59,8 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 0); }
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("MobileLookJoystickActsLikeButton")) { FasterPlayerPrefs.Singleton.SetBool("MobileLookJoystickActsLikeButton", false); }
+
             if (!FasterPlayerPrefs.Singleton.HasBool("UIVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("UIVibrationsEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("DeathVibrationEnabled")) { FasterPlayerPrefs.Singleton.SetBool("DeathVibrationEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasBool("GameplayVibrationsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("GameplayVibrationsEnabled", true); }

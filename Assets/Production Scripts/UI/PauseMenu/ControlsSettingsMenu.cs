@@ -22,6 +22,8 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
         [SerializeField] private TMP_Dropdown orbitalCameraModeDropdown;
+        [SerializeField] private RectTransform mobileLookJoystickActLikeButtonParent;
+        [SerializeField] private Toggle mobileLookJoystickActLikeButtonToggle;
         [SerializeField] private RectTransform mobileLookJoystickInputParent;
         [SerializeField] private InputField mobileLookJoystickSensitivityInput;
         [SerializeField] private RectTransform shouldRepositionMoveJoystickParent;
@@ -68,12 +70,18 @@ namespace Vi.UI
             shouldRepositionMoveJoystick.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileMoveJoystickShouldReposition");
             shouldRepositionMoveJoystick.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(shouldRepositionMoveJoystick, "MobileMoveJoystickShouldReposition"); });
 
+            mobileLookJoystickActLikeButtonToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileLookJoystickActsLikeButton");
+            mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(mobileLookJoystickActLikeButtonToggle, "MobileLookJoystickActsLikeButton"); });
+            mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { mobileLookJoystickInputParent.gameObject.SetActive(!mobileLookJoystickActLikeButtonToggle.isOn); });
+
             gyroSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("GyroscopicRotationSensitivity").ToString();
 
             bool isMobilePlatform = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer;
-            mobileLookJoystickInputParent.gameObject.SetActive(isMobilePlatform);
+            isMobilePlatform = true;
             shouldRepositionMoveJoystickParent.gameObject.SetActive(isMobilePlatform);
-            //gyroSensitivityParent.gameObject.SetActive(isMobilePlatform);
+            gyroSensitivityParent.gameObject.SetActive(isMobilePlatform);
+            mobileLookJoystickActLikeButtonParent.gameObject.SetActive(isMobilePlatform);
+            mobileLookJoystickInputParent.gameObject.SetActive(isMobilePlatform & !mobileLookJoystickActLikeButtonToggle.isOn);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
