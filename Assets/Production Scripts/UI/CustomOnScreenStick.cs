@@ -8,6 +8,7 @@ using Vi.Core;
 using Vi.Utility;
 using Vi.Player;
 using Vi.Core.MovementHandlers;
+using UnityEngine.UI;
 
 namespace Vi.UI
 {
@@ -21,6 +22,8 @@ namespace Vi.UI
         [SerializeField] private float joystickValueMultiplier = 1;
         [SerializeField] private string actLikeButtonPlayerPref;
         [SerializeField] private RectTransform limits;
+        [SerializeField] private Image limitsImage;
+        [SerializeField] private Image stickImage;
 
         private bool shouldRepositionPlayerPrefValue;
 
@@ -67,7 +70,37 @@ namespace Vi.UI
             // Need to check has in case it is the pref name is null
             if (FasterPlayerPrefs.Singleton.HasFloat(joystickValueMultiplierPlayerPref)) { joystickValueMultiplier = FasterPlayerPrefs.Singleton.GetFloat(joystickValueMultiplierPlayerPref); }
             if (FasterPlayerPrefs.Singleton.HasBool(shouldRepositionPlayerPref)) { shouldRepositionPlayerPrefValue = FasterPlayerPrefs.Singleton.GetBool(shouldRepositionPlayerPref); }
-            if (FasterPlayerPrefs.Singleton.HasBool(actLikeButtonPlayerPref)) { actLikeButtonPlayerPrefValue = FasterPlayerPrefs.Singleton.GetBool(actLikeButtonPlayerPref); }
+
+            bool wasChanged = false;
+            if (FasterPlayerPrefs.Singleton.HasBool(actLikeButtonPlayerPref))
+            {
+                bool newVal = FasterPlayerPrefs.Singleton.GetBool(actLikeButtonPlayerPref);
+                if (actLikeButtonPlayerPrefValue != newVal)
+                {
+                    wasChanged = true;
+                }
+                actLikeButtonPlayerPrefValue = newVal;
+            }
+        
+            if (wasChanged)
+            {
+                if (actLikeButtonPlayerPrefValue)
+                {
+                    stickImage.raycastTarget = true;
+                    limitsImage.raycastTarget = false;
+                    limitsImage.enabled = false;
+                    stickImage.transform.SetParent(limits, true);
+                    stickImage.rectTransform.anchoredPosition = Vector2.zero;
+                }
+                else
+                {
+                    stickImage.raycastTarget = false;
+                    limitsImage.raycastTarget = true;
+                    limitsImage.enabled = true;
+                    stickImage.transform.SetParent(limits.parent, true);
+                    stickImage.rectTransform.anchoredPosition = Vector2.zero;
+                }
+            }
         }
 
         private void Update()
@@ -89,6 +122,8 @@ namespace Vi.UI
         private int interactingTouchId = -1;
         private void UpdateJoystick()
         {
+            if (actLikeButtonPlayerPrefValue) { return; }
+
             if (EnhancedTouchSupport.enabled)
             {
                 bool joystickMoving = false;

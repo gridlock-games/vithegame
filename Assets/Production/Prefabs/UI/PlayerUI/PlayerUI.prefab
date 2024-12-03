@@ -4691,7 +4691,10 @@ MonoBehaviour:
   shouldReposition: 0
   joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
+  actLikeButtonPlayerPref: MobileLookJoystickActsLikeButton
   limits: {fileID: 4824479231797674246}
+  limitsImage: {fileID: 4804493591946432725}
+  stickImage: {fileID: 7667653797634952869}
 --- !u!223 &8584051944774833363
 Canvas:
   m_ObjectHideFlags: 0
@@ -5650,7 +5653,7 @@ MonoBehaviour:
   controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
     type: 3}
   platformUIDefinitions:
-  - platforms: 080000000b000000
+  - platforms: 080000000b00000007000000
     gameObjectsToEnable:
     - {fileID: 3289547961240334779}
     - {fileID: 6710211468585535951}
@@ -9436,12 +9439,12 @@ RectTransform:
   - {fileID: 1123886281377378828}
   - {fileID: 2739320560445226099}
   - {fileID: 3731543550060396087}
+  - {fileID: 6526559342921813307}
+  - {fileID: 7622450844637259974}
   - {fileID: 7705709327525387509}
   - {fileID: 4390939452367543251}
   - {fileID: 5614672946541146129}
   - {fileID: 7807986690212306495}
-  - {fileID: 6526559342921813307}
-  - {fileID: 7622450844637259974}
   m_Father: {fileID: 3714436478388541962}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9585,7 +9588,10 @@ MonoBehaviour:
   shouldReposition: 1
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
+  actLikeButtonPlayerPref: 
   limits: {fileID: 210338626573094431}
+  limitsImage: {fileID: 8969209026052012305}
+  stickImage: {fileID: 2522541634243645950}
 --- !u!223 &5516339031664653583
 Canvas:
   m_ObjectHideFlags: 0
