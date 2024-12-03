@@ -24,6 +24,10 @@ namespace Vi.UI
 
         public static bool UIElementIsAbleToBeModified(GameObject g)
         {
+            if (g.name.Contains("Joystick Parent")) { return true; }
+            if (g.name.Contains("Limits")) { return false; }
+            if (g.GetComponent<OnScreenStick>()) { return false; }
+
             return (g.GetComponent<Button>() & !g.name.Contains("Limits")) | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>());
         }
 

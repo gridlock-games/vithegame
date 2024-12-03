@@ -16,7 +16,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform UIMimicParent;
 
         private Dictionary<GameObject, GameObject> prefabCrosswalk = new Dictionary<GameObject, GameObject>();
-        private void Start()
+        private void OnEnable()
         {
             foreach (KeyValuePair<GameObject, GameObject> kvp in prefabCrosswalk)
             {
@@ -161,7 +161,7 @@ namespace Vi.UI
         public void ResetUI()
         {
             FasterPlayerPrefs.Singleton.DeleteKey("UIOverrides");
-            Start();
+            OnEnable();
         }
 
         public void CloseUI()
