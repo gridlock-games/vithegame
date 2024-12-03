@@ -204,21 +204,22 @@ namespace Vi.Core.GameModeManagers
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (!overtime.Value)
+            else if (!overtime.Value) // TODO only enable overtime if one team is on match point
             {
                 roundTimer.Value = overtimeDuration;
                 overtime.Value = true;
             }
             else // End of overtime
             {
-                float highestHP = -1;
+                float highestAverageHP = -1;
                 PlayerDataManager.Team winningTeam = PlayerDataManager.Team.Environment;
-                foreach (Attributes alivePlayer in PlayerDataManager.Singleton.GetActivePlayerObjects().Where(item => item.GetAilment() != ActionClip.Ailment.Death))
+                foreach (PlayerDataManager.Team team in uniqueTeamList)
                 {
-                    if (alivePlayer.GetHP() > highestHP)
+                    float averageHP = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Average(item => item.GetHP());
+                    if (averageHP > highestAverageHP)
                     {
-                        highestHP = alivePlayer.GetHP();
-                        winningTeam = alivePlayer.GetTeam();
+                        winningTeam = team;
+                        highestAverageHP = averageHP;
                     }
                 }
 

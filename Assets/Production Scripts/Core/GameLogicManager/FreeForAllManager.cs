@@ -74,7 +74,7 @@ namespace Vi.Core.GameModeManagers
                 foreach (int id in highestKillIdList)
                 {
                     Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(id);
-                    float highestHP = 0;
+                    float highestHP = -1;
                     int winnerId = (int)NetworkManager.ServerClientId;
                     if (attributes)
                     {
