@@ -77,7 +77,6 @@ namespace Vi.UI
             gyroSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("GyroscopicRotationSensitivity").ToString();
 
             bool isMobilePlatform = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer;
-            isMobilePlatform = true;
             shouldRepositionMoveJoystickParent.gameObject.SetActive(isMobilePlatform);
             gyroSensitivityParent.gameObject.SetActive(isMobilePlatform);
             mobileLookJoystickActLikeButtonParent.gameObject.SetActive(isMobilePlatform);
