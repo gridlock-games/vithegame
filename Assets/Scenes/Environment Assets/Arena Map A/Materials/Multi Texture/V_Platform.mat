@@ -38,6 +38,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Base_Color:
+        m_Texture: {fileID: 2800000, guid: 97cad368c1a622449becc8d61200f2ee, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Black:
         m_Texture: {fileID: 2800000, guid: f8d72b3717936604c8005d922a2a4a76, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -59,6 +63,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Dire_B_N:
+        m_Texture: {fileID: 2800000, guid: ec77c58ed10c55c469c9bddfe2fb32d6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Emission_Map:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -71,7 +79,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SentiGrass_N:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: ec77c58ed10c55c469c9bddfe2fb32d6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SentiLight_N:
@@ -108,9 +116,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Alpha_cut: 1
+    - _Ambient_Strength: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Roughness: 0
-    m_Colors: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Emission_Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Shadow_Threshold: {r: -0.5, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

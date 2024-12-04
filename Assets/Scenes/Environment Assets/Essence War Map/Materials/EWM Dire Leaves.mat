@@ -21,14 +21,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: EWM Dire Leaves
-  m_Shader: {fileID: -6465566751694194690, guid: 82a9abfba28b65d4dbf28a88f77855db,
+  m_Shader: {fileID: -6465566751694194690, guid: f635ba84c3e2fe34696ecfa88b66cbb2,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 2
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -56,12 +56,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Ambiant_Strength: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Roughness: 0
+    - _Roughness: 1
     - _Scale: 0.3
     - _Speed: 1.2
     m_Colors:
-    - _Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
