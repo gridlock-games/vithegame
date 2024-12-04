@@ -71,11 +71,11 @@ namespace Vi.Core.GameModeManagers
 
             if (highestKillIdList.Count > 1)
             {
+                float highestHP = -1;
+                int winnerId = (int)NetworkManager.ServerClientId;
                 foreach (int id in highestKillIdList)
                 {
                     Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(id);
-                    float highestHP = -1;
-                    int winnerId = (int)NetworkManager.ServerClientId;
                     if (attributes)
                     {
                         if (attributes.GetHP() > highestHP)
@@ -84,16 +84,16 @@ namespace Vi.Core.GameModeManagers
                             highestHP = attributes.GetHP();
                         }
                     }
+                }
 
-                    if (winnerId == (int)NetworkManager.ServerClientId)
-                    {
-                        Debug.LogError("FFA winner id is the server client id! This should never happen!");
-                        OnRoundEnd(new int[0]);
-                    }
-                    else
-                    {
-                        OnRoundEnd(new int[] { winnerId });
-                    }
+                if (winnerId == (int)NetworkManager.ServerClientId)
+                {
+                    Debug.LogError("FFA winner id is the server client id! This should never happen!");
+                    OnRoundEnd(new int[0]);
+                }
+                else
+                {
+                    OnRoundEnd(new int[] { winnerId });
                 }
             }
             else if (highestKillIdList.Count == 1)
