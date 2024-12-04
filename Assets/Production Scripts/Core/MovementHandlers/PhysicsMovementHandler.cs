@@ -20,6 +20,7 @@ namespace Vi.Core.MovementHandlers
                 networkTransform.Interpolate = false;
             }
             base.SetOrientation(newPosition, newRotation);
+            combatAgent.NetworkCollider.SetOrientation(newPosition);
         }
 
         protected override void TeleportPositionRpc(Vector3 newPosition)
@@ -30,6 +31,7 @@ namespace Vi.Core.MovementHandlers
                 rb.Sleep();
             }
             base.TeleportPositionRpc(newPosition);
+            combatAgent.NetworkCollider.SetOrientation(newPosition);
         }
 
         public override Vector3 GetPosition() { return rb.position; }
