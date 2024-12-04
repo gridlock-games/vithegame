@@ -51,6 +51,7 @@ namespace Vi.UI
                         continue;
                     }
                     if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
+                    if (copyChildren[childIndex].TryGetComponent(out PotionCard potionCard)) { potionCard.SetPreviewOn(); }
                     if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
 
                     foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
@@ -148,12 +149,26 @@ namespace Vi.UI
                 overridesList = new List<PlatformUIDefinition.PositionOverrideDefinition>();
             }
 
-            overridesList.Add(new PlatformUIDefinition.PositionOverrideDefinition
+            string path = PlatformUIDefinition.GetGameObjectPath(prefabRef);
+            int overrideIndex = overridesList.FindIndex(item => item.gameObjectPath == path);
+            if (overrideIndex == -1)
             {
-                gameObjectPath = PlatformUIDefinition.GetGameObjectPath(prefabRef),
-                newAnchoredX = modifiedRect.anchoredPosition.x,
-                newAnchoredY = modifiedRect.anchoredPosition.y
-            });
+                overridesList.Add(new PlatformUIDefinition.PositionOverrideDefinition
+                {
+                    gameObjectPath = path,
+                    newAnchoredX = modifiedRect.anchoredPosition.x,
+                    newAnchoredY = modifiedRect.anchoredPosition.y
+                });
+            }
+            else
+            {
+                overridesList[overrideIndex] = new PlatformUIDefinition.PositionOverrideDefinition
+                {
+                    gameObjectPath = path,
+                    newAnchoredX = modifiedRect.anchoredPosition.x,
+                    newAnchoredY = modifiedRect.anchoredPosition.y
+                };
+            }
 
             FasterPlayerPrefs.Singleton.SetString("UIOverrides", JsonConvert.SerializeObject(overridesList));
         }

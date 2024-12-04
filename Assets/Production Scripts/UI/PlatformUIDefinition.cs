@@ -242,7 +242,7 @@ namespace Vi.UI
         private int lastHeightEvaluated;
         private void EvaluateUIDefinitionsInUpdate()
         {
-            if (Screen.currentResolution.width == lastWidthEvaluated & Screen.currentResolution.height == lastHeightEvaluated) { return; }
+            if (Screen.width == lastWidthEvaluated & Screen.height == lastHeightEvaluated) { return; }
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
