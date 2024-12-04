@@ -69,15 +69,42 @@ namespace Vi.Core.GameModeManagers
                 highestKillIdList.Add(playerScore.id);
             }
 
-            if (highestKillIdList.Count == 1)
+            if (highestKillIdList.Count > 1)
+            {
+                foreach (int id in highestKillIdList)
+                {
+                    Attributes attributes = PlayerDataManager.Singleton.GetPlayerObjectById(id);
+                    float highestHP = -1;
+                    int winnerId = (int)NetworkManager.ServerClientId;
+                    if (attributes)
+                    {
+                        if (attributes.GetHP() > highestHP)
+                        {
+                            winnerId = attributes.GetPlayerDataId();
+                            highestHP = attributes.GetHP();
+                        }
+                    }
+
+                    if (winnerId == (int)NetworkManager.ServerClientId)
+                    {
+                        Debug.LogError("FFA winner id is the server client id! This should never happen!");
+                        OnRoundEnd(new int[0]);
+                    }
+                    else
+                    {
+                        OnRoundEnd(new int[] { winnerId });
+                    }
+                }
+            }
+            else if (highestKillIdList.Count == 1)
             {
                 OnRoundEnd(highestKillIdList.ToArray());
             }
-            else if (!overtime.Value)
-            {
-                roundTimer.Value = overtimeDuration;
-                overtime.Value = true;
-            }
+            //else if (!overtime.Value)
+            //{
+            //    roundTimer.Value = overtimeDuration;
+            //    overtime.Value = true;
+            //}
             else
             {
                 OnRoundEnd(new int[0]);
@@ -125,9 +152,10 @@ namespace Vi.Core.GameModeManagers
 
             List<PlayerScore> scoreList = new List<PlayerScore>();
             PlayerScore localPlayerScore;
+            var localKvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
             foreach (PlayerScore playerScore in this.scoreList)
             {
-                if (playerScore.id == PlayerDataManager.Singleton.GetLocalPlayerObject().Key)
+                if (playerScore.id == localKvp.Key)
                 {
                     localPlayerScore = playerScore;
                 }
@@ -136,8 +164,16 @@ namespace Vi.Core.GameModeManagers
                     scoreList.Add(playerScore);
                 }
             }
-            // Find player score with highest kills
-            scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ToList();
+
+            // Find player score with highest kills and highest HP
+            Dictionary<int, float> hpDict = new Dictionary<int, float>();
+            foreach (PlayerScore score in scoreList)
+            {
+                Attributes obj = PlayerDataManager.Singleton.GetPlayerObjectById(score.id);
+                hpDict.Add(score.id, obj ? obj.GetHP() : -1);
+            }
+
+            scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ThenByDescending(item => hpDict[item.id]).ToList();
             if (scoreList.Count > 0)
                 return PlayerDataManager.Singleton.GetPlayerData(scoreList[0].id).character.name + ": " + scoreList[0].killsThisRound.ToString();
             else

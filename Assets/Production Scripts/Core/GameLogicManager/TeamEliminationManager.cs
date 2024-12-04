@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Core.CombatAgents;
 using Vi.Core.DynamicEnvironmentElements;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -203,14 +204,39 @@ namespace Vi.Core.GameModeManagers
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (!overtime.Value)
+            else if (!overtime.Value) // TODO only enable overtime if one team is on match point
             {
                 roundTimer.Value = overtimeDuration;
                 overtime.Value = true;
             }
-            else
+            else // End of overtime
             {
-                OnRoundEnd(new int[0]);
+                float highestAverageHP = -1;
+                PlayerDataManager.Team winningTeam = PlayerDataManager.Team.Environment;
+                foreach (PlayerDataManager.Team team in uniqueTeamList)
+                {
+                    float averageHP = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Average(item => item.GetHP());
+                    if (averageHP > highestAverageHP)
+                    {
+                        winningTeam = team;
+                        highestAverageHP = averageHP;
+                    }
+                }
+
+                if (winningTeam == PlayerDataManager.Team.Environment)
+                {
+                    Debug.LogError("Winning team is environment! This should never happen!");
+                    OnRoundEnd(new int[0]);
+                }
+                else
+                {
+                    List<int> winningIds = new List<int>();
+                    foreach (Attributes winningTeamPlayer in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeam))
+                    {
+                        winningIds.Add(winningTeamPlayer.GetPlayerDataId());
+                    }
+                    OnRoundEnd(winningIds.ToArray());
+                }
             }
         }
 
