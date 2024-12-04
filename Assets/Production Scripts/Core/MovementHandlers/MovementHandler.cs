@@ -127,14 +127,14 @@ namespace Vi.Core.MovementHandlers
 
 		public bool SetDestination(Structure structure)
         {
-			if (!structure) { Debug.LogError("Combat agent is null! " + structure); return false; }
-			float minDist = 0;
-			Vector3 destinationPoint = Vector3.zero;
+			if (!structure) { Debug.LogError("Structure is null! " + structure); return false; }
+			float minDist = Mathf.Infinity;
+			Vector3 destinationPoint = structure.transform.position;
 			for (int i = 0; i < structure.Colliders.Length; i++)
 			{
 				Vector3 closestPoint = structure.Colliders[i].ClosestPoint(GetPosition());
 				float dist = Vector3.Distance(GetPosition(), closestPoint);
-				if (dist < minDist | i == 0)
+				if (dist < minDist)
 				{
 					minDist = dist;
 					destinationPoint = closestPoint;
