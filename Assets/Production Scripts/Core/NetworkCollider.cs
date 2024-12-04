@@ -224,7 +224,6 @@ namespace Vi.Core
             if (!MovementHandler) { return; }
             if (collision.transform.root == transform.root) { return; }
             MovementHandler.ReceiveOnCollisionEnterMessage(collision);
-            Debug.Log(collision.transform.root.gameObject.name + " " + collision.relativeVelocity + " " + collision.collider);
         }
 
         private void OnCollisionStay(Collision collision)
