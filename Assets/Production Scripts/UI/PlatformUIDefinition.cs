@@ -24,6 +24,10 @@ namespace Vi.UI
 
         public static bool UIElementIsAbleToBeModified(GameObject g)
         {
+            if (g.name.Contains("Joystick Parent")) { return true; }
+            if (g.name.Contains("Limits")) { return false; }
+            if (g.GetComponent<OnScreenStick>()) { return false; }
+
             return (g.GetComponent<Button>() & !g.name.Contains("Limits")) | (g.GetComponent<OnScreenButton>() & !g.GetComponent<CustomOnScreenStick>());
         }
 
@@ -238,7 +242,7 @@ namespace Vi.UI
         private int lastHeightEvaluated;
         private void EvaluateUIDefinitionsInUpdate()
         {
-            if (Screen.currentResolution.width == lastWidthEvaluated & Screen.currentResolution.height == lastHeightEvaluated) { return; }
+            if (Screen.width == lastWidthEvaluated & Screen.height == lastHeightEvaluated) { return; }
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)

@@ -14,7 +14,17 @@ namespace Vi.UI
         [SerializeField] private Text keybindText;
         [SerializeField] private Text potionsLeftText;
 
-        public AnimationHandler.PotionType PotionType { get { return potionType; } }
+        private bool isPreview;
+        public void SetPreviewOn()
+        {
+            isPreview = true;
+            keybindText.text = "";
+            cooldownText.text = "";
+
+            inactivePotionIcon.fillAmount = 0;
+
+            potionsLeftText.text = "10";
+        }
 
         private Canvas canvas;
         private Image borderImage;
@@ -35,6 +45,8 @@ namespace Vi.UI
 
         private void Update()
         {
+            if (isPreview) { return; }
+
             float timeLeft = combatAgent.AnimationHandler.GetPotionCooldownTimeLeft(potionType);
             cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
 

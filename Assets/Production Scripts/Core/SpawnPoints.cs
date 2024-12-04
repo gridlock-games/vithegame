@@ -204,13 +204,16 @@ namespace Vi.Core
 
         private (bool, List<(int, TransformData)>) GetPossibleSpawnOrientations(PlayerDataManager.GameMode gameMode, PlayerDataManager.Team team)
         {
-            bool findMostClearSpawnPoint = true;
+            bool findMostClearSpawnPoint = gameMode == PlayerDataManager.GameMode.FreeForAll
+                | gameMode == PlayerDataManager.GameMode.HordeMode;
+
+            if (team == PlayerDataManager.Team.Spectator) { findMostClearSpawnPoint = false; }
+
             List<(int, TransformData)> returnedSpawnPoints = new List<(int, TransformData)>();
             foreach (SpawnPointDefinition spawnPoint in spawnPoints)
             {
                 if (spawnPoint.gameModes.Contains(gameMode) & spawnPoint.teams.Contains(team))
                 {
-                    findMostClearSpawnPoint = gameMode == PlayerDataManager.GameMode.FreeForAll & team != PlayerDataManager.Team.Spectator;
                     for (int i = 0; i < spawnPoint.spawnPositions.Length; i++)
                     {
                         if (i < spawnPoint.spawnPriorities.Length)
