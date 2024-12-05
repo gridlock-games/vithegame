@@ -42,7 +42,7 @@ namespace Vi.Editor
         private static void MassConvertMaterialShaders()
         {
             string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
-            Shader shader = Shader.Find("Shader Graphs/Asset Master Material");
+            Shader shader = Shader.Find("Shader Graphs/Character and Weapon Shader");
             foreach (string path in paths)
             {
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -50,24 +50,23 @@ namespace Vi.Editor
                 {
                     if (mat.shader != shader)
                     {
-                        Texture baseMap = mat.GetTexture("_BaseMap");
-                        Texture normalMap = mat.GetTexture("_BumpMap");
+                        //Texture baseMap = mat.GetTexture("_BaseMap");
+                        //Texture normalMap = mat.GetTexture("_BumpMap");
 
-                        if (!baseMap) { Debug.LogWarning("No base map found " + mat); }
-                        if (!normalMap) { Debug.LogWarning("No normal map found " + mat); }
+                        Texture baseMap = mat.GetTexture("_Base_Color");
+
+                        //if (!baseMap) { Debug.LogWarning("No base map found " + mat); }
+                        //if (!normalMap) { Debug.LogWarning("No normal map found " + mat); }
 
                         mat.shader = shader;
 
                         mat.SetTexture("_Base_Color", baseMap);
-                        mat.SetTexture("_Normal_Map", normalMap);
+                        //mat.SetTexture("_Normal_Map", normalMap);
 
-                        EditorUtility.SetDirty(mat);
-                    }
-                    else
-                    {
                         mat.SetFloat("_Alpha_cut", 1);
                         mat.SetFloat("_Ambient_Strength", 1);
                         mat.SetFloat("_Roughness", 0);
+
                         EditorUtility.SetDirty(mat);
                     }
                 }
