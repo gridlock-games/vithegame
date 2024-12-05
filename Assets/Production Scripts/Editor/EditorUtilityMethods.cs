@@ -19,6 +19,25 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Enable GPU Instancing")]
+        private static void EnableGPUInstancing()
+        {
+            string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
+            foreach (string path in paths)
+            {
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat)
+                {
+                    if (!mat.enableInstancing)
+                    {
+                        mat.enableInstancing = true;
+                        EditorUtility.SetDirty(mat);
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("Tools/Production/Mass Convert Material Shaders")]
         private static void MassConvertMaterialShaders()
         {

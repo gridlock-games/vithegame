@@ -173,6 +173,14 @@ namespace Vi.Core
             }
         }
 
+        public void SetOrientation(Vector3 position)
+        {
+            if (staticWallBody)
+            {
+                staticWallBody.position = position;
+            }
+        }
+
         private void FixedUpdate()
         {
             if (!staticWallBody) { return; }
