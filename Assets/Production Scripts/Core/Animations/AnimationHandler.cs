@@ -34,6 +34,10 @@ namespace Vi.Core
                 WaitingForActionClipToPlay = true;
 
                 bool isMotionPredicted = actionClip.IsMotionPredicted(IsAtRest());
+                if (lastClipPlayed.GetClipType() == ActionClip.ClipType.Dodge & actionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                {
+                    isMotionPredicted = true;
+                }
                 PlayActionServerRpc(actionClip.name, isFollowUpClip, isMotionPredicted);
                 if (isMotionPredicted)
                 {
@@ -590,7 +594,8 @@ namespace Vi.Core
                         // Allow double dodging
                         if (actionClip.GetClipType() == ActionClip.ClipType.Dodge)
                         {
-                            if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < 0.55f) { return default; }
+                            // Add a delay on this is we're not the server to prevent position errors
+                            if (animatorReference.CurrentActionsAnimatorStateInfo.normalizedTime < (IsServer ? 0.52f : 0.57f)) { return default; }
                         }
 
                         if (lastClipPlayed.GetClipType() == ActionClip.ClipType.HitReaction) { return default; }

@@ -2725,6 +2725,7 @@ MonoBehaviour:
   worldSpaceLabel: {fileID: 73519393645535981}
   UI: {fileID: 7829688245395688192}
   gameModePreviewUI: {fileID: 4229541647828072647}
+  videoPlayer: {fileID: 4330633906424460103}
 --- !u!135 &5301250773397942924
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3560,6 +3561,12 @@ PrefabInstance:
 --- !u!1 &4229541647828072647 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3051460538353790631, guid: 8e12f82bd215943638ade3bbbdfe1779,
+    type: 3}
+  m_PrefabInstance: {fileID: 1218978552644376160}
+  m_PrefabAsset: {fileID: 0}
+--- !u!328 &4330633906424460103 stripped
+VideoPlayer:
+  m_CorrespondingSourceObject: {fileID: 3238983267143197991, guid: 8e12f82bd215943638ade3bbbdfe1779,
     type: 3}
   m_PrefabInstance: {fileID: 1218978552644376160}
   m_PrefabAsset: {fileID: 0}

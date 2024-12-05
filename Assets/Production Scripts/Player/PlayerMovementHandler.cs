@@ -193,7 +193,7 @@ namespace Vi.Player
                         Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
-                        modifiedStatePayload.tick = rootMotionReconciliationState.tick;
+                        modifiedStatePayload.tick = combatAgent.AnimationHandler.WasLastActionClipMotionPredicted ? latestServerState.Value.tick : rootMotionReconciliationState.tick;
                         stateBuffer[rootMotionReconciliationIndex] = modifiedStatePayload;
 
                         Rigidbody.position = modifiedStatePayload.position;
@@ -356,7 +356,7 @@ namespace Vi.Player
                         {
                             inputPayload.moveInput = Vector2.zero;
                         }
-                        else if (!combatAgent.AnimationHandler.IsAtRest())
+                        else if (!combatAgent.AnimationHandler.IsAtRest() & !combatAgent.AnimationHandler.WasLastActionClipMotionPredicted)
                         {
                             inputPayload.moveInput = Vector2.zero;
                         }
@@ -1136,7 +1136,7 @@ namespace Vi.Player
             base.OnDrawGizmos();
             if (!Application.isPlaying) { return; }
 
-            Gizmos.color = Color.blue;
+            Gizmos.color = latestServerState.Value.usedRootMotion ? Color.red : Color.blue;
             Gizmos.DrawSphere(latestServerState.Value.position, 0.5f);
 
             //Gizmos.color = Color.yellow;
