@@ -4,7 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Player;
 using System.IO;
-// using jomarcentermjm.PlatformAPI;
+using UnityEngine.Video;
 
 namespace Vi.UI
 {
@@ -72,6 +72,8 @@ namespace Vi.UI
         private const int emptyLobbyServersRequired = 1;
 #endif
 
+        [SerializeField] private VideoPlayer videoPlayer;
+
         private void Start()
         {
             originalScale = worldSpaceLabel.transform.localScale;
@@ -81,6 +83,8 @@ namespace Vi.UI
             networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
             currentLobbyCount = LobbyServers.Length;
+
+            videoPlayer.Prepare();
         }
 
         private WebRequestManager.Server[] LobbyServers { get { return System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address); } }

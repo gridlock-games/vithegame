@@ -420,6 +420,16 @@ namespace Vi.UI
             OpenViLogin();
         }
 
+        public void SetAPIURLToProd()
+        {
+            APIURLInputField.text = WebRequestManager.ProdAPIURL[0..^1];
+        }
+
+        public void SetAPIURLToDev()
+        {
+            APIURLInputField.text = WebRequestManager.DevAPIURL[0..^1];
+        }
+
         public void QuitGame()
         {
             FasterPlayerPrefs.QuitGame();
