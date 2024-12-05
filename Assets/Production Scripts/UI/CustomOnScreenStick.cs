@@ -116,6 +116,12 @@ namespace Vi.UI
 
         private void OnDisable()
         {
+            RectTransform rt = (RectTransform)transform.parent;
+            rt.anchoredPosition = joystickParentOriginalAnchoredPosition;
+
+            rt = (RectTransform)transform;
+            rt.anchoredPosition = joystickOriginalAnchoredPosition;
+
             InputSystem.onBeforeUpdate -= UpdateJoystick;
         }
 
