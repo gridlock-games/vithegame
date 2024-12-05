@@ -57,9 +57,6 @@ namespace Vi.UI
             playerInput = movementHandler.GetComponent<PlayerInput>();
             combatAgent = movementHandler.GetComponent<CombatAgent>();
             canvas = GetComponentInParent<Canvas>().rootCanvas;
-
-            RectTransform rt = (RectTransform)transform;
-            joystickOriginalAnchoredPosition = rt.anchoredPosition;
         }
 
         private void RefreshStatus()
@@ -110,12 +107,21 @@ namespace Vi.UI
             RectTransform rt = (RectTransform)transform.parent;
             joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
 
+            rt = (RectTransform)transform;
+            joystickOriginalAnchoredPosition = rt.anchoredPosition;
+
             RefreshStatus();
             InputSystem.onBeforeUpdate += UpdateJoystick;
         }
 
         private void OnDisable()
         {
+            RectTransform rt = (RectTransform)transform.parent;
+            rt.anchoredPosition = joystickParentOriginalAnchoredPosition;
+
+            rt = (RectTransform)transform;
+            rt.anchoredPosition = joystickOriginalAnchoredPosition;
+
             InputSystem.onBeforeUpdate -= UpdateJoystick;
         }
 
