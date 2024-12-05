@@ -193,7 +193,7 @@ namespace Vi.Player
                         Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
-                        modifiedStatePayload.tick = rootMotionReconciliationState.tick;
+                        modifiedStatePayload.tick = combatAgent.AnimationHandler.WasLastActionClipMotionPredicted ? latestServerState.Value.tick : rootMotionReconciliationState.tick;
                         stateBuffer[rootMotionReconciliationIndex] = modifiedStatePayload;
 
                         Rigidbody.position = modifiedStatePayload.position;
