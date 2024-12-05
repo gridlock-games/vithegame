@@ -423,11 +423,13 @@ namespace Vi.UI
         public void SetAPIURLToProd()
         {
             APIURLInputField.text = WebRequestManager.ProdAPIURL[0..^1];
+            SetAPIURL();
         }
 
         public void SetAPIURLToDev()
         {
             APIURLInputField.text = WebRequestManager.DevAPIURL[0..^1];
+            SetAPIURL();
         }
 
         public void QuitGame()
