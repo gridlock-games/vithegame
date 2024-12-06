@@ -11,6 +11,7 @@ using UnityEngine.Profiling;
 using System.IO;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine.AdaptivePerformance;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class DebugOverlay : MonoBehaviour
     [SerializeField] private Text packetLossText;
     [SerializeField] private Text bottomDividerText;
     [SerializeField] private Text jitterText;
+    [SerializeField] private Image thermalWarningImage;
 
     private void Start()
     {
@@ -43,6 +45,8 @@ public class DebugOverlay : MonoBehaviour
 
         StartCoroutine(RefreshStatusAfter1Frame());
 
+        thermalWarningImage.enabled = false;
+
 #if PLATFORM_ANDROID && !UNITY_EDITOR
         if (Debug.isDebugBuild)
         {
@@ -55,6 +59,33 @@ public class DebugOverlay : MonoBehaviour
             //Profiler.maxUsedMemory = 256 * 1024 * 1024;
         }
 #endif
+        ap = Holder.Instance;
+        if (!ap.Active)
+            return;
+
+        ap.ThermalStatus.ThermalEvent += OnThermalEvent;
+    }
+
+    private IAdaptivePerformance ap = null;
+
+    void OnThermalEvent(ThermalMetrics ev)
+    {
+        Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
+
+        switch (ev.WarningLevel)
+        {
+            case WarningLevel.NoWarning:
+                thermalWarningImage.enabled = false;
+                break;
+            case WarningLevel.ThrottlingImminent:
+                thermalWarningImage.enabled = true;
+                thermalWarningImage.color = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+                break;
+            case WarningLevel.Throttling:
+                thermalWarningImage.enabled = true;
+                thermalWarningImage.color = Color.red;
+                break;
+        }
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
