@@ -204,11 +204,11 @@ namespace Vi.Core.GameModeManagers
                 }
                 OnRoundEnd(winningPlayerIds.ToArray());
             }
-            else if (!overtime.Value) // TODO only enable overtime if one team is on match point
-            {
-                roundTimer.Value = overtimeDuration;
-                overtime.Value = true;
-            }
+            //else if (!overtime.Value) // TODO only enable overtime if one team is on match point
+            //{
+            //    roundTimer.Value = overtimeDuration;
+            //    overtime.Value = true;
+            //}
             else // End of overtime
             {
                 PlayerDataManager.Team winningTeam = PlayerDataManager.Team.Environment;
