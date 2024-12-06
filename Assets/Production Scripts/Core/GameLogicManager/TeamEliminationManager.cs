@@ -211,31 +211,77 @@ namespace Vi.Core.GameModeManagers
             }
             else // End of overtime
             {
-                float highestAverageHP = -1;
                 PlayerDataManager.Team winningTeam = PlayerDataManager.Team.Environment;
+                Dictionary<PlayerDataManager.Team, int> aliveCountDict = new Dictionary<PlayerDataManager.Team, int>();
                 foreach (PlayerDataManager.Team team in uniqueTeamList)
                 {
-                    float averageHP = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Average(item => item.GetHP());
-                    if (averageHP > highestAverageHP)
-                    {
-                        winningTeam = team;
-                        highestAverageHP = averageHP;
-                    }
+                    int aliveCount = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Count(item => item.GetAilment() != ActionClip.Ailment.Death);
+                    aliveCountDict.Add(team, aliveCount);
                 }
 
-                if (winningTeam == PlayerDataManager.Team.Environment)
+                List<int> aliveCounts = aliveCountDict.Values.ToList();
+                if (aliveCounts.TrueForAll(item => item == aliveCounts.FirstOrDefault()))
                 {
-                    Debug.LogError("Winning team is environment! This should never happen!");
-                    OnRoundEnd(new int[0]);
-                }
-                else
-                {
-                    List<int> winningIds = new List<int>();
-                    foreach (Attributes winningTeamPlayer in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeam))
+                    Debug.Log("Alive counts are equal");
+                    float highestAverageHP = -1;
+                    foreach (PlayerDataManager.Team team in uniqueTeamList)
                     {
-                        winningIds.Add(winningTeamPlayer.GetPlayerDataId());
+                        float averageHP = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Average(item => item.GetHP());
+                        Debug.Log(team + " " + averageHP);
+                        if (averageHP > highestAverageHP)
+                        {
+                            winningTeam = team;
+                            highestAverageHP = averageHP;
+                        }
                     }
-                    OnRoundEnd(winningIds.ToArray());
+
+                    if (winningTeam == PlayerDataManager.Team.Environment)
+                    {
+                        Debug.LogError("Winning team is environment! This should never happen!");
+                        OnRoundEnd(new int[0]);
+                    }
+                    else
+                    {
+                        List<int> winningIds = new List<int>();
+                        foreach (Attributes winningTeamPlayer in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeam))
+                        {
+                            winningIds.Add(winningTeamPlayer.GetPlayerDataId());
+                        }
+                        OnRoundEnd(winningIds.ToArray());
+                    }
+                }
+                else // Alive counts are not equal
+                {
+                    Debug.Log("Alive counts are not equal");
+                    if (aliveCountDict.Count == 0)
+                    {
+                        Debug.LogError("Death Count dictionary count is 0! This should never happen!");
+                        OnRoundEnd(new int[0]);
+                    }
+                    else
+                    {
+                        foreach (var kvp in aliveCountDict)
+                        {
+                            Debug.Log(kvp.Key + " " + kvp.Value);
+                        }
+
+                        winningTeam = aliveCountDict.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+                        Debug.Log("Winning team: " + winningTeam);
+                        if (winningTeam == PlayerDataManager.Team.Environment)
+                        {
+                            Debug.LogError("Winning team is environment! This should never happen!");
+                            OnRoundEnd(new int[0]);
+                        }
+                        else
+                        {
+                            List<int> winningIds = new List<int>();
+                            foreach (Attributes winningTeamPlayer in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeam))
+                            {
+                                winningIds.Add(winningTeamPlayer.GetPlayerDataId());
+                            }
+                            OnRoundEnd(winningIds.ToArray());
+                        }
+                    }
                 }
             }
         }
