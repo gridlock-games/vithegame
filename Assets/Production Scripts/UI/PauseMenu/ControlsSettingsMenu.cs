@@ -14,7 +14,6 @@ namespace Vi.UI
 {
     public class ControlsSettingsMenu : Menu
     {
-        [SerializeField] private Toggle invertLookToggle;
         [SerializeField] private InputField mouseXSensitivityInput;
         [SerializeField] private InputField mouseYSensitivityInput;
         [SerializeField] private InputField zoomMultiplierInput;
@@ -61,7 +60,6 @@ namespace Vi.UI
 
         private void Awake()
         {
-            invertLookToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("InvertMouse");
             mouseXSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity").ToString();
             mouseYSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity").ToString();
             zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
@@ -215,11 +213,6 @@ namespace Vi.UI
             }
 
             lastControlScheme = playerInput.currentControlScheme;
-        }
-
-        public void SetInvertMouse()
-        {
-            FasterPlayerPrefs.Singleton.SetBool("InvertMouse", invertLookToggle.isOn);
         }
 
         public void ChangeMouseXSensitivity()

@@ -72,6 +72,8 @@ public class DebugOverlay : MonoBehaviour
     {
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
+        if (!thermalEventsEnabled) { return; }
+
         switch (ev.WarningLevel)
         {
             case WarningLevel.NoWarning:
@@ -188,6 +190,8 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
+    private bool thermalEventsEnabled;
+
     private void RefreshStatus()
     {
         consoleEnabled = FasterPlayerPrefs.Singleton.GetBool("ConsoleEnabled");
@@ -195,6 +199,9 @@ public class DebugOverlay : MonoBehaviour
         pingEnabled = FasterPlayerPrefs.Singleton.GetBool("PingEnabled");
         packetLossEnabled = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
+        thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
+
+        if (!thermalEventsEnabled) { thermalWarningImage.enabled = false; }
 
         if (!consoleEnabled)
         {
