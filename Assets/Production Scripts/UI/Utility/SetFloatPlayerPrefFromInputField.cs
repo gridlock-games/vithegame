@@ -35,7 +35,7 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.HasFloat(playerPrefName))
             {
-                inputField.SetTextWithoutNotify(FasterPlayerPrefs.Singleton.GetFloat(playerPrefName).ToString());
+                inputField.text = FasterPlayerPrefs.Singleton.GetFloat(playerPrefName).ToString();
             }
             else
             {

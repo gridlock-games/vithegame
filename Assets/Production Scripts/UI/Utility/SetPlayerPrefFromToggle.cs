@@ -24,7 +24,7 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.HasBool(playerPrefName))
             {
-                toggle.SetIsOnWithoutNotify(FasterPlayerPrefs.Singleton.GetBool(playerPrefName));
+                toggle.isOn = FasterPlayerPrefs.Singleton.GetBool(playerPrefName);
             }
             else
             {

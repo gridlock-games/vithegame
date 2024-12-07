@@ -12,22 +12,8 @@ namespace Vi.UI
 {
     public class GameSettingsMenu : Menu
     {
-        [SerializeField] private Slider UIOpacitySlider;
-        [SerializeField] private Toggle showTextInWorldSpaceLabelsToggle;
         [SerializeField] private GameObject channelDropdownParent;
         [SerializeField] private TMP_Dropdown channelDropdown;
-
-        private void Awake()
-        {
-            showTextInWorldSpaceLabelsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("ShowHPTextInWorldSpaceLabels");
-
-            //showTextInWorldSpaceLabelsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(showTextInWorldSpaceLabelsToggle, "ShowHPTextInWorldSpaceLabels"); });
-
-            UIOpacitySlider.value = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
-            UIOpacitySlider.minValue = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.1f : 0;
-
-            //UIOpacitySlider.onValueChanged.AddListener(delegate { SetPlayerPrefFromSlider(UIOpacitySlider, "UIOpacity"); });
-        }
 
         private void Start()
         {

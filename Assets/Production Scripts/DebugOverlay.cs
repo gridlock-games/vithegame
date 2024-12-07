@@ -59,11 +59,15 @@ public class DebugOverlay : MonoBehaviour
             //Profiler.maxUsedMemory = 256 * 1024 * 1024;
         }
 #endif
-        ap = Holder.Instance;
-        if (!ap.Active)
-            return;
 
-        ap.ThermalStatus.ThermalEvent += OnThermalEvent;
+        ap = Holder.Instance;
+        if (ap != null)
+        {
+            if (!ap.Active)
+                return;
+
+            ap.ThermalStatus.ThermalEvent += OnThermalEvent;
+        }
     }
 
     private IAdaptivePerformance ap = null;

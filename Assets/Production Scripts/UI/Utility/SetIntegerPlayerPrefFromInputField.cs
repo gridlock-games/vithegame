@@ -35,7 +35,7 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.HasInt(playerPrefName))
             {
-                inputField.SetTextWithoutNotify(FasterPlayerPrefs.Singleton.GetInt(playerPrefName).ToString());
+                inputField.text = FasterPlayerPrefs.Singleton.GetInt(playerPrefName).ToString();
             }
             else
             {

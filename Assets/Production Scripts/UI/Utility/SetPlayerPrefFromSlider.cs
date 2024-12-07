@@ -24,7 +24,7 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.HasFloat(playerPrefName))
             {
-                slider.SetValueWithoutNotify(FasterPlayerPrefs.Singleton.GetFloat(playerPrefName));
+                slider.value = FasterPlayerPrefs.Singleton.GetFloat(playerPrefName);
             }
             else
             {
