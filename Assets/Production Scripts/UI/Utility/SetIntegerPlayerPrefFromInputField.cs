@@ -18,6 +18,7 @@ namespace Vi.UI
             if (int.TryParse(value, out int result))
             {
                 FasterPlayerPrefs.Singleton.SetInt(playerPrefName, result);
+                inputField.SetTextWithoutNotify(result.ToString());
             }
             else
             {
