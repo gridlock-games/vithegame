@@ -128,43 +128,56 @@ namespace Vi.Core
 
         private void Physics_ContactModifyEvent(PhysicsScene scene, Unity.Collections.NativeArray<ModifiableContactPair> pairs)
         {
-            // For each contact pair, ignore the contact points that are close to origin
-            foreach (var pair in pairs)
+            foreach (ModifiableContactPair pair in pairs)
             {
                 for (int i = 0; i < pair.contactCount; ++i)
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
-                        //pair.IgnoreContact(i);
+                        if (other.StaticWallsEnabled())
+                        {
+                            pair.IgnoreContact(i);
+                        }
                     }
                     else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                     {
-                        pair.IgnoreContact(i);
-                        // Phase through other players if we are dodging out of an ailment like knockdown
-                        if (CombatAgent.CanRecoveryDodge)
+                        if (other.StaticWallsEnabled())
                         {
-                            if (CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
+                            // Phase through other players if we are dodging out of an ailment like knockdown
+                            if (ShouldApplyRecoveryDodgeLogic())
                             {
-                                if (!CombatAgent.AnimationHandler.IsAtRest())
+                                pair.IgnoreContact(i);
+                            }
+                            else if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                            {
+                                if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
                                 {
-                                    pair.IgnoreContact(i);
+                                    if (!CombatAgent.AnimationHandler.IsAtRest())
+                                    {
+                                        pair.SetDynamicFriction(i, 1);
+                                    }
                                 }
                             }
                         }
-
-                        if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                        else
                         {
-                            if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
-                            {
-                                if (!CombatAgent.AnimationHandler.IsAtRest())
-                                {
-                                    pair.SetDynamicFriction(i, 1);
-                                }
-                            }
+                            pair.IgnoreContact(i);
                         }
                     }
                 }
             }
+        }
+
+        private bool StaticWallsEnabled()
+        {
+            return MovementHandler.Rigidbody.linearVelocity.magnitude < 0.1f | ShouldApplyRecoveryDodgeLogic();
+        }
+
+        private bool ShouldApplyRecoveryDodgeLogic()
+        {
+            return CombatAgent.CanRecoveryDodge
+                & CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge
+                & !CombatAgent.AnimationHandler.IsAtRest();
         }
 
         private void OnDestroy()
@@ -228,14 +241,6 @@ namespace Vi.Core
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
-
-            if (CombatAgent.IsSpawned & CombatAgent.IsClient)
-            {
-                foreach (Collider c in staticWallColliders)
-                {
-                    c.enabled = false;
-                }
-            }
         }
 
         private void OnCollisionEnter(Collision collision)
