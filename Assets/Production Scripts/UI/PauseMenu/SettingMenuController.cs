@@ -11,7 +11,6 @@ namespace Vi.UI
 
         [SerializeField] private List<GameObject> uiList = new List<GameObject>();
         [SerializeField] private int defaultUI;
-        [SerializeField] private GameObject oldControlsUI;
         [SerializeField] private Text errorText;
         private int currentSelection;
 
@@ -59,10 +58,6 @@ namespace Vi.UI
             _settings.GetComponent<Menu>().SetLastMenu(gameObject);
             childMenu = _settings;
             gameObject.SetActive(false);
-        }
-        public void OpenOldControlUI()
-        {
-            Instantiate(oldControlsUI);
         }
     }
 }
