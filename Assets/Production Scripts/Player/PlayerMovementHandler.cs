@@ -63,12 +63,13 @@ namespace Vi.Player
             public bool shouldUseRootMotion;
             public Vector3 rootMotion;
             public float runSpeed;
+            public LoadoutManager.WeaponSlotType equippedWeaponSlot;
             public bool isGrounded;
             public bool shouldPlayHitStop;
             public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed, bool isGrounded,
-                bool shouldPlayHitStop)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed,
+                LoadoutManager.WeaponSlotType weaponSlotType, bool isGrounded, bool shouldPlayHitStop)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
@@ -76,6 +77,7 @@ namespace Vi.Player
                 this.shouldUseRootMotion = shouldUseRootMotion;
                 this.rootMotion = rootMotion;
                 this.runSpeed = runSpeed;
+                this.equippedWeaponSlot = weaponSlotType;
                 this.isGrounded = isGrounded;
                 this.shouldPlayHitStop = shouldPlayHitStop;
                 // This is assigned after the input is processed
@@ -248,6 +250,10 @@ namespace Vi.Player
 
                 // Process new movement with reconciled state
                 InputPayload inputPayload = inputBuffer[bufferIndex];
+                if (inputPayload.equippedWeaponSlot != combatAgent.LoadoutManager.GetEquippedSlotType())
+                {
+                    inputPayload.runSpeed = GetRunSpeed();
+                }
                 StatePayload statePayload = Move(ref inputPayload, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
@@ -257,7 +263,7 @@ namespace Vi.Player
                 tickToProcess++;
             }
             Physics.simulationMode = SimulationMode.FixedUpdate;
-            stepsToBuffer = 2;
+            stepsToBuffer = 1;
         }
 
         public override Vector2[] GetMoveInputQueue()
@@ -483,7 +489,7 @@ namespace Vi.Player
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
-                    GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
+                    GetRunSpeed(), combatAgent.LoadoutManager.GetEquippedSlotType(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
                 if (combatAgent.StatusAgent.IsRooted())
                 {
@@ -825,7 +831,7 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, true, false),
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, combatAgent.LoadoutManager.GetEquippedSlotType(), true, false),
                     Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
         }
