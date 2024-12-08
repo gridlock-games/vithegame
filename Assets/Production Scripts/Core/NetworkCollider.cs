@@ -23,6 +23,7 @@ namespace Vi.Core
         private Collider[] staticWallColliders = new Collider[0];
 
         private static Dictionary<int, NetworkCollider> colliderInstanceIDMap = new Dictionary<int, NetworkCollider>();
+        private static Dictionary<int, NetworkCollider> staticWallColliderInstanceIDMap = new Dictionary<int, NetworkCollider>();
 
         private PooledObject parentPooledObject;
 
@@ -54,7 +55,7 @@ namespace Vi.Core
                     foreach (Collider staticWallCollider in staticWallColliders)
                     {
                         Physics.IgnoreCollision(col, staticWallCollider);
-                        colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
+                        staticWallColliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
                         staticWallCollider.hasModifiableContacts = true;
                     }
                 }
@@ -134,6 +135,10 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
+                        pair.IgnoreContact(i);
+                    }
+                    else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
+                    {
                         // Phase through other players if we are dodging out of an ailment like knockdown
                         if (CombatAgent.CanRecoveryDodge)
                         {
@@ -163,11 +168,16 @@ namespace Vi.Core
 
         private void OnDestroy()
         {
+            foreach (Collider c in Colliders)
+            {
+                colliderInstanceIDMap.Remove(c.GetInstanceID());
+            }
+
             if (staticWallBody)
             {
                 foreach (Collider staticWallCollider in staticWallColliders)
                 {
-                    colliderInstanceIDMap.Remove(staticWallCollider.GetInstanceID());
+                    staticWallColliderInstanceIDMap.Remove(staticWallCollider.GetInstanceID());
                 }
                 Destroy(staticWallBody.gameObject);
             }
@@ -217,6 +227,11 @@ namespace Vi.Core
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
+
+            //foreach (Collider c in staticWallColliders)
+            //{
+            //    c.enabled = false;
+            //}
         }
 
         private void OnCollisionEnter(Collision collision)
