@@ -550,7 +550,6 @@ namespace Vi.Player
 
             if (stepsToBuffer > 0)
             {
-                Debug.Log(stepsToBuffer + " " + t);
                 stepsToBuffer--;
             }
         }
@@ -569,6 +568,8 @@ namespace Vi.Player
             lastProcessedState = default;
             serverInputQueue.Clear();
 
+            lastServerPosition = default;
+            lastCollisionTick = default;
         }
 
         private int movementTick;

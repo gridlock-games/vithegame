@@ -22,6 +22,8 @@ namespace Vi.ArtificialIntelligence
         protected override void OnDisable()
         {
             isHeavyAttacking = default;
+            lastCollisionTick = default;
+            lastServerPosition = default;
         }
 
         protected override void Update()
@@ -276,6 +278,26 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
+        private int lastCollisionTick;
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionEnterMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                lastCollisionTick = NetworkManager.LocalTime.Tick;
+            }
+        }
+
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionStayMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                lastCollisionTick = NetworkManager.LocalTime.Tick;
+            }
+        }
+
+        private Vector3 lastServerPosition;
         void FixedUpdate()
         {
             if (IsServer)
@@ -285,7 +307,16 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
+                // Sync position here with latest server state
+                Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
+
+                if (targetPosition != lastServerPosition & lastCollisionTick <= NetworkManager.ServerTime.Tick)
+                {
+                    Rigidbody.position = targetPosition;
+                    lastServerPosition = targetPosition;
+                }
+
+                Rigidbody.linearVelocity = Vector3.zero;
             }
         }
 
