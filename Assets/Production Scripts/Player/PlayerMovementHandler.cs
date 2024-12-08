@@ -152,7 +152,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.2f;
+        private const float serverReconciliationThreshold = 0.01f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -235,6 +235,7 @@ namespace Vi.Player
             return Vector3.zero;
         }
 
+        private int stepsToBuffer;
         private void ReprocessInputs(int latestServerTick)
         {
             Physics.simulationMode = SimulationMode.Script;
@@ -256,6 +257,7 @@ namespace Vi.Player
                 tickToProcess++;
             }
             Physics.simulationMode = SimulationMode.FixedUpdate;
+            stepsToBuffer = 2;
         }
 
         public override Vector2[] GetMoveInputQueue()
@@ -439,7 +441,7 @@ namespace Vi.Player
                         }
                     }
                 }
-                
+
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (combatAgent.WeaponHandler.LightAttackIsPressed)
@@ -520,7 +522,31 @@ namespace Vi.Player
                 Rigidbody.Sleep();
             }
 
-            interpolationRigidbody.MovePosition(Rigidbody.position);
+            float t = 1;
+            if (stepsToBuffer == 0)
+            {
+                t = 1;
+            }
+            else if (stepsToBuffer == 1)
+            {
+                t = 0.75f;
+            }
+            else if (stepsToBuffer == 2)
+            {
+                t = 0.5f;
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to handle steps to buffer number " + stepsToBuffer);
+            }
+
+            interpolationRigidbody.MovePosition(Vector3.Lerp(interpolationRigidbody.position, Rigidbody.position, t));
+
+            if (stepsToBuffer > 0)
+            {
+                Debug.Log(stepsToBuffer + " " + t);
+                stepsToBuffer--;
+            }
         }
 
         protected override void OnDisable()
