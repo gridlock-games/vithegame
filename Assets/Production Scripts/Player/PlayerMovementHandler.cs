@@ -554,6 +554,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
+                LastMovement = Vector3.zero;
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -568,6 +569,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
+                LastMovement = Vector3.zero;
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -577,6 +579,7 @@ namespace Vi.Player
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
+                LastMovement = Vector3.zero;
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
@@ -586,6 +589,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    LastMovement = Vector3.zero;
                     return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
                 }
             }
@@ -691,6 +695,7 @@ namespace Vi.Player
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
+            LastMovement = movement;
             return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
 

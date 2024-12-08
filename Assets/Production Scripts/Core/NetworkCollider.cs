@@ -134,21 +134,21 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
-                        if (other.StaticWallsEnabled())
+                        if (other.StaticWallsEnabledForThisCollision(other))
                         {
                             pair.IgnoreContact(i);
                         }
                     }
                     else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                     {
-                        if (other.StaticWallsEnabled())
+                        // Phase through other players if we are dodging out of an ailment like knockdown
+                        if (ShouldApplyRecoveryDodgeLogic())
                         {
-                            // Phase through other players if we are dodging out of an ailment like knockdown
-                            if (ShouldApplyRecoveryDodgeLogic())
-                            {
-                                pair.IgnoreContact(i);
-                            }
-                            else if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                            pair.IgnoreContact(i);
+                        }
+                        else if (other.StaticWallsEnabledForThisCollision(other))
+                        {
+                            if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                             {
                                 if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
                                 {
@@ -168,9 +168,19 @@ namespace Vi.Core
             }
         }
 
-        private bool StaticWallsEnabled()
+        private bool StaticWallsEnabledForThisCollision(NetworkCollider other)
         {
-            return MovementHandler.Rigidbody.linearVelocity.magnitude < 0.1f | ShouldApplyRecoveryDodgeLogic();
+            if (CombatAgent.AnimationHandler.IsAtRest() & MovementHandler.LastMovement != Vector3.zero)
+            {
+                return false;
+            }
+
+            if (other.CombatAgent.AnimationHandler.IsAtRest() & other.MovementHandler.LastMovement != Vector3.zero)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool ShouldApplyRecoveryDodgeLogic()

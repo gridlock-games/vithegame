@@ -47,6 +47,8 @@ namespace Vi.Core.MovementHandlers
             NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 
+        public Vector3 LastMovement { get; protected set; }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -105,6 +107,7 @@ namespace Vi.Core.MovementHandlers
             stairColliders.Clear();
             groundColliders.Clear();
             animationMoveInput = default;
+            LastMovement = default;
         }
 
         protected float GetTickRateDeltaTime()

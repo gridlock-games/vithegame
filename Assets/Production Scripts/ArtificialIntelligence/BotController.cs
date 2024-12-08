@@ -298,7 +298,11 @@ namespace Vi.ArtificialIntelligence
                 rootMotion.z = 0;
             }
 
-            if (!IsSpawned) { return; }
+            if (!IsSpawned)
+            {
+                LastMovement = Vector3.zero;
+                return;
+            }
 
             CalculatePath(Rigidbody.position);
 
@@ -306,15 +310,22 @@ namespace Vi.ArtificialIntelligence
             {
                 transform.position = Rigidbody.position;
                 Rigidbody.Sleep();
+                LastMovement = Vector3.zero;
                 return;
             }
             else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 Rigidbody.Sleep();
+                LastMovement = Vector3.zero;
                 return;
             }
 
-            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing) { Rigidbody.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
+            {
+                LastMovement = Vector3.zero;
+                Rigidbody.isKinematic = false;
+                return;
+            }
 
             Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
@@ -323,6 +334,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 movement = Vector3.zero;
             if (combatAgent.IsGrabbing)
             {
+                LastMovement = Vector3.zero;
                 Rigidbody.isKinematic = true;
                 return;
             }
@@ -333,6 +345,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    LastMovement = Vector3.zero;
                     return;
                 }
             }
@@ -425,6 +438,7 @@ namespace Vi.ArtificialIntelligence
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
+            LastMovement = movement;
         }
 
         private const float bodyRadius = 0.5f;
