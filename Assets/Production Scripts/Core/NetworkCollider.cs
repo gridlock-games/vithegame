@@ -135,10 +135,11 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
-                        pair.IgnoreContact(i);
+                        //pair.IgnoreContact(i);
                     }
                     else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                     {
+                        pair.IgnoreContact(i);
                         // Phase through other players if we are dodging out of an ailment like knockdown
                         if (CombatAgent.CanRecoveryDodge)
                         {
@@ -228,10 +229,13 @@ namespace Vi.Core
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
 
-            //foreach (Collider c in staticWallColliders)
-            //{
-            //    c.enabled = false;
-            //}
+            if (CombatAgent.IsSpawned & CombatAgent.IsClient)
+            {
+                foreach (Collider c in staticWallColliders)
+                {
+                    c.enabled = false;
+                }
+            }
         }
 
         private void OnCollisionEnter(Collision collision)

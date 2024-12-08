@@ -42,7 +42,8 @@ namespace Vi.Core.MovementHandlers
             networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
-            rb.isKinematic = !IsServer & !IsOwner;
+            //rb.isKinematic = !IsServer & !IsOwner;
+            rb.isKinematic = false;
             NetworkManager.NetworkTickSystem.Tick += Tick;
         }
 

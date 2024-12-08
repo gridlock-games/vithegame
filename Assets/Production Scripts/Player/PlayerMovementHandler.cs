@@ -288,8 +288,28 @@ namespace Vi.Player
             inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
         }
 
+        private int lastCollisionTick;
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionEnterMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                lastCollisionTick = NetworkManager.LocalTime.Tick;
+            }
+        }
+
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionStayMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                lastCollisionTick = NetworkManager.LocalTime.Tick;
+            }
+        }
+
         private float timeWithoutInputs;
         private InputPayload lastInputPayloadProcessedOnServer;
+        private Vector3 lastServerPosition;
         private void FixedUpdate()
         {
             if (!IsSpawned)
@@ -303,7 +323,15 @@ namespace Vi.Player
                 if (latestServerState.Value.tick > 0)
                 {
                     // Sync position here with latest server state
-                    Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
+                    Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
+
+                    if (targetPosition != lastServerPosition & lastCollisionTick <= NetworkManager.ServerTime.Tick)
+                    {
+                        Rigidbody.position = targetPosition;
+                        lastServerPosition = targetPosition;
+                    }
+
+                    Rigidbody.linearVelocity = Vector3.zero;
                 }
             }
 
