@@ -578,6 +578,24 @@ namespace Vi.Player
             lastCollisionTick = default;
         }
 
+        private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)
+        {
+            LastMovementWasZero = current;
+        }
+
+        private NetworkVariable<bool> lastMovementWasZeroSynced = new NetworkVariable<bool>();
+        private void SetLastMovement(Vector3 lastMovement)
+        {
+            bool value = lastMovement == Vector3.zero;
+            
+            LastMovementWasZero = value;
+
+            if (IsServer)
+            {
+                lastMovementWasZeroSynced.Value = value;
+            }
+        }
+
         private int movementTick;
         RaycastHit[] rootMotionHits = new RaycastHit[10];
         private StatePayload Move(ref InputPayload inputPayload, bool isReprocessing)
@@ -593,7 +611,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -608,7 +626,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -618,7 +636,7 @@ namespace Vi.Player
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
@@ -628,7 +646,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
-                    LastMovement = Vector3.zero;
+                    SetLastMovement(Vector3.zero);
                     return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
                 }
             }
@@ -734,7 +752,7 @@ namespace Vi.Player
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
-            LastMovement = movement;
+            SetLastMovement(movement);
             return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
 
@@ -841,6 +859,11 @@ namespace Vi.Player
                 latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, combatAgent.LoadoutManager.GetEquippedSlotType(), true, false),
                     Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
+
+            if (!IsOwner & !IsServer)
+            {
+                lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -868,6 +891,11 @@ namespace Vi.Player
             if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
+            }
+
+            if (!IsOwner & !IsServer)
+            {
+                lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
             }
         }
 

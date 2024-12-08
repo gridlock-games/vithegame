@@ -134,7 +134,11 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
-                        if (other.StaticWallsEnabledForThisCollision(other))
+                        if (ShouldApplyRecoveryDodgeLogic())
+                        {
+                            pair.IgnoreContact(i);
+                        }
+                        else if (other.StaticWallsEnabledForThisCollision(other))
                         {
                             pair.IgnoreContact(i);
                         }
@@ -170,12 +174,12 @@ namespace Vi.Core
 
         public bool StaticWallsEnabledForThisCollision(NetworkCollider other)
         {
-            if (CombatAgent.AnimationHandler.IsAtRest() & MovementHandler.LastMovement != Vector3.zero)
+            if (CombatAgent.AnimationHandler.IsAtRest() & !MovementHandler.LastMovementWasZero)
             {
                 return false;
             }
 
-            if (other.CombatAgent.AnimationHandler.IsAtRest() & other.MovementHandler.LastMovement != Vector3.zero)
+            if (other.CombatAgent.AnimationHandler.IsAtRest() & !other.MovementHandler.LastMovementWasZero)
             {
                 return false;
             }

@@ -326,6 +326,43 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
+            }
+        }
+
+        private NetworkVariable<bool> lastMovementWasZeroSynced = new NetworkVariable<bool>();
+
+        private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)
+        {
+            LastMovementWasZero = current;
+        }
+
+        private void SetLastMovement(Vector3 lastMovement)
+        {
+            bool value = lastMovement == Vector3.zero;
+
+            LastMovementWasZero = value;
+
+            if (IsServer)
+            {
+                lastMovementWasZeroSynced.Value = value;
+            }
+        }
+
         private void Move()
         {
             Vector3 rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
@@ -337,7 +374,7 @@ namespace Vi.ArtificialIntelligence
 
             if (!IsSpawned)
             {
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return;
             }
 
@@ -347,19 +384,19 @@ namespace Vi.ArtificialIntelligence
             {
                 transform.position = Rigidbody.position;
                 Rigidbody.Sleep();
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return;
             }
             else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 Rigidbody.Sleep();
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 return;
             }
 
             if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
             {
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 Rigidbody.isKinematic = false;
                 return;
             }
@@ -371,7 +408,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 movement = Vector3.zero;
             if (combatAgent.IsGrabbing)
             {
-                LastMovement = Vector3.zero;
+                SetLastMovement(Vector3.zero);
                 Rigidbody.isKinematic = true;
                 return;
             }
@@ -382,7 +419,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
-                    LastMovement = Vector3.zero;
+                    SetLastMovement(Vector3.zero);
                     return;
                 }
             }
@@ -475,7 +512,7 @@ namespace Vi.ArtificialIntelligence
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
-            LastMovement = movement;
+            SetLastMovement(movement);
         }
 
         private const float bodyRadius = 0.5f;
