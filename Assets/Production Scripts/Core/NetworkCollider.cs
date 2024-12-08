@@ -6,6 +6,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -134,23 +135,27 @@ namespace Vi.Core
                 {
                     if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
                     {
+                        if (other == this) { continue; }
+
                         if (ShouldApplyRecoveryDodgeLogic())
                         {
                             pair.IgnoreContact(i);
                         }
-                        else if (other.StaticWallsEnabledForThisCollision(other))
+                        else if (StaticWallsEnabledForThisCollision(other))
                         {
                             pair.IgnoreContact(i);
                         }
                     }
                     else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                     {
+                        if (other == this) { continue; }
+
                         // Phase through other players if we are dodging out of an ailment like knockdown
                         if (ShouldApplyRecoveryDodgeLogic())
                         {
                             pair.IgnoreContact(i);
                         }
-                        else if (other.StaticWallsEnabledForThisCollision(other))
+                        else if (StaticWallsEnabledForThisCollision(other))
                         {
                             if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                             {
@@ -174,17 +179,19 @@ namespace Vi.Core
 
         public bool StaticWallsEnabledForThisCollision(NetworkCollider other)
         {
-            if (CombatAgent.AnimationHandler.IsAtRest() & !MovementHandler.LastMovementWasZero)
+            if (other == this)
             {
-                return false;
+                Debug.LogWarning("Passing the same network collider in here");
             }
 
-            if (other.CombatAgent.AnimationHandler.IsAtRest() & !other.MovementHandler.LastMovementWasZero)
-            {
-                return false;
-            }
+            // If either player is standing still or not at rest, return true
+            if (!CombatAgent.AnimationHandler.IsAtRest()) { return true; }
+            if (!other.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
 
-            return true;
+            if (MovementHandler.LastMovementWasZero) { return true; }
+            if (other.MovementHandler.LastMovementWasZero) { return true; }
+
+            return false;
         }
 
         private bool ShouldApplyRecoveryDodgeLogic()
@@ -255,6 +262,17 @@ namespace Vi.Core
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
+
+            //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            //{
+            //    foreach (Collider col in Colliders)
+            //    {
+            //        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
+            //        {
+            //            Physics.IgnoreCollision(col, otherCol, ShouldApplyRecoveryDodgeLogic() | StaticWallsEnabledForThisCollision(attributes.NetworkCollider));
+            //        }
+            //    }
+            //}
         }
 
         private void OnCollisionEnter(Collision collision)
