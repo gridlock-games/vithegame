@@ -168,7 +168,7 @@ namespace Vi.Core
             }
         }
 
-        private bool StaticWallsEnabledForThisCollision(NetworkCollider other)
+        public bool StaticWallsEnabledForThisCollision(NetworkCollider other)
         {
             if (CombatAgent.AnimationHandler.IsAtRest() & MovementHandler.LastMovement != Vector3.zero)
             {
@@ -245,7 +245,8 @@ namespace Vi.Core
                     }
                     else
                     {
-                        c.enabled = false;
+                        c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
+                        //c.enabled = false;
                     }
                 }
             }
