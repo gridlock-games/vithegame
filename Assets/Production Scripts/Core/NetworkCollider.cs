@@ -247,10 +247,9 @@ namespace Vi.Core
                     {
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
-                    else
+                    else // Player hub
                     {
-                        c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
-                        //c.enabled = false;
+                        c.enabled = false;
                     }
                 }
             }
