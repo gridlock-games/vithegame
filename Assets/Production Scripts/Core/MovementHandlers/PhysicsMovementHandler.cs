@@ -132,8 +132,6 @@ namespace Vi.Core.MovementHandlers
 
         protected override void Update()
         {
-            Debug.Log(combatAgent.GetName() + " " + LastMovementWasZero);
-
             base.Update();
             UpdateAnimatorSpeed();
             UpdateAnimatorParameters();
