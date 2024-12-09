@@ -51,15 +51,16 @@ namespace Vi.Core
                 colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 col.hasModifiableContacts = true;
 
-                if (staticWallBody)
+                foreach (Collider staticWallCollider in staticWallColliders)
                 {
-                    foreach (Collider staticWallCollider in staticWallColliders)
-                    {
-                        Physics.IgnoreCollision(col, staticWallCollider);
-                        staticWallColliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
-                        staticWallCollider.hasModifiableContacts = true;
-                    }
+                    Physics.IgnoreCollision(col, staticWallCollider);
                 }
+            }
+
+            foreach (Collider staticWallCollider in staticWallColliders)
+            {
+                staticWallColliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
+                staticWallCollider.hasModifiableContacts = true;
             }
         }
 
@@ -133,56 +134,74 @@ namespace Vi.Core
             {
                 for (int i = 0; i < pair.contactCount; ++i)
                 {
-                    if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
-                    {
-                        if (other == this) { continue; }
+                    colliderInstanceIDMap.TryGetValue(pair.colliderInstanceID, out NetworkCollider col);
+                    colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other);
 
-                        if (ShouldApplyRecoveryDodgeLogic())
+                    // Both colliders are movement colliders
+                    if (col & other)
+                    {
+                        EvaluateContactPairAsMovementCollider(pair, i, other);
+                    }
+                    else if (col) // Col is a movement collider, but other is a static wall
+                    {
+                        if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                         {
-                            pair.IgnoreContact(i);
-                        }
-                        else if (StaticWallsEnabledForThisCollision(other))
-                        {
-                            pair.IgnoreContact(i);
+                            EvaluateContactPairAsStaticWallCollider(pair, i, other);
                         }
                     }
-                    else if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
+                    else if (other) // Other is a movement collider, but col is a static wall
                     {
-                        if (other == this) { continue; }
-
-                        // Phase through other players if we are dodging out of an ailment like knockdown
-                        if (ShouldApplyRecoveryDodgeLogic())
+                        if (staticWallColliderInstanceIDMap.TryGetValue(pair.colliderInstanceID, out col))
                         {
-                            pair.IgnoreContact(i);
-                        }
-                        else if (StaticWallsEnabledForThisCollision(other))
-                        {
-                            if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
-                            {
-                                if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
-                                {
-                                    if (!CombatAgent.AnimationHandler.IsAtRest())
-                                    {
-                                        pair.SetDynamicFriction(i, 1);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            pair.IgnoreContact(i);
+                            EvaluateContactPairAsStaticWallCollider(pair, i, col);
                         }
                     }
                 }
             }
         }
 
+        private void EvaluateContactPairAsMovementCollider(ModifiableContactPair pair, int i, NetworkCollider other)
+        {
+            //pair.IgnoreContact(i);
+            if (ShouldApplyRecoveryDodgeLogic())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (StaticWallsEnabledForThisCollision(other))
+            {
+                pair.IgnoreContact(i);
+            }
+        }
+
+        private void EvaluateContactPairAsStaticWallCollider(ModifiableContactPair pair, int i, NetworkCollider other)
+        {
+            // Phase through other players if we are dodging out of an ailment like knockdown
+            if (ShouldApplyRecoveryDodgeLogic())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (StaticWallsEnabledForThisCollision(other))
+            {
+                if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                {
+                    if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
+                    {
+                        if (!CombatAgent.AnimationHandler.IsAtRest())
+                        {
+                            pair.SetDynamicFriction(i, 1);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                pair.IgnoreContact(i);
+            }
+        }
+
         public bool StaticWallsEnabledForThisCollision(NetworkCollider other)
         {
-            if (other == this)
-            {
-                Debug.LogWarning("Passing the same network collider in here");
-            }
+            return true;
 
             // If either player is standing still or not at rest, return true
             if (!CombatAgent.AnimationHandler.IsAtRest()) { return true; }
