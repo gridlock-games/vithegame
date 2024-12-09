@@ -201,6 +201,9 @@ namespace Vi.Core
 
         public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
         {
+            if (!col.staticWallBody) { return false; }
+            if (!other.staticWallBody) { return false; }
+
             // If either player is standing still or not at rest, return true
             if (!col.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
             if (!other.CombatAgent.AnimationHandler.IsAtRest()) { return true; }

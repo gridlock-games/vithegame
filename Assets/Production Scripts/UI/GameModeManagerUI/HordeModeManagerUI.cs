@@ -179,11 +179,6 @@ namespace Vi.UI
                         statusIcon.SetActive(false);
                     }
                 }
-                Debug.Log("Structure found!");
-            }
-            else
-            {
-                Debug.Log("No structure found!");
             }
         }
     }
