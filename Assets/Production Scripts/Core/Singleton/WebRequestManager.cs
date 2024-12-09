@@ -128,48 +128,18 @@ namespace Vi.Core
             }
             else // Not the server
             {
-                if (Debug.isDebugBuild)
+                HubServers = servers.FindAll(item => item.type == 0).ToArray();
+                LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
+
+                if (HubServers.Length == 0)
                 {
-                    if (servers.Exists(item => item.ip == localhostIP))
-                    {
-                        HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
-                        if (HubServers.Length == 0) { HubServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray(); }
-                        LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
-                    }
-                    else
-                    {
-                        HubServers = servers.FindAll(item => item.type == 0).ToArray();
-                        LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
-                    }
-                }
-                else // Not development build
-                {
-                    if (servers.Exists(item => item.ip == localhostIP))
-                    {
-                        if (servers.Exists(item => item.ip != localhostIP))
-                        {
-                            HubServers = servers.FindAll(item => item.type == 0 & item.ip != localhostIP).ToArray();
-                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip != localhostIP).ToArray();
-                        }
-                        else
-                        {
-                            HubServers = servers.FindAll(item => item.type == 0 & item.ip == localhostIP).ToArray();
-                            LobbyServers = servers.FindAll(item => item.type == 1 & item.ip == localhostIP).ToArray();
-                        }
-                    }
-                    else
-                    {
-                        HubServers = servers.FindAll(item => item.type == 0).ToArray();
-                        LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
-                    }
+                    HubServers = LobbyServers.ToArray();
                 }
             }
 
             getRequest.Dispose();
             IsRefreshingServers = false;
         }
-
-        private const string localhostIP = "127.0.0.1";
 
         public IEnumerator UpdateServerProgress(int progress)
         {

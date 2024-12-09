@@ -22,6 +22,8 @@ namespace Vi.ArtificialIntelligence
         protected override void OnDisable()
         {
             isHeavyAttacking = default;
+            lastCollisionTick = default;
+            lastServerPosition = default;
         }
 
         protected override void Update()
@@ -276,6 +278,32 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
+        private int lastCollisionTick;
+        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionEnterMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
+                {
+                    lastCollisionTick = NetworkManager.LocalTime.Tick;
+                }
+            }
+        }
+
+        public override void ReceiveOnCollisionStayMessage(Collision collision)
+        {
+            base.ReceiveOnCollisionStayMessage(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
+                {
+                    lastCollisionTick = NetworkManager.LocalTime.Tick;
+                }
+            }
+        }
+
+        private Vector3 lastServerPosition;
         void FixedUpdate()
         {
             if (IsServer)
@@ -285,7 +313,58 @@ namespace Vi.ArtificialIntelligence
             }
             else
             {
-                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
+                // Sync position here with latest server state
+                Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
+                if (targetPosition != lastServerPosition)
+                {
+                    if (lastCollisionTick > NetworkManager.ServerTime.Tick)
+                    {
+                        Rigidbody.position += targetPosition - lastServerPosition;
+                    }
+                    else
+                    {
+                        Rigidbody.position = targetPosition;
+                    }
+                    lastServerPosition = targetPosition;
+                }
+                Rigidbody.linearVelocity = Vector3.zero;
+            }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
+            }
+        }
+
+        private NetworkVariable<bool> lastMovementWasZeroSynced = new NetworkVariable<bool>();
+
+        private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)
+        {
+            LastMovementWasZero = current;
+        }
+
+        private void SetLastMovement(Vector3 lastMovement)
+        {
+            bool value = lastMovement == Vector3.zero;
+
+            LastMovementWasZero = value;
+
+            if (IsServer)
+            {
+                lastMovementWasZeroSynced.Value = value;
             }
         }
 
@@ -298,7 +377,11 @@ namespace Vi.ArtificialIntelligence
                 rootMotion.z = 0;
             }
 
-            if (!IsSpawned) { return; }
+            if (!IsSpawned)
+            {
+                SetLastMovement(Vector3.zero);
+                return;
+            }
 
             CalculatePath(Rigidbody.position);
 
@@ -306,15 +389,22 @@ namespace Vi.ArtificialIntelligence
             {
                 transform.position = Rigidbody.position;
                 Rigidbody.Sleep();
+                SetLastMovement(Vector3.zero);
                 return;
             }
             else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 Rigidbody.Sleep();
+                SetLastMovement(Vector3.zero);
                 return;
             }
 
-            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing) { Rigidbody.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
+            {
+                SetLastMovement(Vector3.zero);
+                Rigidbody.isKinematic = false;
+                return;
+            }
 
             Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
@@ -323,6 +413,7 @@ namespace Vi.ArtificialIntelligence
             Vector3 movement = Vector3.zero;
             if (combatAgent.IsGrabbing)
             {
+                SetLastMovement(Vector3.zero);
                 Rigidbody.isKinematic = true;
                 return;
             }
@@ -333,6 +424,7 @@ namespace Vi.ArtificialIntelligence
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    SetLastMovement(Vector3.zero);
                     return;
                 }
             }
@@ -425,6 +517,7 @@ namespace Vi.ArtificialIntelligence
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
+            SetLastMovement(movement);
         }
 
         private const float bodyRadius = 0.5f;
