@@ -315,13 +315,18 @@ namespace Vi.ArtificialIntelligence
             {
                 // Sync position here with latest server state
                 Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
-
-                if (targetPosition != lastServerPosition & lastCollisionTick <= NetworkManager.ServerTime.Tick)
+                if (targetPosition != lastServerPosition)
                 {
-                    Rigidbody.position = targetPosition;
+                    if (lastCollisionTick > NetworkManager.ServerTime.Tick)
+                    {
+                        Rigidbody.position += targetPosition - lastServerPosition;
+                    }
+                    else
+                    {
+                        Rigidbody.position = targetPosition;
+                    }
                     lastServerPosition = targetPosition;
                 }
-
                 Rigidbody.linearVelocity = Vector3.zero;
             }
         }
