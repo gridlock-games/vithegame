@@ -284,7 +284,7 @@ namespace Vi.ArtificialIntelligence
             base.ReceiveOnCollisionEnterMessage(collision);
             if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (!combatAgent.NetworkCollider.StaticWallsEnabledForThisCollision(networkCollider))
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
                 {
                     lastCollisionTick = NetworkManager.LocalTime.Tick;
                 }
@@ -296,7 +296,7 @@ namespace Vi.ArtificialIntelligence
             base.ReceiveOnCollisionStayMessage(collision);
             if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (!combatAgent.NetworkCollider.StaticWallsEnabledForThisCollision(networkCollider))
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
                 {
                     lastCollisionTick = NetworkManager.LocalTime.Tick;
                 }

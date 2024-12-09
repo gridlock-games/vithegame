@@ -140,56 +140,56 @@ namespace Vi.Core
                     // Both colliders are movement colliders
                     if (col & other)
                     {
-                        EvaluateContactPairAsMovementCollider(pair, i, other);
+                        EvaluateContactPairAsMovementCollider(col, other, pair, i);
                     }
                     else if (col) // Col is a movement collider, but other is a static wall
                     {
                         if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                         {
-                            EvaluateContactPairAsStaticWallCollider(pair, i, other);
+                            EvaluateContactPairAsStaticWallCollider(col, other, pair, i);
                         }
                     }
                     else if (other) // Other is a movement collider, but col is a static wall
                     {
                         if (staticWallColliderInstanceIDMap.TryGetValue(pair.colliderInstanceID, out col))
                         {
-                            EvaluateContactPairAsStaticWallCollider(pair, i, col);
+                            EvaluateContactPairAsStaticWallCollider(col, other, pair, i);
                         }
                     }
                 }
             }
         }
 
-        private void EvaluateContactPairAsMovementCollider(ModifiableContactPair pair, int i, NetworkCollider other)
+        private static void EvaluateContactPairAsMovementCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
-            //pair.IgnoreContact(i);
-            if (ShouldApplyRecoveryDodgeLogic())
+            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
             {
                 pair.IgnoreContact(i);
             }
-            else if (StaticWallsEnabledForThisCollision(other))
+            else if (StaticWallsEnabledForThisCollision(col, other))
             {
                 pair.IgnoreContact(i);
             }
         }
 
-        private void EvaluateContactPairAsStaticWallCollider(ModifiableContactPair pair, int i, NetworkCollider other)
+        private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
             // Phase through other players if we are dodging out of an ailment like knockdown
-            if (ShouldApplyRecoveryDodgeLogic())
+            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
             {
                 pair.IgnoreContact(i);
             }
-            else if (StaticWallsEnabledForThisCollision(other))
+            else if (StaticWallsEnabledForThisCollision(col, other))
             {
-                if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                if (PlayerDataManager.Singleton.CanHit(col.CombatAgent, other.CombatAgent))
                 {
-                    if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
+                    if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !col.CombatAgent.AnimationHandler.IsAtRest())
                     {
-                        if (!CombatAgent.AnimationHandler.IsAtRest())
-                        {
-                            pair.SetDynamicFriction(i, 1);
-                        }
+                        pair.SetDynamicFriction(i, 1);
+                    }
+                    else if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !other.CombatAgent.AnimationHandler.IsAtRest())
+                    {
+                        pair.SetDynamicFriction(i, 1);
                     }
                 }
             }
@@ -199,13 +199,13 @@ namespace Vi.Core
             }
         }
 
-        public bool StaticWallsEnabledForThisCollision(NetworkCollider other)
+        public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
         {
             // If either player is standing still or not at rest, return true
-            if (!CombatAgent.AnimationHandler.IsAtRest()) { return true; }
+            if (!col.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
             if (!other.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
 
-            if (MovementHandler.LastMovementWasZero) { return true; }
+            if (col.MovementHandler.LastMovementWasZero) { return true; }
             if (other.MovementHandler.LastMovementWasZero) { return true; }
 
             return false;
