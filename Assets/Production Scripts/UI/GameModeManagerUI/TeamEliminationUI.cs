@@ -15,7 +15,7 @@ namespace Vi.UI
 
         private TeamEliminationManager teamEliminationManager;
         private Sprite originalViLogoSprite;
-        private new void Start()
+        protected override void Start()
         {
             base.Start();
             teamEliminationManager = gameModeManager.GetComponent<TeamEliminationManager>();
@@ -32,7 +32,7 @@ namespace Vi.UI
         private readonly static Color onColor = new Color(1, 1, 1, 1);
         private readonly static Color offColor = new Color(1, 1, 1, 0);
 
-        private new void Update()
+        protected override void Update()
         {
             base.Update();
 

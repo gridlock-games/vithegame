@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -43,6 +44,11 @@ namespace Vi.Core.GameModeManagers
             //Instantiate(ancientBossNeutralPrefab, playerSpawnPoints.ancientBossNeutralSpawnPoint.position, playerSpawnPoints.ancientBossNeutralSpawnPoint.rotation).GetComponent<NetworkObject>().Spawn(true);
         }
 
+        public bool IsViEssenceSpawned()
+        {
+            return false;
+        }
+
         public override string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
@@ -50,22 +56,74 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Red Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> lightTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+                if (lightTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + GetPlayerScore(lightTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": 0";
+                }
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+                    if (redTeamPlayers.Count > 0)
+                    {
+                        return "Your Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Your Team: 0";
+                    }
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    return "Your Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
+                    if (blueTeamPlayers.Count > 0)
+                    {
+                        return "Your Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Your Team: 0";
+                    }
                 }
                 else
                 {
                     Debug.LogError("Not sure how to handle team " + localTeam);
                     return string.Empty;
+                }
+            }
+        }
+
+
+        public PlayerDataManager.Team GetLeftScoreTeam()
+        {
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Light; }
+
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
+            if (localTeam == PlayerDataManager.Team.Spectator)
+            {
+                return PlayerDataManager.Team.Light;
+            }
+            else
+            {
+                if (localTeam == PlayerDataManager.Team.Light)
+                {
+                    return PlayerDataManager.Team.Light;
+                }
+                else if (localTeam == PlayerDataManager.Team.Corruption)
+                {
+                    return PlayerDataManager.Team.Corruption;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle team " + localTeam);
+                    return PlayerDataManager.Team.Light;
                 }
             }
         }
@@ -77,22 +135,73 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                return "Blue Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                List<Attributes> corruptionTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
+                if (corruptionTeamPlayers.Count > 0)
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + GetPlayerScore(corruptionTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                }
+                else
+                {
+                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": 0";
+                }
             }
             else
             {
-                if (localTeam == PlayerDataManager.Team.Red)
+                if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    return "Enemy Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Blue)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
+                    if (blueTeamPlayers.Count > 0)
+                    {
+                        return "Enemy Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Enemy Team: 0";
+                    }
                 }
-                else if (localTeam == PlayerDataManager.Team.Blue)
+                else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    return "Enemy Team: " + GetPlayerScore(PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Red)[0].GetPlayerDataId()).roundWins.ToString();
+                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
+                    if (redTeamPlayers.Count > 0)
+                    {
+                        return "Enemy Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
+                    }
+                    else
+                    {
+                        return "Enemy Team: 0";
+                    }
                 }
                 else
                 {
                     Debug.LogError("Not sure how to handle team " + localTeam);
                     return string.Empty;
+                }
+            }
+        }
+
+        public PlayerDataManager.Team GetRightScoreTeam()
+        {
+            if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { return PlayerDataManager.Team.Corruption; }
+
+            PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
+            if (localTeam == PlayerDataManager.Team.Spectator)
+            {
+                return PlayerDataManager.Team.Corruption;
+            }
+            else
+            {
+                if (localTeam == PlayerDataManager.Team.Light)
+                {
+                    return PlayerDataManager.Team.Corruption;
+                }
+                else if (localTeam == PlayerDataManager.Team.Corruption)
+                {
+                    return PlayerDataManager.Team.Light;
+                }
+                else
+                {
+                    Debug.LogError("Not sure how to handle team " + localTeam);
+                    return PlayerDataManager.Team.Corruption;
                 }
             }
         }

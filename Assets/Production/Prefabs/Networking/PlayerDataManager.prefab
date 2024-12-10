@@ -102,16 +102,23 @@ MonoBehaviour:
     possibleMapSceneGroupNames:
     - Twilight Chasm
     maxPlayersOnMap: 05000000
+  - gameMode: 3
+    gameModeIcon: {fileID: 21300000, guid: c06d59339e467334b97976559c0f5157, type: 3}
+    possibleTeams: 0a0000000b000000
+    possibleMapSceneGroupNames:
+    - Essence War Test Map
+    maxPlayersOnMap: 06000000
   characterReferenceAddressable:
     m_AssetGUID: 9ad061509b57a4848a6318a1e9067133
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   controlsImageMappingAddressable:
     m_AssetGUID: ddd768ddf42242041bc3568a2f3ebe79
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-  wasDisconnectedByClient: 0
   alertBoxPrefab: {fileID: 1466119099563924269, guid: a6ff763b0d22aa248b76ad157516cae0,
     type: 3}
