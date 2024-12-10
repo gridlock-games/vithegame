@@ -55,8 +55,7 @@ namespace Vi.UI
 
             mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { mobileLookJoystickSensitivityParent.gameObject.SetActive(!mobileLookJoystickActLikeButtonToggle.isOn); });
 
-            bool isMobilePlatform = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer;
-            mobileLookJoystickSensitivityParent.gameObject.SetActive(isMobilePlatform & !mobileLookJoystickActLikeButtonToggle.isOn);
+            mobileLookJoystickSensitivityParent.gameObject.SetActive(FasterPlayerPrefs.IsMobilePlatform & !mobileLookJoystickActLikeButtonToggle.isOn);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
@@ -67,7 +66,7 @@ namespace Vi.UI
             blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
 
-            orbitalCameraModeDropdown.transform.parent.parent.gameObject.SetActive(Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer);
+            orbitalCameraModeDropdown.transform.parent.parent.gameObject.SetActive(!FasterPlayerPrefs.IsMobilePlatform);
             orbitalCameraModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             orbitalCameraModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode"));
 

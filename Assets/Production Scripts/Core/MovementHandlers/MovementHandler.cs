@@ -44,14 +44,9 @@ namespace Vi.Core.MovementHandlers
 			networkInteractable = null;
 			foreach (NetworkInteractable netInter in interactablesInRange)
 			{
-				Quaternion rel = Quaternion.LookRotation(netInter.transform.position - GetPosition());
-				if (Vector3.Distance(netInter.transform.position, GetPosition()) < 8
-					& Quaternion.Angle(rel, GetRotation()) < 30)
-				{
-					networkInteractable = netInter;
-					return true;
-				}
-			}
+				networkInteractable = netInter;
+                return true;
+            }
 			return false;
 		}
 
@@ -390,7 +385,7 @@ namespace Vi.Core.MovementHandlers
 
 		public void ResetLookInput()
         {
-			if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+			if (FasterPlayerPrefs.IsMobilePlatform)
             {
 				lookInput = Vector2.zero;
 			}

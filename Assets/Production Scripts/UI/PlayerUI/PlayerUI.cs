@@ -28,7 +28,7 @@ namespace Vi.UI
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
-        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
+        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter.rectTransform; }
 
         public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
 
@@ -57,7 +57,7 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
-        [SerializeField] private Image interactableImage;
+        [SerializeField] private Image tooltipImage;
         [SerializeField] private Image crosshairImage;
         [Header("Weapon Cards")]
         [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
@@ -94,10 +94,11 @@ namespace Vi.UI
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private RectTransform blockingButton;
-        [SerializeField] private RectTransform lookJoystickCenter;
+        [SerializeField] private Image lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private RectTransform orbitalCameraButton;
+        [SerializeField] private Image mobileInteractableImage;
         [Header("Text Chat")]
         [SerializeField] private Canvas textChatButtonCanvas;
         [SerializeField] private Canvas textChatParentCanvas;
@@ -147,7 +148,7 @@ namespace Vi.UI
             {
                 ScrollToBottomOfTextChat();
                 actionMapHandler.OnTextChatOpen();
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
+                if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
                 unreadMessageCount = 0;
                 textChatMessageNumberText.text = "";
             }
@@ -155,13 +156,13 @@ namespace Vi.UI
             {
                 actionMapHandler.OnTextChatClose();
             }
-            textChatButtonCanvas.enabled = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
+            textChatButtonCanvas.enabled = FasterPlayerPrefs.IsMobilePlatform ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
         }
 
         public void CloseTextChat()
         {
             textChatParentCanvas.enabled = false;
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (FasterPlayerPrefs.IsMobilePlatform)
             {
                 textChatButtonCanvas.enabled = true;
             }
@@ -176,7 +177,7 @@ namespace Vi.UI
         {
             textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
             textChatInputField.text = "";
-            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
+            if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
         }
 
         private InputAction switchWeaponAction;
@@ -327,6 +328,9 @@ namespace Vi.UI
 
         private Vector3 originalCrosshairScale;
 
+        private Color originalMobileInteractableButtonColor;
+        private Color originalLookJoystickCenterColor;
+
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
@@ -352,11 +356,14 @@ namespace Vi.UI
 
             originalCrosshairScale = crosshairImage.transform.localScale;
 
+            originalLookJoystickCenterColor = lookJoystickCenter.color;
+            originalMobileInteractableButtonColor = mobileInteractableImage.color;
+
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
 
             textChatParentCanvas.enabled = false;
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (FasterPlayerPrefs.IsMobilePlatform)
             {
                 textChatButtonCanvas.enabled = true;
             }
@@ -656,6 +663,10 @@ namespace Vi.UI
             {
                 canFadeIn = true;
             }
+
+            mobileInteractableImage.raycastTarget = false;
+            mobileInteractableImage.color = Color.clear;
+            tooltipImage.color = Color.clear;
         }
 
         public void ScrollToBottomOfTextChat()
@@ -699,7 +710,7 @@ namespace Vi.UI
                     textChatMessageNumberText.text = unreadMessageCount.ToString();
                 }
 
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+                if (!FasterPlayerPrefs.IsMobilePlatform)
                 {
                     textChatButtonCanvas.enabled = unreadMessageCount > 0;
                 }
@@ -730,13 +741,29 @@ namespace Vi.UI
 
             if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
-                interactableImage.raycastTarget = true;
-                interactableImage.color = Vector4.MoveTowards(interactableImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
+                {
+                    mobileInteractableImage.raycastTarget = true;
+                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
+                }
+                else
+                {
+                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                }
             }
             else
             {
-                interactableImage.raycastTarget = false;
-                interactableImage.color = Vector4.MoveTowards(interactableImage.color, Color.clear, Time.deltaTime * 5);
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
+                {
+                    mobileInteractableImage.raycastTarget = false;
+                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
+                }
+                else
+                {
+                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * 5);
+                }
             }
 
             if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
@@ -785,7 +812,7 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+                if (!FasterPlayerPrefs.IsMobilePlatform)
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
 

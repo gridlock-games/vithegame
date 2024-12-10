@@ -1,4 +1,5 @@
 using UnityEngine;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -6,7 +7,7 @@ namespace Vi.UI
     {
         private void Start()
         {
-            gameObject.SetActive(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
+            gameObject.SetActive(FasterPlayerPrefs.IsMobilePlatform);
         }
     }
 }
