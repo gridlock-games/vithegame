@@ -34,6 +34,11 @@ namespace Vi.Utility
 #endif
         }
 
+        public static bool IsMobilePlatform
+        {
+            get { return Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
+        }
+
         private void Awake()
         {
             _singleton = this;

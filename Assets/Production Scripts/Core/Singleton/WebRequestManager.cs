@@ -39,8 +39,8 @@ namespace Vi.Core
 
         public static bool IsServerBuild()
         {
-            RuntimePlatform[] excludedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
-            return excludedRuntimePlatforms.Contains(Application.platform);
+            RuntimePlatform[] includedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
+            return includedRuntimePlatforms.Contains(Application.platform);
         }
 
         public const string ProdAPIURL = "http://38.60.246.146:80/";

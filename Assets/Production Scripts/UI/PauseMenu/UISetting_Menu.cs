@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -21,7 +22,7 @@ namespace Vi.UI
         [SerializeField] private Slider UIOpacitySlider;
         private void Awake()
         {
-            UIOpacitySlider.minValue = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? 0.1f : 0;
+            UIOpacitySlider.minValue = FasterPlayerPrefs.IsMobilePlatform ? 0.1f : 0;
         }
     }
 }

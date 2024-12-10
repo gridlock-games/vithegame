@@ -35,7 +35,7 @@ namespace Vi.UI
             List<PlayerCard> leftPlayerCardsTemp = leftPlayerCards.ToList();
             List<PlayerCard> rightPlayerCardsTemp = rightPlayerCards.ToList();
 
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (FasterPlayerPrefs.IsMobilePlatform)
             {
                 leftPlayerCardsTemp.RemoveAt(leftPlayerCardsTemp.Count - 1);
                 rightPlayerCardsTemp.RemoveAt(rightPlayerCardsTemp.Count - 1);

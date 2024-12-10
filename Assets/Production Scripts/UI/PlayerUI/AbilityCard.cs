@@ -69,7 +69,7 @@ namespace Vi.UI
         {
             originalBorderImageColor = borderImage.color;
             originalStaminaCostColor = staminaCostText.color;
-            keybindText.enabled = !(Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer);
+            keybindText.enabled = !FasterPlayerPrefs.IsMobilePlatform;
         }
 
         private int lastAbilityLevel = -1;
