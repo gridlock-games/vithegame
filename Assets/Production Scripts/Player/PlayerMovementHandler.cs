@@ -198,9 +198,7 @@ namespace Vi.Player
                         modifiedStatePayload.tick = combatAgent.AnimationHandler.WasLastActionClipMotionPredicted ? latestServerState.Value.tick : rootMotionReconciliationState.tick;
                         stateBuffer[rootMotionReconciliationIndex] = modifiedStatePayload;
 
-                        Rigidbody.position = modifiedStatePayload.position;
-                        if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
-                        ReprocessInputs(modifiedStatePayload.tick);
+                        ReprocessInputs(modifiedStatePayload);
                     }
                     else
                     {
@@ -226,9 +224,7 @@ namespace Vi.Player
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
-                Rigidbody.position = latestServerState.Value.position;
-                if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
-                ReprocessInputs(latestServerState.Value.tick);
+                ReprocessInputs(latestServerState.Value);
             }
             else
             {
@@ -238,12 +234,16 @@ namespace Vi.Player
         }
 
         private int stepsToBuffer;
-        private void ReprocessInputs(int latestServerTick)
+        private void ReprocessInputs(StatePayload latestServerState)
         {
+            Vector3 oldPosition = Rigidbody.position;
+            Rigidbody.position = latestServerState.position;
+            if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.velocity; }
+
             Physics.simulationMode = SimulationMode.Script;
             NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
-            int tickToProcess = latestServerTick + 1;
+            int tickToProcess = latestServerState.tick + 1;
             while (tickToProcess < movementTick)
             {
                 int bufferIndex = tickToProcess % BUFFER_SIZE;
@@ -263,7 +263,13 @@ namespace Vi.Player
                 tickToProcess++;
             }
             Physics.simulationMode = SimulationMode.FixedUpdate;
-            stepsToBuffer = 1;
+
+            // Only interpolate error if the distance is large enough
+            if (Vector3.Distance(oldPosition, Rigidbody.position) > 0.05f)
+            {
+                Debug.Log(Time.time + " interpolating");
+                stepsToBuffer = 1;
+            }
         }
 
         public override Vector2[] GetMoveInputQueue()
