@@ -5735,6 +5735,8 @@ MonoBehaviour:
   - {fileID: 1790420701838485649}
   - {fileID: 6993215094444466209}
   - {fileID: 8628567555629815188}
+  interactableImage: {fileID: 1791957974577106012}
+  crosshairImage: {fileID: 9064558124592042958}
   primaryWeaponCard: {fileID: 2370067492133711801}
   secondaryWeaponCard: {fileID: 7449748357968769679}
   mobileWeaponCard: {fileID: 7584112050504107559}
@@ -5747,7 +5749,6 @@ MonoBehaviour:
   dodgeButton: {fileID: 2739320560445226099}
   dodgeCooldownImage: {fileID: 169122941553679671}
   dodgeStackText: {fileID: 2814470231337500047}
-  interactableImage: {fileID: 1791957974577106012}
   statusImageParent: {fileID: 3188238356601168215}
   statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
     type: 3}
@@ -11424,7 +11425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6834273739332174182}
   - component: {fileID: 6834273739332174184}
-  - component: {fileID: 6834273739332174183}
+  - component: {fileID: 9064558124592042958}
   m_Layer: 5
   m_Name: Crosshair
   m_TagString: Untagged
@@ -11459,7 +11460,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6834273739332174181}
   m_CullTransparentMesh: 1
---- !u!114 &6834273739332174183
+--- !u!114 &9064558124592042958
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11468,24 +11469,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 6834273739332174181}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.09803922, b: 0.003921569, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 7789b657ea330f94d9b70d6d4a117aed, type: 3}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+  m_Sprite: {fileID: 21300000, guid: 7789b657ea330f94d9b70d6d4a117aed, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &7194206053087095458
 GameObject:
   m_ObjectHideFlags: 0

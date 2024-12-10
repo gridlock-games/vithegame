@@ -57,6 +57,8 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
+        [SerializeField] private Image interactableImage;
+        [SerializeField] private Image crosshairImage;
         [Header("Weapon Cards")]
         [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
         [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
@@ -71,7 +73,6 @@ namespace Vi.UI
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private Image dodgeCooldownImage;
         [SerializeField] private Text dodgeStackText;
-        [SerializeField] private Image interactableImage;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
@@ -411,6 +412,7 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+            crosshairImage.color = FasterPlayerPrefs.Singleton.GetColor("CrosshairColor");
         }
 
         private void UpdateTeammateAttributesList()
