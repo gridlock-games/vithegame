@@ -10,6 +10,7 @@ namespace Vi.UI
 {
     public class TeamEliminationUI : GameModeManagerUI
     {
+        [Header("Team Elimination UI")]
         [SerializeField] private Image viLogoImage;
         [SerializeField] private Sprite viEssenceIcon;
 

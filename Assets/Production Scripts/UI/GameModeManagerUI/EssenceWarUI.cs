@@ -7,8 +7,9 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    public class EssenceWarManagerUI : GameModeManagerUI
+    public class EssenceWarUI : GameModeManagerUI
     {
+        [Header("Essence War UI")]
         [SerializeField] private Image viLogoImage;
         [SerializeField] private Sprite viEssenceIcon;
 

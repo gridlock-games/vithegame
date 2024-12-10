@@ -7,8 +7,9 @@ using Vi.Core;
 
 namespace Vi.UI
 {
-    public class FreeForAllManagerUI : GameModeManagerUI
+    public class FreeForAllUI : GameModeManagerUI
     {
+        [Header("Free For All UI")]
         [SerializeField] private Text killsToWinRoundThresholdText;
 
         private new void Start()
