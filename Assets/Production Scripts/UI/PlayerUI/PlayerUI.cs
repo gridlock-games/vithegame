@@ -325,6 +325,8 @@ namespace Vi.UI
         [SerializeField] private Canvas[] aliveUIChildCanvases;
         [SerializeField] private Canvas[] deathUIChildCanvases;
 
+        private Vector3 originalCrosshairScale;
+
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
@@ -347,6 +349,8 @@ namespace Vi.UI
             ability4Action = playerInput.actions.FindAction("Ability4");
             reloadAction = playerInput.actions.FindAction("Reload");
             dodgeAction = playerInput.actions.FindAction("Dodge");
+
+            originalCrosshairScale = crosshairImage.transform.localScale;
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
@@ -413,6 +417,8 @@ namespace Vi.UI
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
             crosshairImage.color = FasterPlayerPrefs.Singleton.GetColor("CrosshairColor");
+            crosshairImage.transform.localScale = originalCrosshairScale * FasterPlayerPrefs.Singleton.GetFloat("CrosshairSize");
+            crosshairImage.sprite = FasterPlayerPrefs.Singleton.crosshairSprites[FasterPlayerPrefs.Singleton.GetInt("CrosshairStyle")].Result;
         }
 
         private void UpdateTeammateAttributesList()
