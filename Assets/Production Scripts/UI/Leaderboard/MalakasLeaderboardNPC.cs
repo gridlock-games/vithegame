@@ -41,7 +41,11 @@ namespace Vi.UI
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.CombatAgent.IsLocalPlayer) { localPlayerInRange = true; }
+                if (networkCollider.CombatAgent.IsLocalPlayer)
+                {
+                    localPlayerInRange = true;
+                    networkCollider.MovementHandler.SetInteractableInRange(this, true);
+                }
             }
         }
 
@@ -49,7 +53,11 @@ namespace Vi.UI
         {
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
             {
-                if (networkCollider.CombatAgent.IsLocalPlayer) { localPlayerInRange = false; }
+                if (networkCollider.CombatAgent.IsLocalPlayer)
+                {
+                    localPlayerInRange = false;
+                    networkCollider.MovementHandler.SetInteractableInRange(this, false);
+                }
             }
         }
 

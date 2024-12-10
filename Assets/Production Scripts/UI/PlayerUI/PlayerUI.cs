@@ -71,6 +71,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform dodgeButton;
         [SerializeField] private Image dodgeCooldownImage;
         [SerializeField] private Text dodgeStackText;
+        [SerializeField] private Image interactableImage;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
@@ -308,6 +309,11 @@ namespace Vi.UI
         public void IncrementFollowPlayer() { playerMovementHandler.OnIncrementFollowPlayer(); }
 
         public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
+
+        public void Interact()
+        {
+            playerMovementHandler.OnInteract();
+        }
 
         private Attributes attributes;
         private PlayerMovementHandler playerMovementHandler;
@@ -713,6 +719,17 @@ namespace Vi.UI
             if (!attributes.WeaponHandler.WeaponInitialized) { return; }
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
+
+            if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
+            {
+                interactableImage.raycastTarget = true;
+                interactableImage.color = Vector4.MoveTowards(interactableImage.color, new Color(1, 1, 1, 0.7f), Time.deltaTime * 5);
+            }
+            else
+            {
+                interactableImage.raycastTarget = false;
+                interactableImage.color = Vector4.MoveTowards(interactableImage.color, Color.clear, Time.deltaTime * 5);
+            }
 
             if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
             {

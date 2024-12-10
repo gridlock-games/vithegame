@@ -954,19 +954,19 @@ namespace Vi.Player
                         if (playerInput.currentActionMap != null)
                         {
                             Vector2 lookInputToAdd = Vector2.zero;
-
-                            if (UnityEngine.InputSystem.Gyroscope.current != null)
-                            {
-                                if (UnityEngine.InputSystem.Gyroscope.current.enabled)
-                                {
-                                    Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
-                                    gyroVelocity *= gyroscopicRotationSensitivity;
-                                    lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
-                                }
-                            }
-
                             if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                             {
+                                // Gyroscopic rotation
+                                if (UnityEngine.InputSystem.Gyroscope.current != null)
+                                {
+                                    if (UnityEngine.InputSystem.Gyroscope.current.enabled)
+                                    {
+                                        Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
+                                        gyroVelocity *= gyroscopicRotationSensitivity;
+                                        lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
+                                    }
+                                }
+
                                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                                 {
                                     if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
@@ -978,27 +978,6 @@ namespace Vi.Player
                                         {
                                             isTouchingJoystick = true;
                                             break;
-                                        }
-                                    }
-
-                                    if (!isTouchingJoystick)
-                                    {
-                                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-                                        {
-                                            int interactableHitCount = Physics.RaycastNonAlloc(mainCamera.ScreenPointToRay(touch.screenPosition),
-                                                interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
-
-                                            float minDistance = 0;
-                                            bool minDistanceInitialized = false;
-                                            NetworkInteractable networkInteractable = null;
-                                            for (int i = 0; i < interactableHitCount; i++)
-                                            {
-                                                if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                                                networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
-                                                minDistance = interactableHits[i].distance;
-                                                minDistanceInitialized = true;
-                                            }
-                                            if (networkInteractable) { networkInteractable.Interact(gameObject); }
                                         }
                                     }
 
@@ -1127,18 +1106,11 @@ namespace Vi.Player
             "ProjectileCollider"
         };
 
-        void OnInteract()
+        public void OnInteract()
         {
-            int interactableHitsCount = Physics.RaycastNonAlloc(mainCamera.transform.position, mainCamera.transform.forward.normalized,
-                interactableHits, 15, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
-
-            for (int i = 0; i < interactableHitsCount; i++)
+            if (TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
-                if (interactableHits[i].transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
-                {
-                    networkInteractable.Interact(gameObject);
-                    break;
-                }
+                networkInteractable.Interact(gameObject);
             }
         }
 

@@ -22,6 +22,35 @@ namespace Vi.Core.MovementHandlers
 			"ProjectileCollider"
 		};
 
+		protected List<NetworkInteractable> interactablesInRange { get; private set; } = new List<NetworkInteractable>();
+		public void SetInteractableInRange(NetworkInteractable interactable, bool isInRange)
+		{
+			if (isInRange)
+			{
+				interactablesInRange.Add(interactable);
+			}
+			else
+			{
+				interactablesInRange.Remove(interactable);
+            }
+		}
+
+		public bool TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable)
+		{
+			networkInteractable = null;
+			foreach (NetworkInteractable netInter in interactablesInRange)
+			{
+				Quaternion rel = Quaternion.LookRotation(netInter.transform.position - GetPosition());
+				if (Vector3.Distance(netInter.transform.position, GetPosition()) < 8
+					& Quaternion.Angle(rel, GetRotation()) < 30)
+				{
+					networkInteractable = netInter;
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
 			if (!IsServer) { Debug.LogError("MovementHandler.SetOrientation should only be called on the server!"); return; }

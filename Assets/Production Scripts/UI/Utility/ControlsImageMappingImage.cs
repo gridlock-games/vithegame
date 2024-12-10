@@ -12,6 +12,7 @@ namespace Vi.UI
     public class ControlsImageMappingImage : MonoBehaviour
     {
         [SerializeField] private InputActionReference inputAction;
+        [SerializeField] private Sprite defaultSprite;
 
         private Image image;
         private void Start()
@@ -37,8 +38,16 @@ namespace Vi.UI
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
 
             var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { inputAction.action });
-            image.sprite = result.releasedSprites.Count > 0 ? result.releasedSprites[0] : null;
-
+            image.sprite = defaultSprite;
+            foreach (Sprite sprite in result.releasedSprites)
+            {
+                if (sprite)
+                {
+                    image.sprite = sprite;
+                    break;
+                }
+            }
+            
             lastEvaluatedControlScheme = playerInput.currentControlScheme;
         }
 

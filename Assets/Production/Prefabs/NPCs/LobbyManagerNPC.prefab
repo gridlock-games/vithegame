@@ -216,7 +216,6 @@ GameObject:
   - component: {fileID: 73519393645535953}
   - component: {fileID: 73519393645535954}
   - component: {fileID: 73519393645535955}
-  - component: {fileID: 8905977672750229965}
   m_Layer: 6
   m_Name: WorldSpaceLabel
   m_TagString: Untagged
@@ -290,34 +289,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &8905977672750229965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 73519393645535981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  customizablePlayerPrefName: 
-  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
-    type: 3}
-  platformUIDefinitions:
-  - platforms: 0b00000008000000
-    gameObjectsToEnable: []
-    gameObjectsToDisable: []
-    gameObjectsToDestroy: []
-    objectsToMove: []
-  controlSchemeTextDefinitions:
-  - platforms: 00000000010000000200000007000000100000000d000000190000001b000000260000002b0000002c0000002d000000
-    textElement: {fileID: 73519392743507026}
-    action: Interact
-    stringBeforeBinding: LOBBY MANAGER [
-    stringAfterBinding: ']'
-  controlSchemeDefinitions: []
 --- !u!1 &1773665190275810038
 GameObject:
   m_ObjectHideFlags: 0
