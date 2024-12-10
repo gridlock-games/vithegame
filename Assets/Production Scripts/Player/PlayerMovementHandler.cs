@@ -267,7 +267,6 @@ namespace Vi.Player
             // Only interpolate error if the distance is large enough
             if (Vector3.Distance(oldPosition, Rigidbody.position) > 0.05f)
             {
-                Debug.Log(Time.time + " interpolating");
                 stepsToBuffer = 1;
             }
         }

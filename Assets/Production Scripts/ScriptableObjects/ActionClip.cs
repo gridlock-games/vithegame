@@ -366,5 +366,24 @@ namespace Vi.ScriptableObjects
         public int summonableCount = 0;
 
         public const int maxLivingSummonables = 3;
+
+        public bool IsRangedAttack()
+        {
+            if (!IsAttack()) { return false; }
+
+            if (mustBeAiming) { return true; }
+            if (aimDuringAnticipation) { return true; }
+            if (aimDuringAttack) { return true; }
+            if (aimDuringRecovery) { return true; }
+            if (requireAmmo) { return true; }
+            if (avatarLayer == AvatarLayer.Aiming) { return true; }
+
+            // This would mean only VFX is used for hits
+            if (maxHitLimit == 0) { return true; }
+            if (effectedWeaponBones == null) { return true; }
+            if (effectedWeaponBones.Length == 0) { return true; }
+
+            return false;
+        }
     }
 }

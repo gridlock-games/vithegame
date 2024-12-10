@@ -170,6 +170,17 @@ namespace Vi.Core
             {
                 pair.IgnoreContact(i);
             }
+            else if (PlayerDataManager.Singleton.CanHit(col.CombatAgent, other.CombatAgent))
+            {
+                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !col.CombatAgent.AnimationHandler.IsAtRest())
+                {
+                    pair.SetDynamicFriction(i, 1);
+                }
+                else if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !other.CombatAgent.AnimationHandler.IsAtRest())
+                {
+                    pair.SetDynamicFriction(i, 1);
+                }
+            }
         }
 
         private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
@@ -204,10 +215,57 @@ namespace Vi.Core
             if (!col.staticWallBody) { return false; }
             if (!other.staticWallBody) { return false; }
 
-            // If either player is standing still or not at rest, return true
-            if (!col.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
-            if (!other.CombatAgent.AnimationHandler.IsAtRest()) { return true; }
+            // If player is playing an attack, use static walls for collisions between the target and the attacker
+            // Also use static wall collisions when one player is playing a hit reaction
+            if (!col.CombatAgent.AnimationHandler.IsAtRest())
+            {
+                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
+                    & !col.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                {
+                    if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Quaternion rel = Quaternion.LookRotation(other.MovementHandler.GetPosition() - col.MovementHandler.GetPosition());
+                        if (Quaternion.Angle(rel, col.MovementHandler.GetRotation()) < 50)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    return true;
+                }
+            }
 
+            if (!other.CombatAgent.AnimationHandler.IsAtRest())
+            {
+                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
+                    & !other.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                {
+                    if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
+                        if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    return true;
+                }
+            }
+
+            // If either player is standing still, use static wall collisions
             if (col.MovementHandler.LastMovementWasZero) { return true; }
             if (other.MovementHandler.LastMovementWasZero) { return true; }
 
