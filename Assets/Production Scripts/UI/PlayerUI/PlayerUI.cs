@@ -28,7 +28,7 @@ namespace Vi.UI
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
-        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
+        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter.rectTransform; }
 
         public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
 
@@ -94,7 +94,7 @@ namespace Vi.UI
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private RectTransform blockingButton;
-        [SerializeField] private RectTransform lookJoystickCenter;
+        [SerializeField] private Image lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private RectTransform orbitalCameraButton;
@@ -328,6 +328,9 @@ namespace Vi.UI
 
         private Vector3 originalCrosshairScale;
 
+        private Color originalMobileInteractableButtonColor;
+        private Color originalLookJoystickCenterColor;
+
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
@@ -352,6 +355,9 @@ namespace Vi.UI
             dodgeAction = playerInput.actions.FindAction("Dodge");
 
             originalCrosshairScale = crosshairImage.transform.localScale;
+
+            originalLookJoystickCenterColor = lookJoystickCenter.color;
+            originalMobileInteractableButtonColor = mobileInteractableImage.color;
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
@@ -735,10 +741,11 @@ namespace Vi.UI
 
             if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
-                if (FasterPlayerPrefs.IsMobilePlatform)
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     mobileInteractableImage.raycastTarget = true;
-                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.white, Time.deltaTime * 5);
+                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
                 }
                 else
                 {
@@ -747,10 +754,11 @@ namespace Vi.UI
             }
             else
             {
-                if (FasterPlayerPrefs.IsMobilePlatform)
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     mobileInteractableImage.raycastTarget = false;
                     mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
                 }
                 else
                 {
