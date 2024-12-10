@@ -114,6 +114,7 @@ namespace Vi.Core.MovementHandlers
                 if (!physicsMovementHandler.IsOwner & !physicsMovementHandler.IsServer)
                 {
                     physicsMovementHandler.Rigidbody.position = physicsMovementHandler.networkTransform.GetSpaceRelativePosition(true);
+                    physicsMovementHandler.lastCollisionTick = default;
                 }
             }
         }
