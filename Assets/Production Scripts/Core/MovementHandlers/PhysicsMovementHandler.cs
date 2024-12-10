@@ -106,6 +106,18 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
+        private static List<PhysicsMovementHandler> physicsMovementHandlers = new List<PhysicsMovementHandler>();
+        protected static void ResetNonOwnerCollidersToServerPosition()
+        {
+            foreach (PhysicsMovementHandler physicsMovementHandler in physicsMovementHandlers)
+            {
+                if (!physicsMovementHandler.IsOwner & !physicsMovementHandler.IsServer)
+                {
+                    physicsMovementHandler.Rigidbody.position = physicsMovementHandler.networkTransform.GetSpaceRelativePosition(true);
+                }
+            }
+        }
+
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
         protected CombatAgent combatAgent;
@@ -127,6 +139,8 @@ namespace Vi.Core.MovementHandlers
             rb.rotation = Quaternion.identity;
             rb.transform.rotation = Quaternion.identity;
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
+
+            physicsMovementHandlers.Add(this);
         }
         
         protected virtual void OnReturnToPool()
@@ -136,6 +150,8 @@ namespace Vi.Core.MovementHandlers
             rb.transform.localRotation = Quaternion.identity;
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
+
+            physicsMovementHandlers.Remove(this);
 
             interpolateReached = default;
             stairColliders.Clear();

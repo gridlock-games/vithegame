@@ -236,6 +236,8 @@ namespace Vi.Player
         private int stepsToBuffer;
         private void ReprocessInputs(StatePayload latestServerState)
         {
+            ResetNonOwnerCollidersToServerPosition();
+
             Vector3 oldPosition = Rigidbody.position;
             Rigidbody.position = latestServerState.position;
             if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.velocity; }
