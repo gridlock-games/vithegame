@@ -301,62 +301,15 @@ namespace Vi.Player
             inputPayload.shouldPlayHitStop = combatAgent.ShouldPlayHitStop();
         }
 
-        private int lastCollisionTick;
-        public override void ReceiveOnCollisionEnterMessage(Collision collision)
-        {
-            base.ReceiveOnCollisionEnterMessage(collision);
-            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
-            {
-                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
-                {
-                    lastCollisionTick = NetworkManager.LocalTime.Tick;
-                }
-            }
-        }
-
-        public override void ReceiveOnCollisionStayMessage(Collision collision)
-        {
-            base.ReceiveOnCollisionStayMessage(collision);
-            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
-            {
-                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
-                {
-                    lastCollisionTick = NetworkManager.LocalTime.Tick;
-                }
-            }
-        }
-
         private float timeWithoutInputs;
         private InputPayload lastInputPayloadProcessedOnServer;
-        private Vector3 lastServerPosition;
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             if (!IsSpawned)
             {
                 //interpolationRigidbody.position = Rigidbody.position;
                 return;
-            }
-
-            if (!IsOwner & !IsServer)
-            {
-                if (latestServerState.Value.tick > 0)
-                {
-                    // Sync position here with latest server state
-                    Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
-                    if (targetPosition != lastServerPosition)
-                    {
-                        if (lastCollisionTick > NetworkManager.ServerTime.Tick)
-                        {
-                            Rigidbody.position += targetPosition - lastServerPosition;
-                        }
-                        else
-                        {
-                            Rigidbody.position = targetPosition;
-                        }
-                        lastServerPosition = targetPosition;
-                    }
-                    Rigidbody.linearVelocity = Vector3.zero;
-                }
             }
 
             if (!IsClient)
@@ -583,9 +536,6 @@ namespace Vi.Player
             stateBuffer = new StatePayload[BUFFER_SIZE];
             lastProcessedState = default;
             serverInputQueue.Clear();
-
-            lastServerPosition = default;
-            lastCollisionTick = default;
         }
 
         private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)

@@ -100,17 +100,14 @@ namespace Vi.Core.MovementHandlers
             HighestKillPlayer
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             EvaluateTargetingLogic();
             if (IsServer & IsSpawned)
             {
                 EvaluateAction();
                 Move();
-            }
-            else
-            {
-                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
             }
         }
 
