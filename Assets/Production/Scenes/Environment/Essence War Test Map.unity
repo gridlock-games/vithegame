@@ -224,31 +224,39 @@ MonoBehaviour:
   - gameModes: 03000000
     teams: 01000000
     spawnPositions:
-    - {x: -5.5, y: 3, z: 11.97}
+    - {x: -4.96, y: 3, z: -4.36}
     spawnRotations:
     - {x: 22.52, y: 158.6, z: 0}
     spawnPriorities: 
   - gameModes: 03000000
     teams: 0a000000
     spawnPositions:
-    - {x: 15, y: -4, z: -5}
-    - {x: 15, y: -4, z: 5}
-    - {x: 15, y: -4, z: 0}
+    - {x: 8, y: 1, z: 15}
+    - {x: -8, y: 1, z: 15}
+    - {x: 0, y: 1, z: 15}
+    - {x: -4, y: 1, z: 15}
+    - {x: 4, y: 1, z: 15}
     spawnRotations:
-    - {x: 0, y: -90, z: 0}
-    - {x: 0, y: -90, z: 0}
-    - {x: 0, y: -90, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 180, z: 0}
     spawnPriorities: 
   - gameModes: 03000000
     teams: 0b000000
     spawnPositions:
-    - {x: -15, y: -4, z: -5}
-    - {x: -15, y: -4, z: 5}
-    - {x: -15, y: -4, z: 0}
+    - {x: 8, y: 1, z: -15}
+    - {x: 4, y: 1, z: -15}
+    - {x: 0, y: 1, z: -15}
+    - {x: -4, y: 1, z: -15}
+    - {x: -8, y: 1, z: -15}
     spawnRotations:
-    - {x: 0, y: 90, z: 0}
-    - {x: 0, y: 90, z: 0}
-    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
     spawnPriorities: 
   damageCircleSpawnPosition: {x: 0, y: 0, z: 0}
   damageCircleMaxScale: {x: 100, y: 200, z: 100}
@@ -564,7 +572,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 1, z: 50}
+  m_LocalScale: {x: 25, y: 1, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
