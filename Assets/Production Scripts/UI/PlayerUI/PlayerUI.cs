@@ -723,7 +723,7 @@ namespace Vi.UI
             if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
                 interactableImage.raycastTarget = true;
-                interactableImage.color = Vector4.MoveTowards(interactableImage.color, new Color(1, 1, 1, 0.7f), Time.deltaTime * 5);
+                interactableImage.color = Vector4.MoveTowards(interactableImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
             }
             else
             {
