@@ -730,20 +730,18 @@ namespace Vi.Player
                 if (grabAssailant)
                 {
                     Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                    return Quaternion.LookRotation(rel, Vector3.up);
+                    return IsolateYRotation(Quaternion.LookRotation(rel, Vector3.up));
                 }
             }
 
             if (IsOwner)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
-                camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (combatAgent.IsGrabbing)
                     return transform.rotation;
                 else if (!combatAgent.ShouldPlayHitStop())
-                    return Quaternion.LookRotation(camDirection);
+                    return IsolateYRotation(Quaternion.LookRotation(camDirection));
             }
             else
             {

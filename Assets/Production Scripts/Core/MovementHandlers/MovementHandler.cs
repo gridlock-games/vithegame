@@ -13,8 +13,12 @@ namespace Vi.Core.MovementHandlers
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PooledObject))]
 	public abstract class MovementHandler : NetworkBehaviour
-	{
-		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+    {
+        public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+        public static Quaternion IsolateYRotation(Quaternion input)
+		{
+			return Quaternion.Euler(0, input.eulerAngles.y, 0);
+		}
 
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
