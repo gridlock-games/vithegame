@@ -64,7 +64,6 @@ namespace Vi.Core.MovementHandlers
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return transform.rotation; }
 
             Vector3 camDirection = (NextPosition - Rigidbody.position).normalized;
-            camDirection.Scale(HORIZONTAL_PLANE);
 
             if (combatAgent.ShouldApplyAilmentRotation())
                 return combatAgent.GetAilmentRotation();
@@ -76,12 +75,11 @@ namespace Vi.Core.MovementHandlers
                 if (grabAssailant)
                 {
                     Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                    return Quaternion.LookRotation(rel, Vector3.up);
+                    return IsolateYRotation(Quaternion.LookRotation(rel, Vector3.up));
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : IsolateYRotation(Quaternion.LookRotation(camDirection)), Time.deltaTime * 3);
 
             return transform.rotation;
         }
@@ -100,17 +98,14 @@ namespace Vi.Core.MovementHandlers
             HighestKillPlayer
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             EvaluateTargetingLogic();
             if (IsServer & IsSpawned)
             {
                 EvaluateAction();
                 Move();
-            }
-            else
-            {
-                Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
             }
         }
 

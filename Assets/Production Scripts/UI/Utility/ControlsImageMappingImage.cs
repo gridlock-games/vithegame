@@ -12,32 +12,64 @@ namespace Vi.UI
     public class ControlsImageMappingImage : MonoBehaviour
     {
         [SerializeField] private InputActionReference inputAction;
+        [SerializeField] private Sprite defaultSprite;
 
         private Image image;
         private void Start()
         {
             image = GetComponent<Image>();
             FindPlayerInput();
-            UpdateImage();
+            UpdateImage(false);
         }
 
         private void Update()
         {
             FindPlayerInput();
-            UpdateImage();
+            UpdateImage(false);
+        }
+
+        private void OnEnable()
+        {
+            UpdateImage(true);
         }
 
         private string lastEvaluatedControlScheme;
-        private void UpdateImage()
+        private void UpdateImage(bool force)
         {
             if (!playerInput) { return; }
             if (string.IsNullOrEmpty(playerInput.currentControlScheme)) { return; }
-            if (playerInput.currentControlScheme == lastEvaluatedControlScheme) { return; }
 
+            if (!force)
+            {
+                if (playerInput.currentControlScheme == lastEvaluatedControlScheme) { return; }
+            }
+            
             InputControlScheme controlScheme = playerInput.actions.FindControlScheme(playerInput.currentControlScheme).Value;
 
-            var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { inputAction.action });
-            image.sprite = result.releasedSprites.Count > 0 ? result.releasedSprites[0] : null;
+            List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, inputAction.action);
+            image.sprite = null;
+            foreach (Sprite sprite in controlSchemeSpriteList)
+            {
+                if (sprite)
+                {
+                    image.sprite = sprite;
+                    break;
+                }
+            }
+            
+            if (!image.sprite)
+            {
+                var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { inputAction.action });
+                image.sprite = defaultSprite;
+                foreach (Sprite sprite in result.releasedSprites)
+                {
+                    if (sprite)
+                    {
+                        image.sprite = sprite;
+                        break;
+                    }
+                }
+            }
 
             lastEvaluatedControlScheme = playerInput.currentControlScheme;
         }

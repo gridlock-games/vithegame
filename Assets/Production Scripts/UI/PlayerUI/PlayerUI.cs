@@ -57,6 +57,8 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
+        [SerializeField] private Image interactableImage;
+        [SerializeField] private Image crosshairImage;
         [Header("Weapon Cards")]
         [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
         [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
@@ -309,6 +311,11 @@ namespace Vi.UI
 
         public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
 
+        public void Interact()
+        {
+            playerMovementHandler.OnInteract();
+        }
+
         private Attributes attributes;
         private PlayerMovementHandler playerMovementHandler;
         private TextChat textChat;
@@ -317,6 +324,8 @@ namespace Vi.UI
 
         [SerializeField] private Canvas[] aliveUIChildCanvases;
         [SerializeField] private Canvas[] deathUIChildCanvases;
+
+        private Vector3 originalCrosshairScale;
 
         private void Awake()
         {
@@ -340,6 +349,8 @@ namespace Vi.UI
             ability4Action = playerInput.actions.FindAction("Ability4");
             reloadAction = playerInput.actions.FindAction("Reload");
             dodgeAction = playerInput.actions.FindAction("Dodge");
+
+            originalCrosshairScale = crosshairImage.transform.localScale;
 
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
@@ -405,6 +416,9 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+            crosshairImage.color = FasterPlayerPrefs.Singleton.GetColor("CrosshairColor");
+            crosshairImage.transform.localScale = originalCrosshairScale * FasterPlayerPrefs.Singleton.GetFloat("CrosshairSize");
+            crosshairImage.sprite = FasterPlayerPrefs.Singleton.crosshairSprites[FasterPlayerPrefs.Singleton.GetInt("CrosshairStyle")].Result;
         }
 
         private void UpdateTeammateAttributesList()
@@ -713,6 +727,17 @@ namespace Vi.UI
             if (!attributes.WeaponHandler.WeaponInitialized) { return; }
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
+
+            if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
+            {
+                interactableImage.raycastTarget = true;
+                interactableImage.color = Vector4.MoveTowards(interactableImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+            }
+            else
+            {
+                interactableImage.raycastTarget = false;
+                interactableImage.color = Vector4.MoveTowards(interactableImage.color, Color.clear, Time.deltaTime * 5);
+            }
 
             if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
             {

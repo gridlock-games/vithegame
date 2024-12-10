@@ -93,7 +93,7 @@ namespace Vi.UI
                 if (rebindableActionGroup.Length > 0)
                 {
                     rebindingElementObjects.Add(Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent));
-                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString().ToUpper();
+                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup == ActionGroup.UI ? "USER INTERFACE" : actionGroup.ToString().ToUpper();
 
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {

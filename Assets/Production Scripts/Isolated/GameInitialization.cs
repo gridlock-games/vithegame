@@ -57,6 +57,10 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasColor("CrosshairColor")) { FasterPlayerPrefs.Singleton.SetColor("CrosshairColor", Color.red); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("CrosshairSize")) { FasterPlayerPrefs.Singleton.SetFloat("CrosshairSize", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("CrosshairStyle")) { FasterPlayerPrefs.Singleton.SetInt("CrosshairStyle", 26); }
+
             if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 0); }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("MobileLookJoystickActsLikeButton")) { FasterPlayerPrefs.Singleton.SetBool("MobileLookJoystickActsLikeButton", false); }

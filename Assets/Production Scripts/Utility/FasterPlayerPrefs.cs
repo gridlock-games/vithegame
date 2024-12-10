@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.Linq;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Utility
 {
     public class FasterPlayerPrefs : MonoBehaviour
     {
+        [SerializeField] private AssetReferenceSprite[] crosshairStyleOptions;
+
+        public AsyncOperationHandle<Sprite>[] crosshairSprites;
+
         public static FasterPlayerPrefs Singleton { get { return _singleton; } }
         private static FasterPlayerPrefs _singleton;
 
@@ -44,6 +50,15 @@ namespace Vi.Utility
             intPrefs = JsonConvert.DeserializeObject<Dictionary<string, int>>(PlayerPrefs.GetString(intPrefKey));
             boolPrefs = JsonConvert.DeserializeObject<Dictionary<string, bool>>(PlayerPrefs.GetString(boolPrefKey));
             colorPrefs = JsonConvert.DeserializeObject<Dictionary<string, SerializableColor>>(PlayerPrefs.GetString(colorPrefKey));
+
+            crosshairSprites = new AsyncOperationHandle<Sprite>[crosshairStyleOptions.Length];
+
+            int index = 0;
+            foreach (AssetReferenceSprite assetReferenceSprite in crosshairStyleOptions)
+            {
+                crosshairSprites[index] = Addressables.LoadAssetAsync<Sprite>(assetReferenceSprite);
+                index++;
+            }
 
 #if (UNITY_IOS || UNITY_ANDROID)
             UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
@@ -109,7 +124,8 @@ namespace Vi.Utility
         {
             { "EnemyColor", new Color(237f / 255, 85f / 255, 84f / 255, 1) },
             { "TeammateColor", new Color(5f / 255, 159f / 255, 242f / 255, 1) },
-            { "LocalPlayerColor", Color.white }
+            { "LocalPlayerColor", Color.white },
+            { "CrosshairColor", Color.red }
         };
 
         public bool PlayerPrefsWasUpdatedThisFrame { get; private set; } = false;

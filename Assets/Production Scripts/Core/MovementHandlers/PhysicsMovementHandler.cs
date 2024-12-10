@@ -42,7 +42,6 @@ namespace Vi.Core.MovementHandlers
             networkTransform.Interpolate = true;
             rb.interpolation = IsClient ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
             rb.collisionDetectionMode = IsServer | IsOwner ? CollisionDetectionMode.Continuous : CollisionDetectionMode.Discrete;
-            //rb.isKinematic = !IsServer & !IsOwner;
             rb.isKinematic = false;
             NetworkManager.NetworkTickSystem.Tick += Tick;
         }
@@ -72,6 +71,54 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
+        protected virtual void FixedUpdate()
+        {
+            UpdateNonOwnerColliderPosition();   
+        }
+
+        private Vector3 lastServerPosition;
+        private void UpdateNonOwnerColliderPosition()
+        {
+            if (IsSpawned)
+            {
+                if (!IsOwner & !IsServer)
+                {
+                    // Sync position here with latest server state
+                    Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
+                    if (targetPosition != lastServerPosition)
+                    {
+                        if (lastCollisionTick > NetworkManager.ServerTime.Tick)
+                        {
+                            Rigidbody.position += targetPosition - lastServerPosition;
+                        }
+                        else
+                        {
+                            Rigidbody.position = targetPosition;
+                        }
+                        lastServerPosition = targetPosition;
+                    }
+                    Rigidbody.linearVelocity = Vector3.zero;
+                }
+            }
+            else
+            {
+                Rigidbody.position = networkTransform.GetSpaceRelativePosition(true);
+            }
+        }
+
+        private static List<PhysicsMovementHandler> physicsMovementHandlers = new List<PhysicsMovementHandler>();
+        protected static void ResetNonOwnerCollidersToServerPosition()
+        {
+            foreach (PhysicsMovementHandler physicsMovementHandler in physicsMovementHandlers)
+            {
+                if (!physicsMovementHandler.IsOwner & !physicsMovementHandler.IsServer)
+                {
+                    physicsMovementHandler.Rigidbody.position = physicsMovementHandler.networkTransform.GetSpaceRelativePosition(true);
+                    physicsMovementHandler.lastCollisionTick = default;
+                }
+            }
+        }
+
         public Rigidbody Rigidbody { get { return rb; } }
         private Rigidbody rb;
         protected CombatAgent combatAgent;
@@ -93,6 +140,8 @@ namespace Vi.Core.MovementHandlers
             rb.rotation = Quaternion.identity;
             rb.transform.rotation = Quaternion.identity;
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.AddRigidbody(rb); }
+
+            physicsMovementHandlers.Add(this);
         }
         
         protected virtual void OnReturnToPool()
@@ -103,11 +152,16 @@ namespace Vi.Core.MovementHandlers
             rb.Sleep();
             if (!GetComponent<ActionVFX>() & rb) { NetworkPhysicsSimulation.RemoveRigidbody(rb); }
 
+            physicsMovementHandlers.Remove(this);
+
             interpolateReached = default;
             stairColliders.Clear();
             groundColliders.Clear();
             animationMoveInput = default;
             LastMovementWasZero = true;
+
+            lastCollisionTick = default;
+            lastServerPosition = default;
         }
 
         protected float GetTickRateDeltaTime()
@@ -229,14 +283,29 @@ namespace Vi.Core.MovementHandlers
             }
         }
 
+        private int lastCollisionTick;
         public override void ReceiveOnCollisionEnterMessage(Collision collision)
         {
             EvaluateGroundCollider(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
+                {
+                    lastCollisionTick = NetworkManager.LocalTime.Tick;
+                }
+            }
         }
 
         public override void ReceiveOnCollisionStayMessage(Collision collision)
         {
             EvaluateGroundCollider(collision);
+            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
+                {
+                    lastCollisionTick = NetworkManager.LocalTime.Tick;
+                }
+            }
         }
 
         List<Collider> groundColliders = new List<Collider>();

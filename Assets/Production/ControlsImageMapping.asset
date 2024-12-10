@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: ControlsImageMapping
   m_EditorClassIdentifier: 
   controlSchemeActionImages:
-  - controlSchemeName: Touchscreen
-    actionName: Look
+  - actionName: Look
+    controlSchemeName: Touchscreen
     sprite: {fileID: 21300000, guid: 627e1ca0e3717a24ba0ac17e91e7c814, type: 3}
+  - actionName: Interact
+    controlSchemeName: Touchscreen
+    sprite: {fileID: 21300000, guid: d8dbee21c3a724d9babb348b114f2496, type: 3}
   controlsImageElements:
   - inputPath: <Keyboard>/anyKey
     displayName: Any Key
@@ -25,8 +28,8 @@ MonoBehaviour:
   - inputPath: <Keyboard>/escape
     displayName: Esc
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 792610918, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 792610918, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/space
     displayName: Space
     shortDisplayName: 
@@ -35,13 +38,13 @@ MonoBehaviour:
   - inputPath: <Keyboard>/enter
     displayName: Enter
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 873197532, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 873197532, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/tab
     displayName: Tab
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 2113732233, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 2113732233, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/backquote
     displayName: '`'
     shortDisplayName: 
@@ -125,13 +128,14 @@ MonoBehaviour:
   - inputPath: <Keyboard>/b
     displayName: B
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 763052953, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 763052953, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/c
     displayName: C
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1120141879, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1120141879, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/d
     displayName: D
     shortDisplayName: 
@@ -150,53 +154,54 @@ MonoBehaviour:
   - inputPath: <Keyboard>/g
     displayName: G
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -339955833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -339955833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/h
     displayName: H
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 215955547, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 215955547, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/i
     displayName: I
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 625548145, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 625548145, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/j
     displayName: J
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1756982213, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1756982213, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/k
     displayName: K
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -437147866, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -437147866, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/l
     displayName: L
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 2058048843, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 2058048843, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/m
     displayName: M
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 573775827, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 573775827, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/n
     displayName: N
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -369367431, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -369367431, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/o
     displayName: O
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -651992437, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -651992437, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/p
     displayName: P
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 623794471, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 623794471, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/q
     displayName: Q
     shortDisplayName: 
@@ -205,8 +210,9 @@ MonoBehaviour:
   - inputPath: <Keyboard>/r
     displayName: R
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1086976902, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1086976902, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/s
     displayName: S
     shortDisplayName: 
@@ -215,13 +221,13 @@ MonoBehaviour:
   - inputPath: <Keyboard>/t
     displayName: T
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 674356324, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 674356324, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/u
     displayName: U
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1357780934, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1357780934, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/v
     displayName: V
     shortDisplayName: 
@@ -235,18 +241,19 @@ MonoBehaviour:
   - inputPath: <Keyboard>/x
     displayName: X
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1685659658, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1685659658, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/y
     displayName: Y
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1710811454, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1710811454, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/z
     displayName: Z
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1849002522, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1849002522, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/1
     displayName: 1
     shortDisplayName: 
@@ -260,43 +267,46 @@ MonoBehaviour:
   - inputPath: <Keyboard>/3
     displayName: 3
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1108695777, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1108695777, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/4
     displayName: 4
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -234226904, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -234226904, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/5
     displayName: 5
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1806997139, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1806997139, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/6
     displayName: 6
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1228427391, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1228427391, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/7
     displayName: 7
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 989091092, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 989091092, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/8
     displayName: 8
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1836162390, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1836162390, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/9
     displayName: 9
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 519379653, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 519379653, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/0
     displayName: 0
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -867058848, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -867058848, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/leftShift
     displayName: Shift
     shortDisplayName: 
@@ -305,43 +315,46 @@ MonoBehaviour:
   - inputPath: <Keyboard>/rightShift
     displayName: Right Shift
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 927217833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 927217833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/shift
     displayName: Shift
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 927217833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 927217833, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/leftAlt
     displayName: Alt
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/rightAlt
     displayName: Right Alt
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/alt
     displayName: Alt
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: 1864798315, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
   - inputPath: <Keyboard>/leftCtrl
     displayName: Ctrl
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/rightCtrl
     displayName: Right Ctrl
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/ctrl
     displayName: Control
     shortDisplayName: 
-    pressedSprite: {fileID: 0}
-    releasedSprite: {fileID: 0}
+    pressedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a, type: 3}
+    releasedSprite: {fileID: -1713548389, guid: bb026999caf2741448fd04a17b092f7a,
+      type: 3}
   - inputPath: <Keyboard>/leftMeta
     displayName: Left Windows
     shortDisplayName: 

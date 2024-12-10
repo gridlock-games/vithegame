@@ -22,8 +22,6 @@ namespace Vi.ArtificialIntelligence
         protected override void OnDisable()
         {
             isHeavyAttacking = default;
-            lastCollisionTick = default;
-            lastServerPosition = default;
         }
 
         protected override void Update()
@@ -51,7 +49,6 @@ namespace Vi.ArtificialIntelligence
             if (IsServer)
             {
                 Vector3 camDirection = (NextPosition - Rigidbody.position).normalized;
-                camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (combatAgent.ShouldApplyAilmentRotation())
                     return combatAgent.GetAilmentRotation();
@@ -63,12 +60,11 @@ namespace Vi.ArtificialIntelligence
                     if (grabAssailant)
                     {
                         Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                        rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                        return Quaternion.LookRotation(rel, Vector3.up);
+                        return IsolateYRotation(Quaternion.LookRotation(rel, Vector3.up));
                     }
                 }
                 else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
-                    return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(camDirection), Time.deltaTime * 3);
+                    return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : IsolateYRotation(Quaternion.LookRotation(camDirection)), Time.deltaTime * 3);
 
                 return transform.rotation;
             }
@@ -278,56 +274,13 @@ namespace Vi.ArtificialIntelligence
             }
         }
 
-        private int lastCollisionTick;
-        public override void ReceiveOnCollisionEnterMessage(Collision collision)
+        protected override void FixedUpdate()
         {
-            base.ReceiveOnCollisionEnterMessage(collision);
-            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
-            {
-                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
-                {
-                    lastCollisionTick = NetworkManager.LocalTime.Tick;
-                }
-            }
-        }
-
-        public override void ReceiveOnCollisionStayMessage(Collision collision)
-        {
-            base.ReceiveOnCollisionStayMessage(collision);
-            if (collision.transform.root.TryGetComponent(out NetworkCollider networkCollider))
-            {
-                if (!NetworkCollider.StaticWallsEnabledForThisCollision(combatAgent.NetworkCollider, networkCollider))
-                {
-                    lastCollisionTick = NetworkManager.LocalTime.Tick;
-                }
-            }
-        }
-
-        private Vector3 lastServerPosition;
-        void FixedUpdate()
-        {
+            base.FixedUpdate();
             if (IsServer)
             {
                 EvaluateBotLogic();
                 Move();
-            }
-            else
-            {
-                // Sync position here with latest server state
-                Vector3 targetPosition = networkTransform.GetSpaceRelativePosition(true);
-                if (targetPosition != lastServerPosition)
-                {
-                    if (lastCollisionTick > NetworkManager.ServerTime.Tick)
-                    {
-                        Rigidbody.position += targetPosition - lastServerPosition;
-                    }
-                    else
-                    {
-                        Rigidbody.position = targetPosition;
-                    }
-                    lastServerPosition = targetPosition;
-                }
-                Rigidbody.linearVelocity = Vector3.zero;
             }
         }
 
