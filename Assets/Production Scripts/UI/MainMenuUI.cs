@@ -16,6 +16,8 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
 using jomarcentermjm.steamauthentication;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace Vi.UI
 {
@@ -85,6 +87,29 @@ namespace Vi.UI
         public void StartHubServerButton()
         { StartCoroutine(StartHubServer()); }
 
+        private string GetLocalIP()
+        {
+            string output = "127.0.0.1";
+            foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                NetworkInterfaceType _type1 = NetworkInterfaceType.Wireless80211;
+                NetworkInterfaceType _type2 = NetworkInterfaceType.Ethernet;
+
+                if ((item.NetworkInterfaceType == _type1 || item.NetworkInterfaceType == _type2) && item.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
+                    {
+                        // IPv4
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            output = ip.Address.ToString();
+                        }
+                    }
+                }
+            }
+            return output;
+        }
+
         private IEnumerator StartHubServer()
         {
             if (startServerCalled) { yield break; }
@@ -121,7 +146,7 @@ namespace Vi.UI
             {
                 if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
                 {
-                    serverIP = "127.0.0.1";
+                    serverIP = GetLocalIP();
                 }
                 else
                 {
@@ -179,7 +204,7 @@ namespace Vi.UI
             {
                 if (Application.platform == RuntimePlatform.WindowsPlayer | Application.platform == RuntimePlatform.WindowsServer | Application.isEditor)
                 {
-                    serverIP = "127.0.0.1";
+                    serverIP = GetLocalIP();
                 }
                 else
                 {

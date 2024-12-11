@@ -99,16 +99,16 @@ namespace Vi.Core.CombatAgents
             if (!(IsHost & IsLocalPlayer)) { yield return new WaitUntil(() => GetPlayerDataId() != (int)NetworkManager.ServerClientId); }
             PlayerDataManager.Singleton.AddPlayerObject(GetPlayerDataId(), this);
 
-            foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-            {
-                foreach (Collider col in NetworkCollider.Colliders)
-                {
-                    foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
-                    {
-                        Physics.IgnoreCollision(col, otherCol, true);
-                    }
-                }
-            }
+            //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            //{
+            //    foreach (Collider col in NetworkCollider.Colliders)
+            //    {
+            //        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
+            //        {
+            //            Physics.IgnoreCollision(col, otherCol, true);
+            //        }
+            //    }
+            //}
         }
 
         public override void OnNetworkDespawn()

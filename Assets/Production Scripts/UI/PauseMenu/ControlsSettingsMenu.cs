@@ -14,26 +14,16 @@ namespace Vi.UI
 {
     public class ControlsSettingsMenu : Menu
     {
-        [SerializeField] private Toggle invertLookToggle;
-        [SerializeField] private InputField mouseXSensitivityInput;
-        [SerializeField] private InputField mouseYSensitivityInput;
-        [SerializeField] private InputField zoomMultiplierInput;
         [SerializeField] private TMP_Dropdown lightAttackModeDropdown;
         [SerializeField] private TMP_Dropdown zoomModeDropdown;
         [SerializeField] private TMP_Dropdown blockingModeDropdown;
         [SerializeField] private TMP_Dropdown orbitalCameraModeDropdown;
         [SerializeField] private RectTransform mobileLookJoystickActLikeButtonParent;
         [SerializeField] private Toggle mobileLookJoystickActLikeButtonToggle;
-        [SerializeField] private RectTransform mobileLookJoystickInputParent;
-        [SerializeField] private InputField mobileLookJoystickSensitivityInput;
-        [SerializeField] private RectTransform shouldRepositionMoveJoystickParent;
+        [SerializeField] private RectTransform mobileLookJoystickSensitivityParent;
         [SerializeField] private Toggle shouldRepositionMoveJoystick;
-        [SerializeField] private InputField gyroSensitivityInput;
-        [SerializeField] private RectTransform gyroSensitivityParent;
-        [SerializeField] private Toggle UIVibrationsToggle;
-        [SerializeField] private Toggle deathVibrationToggle;
-        [SerializeField] private Toggle gameplayVibrationsToggle;
         [Header("Key Rebinding")]
+        [SerializeField] private RectTransform resetBindingsButtonParent;
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private RectTransform rebindingElementParent;
         [SerializeField] private RebindingElement rebindingElementPrefab;
@@ -61,26 +51,11 @@ namespace Vi.UI
 
         private void Awake()
         {
-            invertLookToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("InvertMouse");
-            mouseXSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseXSensitivity").ToString();
-            mouseYSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MouseYSensitivity").ToString();
-            zoomMultiplierInput.text = FasterPlayerPrefs.Singleton.GetFloat("ZoomSensitivityMultiplier").ToString();
-            mobileLookJoystickSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("MobileLookJoystickSensitivity").ToString();
+            resetBindingsButtonParent.gameObject.SetActive(false);
 
-            shouldRepositionMoveJoystick.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileMoveJoystickShouldReposition");
-            shouldRepositionMoveJoystick.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(shouldRepositionMoveJoystick, "MobileMoveJoystickShouldReposition"); });
+            mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { mobileLookJoystickSensitivityParent.gameObject.SetActive(!mobileLookJoystickActLikeButtonToggle.isOn); });
 
-            mobileLookJoystickActLikeButtonToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("MobileLookJoystickActsLikeButton");
-            mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(mobileLookJoystickActLikeButtonToggle, "MobileLookJoystickActsLikeButton"); });
-            mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { mobileLookJoystickInputParent.gameObject.SetActive(!mobileLookJoystickActLikeButtonToggle.isOn); });
-
-            gyroSensitivityInput.text = FasterPlayerPrefs.Singleton.GetFloat("GyroscopicRotationSensitivity").ToString();
-
-            bool isMobilePlatform = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer;
-            shouldRepositionMoveJoystickParent.gameObject.SetActive(isMobilePlatform);
-            gyroSensitivityParent.gameObject.SetActive(isMobilePlatform);
-            mobileLookJoystickActLikeButtonParent.gameObject.SetActive(isMobilePlatform);
-            mobileLookJoystickInputParent.gameObject.SetActive(isMobilePlatform & !mobileLookJoystickActLikeButtonToggle.isOn);
+            mobileLookJoystickSensitivityParent.gameObject.SetActive(FasterPlayerPrefs.IsMobilePlatform & !mobileLookJoystickActLikeButtonToggle.isOn);
 
             lightAttackModeDropdown.AddOptions(WeaponHandler.GetAttackModeOptions());
             lightAttackModeDropdown.value = WeaponHandler.GetAttackModeOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("LightAttackMode"));
@@ -91,30 +66,13 @@ namespace Vi.UI
             blockingModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             blockingModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("BlockingMode"));
 
-            orbitalCameraModeDropdown.transform.parent.parent.gameObject.SetActive(Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer);
+            orbitalCameraModeDropdown.transform.parent.parent.gameObject.SetActive(!FasterPlayerPrefs.IsMobilePlatform);
             orbitalCameraModeDropdown.AddOptions(WeaponHandler.GetHoldToggleOptions());
             orbitalCameraModeDropdown.value = WeaponHandler.GetHoldToggleOptions().IndexOf(FasterPlayerPrefs.Singleton.GetString("OrbitalCameraMode"));
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
             if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(); }
-
-            UIVibrationsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("UIVibrationsEnabled");
-            deathVibrationToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("DeathVibrationEnabled");
-            gameplayVibrationsToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("GameplayVibrationsEnabled");
-
-            UIVibrationsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(UIVibrationsToggle, "UIVibrationsEnabled"); });
-            deathVibrationToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(deathVibrationToggle, "DeathVibrationEnabled"); });
-            gameplayVibrationsToggle.onValueChanged.AddListener(delegate { SetPlayerPrefFromToggle(gameplayVibrationsToggle, "GameplayVibrationsEnabled"); });
-
-            UIVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
-            deathVibrationToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme != "Keyboard & Mouse");
-            gameplayVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
-        }
-
-        private void SetPlayerPrefFromToggle(Toggle toggle, string playerPrefName)
-        {
-            FasterPlayerPrefs.Singleton.SetBool(playerPrefName, toggle.isOn);
         }
 
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
@@ -124,6 +82,7 @@ namespace Vi.UI
             {
                 Destroy(g);
             }
+            rebindingElementObjects.Clear();
 
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
@@ -133,7 +92,7 @@ namespace Vi.UI
                 if (rebindableActionGroup.Length > 0)
                 {
                     rebindingElementObjects.Add(Instantiate(rebindingSectionHeaderPrefab, rebindingElementParent));
-                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup.ToString().ToUpper();
+                    rebindingElementObjects[^1].GetComponentInChildren<Text>().text = actionGroup == ActionGroup.UI ? "USER INTERFACE" : actionGroup.ToString().ToUpper();
 
                     foreach (RebindableAction rebindableAction in rebindableActionGroup)
                     {
@@ -162,6 +121,8 @@ namespace Vi.UI
                     }
                 }
             }
+
+            resetBindingsButtonParent.gameObject.SetActive(rebindingElementObjects.Count > 0);
         }
 
         public void ResetBindingsToDefaults()
@@ -207,46 +168,10 @@ namespace Vi.UI
 
             if (playerInput.currentControlScheme != lastControlScheme)
             {
-                UIVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
-                deathVibrationToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme != "Keyboard & Mouse");
-                gameplayVibrationsToggle.transform.parent.parent.gameObject.SetActive(playerInput.currentControlScheme == "Touchscreen");
-
                 RegenerateInputBindingMenu();
             }
 
             lastControlScheme = playerInput.currentControlScheme;
-        }
-
-        public void SetInvertMouse()
-        {
-            FasterPlayerPrefs.Singleton.SetBool("InvertMouse", invertLookToggle.isOn);
-        }
-
-        public void ChangeMouseXSensitivity()
-        {
-            mouseXSensitivityInput.text = Regex.Replace(mouseXSensitivityInput.text, @"[^0-9|.]", "");
-            if (float.TryParse(mouseXSensitivityInput.text, out float mouseXSens))
-            {
-                if (mouseXSens > 0) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", mouseXSens); }
-            }
-        }
-
-        public void ChangeMouseYSensitivity()
-        {
-            mouseYSensitivityInput.text = Regex.Replace(mouseYSensitivityInput.text, @"[^0-9|.]", "");
-            if (float.TryParse(mouseYSensitivityInput.text, out float mouseYSens))
-            {
-                if (mouseYSens > 0) { FasterPlayerPrefs.Singleton.SetFloat("MouseYSensitivity", mouseYSens); }
-            }
-        }
-
-        public void ChangeZoomMultiplier()
-        {
-            zoomMultiplierInput.text = Regex.Replace(zoomMultiplierInput.text, @"[^0-9|.]", "");
-            if (float.TryParse(zoomMultiplierInput.text, out float zoomMultiplier))
-            {
-                if (zoomMultiplier > 0) { FasterPlayerPrefs.Singleton.SetFloat("ZoomSensitivityMultiplier", zoomMultiplier); }
-            }
         }
 
         public void ChangeLightAttackMode()
@@ -267,24 +192,6 @@ namespace Vi.UI
         public void ChangeOrbitalCameraMode()
         {
             FasterPlayerPrefs.Singleton.SetString("OrbitalCameraMode", WeaponHandler.GetHoldToggleOptions()[orbitalCameraModeDropdown.value]);
-        }
-
-        public void ChangeMobileLookJoystickSensitivity()
-        {
-            mobileLookJoystickSensitivityInput.text = Regex.Replace(mobileLookJoystickSensitivityInput.text, @"[^0-9|.]", "");
-            if (float.TryParse(mobileLookJoystickSensitivityInput.text, out float sensitivity))
-            {
-                FasterPlayerPrefs.Singleton.SetFloat("MobileLookJoystickSensitivity", sensitivity);
-            }
-        }
-
-        public void ChangeGyroSensitivity()
-        {
-            gyroSensitivityInput.text = Regex.Replace(gyroSensitivityInput.text, @"[^0-9|.]", "");
-            if (float.TryParse(gyroSensitivityInput.text, out float sensitivity))
-            {
-                FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", sensitivity);
-            }
         }
     }
 }

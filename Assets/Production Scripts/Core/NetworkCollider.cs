@@ -6,6 +6,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Vi.Utility;
 using System.Linq;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -23,6 +24,7 @@ namespace Vi.Core
         private Collider[] staticWallColliders = new Collider[0];
 
         private static Dictionary<int, NetworkCollider> colliderInstanceIDMap = new Dictionary<int, NetworkCollider>();
+        private static Dictionary<int, NetworkCollider> staticWallColliderInstanceIDMap = new Dictionary<int, NetworkCollider>();
 
         private PooledObject parentPooledObject;
 
@@ -49,15 +51,16 @@ namespace Vi.Core
                 colliderInstanceIDMap.Add(col.GetInstanceID(), this);
                 col.hasModifiableContacts = true;
 
-                if (staticWallBody)
+                foreach (Collider staticWallCollider in staticWallColliders)
                 {
-                    foreach (Collider staticWallCollider in staticWallColliders)
-                    {
-                        Physics.IgnoreCollision(col, staticWallCollider);
-                        colliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
-                        staticWallCollider.hasModifiableContacts = true;
-                    }
+                    Physics.IgnoreCollision(col, staticWallCollider);
                 }
+            }
+
+            foreach (Collider staticWallCollider in staticWallColliders)
+            {
+                staticWallColliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
+                staticWallCollider.hasModifiableContacts = true;
             }
         }
 
@@ -127,47 +130,167 @@ namespace Vi.Core
 
         private void Physics_ContactModifyEvent(PhysicsScene scene, Unity.Collections.NativeArray<ModifiableContactPair> pairs)
         {
-            // For each contact pair, ignore the contact points that are close to origin
-            foreach (var pair in pairs)
+            foreach (ModifiableContactPair pair in pairs)
             {
                 for (int i = 0; i < pair.contactCount; ++i)
                 {
-                    if (colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other))
-                    {
-                        // Phase through other players if we are dodging out of an ailment like knockdown
-                        if (CombatAgent.CanRecoveryDodge)
-                        {
-                            if (CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge)
-                            {
-                                if (!CombatAgent.AnimationHandler.IsAtRest())
-                                {
-                                    pair.IgnoreContact(i);
-                                }
-                            }
-                        }
+                    colliderInstanceIDMap.TryGetValue(pair.colliderInstanceID, out NetworkCollider col);
+                    colliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out NetworkCollider other);
 
-                        if (CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
+                    // Both colliders are movement colliders
+                    if (col & other)
+                    {
+                        EvaluateContactPairAsMovementCollider(col, other, pair, i);
+                    }
+                    else if (col) // Col is a movement collider, but other is a static wall
+                    {
+                        if (staticWallColliderInstanceIDMap.TryGetValue(pair.otherColliderInstanceID, out other))
                         {
-                            if (PlayerDataManager.Singleton.CanHit(CombatAgent, other.CombatAgent))
-                            {
-                                if (!CombatAgent.AnimationHandler.IsAtRest())
-                                {
-                                    pair.SetDynamicFriction(i, 1);
-                                }
-                            }
+                            EvaluateContactPairAsStaticWallCollider(col, other, pair, i);
+                        }
+                    }
+                    else if (other) // Other is a movement collider, but col is a static wall
+                    {
+                        if (staticWallColliderInstanceIDMap.TryGetValue(pair.colliderInstanceID, out col))
+                        {
+                            EvaluateContactPairAsStaticWallCollider(col, other, pair, i);
                         }
                     }
                 }
             }
         }
 
+        private static void EvaluateContactPairAsMovementCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
+        {
+            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (StaticWallsEnabledForThisCollision(col, other))
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (PlayerDataManager.Singleton.CanHit(col.CombatAgent, other.CombatAgent))
+            {
+                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !col.CombatAgent.AnimationHandler.IsAtRest())
+                {
+                    pair.SetDynamicFriction(i, 1);
+                }
+                else if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !other.CombatAgent.AnimationHandler.IsAtRest())
+                {
+                    pair.SetDynamicFriction(i, 1);
+                }
+            }
+        }
+
+        private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
+        {
+            // Phase through other players if we are dodging out of an ailment like knockdown
+            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (StaticWallsEnabledForThisCollision(col, other))
+            {
+                if (PlayerDataManager.Singleton.CanHit(col.CombatAgent, other.CombatAgent))
+                {
+                    if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !col.CombatAgent.AnimationHandler.IsAtRest())
+                    {
+                        pair.SetDynamicFriction(i, 1);
+                    }
+                    else if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack() & !other.CombatAgent.AnimationHandler.IsAtRest())
+                    {
+                        pair.SetDynamicFriction(i, 1);
+                    }
+                }
+            }
+            else
+            {
+                pair.IgnoreContact(i);
+            }
+        }
+
+        public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
+        {
+            if (!col.staticWallBody) { return false; }
+            if (!other.staticWallBody) { return false; }
+
+            // If player is playing an attack, use static walls for collisions between the target and the attacker
+            // Also use static wall collisions when one player is playing a hit reaction
+            if (!col.CombatAgent.AnimationHandler.IsAtRest())
+            {
+                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
+                    & !col.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                {
+                    if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Quaternion rel = Quaternion.LookRotation(other.MovementHandler.GetPosition() - col.MovementHandler.GetPosition());
+                        if (Quaternion.Angle(rel, col.MovementHandler.GetRotation()) < 50)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    return true;
+                }
+            }
+
+            if (!other.CombatAgent.AnimationHandler.IsAtRest())
+            {
+                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
+                    & !other.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                {
+                    if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
+                        if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
+                {
+                    return true;
+                }
+            }
+
+            // If either player is standing still, use static wall collisions
+            if (col.MovementHandler.LastMovementWasZero) { return true; }
+            if (other.MovementHandler.LastMovementWasZero) { return true; }
+
+            return false;
+        }
+
+        private bool ShouldApplyRecoveryDodgeLogic()
+        {
+            return CombatAgent.CanRecoveryDodge
+                & CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge
+                & !CombatAgent.AnimationHandler.IsAtRest();
+        }
+
         private void OnDestroy()
         {
+            foreach (Collider c in Colliders)
+            {
+                colliderInstanceIDMap.Remove(c.GetInstanceID());
+            }
+
             if (staticWallBody)
             {
                 foreach (Collider staticWallCollider in staticWallColliders)
                 {
-                    colliderInstanceIDMap.Remove(staticWallCollider.GetInstanceID());
+                    staticWallColliderInstanceIDMap.Remove(staticWallCollider.GetInstanceID());
                 }
                 Destroy(staticWallBody.gameObject);
             }
@@ -209,7 +332,7 @@ namespace Vi.Core
                     {
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
-                    else
+                    else // Player hub
                     {
                         c.enabled = false;
                     }
@@ -217,6 +340,17 @@ namespace Vi.Core
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
+
+            //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            //{
+            //    foreach (Collider col in Colliders)
+            //    {
+            //        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
+            //        {
+            //            Physics.IgnoreCollision(col, otherCol, ShouldApplyRecoveryDodgeLogic() | StaticWallsEnabledForThisCollision(attributes.NetworkCollider));
+            //        }
+            //    }
+            //}
         }
 
         private void OnCollisionEnter(Collision collision)

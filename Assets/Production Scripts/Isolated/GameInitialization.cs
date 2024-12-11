@@ -53,9 +53,13 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasInt("TargetFrameRate"))
             {
                 int targetFrameRate = Mathf.CeilToInt((float)Screen.currentResolution.refreshRateRatio.value + 60);
-                if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer) { targetFrameRate = 60; }
+                if (FasterPlayerPrefs.IsMobilePlatform) { targetFrameRate = 60; }
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
+
+            if (!FasterPlayerPrefs.Singleton.HasColor("CrosshairColor")) { FasterPlayerPrefs.Singleton.SetColor("CrosshairColor", Color.red); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("CrosshairSize")) { FasterPlayerPrefs.Singleton.SetFloat("CrosshairSize", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("CrosshairStyle")) { FasterPlayerPrefs.Singleton.SetInt("CrosshairStyle", 26); }
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 0); }
 
@@ -113,6 +117,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("PacketLossEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PacketLossEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("JitterEnabled")) { FasterPlayerPrefs.Singleton.SetBool("JitterEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", false); }
 
             if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 

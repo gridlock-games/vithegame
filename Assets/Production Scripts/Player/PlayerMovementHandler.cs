@@ -63,12 +63,13 @@ namespace Vi.Player
             public bool shouldUseRootMotion;
             public Vector3 rootMotion;
             public float runSpeed;
+            public LoadoutManager.WeaponSlotType equippedWeaponSlot;
             public bool isGrounded;
             public bool shouldPlayHitStop;
             public float stairMovement;
 
-            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed, bool isGrounded,
-                bool shouldPlayHitStop)
+            public InputPayload(int tick, Vector2 moveInput, Quaternion rotation, bool shouldUseRootMotion, Vector3 rootMotion, float runSpeed,
+                LoadoutManager.WeaponSlotType weaponSlotType, bool isGrounded, bool shouldPlayHitStop)
             {
                 this.tick = tick;
                 this.moveInput = moveInput;
@@ -76,6 +77,7 @@ namespace Vi.Player
                 this.shouldUseRootMotion = shouldUseRootMotion;
                 this.rootMotion = rootMotion;
                 this.runSpeed = runSpeed;
+                this.equippedWeaponSlot = weaponSlotType;
                 this.isGrounded = isGrounded;
                 this.shouldPlayHitStop = shouldPlayHitStop;
                 // This is assigned after the input is processed
@@ -152,7 +154,7 @@ namespace Vi.Player
             }
         }
 
-        private const float serverReconciliationThreshold = 0.2f;
+        private const float serverReconciliationThreshold = 0.01f;
         private Vector3 HandleServerReconciliation()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
@@ -196,9 +198,7 @@ namespace Vi.Player
                         modifiedStatePayload.tick = combatAgent.AnimationHandler.WasLastActionClipMotionPredicted ? latestServerState.Value.tick : rootMotionReconciliationState.tick;
                         stateBuffer[rootMotionReconciliationIndex] = modifiedStatePayload;
 
-                        Rigidbody.position = modifiedStatePayload.position;
-                        if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = modifiedStatePayload.velocity; }
-                        ReprocessInputs(modifiedStatePayload.tick);
+                        ReprocessInputs(modifiedStatePayload);
                     }
                     else
                     {
@@ -224,9 +224,7 @@ namespace Vi.Player
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;
 
                 // Now re-simulate the rest of the ticks up to the current tick on the client
-                Rigidbody.position = latestServerState.Value.position;
-                if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.Value.velocity; }
-                ReprocessInputs(latestServerState.Value.tick);
+                ReprocessInputs(latestServerState.Value);
             }
             else
             {
@@ -235,18 +233,29 @@ namespace Vi.Player
             return Vector3.zero;
         }
 
-        private void ReprocessInputs(int latestServerTick)
+        private int stepsToBuffer;
+        private void ReprocessInputs(StatePayload latestServerState)
         {
+            ResetNonOwnerCollidersToServerPosition();
+
+            Vector3 oldPosition = Rigidbody.position;
+            Rigidbody.position = latestServerState.position;
+            if (!Rigidbody.isKinematic) { Rigidbody.linearVelocity = latestServerState.velocity; }
+
             Physics.simulationMode = SimulationMode.Script;
             NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
-            int tickToProcess = latestServerTick + 1;
+            int tickToProcess = latestServerState.tick + 1;
             while (tickToProcess < movementTick)
             {
                 int bufferIndex = tickToProcess % BUFFER_SIZE;
 
                 // Process new movement with reconciled state
                 InputPayload inputPayload = inputBuffer[bufferIndex];
+                if (inputPayload.equippedWeaponSlot != combatAgent.LoadoutManager.GetEquippedSlotType())
+                {
+                    inputPayload.runSpeed = GetRunSpeed();
+                }
                 StatePayload statePayload = Move(ref inputPayload, true);
                 NetworkPhysicsSimulation.SimulateOneRigidbody(Rigidbody, false);
 
@@ -256,6 +265,12 @@ namespace Vi.Player
                 tickToProcess++;
             }
             Physics.simulationMode = SimulationMode.FixedUpdate;
+
+            // Only interpolate error if the distance is large enough
+            if (Vector3.Distance(oldPosition, Rigidbody.position) > 0.05f)
+            {
+                stepsToBuffer = 1;
+            }
         }
 
         public override Vector2[] GetMoveInputQueue()
@@ -290,21 +305,13 @@ namespace Vi.Player
 
         private float timeWithoutInputs;
         private InputPayload lastInputPayloadProcessedOnServer;
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             if (!IsSpawned)
             {
                 //interpolationRigidbody.position = Rigidbody.position;
                 return;
-            }
-
-            if (!IsOwner & !IsServer)
-            {
-                if (latestServerState.Value.tick > 0)
-                {
-                    // Sync position here with latest server state
-                    Rigidbody.MovePosition(networkTransform.GetSpaceRelativePosition(true));
-                }
             }
 
             if (!IsClient)
@@ -411,7 +418,7 @@ namespace Vi.Player
                         }
                     }
                 }
-                
+
                 Vector2 moveInput;
                 bool shouldApplyRootMotion = combatAgent.AnimationHandler.ShouldApplyRootMotion();
                 if (combatAgent.WeaponHandler.LightAttackIsPressed)
@@ -453,7 +460,7 @@ namespace Vi.Player
 
                 InputPayload inputPayload = new InputPayload(movementTick, moveInput,
                     EvaluateRotation(), shouldApplyRootMotion, combatAgent.AnimationHandler.ApplyRootMotion(),
-                    GetRunSpeed(), IsGrounded(), combatAgent.ShouldPlayHitStop());
+                    GetRunSpeed(), combatAgent.LoadoutManager.GetEquippedSlotType(), IsGrounded(), combatAgent.ShouldPlayHitStop());
 
                 if (combatAgent.StatusAgent.IsRooted())
                 {
@@ -492,7 +499,30 @@ namespace Vi.Player
                 Rigidbody.Sleep();
             }
 
-            interpolationRigidbody.MovePosition(Rigidbody.position);
+            float t = 1;
+            if (stepsToBuffer == 0)
+            {
+                t = 1;
+            }
+            else if (stepsToBuffer == 1)
+            {
+                t = 0.75f;
+            }
+            else if (stepsToBuffer == 2)
+            {
+                t = 0.5f;
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to handle steps to buffer number " + stepsToBuffer);
+            }
+
+            interpolationRigidbody.MovePosition(Vector3.Lerp(interpolationRigidbody.position, Rigidbody.position, t));
+
+            if (stepsToBuffer > 0)
+            {
+                stepsToBuffer--;
+            }
         }
 
         protected override void OnDisable()
@@ -508,7 +538,24 @@ namespace Vi.Player
             stateBuffer = new StatePayload[BUFFER_SIZE];
             lastProcessedState = default;
             serverInputQueue.Clear();
+        }
 
+        private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)
+        {
+            LastMovementWasZero = current;
+        }
+
+        private NetworkVariable<bool> lastMovementWasZeroSynced = new NetworkVariable<bool>();
+        private void SetLastMovement(Vector3 lastMovement)
+        {
+            bool value = lastMovement == Vector3.zero;
+            
+            LastMovementWasZero = value;
+
+            if (IsServer)
+            {
+                lastMovementWasZeroSynced.Value = value;
+            }
         }
 
         private int movementTick;
@@ -526,6 +573,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -540,6 +588,7 @@ namespace Vi.Player
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(latestServerState.Value.position);
                 }
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
 
@@ -549,6 +598,7 @@ namespace Vi.Player
             {
                 Rigidbody.isKinematic = true;
                 //if (!IsServer) { Rigidbody.MovePosition(latestServerState.Value.position); }
+                SetLastMovement(Vector3.zero);
                 return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
@@ -558,6 +608,7 @@ namespace Vi.Player
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    SetLastMovement(Vector3.zero);
                     return new StatePayload(inputPayload, Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
                 }
             }
@@ -663,6 +714,7 @@ namespace Vi.Player
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             if (GetStairCollidersCount() == 0 | !Mathf.Approximately(movement.sqrMagnitude, 0)) { Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration); }
             inputPayload.stairMovement = stairMovement;
+            SetLastMovement(movement);
             return new StatePayload(inputPayload, Rigidbody, inputPayload.shouldUseRootMotion, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
         }
 
@@ -678,20 +730,18 @@ namespace Vi.Player
                 if (grabAssailant)
                 {
                     Vector3 rel = grabAssailant.MovementHandler.GetPosition() - GetPosition();
-                    rel = Vector3.Scale(rel, HORIZONTAL_PLANE);
-                    return Quaternion.LookRotation(rel, Vector3.up);
+                    return IsolateYRotation(Quaternion.LookRotation(rel, Vector3.up));
                 }
             }
 
             if (IsOwner)
             {
                 Vector3 camDirection = cameraController.GetCamDirection();
-                camDirection.Scale(HORIZONTAL_PLANE);
 
                 if (combatAgent.IsGrabbing)
                     return transform.rotation;
                 else if (!combatAgent.ShouldPlayHitStop())
-                    return Quaternion.LookRotation(camDirection);
+                    return IsolateYRotation(Quaternion.LookRotation(camDirection));
             }
             else
             {
@@ -766,8 +816,13 @@ namespace Vi.Player
 
             if (IsServer)
             {
-                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, true, false),
+                latestServerState.Value = new StatePayload(new InputPayload(0, Vector2.zero, transform.rotation, false, Vector3.zero, 0, combatAgent.LoadoutManager.GetEquippedSlotType(), true, false),
                     Rigidbody, false, combatAgent.AnimationHandler.RootMotionId, combatAgent.AnimationHandler.TotalRootMotionTime);
+            }
+
+            if (!IsOwner & !IsServer)
+            {
+                lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
             }
         }
 
@@ -796,6 +851,11 @@ namespace Vi.Player
             if (!IsClient & IsServer)
             {
                 inputBuffer.OnListChanged -= OnInputBufferChanged;
+            }
+
+            if (!IsOwner & !IsServer)
+            {
+                lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
             }
         }
 
@@ -892,19 +952,19 @@ namespace Vi.Player
                         if (playerInput.currentActionMap != null)
                         {
                             Vector2 lookInputToAdd = Vector2.zero;
-
-                            if (UnityEngine.InputSystem.Gyroscope.current != null)
-                            {
-                                if (UnityEngine.InputSystem.Gyroscope.current.enabled)
-                                {
-                                    Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
-                                    gyroVelocity *= gyroscopicRotationSensitivity;
-                                    lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
-                                }
-                            }
-
                             if (playerInput.currentActionMap.name == playerInput.defaultActionMap)
                             {
+                                // Gyroscopic rotation
+                                if (UnityEngine.InputSystem.Gyroscope.current != null)
+                                {
+                                    if (UnityEngine.InputSystem.Gyroscope.current.enabled)
+                                    {
+                                        Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
+                                        gyroVelocity *= gyroscopicRotationSensitivity;
+                                        lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
+                                    }
+                                }
+
                                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                                 {
                                     if (joysticks.Length == 0) { joysticks = GetComponentsInChildren<UIDeadZoneElement>(); }
@@ -916,27 +976,6 @@ namespace Vi.Player
                                         {
                                             isTouchingJoystick = true;
                                             break;
-                                        }
-                                    }
-
-                                    if (!isTouchingJoystick)
-                                    {
-                                        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
-                                        {
-                                            int interactableHitCount = Physics.RaycastNonAlloc(mainCamera.ScreenPointToRay(touch.screenPosition),
-                                                interactableHits, 10, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
-
-                                            float minDistance = 0;
-                                            bool minDistanceInitialized = false;
-                                            NetworkInteractable networkInteractable = null;
-                                            for (int i = 0; i < interactableHitCount; i++)
-                                            {
-                                                if (interactableHits[i].distance > minDistance & minDistanceInitialized) { continue; }
-                                                networkInteractable = interactableHits[i].transform.root.GetComponent<NetworkInteractable>();
-                                                minDistance = interactableHits[i].distance;
-                                                minDistanceInitialized = true;
-                                            }
-                                            if (networkInteractable) { networkInteractable.Interact(gameObject); }
                                         }
                                     }
 
@@ -1065,18 +1104,11 @@ namespace Vi.Player
             "ProjectileCollider"
         };
 
-        void OnInteract()
+        public void OnInteract()
         {
-            int interactableHitsCount = Physics.RaycastNonAlloc(mainCamera.transform.position, mainCamera.transform.forward.normalized,
-                interactableHits, 15, LayerMask.GetMask(interactableRaycastLayers), QueryTriggerInteraction.Ignore);
-
-            for (int i = 0; i < interactableHitsCount; i++)
+            if (TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
-                if (interactableHits[i].transform.root.TryGetComponent(out NetworkInteractable networkInteractable))
-                {
-                    networkInteractable.Interact(gameObject);
-                    break;
-                }
+                networkInteractable.Interact(gameObject);
             }
         }
 

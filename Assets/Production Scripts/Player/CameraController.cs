@@ -290,10 +290,7 @@ namespace Vi.Player
             animator.Play(stateName);
         }
 
-        public Vector3 GetCamDirection()
-        {
-            return IsAnimating ? CameraPositionClone.transform.forward : transform.forward;
-        }
+        public Vector3 GetCamDirection() { return IsAnimating ? CameraPositionClone.transform.forward : transform.forward; }
 
         Vector3 animationPositionOffset;
         Quaternion animationRotationOffset;

@@ -475,7 +475,7 @@ namespace Vi.Core.GameModeManagers
                 playerScore.ResetRoundVariables();
                 disconnectedScoreList[i] = new DisconnectedPlayerScore(charId, playerScore);
             }
-            roundCount.Value += 1;
+            roundCount.Value++;
             killHistory.Clear();
         }
 

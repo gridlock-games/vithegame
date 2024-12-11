@@ -28,7 +28,7 @@ namespace Vi.UI
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
-        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter; }
+        public RectTransform GetLookJoystickCenter() { return lookJoystickCenter.rectTransform; }
 
         public RuntimeWeaponCard[] GetWeaponCards() { return GetComponentsInChildren<RuntimeWeaponCard>(true); }
 
@@ -57,6 +57,8 @@ namespace Vi.UI
         [SerializeField] private InputActionAsset controlsAsset;
         [SerializeField] private PlayerCard playerCard;
         [SerializeField] private PlayerCard[] teammatePlayerCards;
+        [SerializeField] private Image tooltipImage;
+        [SerializeField] private Image crosshairImage;
         [Header("Weapon Cards")]
         [SerializeField] private RuntimeWeaponCard primaryWeaponCard;
         [SerializeField] private RuntimeWeaponCard secondaryWeaponCard;
@@ -92,10 +94,11 @@ namespace Vi.UI
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
         [SerializeField] private RectTransform blockingButton;
-        [SerializeField] private RectTransform lookJoystickCenter;
+        [SerializeField] private Image lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
         [SerializeField] private RectTransform orbitalCameraButton;
+        [SerializeField] private Image mobileInteractableImage;
         [Header("Text Chat")]
         [SerializeField] private Canvas textChatButtonCanvas;
         [SerializeField] private Canvas textChatParentCanvas;
@@ -145,7 +148,7 @@ namespace Vi.UI
             {
                 ScrollToBottomOfTextChat();
                 actionMapHandler.OnTextChatOpen();
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
+                if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
                 unreadMessageCount = 0;
                 textChatMessageNumberText.text = "";
             }
@@ -153,13 +156,13 @@ namespace Vi.UI
             {
                 actionMapHandler.OnTextChatClose();
             }
-            textChatButtonCanvas.enabled = Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
+            textChatButtonCanvas.enabled = FasterPlayerPrefs.IsMobilePlatform ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
         }
 
         public void CloseTextChat()
         {
             textChatParentCanvas.enabled = false;
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (FasterPlayerPrefs.IsMobilePlatform)
             {
                 textChatButtonCanvas.enabled = true;
             }
@@ -174,7 +177,7 @@ namespace Vi.UI
         {
             textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
             textChatInputField.text = "";
-            if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer) { textChatInputField.ActivateInputField(); }
+            if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
         }
 
         private InputAction switchWeaponAction;
@@ -309,6 +312,11 @@ namespace Vi.UI
 
         public void DecrementFollowPlayer() { playerMovementHandler.OnDecrementFollowPlayer(); }
 
+        public void Interact()
+        {
+            playerMovementHandler.OnInteract();
+        }
+
         private Attributes attributes;
         private PlayerMovementHandler playerMovementHandler;
         private TextChat textChat;
@@ -317,6 +325,11 @@ namespace Vi.UI
 
         [SerializeField] private Canvas[] aliveUIChildCanvases;
         [SerializeField] private Canvas[] deathUIChildCanvases;
+
+        private Vector3 originalCrosshairScale;
+
+        private Color originalMobileInteractableButtonColor;
+        private Color originalLookJoystickCenterColor;
 
         private void Awake()
         {
@@ -341,11 +354,16 @@ namespace Vi.UI
             reloadAction = playerInput.actions.FindAction("Reload");
             dodgeAction = playerInput.actions.FindAction("Dodge");
 
+            originalCrosshairScale = crosshairImage.transform.localScale;
+
+            originalLookJoystickCenterColor = lookJoystickCenter.color;
+            originalMobileInteractableButtonColor = mobileInteractableImage.color;
+
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
 
             textChatParentCanvas.enabled = false;
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+            if (FasterPlayerPrefs.IsMobilePlatform)
             {
                 textChatButtonCanvas.enabled = true;
             }
@@ -405,6 +423,9 @@ namespace Vi.UI
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
+            crosshairImage.color = FasterPlayerPrefs.Singleton.GetColor("CrosshairColor");
+            crosshairImage.transform.localScale = originalCrosshairScale * FasterPlayerPrefs.Singleton.GetFloat("CrosshairSize");
+            crosshairImage.sprite = FasterPlayerPrefs.Singleton.crosshairSprites[FasterPlayerPrefs.Singleton.GetInt("CrosshairStyle")].Result;
         }
 
         private void UpdateTeammateAttributesList()
@@ -642,6 +663,10 @@ namespace Vi.UI
             {
                 canFadeIn = true;
             }
+
+            mobileInteractableImage.raycastTarget = false;
+            mobileInteractableImage.color = Color.clear;
+            tooltipImage.color = Color.clear;
         }
 
         public void ScrollToBottomOfTextChat()
@@ -685,7 +710,7 @@ namespace Vi.UI
                     textChatMessageNumberText.text = unreadMessageCount.ToString();
                 }
 
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+                if (!FasterPlayerPrefs.IsMobilePlatform)
                 {
                     textChatButtonCanvas.enabled = unreadMessageCount > 0;
                 }
@@ -713,6 +738,33 @@ namespace Vi.UI
             if (!attributes.WeaponHandler.WeaponInitialized) { return; }
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
+
+            if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
+            {
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
+                {
+                    mobileInteractableImage.raycastTarget = true;
+                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
+                }
+                else
+                {
+                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                }
+            }
+            else
+            {
+                if (mobileInteractableImage.gameObject.activeInHierarchy)
+                {
+                    mobileInteractableImage.raycastTarget = false;
+                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
+                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
+                }
+                else
+                {
+                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * 5);
+                }
+            }
 
             if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
             {
@@ -760,7 +812,7 @@ namespace Vi.UI
 
             if (attributes.GetAilment() != ActionClip.Ailment.Death)
             {
-                if (Application.platform != RuntimePlatform.Android & Application.platform != RuntimePlatform.IPhonePlayer)
+                if (!FasterPlayerPrefs.IsMobilePlatform)
                 {
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
 

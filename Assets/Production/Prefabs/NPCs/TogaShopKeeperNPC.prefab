@@ -398,7 +398,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'ITEM SHOP [TAP]'
+  m_Text: ITEM SHOP
 --- !u!114 &2203279674645284873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10061,7 +10061,6 @@ GameObject:
   - component: {fileID: 7952205394485598758}
   - component: {fileID: 843864254522680378}
   - component: {fileID: 4059681917432237431}
-  - component: {fileID: 7403137512713476609}
   m_Layer: 6
   m_Name: WorldSpaceLabel
   m_TagString: Untagged
@@ -10135,29 +10134,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &7403137512713476609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4195338354673226359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ef3549b1f0746f46ae53c6ebcbb47de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  customizablePlayerPrefName: 
-  controlsAsset: {fileID: -944628639613478452, guid: 89394a0546c86d141bf6aafeb721c454,
-    type: 3}
-  platformUIDefinitions: []
-  controlSchemeTextDefinitions:
-  - platforms: 00000000010000000200000007000000100000000d000000190000001b000000260000002b0000002c0000002d000000
-    textElement: {fileID: 6361681558894229644}
-    action: Interact
-    stringBeforeBinding: ITEM SHOP [
-    stringAfterBinding: ']'
-  controlSchemeDefinitions: []
 --- !u!1 &4201586997898491533
 GameObject:
   m_ObjectHideFlags: 0
@@ -10944,6 +10920,7 @@ GameObject:
   - component: {fileID: 452946550557755840}
   - component: {fileID: 341003221020181963}
   - component: {fileID: 3857741722441179534}
+  - component: {fileID: 6179685418978796653}
   m_Layer: 6
   m_Name: TogaShopKeeperNPC
   m_TagString: Untagged
@@ -11093,8 +11070,39 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 2
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &6179685418978796653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4810389651018212386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &4812971677482875181
 GameObject:
   m_ObjectHideFlags: 0
@@ -19194,7 +19202,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -0.0000007748604, y: 0}
-  m_SizeDelta: {x: 85.700005, y: 24.5}
+  m_SizeDelta: {x: 59.900005, y: 24.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5011560577756428989
 CanvasRenderer:

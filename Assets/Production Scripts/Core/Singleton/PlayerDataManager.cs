@@ -1097,7 +1097,7 @@ namespace Vi.Core
 
         private void AddPlayerToSpawnQueue(PlayerData playerData)
         {
-            Debug.Log("Adding player to spawn queue " + playerData.character.name.ToString());
+            //Debug.Log("Adding player to spawn queue " + playerData.character.name.ToString());
             playersToSpawnQueue.Enqueue(playerData);
         }
 
@@ -1256,7 +1256,7 @@ namespace Vi.Core
                     }
                     else
                     {
-                        Debug.Log("Clearing spawn queue");
+                        //Debug.Log("Clearing spawn queue");
                         playersToSpawnQueue.Clear();
                     }
                 }

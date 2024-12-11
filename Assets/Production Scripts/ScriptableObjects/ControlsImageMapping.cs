@@ -106,8 +106,8 @@ namespace Vi.ScriptableObjects
         [System.Serializable]
         private class ControlSchemeActionImage : System.IEquatable<ControlSchemeActionImage>
         {
-            public string controlSchemeName;
             public string actionName;
+            public string controlSchemeName;
             public Sprite sprite;
 
             public bool Equals(ControlSchemeActionImage other)

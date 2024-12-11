@@ -13,14 +13,42 @@ namespace Vi.Core.MovementHandlers
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PooledObject))]
 	public abstract class MovementHandler : NetworkBehaviour
-	{
-		public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+    {
+        public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
+        public static Quaternion IsolateYRotation(Quaternion input)
+		{
+			return Quaternion.Euler(0, input.eulerAngles.y, 0);
+		}
 
 		public static readonly string[] layersToAccountForInMovement = new string[]
 		{
 			"Default",
 			"ProjectileCollider"
 		};
+
+		protected List<NetworkInteractable> interactablesInRange { get; private set; } = new List<NetworkInteractable>();
+		public void SetInteractableInRange(NetworkInteractable interactable, bool isInRange)
+		{
+			if (isInRange)
+			{
+				interactablesInRange.Add(interactable);
+			}
+			else
+			{
+				interactablesInRange.Remove(interactable);
+            }
+		}
+
+		public bool TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable)
+		{
+			networkInteractable = null;
+			foreach (NetworkInteractable netInter in interactablesInRange)
+			{
+				networkInteractable = netInter;
+                return true;
+            }
+			return false;
+		}
 
 		public virtual void SetOrientation(Vector3 newPosition, Quaternion newRotation)
 		{
@@ -357,7 +385,7 @@ namespace Vi.Core.MovementHandlers
 
 		public void ResetLookInput()
         {
-			if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
+			if (FasterPlayerPrefs.IsMobilePlatform)
             {
 				lookInput = Vector2.zero;
 			}
