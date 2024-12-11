@@ -3330,8 +3330,10 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 0.85
-  recoveryAnimationSpeed: 0.85
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 0
   agentRageCost: 50
   effectedWeaponBones: 0f000000
@@ -3352,8 +3354,8 @@ MonoBehaviour:
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 6
-  timeBetweenHits: 0.15
+  maxHitLimit: 7
+  timeBetweenHits: 0.1
   isBlockable: 1
   isUninterruptable: 1
   isInvincible: 0
@@ -3411,7 +3413,22 @@ MonoBehaviour:
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
   actionClipSoundEffects: []
-  statusesToApplyToSelfOnActivate: []
+  statusesToApplyToSelfOnActivate:
+  - status: 1
+    value: 5
+    duration: 3
+    delay: 0.1
+    associatedWithCurrentWeapon: 1
+  - status: 15
+    value: 1
+    duration: 3
+    delay: 0
+    associatedWithCurrentWeapon: 1
+  - status: 16
+    value: 1
+    duration: 3
+    delay: 0
+    associatedWithCurrentWeapon: 1
   statusesToApplyToTargetOnHit:
   - status: 9
     value: 0.2
@@ -3437,6 +3454,7 @@ MonoBehaviour:
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
