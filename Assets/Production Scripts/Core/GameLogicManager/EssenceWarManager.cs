@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
+using Vi.Utility;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -79,7 +80,7 @@ namespace Vi.Core.GameModeManagers
         private void SpawnViEssence(Vector3 position, Quaternion rotation)
         {
             if (!IsServer) { Debug.LogError("SpawnViEssence should only be called on the server!"); return; }
-            EssenceWarViEssence viEssence = Instantiate(viEssencePrefab, position + new Vector3(0, 1, 0), rotation).GetComponent<EssenceWarViEssence>();
+            EssenceWarViEssence viEssence = ObjectPoolingManager.SpawnObject(viEssencePrefab.GetComponent<PooledObject>(), position + new Vector3(0, 1, 0), rotation).GetComponent<EssenceWarViEssence>();
             viEssence.Initialize(this);
             viEssence.NetworkObject.Spawn(true);
             viEssenceNetObjId.Value = viEssence.NetworkObjectId;

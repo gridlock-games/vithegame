@@ -34,7 +34,6 @@ namespace Vi.Core.GameModeManagers
             {
                 if (networkCollider.CombatAgent is Attributes attributes)
                 {
-                    Debug.Log("Interacting with " + networkCollider.CombatAgent.GetName());
                     essenceWarManager.OnViEssenceActivation(attributes);
                     NetworkObject.Despawn(true);
                 }
