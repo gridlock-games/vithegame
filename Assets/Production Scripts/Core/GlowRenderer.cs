@@ -49,6 +49,12 @@ namespace Vi.Core
             this.canFlashAttack = canFlashAttack;
         }
 
+        private bool isBearer;
+        public void RenderIsBearer(bool isBearer)
+        {
+            this.isBearer = isBearer;
+        }
+
         private void OnEnable()
         {
             lastBlockTime = -5;
@@ -63,12 +69,9 @@ namespace Vi.Core
 
         private void Start()
         {
-            if (!GetComponent<PooledObject>())
+            foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
-                foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
-                {
-                    RegisterRenderer(renderer);
-                }
+                RegisterRenderer(renderer);
             }
         }
 
@@ -76,6 +79,7 @@ namespace Vi.Core
 
         public void RegisterRenderer(Renderer renderer)
         {
+            if (glowMaterialInstances.ContainsKey(renderer)) { return; }
             if (renderer.GetComponent<MagicaCloth>()) { return; }
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
@@ -139,6 +143,7 @@ namespace Vi.Core
         private readonly Color healColor = new Color(0, 1, 0);
         private readonly Color blockColor = new Color(0, 0, 1);
         private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        private readonly Color bearerColor = new Color(239f / 255, 147f / 255, 39f / 255);
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
         private const float colorChangeSpeed = 40;
@@ -173,6 +178,16 @@ namespace Vi.Core
             {
                 colorTarget = flashAttackColor;
             }
+            else if (isBearer)
+            {
+                colorTarget = bearerColor;
+            }
+
+            float emissivePower = 1;
+            if (isBearer)
+            {
+                emissivePower = 5;
+            }
 
             currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
             if (lastColor != currentColor)
@@ -182,6 +197,7 @@ namespace Vi.Core
                     foreach (Material glowMaterialInstance in materialList)
                     {
                         glowMaterialInstance.SetColor(_Color, currentColor);
+                        glowMaterialInstance.SetFloat(_EmissivePower, emissivePower);
                     }
                 }
             }
@@ -190,5 +206,6 @@ namespace Vi.Core
         }
 
         private readonly int _Color = Shader.PropertyToID("_Color");
+        private readonly int _EmissivePower = Shader.PropertyToID("_EmissivePower");
     }
 }

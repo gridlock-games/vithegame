@@ -18,6 +18,15 @@ namespace Vi.Core.GameModeManagers
             {
                 roundResultMessage.Value = "Essence War Starting! ";
             }
+
+            bearerId.OnValueChanged += OnBearerIdChanged;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+
+            bearerId.OnValueChanged -= OnBearerIdChanged;
         }
 
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
@@ -39,7 +48,7 @@ namespace Vi.Core.GameModeManagers
                         }
                     }
 
-                    if (!IsViEssenceSpawned())
+                    if (!IsViEssenceSpawned() & !HasBearer())
                     {
                         if (Time.time - lastOgreSpawnEventTime > 40)
                         {
@@ -89,11 +98,55 @@ namespace Vi.Core.GameModeManagers
         public void OnViEssenceActivation(Attributes newBearer)
         {
             lastOgreSpawnEventTime = Time.time;
+            bearerId.Value = newBearer.GetPlayerDataId();
+        }
+
+        private NetworkVariable<int> bearerId = new NetworkVariable<int>();
+
+        private bool HasBearer()
+        {
+            return PlayerDataManager.Singleton.IdHasLocalPlayer(bearerId.Value);
+        }
+
+        private bool TryGetBearerInstance(out Attributes bearer)
+        {
+            if (PlayerDataManager.Singleton.IdHasLocalPlayer(bearerId.Value))
+            {
+                bearer = PlayerDataManager.Singleton.GetPlayerObjectById(bearerId.Value);
+                return true;
+            }
+            bearer = null;
+            return false;
+        }
+
+        private void RemoveBearer()
+        {
+            bearerId.Value = (int)NetworkManager.ServerClientId;
+        }
+
+        private void OnBearerIdChanged(int prev, int current)
+        {
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                bearer.GlowRenderer.RenderIsBearer(true);
+            }
+            else if (PlayerDataManager.Singleton.IdHasLocalPlayer(prev))
+            {
+                PlayerDataManager.Singleton.GetPlayerObjectById(prev).GlowRenderer.RenderIsBearer(false);
+            }
         }
 
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
+
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                if (bearer == victim)
+                {
+                    RemoveBearer();
+                }
+            }
 
             if (victim.GetName().ToUpper().Contains("KING OGRE"))
             {
@@ -104,6 +157,14 @@ namespace Vi.Core.GameModeManagers
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
         {
             base.OnPlayerKill(killer, victim);
+
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                if (bearer == victim)
+                {
+                    RemoveBearer();
+                }
+            }
 
             if (victim.GetName().ToUpper().Contains("KING OGRE"))
             {
