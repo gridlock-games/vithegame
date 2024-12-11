@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Core.GameModeManagers;
+using Unity.Netcode;
 
 namespace Vi.UI
 {
@@ -35,6 +36,29 @@ namespace Vi.UI
         protected override void Update()
         {
             base.Update();
+
+            if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
+            {
+                if (PlayerDataManager.Singleton.ContainsId((int)NetworkManager.Singleton.LocalClientId))
+                {
+                    roundResultText.enabled = true;
+                    PlayerDataManager.Team team = PlayerDataManager.Singleton.LocalPlayerData.team;
+                    if (team == PlayerDataManager.Team.Spectator)
+                        roundResultText.text = "Fight!";
+                    else
+                        roundResultText.text = "Fight for " + PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.LocalPlayerData.team) + "'s Glory!";
+                }
+
+                if (gameModeManager.ShouldDisplayNextGameActionTimer())
+                {
+                    roundResultText.text += " " + gameModeManager.GetNextGameActionTimerDisplayString();
+                }
+                else
+                {
+                    roundResultText.text = roundResultText.text.Trim();
+                }
+            }
+
             if (essenceWarManager.IsViEssenceSpawned())
             {
                 if (viLogoImage.sprite == viEssenceIcon)

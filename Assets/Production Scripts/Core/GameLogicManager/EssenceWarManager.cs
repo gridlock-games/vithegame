@@ -97,6 +97,31 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        protected override void OnRoundEnd(int[] winningPlayersDataIds)
+        {
+            base.OnRoundEnd(winningPlayersDataIds);
+
+            // Despawn vi essence and other mobs here?
+
+            if (gameOver.Value) { return; }
+            if (winningPlayersDataIds.Length == 0)
+            {
+                roundResultMessage.Value = "Round Draw! ";
+            }
+            else
+            {
+                string message = PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Secured Round " + GetRoundCount().ToString() + " ";
+                roundResultMessage.Value = message;
+            }
+        }
+
+        protected override void OnGameEnd(int[] winningPlayersDataIds)
+        {
+            base.OnGameEnd(winningPlayersDataIds);
+            roundResultMessage.Value = "Game Over! ";
+            gameEndMessage.Value = PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).team) + " Wins the Match!";
+        }
+
         public override string GetLeftScoreString()
         {
             if (!NetworkManager.LocalClient.PlayerObject) { return ""; }
