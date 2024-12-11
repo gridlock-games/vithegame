@@ -9,9 +9,6 @@ namespace Vi.Core.GameModeManagers
 {
     public class EssenceWarManager : GameModeManager
     {
-        [Header("Essence War Specific")]
-        [SerializeField] private EssenceWarViEssence viEssencePrefab;
-
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -22,12 +19,8 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
-        public bool IsViEssenceSpawned()
-        {
-            return false;
-        }
-
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
+        private float lastOgreSpawnEventTime = Mathf.NegativeInfinity;
         protected override void Update()
         {
             base.Update();
@@ -44,10 +37,20 @@ namespace Vi.Core.GameModeManagers
                             lastWaveSpawnTime = Time.time;
                         }
                     }
+
+                    if (!IsViEssenceSpawned())
+                    {
+                        if (Time.time - lastOgreSpawnEventTime > 40)
+                        {
+                            SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
+                        }
+                    }
                 }
             }
         }
 
+        [Header("Essence War Specific")]
+        [SerializeField] private Mob kingOgreMob;
         [SerializeField] private Mob spiderMinionMob;
         private bool SpawnWave()
         {
@@ -60,6 +63,49 @@ namespace Vi.Core.GameModeManagers
             }
 
             return true;
+        }
+
+        [SerializeField] private EssenceWarViEssence viEssencePrefab;
+        public bool IsViEssenceSpawned() { return NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value); }
+
+        private EssenceWarViEssence GetViEssenceInstance()
+        {
+            if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value)) { return null; }
+            return NetworkManager.SpawnManager.SpawnedObjects[viEssenceNetObjId.Value].GetComponent<EssenceWarViEssence>();
+        }
+
+        private NetworkVariable<ulong> viEssenceNetObjId = new NetworkVariable<ulong>();
+        private void SpawnViEssence(Vector3 position, Quaternion rotation)
+        {
+            if (!IsServer) { Debug.LogError("SpawnViEssence should only be called on the server!"); return; }
+            EssenceWarViEssence viEssence = Instantiate(viEssencePrefab, position, rotation).GetComponent<EssenceWarViEssence>();
+            viEssence.Initialize(this);
+            viEssenceNetObjId.Value = viEssence.NetworkObjectId;
+        }
+
+        public void OnViEssenceActivation(Attributes newBearer)
+        {
+
+        }
+
+        public override void OnEnvironmentKill(CombatAgent victim)
+        {
+            base.OnEnvironmentKill(victim);
+
+            if (victim.GetName().ToUpper().Contains("OGRE"))
+            {
+                SpawnViEssence(victim.MovementHandler.GetPosition(), victim.MovementHandler.GetRotation());
+            }
+        }
+
+        public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
+        {
+            base.OnPlayerKill(killer, victim);
+
+            if (victim.GetName().ToUpper().Contains("OGRE"))
+            {
+                SpawnViEssence(victim.MovementHandler.GetPosition(), victim.MovementHandler.GetRotation());
+            }
         }
 
         public override void OnStructureKill(CombatAgent killer, Structure structure)
