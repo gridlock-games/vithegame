@@ -47,7 +47,7 @@ namespace Vi.Core.GameModeManagers
             List<Mob> mobsToRemove = new List<Mob>();
             foreach (Mob mob in currentlySpawnedMobs)
             {
-                mob.NetworkObject.Despawn(true);
+                if (mob.IsSpawned) { mob.NetworkObject.Despawn(true); }
                 mobsToRemove.Add(mob);
             }
             currentlySpawnedMobs.RemoveAll(item => mobsToRemove.Contains(item));

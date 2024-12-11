@@ -43,6 +43,7 @@ namespace Vi.Core.GameModeManagers
                         if (Time.time - lastOgreSpawnEventTime > 40)
                         {
                             SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
+                            lastOgreSpawnEventTime = Time.time;
                         }
                     }
                 }
@@ -78,21 +79,22 @@ namespace Vi.Core.GameModeManagers
         private void SpawnViEssence(Vector3 position, Quaternion rotation)
         {
             if (!IsServer) { Debug.LogError("SpawnViEssence should only be called on the server!"); return; }
-            EssenceWarViEssence viEssence = Instantiate(viEssencePrefab, position, rotation).GetComponent<EssenceWarViEssence>();
+            EssenceWarViEssence viEssence = Instantiate(viEssencePrefab, position + new Vector3(0, 1, 0), rotation).GetComponent<EssenceWarViEssence>();
             viEssence.Initialize(this);
+            viEssence.NetworkObject.Spawn(true);
             viEssenceNetObjId.Value = viEssence.NetworkObjectId;
         }
 
         public void OnViEssenceActivation(Attributes newBearer)
         {
-
+            lastOgreSpawnEventTime = Time.time;
         }
 
         public override void OnEnvironmentKill(CombatAgent victim)
         {
             base.OnEnvironmentKill(victim);
 
-            if (victim.GetName().ToUpper().Contains("OGRE"))
+            if (victim.GetName().ToUpper().Contains("KING OGRE"))
             {
                 SpawnViEssence(victim.MovementHandler.GetPosition(), victim.MovementHandler.GetRotation());
             }
@@ -102,7 +104,7 @@ namespace Vi.Core.GameModeManagers
         {
             base.OnPlayerKill(killer, victim);
 
-            if (victim.GetName().ToUpper().Contains("OGRE"))
+            if (victim.GetName().ToUpper().Contains("KING OGRE"))
             {
                 SpawnViEssence(victim.MovementHandler.GetPosition(), victim.MovementHandler.GetRotation());
             }

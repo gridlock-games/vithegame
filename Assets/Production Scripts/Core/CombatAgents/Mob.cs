@@ -99,6 +99,24 @@ namespace Vi.Core.CombatAgents
         [SerializeField] private bool useRage;
         protected override bool ShouldUseRage() { return useRage; }
 
+        protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
+        {
+            base.OnAilmentChanged(prev, current);
+
+            if (current == ActionClip.Ailment.Death & IsServer)
+            {
+                StartCoroutine(DespawnAfterDuration());
+            }
+        }
+
+        private IEnumerator DespawnAfterDuration()
+        {
+            yield return new WaitForSeconds(AnimationHandler.deadRendererDisplayTime);
+            yield return new WaitForSeconds(0.5f);
+
+            NetworkObject.Despawn(true);
+        }
+
         // Uncomment to make mobs respawn automatically
         //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         //{
