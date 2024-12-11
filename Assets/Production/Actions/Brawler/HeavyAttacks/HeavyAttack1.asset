@@ -999,6 +999,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.2
   dodgeCancelTransitionTime: 0.2
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 0
@@ -1099,7 +1101,7 @@ MonoBehaviour:
   limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 30
   canLunge: 0
-  minLungeDistance: 2.5
+  minLungeDistance: 1
   maxLungeDistance: 5
   bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0

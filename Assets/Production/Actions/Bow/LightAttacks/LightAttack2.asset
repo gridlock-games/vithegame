@@ -1269,6 +1269,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
@@ -1296,7 +1298,7 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 0
+  canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 4
   grabAttackClip: {fileID: 0}
@@ -1362,7 +1364,7 @@ MonoBehaviour:
   limitAttackMotionBasedOnTarget: 1
   maximumTargetingRotationAngle: 60
   canLunge: 1
-  minLungeDistance: 2.5
+  minLungeDistance: 1.5
   maxLungeDistance: 5
   bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
