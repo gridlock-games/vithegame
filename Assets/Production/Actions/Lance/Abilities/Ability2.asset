@@ -1117,6 +1117,7 @@ MonoBehaviour:
   transitionTime: 0.1
   dodgeCancelTransitionTime: 0.15
   rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 0.95
   recoveryAnimationSpeed: 1
   agentStaminaCost: 15
@@ -1196,7 +1197,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: e5b06940777aae4439de6aef6708692b, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 10
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
