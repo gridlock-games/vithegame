@@ -65,6 +65,7 @@ namespace Vi.Core
             canFlashAttack = false;
             currentColor = default;
             lastColor = default;
+            isBearer = false;
         }
 
         private void Start()
