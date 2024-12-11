@@ -9,20 +9,7 @@ namespace Vi.Core.GameModeManagers
     public class EssenceWarManager : GameModeManager
     {
         [Header("Essence War Specific")]
-        [SerializeField] private GameObject ancientBossCorruptPrefab;
-        [SerializeField] private GameObject ancientBossLightPrefab;
-        [SerializeField] private GameObject ancientBossNeutralPrefab;
-        [SerializeField] private GameObject ancientBossNeutralSlavePrefab;
         [SerializeField] private EssenceWarViEssence viEssencePrefab;
-
-        private const float neutralAncientLogicThresholdDuration = 60;
-        private const float neutralAncientRespawnDuration = 10;
-        private const float neutralAncientRespawnDurationNoBlessed = 15;
-        private const float viEssenceItemDuration = 30;
-        private const int neutralAncientSlaveCount = 3;
-        private const float neutralAncientRoamRadius = 5;
-
-        private GameObject instance;
 
         public override void OnNetworkSpawn()
         {
@@ -30,13 +17,48 @@ namespace Vi.Core.GameModeManagers
 
             if (IsServer)
             {
-                roundResultMessage.Value = "Essence war starting! ";
+                roundResultMessage.Value = "Essence War Starting! ";
             }
         }
 
         public bool IsViEssenceSpawned()
         {
             return false;
+        }
+
+        private float lastWaveSpawnTime = Mathf.NegativeInfinity;
+        protected override void Update()
+        {
+            base.Update();
+            if (!IsSpawned) { return; }
+
+            if (IsServer)
+            {
+                if (!ShouldDisplayNextGameAction() & !IsGameOver())
+                {
+                    if (Time.time - lastWaveSpawnTime > 30)
+                    {
+                        if (SpawnWave())
+                        {
+                            lastWaveSpawnTime = Time.time;
+                        }
+                    }
+                }
+            }
+        }
+
+        [SerializeField] private Mob spiderMinionMob;
+        private bool SpawnWave()
+        {
+            if (!PlayerDataManager.Singleton.HasPlayerSpawnPoints()) { return false; }
+
+            for (int i = 0; i < 5; i++)
+            {
+                SpawnMob(spiderMinionMob, PlayerDataManager.Team.Light, false);
+                SpawnMob(spiderMinionMob, PlayerDataManager.Team.Corruption, false);
+            }
+
+            return true;
         }
 
         public override string GetLeftScoreString()

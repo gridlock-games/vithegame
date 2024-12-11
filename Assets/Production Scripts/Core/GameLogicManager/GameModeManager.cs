@@ -107,9 +107,9 @@ namespace Vi.Core.GameModeManagers
             return gameItemInstance;
         }
 
-        protected Mob SpawnMob(Mob mobPrefab, PlayerDataManager.Team team)
+        protected Mob SpawnMob(Mob mobPrefab, PlayerDataManager.Team team, bool useGenericSpawnPoint)
         {
-            SpawnPoints.TransformData transformData = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpawnPoint(mobPrefab);
+            SpawnPoints.TransformData transformData = useGenericSpawnPoint ? PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetGenericMobSpawnPoint() : PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetMobSpecificSpawnPoint(mobPrefab, team);
 
             Mob mob = ObjectPoolingManager.SpawnObject(mobPrefab.GetComponent<PooledObject>(), transformData.position, transformData.rotation).GetComponent<Mob>();
             mob.SetTeam(team);
@@ -1079,7 +1079,7 @@ namespace Vi.Core.GameModeManagers
             startTime = Time.time;
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
             if (IsWaitingForPlayers) { if (!AreAllPlayersConnected()) { return; } }
             IsWaitingForPlayers = false;

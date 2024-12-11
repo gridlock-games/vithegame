@@ -239,21 +239,38 @@ namespace Vi.Core
         [SerializeField] private MobSpawnPointDefinition[] mobSpawnPoints = new MobSpawnPointDefinition[0];
 
         private int mobSpawnPointIndex = -1;
-        public TransformData GetMobSpawnPoint(Mob mobPrefab)
+        public TransformData GetGenericMobSpawnPoint()
         {
             if (mobSpawnPoints.Length == 0) { return new TransformData(new Vector3(Random.Range(-10, 10), Random.Range(3, 5), Random.Range(-10, 10)), default); }
             mobSpawnPointIndex++;
             if (mobSpawnPointIndex >= mobSpawnPoints.Length) { mobSpawnPointIndex = 0; }
             MobSpawnPointDefinition mobSpawnPointDefinition = mobSpawnPoints[mobSpawnPointIndex];
-            if (mobSpawnPointDefinition == null) { Debug.LogError("Could not find mob spawn point for mob prefab! " + mobPrefab); }
+            if (mobSpawnPointDefinition == null) { Debug.LogWarning("Could not find generic mob spawn point!"); }
             else { return mobSpawnPointDefinition.GetRandomOrientation(); }
             return default;
+        }
+
+        public TransformData GetMobSpecificSpawnPoint(Mob mobPrefab, PlayerDataManager.Team team)
+        {
+            if (mobSpawnPoints.Length == 0) { return new TransformData(new Vector3(Random.Range(-10, 10), Random.Range(3, 5), Random.Range(-10, 10)), default); }
+
+            int index = System.Array.FindIndex(mobSpawnPoints, item => item.mobPrefab.name == mobPrefab.name & item.team == team);
+            if (index == -1)
+            {
+                Debug.LogWarning("Mob spawn point index is -1! This should never happen");
+                return new TransformData(new Vector3(Random.Range(-10, 10), Random.Range(3, 5), Random.Range(-10, 10)), default);
+            }
+            else
+            {
+                return mobSpawnPoints[index].GetRandomOrientation();
+            }
         }
 
         [System.Serializable]
         private class MobSpawnPointDefinition
         {
-            public Vector3 spawnPosition;
+            public Mob mobPrefab;
+            public PlayerDataManager.Team team;
             public BoxCollider[] spawnAreas;
             public Vector3[] spawnRotations;
 

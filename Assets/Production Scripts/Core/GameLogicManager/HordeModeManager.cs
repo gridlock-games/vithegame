@@ -54,7 +54,7 @@ namespace Vi.Core.GameModeManagers
 
             foreach (Mob mob in waves[GetRoundCount() - 1].mobPrefabs)
             {
-                currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam));
+                currentlySpawnedMobs.Add(SpawnMob(mob, mobTeam, true));
             }
         }
 
