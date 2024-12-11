@@ -657,6 +657,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 2
   recoveryAnimationSpeed: 2
   agentStaminaCost: 20
@@ -674,7 +676,7 @@ MonoBehaviour:
   recoveryNormalizedTime: 0.6
   isAffectedByRage: 1
   damage: 3
-  healAmount: 7
+  healAmount: 10
   staminaDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
@@ -684,7 +686,7 @@ MonoBehaviour:
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 0
+  canFlashAttack: 1
   isFollowUpAttack: 0
   ailment: 0
   grabAttackClip: {fileID: 0}
