@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Vi.Core.CombatAgents;
+using Vi.Core.Structures;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -59,6 +60,41 @@ namespace Vi.Core.GameModeManagers
             }
 
             return true;
+        }
+
+        public override void OnStructureKill(CombatAgent killer, Structure structure)
+        {
+            base.OnStructureKill(killer, structure);
+            if (gameOver.Value) { return; }
+
+            if (structure.GetName().ToUpper().Contains("TOTEM"))
+            {
+                PlayerDataManager.Team winningTeam;
+                if (structure.GetTeam() == PlayerDataManager.Team.Light)
+                {
+                    winningTeam = PlayerDataManager.Team.Corruption;
+                }
+                else if (structure.GetTeam() == PlayerDataManager.Team.Corruption)
+                {
+                    winningTeam = PlayerDataManager.Team.Light;
+                }
+                else
+                {
+                    Debug.LogWarning("Unsure how to handle structure team " + structure.GetTeam());
+                    winningTeam = PlayerDataManager.Team.Environment;
+                }
+
+                List<int> winningIdList = new List<int>();
+                foreach (Attributes player in PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(winningTeam))
+                {
+                    winningIdList.Add(player.GetPlayerDataId());
+                }
+                OnRoundEnd(winningIdList.ToArray());
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to handle structure kill " + structure.GetName());
+            }
         }
 
         public override string GetLeftScoreString()

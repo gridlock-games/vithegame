@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 1305613998388130847}
   - component: {fileID: 6673324655095458704}
   - component: {fileID: 7842506921039290929}
-  m_Layer: 0
+  - component: {fileID: 6675371897526124775}
+  m_Layer: 6
   m_Name: LightTotem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,7 +53,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -84,6 +85,29 @@ MonoBehaviour:
   team: 10
   deathSound: {fileID: 0}
   armorType: 1
+--- !u!136 &6675371897526124775
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541657554978611873}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2.5
+  m_Height: 7.320535
+  m_Direction: 1
+  m_Center: {x: 0, y: 3.1602676, z: 0}
 --- !u!1001 &4104936806833971225
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96,6 +120,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LODs.Array.data[1].screenRelativeHeight
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 954900268139620257, guid: 40c3fa423696f1d43bf64bb95ebdc4c4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3778052550630841702, guid: 40c3fa423696f1d43bf64bb95ebdc4c4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4814177262543655574, guid: 40c3fa423696f1d43bf64bb95ebdc4c4,
         type: 3}
@@ -151,6 +185,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: prop_LightRune
+      objectReference: {fileID: 0}
+    - target: {fileID: 5297557086146463788, guid: 40c3fa423696f1d43bf64bb95ebdc4c4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
