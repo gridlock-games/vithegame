@@ -28,6 +28,9 @@ namespace Vi.Core
 
         private PooledObject parentPooledObject;
 
+        // This is for code executed not on the main thread
+        private bool hasStaticWallBody;
+
         private void Awake()
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
@@ -42,6 +45,8 @@ namespace Vi.Core
             {
                 staticWallColliders = staticWallBody.GetComponentsInChildren<Collider>();
             }
+
+            hasStaticWallBody = staticWallBody;
 
             CombatAgent.SetNetworkCollider(this);
             
@@ -212,8 +217,8 @@ namespace Vi.Core
 
         public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
         {
-            if (!col.staticWallBody) { return false; }
-            if (!other.staticWallBody) { return false; }
+            if (!col.hasStaticWallBody) { return false; }
+            if (!other.hasStaticWallBody) { return false; }
 
             // If player is playing an attack, use static walls for collisions between the target and the attacker
             // Also use static wall collisions when one player is playing a hit reaction

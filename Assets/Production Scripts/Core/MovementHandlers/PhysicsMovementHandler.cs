@@ -34,7 +34,8 @@ namespace Vi.Core.MovementHandlers
             combatAgent.NetworkCollider.SetOrientation(newPosition);
         }
 
-        public override Vector3 GetPosition() { return rb.position; }
+        private Vector3 cachedRigidbodyPosition;
+        public override Vector3 GetPosition() { return cachedRigidbodyPosition; }
 
         public override void OnNetworkSpawn()
         {
@@ -73,7 +74,8 @@ namespace Vi.Core.MovementHandlers
 
         protected virtual void FixedUpdate()
         {
-            UpdateNonOwnerColliderPosition();   
+            UpdateNonOwnerColliderPosition();
+            cachedRigidbodyPosition = rb.position;
         }
 
         private Vector3 lastServerPosition;
@@ -192,8 +194,9 @@ namespace Vi.Core.MovementHandlers
             networkTransform.SetMaxInterpolationBound(combatAgent.AnimationHandler.ShouldApplyRootMotion() ? 1 : 3);
         }
 
-        protected virtual void LateUpdate()
+        protected override void LateUpdate()
         {
+            base.LateUpdate();
             if (combatAgent.ShouldShake()) { transform.position += Random.insideUnitSphere * (Time.deltaTime * CombatAgent.ShakeAmount); }
         }
 
