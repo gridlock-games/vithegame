@@ -87,6 +87,7 @@ namespace Vi.Isolated
                 NetworkPrefab netPref = new NetworkPrefab()
                 {
                     Override = NetworkPrefabOverride.Hash,
+                    Prefab = NetworkPrefabsLoading[overide.index].Result,
                     OverridingTargetPrefab = NetworkPrefabsLoading[overide.index].Result,
                     SourceHashToOverride = overide.hashOverride
                 };

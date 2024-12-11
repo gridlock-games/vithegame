@@ -111,7 +111,7 @@ namespace Vi.Core.MovementHandlers
 			}
 			else
 			{
-				Debug.LogError("Destination point is not on nav mesh! " + name);
+				//Debug.LogWarning("Destination point is not on nav mesh! " + name);
 				this.destination.Value = destination;
 				return false;
 			}
@@ -142,7 +142,7 @@ namespace Vi.Core.MovementHandlers
 				}
 				else
 				{
-					Debug.LogError("Destination point is not on nav mesh! " + name);
+					//Debug.LogWarning("Destination point is not on nav mesh! " + name);
 					destination.Value = destinationPoint;
 					return false;
 				}
@@ -177,7 +177,7 @@ namespace Vi.Core.MovementHandlers
 			}
 			else
 			{
-				Debug.LogError("Destination point is not on nav mesh! " + name);
+				Debug.LogWarning("Destination point is not on nav mesh! " + name);
 				destination.Value = destinationPoint;
 				return false;
 			}
@@ -269,7 +269,7 @@ namespace Vi.Core.MovementHandlers
 				}
 				else
 				{
-					//Debug.LogError("Path calculation failed! " + name);
+					//Debug.LogWarning("Path calculation failed! " + name);
 					//SetOrientation(myNavHit.position, transform.rotation);
 					nextPosition.Value = Destination;
 					return false;
@@ -278,7 +278,7 @@ namespace Vi.Core.MovementHandlers
 			else
             {
 				// Uncomment this to force bots to stay on nav mesh at all times
-				//Debug.LogError("Start Position is not on navmesh! " + name);
+				//Debug.LogWarning("Start Position is not on navmesh! " + name);
 				//if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, navMeshQueryFilter))
 				//{
 				//	SetOrientation(myNavHit.position, transform.rotation);
