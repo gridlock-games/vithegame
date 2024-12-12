@@ -1010,11 +1010,14 @@ namespace Vi.Core
             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Start;
             ResetRootMotionTime();
 
-            if (actionClip.chargeAttackChargingVFX)
+            if (IsServer)
             {
-                chargingVFXInstance = combatAgent.WeaponHandler.SpawnActionVFX(actionClip, actionClip.chargeAttackChargingVFX, transform).GetComponent<NetworkObject>();
+                if (actionClip.chargeAttackChargingVFX)
+                {
+                    chargingVFXInstance = combatAgent.WeaponHandler.SpawnActionVFX(actionClip, actionClip.chargeAttackChargingVFX, transform).GetComponent<NetworkObject>();
+                }
             }
-
+            
             bool heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value;
 
             float chargeTime = 0;
