@@ -12,6 +12,7 @@ namespace Vi.Core.MovementHandlers
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PooledObject))]
+	[RequireComponent(typeof(ObjectiveHandler))]
 	public abstract class MovementHandler : NetworkBehaviour
     {
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -294,7 +295,9 @@ namespace Vi.Core.MovementHandlers
 			areaMask = NavMesh.AllAreas
 		};
 
-		protected WeaponHandler weaponHandler;
+        public ObjectiveHandler ObjectiveHandler { get; private set; }
+
+        protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
@@ -304,8 +307,10 @@ namespace Vi.Core.MovementHandlers
 		private int navMeshAgentTypeID;
 
         protected virtual void Awake()
-		{
-			path = new NavMeshPath();
+        {
+            ObjectiveHandler = GetComponent<ObjectiveHandler>();
+
+            path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
 			if (playerInput)

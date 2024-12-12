@@ -288,7 +288,6 @@ namespace Vi.UI
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
 
-
             float HP = combatAgent.GetHP();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
             float maxHP = combatAgent.GetMaxHP();
