@@ -8,10 +8,15 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3528456759669615572, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: pooledObjectIndex
+      value: 368
+      objectReference: {fileID: 0}
     - target: {fileID: 6338653637799090981, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
         type: 3}
       propertyPath: m_Name
-      value: HCFX_Charging_02_Step3
+      value: charging_vfx_start
       objectReference: {fileID: 0}
     - target: {fileID: 6338653637799090986, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
         type: 3}
@@ -62,6 +67,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8435710354504267484, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2528430461
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
