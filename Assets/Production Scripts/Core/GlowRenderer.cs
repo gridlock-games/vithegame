@@ -81,7 +81,7 @@ namespace Vi.Core
         public void RegisterRenderer(Renderer renderer)
         {
             if (glowMaterialInstances.ContainsKey(renderer)) { return; }
-            if (renderer.GetComponent<MagicaCloth>()) { return; }
+            //if (renderer.GetComponent<MagicaCloth>()) { return; }
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj.IsSpawned) { return; }
@@ -151,8 +151,34 @@ namespace Vi.Core
 
         private Color currentColor;
         private Color lastColor;
+
+#if UNITY_EDITOR
+        [SerializeField] private bool debugMode;
+        [SerializeField] private Color debugColor;
+        [SerializeField] private Vector2 debugFresnelBounds;
+        [SerializeField] private float debugBreathSpeed;
+        [SerializeField] private float debugEmissionPower;
+#endif
+
         private void Update()
         {
+#if UNITY_EDITOR
+            if (debugMode)
+            {
+                foreach (List<Material> materialList in glowMaterialInstances.Values)
+                {
+                    foreach (Material glowMaterialInstance in materialList)
+                    {
+                        glowMaterialInstance.SetColor(_Color, debugColor);
+                        glowMaterialInstance.SetVector(_FresnelBounds, debugFresnelBounds);
+                        glowMaterialInstance.SetFloat(_EmissivePower, debugEmissionPower);
+                        glowMaterialInstance.SetFloat(_BreathSpeed, debugBreathSpeed);
+                    }
+                }
+                return;
+            }
+#endif
+
             Color colorTarget = defaultColor;
 
             if (Time.time - lastHitTime < 0.25f)
@@ -207,6 +233,8 @@ namespace Vi.Core
         }
 
         private readonly int _Color = Shader.PropertyToID("_Color");
+        private readonly int _FresnelBounds = Shader.PropertyToID("_FresnelBounds");
+        private readonly int _BreathSpeed = Shader.PropertyToID("_BreathSpeed");
         private readonly int _EmissivePower = Shader.PropertyToID("_EmissivePower");
     }
 }
