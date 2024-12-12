@@ -261,6 +261,7 @@ namespace Vi.Core
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+            TryDespawnChargingVFXInstance();
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
@@ -322,6 +323,7 @@ namespace Vi.Core
 
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
             if (heavyAttackCoroutine != null) { StopCoroutine(heavyAttackCoroutine); }
+            TryDespawnChargingVFXInstance();
 
             if (waitForLungeThenPlayAttackCorountine != null) { StopCoroutine(waitForLungeThenPlayAttackCorountine); }
 
@@ -720,6 +722,7 @@ namespace Vi.Core
                 if (heavyAttackCoroutine != null)
                 {
                     StopCoroutine(heavyAttackCoroutine);
+                    TryDespawnChargingVFXInstance();
                     Animator.CrossFadeInFixedTime("Empty", 0, actionsLayerIndex);
                 }
             }
@@ -979,10 +982,23 @@ namespace Vi.Core
 
         private HeavyAttackAnimationPhase heavyAttackAnimationPhase;
 
+        private void TryDespawnChargingVFXInstance()
+        {
+            if (chargingVFXInstance)
+            {
+                if (chargingVFXInstance.IsSpawned)
+                {
+                    chargingVFXInstance.Despawn(true);
+                    chargingVFXInstance = null;
+                }
+            }
+        }
+
+        private NetworkObject chargingVFXInstance;
         private IEnumerator PlayHeavyAttack(ActionClip actionClip)
         {
             if (actionClip.GetClipType() != ActionClip.ClipType.HeavyAttack) { Debug.LogError("AnimationHandler.PlayHeavyAttack() should only be called for heavy attack action clips!"); yield break; }
-
+            
             Animator.ResetTrigger("CancelHeavyAttackState");
             Animator.ResetTrigger("ProgressHeavyAttackState");
             Animator.SetBool("EnhanceHeavyAttack", false);
@@ -993,6 +1009,11 @@ namespace Vi.Core
             Animator.CrossFadeInFixedTime(animationStateName + "_Start", actionClip.transitionTime, actionsLayerIndex);
             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Start;
             ResetRootMotionTime();
+
+            if (actionClip.chargeAttackChargingVFX)
+            {
+                chargingVFXInstance = combatAgent.WeaponHandler.SpawnActionVFX(actionClip, actionClip.chargeAttackChargingVFX, transform).GetComponent<NetworkObject>();
+            }
 
             bool heavyAttackWasPressedInThisCoroutine = heavyAttackPressed.Value;
 
@@ -1025,6 +1046,7 @@ namespace Vi.Core
                     {
                         combatAgent.ProcessEnvironmentDamageWithHitReaction(-actionClip.chargePenaltyDamage, NetworkObject);
                         HeavyAttackChargeTime = 0;
+                        TryDespawnChargingVFXInstance();
                         break;
                     }
 
@@ -1037,6 +1059,7 @@ namespace Vi.Core
                             Animator.SetTrigger("ProgressHeavyAttackState");
                             Animator.SetBool("CancelHeavyAttack", false);
                             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Attack;
+                            TryDespawnChargingVFXInstance();
                             ResetRootMotionTime();
 
                             yield return new WaitUntil(() => animatorReference.CurrentActionsAnimatorStateInfo.IsName(animationStateName + "_Attack"));
@@ -1053,6 +1076,7 @@ namespace Vi.Core
                                         if (actionClip.chargeAttackHasEndAnimation)
                                         {
                                             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.AttackEnd;
+                                            TryDespawnChargingVFXInstance();
                                             ResetRootMotionTime();
                                         }
                                         break;
@@ -1066,10 +1090,12 @@ namespace Vi.Core
                             Animator.SetBool("CancelHeavyAttack", true);
                             heavyAttackAnimationPhase = HeavyAttackAnimationPhase.Cancel;
                             ResetRootMotionTime();
+                            TryDespawnChargingVFXInstance();
                         }
                         else // Return straight to idle
                         {
                             Animator.SetTrigger("CancelHeavyAttackState");
+                            TryDespawnChargingVFXInstance();
                         }
                         break;
                     }
