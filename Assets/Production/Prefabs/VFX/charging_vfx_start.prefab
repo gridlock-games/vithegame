@@ -8,10 +8,40 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3828540483019175826, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: transformType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -3528456759669615572, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
         type: 3}
       propertyPath: pooledObjectIndex
       value: 368
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226881109940448288, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.44705883
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226881109940448288, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226881109940448288, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.37877154
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226881109940448288, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3302712028306090665, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 0.28235295
       objectReference: {fileID: 0}
     - target: {fileID: 6338653637799090981, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
         type: 3}
@@ -66,6 +96,21 @@ PrefabInstance:
     - target: {fileID: 6338653637799090986, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7032713674812220648, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7032713674974098337, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7032713675120696774, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8435710354504267484, guid: 0e2ffd521fb02874fad3bd7a2fbfd80b,
