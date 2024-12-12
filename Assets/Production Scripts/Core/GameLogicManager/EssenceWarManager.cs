@@ -31,6 +31,7 @@ namespace Vi.Core.GameModeManagers
 
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
         private float lastOgreSpawnEventTime = Mathf.NegativeInfinity;
+        private Mob ogreMobInstance;
         protected override void Update()
         {
             base.Update();
@@ -48,11 +49,26 @@ namespace Vi.Core.GameModeManagers
                         }
                     }
 
-                    if (!IsViEssenceSpawned() & !HasBearer())
+                    if (IsViEssenceSpawned() | HasBearer())
+                    {
+                        lastOgreSpawnEventTime = Time.time;
+                    }
+                    else if (ogreMobInstance)
+                    {
+                        if (ogreMobInstance.IsSpawned)
+                        {
+                            lastOgreSpawnEventTime = Time.time;
+                        }
+                        else if (!ogreMobInstance.gameObject.activeInHierarchy)
+                        {
+                            ogreMobInstance = null;
+                        }
+                    }
+                    else
                     {
                         if (Time.time - lastOgreSpawnEventTime > 40)
                         {
-                            SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
+                            ogreMobInstance = SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
                             lastOgreSpawnEventTime = Time.time;
                         }
                     }
