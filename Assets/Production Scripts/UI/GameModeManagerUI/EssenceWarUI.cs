@@ -2,30 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Vi.Core.GameModeManagers;
 using Vi.Core;
+using Vi.Core.GameModeManagers;
 using Unity.Netcode;
 
 namespace Vi.UI
 {
-    public class TeamEliminationUI : GameModeManagerUI
+    public class EssenceWarUI : GameModeManagerUI
     {
-        [Header("Team Elimination UI")]
+        [Header("Essence War UI")]
         [SerializeField] private Image viLogoImage;
         [SerializeField] private Sprite viEssenceIcon;
 
-        private TeamEliminationManager teamEliminationManager;
+        private EssenceWarManager essenceWarManager;
         private Sprite originalViLogoSprite;
         protected override void Start()
         {
             base.Start();
-            teamEliminationManager = gameModeManager.GetComponent<TeamEliminationManager>();
+            essenceWarManager = gameModeManager.GetComponent<EssenceWarManager>();
             originalViLogoSprite = viLogoImage.sprite;
 
             leftScoreTeamColorImage.enabled = true;
-            leftScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetLeftScoreTeam());
+            leftScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(essenceWarManager.GetLeftScoreTeam());
             rightScoreTeamColorImage.enabled = true;
-            rightScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetRightScoreTeam());
+            rightScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(essenceWarManager.GetRightScoreTeam());
         }
 
         private const float colorTransitionSpeed = 2;
@@ -59,7 +59,7 @@ namespace Vi.UI
                 }
             }
 
-            if (teamEliminationManager.IsViEssenceSpawned())
+            if (essenceWarManager.IsViEssenceSpawned())
             {
                 if (viLogoImage.sprite == viEssenceIcon)
                 {

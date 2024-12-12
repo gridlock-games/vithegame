@@ -274,7 +274,7 @@ namespace Vi.Core
             StartCoroutine(HideRenderersAfterDuration());
         }
 
-        private const float deadRendererDisplayTime = 5;
+        public const float deadRendererDisplayTime = 5;
         private IEnumerator HideRenderersAfterDuration()
         {
             yield return new WaitForSeconds(deadRendererDisplayTime);

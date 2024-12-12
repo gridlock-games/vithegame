@@ -34,7 +34,7 @@ namespace Vi.UI
         [SerializeField] private Light previewLightPrefab;
 
         protected GameModeManager gameModeManager;
-        protected void Start()
+        protected virtual void Start()
         {
             RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
@@ -144,7 +144,7 @@ namespace Vi.UI
             }
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
             FindLocalActionMapHandler();
 

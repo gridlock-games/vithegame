@@ -129,7 +129,8 @@ namespace Vi.UI
         {
             PlayerDataManager.GameMode.FreeForAll,
             PlayerDataManager.GameMode.TeamElimination,
-            PlayerDataManager.GameMode.HordeMode
+            PlayerDataManager.GameMode.HordeMode,
+            PlayerDataManager.GameMode.EssenceWar
         };
 
         private Unity.Netcode.Transports.UTP.UnityTransport networkTransport;
@@ -168,6 +169,8 @@ namespace Vi.UI
             {
                 if (!whitelistedGameModes.Contains(gameMode)) { continue; }
                 //if (gameMode == PlayerDataManager.GameMode.None) { continue; }
+
+                if (!Application.isEditor & gameMode == PlayerDataManager.GameMode.EssenceWar) { continue; }
 
                 GameModeOption option = Instantiate(gameModeOptionPrefab.gameObject, gameModeOptionParent).GetComponent<GameModeOption>();
                 StartCoroutine(option.Initialize(gameMode, PlayerDataManager.Singleton.GetGameModeIcon(gameMode)));
