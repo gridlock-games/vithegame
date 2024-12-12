@@ -11,7 +11,6 @@ using Vi.Core.GameModeManagers;
 using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Core.Weapons;
-using UnityEditor.PackageManager;
 
 namespace Vi.Core
 {
