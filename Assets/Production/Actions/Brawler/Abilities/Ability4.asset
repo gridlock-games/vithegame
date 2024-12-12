@@ -261,9 +261,11 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.4
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1.6
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 40
+  agentStaminaCost: 0
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -274,6 +276,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.35
   recoveryNormalizedTime: 0.55
   isAffectedByRage: 1
@@ -290,9 +293,47 @@ MonoBehaviour:
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 1
-  ailment: 0
+  ailment: 4
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 010000
   dodgeLock: 1
   canCancelLightAttacks: 0
@@ -302,7 +343,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 39d596f741ce8f046b74543cec2eb51d, type: 3}
-  abilityCooldownTime: 40
+  abilityCooldownTime: 0
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate:
   - status: 8
@@ -323,7 +364,8 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
-  - {fileID: -3514187058608717973, guid: 2315a90150b79429089df4223fcf43da, type: 3}
+  - {fileID: -1401729009039061684, guid: 2315a90150b79429089df4223fcf43da, type: 3}
+  - {fileID: -6744544654460733046, guid: 756e4187b71754462877350bf5bfab1a, type: 3}
   previewActionVFX: {fileID: 0}
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
@@ -334,6 +376,7 @@ MonoBehaviour:
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
