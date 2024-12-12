@@ -265,7 +265,7 @@ MonoBehaviour:
   truncatedTransitionOutTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 2
-  agentStaminaCost: 25
+  agentStaminaCost: 30
   agentRageCost: 0
   effectedWeaponBones: 12000000
   weaponBonesToHide: 
@@ -285,14 +285,14 @@ MonoBehaviour:
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 4
-  timeBetweenHits: 0.05
+  maxHitLimit: 5
+  timeBetweenHits: 0.15
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
   canFlashAttack: 0
   isFollowUpAttack: 1
-  ailment: 0
+  ailment: 5
   grabAttackClip: {fileID: 0}
   grabAttackRootMotionData:
     curveX:
@@ -333,7 +333,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  ailmentHitDefinition: 
+  ailmentHitDefinition: 000001
   dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
@@ -342,7 +342,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 3c7ccecc924911c4984c92e07104862c, type: 3}
-  abilityCooldownTime: 15
+  abilityCooldownTime: 25
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate:
   - status: 2
@@ -358,7 +358,7 @@ MonoBehaviour:
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 0.3, y: 0.3, z: 0.3}
-  useRotationalTargetingSystem: 1
+  useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 1
   maximumTargetingRotationAngle: 60
   canLunge: 0
