@@ -57,20 +57,52 @@ namespace Vi.UI
             {
                 if (localObjectiveHandler.Objective)
                 {
+                    Vector3 newPosition = localObjectiveHandler.Objective.transform.position + localObjectiveHandler.MovementHandler.BodyHeightOffset;
+                    Quaternion newRot = Quaternion.LookRotation(mainCamera.transform.position - newPosition);
+
+                    Vector3 viewportPos = mainCamera.WorldToViewportPoint(newPosition);
+
+                    bool remakeRotation = false;
+                    if (viewportPos.z < 0) // Check if objective is behind
+                    {
+                        viewportPos.x = 0.5f;
+                        viewportPos.y = 0.05f;
+                        viewportPos.z = 5;
+                        remakeRotation = true;
+                    }
+                    else if (viewportPos.x > 1 | viewportPos.y > 1 | viewportPos.x < 0 | viewportPos.y < 0) // Check if the objective is off-screen
+                    {
+                        viewportPos.x = Mathf.Clamp(viewportPos.x, 0.05f, 0.95f);
+                        viewportPos.y = Mathf.Clamp(viewportPos.y, 0.05f, 0.95f);
+                        viewportPos.z = 5;
+                        remakeRotation = true;
+                    }
+
+                    // Convert viewport position to world position for the UI
+                    Vector3 worldPos = mainCamera.ViewportToWorldPoint(viewportPos);
+
+                    if (remakeRotation)
+                    {
+                        newRot = Quaternion.LookRotation(mainCamera.transform.position - worldPos);
+
+                        Vector2 viewportCenter = new Vector2(0.5f, 0.5f);
+                        Vector2 direction = new Vector2(viewportPos.x, viewportPos.y) - viewportCenter;
+
+                        float zAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+
+                        if (Mathf.Abs(direction.x) < Mathf.Abs(direction.y))
+                        {
+                            zAngle += 180;
+                        }
+
+                        newRot *= Quaternion.Euler(0, 0, zAngle);
+                    }
+
+                    // Set the position of the UI Indicator
                     indicatorImage.enabled = true;
-                    indicatorImage.transform.position = localObjectiveHandler.Objective.transform.position + localObjectiveHandler.MovementHandler.BodyHeightOffset;
-                    indicatorImage.transform.position += Vector3.up * indicatorImage.rectTransform.sizeDelta.y;
-                    indicatorImage.transform.position += Vector3.up * Mathf.PingPong(Time.time, 0.5f);
-
-                    Vector3 rel = localObjectiveHandler.Objective.transform.position - indicatorImage.transform.position;
-
-                    //Quaternion lookAtTargetRot = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel);
-                    //Debug.Log(lookAtTargetRot.eulerAngles);
-                    //var t = lookAtCameraRot * Quaternion.Euler(lookAtTargetRot.eulerAngles.x, 0, 0);
-
-                    Quaternion lookAtCameraRot = Quaternion.LookRotation(mainCamera.transform.position - indicatorImage.transform.position);
-
-                    indicatorImage.transform.rotation = lookAtCameraRot;
+                    indicatorImage.transform.position = worldPos;
+                    indicatorImage.transform.position += indicatorImage.transform.up * Mathf.PingPong(Time.time, 0.5f);
+                    indicatorImage.transform.rotation = newRot;
                 }
                 else
                 {
