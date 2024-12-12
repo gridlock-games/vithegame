@@ -233,8 +233,10 @@ namespace Vi.Core
         }
 
         private readonly int _Color = Shader.PropertyToID("_Color");
+#if UNITY_EDITOR
         private readonly int _FresnelBounds = Shader.PropertyToID("_FresnelBounds");
         private readonly int _BreathSpeed = Shader.PropertyToID("_BreathSpeed");
+#endif
         private readonly int _EmissivePower = Shader.PropertyToID("_EmissivePower");
     }
 }
