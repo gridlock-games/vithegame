@@ -222,12 +222,10 @@ namespace Vi.Core.GameModeManagers
                 List<int> aliveCounts = aliveCountDict.Values.ToList();
                 if (aliveCounts.TrueForAll(item => item == aliveCounts.FirstOrDefault()))
                 {
-                    Debug.Log("Alive counts are equal");
                     float highestAverageHP = -1;
                     foreach (PlayerDataManager.Team team in uniqueTeamList)
                     {
                         float averageHP = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(team).Average(item => item.GetHP());
-                        Debug.Log(team + " " + averageHP);
                         if (averageHP > highestAverageHP)
                         {
                             winningTeam = team;
@@ -252,7 +250,6 @@ namespace Vi.Core.GameModeManagers
                 }
                 else // Alive counts are not equal
                 {
-                    Debug.Log("Alive counts are not equal");
                     if (aliveCountDict.Count == 0)
                     {
                         Debug.LogError("Death Count dictionary count is 0! This should never happen!");
@@ -266,7 +263,6 @@ namespace Vi.Core.GameModeManagers
                         }
 
                         winningTeam = aliveCountDict.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-                        Debug.Log("Winning team: " + winningTeam);
                         if (winningTeam == PlayerDataManager.Team.Environment)
                         {
                             Debug.LogError("Winning team is environment! This should never happen!");

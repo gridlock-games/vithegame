@@ -28,6 +28,7 @@ namespace Vi.Core.GameModeManagers
 
         private void OnTriggerEnter(Collider other)
         {
+            if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
             if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))

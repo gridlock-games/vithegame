@@ -12,6 +12,7 @@ namespace Vi.Core.MovementHandlers
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PooledObject))]
+	[RequireComponent(typeof(ObjectiveHandler))]
 	public abstract class MovementHandler : NetworkBehaviour
     {
         public static readonly Vector3 HORIZONTAL_PLANE = new Vector3(1, 0, 1);
@@ -66,7 +67,8 @@ namespace Vi.Core.MovementHandlers
 
         public virtual Vector3 GetPosition() { return transform.position; }
 
-		public virtual Quaternion GetRotation() { return transform.rotation; }
+		private Quaternion cachedRotation;
+		public virtual Quaternion GetRotation() { return cachedRotation; }
 
 		public virtual Vector2[] GetMoveInputQueue() { return new Vector2[0]; }
 
@@ -110,7 +112,7 @@ namespace Vi.Core.MovementHandlers
 			}
 			else
 			{
-				Debug.LogError("Destination point is not on nav mesh! " + name);
+				//Debug.LogWarning("Destination point is not on nav mesh! " + name);
 				this.destination.Value = destination;
 				return false;
 			}
@@ -141,7 +143,7 @@ namespace Vi.Core.MovementHandlers
 				}
 				else
 				{
-					Debug.LogError("Destination point is not on nav mesh! " + name);
+					//Debug.LogWarning("Destination point is not on nav mesh! " + name);
 					destination.Value = destinationPoint;
 					return false;
 				}
@@ -176,7 +178,7 @@ namespace Vi.Core.MovementHandlers
 			}
 			else
 			{
-				Debug.LogError("Destination point is not on nav mesh! " + name);
+				Debug.LogWarning("Destination point is not on nav mesh! " + name);
 				destination.Value = destinationPoint;
 				return false;
 			}
@@ -268,7 +270,7 @@ namespace Vi.Core.MovementHandlers
 				}
 				else
 				{
-					//Debug.LogError("Path calculation failed! " + name);
+					//Debug.LogWarning("Path calculation failed! " + name);
 					//SetOrientation(myNavHit.position, transform.rotation);
 					nextPosition.Value = Destination;
 					return false;
@@ -276,11 +278,12 @@ namespace Vi.Core.MovementHandlers
 			}
 			else
             {
-				Debug.LogError("Start Position is not on navmesh! " + name);
-				if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, navMeshQueryFilter))
-				{
-					SetOrientation(myNavHit.position, transform.rotation);
-				}
+				// Uncomment this to force bots to stay on nav mesh at all times
+				//Debug.LogWarning("Start Position is not on navmesh! " + name);
+				//if (NavMesh.SamplePosition(startPosition, out NavMeshHit myNavHit, Mathf.Infinity, navMeshQueryFilter))
+				//{
+				//	SetOrientation(myNavHit.position, transform.rotation);
+				//}
 				nextPosition.Value = Destination;
 				return false;
             }
@@ -292,7 +295,9 @@ namespace Vi.Core.MovementHandlers
 			areaMask = NavMesh.AllAreas
 		};
 
-		protected WeaponHandler weaponHandler;
+        public ObjectiveHandler ObjectiveHandler { get; private set; }
+
+        protected WeaponHandler weaponHandler;
 		protected PlayerInput playerInput;
 		protected InputAction moveAction;
 		protected InputAction lookAction;
@@ -302,8 +307,10 @@ namespace Vi.Core.MovementHandlers
 		private int navMeshAgentTypeID;
 
         protected virtual void Awake()
-		{
-			path = new NavMeshPath();
+        {
+            ObjectiveHandler = GetComponent<ObjectiveHandler>();
+
+            path = new NavMeshPath();
 			weaponHandler = GetComponent<WeaponHandler>();
 			playerInput = GetComponent<PlayerInput>();
 			if (playerInput)
@@ -366,6 +373,11 @@ namespace Vi.Core.MovementHandlers
         {
 			if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
 		}
+
+		protected virtual void LateUpdate()
+		{
+            cachedRotation = transform.rotation;
+        }
 
         public virtual void Flinch(Vector2 flinchAmount) { }
 

@@ -49,6 +49,12 @@ namespace Vi.Core
             this.canFlashAttack = canFlashAttack;
         }
 
+        private bool isBearer;
+        public void RenderIsBearer(bool isBearer)
+        {
+            this.isBearer = isBearer;
+        }
+
         private void OnEnable()
         {
             lastBlockTime = -5;
@@ -59,16 +65,14 @@ namespace Vi.Core
             canFlashAttack = false;
             currentColor = default;
             lastColor = default;
+            isBearer = false;
         }
 
         private void Start()
         {
-            if (!GetComponent<PooledObject>())
+            foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
-                foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
-                {
-                    RegisterRenderer(renderer);
-                }
+                RegisterRenderer(renderer);
             }
         }
 
@@ -76,7 +80,8 @@ namespace Vi.Core
 
         public void RegisterRenderer(Renderer renderer)
         {
-            if (renderer.GetComponent<MagicaCloth>()) { return; }
+            if (glowMaterialInstances.ContainsKey(renderer)) { return; }
+            //if (renderer.GetComponent<MagicaCloth>()) { return; }
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj.IsSpawned) { return; }
@@ -139,14 +144,41 @@ namespace Vi.Core
         private readonly Color healColor = new Color(0, 1, 0);
         private readonly Color blockColor = new Color(0, 0, 1);
         private readonly Color flashAttackColor = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        private readonly Color bearerColor = new Color(239f / 255, 147f / 255, 39f / 255);
 
         private readonly Color defaultColor = new Color(0, 0, 0, 0);
         private const float colorChangeSpeed = 40;
 
         private Color currentColor;
         private Color lastColor;
+
+#if UNITY_EDITOR
+        [SerializeField] private bool debugMode;
+        [SerializeField] private Color debugColor;
+        [SerializeField] private Vector2 debugFresnelBounds;
+        [SerializeField] private float debugBreathSpeed;
+        [SerializeField] private float debugEmissionPower;
+#endif
+
         private void Update()
         {
+#if UNITY_EDITOR
+            if (debugMode)
+            {
+                foreach (List<Material> materialList in glowMaterialInstances.Values)
+                {
+                    foreach (Material glowMaterialInstance in materialList)
+                    {
+                        glowMaterialInstance.SetColor(_Color, debugColor);
+                        glowMaterialInstance.SetVector(_FresnelBounds, debugFresnelBounds);
+                        glowMaterialInstance.SetFloat(_EmissivePower, debugEmissionPower);
+                        glowMaterialInstance.SetFloat(_BreathSpeed, debugBreathSpeed);
+                    }
+                }
+                return;
+            }
+#endif
+
             Color colorTarget = defaultColor;
 
             if (Time.time - lastHitTime < 0.25f)
@@ -173,6 +205,16 @@ namespace Vi.Core
             {
                 colorTarget = flashAttackColor;
             }
+            else if (isBearer)
+            {
+                colorTarget = bearerColor;
+            }
+
+            float emissivePower = 1;
+            if (isBearer)
+            {
+                emissivePower = 5;
+            }
 
             currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
             if (lastColor != currentColor)
@@ -182,6 +224,7 @@ namespace Vi.Core
                     foreach (Material glowMaterialInstance in materialList)
                     {
                         glowMaterialInstance.SetColor(_Color, currentColor);
+                        glowMaterialInstance.SetFloat(_EmissivePower, emissivePower);
                     }
                 }
             }
@@ -190,5 +233,10 @@ namespace Vi.Core
         }
 
         private readonly int _Color = Shader.PropertyToID("_Color");
+#if UNITY_EDITOR
+        private readonly int _FresnelBounds = Shader.PropertyToID("_FresnelBounds");
+        private readonly int _BreathSpeed = Shader.PropertyToID("_BreathSpeed");
+#endif
+        private readonly int _EmissivePower = Shader.PropertyToID("_EmissivePower");
     }
 }
