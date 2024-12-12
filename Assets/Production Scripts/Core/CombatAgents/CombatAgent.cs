@@ -646,7 +646,7 @@ namespace Vi.Core
                     AudioManager.Singleton.Play2DClip(gameObject, killer.onKillAudioClip, 0.75f);
                 }
             }
-            else
+            else if (killer.NetworkObject.IsPlayerObject)
             {
                 killer.PlayKillerSoundEffectRpc(RpcTarget.Single(killer.OwnerClientId, RpcTargetUse.Temp));
             }
