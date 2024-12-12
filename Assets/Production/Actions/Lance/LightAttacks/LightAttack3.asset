@@ -1098,7 +1098,9 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.25
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 1.8
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
+  animationSpeed: 2.5
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
   agentRageCost: 50
@@ -1182,7 +1184,7 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
   - status: 8
-    value: 1
+    value: 2
     duration: 3
     delay: 0
     associatedWithCurrentWeapon: 0

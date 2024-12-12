@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94f518d8a6dafe547bb805955b2bd479, type: 3}
-  m_Name: HeavyAttack1
+  m_Name: FlashAttack
   m_EditorClassIdentifier: 
-  clipType: 2
+  clipType: 5
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
@@ -22,49 +22,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.35
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.102924705
-      value: 1.35
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.119406044
       value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 136
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  rootMotionSidesMultiplier:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -73,7 +31,31 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 1
-      value: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rootMotionSidesMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -277,40 +259,40 @@ MonoBehaviour:
   YAngleRotationOffset: 0
   ZAngleRotationOffset: 0
   avatarLayer: 0
-  transitionTime: 0.1
+  transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
   rootMotionTruncateOffset: 0.15
   truncatedTransitionOutTime: 0.15
-  animationSpeed: 1.25
-  recoveryAnimationSpeed: 1.5
+  animationSpeed: 1.2
+  recoveryAnimationSpeed: 1
   agentStaminaCost: 0
-  agentRageCost: 50
+  agentRageCost: 0
   effectedWeaponBones: 12000000
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
   chargeAttackStateLoopCount: 1
   canEnhance: 1
-  chargeTimeDamageMultiplier: 1.1
-  enhancedChargeDamageMultiplier: 1.2
+  chargeTimeDamageMultiplier: 5
+  enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.15
-  recoveryNormalizedTime: 0.3
+  attackingNormalizedTime: 0
+  recoveryNormalizedTime: 0.75
   isAffectedByRage: 1
-  damage: 12
+  damage: 10
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 3
-  timeBetweenHits: 0.05
+  maxHitLimit: 2
+  timeBetweenHits: 0.4
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 1
-  isFollowUpAttack: 0
-  ailment: 4
+  canFlashAttack: 0
+  isFollowUpAttack: 1
+  ailment: 2
   grabAttackClip: {fileID: 0}
   grabAttackRootMotionData:
     curveX:
@@ -351,11 +333,11 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  ailmentHitDefinition: 010000
-  dodgeLock: 1
-  canCancelLightAttacks: 1
+  ailmentHitDefinition: 0001
+  dodgeLock: 2
+  canCancelLightAttacks: 0
   canCancelHeavyAttacks: 0
-  canCancelAbilities: 1
+  canCancelAbilities: 0
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
@@ -363,26 +345,18 @@ MonoBehaviour:
   abilityCooldownTime: 5
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
-  statusesToApplyToTargetOnHit:
-  - status: 6
-    value: 0.33333334
-    duration: 3
-    delay: 0
-    associatedWithCurrentWeapon: 0
+  statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 7759964872974293715, guid: 2b653f079be9e46208648fc4966dcce8, type: 3}
-  - {fileID: 7057281741328151756, guid: 16f2573dcfbd8405f8fb53570f1cc05f, type: 3}
-  - {fileID: -2307277777639303676, guid: 8d3f722683f794ac18e8fafdb835723e, type: 3}
+  actionVFXList: []
   previewActionVFX: {fileID: 0}
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 1
   limitAttackMotionBasedOnTarget: 1
-  maximumTargetingRotationAngle: 25
-  canLunge: 0
-  minLungeDistance: 2.5
+  maximumTargetingRotationAngle: 10
+  canLunge: 1
+  minLungeDistance: 1.5
   maxLungeDistance: 5
   bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
