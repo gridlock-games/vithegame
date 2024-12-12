@@ -853,9 +853,8 @@ namespace Vi.UI
             }
             else // Dead
             {
-                NetworkObject killerNetObj = attributes.GetKiller();
                 CombatAgent killerCombatAgent = null;
-                if (killerNetObj) { killerCombatAgent = killerNetObj.GetComponent<CombatAgent>(); }
+                if (attributes.TryGetKiller(out NetworkObject killerNetObj)) { killerCombatAgent = killerNetObj.GetComponent<CombatAgent>(); }
 
                 if (killerCombatAgent)
                 {
