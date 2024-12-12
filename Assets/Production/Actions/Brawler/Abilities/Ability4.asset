@@ -265,7 +265,7 @@ MonoBehaviour:
   truncatedTransitionOutTime: 0.15
   animationSpeed: 1.6
   recoveryAnimationSpeed: 1
-  agentStaminaCost: 0
+  agentStaminaCost: 40
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -343,7 +343,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 0
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 21300000, guid: 39d596f741ce8f046b74543cec2eb51d, type: 3}
-  abilityCooldownTime: 0
+  abilityCooldownTime: 40
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate:
   - status: 8
