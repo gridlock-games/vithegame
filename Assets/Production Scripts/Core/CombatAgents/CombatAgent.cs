@@ -11,6 +11,7 @@ using Vi.Core.GameModeManagers;
 using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Core.Weapons;
+using UnityEditor.PackageManager;
 
 namespace Vi.Core
 {
@@ -634,16 +635,44 @@ namespace Vi.Core
             return lastAttackingCombatAgent;
         }
 
-        protected void SetKiller(CombatAgent killer) { killerNetObjId.Value = killer.NetworkObjectId; }
-
-        public NetworkObject GetKiller()
+        protected void SetKiller(CombatAgent killer)
         {
-            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return null; }
+            if (!IsServer | !IsSpawned) { Debug.LogError("Calling SetKiller when not the server! This is not allowed!"); return; }
+            killerNetObjId.Value = killer.NetworkObjectId;
+
+            if (killer.IsLocalPlayer)
+            {
+                if (killer.onKillAudioClip)
+                {
+                    AudioManager.Singleton.Play2DClip(gameObject, killer.onKillAudioClip, 0.75f);
+                }
+            }
+            else
+            {
+                killer.PlayKillerSoundEffectRpc(RpcTarget.Single(killer.OwnerClientId, RpcTargetUse.Temp));
+            }
+        }
+
+        [SerializeField] private AudioClip onKillAudioClip;
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void PlayKillerSoundEffectRpc(RpcParams rpcParams)
+        {
+            if (onKillAudioClip)
+            {
+                AudioManager.Singleton.Play2DClip(gameObject, onKillAudioClip, 0.75f);
+            }
+        }
+
+        public bool TryGetKiller(out NetworkObject killer)
+        {
+            killer = null;
+            if (ailment.Value != ActionClip.Ailment.Death) { Debug.LogError("Trying to get killer while not dead!"); return false; }
 
             if (NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(killerNetObjId.Value))
-                return NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
-            else
-                return null;
+                killer = NetworkManager.SpawnManager.SpawnedObjects[killerNetObjId.Value];
+
+            return killer != null;
         }
 
         private NetworkVariable<Quaternion> ailmentRotation = new NetworkVariable<Quaternion>(Quaternion.Euler(0, 0, 0)); // Don't remove the Quaternion.Euler() call, for some reason it's necessary BLACK MAGIC

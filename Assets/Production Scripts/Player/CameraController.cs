@@ -219,8 +219,7 @@ namespace Vi.Player
                 }
                 else
                 {
-                    NetworkObject killer = attributes.GetKiller();
-                    if (killer)
+                    if (attributes.TryGetKiller(out NetworkObject killer))
                     {
                         Quaternion killerRotation = Quaternion.LookRotation(killer.transform.position - transform.position, Vector3.up);
                         if (Quaternion.Angle(transform.rotation, killerRotation) > killerRotationSlerpThreshold) { killerRotation = Quaternion.Slerp(transform.rotation, killerRotation, Time.deltaTime * killerRotationSpeed); }
