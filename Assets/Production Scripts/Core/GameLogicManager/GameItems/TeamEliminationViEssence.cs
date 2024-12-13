@@ -5,12 +5,15 @@ using System.Linq;
 using Vi.Utility;
 using Vi.Core.CombatAgents;
 using Vi.Core.DynamicEnvironmentElements;
+using Unity.Netcode;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.GameModeManagers
 {
     public class TeamEliminationViEssence : GameItem
     {
         [SerializeField] private AudioClip spawnSound;
+        [SerializeField] private AudioClip activateSound;
 
         private TeamEliminationManager teamEliminationManager;
         private DamageCircle damageCircle;
@@ -23,7 +26,14 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound, true, gameItemVolume);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            PlayActivateSound();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -36,7 +46,7 @@ namespace Vi.Core.GameModeManagers
                 if (networkCollider.CombatAgent is Attributes attributes)
                 {
                     List<Attributes> teammates = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
-                    if (teammates.Where(item => item.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death).ToList().Count == 0)
+                    if (teammates.Count(item => item.GetAilment() != ActionClip.Ailment.Death) == 0)
                     {
                         PlayerDataManager.Singleton.RevivePlayer(teammates[Random.Range(0, teammates.Count)]);
                         teamEliminationManager.OnViEssenceActivation();
@@ -44,6 +54,11 @@ namespace Vi.Core.GameModeManagers
                     }
                 }
             }
+        }
+
+        private void PlayActivateSound()
+        {
+            AudioManager.Singleton.PlayClipAtPoint(null, activateSound, transform.position, gameItemVolume);
         }
 
         protected override bool OnHit(CombatAgent attacker)

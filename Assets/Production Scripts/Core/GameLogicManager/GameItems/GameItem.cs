@@ -11,7 +11,7 @@ namespace Vi.Core.GameModeManagers
     [RequireComponent(typeof(PooledObject))]
     public class GameItem : NetworkBehaviour, IHittable
     {
-        protected const float gameItemVolume = 1;
+        protected const float gameItemVolume = 0.85f;
 
         protected virtual bool OnHit(CombatAgent attacker)
         {

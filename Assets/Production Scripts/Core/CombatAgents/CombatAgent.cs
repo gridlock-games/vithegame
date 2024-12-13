@@ -654,7 +654,7 @@ namespace Vi.Core
 
         [SerializeField] private AudioClip onKillAudioClip;
 
-        [Rpc(SendTo.SpecifiedInParams)]
+        [Rpc(SendTo.SpecifiedInParams, Delivery = RpcDelivery.Unreliable)]
         private void PlayKillerSoundEffectRpc(RpcParams rpcParams)
         {
             if (onKillAudioClip)
