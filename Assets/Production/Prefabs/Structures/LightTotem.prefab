@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 8740251984681040938}
   - component: {fileID: 1305613998388130847}
   - component: {fileID: 6673324655095458704}
-  - component: {fileID: 7842506921039290929}
   - component: {fileID: 6675371897526124775}
+  - component: {fileID: 1989026005269609094}
+  - component: {fileID: 1338611585608732388}
   m_Layer: 6
   m_Name: LightTotem
   m_TagString: Untagged
@@ -69,22 +70,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7842506921039290929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7541657554978611873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29fb8e5a71b4c1248a787fa719e179de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  team: 10
-  deathSound: {fileID: 0}
-  armorType: 1
 --- !u!136 &6675371897526124775
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -108,6 +93,34 @@ CapsuleCollider:
   m_Height: 7.320535
   m_Direction: 1
   m_Center: {x: 0, y: 3.1602676, z: 0}
+--- !u!114 &1989026005269609094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541657554978611873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a87dc2daa2ed39408d62461989dd9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1338611585608732388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541657554978611873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de3f643600ad4934295d06237c1edf0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  team: 10
+  deathSound: {fileID: 0}
+  armorType: 1
 --- !u!1001 &4104936806833971225
 PrefabInstance:
   m_ObjectHideFlags: 0
