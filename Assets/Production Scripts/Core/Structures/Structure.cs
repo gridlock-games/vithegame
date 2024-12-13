@@ -10,6 +10,7 @@ using Vi.Core.Weapons;
 
 namespace Vi.Core.Structures
 {
+    [RequireComponent(typeof(ObjectiveHandler))]
     public class Structure : HittableAgent
     {
         [SerializeField] private float maxHP = 100;
@@ -18,11 +19,14 @@ namespace Vi.Core.Structures
 
         public Collider[] Colliders { get; private set; }
 
+        public ObjectiveHandler ObjectiveHandler { get; private set; }
+
         private ExplodableMesh[] explodableMeshes;
         protected override void Awake()
         {
             base.Awake();
             Colliders = GetComponentsInChildren<Collider>();
+            ObjectiveHandler = GetComponent<ObjectiveHandler>();
             explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
 
             List<Collider> networkPredictionLayerColliders = new List<Collider>();

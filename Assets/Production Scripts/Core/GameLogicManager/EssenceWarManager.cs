@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using Vi.Utility;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -20,6 +21,8 @@ namespace Vi.Core.GameModeManagers
             }
 
             bearerId.OnValueChanged += OnBearerIdChanged;
+            lightScore.OnValueChanged += OnScoreChanged;
+            corruptionScore.OnValueChanged += OnScoreChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -27,12 +30,22 @@ namespace Vi.Core.GameModeManagers
             base.OnNetworkDespawn();
 
             bearerId.OnValueChanged -= OnBearerIdChanged;
+            lightScore.OnValueChanged -= OnScoreChanged;
+            corruptionScore.OnValueChanged -= OnScoreChanged;
         }
+
+        private List<Attributes> playerList = new List<Attributes>();
 
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
         private float lastOgreSpawnEventTime = Mathf.NegativeInfinity;
+        private Mob ogreMobInstance;
         protected override void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame)
+            {
+                playerList = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            }
+
             base.Update();
             if (!IsSpawned) { return; }
 
@@ -48,14 +61,51 @@ namespace Vi.Core.GameModeManagers
                         }
                     }
 
-                    if (!IsViEssenceSpawned() & !HasBearer())
+                    if (IsViEssenceSpawned() | HasBearer())
+                    {
+                        lastOgreSpawnEventTime = Time.time;
+                    }
+                    else if (ogreMobInstance)
+                    {
+                        if (ogreMobInstance.IsSpawned)
+                        {
+                            lastOgreSpawnEventTime = Time.time;
+                        }
+                        else if (!ogreMobInstance.gameObject.activeInHierarchy)
+                        {
+                            ogreMobInstance = null;
+                        }
+                    }
+                    else
                     {
                         if (Time.time - lastOgreSpawnEventTime > 40)
                         {
-                            SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
+                            ogreMobInstance = SpawnMob(kingOgreMob, PlayerDataManager.Team.Environment, false);
                             lastOgreSpawnEventTime = Time.time;
                         }
                     }
+                }
+            }
+
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                foreach (Attributes player in playerList)
+                {
+                    if (player == bearer)
+                    {
+                        // Set this to the friendly structure
+                        player.MovementHandler.ObjectiveHandler.SetObjective(null);
+                        continue;
+                    }
+
+                    player.MovementHandler.ObjectiveHandler.SetObjective(bearer.MovementHandler.ObjectiveHandler);
+                }
+            }
+            else
+            {
+                foreach (Attributes player in playerList)
+                {
+                    player.MovementHandler.ObjectiveHandler.SetObjective(null);
                 }
             }
         }
@@ -99,6 +149,7 @@ namespace Vi.Core.GameModeManagers
         {
             lastOgreSpawnEventTime = Time.time;
             bearerId.Value = newBearer.GetPlayerDataId();
+            newBearer.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedDecrease, 1, 10, 0, false);
         }
 
         private NetworkVariable<int> bearerId = new NetworkVariable<int>();
@@ -108,7 +159,7 @@ namespace Vi.Core.GameModeManagers
             return PlayerDataManager.Singleton.IdHasLocalPlayer(bearerId.Value);
         }
 
-        private bool TryGetBearerInstance(out Attributes bearer)
+        public bool TryGetBearerInstance(out Attributes bearer)
         {
             if (PlayerDataManager.Singleton.IdHasLocalPlayer(bearerId.Value))
             {
@@ -134,6 +185,33 @@ namespace Vi.Core.GameModeManagers
             {
                 PlayerDataManager.Singleton.GetPlayerObjectById(prev).GlowRenderer.RenderIsBearer(false);
             }
+        }
+
+        private NetworkVariable<int> lightScore = new NetworkVariable<int>();
+        private NetworkVariable<int> corruptionScore = new NetworkVariable<int>();
+
+        private void OnScoreChanged(int prev, int current)
+        {
+            onScoreListChanged?.Invoke();
+        }
+
+        public void OnBearerReachedTotem(PlayerDataManager.Team team)
+        {
+            if (!IsServer) { Debug.LogError("OnBearerReachedTotem should only be called on the server!"); return; }
+
+            if (team == PlayerDataManager.Team.Light)
+            {
+                lightScore.Value++;
+            }
+            else if (team == PlayerDataManager.Team.Corruption)
+            {
+                corruptionScore.Value++;
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to handle team on bearer reached totem " + team);
+            }
+            RemoveBearer();
         }
 
         public override void OnEnvironmentKill(CombatAgent victim)
@@ -239,41 +317,17 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                List<Attributes> lightTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
-                if (lightTeamPlayers.Count > 0)
-                {
-                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + GetPlayerScore(lightTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                }
-                else
-                {
-                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": 0";
-                }
+                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Light) + ": " + lightScore.Value.ToString();
             }
             else
             {
                 if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
-                    if (redTeamPlayers.Count > 0)
-                    {
-                        return "Your Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                    }
-                    else
-                    {
-                        return "Your Team: 0";
-                    }
+                    return "Your Team: " + lightScore.Value.ToString();
                 }
                 else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
-                    if (blueTeamPlayers.Count > 0)
-                    {
-                        return "Your Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                    }
-                    else
-                    {
-                        return "Your Team: 0";
-                    }
+                    return "Your Team: " + corruptionScore.Value.ToString();
                 }
                 else
                 {
@@ -318,41 +372,17 @@ namespace Vi.Core.GameModeManagers
             PlayerDataManager.Team localTeam = PlayerDataManager.Singleton.LocalPlayerData.team;
             if (localTeam == PlayerDataManager.Team.Spectator)
             {
-                List<Attributes> corruptionTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
-                if (corruptionTeamPlayers.Count > 0)
-                {
-                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + GetPlayerScore(corruptionTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                }
-                else
-                {
-                    return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": 0";
-                }
+                return PlayerDataManager.Singleton.GetTeamText(PlayerDataManager.Team.Corruption) + ": " + corruptionScore.Value.ToString();
             }
             else
             {
                 if (localTeam == PlayerDataManager.Team.Light)
                 {
-                    List<Attributes> blueTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Corruption);
-                    if (blueTeamPlayers.Count > 0)
-                    {
-                        return "Enemy Team: " + GetPlayerScore(blueTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                    }
-                    else
-                    {
-                        return "Enemy Team: 0";
-                    }
+                    return "Enemy Team: " + corruptionScore.Value.ToString();
                 }
                 else if (localTeam == PlayerDataManager.Team.Corruption)
                 {
-                    List<Attributes> redTeamPlayers = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(PlayerDataManager.Team.Light);
-                    if (redTeamPlayers.Count > 0)
-                    {
-                        return "Enemy Team: " + GetPlayerScore(redTeamPlayers[0].GetPlayerDataId()).roundWins.ToString();
-                    }
-                    else
-                    {
-                        return "Enemy Team: 0";
-                    }
+                    return "Enemy Team: " + lightScore.Value.ToString();
                 }
                 else
                 {
