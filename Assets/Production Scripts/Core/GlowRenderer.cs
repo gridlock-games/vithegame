@@ -210,7 +210,7 @@ namespace Vi.Core
                 colorTarget = bearerColor;
             }
 
-            float emissivePower = 1;
+            float emissivePower = 2;
             if (isBearer)
             {
                 emissivePower = 5;
