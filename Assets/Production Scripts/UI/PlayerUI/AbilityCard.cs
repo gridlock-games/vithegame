@@ -7,6 +7,7 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
+    [RequireComponent(typeof(CanvasGroup))]
     public class AbilityCard : MonoBehaviour
     {
         [SerializeField] private Image abilityIcon;
