@@ -746,12 +746,12 @@ namespace Vi.UI
                     mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
                     lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
 
-                    ability1.CanvasGroup.alpha = Mathf.MoveTowards(ability1.CanvasGroup.alpha, 0, Time.deltaTime * 5);
-                    ability2.CanvasGroup.alpha = Mathf.MoveTowards(ability2.CanvasGroup.alpha, 0, Time.deltaTime * 5);
-                    ability3.CanvasGroup.alpha = Mathf.MoveTowards(ability3.CanvasGroup.alpha, 0, Time.deltaTime * 5);
-                    ability4.CanvasGroup.alpha = Mathf.MoveTowards(ability4.CanvasGroup.alpha, 0, Time.deltaTime * 5);
-                    healthPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(healthPotionCard.CanvasGroup.alpha, 0, Time.deltaTime * 5);
-                    staminaPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(staminaPotionCard.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    ability1.SetActive(false);
+                    ability2.SetActive(false);
+                    ability3.SetActive(false);
+                    ability4.SetActive(false);
+                    healthPotionCard.SetActive(false);
+                    staminaPotionCard.SetActive(false);
                 }
                 else
                 {
@@ -766,12 +766,12 @@ namespace Vi.UI
                     mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
                     lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
 
-                    ability1.CanvasGroup.alpha = Mathf.MoveTowards(ability1.CanvasGroup.alpha, 1, Time.deltaTime * 5);
-                    ability2.CanvasGroup.alpha = Mathf.MoveTowards(ability2.CanvasGroup.alpha, 1, Time.deltaTime * 5);
-                    ability3.CanvasGroup.alpha = Mathf.MoveTowards(ability3.CanvasGroup.alpha, 1, Time.deltaTime * 5);
-                    ability4.CanvasGroup.alpha = Mathf.MoveTowards(ability4.CanvasGroup.alpha, 1, Time.deltaTime * 5);
-                    healthPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(healthPotionCard.CanvasGroup.alpha, 1, Time.deltaTime * 5);
-                    staminaPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(staminaPotionCard.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    ability1.SetActive(true);
+                    ability2.SetActive(true);
+                    ability3.SetActive(true);
+                    ability4.SetActive(true);
+                    healthPotionCard.SetActive(true);
+                    staminaPotionCard.SetActive(true);
                 }
                 else
                 {

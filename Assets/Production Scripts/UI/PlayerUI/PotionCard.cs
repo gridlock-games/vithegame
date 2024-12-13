@@ -6,7 +6,6 @@ using Vi.Utility;
 
 namespace Vi.UI
 {
-    [RequireComponent(typeof(CanvasGroup))]
     public class PotionCard : MonoBehaviour
     {
         [SerializeField] private AnimationHandler.PotionType potionType;
@@ -27,7 +26,13 @@ namespace Vi.UI
             potionsLeftText.text = "10";
         }
 
-        public CanvasGroup CanvasGroup { get; private set; }
+        public void SetActive(bool isActive)
+        {
+            if (!canvas) { canvas = GetComponent<Canvas>(); }
+            if (canvas.enabled == isActive) { return; }
+            canvas.enabled = isActive;
+        }
+
         private Canvas canvas;
         private Image borderImage;
         private CombatAgent combatAgent;
@@ -36,7 +41,6 @@ namespace Vi.UI
             canvas = GetComponent<Canvas>();
             borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
-            CanvasGroup = GetComponent<CanvasGroup>();
 
             GetComponent<Button>().onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
         }

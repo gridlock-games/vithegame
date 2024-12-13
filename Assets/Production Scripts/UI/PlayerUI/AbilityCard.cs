@@ -7,7 +7,6 @@ using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
-    [RequireComponent(typeof(CanvasGroup))]
     public class AbilityCard : MonoBehaviour
     {
         [SerializeField] private Image abilityIcon;
@@ -26,17 +25,16 @@ namespace Vi.UI
         public void SetActive(bool isActive)
         {
             if (!canvas) { canvas = GetComponent<Canvas>(); }
+            if (canvas.enabled == isActive) { return; }
             canvas.enabled = isActive;
         }
 
-        public CanvasGroup CanvasGroup { get; private set; }
         private Canvas canvas;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
             borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
-            CanvasGroup = GetComponent<CanvasGroup>();
         }
 
         public void SetPreviewOn()
