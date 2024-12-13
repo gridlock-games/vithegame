@@ -9,9 +9,17 @@ using Vi.Core.Weapons;
 namespace Vi.Core.GameModeManagers
 {
     [RequireComponent(typeof(PooledObject))]
+    [RequireComponent(typeof(ObjectiveHandler))]
     public class GameItem : NetworkBehaviour, IHittable
     {
         protected const float gameItemVolume = 0.85f;
+
+        public ObjectiveHandler ObjectiveHandler { get; private set; }
+
+        protected virtual void Awake()
+        {
+            ObjectiveHandler = GetComponent<ObjectiveHandler>();
+        }
 
         protected virtual bool OnHit(CombatAgent attacker)
         {

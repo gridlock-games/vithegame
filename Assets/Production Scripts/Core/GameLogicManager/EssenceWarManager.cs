@@ -34,11 +34,18 @@ namespace Vi.Core.GameModeManagers
             corruptionScore.OnValueChanged -= OnScoreChanged;
         }
 
+        private List<Attributes> playerList = new List<Attributes>();
+
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
         private float lastOgreSpawnEventTime = Mathf.NegativeInfinity;
         private Mob ogreMobInstance;
         protected override void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame)
+            {
+                playerList = PlayerDataManager.Singleton.GetActivePlayerObjects();
+            }
+
             base.Update();
             if (!IsSpawned) { return; }
 
@@ -77,6 +84,28 @@ namespace Vi.Core.GameModeManagers
                             lastOgreSpawnEventTime = Time.time;
                         }
                     }
+                }
+            }
+
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                foreach (Attributes player in playerList)
+                {
+                    if (player == bearer)
+                    {
+                        // Set this to the friendly structure
+                        player.MovementHandler.ObjectiveHandler.SetObjective(null);
+                        continue;
+                    }
+
+                    player.MovementHandler.ObjectiveHandler.SetObjective(bearer.MovementHandler.ObjectiveHandler);
+                }
+            }
+            else
+            {
+                foreach (Attributes player in playerList)
+                {
+                    player.MovementHandler.ObjectiveHandler.SetObjective(null);
                 }
             }
         }
@@ -182,6 +211,7 @@ namespace Vi.Core.GameModeManagers
             {
                 Debug.LogWarning("Unsure how to handle team on bearer reached totem " + team);
             }
+            RemoveBearer();
         }
 
         public override void OnEnvironmentKill(CombatAgent victim)
