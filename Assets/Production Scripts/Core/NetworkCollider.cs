@@ -437,6 +437,52 @@ namespace Vi.Core
 
             AssignPhysicMaterialToColliders();
         }
+
+        [ContextMenu("Generate Static Wall Colliders")]
+        private void GenerateStaticWallColliders()
+        {
+            if (staticWallBody) { Debug.LogWarning("We already have a static wall body!"); return; }
+            if (GetNetworkColliders().Count == 0) { Debug.LogWarning("No network colliders to base off of!"); return; }
+
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                GameObject g = Instantiate(rb.gameObject, rb.transform.parent);
+                g.name = "StaticWallCollider";
+
+                DestroyImmediate(g.GetComponent<NetworkCollider>());
+
+                foreach (Transform t in g.GetComponentsInChildren<Transform>())
+                {
+                    if (t.TryGetComponent(out Collider col))
+                    {
+                        if (col.isTrigger)
+                        {
+                            DestroyImmediate(t.gameObject);
+                            continue;
+                        }
+                    }
+
+                    t.gameObject.layer = LayerMask.NameToLayer("AgentCollider");
+
+                    if (!t.TryGetComponent(out Rigidbody staticRb))
+                    {
+                        staticRb = t.gameObject.AddComponent<Rigidbody>();
+                    }
+
+                    staticRb.useGravity = false;
+                    staticRb.isKinematic = true;
+                    staticRb.constraints = RigidbodyConstraints.None;
+                }
+
+                staticWallBody = g.GetComponent<Rigidbody>();
+            }
+            else
+            {
+                Debug.LogWarning("No rigidbody to base off of!");
+            }
+
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
 # endif
     }
 }

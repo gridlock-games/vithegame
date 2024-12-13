@@ -605,6 +605,7 @@ MonoBehaviour:
   rageStartVFXPrefab: {fileID: -5598191903913794490, guid: f8c2d4cc44c53d348a31254d6ec12242,
     type: 3}
   rageStartSprite: {fileID: 21300000, guid: 772ab1f1608b0694bb7758951fef42c9, type: 3}
+  onKillAudioClip: {fileID: 8300000, guid: 1902387c27c7f450baab938d3a2bc3c4, type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3
     actionVFX: {fileID: 3922548515315126405, guid: 92e09002586d112498d7f92d499e563b,
@@ -617,7 +618,6 @@ MonoBehaviour:
   deathVFX: {fileID: 0}
   deathVFXAttack: {fileID: 0}
   wasStaggeredThisFrame: 0
-  onKillAudioClip: {fileID: 8300000, guid: 1902387c27c7f450baab938d3a2bc3c4, type: 3}
   teamIndicatorPrefab: {fileID: -9076160948696418514, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
   heartbeatSoundEffect: {fileID: 8300000, guid: d22fc966ad7a64afd923f2e84ef54228,
@@ -1151,7 +1151,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!136 &6686379670752557657
 CapsuleCollider:
