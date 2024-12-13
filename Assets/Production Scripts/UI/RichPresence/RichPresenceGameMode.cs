@@ -46,13 +46,13 @@ namespace Vi.UI
 
             if (gameModeID != PlayerDataManager.GameMode.None)
             {
-                gameModeManager.SubscribeScoreListCallback(delegate { OnListChange(); });
+                gameModeManager.onScoreListChanged += OnListChange;
             }
         }
 
         private void OnDestroy()
         {
-            gameModeManager.UnsubscribeScoreListCallback(delegate { OnListChange(); });
+            gameModeManager.onScoreListChanged -= OnListChange;
         }
 
         protected void OnListChange()

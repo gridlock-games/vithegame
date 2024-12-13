@@ -9,6 +9,7 @@ using Unity.Collections;
 using Vi.Core.CombatAgents;
 using Vi.ScriptableObjects;
 using Vi.Core.Structures;
+using UnityEngine.Events;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -965,6 +966,8 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public UnityAction onScoreListChanged;
+
         private void OnScoreListChange(NetworkListEvent<PlayerScore> networkListEvent)
         {
             if (IsServer)
@@ -996,6 +999,8 @@ namespace Vi.Core.GameModeManagers
                     if (!isEvaluatingRoundEndAnimations) { StartCoroutine(EvaluateRoundEndAnimations()); }
                 }
             }
+
+            onScoreListChanged?.Invoke();
         }
 
         private List<(bool, PlayerScore)> scoresToEvaluate = new List<(bool, PlayerScore)>();
@@ -1042,16 +1047,6 @@ namespace Vi.Core.GameModeManagers
             {
                 animationHandler.Animator.CrossFadeInFixedTime("Empty", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
             }
-        }
-
-        public void SubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
-        {
-            scoreList.OnListChanged += onListChangedDelegate;
-        }
-
-        public void UnsubscribeScoreListCallback(NetworkList<PlayerScore>.OnListChangedDelegate onListChangedDelegate)
-        {
-            scoreList.OnListChanged -= onListChangedDelegate;
         }
 
         public bool IsWaitingForPlayers { get; private set; } = true;

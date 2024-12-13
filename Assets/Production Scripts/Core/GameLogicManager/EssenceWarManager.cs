@@ -21,6 +21,8 @@ namespace Vi.Core.GameModeManagers
             }
 
             bearerId.OnValueChanged += OnBearerIdChanged;
+            lightScore.OnValueChanged += OnScoreChanged;
+            corruptionScore.OnValueChanged += OnScoreChanged;
         }
 
         public override void OnNetworkDespawn()
@@ -28,6 +30,8 @@ namespace Vi.Core.GameModeManagers
             base.OnNetworkDespawn();
 
             bearerId.OnValueChanged -= OnBearerIdChanged;
+            lightScore.OnValueChanged -= OnScoreChanged;
+            corruptionScore.OnValueChanged -= OnScoreChanged;
         }
 
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
@@ -156,6 +160,11 @@ namespace Vi.Core.GameModeManagers
 
         private NetworkVariable<int> lightScore = new NetworkVariable<int>();
         private NetworkVariable<int> corruptionScore = new NetworkVariable<int>();
+
+        private void OnScoreChanged(int prev, int current)
+        {
+            onScoreListChanged?.Invoke();
+        }
 
         public void OnBearerReachedTotem(PlayerDataManager.Team team)
         {
