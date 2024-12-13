@@ -52,6 +52,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnGameEnd(int[] winningPlayersDataIds)
         {
             base.OnGameEnd(winningPlayersDataIds);
+            damageCircleInstance.NetworkObject.Despawn(true);
             roundResultMessage.Value = "Game Over! ";
             gameEndMessage.Value = PlayerDataManager.Singleton.GetPlayerData(winningPlayersDataIds[0]).character.name + " Wins the Free for All!";
         }
