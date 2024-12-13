@@ -28,12 +28,14 @@ namespace Vi.UI
             canvas.enabled = isActive;
         }
 
+        public CanvasGroup CanvasGroup { get; private set; }
         private Canvas canvas;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
             borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
+            CanvasGroup = GetComponent<CanvasGroup>();
         }
 
         public void SetPreviewOn()

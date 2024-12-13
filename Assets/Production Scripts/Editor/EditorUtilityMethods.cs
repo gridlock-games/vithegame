@@ -390,16 +390,38 @@ namespace Vi.Editor
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
         }
 
-        [MenuItem("Tools/Production/5.Add Unregistered Pooled Objects")]
-        static void AddUnregisteredPooledObjects()
+        private static List<ActionClip> GetActionClips()
         {
             List<ActionClip> actionClips = new List<ActionClip>();
             string actionClipFolder = @"Assets/Production/Actions";
             foreach (string actionClipFilePath in Directory.GetFiles(actionClipFolder, "*.asset", SearchOption.AllDirectories))
             {
                 ActionClip actionClip = AssetDatabase.LoadAssetAtPath<ActionClip>(actionClipFilePath);
-                if (actionClip) { actionClips.Add(actionClip); }
+                if (actionClip)
+                {
+                    actionClips.Add(actionClip);
+                    foreach (ActionVFX vfx in actionClip.actionVFXList)
+                    {
+                        if (!vfx)
+                        {
+                            Debug.LogError(actionClip + " has a null VFX reference " + actionClipFilePath);
+                        }
+                    }
+                }
             }
+            return actionClips;
+        }
+
+        [MenuItem("Tools/Production/Check Action Clips")]
+        private static void CheckActionClips()
+        {
+            GetActionClips();
+        }
+
+        [MenuItem("Tools/Production/5.Add Unregistered Pooled Objects")]
+        static void AddUnregisteredPooledObjects()
+        {
+            List<ActionClip> actionClips = GetActionClips();
 
             int counter = 0;
             List<string> files = new List<string>();

@@ -359,7 +359,6 @@ namespace Vi.UI
             originalLookJoystickCenterColor = lookJoystickCenter.color;
             originalMobileInteractableButtonColor = mobileInteractableImage.color;
 
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
 
             textChatParentCanvas.enabled = false;
@@ -379,7 +378,7 @@ namespace Vi.UI
         private Vector2 stowedWeaponCardTargetAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
-        private CanvasGroup[] canvasGroups;
+        [SerializeField] private CanvasGroup[] canvasGroupsThatAffectOpacity;
 
         private bool canFadeIn;
         private void Start()
@@ -419,7 +418,7 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
+            foreach (CanvasGroup canvasGroup in canvasGroupsThatAffectOpacity)
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
@@ -746,6 +745,13 @@ namespace Vi.UI
                     mobileInteractableImage.raycastTarget = true;
                     mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
                     lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
+
+                    ability1.CanvasGroup.alpha = Mathf.MoveTowards(ability1.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    ability2.CanvasGroup.alpha = Mathf.MoveTowards(ability2.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    ability3.CanvasGroup.alpha = Mathf.MoveTowards(ability3.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    ability4.CanvasGroup.alpha = Mathf.MoveTowards(ability4.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    healthPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(healthPotionCard.CanvasGroup.alpha, 0, Time.deltaTime * 5);
+                    staminaPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(staminaPotionCard.CanvasGroup.alpha, 0, Time.deltaTime * 5);
                 }
                 else
                 {
@@ -759,6 +765,13 @@ namespace Vi.UI
                     mobileInteractableImage.raycastTarget = false;
                     mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
                     lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
+
+                    ability1.CanvasGroup.alpha = Mathf.MoveTowards(ability1.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    ability2.CanvasGroup.alpha = Mathf.MoveTowards(ability2.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    ability3.CanvasGroup.alpha = Mathf.MoveTowards(ability3.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    ability4.CanvasGroup.alpha = Mathf.MoveTowards(ability4.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    healthPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(healthPotionCard.CanvasGroup.alpha, 1, Time.deltaTime * 5);
+                    staminaPotionCard.CanvasGroup.alpha = Mathf.MoveTowards(staminaPotionCard.CanvasGroup.alpha, 1, Time.deltaTime * 5);
                 }
                 else
                 {
