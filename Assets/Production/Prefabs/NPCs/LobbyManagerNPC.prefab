@@ -3450,6 +3450,7 @@ MonoBehaviour:
   worldSpaceLabel: {fileID: 73519393645535981}
   UI: {fileID: 7829688245395688192}
   gameModePreviewUI: {fileID: 4229541647828072647}
+  videoPlayer: {fileID: 4330633906424460103}
 --- !u!135 &5301250773397942924
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5484,7 +5485,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 
   m_DirectAudioMutes: 
   m_ControlledAudioTrackCount: 0
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 1
   m_WaitForFirstFrame: 1
