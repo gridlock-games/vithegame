@@ -593,7 +593,10 @@ namespace Vi.Core
 
         protected Dictionary<CombatAgent, float> damageMappingThisLife = new Dictionary<CombatAgent, float>();
 
-        public Dictionary<CombatAgent, float> GetDamageMappingThisLife() { return damageMappingThisLife; }
+        public Dictionary<CombatAgent, float> GetDamageMappingThisLife()
+        {
+            return damageMappingThisLife.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
+        }
 
         protected void AddDamageToMapping(CombatAgent attacker, float damage)
         {
