@@ -57,6 +57,8 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasInt("BotSpawnNumber")) { FasterPlayerPrefs.Singleton.SetInt("BotSpawnNumber", 4); }
+
             if (!FasterPlayerPrefs.Singleton.HasBool("AllowLocalhostServers")) { FasterPlayerPrefs.Singleton.SetBool("AllowLocalhostServers", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("AllowLANServers")) { FasterPlayerPrefs.Singleton.SetBool("AllowLANServers", false); }
 
