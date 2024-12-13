@@ -722,6 +722,7 @@ namespace Vi.Core
                 {
                     foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
+                        if (!actionVFX) { continue; }
                         if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {

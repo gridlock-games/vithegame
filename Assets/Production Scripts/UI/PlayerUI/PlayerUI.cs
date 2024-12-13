@@ -430,7 +430,7 @@ namespace Vi.UI
 
         private void UpdateTeammateAttributesList()
         {
-            teammateAttributes = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(attributes.GetTeam(), attributes);
+            teammateAttributes = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(attributes.GetTeam(), attributes);
         }
 
         public void OnRebinding()
@@ -727,7 +727,7 @@ namespace Vi.UI
             }
         }
 
-        List<CombatAgent> teammateAttributes = new List<CombatAgent>();
+        List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
         private void Update()
@@ -817,7 +817,7 @@ namespace Vi.UI
                     if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateTeammateAttributesList(); }
 
                     // Order player cards by distance
-                    List<CombatAgent> orderedTeammateAttributes = teammateAttributes.Where(item => item).OrderBy(item => item.GetAilment() == ActionClip.Ailment.Death).ThenBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
+                    List<Attributes> orderedTeammateAttributes = teammateAttributes.Where(item => item).OrderBy(item => item.GetAilment() == ActionClip.Ailment.Death).ThenBy(x => Vector3.Distance(attributes.transform.position, x.transform.position)).Take(teammatePlayerCards.Length).ToList();
                     for (int i = 0; i < teammatePlayerCards.Length; i++)
                     {
                         if (i < orderedTeammateAttributes.Count)

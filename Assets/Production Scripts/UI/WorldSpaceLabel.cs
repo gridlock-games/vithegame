@@ -26,6 +26,7 @@ namespace Vi.UI
 
         [Header("Object Assignments")]
         [SerializeField] private Text nameDisplay;
+        [SerializeField] private Image background;
         [SerializeField] private RectTransform healthBarParent;
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
@@ -78,6 +79,17 @@ namespace Vi.UI
 
             if (combatAgent)
             {
+                if (combatAgent is Mob)
+                {
+                    background.enabled = false;
+                    nameDisplay.enabled = false;
+                }
+                else
+                {
+                    background.enabled = true;
+                    nameDisplay.enabled = true;
+                }
+
                 UpdateNameTextAndColors();
 
                 List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();

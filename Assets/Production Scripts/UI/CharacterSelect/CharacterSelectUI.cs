@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
-// // using jomarcentermjm.PlatformAPI;
+using TMPro;
 
 namespace Vi.UI
 {
@@ -39,6 +39,10 @@ namespace Vi.UI
         [SerializeField] private Button deleteCharacterButton;
         [SerializeField] private Button tutorialButton;
         [SerializeField] private GameObject statsAndGearParent;
+
+        [Header("Training Room Configuration")]
+        [SerializeField] private TMP_Dropdown trainingRoomMapDropdown;
+        [SerializeField] private InputField trainingRoomBotNumberDropdown;
 
         [Header("Stats Section")]
         [SerializeField] private GameObject statsParent;
@@ -209,6 +213,9 @@ namespace Vi.UI
             {
                 data.OnDragEvent += OnCharPreviewDrag;
             }
+
+            trainingRoomMapDropdown.ClearOptions();
+            trainingRoomMapDropdown.AddOptions(trainingRoomMapOptions);
         }
 
         private void OnDestroy()
@@ -986,6 +993,15 @@ namespace Vi.UI
             OpenCharacterSelect();
         }
 
+        private List<string> trainingRoomMapOptions = new List<string>()
+        {
+            "Tutorial Map",
+            "Duo's Sanctum",
+            "Octagon Skirmish",
+            "Twilight Chasm",
+            "Eclipse Grove"
+        };
+
         public void GoToTrainingRoom()
         {
             goToTrainingRoomButton.interactable = false;
@@ -994,7 +1010,7 @@ namespace Vi.UI
             {
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
-                    NetSceneManager.Singleton.LoadScene("Training Room", "Tutorial Map");
+                    NetSceneManager.Singleton.LoadScene("Training Room", trainingRoomMapOptions[trainingRoomMapDropdown.value]);
                 }
                 else
                 {
@@ -1102,6 +1118,7 @@ namespace Vi.UI
             codeInputBoxParent.SetActive(false);
             if (autoConnectToHubServerCoroutine != null) { StopCoroutine(autoConnectToHubServerCoroutine); }
             selectCharacterButton.interactable = true;
+            goToTrainingRoomButton.interactable = true;
         }
 
         public void OpenViDiscord()

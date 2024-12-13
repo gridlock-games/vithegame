@@ -9,7 +9,7 @@ namespace Vi.ArtificialIntelligence
 {
     public class BotSpawner : MonoBehaviour
     {
-        [SerializeField] private BotDefinition[] botDefinitions;
+        [SerializeField] private PlayerDataManager.Team botTeam = PlayerDataManager.Team.Competitor;
 
         private void Start()
         {
@@ -25,18 +25,10 @@ namespace Vi.ArtificialIntelligence
         private IEnumerator SpawnBots()
         {
             yield return new WaitUntil(() => NetSceneManager.Singleton.ShouldSpawnPlayerCached);
-            foreach (BotDefinition botDefinition in botDefinitions)
+            for (int i = 0; i < FasterPlayerPrefs.Singleton.GetInt("BotSpawnNumber"); i++)
             {
-                if (!botDefinition.enabled) { continue; }
-                PlayerDataManager.Singleton.AddBotData(botDefinition.team, false);
+                PlayerDataManager.Singleton.AddBotData(botTeam, false);
             }
-        }
-
-        [System.Serializable]
-        private class BotDefinition
-        {
-            public PlayerDataManager.Team team;
-            public bool enabled;
         }
     }
 }
