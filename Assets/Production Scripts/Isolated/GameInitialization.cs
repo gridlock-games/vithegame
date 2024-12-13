@@ -57,6 +57,9 @@ namespace Vi.Core
                 FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
             }
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("AllowLocalhostServers")) { FasterPlayerPrefs.Singleton.SetBool("AllowLocalhostServers", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("AllowLANServers")) { FasterPlayerPrefs.Singleton.SetBool("AllowLANServers", false); }
+
             if (!FasterPlayerPrefs.Singleton.HasColor("CrosshairColor")) { FasterPlayerPrefs.Singleton.SetColor("CrosshairColor", Color.red); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("CrosshairSize")) { FasterPlayerPrefs.Singleton.SetFloat("CrosshairSize", 1); }
             if (!FasterPlayerPrefs.Singleton.HasInt("CrosshairStyle")) { FasterPlayerPrefs.Singleton.SetInt("CrosshairStyle", 26); }

@@ -20,20 +20,25 @@ namespace Vi.Core
             MovementHandler = GetComponent<MovementHandler>();
         }
 
-        private void Update()
+        private void OnDisable()
         {
-            List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
-
-            foreach (Attributes player in players)
-            {
-                if (player == this) { continue; }
-
-                if (player.TryGetComponent(out ObjectiveHandler objectiveHandler))
-                {
-                    SetObjective(objectiveHandler);
-                }
-                break;
-            }
+            Objective = default;
         }
+
+        //private void Update()
+        //{
+        //    List<Attributes> players = PlayerDataManager.Singleton.GetActivePlayerObjects();
+
+        //    foreach (Attributes player in players)
+        //    {
+        //        if (player == this) { continue; }
+
+        //        if (player.TryGetComponent(out ObjectiveHandler objectiveHandler))
+        //        {
+        //            SetObjective(objectiveHandler);
+        //        }
+        //        break;
+        //    }
+        //}
     }
 }

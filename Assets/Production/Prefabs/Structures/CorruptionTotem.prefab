@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 6597025428375073374}
   - component: {fileID: 6909865464015930813}
   - component: {fileID: 4425300840577226586}
-  - component: {fileID: 7780812751709243926}
   - component: {fileID: 7522459453926130721}
+  - component: {fileID: 2706458474113516559}
+  - component: {fileID: 691023207017391043}
   m_Layer: 6
   m_Name: CorruptionTotem
   m_TagString: Untagged
@@ -48,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 938683574
+  GlobalObjectIdHash: 3524060590
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -69,22 +70,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7780812751709243926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3934794101523992449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29fb8e5a71b4c1248a787fa719e179de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  team: 11
-  deathSound: {fileID: 0}
-  armorType: 1
 --- !u!136 &7522459453926130721
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -108,6 +93,34 @@ CapsuleCollider:
   m_Height: 8.79237
   m_Direction: 1
   m_Center: {x: 0, y: 4.5, z: 0}
+--- !u!114 &2706458474113516559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3934794101523992449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a87dc2daa2ed39408d62461989dd9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &691023207017391043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3934794101523992449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de3f643600ad4934295d06237c1edf0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  team: 11
+  deathSound: {fileID: 0}
+  armorType: 1
 --- !u!1001 &2478945061277201600
 PrefabInstance:
   m_ObjectHideFlags: 0

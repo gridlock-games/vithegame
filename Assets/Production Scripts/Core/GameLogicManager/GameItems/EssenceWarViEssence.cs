@@ -12,6 +12,7 @@ namespace Vi.Core.GameModeManagers
     public class EssenceWarViEssence : GameItem
     {
         [SerializeField] private AudioClip spawnSound;
+        [SerializeField] private AudioClip activateSound;
 
         private EssenceWarManager essenceWarManager;
 
@@ -22,7 +23,14 @@ namespace Vi.Core.GameModeManagers
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             AudioManager.Singleton.PlayClipOnTransform(transform, spawnSound, true, gameItemVolume);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            PlayActivateSound();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -38,6 +46,11 @@ namespace Vi.Core.GameModeManagers
                     NetworkObject.Despawn(true);
                 }
             }
+        }
+
+        private void PlayActivateSound()
+        {
+            AudioManager.Singleton.PlayClipAtPoint(null, activateSound, transform.position, gameItemVolume);
         }
 
         private void OnDrawGizmos()
