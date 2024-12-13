@@ -33,9 +33,19 @@ namespace Vi.UI
             canvas.enabled = isActive;
         }
 
+        public void CrossFadeOpacity(float alpha)
+        {
+            foreach (Graphic graphic in graphics)
+            {
+                graphic.color = StringUtility.SetColorAlpha(graphic.color, Mathf.MoveTowards(graphic.color.a, alpha, Time.deltaTime * 5));
+            }
+        }
+
         private Canvas canvas;
         private Image borderImage;
         private CombatAgent combatAgent;
+
+        private Graphic[] graphics;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
@@ -43,6 +53,8 @@ namespace Vi.UI
             combatAgent = GetComponentInParent<CombatAgent>();
 
             GetComponent<Button>().onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
+
+            graphics = GetComponentsInChildren<Graphic>();
         }
 
         public void Initialize(string keybindText)
