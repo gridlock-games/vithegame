@@ -43237,7 +43237,19 @@ MonoBehaviour:
   environmentViewPoints:
   - position: {x: 0, y: 11.25, z: -7.6}
     rotation: {x: 0.444557, y: 0, z: 0, w: 0.8957506}
-  gameItemSpawnPoints: []
+  gameItemSpawnPoints:
+  - position: {x: 9.5, y: -3, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -9.5, y: -3, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -7, y: -3, z: 12}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 7, y: -3, z: -12}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -13, y: -3, z: 8}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 13, y: -3, z: -8}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
   - gameModes: 000000000100000002000000
     teams: 01000000
