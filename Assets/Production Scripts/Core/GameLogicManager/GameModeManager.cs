@@ -30,6 +30,10 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
         [SerializeField] private bool levelingEnabled = false;
 
+        public float RoundDuration { get { return roundDuration; } }
+
+        public float RoundTimer { get { return roundTimer.Value; } }
+
         protected const float overtimeDuration = 20;
 
         public enum RespawnType

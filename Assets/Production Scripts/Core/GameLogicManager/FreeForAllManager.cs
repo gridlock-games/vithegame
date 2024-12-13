@@ -4,20 +4,35 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
 using Vi.Core.CombatAgents;
+using Vi.Core.DynamicEnvironmentElements;
 
 namespace Vi.Core.GameModeManagers
 {
     public class FreeForAllManager : GameModeManager
     {
-        [Header("Free for all specific")]
+        [Header("Free For All Specific")]
+        [SerializeField] private DamageCircle damageCirclePrefab;
         [SerializeField] private int killsToWinRound = 2;
+
+        private DamageCircle damageCircleInstance;
 
         public int GetKillsToWinRound() { return killsToWinRound; }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            if (IsServer) { roundResultMessage.Value = "Free for All Starting! "; }
+            if (IsServer)
+            {
+                roundResultMessage.Value = "Free For All Starting! ";
+                StartCoroutine(CreateDamageCircle());
+            }
+        }
+
+        private IEnumerator CreateDamageCircle()
+        {
+            yield return new WaitUntil(() => PlayerDataManager.Singleton.HasPlayerSpawnPoints());
+            damageCircleInstance = Instantiate(damageCirclePrefab.gameObject).GetComponent<DamageCircle>();
+            damageCircleInstance.NetworkObject.Spawn(true);
         }
 
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
@@ -44,6 +59,7 @@ namespace Vi.Core.GameModeManagers
         protected override void OnRoundEnd(int[] winningPlayersDataIds)
         {
             base.OnRoundEnd(winningPlayersDataIds);
+            damageCircleInstance.ResetDamageCircle();
             if (gameOver.Value) { return; }
             string message;
             if (winningPlayersDataIds.Length > 1)

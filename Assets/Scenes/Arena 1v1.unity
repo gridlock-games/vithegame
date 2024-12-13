@@ -6517,7 +6517,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  size: {x: 61.192295, y: 41.511925, z: 132.8353}
+  size: {x: 61.1923, y: 41.511925, z: 132.8353}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -6557,7 +6557,7 @@ Transform:
   m_GameObject: {fileID: 1197548990}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.846235, y: -3.2120972, z: 2.1495495}
+  m_LocalPosition: {x: -8.846233, y: -3.2120972, z: 2.1495495}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9283,8 +9283,8 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0}
     spawnPriorities: 
   damageCircleSpawnPosition: {x: 0, y: 0, z: 0}
-  damageCircleMaxScale: {x: 25, y: 200, z: 25}
-  damageCircleMinScale: {x: 5, y: 200, z: 5}
+  damageCircleMaxScale: {x: 50, y: 200, z: 50}
+  damageCircleMinScale: {x: 15, y: 200, z: 15}
   shrinkSize: 20
   mobSpawnPoints: []
   displayDefaultGizmos: 0

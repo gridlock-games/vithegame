@@ -4,12 +4,12 @@ using UnityEngine;
 using Unity.Netcode;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
+using Vi.Utility;
 
 namespace Vi.Core.DynamicEnvironmentElements
 {
     public class DamageCircle : NetworkBehaviour
     {
-        public bool canShrink = true;
         public float shrinkSpeed = 10;
         public float healthDeductionRate = 3;
 
@@ -45,6 +45,7 @@ namespace Vi.Core.DynamicEnvironmentElements
                 transform.localScale = PlayerDataManager.Singleton.GetDamageCircleMaxScale();
                 targetScale.Value = transform.localScale;
             }
+            OnShouldRenderChanged(false, shouldRender.Value);
         }
 
         public override void OnNetworkDespawn()
@@ -79,9 +80,26 @@ namespace Vi.Core.DynamicEnvironmentElements
             if (!GameModeManager.Singleton) { Debug.LogError("Damage circle should only be present when there is a game mode manager!"); return; }
             if (!IsServer) { return; }
             
-            if (canShrink) { transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale.Value, Time.deltaTime * shrinkSpeed); }
+            transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale.Value, Time.deltaTime * shrinkSpeed);
 
             if (GameModeManager.Singleton.ShouldDisplayNextGameAction() | GameModeManager.Singleton.IsGameOver()) { return; }
+
+            if (PlayerDataManager.Singleton.HasPlayerSpawnPoints())
+            {
+                if (PlayerDataManager.Singleton.GetGameItemSpawnPoints().Length == 0 | PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.TeamElimination)
+                {
+                    if (GameModeManager.Singleton.RoundDuration > 60)
+                    {
+                        if (GameModeManager.Singleton.RoundTimer <= 60)
+                        {
+                            targetScale.Value = Vector3.Lerp(PlayerDataManager.Singleton.GetDamageCircleMaxScale(),
+                                PlayerDataManager.Singleton.GetDamageCircleMinScale(),
+                                1 - StringUtility.NormalizeValue(GameModeManager.Singleton.RoundTimer, 10, 60));
+                            shouldRender.Value = true;
+                        }
+                    }
+                }
+            }
 
             Vector3 bottom = new Vector3(capsuleCollider.center.x, capsuleCollider.center.y - (capsuleCollider.height * transform.localScale.y / 2), capsuleCollider.center.z);
             Vector3 top = new Vector3(capsuleCollider.center.x, capsuleCollider.center.y + (capsuleCollider.height * transform.localScale.y / 2), capsuleCollider.center.z);
