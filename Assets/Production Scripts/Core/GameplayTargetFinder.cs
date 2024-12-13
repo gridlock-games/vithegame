@@ -12,10 +12,12 @@ namespace Vi.Core
     {
         private CombatAgent combatAgent;
         private Attributes attributes;
+        private ObjectiveHandler objectiveHandler;
         private void Awake()
         {
             combatAgent = GetComponent<CombatAgent>();
             attributes = GetComponent<Attributes>();
+            objectiveHandler = GetComponent<ObjectiveHandler>();
         }
 
         private void OnEnable()
@@ -51,6 +53,7 @@ namespace Vi.Core
 
         public bool SetDestination(MovementHandler movementHandler)
         {
+            if (objectiveHandler.Objective) { return movementHandler.SetDestination(objectiveHandler.Objective.transform.position); }
             if (targetStructure) { return movementHandler.SetDestination(targetStructure); }
             if (targetCombatAgent) { return movementHandler.SetDestination(targetCombatAgent); }
             Debug.LogError("No Target!");

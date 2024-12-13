@@ -34,6 +34,12 @@ namespace Vi.Core.GameModeManagers
             corruptionScore.OnValueChanged -= OnScoreChanged;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+            playerList = PlayerDataManager.Singleton.GetActivePlayerObjects();
+        }
+
         private List<Attributes> playerList = new List<Attributes>();
 
         private float lastWaveSpawnTime = Mathf.NegativeInfinity;
@@ -101,6 +107,13 @@ namespace Vi.Core.GameModeManagers
                     player.MovementHandler.ObjectiveHandler.SetObjective(bearer.MovementHandler.ObjectiveHandler);
                 }
             }
+            else if (TryGetViEssenceInstance(out EssenceWarViEssence essenceWarViEssenceInstance))
+            {
+                foreach (Attributes player in playerList)
+                {
+                    player.MovementHandler.ObjectiveHandler.SetObjective(essenceWarViEssenceInstance.ObjectiveHandler);
+                }
+            }
             else
             {
                 foreach (Attributes player in playerList)
@@ -129,10 +142,12 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private EssenceWarViEssence viEssencePrefab;
         public bool IsViEssenceSpawned() { return NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value); }
 
-        private EssenceWarViEssence GetViEssenceInstance()
+        private bool TryGetViEssenceInstance(out EssenceWarViEssence essenceWarViEssenceInstance)
         {
-            if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value)) { return null; }
-            return NetworkManager.SpawnManager.SpawnedObjects[viEssenceNetObjId.Value].GetComponent<EssenceWarViEssence>();
+            essenceWarViEssenceInstance = null;
+            if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(viEssenceNetObjId.Value)) { return false; }
+            essenceWarViEssenceInstance = NetworkManager.SpawnManager.SpawnedObjects[viEssenceNetObjId.Value].GetComponent<EssenceWarViEssence>();
+            return essenceWarViEssenceInstance != null;
         }
 
         private NetworkVariable<ulong> viEssenceNetObjId = new NetworkVariable<ulong>();

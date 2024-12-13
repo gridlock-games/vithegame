@@ -100,7 +100,7 @@ namespace Vi.Core.MovementHandlers
 		private NetworkVariable<Vector3> destination = new NetworkVariable<Vector3>();
 
 		private const float destinationNavMeshDistanceThreshold = 20;
-		protected bool SetDestination(Vector3 destination)
+		public bool SetDestination(Vector3 destination)
         {
 			if (!IsSpawned) { return false; }
 			if (!IsServer) { Debug.LogError("MovementHandler.SetDestination() should only be called on the server!"); return false; }
