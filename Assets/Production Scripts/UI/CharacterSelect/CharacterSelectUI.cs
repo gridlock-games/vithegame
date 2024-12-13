@@ -43,6 +43,7 @@ namespace Vi.UI
         [Header("Training Room Configuration")]
         [SerializeField] private TMP_Dropdown trainingRoomMapDropdown;
         [SerializeField] private InputField trainingRoomBotNumberDropdown;
+        [SerializeField] private Button trainingRoomSettingsButton;
 
         [Header("Stats Section")]
         [SerializeField] private GameObject statsParent;
@@ -730,6 +731,8 @@ namespace Vi.UI
             tutorialButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
             tutorialButton.onClick.AddListener(() => GoToTutorial());
 
+            trainingRoomSettingsButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
+
             HandlePlatformAPI(false);
         }
 
@@ -1062,6 +1065,7 @@ namespace Vi.UI
         public void SkipTutorial()
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", true);
+            trainingRoomSettingsButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
         }
 
         private const string connectToServerCode = "217031";
@@ -1078,6 +1082,7 @@ namespace Vi.UI
         {
             selectCharacterButton.interactable = false;
             goToTrainingRoomButton.interactable = false;
+            trainingRoomSettingsButton.interactable = false;
 
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
@@ -1108,6 +1113,7 @@ namespace Vi.UI
 
             selectCharacterButton.interactable = true;
             goToTrainingRoomButton.interactable = true;
+            trainingRoomSettingsButton.interactable = true;
         }
 
         [SerializeField] private GameObject codeInputBoxParent;
@@ -1119,6 +1125,7 @@ namespace Vi.UI
             if (autoConnectToHubServerCoroutine != null) { StopCoroutine(autoConnectToHubServerCoroutine); }
             selectCharacterButton.interactable = true;
             goToTrainingRoomButton.interactable = true;
+            trainingRoomSettingsButton.interactable = true;
         }
 
         public void OpenViDiscord()

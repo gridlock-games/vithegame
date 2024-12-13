@@ -1675,7 +1675,6 @@ GameObject:
   - component: {fileID: 203406457}
   - component: {fileID: 203406456}
   - component: {fileID: 203406455}
-  - component: {fileID: 203406459}
   m_Layer: 5
   m_Name: main_settings
   m_TagString: Untagged
@@ -1809,19 +1808,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203406453}
   m_CullTransparentMesh: 1
---- !u!114 &203406459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 203406453}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19021ba5579b8d642a00800b7f29371d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectableToCopy: {fileID: 1306957082}
 --- !u!1 &212596805
 GameObject:
   m_ObjectHideFlags: 0
@@ -2162,6 +2148,7 @@ MonoBehaviour:
   statsAndGearParent: {fileID: 1292376091}
   trainingRoomMapDropdown: {fileID: 5050779720111271409}
   trainingRoomBotNumberDropdown: {fileID: 3615452606025246591}
+  trainingRoomSettingsButton: {fileID: 203406456}
   statsParent: {fileID: 525894811}
   gearParent: {fileID: 33587557}
   primaryWeaponDisplayElement: {fileID: 178529226}
