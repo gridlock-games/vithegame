@@ -39,7 +39,7 @@ namespace Vi.UI
             RefreshStatus();
             gameModeManager = GetComponentInParent<GameModeManager>();
             OnScoreListChanged();
-            gameModeManager.SubscribeScoreListCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.onScoreListChanged += OnScoreListChanged;
             
             roundResultText.enabled = false;
 
@@ -56,7 +56,7 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            gameModeManager.UnsubscribeScoreListCallback(delegate { OnScoreListChanged(); });
+            gameModeManager.onScoreListChanged -= OnScoreListChanged;
             if (lightInstance) { Destroy(lightInstance); }
             if (MVPPreviewObject)
             {
