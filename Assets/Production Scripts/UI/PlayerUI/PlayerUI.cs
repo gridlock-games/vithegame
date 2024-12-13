@@ -746,18 +746,14 @@ namespace Vi.UI
                     float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * 5);
                     if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                     {
-                        Color newColor = lookJoystickCenter.color;
-                        newColor.a = newLookJoystickAlpha;
-                        lookJoystickCenter.color = newColor;
+                        lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
                     }
                     else
                     {
                         float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 1, Time.deltaTime * 5);
                         if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                         {
-                            Color newColor = mobileInteractableImage.color;
-                            newColor.a = newInteractableImageAlpha;
-                            mobileInteractableImage.color = newColor;
+                            mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color, newInteractableImageAlpha);
                         }
                     }
                 }
@@ -779,9 +775,7 @@ namespace Vi.UI
                     float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * 5);
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                     {
-                        Color newColor = mobileInteractableImage.color;
-                        newColor.a = newInteractableImageAlpha;
-                        mobileInteractableImage.color = newColor;
+                        mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color,  newInteractableImageAlpha);
                     }
                     else
                     {
@@ -795,9 +789,7 @@ namespace Vi.UI
                         float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * 5);
                         if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                         {
-                            Color newColor = lookJoystickCenter.color;
-                            newColor.a = newLookJoystickAlpha;
-                            lookJoystickCenter.color = newColor;
+                            lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
                         }
                     }
                 }
