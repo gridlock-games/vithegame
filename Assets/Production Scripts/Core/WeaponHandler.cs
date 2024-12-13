@@ -722,11 +722,6 @@ namespace Vi.Core
                 {
                     foreach (ActionVFX actionVFX in CurrentActionClip.actionVFXList)
                     {
-                        if (!actionVFX)
-                        {
-                            Debug.LogWarning(CurrentActionClip + " has a null vfx reference " + GetWeapon());
-                            continue;
-                        }
                         if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
                         if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
                         {

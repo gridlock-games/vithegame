@@ -1,16 +1,22 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class CopySelectableInteractability : MonoBehaviour
+namespace Vi.UI
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [RequireComponent(typeof(Selectable))]
+    public class CopySelectableInteractability : MonoBehaviour
     {
-        
-    }
+        [SerializeField] private Selectable selectableToCopy;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private Selectable selectable;
+        private void Awake()
+        {
+            selectable = GetComponent<Selectable>();
+        }
+
+        private void Update()
+        {
+            selectable.interactable = selectableToCopy.interactable;
+        }
     }
 }
