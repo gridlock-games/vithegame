@@ -16,11 +16,11 @@ MonoBehaviour:
   runSpeed: 4
   walkSpeed: 2
   blockingLocomotion: 0
-  maxHP: 200
+  maxHP: 600
   maxStamina: 100
   staminaRecoveryRate: 0
   staminaDelay: 0
-  maxSpirit: 100
+  maxSpirit: 10000
   maxRage: 100
   rageRecoveryRate: 0
   shouldUseAmmo: 0
@@ -171,15 +171,19 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0.165, y: -0.128, z: 0.026}
       weaponRotationOffset: {x: -13.313, y: 10.931, z: 50.014}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 6b851d42d3f9d81448a9cde827150975,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: -0.18, y: 0.09, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
   hitReactions:
   - hitLocation: 1
     reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
@@ -266,3 +270,4 @@ MonoBehaviour:
     type: 2}
   animationClipLookupKeys: []
   animationClipLookupValues: []
+  animationRootMotion: []
