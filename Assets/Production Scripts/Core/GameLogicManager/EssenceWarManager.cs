@@ -211,6 +211,7 @@ namespace Vi.Core.GameModeManagers
             {
                 Debug.LogWarning("Unsure how to handle team on bearer reached totem " + team);
             }
+            RemoveBearer();
         }
 
         public override void OnEnvironmentKill(CombatAgent victim)
