@@ -9,6 +9,12 @@ namespace Vi.Utility
 {
     public static class StringUtility
     {
+        public static Color SetColorAlpha(Color baseColor, float newAlpha)
+        {
+            baseColor.a = newAlpha;
+            return baseColor;
+        }
+
         public static T Random<T>(this List<T> enumerable)
         {
             if (enumerable == null)

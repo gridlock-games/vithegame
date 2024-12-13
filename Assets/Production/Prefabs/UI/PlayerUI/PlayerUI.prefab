@@ -4766,7 +4766,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7953296521880205653}
+  m_Father: {fileID: 7393267018165496682}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5680,8 +5680,6 @@ MonoBehaviour:
   - {fileID: 8628567555629815188}
   tooltipImage: {fileID: 1791957974577106012}
   crosshairImage: {fileID: 9064558124592042958}
-  objectiveImage: {fileID: 0}
-  objectiveRotationOffset: {x: 0, y: 0, z: 0}
   primaryWeaponCard: {fileID: 2370067492133711801}
   secondaryWeaponCard: {fileID: 7449748357968769679}
   mobileWeaponCard: {fileID: 7584112050504107559}
@@ -5734,6 +5732,11 @@ MonoBehaviour:
   deathUIChildCanvases:
   - {fileID: 2224668510273317115}
   - {fileID: 5694451687495376449}
+  canvasGroupsThatAffectOpacity:
+  - {fileID: 2182201049159181946}
+  - {fileID: 4230892195352561817}
+  - {fileID: 8543568069670782451}
+  - {fileID: 2593380636702484948}
 --- !u!114 &5666987421114583128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12167,6 +12170,7 @@ RectTransform:
   m_Children:
   - {fileID: 3508811814141181717}
   - {fileID: 8590392794831888931}
+  - {fileID: 8982813702784243409}
   m_Father: {fileID: 7953296521880205653}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -12283,7 +12287,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6834273739332174182}
-  - {fileID: 8982813702784243409}
   - {fileID: 7393267018165496682}
   - {fileID: 8369445866491870090}
   - {fileID: 3188238356601168215}
@@ -14992,7 +14995,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 48.426575
+      value: 49
       objectReference: {fileID: 0}
     - target: {fileID: 6117385750501809473, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
@@ -17612,7 +17615,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 48.426575
+      value: 49
       objectReference: {fileID: 0}
     - target: {fileID: 6117385750501809473, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}

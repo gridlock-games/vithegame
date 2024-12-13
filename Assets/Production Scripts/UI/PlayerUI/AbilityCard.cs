@@ -25,15 +25,42 @@ namespace Vi.UI
         public void SetActive(bool isActive)
         {
             if (!canvas) { canvas = GetComponent<Canvas>(); }
+            if (canvas.enabled == isActive) { return; }
             canvas.enabled = isActive;
         }
 
+        private float lastOpacityEvaluated = 1;
+        private float lastOpacityEvaluatedSmoothened = 1;
+        public void CrossFadeOpacity(float alpha)
+        {
+            if (Mathf.Approximately(lastOpacityEvaluatedSmoothened, alpha)) { return; }
+            lastOpacityEvaluatedSmoothened = Mathf.MoveTowards(lastOpacityEvaluatedSmoothened, alpha, Time.deltaTime * 5);
+            foreach (Graphic graphic in graphics)
+            {
+                if (graphic == upgradeIcon)
+                {
+                    if (Mathf.Approximately(lastOpacityEvaluatedSmoothened, alpha) | alpha < 1)
+                    {
+                        graphic.color = StringUtility.SetColorAlpha(graphic.color, alpha);
+                    }
+                }
+                else
+                {
+                    graphic.color = StringUtility.SetColorAlpha(graphic.color, Mathf.MoveTowards(graphic.color.a, alpha, Time.deltaTime * 5));
+                }
+            }
+            lastOpacityEvaluated = alpha;
+        }
+
         private Canvas canvas;
+        private Graphic[] graphics;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
             borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
+
+            graphics = GetComponentsInChildren<Graphic>();
         }
 
         public void SetPreviewOn()
@@ -96,8 +123,8 @@ namespace Vi.UI
             {
                 if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
                 {
-                    borderImage.color = originalBorderImageColor;
-                    staminaCostText.color = originalStaminaCostColor;
+                    borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
+                    staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
                     cooldownText.text = "";
                     abilityIcon.fillAmount = 1;
                     return;
@@ -110,13 +137,13 @@ namespace Vi.UI
 
             if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
             {
-                borderImage.color = Color.red;
-                staminaCostText.color = Color.red;
+                borderImage.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                staminaCostText.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
             }
             else
             {
-                borderImage.color = originalBorderImageColor;
-                staminaCostText.color = originalStaminaCostColor;
+                borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
+                staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
             }
 
             int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);

@@ -328,9 +328,6 @@ namespace Vi.UI
 
         private Vector3 originalCrosshairScale;
 
-        private Color originalMobileInteractableButtonColor;
-        private Color originalLookJoystickCenterColor;
-
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
@@ -356,10 +353,6 @@ namespace Vi.UI
 
             originalCrosshairScale = crosshairImage.transform.localScale;
 
-            originalLookJoystickCenterColor = lookJoystickCenter.color;
-            originalMobileInteractableButtonColor = mobileInteractableImage.color;
-
-            canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
             RefreshStatus();
 
             textChatParentCanvas.enabled = false;
@@ -379,7 +372,7 @@ namespace Vi.UI
         private Vector2 stowedWeaponCardTargetAnchoredPosition;
 
         private Vector2 moveJoystickOriginalAnchoredPosition;
-        private CanvasGroup[] canvasGroups;
+        [SerializeField] private CanvasGroup[] canvasGroupsThatAffectOpacity;
 
         private bool canFadeIn;
         private void Start()
@@ -419,7 +412,7 @@ namespace Vi.UI
 
         private void RefreshStatus()
         {
-            foreach (CanvasGroup canvasGroup in canvasGroups)
+            foreach (CanvasGroup canvasGroup in canvasGroupsThatAffectOpacity)
             {
                 canvasGroup.alpha = FasterPlayerPrefs.Singleton.GetFloat("UIOpacity");
             }
@@ -664,9 +657,7 @@ namespace Vi.UI
                 canFadeIn = true;
             }
 
-            mobileInteractableImage.raycastTarget = false;
-            mobileInteractableImage.color = Color.clear;
-            tooltipImage.color = Color.clear;
+            lastNumDodgesEvaluated = -1;
         }
 
         public void ScrollToBottomOfTextChat()
@@ -730,6 +721,7 @@ namespace Vi.UI
         List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
+        private int lastNumDodgesEvaluated = -1;
         private void Update()
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
@@ -743,26 +735,71 @@ namespace Vi.UI
             {
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
-                    mobileInteractableImage.raycastTarget = true;
-                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, originalMobileInteractableButtonColor, Time.deltaTime * 5);
-                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, Color.clear, Time.deltaTime * 5);
+                    if (!mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = true; }
+
+                    ability1.CrossFadeOpacity(0);
+                    ability2.CrossFadeOpacity(0);
+                    ability3.CrossFadeOpacity(0);
+                    ability4.CrossFadeOpacity(0);
+                    healthPotionCard.CrossFadeOpacity(0);
+                    staminaPotionCard.CrossFadeOpacity(0);
+                    float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * 5);
+                    if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
+                    {
+                        lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
+                    }
+                    else
+                    {
+                        float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 1, Time.deltaTime * 5);
+                        if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
+                        {
+                            mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color, newInteractableImageAlpha);
+                        }
+                    }
                 }
                 else
                 {
-                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                    Color target = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                    if (tooltipImage.color != target)
+                    {
+                        tooltipImage.color = target;
+                    }
                 }
             }
             else
             {
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
-                    mobileInteractableImage.raycastTarget = false;
-                    mobileInteractableImage.color = Vector4.MoveTowards(mobileInteractableImage.color, Color.clear, Time.deltaTime * 5);
-                    lookJoystickCenter.color = Vector4.MoveTowards(lookJoystickCenter.color, originalLookJoystickCenterColor, Time.deltaTime * 5);
+                    if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
+
+                    float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * 5);
+                    if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
+                    {
+                        mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color,  newInteractableImageAlpha);
+                    }
+                    else
+                    {
+                        ability1.CrossFadeOpacity(1);
+                        ability2.CrossFadeOpacity(1);
+                        ability3.CrossFadeOpacity(1);
+                        ability4.CrossFadeOpacity(1);
+                        healthPotionCard.CrossFadeOpacity(1);
+                        staminaPotionCard.CrossFadeOpacity(1);
+
+                        float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * 5);
+                        if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
+                        {
+                            lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
+                        }
+                    }
                 }
                 else
                 {
-                    tooltipImage.color = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * 5);
+                    Color target = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * 5);
+                    if (tooltipImage.color != target)
+                    {
+                        tooltipImage.color = target;
+                    }
                 }
             }
 
@@ -770,7 +807,10 @@ namespace Vi.UI
             {
                 Color newColor = dodgeCooldownImage.color;
                 newColor.a = 0.15f;
-                dodgeCooldownImage.color = newColor;
+                if (dodgeCooldownImage.color != newColor)
+                {
+                    dodgeCooldownImage.color = newColor;
+                }
             }
             else if (attributes.WeaponHandler.GetWeapon().IsDodgeOnCooldown())
             {
@@ -783,15 +823,22 @@ namespace Vi.UI
             {
                 Color newColor = dodgeCooldownImage.color;
                 newColor.a = 1;
-                dodgeCooldownImage.color = newColor;
+                if (dodgeCooldownImage.color != newColor)
+                {
+                    dodgeCooldownImage.color = newColor;
+                }
             }
 
             int numOfDodges = attributes.WeaponHandler.GetWeapon().GetNumberOfDodgesOffCooldown();
-            dodgeStackText.text = numOfDodges.ToString();
-            if (numOfDodges > 0)
+            if (numOfDodges != lastNumDodgesEvaluated)
             {
-                dodgeStackText.text += "x";
+                dodgeStackText.text = numOfDodges.ToString();
+                if (numOfDodges > 0)
+                {
+                    dodgeStackText.text += "x";
+                }
             }
+            lastNumDodgesEvaluated = numOfDodges;
 
             if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {

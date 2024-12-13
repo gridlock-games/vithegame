@@ -4,6 +4,7 @@ using UnityEngine;
 using Vi.Core;
 using Vi.Player;
 using System.IO;
+using UnityEngine.Video;
 
 namespace Vi.UI
 {
@@ -12,6 +13,7 @@ namespace Vi.UI
         [SerializeField] private GameObject worldSpaceLabel;
         [SerializeField] private HubServerBrowser UI;
         [SerializeField] private GameObject gameModePreviewUI;
+        [SerializeField] private VideoPlayer videoPlayer;
 
         private GameObject invoker;
 
@@ -20,11 +22,13 @@ namespace Vi.UI
             this.invoker = invoker;
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
             gameModePreviewUI.gameObject.SetActive(true);
+            videoPlayer.Play();
         }
 
         public void ShowServerBrowser()
         {
             gameModePreviewUI.gameObject.SetActive(false);
+            videoPlayer.Pause();
             UI.gameObject.SetActive(true);
         }
 
@@ -39,6 +43,7 @@ namespace Vi.UI
             invoker = null;
             UI.gameObject.SetActive(false);
             gameModePreviewUI.gameObject.SetActive(false);
+            videoPlayer.Stop();
         }
 
         private bool localPlayerInRange;
@@ -88,6 +93,8 @@ namespace Vi.UI
             networkTransport = NetworkManager.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
             currentLobbyCount = LobbyServers.Length;
+
+            videoPlayer.Prepare();
         }
 
         private WebRequestManager.Server[] LobbyServers { get { return System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address); } }

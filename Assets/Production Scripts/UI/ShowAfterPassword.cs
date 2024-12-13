@@ -15,6 +15,11 @@ namespace Vi.UI
             objectToConstrain.SetActive(false);
             passwordSectionParent.SetActive(true);
             passwordInput.text = "";
+
+            if (Application.isEditor)
+            {
+                passwordInput.text = password;
+            }
         }
 
         private void OnDisable()

@@ -972,6 +972,7 @@ namespace Vi.Player
                                     bool isTouchingJoystick = false;
                                     foreach (UIDeadZoneElement joystick in joysticks)
                                     {
+                                        if (!joystick.IsDeadZone) { continue; }
                                         if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition, joystick.RootCanvas.worldCamera))
                                         {
                                             isTouchingJoystick = true;

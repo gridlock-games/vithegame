@@ -85,6 +85,7 @@ namespace Vi.UI
                     limitsImage.enabled = false;
                     stickImage.transform.SetParent(limits, true);
                     stickImage.rectTransform.anchoredPosition = Vector2.zero;
+                    IsDeadZone = false;
                 }
                 else
                 {
@@ -93,6 +94,7 @@ namespace Vi.UI
                     limitsImage.enabled = true;
                     stickImage.transform.SetParent(limits.parent, true);
                     stickImage.rectTransform.anchoredPosition = Vector2.zero;
+                    IsDeadZone = true;
                 }
             }
         }
