@@ -113,6 +113,9 @@ namespace Vi.Core.DynamicEnvironmentElements
 
             foreach (CombatAgent attributes in PlayerDataManager.Singleton.GetActiveCombatAgents())
             {
+                // Don't apply damage to players within 10 seconds of becoming alive to give them a chance to get inside the circle
+                if (Time.time - attributes.LastAliveStartTime < 10) { continue; }
+
                 if (!attributesInside.Contains(attributes)) { attributes.ProcessEnvironmentDamage(Time.deltaTime * -healthDeductionRate, NetworkObject); }
             }
         }

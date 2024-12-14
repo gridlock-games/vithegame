@@ -230,6 +230,8 @@ namespace Vi.Core
             spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
 
+            LastAliveStartTime = Time.time;
+
             if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
@@ -914,8 +916,10 @@ namespace Vi.Core
             Explode
         }
 
+        public float LastAliveStartTime { get; private set; }
         protected virtual void OnAlive()
         {
+            LastAliveStartTime = Time.time;
             switch (deathBehavior)
             {
                 case DeathBehavior.Ragdoll:
