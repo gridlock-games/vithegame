@@ -17,6 +17,16 @@ namespace Vi.Core.VFX.Staff
 
         private void OnTriggerEnter(Collider other)
         {
+            ProcessTriggerEvent(other);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            ProcessTriggerEvent(other);
+        }
+
+        private void ProcessTriggerEvent(Collider other)
+        {
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
 
