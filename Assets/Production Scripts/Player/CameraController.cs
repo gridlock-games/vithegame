@@ -269,13 +269,33 @@ namespace Vi.Player
 
                     // Move camera if there is a wall in the way
                     if (Application.isEditor) { Debug.DrawRay(cameraInterp.transform.position, cameraInterp.transform.forward * currentPositionOffset.z, Color.blue, Time.deltaTime); }
-                    if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z, LayerMask.GetMask(MovementHandler.layersToAccountForInMovement), QueryTriggerInteraction.Ignore))
+                    if (Physics.Raycast(cameraInterp.transform.position, cameraInterp.transform.forward, out RaycastHit hit, currentPositionOffset.z,
+                        LayerMask.GetMask(layersToAccountForInCameraCollision), QueryTriggerInteraction.Ignore))
                     {
-                        transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                        bool canEvaluate = true;
+                        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("NetworkPrediction"))
+                        {
+                            if (hit.transform.root.GetComponent<NetworkCollider>())
+                            {
+                                canEvaluate = false;
+                            }
+                        }
+
+                        if (canEvaluate)
+                        {
+                            transform.position = cameraInterp.transform.position + cameraInterp.transform.rotation * new Vector3(0, 0, hit.distance + collisionPositionOffset);
+                        }
                     }
                 }
             }
         }
+
+        private static readonly string[] layersToAccountForInCameraCollision = new string[]
+        {
+            "Default",
+            "NetworkPrediction",
+            "ProjectileCollider"
+        };
 
         private void LateUpdate()
         {
