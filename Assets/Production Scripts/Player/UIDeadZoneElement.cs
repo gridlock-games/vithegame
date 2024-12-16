@@ -11,7 +11,5 @@ namespace Vi.Player
         {
             RootCanvas = GetComponentInParent<Canvas>().rootCanvas;
         }
-
-        public bool IsDeadZone { get; protected set; } = true;
     }
 }

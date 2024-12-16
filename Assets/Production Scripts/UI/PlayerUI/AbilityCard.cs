@@ -34,7 +34,7 @@ namespace Vi.UI
         public void CrossFadeOpacity(float alpha)
         {
             if (Mathf.Approximately(lastOpacityEvaluatedSmoothened, alpha)) { return; }
-            lastOpacityEvaluatedSmoothened = Mathf.MoveTowards(lastOpacityEvaluatedSmoothened, alpha, Time.deltaTime * 5);
+            lastOpacityEvaluatedSmoothened = Mathf.MoveTowards(lastOpacityEvaluatedSmoothened, alpha, Time.deltaTime * PlayerUI.alphaTransitionSpeed);
             foreach (Graphic graphic in graphics)
             {
                 if (graphic == upgradeIcon)

@@ -959,7 +959,7 @@ namespace Vi.Player
                                 {
                                     if (UnityEngine.InputSystem.Gyroscope.current.enabled)
                                     {
-                                        Vector3 gyroVelocity = UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
+                                        Vector3 gyroVelocity = -UnityEngine.InputSystem.Gyroscope.current.angularVelocity.value;
                                         gyroVelocity *= gyroscopicRotationSensitivity;
                                         lookInputToAdd += new Vector2(gyroVelocity.y, gyroVelocity.x);
                                     }
@@ -972,7 +972,6 @@ namespace Vi.Player
                                     bool isTouchingJoystick = false;
                                     foreach (UIDeadZoneElement joystick in joysticks)
                                     {
-                                        if (!joystick.IsDeadZone) { continue; }
                                         if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)joystick.transform.parent, touch.startScreenPosition, joystick.RootCanvas.worldCamera))
                                         {
                                             isTouchingJoystick = true;

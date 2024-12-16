@@ -82,19 +82,15 @@ namespace Vi.UI
                 {
                     stickImage.raycastTarget = true;
                     limitsImage.raycastTarget = false;
-                    limitsImage.enabled = false;
                     stickImage.transform.SetParent(limits, true);
                     stickImage.rectTransform.anchoredPosition = Vector2.zero;
-                    IsDeadZone = false;
                 }
                 else
                 {
                     stickImage.raycastTarget = false;
                     limitsImage.raycastTarget = true;
-                    limitsImage.enabled = true;
                     stickImage.transform.SetParent(limits.parent, true);
                     stickImage.rectTransform.anchoredPosition = Vector2.zero;
-                    IsDeadZone = true;
                 }
             }
         }
