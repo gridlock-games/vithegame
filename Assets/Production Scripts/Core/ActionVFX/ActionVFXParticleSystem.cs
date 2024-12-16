@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Vi.Core.MovementHandlers;
 using Vi.Core.Weapons;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.VFX
 {
@@ -25,6 +26,9 @@ namespace Vi.Core.VFX
         [SerializeField] private bool scaleVFXBasedOnEdges;
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
+        [Header("These use attached trigger colliders")]
+        [SerializeField] private ActionClip.StatusPayload[] enemyStatuses = new ActionClip.StatusPayload[0];
+        [SerializeField] private ActionClip.StatusPayload[] friendlyStatuses = new ActionClip.StatusPayload[0];
 
         private new void Awake()
         {
