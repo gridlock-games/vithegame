@@ -19,7 +19,6 @@ namespace Vi.UI
             {
                 List<Material> materials = new List<Material>();
                 renderers[i].GetMaterials(materials);
-                materials = materials.FindAll(item => item.HasProperty(_Glow));
                 rendererMaterialCache.Add(i, materials);
             }
 
@@ -32,7 +31,6 @@ namespace Vi.UI
             combatAgent = GetComponentInParent<CombatAgent>();
         }
 
-        private readonly int _Glow = Shader.PropertyToID("_Glow");
         private readonly int _Transparency = Shader.PropertyToID("_Transparency");
 
         Dictionary<int, List<Material>> rendererMaterialCache = new Dictionary<int, List<Material>>();
@@ -55,7 +53,8 @@ namespace Vi.UI
                         mat.color = Color.black;
                         mat.SetFloat(_Transparency, 0);
                     }
-                    //mat.SetFloat(_Glow, glowAmount);
+                    //mat.color = combatAgent.IsLocalPlayer ? PlayerDataManager.Singleton.LocalPlayerColor : PlayerDataManager.Singleton.GetRelativeTeamColor(combatAgent.GetTeam());
+                    //mat.SetFloat(_Transparency, 1);
                 }
                 renderers[i].enabled = combatAgent.GetAilment() != ScriptableObjects.ActionClip.Ailment.Death;
             }
