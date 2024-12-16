@@ -52,6 +52,7 @@ namespace Vi.Core.CombatAgents
             comboCounter.OnValueChanged += OnComboCounterChange;
 
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
+            teamIndicatorInstance.transform.localPosition = new Vector3(0, 0.01f, 0);
         }
 
         public void UpdateNetworkVisiblity()

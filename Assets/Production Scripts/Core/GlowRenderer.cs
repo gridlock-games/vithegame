@@ -81,7 +81,7 @@ namespace Vi.Core
         public void RegisterRenderer(Renderer renderer)
         {
             if (glowMaterialInstances.ContainsKey(renderer)) { return; }
-            //if (renderer.GetComponent<MagicaCloth>()) { return; }
+            if (renderer.GetComponent<MagicaCloth>()) { return; }
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj.IsSpawned) { return; }
