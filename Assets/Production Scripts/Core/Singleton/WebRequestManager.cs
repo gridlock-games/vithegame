@@ -128,22 +128,28 @@ namespace Vi.Core
             }
             else // Not the server
             {
-                if (!FasterPlayerPrefs.Singleton.GetBool("AllowLocalhostServers"))
+                if (FasterPlayerPrefs.Singleton.GetBool("AllowLocalhostServers"))
+                {
+                    if (servers.Count(item => item.ip == "127.0.0.1") > 0)
+                    {
+                        servers.RemoveAll(item => item.ip != "127.0.0.1");
+                    }
+                }
+                else
                 {
                     servers.RemoveAll(item => item.ip == "127.0.0.1");
                 }
-                else
-                {
-                    servers.RemoveAll(item => item.ip != "127.0.0.1");
-                }
 
-                if (!FasterPlayerPrefs.Singleton.GetBool("AllowLANServers"))
+                if (FasterPlayerPrefs.Singleton.GetBool("AllowLANServers"))
+                {
+                    if (servers.Count(item => item.ip.StartsWith("192.168.")) > 0)
+                    {
+                        servers.RemoveAll(item => !item.ip.StartsWith("192.168."));
+                    }
+                }
+                else
                 {
                     servers.RemoveAll(item => item.ip.StartsWith("192.168."));
-                }
-                else
-                {
-                    servers.RemoveAll(item => !item.ip.StartsWith("192.168."));
                 }
 
                 HubServers = servers.FindAll(item => item.type == 0).ToArray();
