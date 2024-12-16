@@ -718,6 +718,8 @@ namespace Vi.UI
             }
         }
 
+        public const float alphaTransitionSpeed = 5;
+
         List<Attributes> teammateAttributes = new List<Attributes>();
         private string lastControlScheme;
         private int moveTouchId;
@@ -743,14 +745,14 @@ namespace Vi.UI
                     ability4.CrossFadeOpacity(0);
                     healthPotionCard.CrossFadeOpacity(0);
                     staminaPotionCard.CrossFadeOpacity(0);
-                    float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * 5);
+                    float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                     {
                         lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
                     }
                     else
                     {
-                        float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 1, Time.deltaTime * 5);
+                        float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
                         if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                         {
                             mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color, newInteractableImageAlpha);
@@ -759,7 +761,7 @@ namespace Vi.UI
                 }
                 else
                 {
-                    Color target = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * 5);
+                    Color target = Vector4.MoveTowards(tooltipImage.color, new Color(1, 1, 1, 0.65f), Time.deltaTime * alphaTransitionSpeed);
                     if (tooltipImage.color != target)
                     {
                         tooltipImage.color = target;
@@ -772,7 +774,7 @@ namespace Vi.UI
                 {
                     if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
 
-                    float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * 5);
+                    float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                     {
                         mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color,  newInteractableImageAlpha);
@@ -786,7 +788,7 @@ namespace Vi.UI
                         healthPotionCard.CrossFadeOpacity(1);
                         staminaPotionCard.CrossFadeOpacity(1);
 
-                        float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * 5);
+                        float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
                         if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                         {
                             lookJoystickCenter.color = StringUtility.SetColorAlpha(lookJoystickCenter.color, newLookJoystickAlpha);
@@ -795,7 +797,7 @@ namespace Vi.UI
                 }
                 else
                 {
-                    Color target = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * 5);
+                    Color target = Vector4.MoveTowards(tooltipImage.color, Color.clear, Time.deltaTime * alphaTransitionSpeed);
                     if (tooltipImage.color != target)
                     {
                         tooltipImage.color = target;

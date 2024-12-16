@@ -66,7 +66,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasFloat("CrosshairSize")) { FasterPlayerPrefs.Singleton.SetFloat("CrosshairSize", 1); }
             if (!FasterPlayerPrefs.Singleton.HasInt("CrosshairStyle")) { FasterPlayerPrefs.Singleton.SetInt("CrosshairStyle", 26); }
 
-            if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 0); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("GyroscopicRotationSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("GyroscopicRotationSensitivity", 1); }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("MobileLookJoystickActsLikeButton")) { FasterPlayerPrefs.Singleton.SetBool("MobileLookJoystickActsLikeButton", false); }
 
