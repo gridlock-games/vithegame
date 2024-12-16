@@ -4611,13 +4611,17 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
-  animationSpeed: 2
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
+  animationSpeed: 1
   recoveryAnimationSpeed: 2
-  agentStaminaCost: 15
+  agentStaminaCost: 20
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -4628,8 +4632,9 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
-  attackingNormalizedTime: 0.45
-  recoveryNormalizedTime: 1
+  chargeAttackChargingVFX: {fileID: 0}
+  attackingNormalizedTime: 0.05
+  recoveryNormalizedTime: 0.1
   isAffectedByRage: 1
   damage: 2
   healAmount: 0
@@ -4646,17 +4651,55 @@ MonoBehaviour:
   isFollowUpAttack: 0
   ailment: 0
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 
   dodgeLock: 1
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
   canCancelAbilities: 1
-  canBeCancelledByLightAttacks: 0
-  canBeCancelledByHeavyAttacks: 0
-  canBeCancelledByAbilities: 0
+  canBeCancelledByLightAttacks: 1
+  canBeCancelledByHeavyAttacks: 1
+  canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 10dc53326b2f7fd4bab2c0c3b94f3bdc, type: 3}
-  abilityCooldownTime: 10
+  abilityCooldownTime: 15
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
@@ -4675,15 +4718,16 @@ MonoBehaviour:
   - {fileID: 4391706194936514060, guid: b74cebbdbf7bd0443b39799b5da6da6b, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,
     type: 3}
-  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 5}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
-  previewActionVFXScale: {x: 0.8, y: 0.8, z: 0.8}
+  previewActionVFXScale: {x: 0.5, y: 0.5, z: 0.5}
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 60
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
