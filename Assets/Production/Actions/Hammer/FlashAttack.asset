@@ -22,7 +22,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -31,7 +31,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.043577984
-      value: 1
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -40,7 +40,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.08715597
-      value: 1
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -49,16 +49,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.14840558
-      value: 1.8392639
-      inSlope: 5.099017
-      outSlope: 5.099017
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.34976205
-    - serializedVersion: 3
-      time: 0.24456829
-      value: 1.9844933
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -66,8 +57,8 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.4678899
-      value: 1
+      time: 0.2480126
+      value: 0.9976416
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -75,8 +66,8 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.54816514
-      value: 1
+      time: 0.4942963
+      value: 0.9976416
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -84,8 +75,17 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.5894496
-      value: 1
+      time: 0.55160946
+      value: 0.9976416
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.5928939
+      value: 0.9976416
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -94,7 +94,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.69266057
-      value: 1
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -103,7 +103,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.7454129
-      value: 1
+      value: 1.5
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -112,7 +112,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.8050459
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -121,7 +121,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.8417431
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -130,7 +130,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.9197248
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -139,7 +139,7 @@ MonoBehaviour:
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 136
@@ -9348,21 +9348,22 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.1
   recoveryNormalizedTime: 0.5
   isAffectedByRage: 1
-  damage: 1
+  damage: 3
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
   staminaPenaltyOnMiss: 0
   ragePenaltyOnMiss: 0
-  maxHitLimit: 2
-  timeBetweenHits: 0.1
+  maxHitLimit: 3
+  timeBetweenHits: 0.25
   isBlockable: 1
   isUninterruptable: 0
   isInvincible: 0
-  canFlashAttack: 1
+  canFlashAttack: 0
   isFollowUpAttack: 0
   ailment: 0
   grabAttackClip: {fileID: 0}
