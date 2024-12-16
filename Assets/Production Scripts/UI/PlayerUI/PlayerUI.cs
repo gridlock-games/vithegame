@@ -72,6 +72,7 @@ namespace Vi.UI
         [SerializeField] private PotionCard staminaPotionCard;
         [SerializeField] private Image dodgeButton;
         [SerializeField] private Text dodgeStackText;
+        [SerializeField] private Image dodgeBackgroundTextImage;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
         [SerializeField] private StatusIcon statusImagePrefab;
@@ -738,6 +739,7 @@ namespace Vi.UI
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     if (!mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = true; }
+                    if (blockingButton.raycastTarget) { blockingButton.raycastTarget = false; }
 
                     ability1.CrossFadeOpacity(0);
                     ability2.CrossFadeOpacity(0);
@@ -781,6 +783,7 @@ namespace Vi.UI
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
+                    if (!blockingButton.raycastTarget) { blockingButton.raycastTarget = true; }
 
                     float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
@@ -868,6 +871,7 @@ namespace Vi.UI
                 if (!Mathf.Approximately(dodgeStackText.color.a, newAlpha))
                 {
                     dodgeStackText.color = StringUtility.SetColorAlpha(dodgeStackText.color, newAlpha);
+                    dodgeBackgroundTextImage.color = StringUtility.SetColorAlpha(dodgeBackgroundTextImage.color, newAlpha);
                 }
             }
             else
@@ -876,6 +880,7 @@ namespace Vi.UI
                 if (!Mathf.Approximately(dodgeStackText.color.a, newAlpha))
                 {
                     dodgeStackText.color = StringUtility.SetColorAlpha(dodgeStackText.color, newAlpha);
+                    dodgeBackgroundTextImage.color = StringUtility.SetColorAlpha(dodgeBackgroundTextImage.color, newAlpha);
                 }
             }
 

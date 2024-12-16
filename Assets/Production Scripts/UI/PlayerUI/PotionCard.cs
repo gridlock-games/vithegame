@@ -42,6 +42,8 @@ namespace Vi.UI
             {
                 graphic.color = StringUtility.SetColorAlpha(graphic.color, Mathf.MoveTowards(graphic.color.a, alpha, Time.deltaTime * 5));
             }
+
+            button.interactable = !Mathf.Approximately(alpha, 0);
         }
 
         private Canvas canvas;
@@ -49,13 +51,15 @@ namespace Vi.UI
         private CombatAgent combatAgent;
 
         private Graphic[] graphics;
+        private Button button;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
             borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
 
-            GetComponent<Button>().onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
+            button = GetComponent<Button>();
+            button.onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
 
             graphics = GetComponentsInChildren<Graphic>();
         }
