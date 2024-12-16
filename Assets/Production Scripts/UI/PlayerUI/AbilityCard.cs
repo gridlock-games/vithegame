@@ -50,8 +50,11 @@ namespace Vi.UI
                 }
             }
             lastOpacityEvaluated = alpha;
+
+            button.interactable = !Mathf.Approximately(alpha, 0);
         }
 
+        private Button button;
         private Canvas canvas;
         private Graphic[] graphics;
         private void Awake()
@@ -61,6 +64,8 @@ namespace Vi.UI
             combatAgent = GetComponentInParent<CombatAgent>();
 
             graphics = GetComponentsInChildren<Graphic>();
+
+            button = GetComponent<Button>();
         }
 
         public void SetPreviewOn()
