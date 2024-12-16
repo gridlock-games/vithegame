@@ -22,9 +22,9 @@ namespace Vi.UI
 
         public Image GetHeavyAttackButton() { return heavyAttackButton; }
 
-        public RectTransform GetBlockingButton() { return blockingButton; }
+        public RectTransform GetBlockingButton() { return blockingButton.rectTransform; }
 
-        public RectTransform GetDodgeButton() { return dodgeButton; }
+        public RectTransform GetDodgeButton() { return dodgeButton.rectTransform; }
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
 
@@ -70,8 +70,7 @@ namespace Vi.UI
         [SerializeField] private AbilityCard ability4;
         [SerializeField] private PotionCard healthPotionCard;
         [SerializeField] private PotionCard staminaPotionCard;
-        [SerializeField] private RectTransform dodgeButton;
-        [SerializeField] private Image dodgeCooldownImage;
+        [SerializeField] private Image dodgeButton;
         [SerializeField] private Text dodgeStackText;
         [Header("Status UI")]
         [SerializeField] private Transform statusImageParent;
@@ -93,7 +92,7 @@ namespace Vi.UI
         [SerializeField] private Image heavyAttackButton;
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
-        [SerializeField] private RectTransform blockingButton;
+        [SerializeField] private Image blockingButton;
         [SerializeField] private Image lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
@@ -733,6 +732,7 @@ namespace Vi.UI
 
             scoreboardButton.gameObject.SetActive(GameModeManager.Singleton);
 
+            bool overrideDodgeColor = false;
             if (playerMovementHandler.TryGetNetworkInteractableInRange(out NetworkInteractable networkInteractable))
             {
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
@@ -745,6 +745,14 @@ namespace Vi.UI
                     ability4.CrossFadeOpacity(0);
                     healthPotionCard.CrossFadeOpacity(0);
                     staminaPotionCard.CrossFadeOpacity(0);
+                    overrideDodgeColor = true;
+
+                    float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
+                    if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
+                    {
+                        blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
+                    }
+                    
                     float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                     {
@@ -773,6 +781,12 @@ namespace Vi.UI
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
+
+                    float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
+                    if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
+                    {
+                        blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
+                    }
 
                     float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
@@ -805,29 +819,35 @@ namespace Vi.UI
                 }
             }
 
-            if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
+            if (overrideDodgeColor)
             {
-                Color newColor = dodgeCooldownImage.color;
-                newColor.a = 0.15f;
-                if (dodgeCooldownImage.color != newColor)
+                float newAlpha = Mathf.MoveTowards(0.15f, 0, Time.deltaTime * alphaTransitionSpeed);
+                if (!Mathf.Approximately(dodgeButton.color.a, newAlpha))
                 {
-                    dodgeCooldownImage.color = newColor;
+                    dodgeButton.color = StringUtility.SetColorAlpha(dodgeButton.color, newAlpha);
+                }
+            }
+            else if (!attributes.AnimationHandler.AreActionClipRequirementsMet(attributes.WeaponHandler.GetWeapon().GetDodgeClip(0)))
+            {
+                if (!Mathf.Approximately(dodgeButton.color.a, 0.15f))
+                {
+                    dodgeButton.color = StringUtility.SetColorAlpha(dodgeButton.color, 0.15f);
                 }
             }
             else if (attributes.WeaponHandler.GetWeapon().IsDodgeOnCooldown())
             {
                 float dodgeCooldownProgress = attributes.WeaponHandler.GetWeapon().GetDodgeCooldownProgress();
-                Color newColor = dodgeCooldownImage.color;
-                newColor.a = Mathf.Lerp(0.15f, 1, dodgeCooldownProgress);
-                dodgeCooldownImage.color = newColor;
+                float newAlpha = Mathf.Lerp(0.15f, 1, dodgeCooldownProgress);
+                if (!Mathf.Approximately(dodgeButton.color.a, newAlpha))
+                {
+                    dodgeButton.color = StringUtility.SetColorAlpha(dodgeButton.color, newAlpha);
+                }
             }
             else
             {
-                Color newColor = dodgeCooldownImage.color;
-                newColor.a = 1;
-                if (dodgeCooldownImage.color != newColor)
+                if (!Mathf.Approximately(dodgeButton.color.a, 1))
                 {
-                    dodgeCooldownImage.color = newColor;
+                    dodgeButton.color = StringUtility.SetColorAlpha(dodgeButton.color, 1);
                 }
             }
 
