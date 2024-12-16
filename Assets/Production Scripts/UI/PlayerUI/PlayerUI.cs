@@ -821,7 +821,7 @@ namespace Vi.UI
 
             if (overrideDodgeColor)
             {
-                float newAlpha = Mathf.MoveTowards(0.15f, 0, Time.deltaTime * alphaTransitionSpeed);
+                float newAlpha = Mathf.MoveTowards(dodgeButton.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                 if (!Mathf.Approximately(dodgeButton.color.a, newAlpha))
                 {
                     dodgeButton.color = StringUtility.SetColorAlpha(dodgeButton.color, newAlpha);
@@ -861,6 +861,23 @@ namespace Vi.UI
                 }
             }
             lastNumDodgesEvaluated = numOfDodges;
+
+            if (overrideDodgeColor)
+            {
+                float newAlpha = Mathf.MoveTowards(dodgeStackText.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
+                if (!Mathf.Approximately(dodgeStackText.color.a, newAlpha))
+                {
+                    dodgeStackText.color = StringUtility.SetColorAlpha(dodgeStackText.color, newAlpha);
+                }
+            }
+            else
+            {
+                float newAlpha = Mathf.MoveTowards(dodgeStackText.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
+                if (!Mathf.Approximately(dodgeStackText.color.a, newAlpha))
+                {
+                    dodgeStackText.color = StringUtility.SetColorAlpha(dodgeStackText.color, newAlpha);
+                }
+            }
 
             if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
             {
