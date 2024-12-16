@@ -6905,9 +6905,9 @@ MonoBehaviour:
   dodgeCancelTransitionTime: 0.15
   rootMotionTruncateOffset: 0.15
   truncatedTransitionOutTime: 0.15
-  animationSpeed: 1
-  recoveryAnimationSpeed: 1
-  agentStaminaCost: 45
+  animationSpeed: 2
+  recoveryAnimationSpeed: 1.25
+  agentStaminaCost: 40
   agentRageCost: 0
   effectedWeaponBones: 
   weaponBonesToHide: 
@@ -6918,6 +6918,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.45
   recoveryNormalizedTime: 0.9
   isAffectedByRage: 1
@@ -6976,15 +6977,15 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   ailmentHitDefinition: 
-  dodgeLock: 1
+  dodgeLock: 0
   canCancelLightAttacks: 1
   canCancelHeavyAttacks: 1
   canCancelAbilities: 1
   canBeCancelledByLightAttacks: 0
   canBeCancelledByHeavyAttacks: 0
-  canBeCancelledByAbilities: 0
+  canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: 2c5a0b8d141cf904d9f27751cd897d13, type: 3}
-  abilityCooldownTime: 45
+  abilityCooldownTime: 35
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
