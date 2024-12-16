@@ -47,6 +47,16 @@ namespace Vi.Core
 
         private void InitializePlayerPrefs()
         {
+            // Track if we just updated
+            if (FasterPlayerPrefs.Singleton.HasString("LastApplicationVersion"))
+            {
+                if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
+                {
+                    // Just updated, execute this code
+                }
+            }
+            FasterPlayerPrefs.Singleton.SetString("LastApplicationVersion", Application.version);
+
             if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
 
