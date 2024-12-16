@@ -687,7 +687,11 @@ namespace Vi.Core
         {
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
-                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+                if (status.associatedWithCurrentWeapon)
+                {
+                    Debug.LogWarning("Adding a status to a target on hit but it's associated with its current weapon " + attack + " " + attacker.WeaponHandler.GetWeapon() + " " + status.status);
+                }
+                StatusAgent.TryAddStatus(status);
             }
 
             // Ailments
@@ -1098,7 +1102,11 @@ namespace Vi.Core
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
                 {
-                    StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+                    if (status.associatedWithCurrentWeapon)
+                    {
+                        Debug.LogWarning("Adding a status to an ally on hit but it's associated with its current weapon " + attack + " " + attacker.WeaponHandler.GetWeapon() + " " + status.status);
+                    }
+                    StatusAgent.TryAddStatus(status);
                 }
                 return HitResult.False;
             }

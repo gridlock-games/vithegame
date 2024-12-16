@@ -164,7 +164,7 @@ namespace Vi.Core.GameModeManagers
         {
             lastOgreSpawnEventTime = Time.time;
             bearerId.Value = newBearer.GetPlayerDataId();
-            newBearer.StatusAgent.TryAddStatus(ActionClip.Status.movementSpeedDecrease, 1, 10, 0, false);
+            newBearer.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 10, 0, false));
         }
 
         private NetworkVariable<int> bearerId = new NetworkVariable<int>();

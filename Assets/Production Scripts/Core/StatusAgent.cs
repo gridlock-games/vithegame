@@ -11,7 +11,6 @@ namespace Vi.Core
         private HittableAgent hittableAgent;
         private void Awake()
         {
-            statuses = new NetworkList<ActionClip.StatusPayload>();
             activeStatuses = new NetworkList<int>();
             hittableAgent = GetComponent<HittableAgent>();
         }
@@ -33,19 +32,16 @@ namespace Vi.Core
 
         public override void OnNetworkSpawn()
         {
-            statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
 
             if (IsServer)
             {
-                statuses.Clear();
                 activeStatuses.Clear();
             }
         }
 
         public override void OnNetworkDespawn()
         {
-            statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
         }
 
@@ -58,8 +54,6 @@ namespace Vi.Core
             }
             return statusList;
         }
-
-        private NetworkList<ActionClip.StatusPayload> statuses;
 
         private NetworkList<int> activeStatuses;
 
@@ -75,11 +69,12 @@ namespace Vi.Core
             ActionClip.Status.spiritIncreaseMultiplier
         };
 
-        public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
+        public bool TryAddStatus(ActionClip.StatusPayload statusPayload)
         {
-            if (!IsServer) { Debug.LogError("Attributes.TryAddStatus() should only be called on the server"); return false; }
+            if (!IsSpawned) { Debug.LogError("StatusAgent.TryAddStatus() should onyl be called when we're spawned"); return false; }
+            if (!IsServer) { Debug.LogError("StatusAgent.TryAddStatus() should only be called on the server"); return false; }
 
-            if (negativeStatuses.Contains(status))
+            if (negativeStatuses.Contains(statusPayload.status))
             {
                 if (GetActiveStatuses().Contains(ActionClip.Status.immuneToNegativeStatuses))
                 {
@@ -87,14 +82,15 @@ namespace Vi.Core
                 }
             }
 
-            statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay, associatedWithCurrentWeapon));
+            StartCoroutine(ProcessStatusChange(statusPayload));
             return true;
         }
 
         private bool stopAllStatuses;
         public void RemoveAllStatuses()
         {
-            if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatuses() should only be called on the server"); return; }
+            if (!IsSpawned) { Debug.LogError("StatusAgent.RemoveAddStatus() should onyl be called when we're spawned"); return; }
+            if (!IsServer) { Debug.LogError("StatusAgent.RemoveAllStatuses() should only be called on the server"); return; }
 
             if (stopAllStatusesCoroutine != null) { StopCoroutine(stopAllStatusesCoroutine); }
 
@@ -143,41 +139,6 @@ namespace Vi.Core
             stopAllStatusesAssociatedWithWeapon = false;
         }
 
-        private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.TryRemoveStatus() should only be called on the server"); return false; }
-
-            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains((int)statusPayload.status))
-            {
-                Debug.LogError("Trying to remove status but it isn't in both status lists! " + statusPayload.status);
-                return false;
-            }
-            else
-            {
-                int indexToRemoveAt = -1;
-                for (int i = 0; i < statuses.Count; i++)
-                {
-                    if (statuses[i].status == statusPayload.status
-                        & statuses[i].value == statusPayload.value
-                        & statuses[i].duration == statusPayload.duration
-                        & statuses[i].delay == statusPayload.delay)
-                    { indexToRemoveAt = i; break; }
-                }
-
-                if (indexToRemoveAt > -1)
-                {
-                    statuses.RemoveAt(indexToRemoveAt);
-                    activeStatuses.Remove((int)statusPayload.status);
-                }
-                else
-                {
-                    Debug.LogError("Trying to remove status but couldn't find an index to remove at! " + statusPayload.status);
-                    return false;
-                }
-            }
-            return true;
-        }
-
         public float DamageMultiplier { get; private set; } = 1;
         public float DamageReductionMultiplier { get; private set; } = 1;
         public float DamageReceivedMultiplier { get; private set; } = 1;
@@ -195,12 +156,6 @@ namespace Vi.Core
         public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
         public bool IsFeared() { return activeStatuses.Contains((int)ActionClip.Status.fear); }
         public bool IsImmuneToGroundSpells() { return activeStatuses.Contains((int)ActionClip.Status.immuneToGroundSpells); }
-
-        private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
-        {
-            if (!IsServer) { return; }
-            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
-        }
 
         public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
         private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
@@ -240,7 +195,6 @@ namespace Vi.Core
                     }
 
                     DamageMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReductionMultiplier:
                     DamageReductionMultiplier *= statusPayload.value;
@@ -257,7 +211,6 @@ namespace Vi.Core
                     }
 
                     DamageReductionMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.damageReceivedMultiplier:
                     DamageReceivedMultiplier *= statusPayload.value;
@@ -274,7 +227,6 @@ namespace Vi.Core
                     }
 
                     DamageReceivedMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healingMultiplier:
                     HealingMultiplier *= statusPayload.value;
@@ -291,7 +243,6 @@ namespace Vi.Core
                     }
 
                     HealingMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.spiritIncreaseMultiplier:
                     SpiritIncreaseMultiplier *= statusPayload.value;
@@ -308,7 +259,6 @@ namespace Vi.Core
                     }
 
                     SpiritIncreaseMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.spiritReductionMultiplier:
                     SpiritReductionMultiplier *= statusPayload.value;
@@ -325,7 +275,6 @@ namespace Vi.Core
                     }
 
                     SpiritReductionMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.burning:
                     elapsedTime = 0;
@@ -339,7 +288,6 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.poisoned:
                     elapsedTime = 0;
@@ -353,7 +301,6 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.drain:
                     elapsedTime = 0;
@@ -367,7 +314,6 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
                     movementSpeedDecrease.Value += statusPayload.value;
@@ -384,7 +330,6 @@ namespace Vi.Core
                     }
 
                     movementSpeedDecrease.Value -= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
                     movementSpeedIncrease.Value += statusPayload.value;
@@ -401,7 +346,6 @@ namespace Vi.Core
                     }
 
                     movementSpeedIncrease.Value -= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;
@@ -415,7 +359,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.silenced:
                     elapsedTime = 0;
@@ -429,7 +372,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.fear:
                     elapsedTime = 0;
@@ -443,7 +385,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healing:
                     elapsedTime = 0;
@@ -457,7 +398,6 @@ namespace Vi.Core
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToGroundSpells:
                     elapsedTime = 0;
@@ -471,7 +411,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToAilments:
                     elapsedTime = 0;
@@ -485,7 +424,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToNegativeStatuses:
                     elapsedTime = 0;
@@ -499,7 +437,6 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 default:
                     Debug.LogError(statusPayload.status + " has not been implemented!");

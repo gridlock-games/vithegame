@@ -120,7 +120,7 @@ namespace Vi.Core.Structures
                 AddHP(attack.healAmount);
                 foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTeammateOnHit)
                 {
-                    StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+                    StatusAgent.TryAddStatus(status);
                 }
                 return false;
             }
@@ -150,7 +150,7 @@ namespace Vi.Core.Structures
 
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
-                StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, false);
+                StatusAgent.TryAddStatus(status);
             }
 
             lastAttackingCombatAgent = attacker;
