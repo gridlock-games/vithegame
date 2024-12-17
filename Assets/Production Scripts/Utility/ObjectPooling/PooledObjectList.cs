@@ -109,7 +109,7 @@ namespace Vi.Utility
 
         private void MakeReferenceAddressable(string guid)
         {
-            if (IsAssetAddressable(guid)) { return; }
+            //if (IsAssetAddressable(guid)) { return; }
 
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
 
