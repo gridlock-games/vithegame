@@ -110,7 +110,7 @@ namespace Vi.Core.VFX
 
         private void ProcessHit(HittableAgent hittable, Vector3 impactPosition)
         {
-            if (hittable.ProcessProjectileHit(GetAttacker(), null, hitCounter, GetAttack(), impactPosition, shouldUseAttackerPositionForHitAngles ? GetAttacker().transform.position : transform.position))
+            if (hittable.ProcessProjectileHit(GetAttacker(), NetworkObject, null, hitCounter, GetAttack(), impactPosition, shouldUseAttackerPositionForHitAngles ? GetAttacker().transform.position : transform.position))
             {
                 if (!hitCounter.ContainsKey(hittable))
                 {
