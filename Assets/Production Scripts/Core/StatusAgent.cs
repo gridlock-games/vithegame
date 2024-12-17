@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -98,16 +99,18 @@ namespace Vi.Core
         }
 
         private int statusEventId;
-        public int AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
+        public (bool, int) AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
         {
-            if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return 0; }
-            if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return 0; }
+            if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return default; }
+            if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return default; }
+
+            if (blacklistedStatuses.Contains(statusPayload.status)) { return default; }
 
             statusPayload.duration = maxDuration;
 
             statusEventId++;
             StartCoroutine(ProcessStatusChange(statusEventId, statusPayload));
-            return statusEventId;
+            return (true, statusEventId);
         }
 
         public void RemoveConditionalStatus(int statusEventIdToRemove)
@@ -127,16 +130,20 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private ActionClip.Status[] blacklistedStatuses = new ActionClip.Status[0];
+
         public bool TryAddStatus(ActionClip.StatusPayload statusPayload)
         {
             if (!IsSpawned) { Debug.LogError("StatusAgent.TryAddStatus() should onyl be called when we're spawned"); return false; }
             if (!IsServer) { Debug.LogError("StatusAgent.TryAddStatus() should only be called on the server"); return false; }
 
+            if (blacklistedStatuses.Contains(statusPayload.status)) { return false; }
+
             if (negativeStatuses.Contains(statusPayload.status))
             {
                 if (GetActiveStatuses().Contains(ActionClip.Status.immuneToNegativeStatuses))
                 {
-                    return false;
+                    statusPayload.duration = 0;
                 }
             }
 

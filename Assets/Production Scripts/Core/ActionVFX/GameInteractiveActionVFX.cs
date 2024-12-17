@@ -163,11 +163,19 @@ namespace Vi.Core.VFX
             {
                 if (collisionStatusTracker.ContainsKey(hittableAgent))
                 {
-                    collisionStatusTracker[hittableAgent].Add(hittableAgent.StatusAgent.AddConditionalStatus(statusPayload));
+                    (bool, int) tuple = hittableAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                    if (tuple.Item1)
+                    {
+                        collisionStatusTracker[hittableAgent].Add(tuple.Item2);
+                    }
                 }
                 else
                 {
-                    collisionStatusTracker.Add(hittableAgent, new List<int>() { hittableAgent.StatusAgent.AddConditionalStatus(statusPayload) });
+                    (bool, int) tuple = hittableAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                    if (tuple.Item1)
+                    {
+                        collisionStatusTracker.Add(hittableAgent, new List<int>() { tuple.Item2 });
+                    }
                 }
             }
         }

@@ -167,7 +167,16 @@ namespace Vi.Core.GameModeManagers
         {
             lastOgreSpawnEventTime = Time.time;
             bearerId.Value = newBearer.GetPlayerDataId();
-            bearerMovementSpeedDecreaseStatusId = newBearer.StatusAgent.AddConditionalStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 0, 0, false));
+
+            (bool, int) tuple = newBearer.StatusAgent.AddConditionalStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 0, 0, false));
+            if (tuple.Item1)
+            {
+                bearerMovementSpeedDecreaseStatusId = tuple.Item2;
+            }
+            else
+            {
+                Debug.LogWarning("Unable to assign movement speed decrease to bearer!");
+            }
         }
 
         private NetworkVariable<int> bearerId = new NetworkVariable<int>();

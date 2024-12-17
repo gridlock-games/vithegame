@@ -79,11 +79,19 @@ namespace Vi.Core
         {
             if (essenceBuffStatusTracker.ContainsKey(this))
             {
-                essenceBuffStatusTracker[this].Add(combatAgent.StatusAgent.AddConditionalStatus(statusPayload));
+                (bool, int) tuple = combatAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                if (tuple.Item1)
+                {
+                    essenceBuffStatusTracker[this].Add(tuple.Item2);
+                }
             }
             else
             {
-                essenceBuffStatusTracker.Add(this, new List<int>() { combatAgent.StatusAgent.AddConditionalStatus(statusPayload) });
+                (bool, int) tuple = combatAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                if (tuple.Item1)
+                {
+                    essenceBuffStatusTracker.Add(this, new List<int>() { tuple.Item2 });
+                }
             }
         }
 
