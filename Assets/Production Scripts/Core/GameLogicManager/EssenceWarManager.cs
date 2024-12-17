@@ -160,11 +160,14 @@ namespace Vi.Core.GameModeManagers
             viEssenceNetObjId.Value = viEssence.NetworkObjectId;
         }
 
+        private int bearerMovementSpeedDecreaseStatusId;
+
+        // This is only called on the server
         public void OnViEssenceActivation(Attributes newBearer)
         {
             lastOgreSpawnEventTime = Time.time;
             bearerId.Value = newBearer.GetPlayerDataId();
-            newBearer.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 10, 0, false));
+            bearerMovementSpeedDecreaseStatusId = newBearer.StatusAgent.AddConditionalStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 0, 0, false));
         }
 
         private NetworkVariable<int> bearerId = new NetworkVariable<int>();
@@ -213,6 +216,11 @@ namespace Vi.Core.GameModeManagers
         public void OnBearerReachedTotem(PlayerDataManager.Team team)
         {
             if (!IsServer) { Debug.LogError("OnBearerReachedTotem should only be called on the server!"); return; }
+
+            if (TryGetBearerInstance(out Attributes bearer))
+            {
+                bearer.StatusAgent.RemoveConditionalStatus(bearerMovementSpeedDecreaseStatusId);
+            }
 
             if (team == PlayerDataManager.Team.Light)
             {

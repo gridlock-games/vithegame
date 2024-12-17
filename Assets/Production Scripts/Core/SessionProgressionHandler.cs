@@ -73,6 +73,32 @@ namespace Vi.Core
         public int Essences { get { return essences.Value; } }
         private NetworkVariable<int> essences = new NetworkVariable<int>();
 
+        private static Dictionary<SessionProgressionHandler, List<int>> essenceBuffStatusTracker = new Dictionary<SessionProgressionHandler, List<int>>();
+
+        private void RegisterEssenceBuffStatus(ActionClip.StatusPayload statusPayload)
+        {
+            if (essenceBuffStatusTracker.ContainsKey(this))
+            {
+                essenceBuffStatusTracker[this].Add(combatAgent.StatusAgent.AddConditionalStatus(statusPayload));
+            }
+            else
+            {
+                essenceBuffStatusTracker.Add(this, new List<int>() { combatAgent.StatusAgent.AddConditionalStatus(statusPayload) });
+            }
+        }
+
+        public static void RemoveAllEssenceBuffStatuses()
+        {
+            foreach (KeyValuePair<SessionProgressionHandler, List<int>> kvp in essenceBuffStatusTracker)
+            {
+                foreach (int statusId in kvp.Value)
+                {
+                    kvp.Key.combatAgent.StatusAgent.RemoveConditionalStatus(statusId);
+                }
+            }
+            essenceBuffStatusTracker.Clear();
+        }
+
         public void RedeemEssenceBuff(int essenceBuffIndex)
         {
             if (Essences < GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].requiredEssenceCount) { return; }
@@ -101,31 +127,31 @@ namespace Vi.Core
                     case "Increased Move Speed":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedIncrease, 0.2f, true, buffDuration, 0, false));
+                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedIncrease, 0.2f, true, buffDuration, 0, false));
                         }
                         break;
                     case "Resist Ailments":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToAilments, 0, false, buffDuration, 0, false));
+                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToAilments, 0, false, buffDuration, 0, false));
                         }
                         break;
                     case "Resist Statuses":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToNegativeStatuses, 0, false, buffDuration, 0, false));
+                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToNegativeStatuses, 0, false, buffDuration, 0, false));
                         }
                         break;
                     case "Damage Resistance":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.damageReductionMultiplier, 0.7f, false, buffDuration, 0, false));
+                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.damageReductionMultiplier, 0.7f, false, buffDuration, 0, false));
                         }
                         break;
                     case "Health Regeneration":
                         foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                         {
-                            attributes.StatusAgent.TryAddStatus(new ActionClip.StatusPayload(ActionClip.Status.healing, 0.1f, false, buffDuration, 0, false));
+                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.healing, 0.1f, false, buffDuration, 0, false));
                         }
                         break;
                     default:
