@@ -67,7 +67,9 @@ namespace Vi.ScriptableObjects
             healing,
             immuneToGroundSpells,
             immuneToAilments,
-            immuneToNegativeStatuses
+            immuneToNegativeStatuses,
+            spiritRegeneration,
+            staminaRegeneration
         }
 
         [System.Serializable]

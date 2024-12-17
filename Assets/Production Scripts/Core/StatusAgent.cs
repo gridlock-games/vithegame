@@ -9,10 +9,12 @@ namespace Vi.Core
     public class StatusAgent : NetworkBehaviour
     {
         private HittableAgent hittableAgent;
+        private CombatAgent combatAgent;
         private void Awake()
         {
             activeStatuses = new NetworkList<int>();
             hittableAgent = GetComponent<HittableAgent>();
+            combatAgent = GetComponent<CombatAgent>();
         }
 
         private void OnEnable()
@@ -235,6 +237,38 @@ namespace Vi.Core
             if (statusPayload.valueIsPercentage)
             {
                 changeAmount = hittableAgent.GetMaxHP() * statusPayload.value;
+            }
+            else
+            {
+                changeAmount = statusPayload.value;
+            }
+            return changeAmount;
+        }
+
+        private float GetSpiritChangeAmount(ActionClip.StatusPayload statusPayload)
+        {
+            if (!combatAgent) { return 0; }
+
+            float changeAmount;
+            if (statusPayload.valueIsPercentage)
+            {
+                changeAmount = combatAgent.GetMaxSpirit() * statusPayload.value;
+            }
+            else
+            {
+                changeAmount = statusPayload.value;
+            }
+            return changeAmount;
+        }
+
+        private float GetStaminaChangeAmount(ActionClip.StatusPayload statusPayload)
+        {
+            if (!combatAgent) { return 0; }
+
+            float changeAmount;
+            if (statusPayload.valueIsPercentage)
+            {
+                changeAmount = combatAgent.GetMaxStamina() * statusPayload.value;
             }
             else
             {
@@ -514,6 +548,40 @@ namespace Vi.Core
                         yield return null;
                     }
 
+                    break;
+                case ActionClip.Status.spiritRegeneration:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        if (combatAgent)
+                        {
+                            combatAgent.AddSpirit(GetSpiritChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                        }
+
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+                    break;
+                case ActionClip.Status.staminaRegeneration:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        if (combatAgent)
+                        {
+                            combatAgent.AddStamina(GetStaminaChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                        }
+
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
                     break;
                 default:
                     Debug.LogError(StatusEventsForThisObject[statusEventId].status + " has not been implemented!");
