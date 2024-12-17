@@ -15,8 +15,9 @@ namespace Vi.Core.VFX.Staff
             if (IsServer) { serverSpawnTime = Time.time; }
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected override void OnTriggerEnter(Collider other)
         {
+            base.OnTriggerEnter(other);
             ProcessTriggerEvent(other);
         }
 

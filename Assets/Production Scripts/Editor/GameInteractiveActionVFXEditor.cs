@@ -17,6 +17,9 @@ namespace Vi.Editor
         private SerializedProperty spShouldDestroyOnEnemyHit;
         private SerializedProperty spTeamColorParticleSystems;
 
+        private SerializedProperty spEnemyStatuses;
+        private SerializedProperty spFriendlyStatuses;
+
         protected new void OnEnable()
         {
             base.OnEnable();
@@ -25,6 +28,9 @@ namespace Vi.Editor
             spShouldBlockProjectiles = serializedObject.FindProperty("shouldBlockProjectiles");
             spShouldDestroyOnEnemyHit = serializedObject.FindProperty("shouldDestroyOnEnemyHit");
             spTeamColorParticleSystems = serializedObject.FindProperty("teamColorParticleSystems");
+
+            spEnemyStatuses = serializedObject.FindProperty("enemyStatuses");
+            spFriendlyStatuses = serializedObject.FindProperty("friendlyStatuses");
         }
 
         public override void OnInspectorGUI()
@@ -36,6 +42,10 @@ namespace Vi.Editor
             EditorGUILayout.PropertyField(spShouldBlockProjectiles);
             EditorGUILayout.PropertyField(spShouldDestroyOnEnemyHit);
             EditorGUILayout.PropertyField(spTeamColorParticleSystems);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("These use attached trigger colliders", EditorStyles.whiteLabel);
+            EditorGUILayout.PropertyField(spEnemyStatuses);
+            EditorGUILayout.PropertyField(spFriendlyStatuses);
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
         }

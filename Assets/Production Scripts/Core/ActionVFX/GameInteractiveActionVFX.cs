@@ -23,6 +23,8 @@ namespace Vi.Core.VFX
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
         [SerializeField] private bool shouldBlockProjectiles;
         [SerializeField] private bool shouldDestroyOnEnemyHit;
+        [SerializeField] private ActionClip.StatusPayload[] enemyStatuses = new ActionClip.StatusPayload[0];
+        [SerializeField] private ActionClip.StatusPayload[] friendlyStatuses = new ActionClip.StatusPayload[0];
 
         public bool ShouldBlockProjectiles() { return shouldBlockProjectiles; }
 
@@ -119,6 +121,11 @@ namespace Vi.Core.VFX
                 var main = teamColorParticleSystems[i].main;
                 main.startColor = originalColors[i];
             }
+
+            if (IsServer)
+            {
+                RemoveAllCollisionStatuses();
+            }
         }
 
         protected virtual bool OnHit(CombatAgent attacker)
@@ -147,5 +154,77 @@ namespace Vi.Core.VFX
 
         public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
         public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
+
+        private Dictionary<HittableAgent, List<int>> collisionStatusTracker = new Dictionary<HittableAgent, List<int>>();
+
+        private void RegisterCollisionStatuses(HittableAgent hittableAgent)
+        {
+            foreach (ActionClip.StatusPayload statusPayload in (PlayerDataManager.Singleton.CanHit(GetAttacker(), hittableAgent) ? enemyStatuses : friendlyStatuses))
+            {
+                if (collisionStatusTracker.ContainsKey(hittableAgent))
+                {
+                    collisionStatusTracker[hittableAgent].Add(hittableAgent.StatusAgent.AddConditionalStatus(statusPayload));
+                }
+                else
+                {
+                    collisionStatusTracker.Add(hittableAgent, new List<int>() { hittableAgent.StatusAgent.AddConditionalStatus(statusPayload) });
+                }
+            }
+        }
+
+        private void RemoveCollisionStatus(HittableAgent hittableAgent, bool removeFromTracker = true)
+        {
+            if (collisionStatusTracker.ContainsKey(hittableAgent))
+            {
+                foreach (int statusEventId in collisionStatusTracker[hittableAgent])
+                {
+                    hittableAgent.StatusAgent.RemoveConditionalStatus(statusEventId);
+                }
+            }
+
+            if (removeFromTracker)
+            {
+                collisionStatusTracker.Remove(hittableAgent);
+            }
+        }
+
+        private void RemoveAllCollisionStatuses()
+        {
+            foreach (HittableAgent hittableAgent in collisionStatusTracker.Keys)
+            {
+                RemoveCollisionStatus(hittableAgent, false);
+            }
+            collisionStatusTracker.Clear();
+        }
+
+        protected virtual void OnTriggerEnter(Collider other)
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                RegisterCollisionStatuses(networkCollider.CombatAgent);
+            }
+            else if (other.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+            {
+                RegisterCollisionStatuses(hittableAgent);
+            }
+        }
+
+        protected virtual void OnTriggerExit(Collider other)
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
+            {
+                RemoveCollisionStatus(networkCollider.CombatAgent);
+            }
+            else if (other.transform.root.TryGetComponent(out HittableAgent hittableAgent))
+            {
+                RemoveCollisionStatus(hittableAgent);
+            }
+        }
     }
 }

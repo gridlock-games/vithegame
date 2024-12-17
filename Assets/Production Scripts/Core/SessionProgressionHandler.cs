@@ -296,6 +296,7 @@ namespace Vi.Core
         private void OnDisable()
         {
             abilityLevelTracker.Clear();
+            essenceBuffStatusTracker.Remove(this);
         }
 
         private bool UpgradeAbilityLocally(string weaponName, string abilityName)
