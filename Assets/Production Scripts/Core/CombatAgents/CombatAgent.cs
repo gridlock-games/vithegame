@@ -426,6 +426,7 @@ namespace Vi.Core
             CancelGrab();
         }
 
+        protected NetworkVariable<ulong> pullAssailantFallbackNetworkObjectId = new NetworkVariable<ulong>();
         protected NetworkVariable<ulong> pullAssailantNetworkObjectId = new NetworkVariable<ulong>();
         protected NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
 
@@ -433,9 +434,15 @@ namespace Vi.Core
 
         public Vector3 GetPullAssailantPosition()
         {
-            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantNetworkObjectId.Value, out NetworkObject networkObject);
-            if (!networkObject) { Debug.LogWarning("Could not find pull assailant! " + pullAssailantNetworkObjectId.Value); return MovementHandler.GetPosition(); }
-
+            if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantNetworkObjectId.Value, out NetworkObject networkObject))
+            {
+                if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantFallbackNetworkObjectId.Value, out networkObject))
+                {
+                    Debug.LogWarning("Could not find pull assailant! " + pullAssailantNetworkObjectId.Value + " " + pullAssailantFallbackNetworkObjectId.Value);
+                    return MovementHandler.GetPosition();
+                }
+            }
+            
             if (networkObject.TryGetComponent(out MovementHandler movementHandler))
             {
                 return movementHandler.GetPosition();
@@ -728,6 +735,7 @@ namespace Vi.Core
 
                     if (attackAilment == ActionClip.Ailment.Pull)
                     {
+                        pullAssailantFallbackNetworkObjectId.Value = attacker.NetworkObjectId;
                         pullAssailantNetworkObjectId.Value = attackingNetworkObject.NetworkObjectId;
                         isPulled.Value = true;
                     }
