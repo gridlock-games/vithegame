@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Vi.Core.MovementHandlers;
 using Vi.Core.Weapons;
+using Vi.ScriptableObjects;
 
 namespace Vi.Core.VFX
 {
@@ -124,8 +125,9 @@ namespace Vi.Core.VFX
 
         private const string layersToHit = "NetworkPrediction";
 
-        protected void OnTriggerEnter(Collider other)
+        protected override void OnTriggerEnter(Collider other)
         {
+            base.OnTriggerEnter(other);
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
             if (other.gameObject.layer != LayerMask.NameToLayer(layersToHit)) { return; }

@@ -119,8 +119,9 @@ namespace Vi.Core.VFX
             rb.MoveRotation(rb.linearVelocity == Vector3.zero ? originalRotation : Quaternion.LookRotation(rb.linearVelocity));
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected override void OnTriggerEnter(Collider other)
         {
+            base.OnTriggerEnter(other);
             if (!IsSpawned) { return; }
             if (!IsServer) { return; }
             if (!GetAttacker()) { return; }

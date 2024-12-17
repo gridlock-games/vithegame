@@ -348,9 +348,10 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate:
   - status: 2
     value: 0.7
+    valueIsPercentage: 0
     duration: 10
     delay: 1
-    associatedWithCurrentWeapon: 0
+    associatedWithCurrentWeapon: 1
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:

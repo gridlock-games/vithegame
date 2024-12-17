@@ -9,11 +9,17 @@ namespace Vi.Core
     public class StatusAgent : NetworkBehaviour
     {
         private HittableAgent hittableAgent;
+        private CombatAgent combatAgent;
         private void Awake()
         {
-            statuses = new NetworkList<ActionClip.StatusPayload>();
             activeStatuses = new NetworkList<int>();
             hittableAgent = GetComponent<HittableAgent>();
+            combatAgent = GetComponent<CombatAgent>();
+        }
+
+        private void OnEnable()
+        {
+            statusEvents.Add(this, new Dictionary<int, ActionClip.StatusPayload>());
         }
 
         private void OnDisable()
@@ -29,23 +35,23 @@ namespace Vi.Core
             SpiritReductionMultiplier = 1;
 
             ActiveStatusesWasUpdatedThisFrame = default;
+
+            statusEvents.Remove(this);
+            statusEventId = default;
         }
 
         public override void OnNetworkSpawn()
         {
-            statuses.OnListChanged += OnStatusChange;
             activeStatuses.OnListChanged += OnActiveStatusChange;
 
             if (IsServer)
             {
-                statuses.Clear();
                 activeStatuses.Clear();
             }
         }
 
         public override void OnNetworkDespawn()
         {
-            statuses.OnListChanged -= OnStatusChange;
             activeStatuses.OnListChanged -= OnActiveStatusChange;
         }
 
@@ -58,8 +64,6 @@ namespace Vi.Core
             }
             return statusList;
         }
-
-        private NetworkList<ActionClip.StatusPayload> statuses;
 
         private NetworkList<int> activeStatuses;
 
@@ -75,11 +79,60 @@ namespace Vi.Core
             ActionClip.Status.spiritIncreaseMultiplier
         };
 
-        public bool TryAddStatus(ActionClip.Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.TryAddStatus() should only be called on the server"); return false; }
+        private static Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>> statusEvents = new Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>>();
 
-            if (negativeStatuses.Contains(status))
+        private Dictionary<int, ActionClip.StatusPayload> StatusEventsForThisObject
+        {
+            get
+            {
+                if (statusEvents.ContainsKey(this))
+                {
+                    return statusEvents[this];
+                }
+                else
+                {
+                    Debug.LogWarning("Could not find status events for this object! " + this);
+                    return new Dictionary<int, ActionClip.StatusPayload>();
+                }
+            }
+        }
+
+        private int statusEventId;
+        public int AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
+        {
+            if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return 0; }
+            if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return 0; }
+
+            statusPayload.duration = maxDuration;
+
+            statusEventId++;
+            StartCoroutine(ProcessStatusChange(statusEventId, statusPayload));
+            return statusEventId;
+        }
+
+        public void RemoveConditionalStatus(int statusEventIdToRemove)
+        {
+            if (!IsSpawned) { Debug.LogError("StatusAgent.RemoveConditionalStatus() should onyl be called when we're spawned"); return; }
+            if (!IsServer) { Debug.LogError("StatusAgent.RemoveConditionalStatus() should only be called on the server"); return; }
+
+            if (StatusEventsForThisObject.ContainsKey(statusEventIdToRemove))
+            {
+                ActionClip.StatusPayload change = StatusEventsForThisObject[statusEventIdToRemove];
+                change.duration = 0;
+                StatusEventsForThisObject[statusEventIdToRemove] = change;
+            }
+            else
+            {
+                Debug.LogWarning("Status event id not found for removal! " + statusEventIdToRemove);
+            }
+        }
+
+        public bool TryAddStatus(ActionClip.StatusPayload statusPayload)
+        {
+            if (!IsSpawned) { Debug.LogError("StatusAgent.TryAddStatus() should onyl be called when we're spawned"); return false; }
+            if (!IsServer) { Debug.LogError("StatusAgent.TryAddStatus() should only be called on the server"); return false; }
+
+            if (negativeStatuses.Contains(statusPayload.status))
             {
                 if (GetActiveStatuses().Contains(ActionClip.Status.immuneToNegativeStatuses))
                 {
@@ -87,14 +140,16 @@ namespace Vi.Core
                 }
             }
 
-            statuses.Add(new ActionClip.StatusPayload(status, value, duration, delay, associatedWithCurrentWeapon));
+            statusEventId++;
+            StartCoroutine(ProcessStatusChange(statusEventId, statusPayload));
             return true;
         }
 
         private bool stopAllStatuses;
         public void RemoveAllStatuses()
         {
-            if (!IsServer) { Debug.LogError("Attributes.RemoveAllStatuses() should only be called on the server"); return; }
+            if (!IsSpawned) { Debug.LogError("StatusAgent.RemoveAddStatus() should onyl be called when we're spawned"); return; }
+            if (!IsServer) { Debug.LogError("StatusAgent.RemoveAllStatuses() should only be called on the server"); return; }
 
             if (stopAllStatusesCoroutine != null) { StopCoroutine(stopAllStatusesCoroutine); }
 
@@ -143,41 +198,6 @@ namespace Vi.Core
             stopAllStatusesAssociatedWithWeapon = false;
         }
 
-        private bool TryRemoveStatus(ActionClip.StatusPayload statusPayload)
-        {
-            if (!IsServer) { Debug.LogError("Attributes.TryRemoveStatus() should only be called on the server"); return false; }
-
-            if (!statuses.Contains(statusPayload) & !activeStatuses.Contains((int)statusPayload.status))
-            {
-                Debug.LogError("Trying to remove status but it isn't in both status lists! " + statusPayload.status);
-                return false;
-            }
-            else
-            {
-                int indexToRemoveAt = -1;
-                for (int i = 0; i < statuses.Count; i++)
-                {
-                    if (statuses[i].status == statusPayload.status
-                        & statuses[i].value == statusPayload.value
-                        & statuses[i].duration == statusPayload.duration
-                        & statuses[i].delay == statusPayload.delay)
-                    { indexToRemoveAt = i; break; }
-                }
-
-                if (indexToRemoveAt > -1)
-                {
-                    statuses.RemoveAt(indexToRemoveAt);
-                    activeStatuses.Remove((int)statusPayload.status);
-                }
-                else
-                {
-                    Debug.LogError("Trying to remove status but couldn't find an index to remove at! " + statusPayload.status);
-                    return false;
-                }
-            }
-            return true;
-        }
-
         public float DamageMultiplier { get; private set; } = 1;
         public float DamageReductionMultiplier { get; private set; } = 1;
         public float DamageReceivedMultiplier { get; private set; } = 1;
@@ -196,12 +216,6 @@ namespace Vi.Core
         public bool IsFeared() { return activeStatuses.Contains((int)ActionClip.Status.fear); }
         public bool IsImmuneToGroundSpells() { return activeStatuses.Contains((int)ActionClip.Status.immuneToGroundSpells); }
 
-        private void OnStatusChange(NetworkListEvent<ActionClip.StatusPayload> networkListEvent)
-        {
-            if (!IsServer) { return; }
-            if (networkListEvent.Type == NetworkListEvent<ActionClip.StatusPayload>.EventType.Add) { StartCoroutine(ProcessStatusChange(networkListEvent.Value)); }
-        }
-
         public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
         private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
         {
@@ -217,294 +231,364 @@ namespace Vi.Core
             ActiveStatusesWasUpdatedThisFrame = false;
         }
 
-        private const bool useConstantRateForHPChangeStatuses = true;
-        private const float HPChangeMultiplier = 1;
-        private IEnumerator ProcessStatusChange(ActionClip.StatusPayload statusPayload)
+        private float GetHPChangeAmount(ActionClip.StatusPayload statusPayload)
         {
-            yield return new WaitForSeconds(statusPayload.delay);
-            activeStatuses.Add((int)statusPayload.status);
-            switch (statusPayload.status)
+            float changeAmount;
+            if (statusPayload.valueIsPercentage)
+            {
+                changeAmount = hittableAgent.GetMaxHP() * statusPayload.value;
+            }
+            else
+            {
+                changeAmount = statusPayload.value;
+            }
+            return changeAmount;
+        }
+
+        private float GetSpiritChangeAmount(ActionClip.StatusPayload statusPayload)
+        {
+            if (!combatAgent) { return 0; }
+
+            float changeAmount;
+            if (statusPayload.valueIsPercentage)
+            {
+                changeAmount = combatAgent.GetMaxSpirit() * statusPayload.value;
+            }
+            else
+            {
+                changeAmount = statusPayload.value;
+            }
+            return changeAmount;
+        }
+
+        private float GetStaminaChangeAmount(ActionClip.StatusPayload statusPayload)
+        {
+            if (!combatAgent) { return 0; }
+
+            float changeAmount;
+            if (statusPayload.valueIsPercentage)
+            {
+                changeAmount = combatAgent.GetMaxStamina() * statusPayload.value;
+            }
+            else
+            {
+                changeAmount = statusPayload.value;
+            }
+            return changeAmount;
+        }
+
+        private IEnumerator ProcessStatusChange(int statusEventId, ActionClip.StatusPayload statusPayload)
+        {
+            if (StatusEventsForThisObject.ContainsKey(statusEventId))
+            {
+                Debug.LogWarning("Status event id is already in dictionary!");
+                yield break;
+            }
+
+            StatusEventsForThisObject.Add(statusEventId, statusPayload);
+            
+            yield return new WaitForSeconds(StatusEventsForThisObject[statusEventId].delay);
+            activeStatuses.Add((int)StatusEventsForThisObject[statusEventId].status);
+            switch (StatusEventsForThisObject[statusEventId].status)
             {
                 case ActionClip.Status.damageMultiplier:
-                    DamageMultiplier *= statusPayload.value;
+                    DamageMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     float elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    DamageMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    DamageMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.damageReductionMultiplier:
-                    DamageReductionMultiplier *= statusPayload.value;
+                    DamageReductionMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    DamageReductionMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    DamageReductionMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.damageReceivedMultiplier:
-                    DamageReceivedMultiplier *= statusPayload.value;
+                    DamageReceivedMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    DamageReceivedMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    DamageReceivedMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.healingMultiplier:
-                    HealingMultiplier *= statusPayload.value;
+                    HealingMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    HealingMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    HealingMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.spiritIncreaseMultiplier:
-                    SpiritIncreaseMultiplier *= statusPayload.value;
+                    SpiritIncreaseMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    SpiritIncreaseMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    SpiritIncreaseMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.spiritReductionMultiplier:
-                    SpiritReductionMultiplier *= statusPayload.value;
+                    SpiritReductionMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    SpiritReductionMultiplier /= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    SpiritReductionMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.burning:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage(-GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.poisoned:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage(-GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.drain:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
-                        hittableAgent.ProcessEnvironmentDamage((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetHP()) * -statusPayload.value * Time.deltaTime, NetworkObject);
+                        hittableAgent.ProcessEnvironmentDamage(-GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime, NetworkObject);
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
-                    movementSpeedDecrease.Value += statusPayload.value;
+                    movementSpeedDecrease.Value += StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    movementSpeedDecrease.Value -= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    movementSpeedDecrease.Value -= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
-                    movementSpeedIncrease.Value += statusPayload.value;
+                    movementSpeedIncrease.Value += StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    movementSpeedIncrease.Value -= statusPayload.value;
-                    TryRemoveStatus(statusPayload);
+                    movementSpeedIncrease.Value -= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.silenced:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.fear:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.healing:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
-                        hittableAgent.AddHP((useConstantRateForHPChangeStatuses ? HPChangeMultiplier : hittableAgent.GetMaxHP() / hittableAgent.GetHP() * 10) * statusPayload.value * Time.deltaTime);
+                        hittableAgent.AddHP(GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToGroundSpells:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToAilments:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
                     break;
                 case ActionClip.Status.immuneToNegativeStatuses:
                     elapsedTime = 0;
-                    while (elapsedTime < statusPayload.duration & !stopAllStatuses)
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         elapsedTime += Time.deltaTime;
-                        if (statusPayload.associatedWithCurrentWeapon)
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
                         {
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
                     }
 
-                    TryRemoveStatus(statusPayload);
+                    break;
+                case ActionClip.Status.spiritRegeneration:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        if (combatAgent)
+                        {
+                            combatAgent.AddSpirit(GetSpiritChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                        }
+
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+                    break;
+                case ActionClip.Status.staminaRegeneration:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        if (combatAgent)
+                        {
+                            combatAgent.AddStamina(GetStaminaChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                        }
+
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
                     break;
                 default:
-                    Debug.LogError(statusPayload.status + " has not been implemented!");
+                    Debug.LogError(StatusEventsForThisObject[statusEventId].status + " has not been implemented!");
                     break;
             }
+            activeStatuses.Remove((int)StatusEventsForThisObject[statusEventId].status);
+            StatusEventsForThisObject.Remove(statusEventId);
         }
     }
 }

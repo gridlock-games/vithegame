@@ -487,7 +487,11 @@ namespace Vi.Core
             {
                 foreach (ActionClip.StatusPayload status in CurrentActionClip.statusesToApplyToSelfOnActivate)
                 {
-                    combatAgent.StatusAgent.TryAddStatus(status.status, status.value, status.duration, status.delay, true);
+                    if (!status.associatedWithCurrentWeapon)
+                    {
+                        Debug.LogWarning("You're applying a status to self on activate but it's not associated with the current weapon " + GetWeapon() + " " + CurrentActionClip + " " + status.status);
+                    }
+                    combatAgent.StatusAgent.TryAddStatus(status);
                 }
             }
         }

@@ -4703,17 +4703,7 @@ MonoBehaviour:
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []
-  statusesToApplyToTeammateOnHit:
-  - status: 15
-    value: 0
-    duration: 0.1
-    delay: 0
-    associatedWithCurrentWeapon: 0
-  - status: 5
-    value: 0.1
-    duration: 0.1
-    delay: 0
-    associatedWithCurrentWeapon: 0
+  statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 4391706194936514060, guid: b74cebbdbf7bd0443b39799b5da6da6b, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,

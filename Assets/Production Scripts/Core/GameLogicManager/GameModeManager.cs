@@ -486,6 +486,7 @@ namespace Vi.Core.GameModeManagers
 
         protected virtual void OnRoundEnd(int[] winningPlayersDataIds)
         {
+            SessionProgressionHandler.RemoveAllEssenceBuffStatuses();
             bool shouldEndGame = false;
             foreach (int id in winningPlayersDataIds)
             {

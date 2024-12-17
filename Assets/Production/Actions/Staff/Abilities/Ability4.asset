@@ -6991,15 +6991,11 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit:
   - status: 11
     value: 0
+    valueIsPercentage: 0
     duration: 1
     delay: 1
     associatedWithCurrentWeapon: 0
-  statusesToApplyToTeammateOnHit:
-  - status: 15
-    value: 0
-    duration: 0.1
-    delay: 0
-    associatedWithCurrentWeapon: 0
+  statusesToApplyToTeammateOnHit: []
   actionVFXList:
   - {fileID: 7695901101582375111, guid: f1ab6d20d810285409e0072107dd94fe, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,

@@ -67,7 +67,9 @@ namespace Vi.ScriptableObjects
             healing,
             immuneToGroundSpells,
             immuneToAilments,
-            immuneToNegativeStatuses
+            immuneToNegativeStatuses,
+            spiritRegeneration,
+            staminaRegeneration
         }
 
         [System.Serializable]
@@ -75,14 +77,16 @@ namespace Vi.ScriptableObjects
         {
             public Status status;
             public float value;
+            public bool valueIsPercentage;
             public float duration;
             public float delay;
             public bool associatedWithCurrentWeapon;
 
-            public StatusPayload(Status status, float value, float duration, float delay, bool associatedWithCurrentWeapon)
+            public StatusPayload(Status status, float value, bool valueIsPercentage, float duration, float delay, bool associatedWithCurrentWeapon)
             {
                 this.status = status;
                 this.value = value;
+                this.valueIsPercentage = valueIsPercentage;
                 this.duration = duration;
                 this.delay = delay;
                 this.associatedWithCurrentWeapon = associatedWithCurrentWeapon;

@@ -14,7 +14,7 @@ namespace Vi.Core.VFX.Staff
 
         private List<SpellType> spellTypesToCancel = new List<SpellType>() { SpellType.NotASpell, SpellType.GroundSpell, SpellType.AerialSpell };
 
-        private new void OnTriggerEnter(Collider other)
+        protected override void OnTriggerEnter(Collider other)
         {
             base.OnTriggerEnter(other);
             if (!IsSpawned) { return; }

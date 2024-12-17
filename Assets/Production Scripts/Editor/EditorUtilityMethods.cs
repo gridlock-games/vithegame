@@ -407,6 +407,14 @@ namespace Vi.Editor
                             Debug.LogError(actionClip + " has a null VFX reference " + actionClipFilePath);
                         }
                     }
+
+                    foreach (ActionClip.StatusPayload statusPayload in actionClip.statusesToApplyToTeammateOnHit)
+                    {
+                        if (statusPayload.associatedWithCurrentWeapon)
+                        {
+                            Debug.Log(actionClip + " " + statusPayload.status + " " + actionClipFilePath);
+                        }
+                    }
                 }
             }
             return actionClips;
