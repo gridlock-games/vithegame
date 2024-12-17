@@ -159,15 +159,25 @@ namespace Vi.Core.VFX
 
         private void RegisterCollisionStatuses(HittableAgent hittableAgent)
         {
+            if (collisionStatusTracker.ContainsKey(hittableAgent)) { return; }
+
             foreach (ActionClip.StatusPayload statusPayload in (PlayerDataManager.Singleton.CanHit(GetAttacker(), hittableAgent) ? enemyStatuses : friendlyStatuses))
             {
                 if (collisionStatusTracker.ContainsKey(hittableAgent))
                 {
-                    collisionStatusTracker[hittableAgent].Add(hittableAgent.StatusAgent.AddConditionalStatus(statusPayload));
+                    (bool, int) tuple = hittableAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                    if (tuple.Item1)
+                    {
+                        collisionStatusTracker[hittableAgent].Add(tuple.Item2);
+                    }
                 }
                 else
                 {
-                    collisionStatusTracker.Add(hittableAgent, new List<int>() { hittableAgent.StatusAgent.AddConditionalStatus(statusPayload) });
+                    (bool, int) tuple = hittableAgent.StatusAgent.AddConditionalStatus(statusPayload);
+                    if (tuple.Item1)
+                    {
+                        collisionStatusTracker.Add(hittableAgent, new List<int>() { tuple.Item2 });
+                    }
                 }
             }
         }

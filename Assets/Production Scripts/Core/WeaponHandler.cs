@@ -515,7 +515,7 @@ namespace Vi.Core
             previewInstance.transform.rotation *= Quaternion.Euler(actionClip.previewActionVFXRotationOffset);
             previewInstance.transform.position += previewInstance.transform.rotation * actionClip.previewActionVFXPositionOffset;
             previewInstance.transform.localScale = actionClip.previewActionVFXScale;
-            previewInstance.SetActionVFX(actionClip.actionVFXList[0]);
+            previewInstance.Initialize(actionClip, actionClip.actionVFXList[0]);
             return previewInstance.gameObject;
         }
 

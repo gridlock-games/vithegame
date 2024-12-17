@@ -171,19 +171,18 @@ namespace Vi.Core.MovementHandlers
             return NetworkManager.NetworkTickSystem.LocalTime.FixedDeltaTime * Time.timeScale;
         }
 
-        protected float GetRootMotionSpeed()
-        {
-            return Mathf.Clamp01(weaponHandler.GetWeapon().GetMovementSpeed(false, false) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount() + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount());
-        }
-
         protected float GetRunSpeed()
         {
-            return Mathf.Max(0, weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking, weaponHandler.IsAiming()) - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount();
+            float baseMovementSpeed = weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking, weaponHandler.IsAiming());
+            float moveSpeedAdjusted = baseMovementSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount(baseMovementSpeed) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount(baseMovementSpeed);
+            return Mathf.Max(0, moveSpeedAdjusted);
         }
 
-        protected float GetAnimatorSpeed()
+        public float GetAnimatorSpeed()
         {
-            return (Mathf.Max(0, weaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / weaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+            float baseMovementSpeed = weaponHandler.GetWeapon().GetRunSpeed();
+            float moveSpeedAdjusted = baseMovementSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount(baseMovementSpeed) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount(baseMovementSpeed);
+            return Mathf.Max(0, moveSpeedAdjusted) / weaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
         }
 
         protected override void Update()

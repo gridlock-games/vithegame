@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
+using System.Linq;
 
 namespace Vi.Core
 {
@@ -98,16 +99,18 @@ namespace Vi.Core
         }
 
         private int statusEventId;
-        public int AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
+        public (bool, int) AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
         {
-            if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return 0; }
-            if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return 0; }
+            if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return default; }
+            if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return default; }
+
+            if (blacklistedStatuses.Contains(statusPayload.status)) { return default; }
 
             statusPayload.duration = maxDuration;
 
             statusEventId++;
             StartCoroutine(ProcessStatusChange(statusEventId, statusPayload));
-            return statusEventId;
+            return (true, statusEventId);
         }
 
         public void RemoveConditionalStatus(int statusEventIdToRemove)
@@ -127,16 +130,20 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private ActionClip.Status[] blacklistedStatuses = new ActionClip.Status[0];
+
         public bool TryAddStatus(ActionClip.StatusPayload statusPayload)
         {
             if (!IsSpawned) { Debug.LogError("StatusAgent.TryAddStatus() should onyl be called when we're spawned"); return false; }
             if (!IsServer) { Debug.LogError("StatusAgent.TryAddStatus() should only be called on the server"); return false; }
 
+            if (blacklistedStatuses.Contains(statusPayload.status)) { return false; }
+
             if (negativeStatuses.Contains(statusPayload.status))
             {
                 if (GetActiveStatuses().Contains(ActionClip.Status.immuneToNegativeStatuses))
                 {
-                    return false;
+                    statusPayload.duration = 0;
                 }
             }
 
@@ -205,11 +212,25 @@ namespace Vi.Core
         public float SpiritIncreaseMultiplier { get; private set; } = 1;
         public float SpiritReductionMultiplier { get; private set; } = 1;
 
-        public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
-        private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedDecreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedDecreasePercentage = new NetworkVariable<float>();
 
-        public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
-        private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
+        public float GetMovementSpeedDecreaseAmount(float baseRunSpeed)
+        {
+            float decrease = movementSpeedDecreaseAmount.Value;
+            decrease += baseRunSpeed * movementSpeedDecreasePercentage.Value;
+            return Mathf.Max(0, decrease);
+        }
+
+        private NetworkVariable<float> movementSpeedIncreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedIncreasePercentage = new NetworkVariable<float>();
+
+        public float GetMovementSpeedIncreaseAmount(float baseRunSpeed)
+        {
+            float increase = movementSpeedIncreaseAmount.Value;
+            increase += baseRunSpeed * movementSpeedIncreasePercentage.Value;
+            return Mathf.Max(0, increase);
+        }
 
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
         public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
@@ -427,7 +448,14 @@ namespace Vi.Core
                     }
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
-                    movementSpeedDecrease.Value += StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedDecreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedDecreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -440,10 +468,24 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    movementSpeedDecrease.Value -= StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedDecreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedDecreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
-                    movementSpeedIncrease.Value += StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedIncreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedIncreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -456,7 +498,14 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    movementSpeedIncrease.Value -= StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedIncreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;

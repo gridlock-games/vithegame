@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3127381298
+  GlobalObjectIdHash: 519525903
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -70,6 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blacklistedStatuses: 000000000400000005000000090000000a0000000b0000000c0000000d0000000f00000010000000110000001200000013000000
 --- !u!136 &6675371897526124775
 CapsuleCollider:
   m_ObjectHideFlags: 0
