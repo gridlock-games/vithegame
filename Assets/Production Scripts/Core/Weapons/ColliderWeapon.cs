@@ -123,7 +123,7 @@ namespace Vi.Core.Weapons
                 if (parentCombatAgent == networkCollider.CombatAgent) { return; }
                 if (!CanHit(networkCollider.CombatAgent)) { return; }
 
-                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent,
+                bool bHit = networkCollider.CombatAgent.ProcessMeleeHit(parentCombatAgent, parentCombatAgent.NetworkObject,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),
@@ -135,7 +135,7 @@ namespace Vi.Core.Weapons
                 if ((Object)hittable == parentCombatAgent) { return; }
                 if (!CanHit(hittable)) { return; }
 
-                bool bHit = hittable.ProcessMeleeHit(parentCombatAgent,
+                bool bHit = hittable.ProcessMeleeHit(parentCombatAgent, parentCombatAgent.NetworkObject,
                     parentCombatAgent.WeaponHandler.CurrentActionClip,
                     this,
                     other.ClosestPointOnBounds(transform.position),

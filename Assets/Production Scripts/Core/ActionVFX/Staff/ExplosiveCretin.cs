@@ -51,13 +51,13 @@ namespace Vi.Core.VFX.Staff
                             }
                             else
                             {
-                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
+                                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), NetworkObject, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                     GetAttack(), networkCollider.CombatAgent.transform.position, transform.position);
                             }
                         }
                         else
                         {
-                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
+                            bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), NetworkObject, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                     GetAttack(), networkCollider.CombatAgent.transform.position, transform.position);
                         }
                         shouldDespawn = true;

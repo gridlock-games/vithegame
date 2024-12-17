@@ -140,7 +140,7 @@ namespace Vi.Core.VFX
 
                 if (canHit)
                 {
-                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                    bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), NetworkObject, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
                     if (!hitSuccess & networkCollider.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown) { return; }
                 }
             }
@@ -149,7 +149,7 @@ namespace Vi.Core.VFX
                 if ((Object)hittable == GetAttacker()) { return; }
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
+                hittable.ProcessProjectileHit(GetAttacker(), NetworkObject, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(), GetAttack(), other.ClosestPointOnBounds(transform.position), transform.position - transform.rotation * projectileForce);
             }
             else if (other.transform.root.TryGetComponent(out ActionVFXPhysicsProjectile otherProjectile))
             {

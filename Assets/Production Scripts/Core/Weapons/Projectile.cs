@@ -180,7 +180,7 @@ namespace Vi.Core.Weapons
 
                 Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), networkCollider.MovementHandler.GetPosition()) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
 
-                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack,
+                bool hitSuccess = networkCollider.CombatAgent.ProcessProjectileHit(attacker, NetworkObject, shooterWeapon, shooterWeapon.GetHitCounter(), attack,
                     other.ClosestPointOnBounds(transform.position), hitSourcePos, damageMultiplier);
                 if (!hitSuccess) { return; }
             }
@@ -191,7 +191,7 @@ namespace Vi.Core.Weapons
                 Vector3 hitSourcePos = Vector3.Distance(attacker.MovementHandler.GetPosition(), other.transform.position) > 1 ? (transform.position - transform.rotation * projectileForce * 5) : attacker.MovementHandler.GetPosition();
 
                 shouldDestroy = hittable.ShouldBlockProjectiles();
-                hittable.ProcessProjectileHit(attacker, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position),
+                hittable.ProcessProjectileHit(attacker, NetworkObject, shooterWeapon, shooterWeapon.GetHitCounter(), attack, other.ClosestPointOnBounds(transform.position),
                     hitSourcePos, damageMultiplier);
             }
             else if (other.transform.root.TryGetComponent(out Projectile otherProjectile))

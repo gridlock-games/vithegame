@@ -12,10 +12,24 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 1858286383, guid: 66e0fc81c41b55141b20347771ab2b94, type: 3}
+      propertyPath: TriggerModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1402780172799429287, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1402780172799429306, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: TriggerModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1402780172799429306, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: TriggerModule.primitives.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1402780173014718727, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
@@ -26,6 +40,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4977924889408930067, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: TriggerModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4977924889408930067, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: TriggerModule.primitives.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4977924889408930069, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
@@ -61,6 +85,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6363980004133781733, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6363980004133781733, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6363980004133781733, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6363980004133781733, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
@@ -112,6 +151,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6363980004133781733, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6363980004133781735, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
       propertyPath: TriggerModule.enter
@@ -126,6 +170,11 @@ PrefabInstance:
         type: 3}
       propertyPath: TriggerModule.enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6363980004133781735, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      propertyPath: TriggerModule.radiusScale
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 6363980004133781735, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
@@ -174,15 +223,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6363980004133781732, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: -4058509365489480618}
-    - targetCorrespondingSourceObject: {fileID: 6363980004133781732, guid: 66e0fc81c41b55141b20347771ab2b94,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2371419836842347775}
     - targetCorrespondingSourceObject: {fileID: 6363980004133781732, guid: 66e0fc81c41b55141b20347771ab2b94,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: -6330334364301419333}
+    - targetCorrespondingSourceObject: {fileID: 6363980004133781732, guid: 66e0fc81c41b55141b20347771ab2b94,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5682364909986063076}
   m_SourcePrefab: {fileID: 100100000, guid: 66e0fc81c41b55141b20347771ab2b94, type: 3}
 --- !u!1 &2732152011434741654 stripped
 GameObject:
@@ -212,7 +261,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -229,7 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2240176591
+  GlobalObjectIdHash: 2604006506
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -296,43 +345,6 @@ MonoBehaviour:
   numberOfObjectsToPool: 5
   pooledObjectIndex: 371
   isPrewarmObject: 1
---- !u!114 &-4058509365489480618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2732152011434741654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccfb7ebf44a80f8408efada6ad352880, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vfxPositionOffset: {x: 0, y: 0, z: 0}
-  baseRotationOnRoot: 0
-  vfxRotationOffset: {x: 0, y: 0, z: 0}
-  vfxSpawnType: 0
-  transformType: 4
-  offsetByTargetBodyHeight: 0
-  onActivateVFXSpawnNormalizedTime: 0
-  raycastOffset: {x: 0, y: 2, z: 3}
-  fartherRaycastOffset: {x: 0, y: 4, z: 5}
-  raycastMaxDistance: 5
-  lookRotationUpDirection: {x: 0, y: 1, z: 0}
-  weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
-  awakeAudioClipDelay: 0
-  awakeAudioClipStartTime: 0
-  audioClipToPlayOnDestroy: {fileID: 0}
-  VFXToPlayOnDestroy: []
-  spellType: 1
-  followUpVFXToPlayOnDestroy: []
-  shouldBlockProjectiles: 0
-  shouldDestroyOnEnemyHit: 0
-  teamColorParticleSystems: []
-  shouldAffectSelf: 0
-  shouldAffectTeammates: 0
-  shouldAffectEnemies: 1
 --- !u!135 &2371419836842347775
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -352,7 +364,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.5
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!95 &-6330334364301419333
 Animator:
@@ -376,3 +388,50 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5682364909986063076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2732152011434741654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb93f65590e21844a98f3eda365e11f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPositionOffset: {x: 0, y: 0, z: 5}
+  baseRotationOnRoot: 0
+  vfxRotationOffset: {x: 0, y: 0, z: 0}
+  vfxSpawnType: 0
+  transformType: 0
+  offsetByTargetBodyHeight: 0
+  onActivateVFXSpawnNormalizedTime: 0
+  raycastOffset: {x: 0, y: 2, z: 3}
+  fartherRaycastOffset: {x: 0, y: 4, z: 5}
+  raycastMaxDistance: 5
+  lookRotationUpDirection: {x: 0, y: 1, z: 0}
+  weaponBone: 18
+  audioClipToPlayOnAwake: {fileID: 8300000, guid: 6e9b09fcfd33c4db0b299e344af30095,
+    type: 3}
+  awakeAudioClipDelay: 0
+  awakeAudioClipStartTime: 0
+  audioClipToPlayOnDestroy: {fileID: 0}
+  VFXToPlayOnDestroy: []
+  spellType: 2
+  followUpVFXToPlayOnDestroy: []
+  shouldBlockProjectiles: 0
+  shouldDestroyOnEnemyHit: 0
+  enemyStatuses: []
+  friendlyStatuses: []
+  teamColorParticleSystems: []
+  shouldAffectSelf: 0
+  shouldAffectTeammates: 0
+  shouldAffectEnemies: 1
+  particleSystemType: 0
+  shouldUseAttackerPositionForHitAngles: 1
+  shouldOverrideMaxHits: 0
+  maxHitOverride: 1
+  scaleVFXBasedOnEdges: 0
+  boundsPoint: {x: 0, y: 0, z: 2.5}
+  boundsLocalAxis: {x: 0, y: -1, z: 0}

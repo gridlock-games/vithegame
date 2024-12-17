@@ -11,6 +11,7 @@ using Vi.Core.GameModeManagers;
 using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Core.Weapons;
+using Unity.Netcode.Components;
 
 namespace Vi.Core
 {
@@ -425,16 +426,32 @@ namespace Vi.Core
             CancelGrab();
         }
 
-        protected NetworkVariable<ulong> pullAssailantDataId = new NetworkVariable<ulong>();
+        protected NetworkVariable<ulong> pullAssailantNetworkObjectId = new NetworkVariable<ulong>();
         protected NetworkVariable<bool> isPulled = new NetworkVariable<bool>();
 
         public bool IsPulled { get { return isPulled.Value; } }
 
-        public CombatAgent GetPullAssailant()
+        public Vector3 GetPullAssailantPosition()
         {
-            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantDataId.Value, out NetworkObject networkObject);
-            if (!networkObject) { Debug.LogError("Could not find pull assailant! " + pullAssailantDataId.Value); return null; }
-            return networkObject.GetComponent<CombatAgent>();
+            NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(pullAssailantNetworkObjectId.Value, out NetworkObject networkObject);
+            if (!networkObject) { Debug.LogWarning("Could not find pull assailant! " + pullAssailantNetworkObjectId.Value); return MovementHandler.GetPosition(); }
+
+            if (networkObject.TryGetComponent(out MovementHandler movementHandler))
+            {
+                return movementHandler.GetPosition();
+            }
+            else if (networkObject.TryGetComponent(out NetworkTransform networkTransform))
+            {
+                return networkTransform.GetSpaceRelativePosition(true);
+            }
+            else if (networkObject.TryGetComponent(out Rigidbody rigidbody))
+            {
+                return rigidbody.position;
+            }
+            else
+            {
+                return transform.position;
+            }
         }
 
         protected virtual void Update()
@@ -683,7 +700,7 @@ namespace Vi.Core
         public bool ShouldApplyAilmentRotation() { return ailment.Value != ActionClip.Ailment.None & ailment.Value != ActionClip.Ailment.Pull; }
         public Quaternion GetAilmentRotation() { return ailmentRotation.Value; }
 
-        protected void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, ActionClip attack, ActionClip hitReaction)
+        protected void EvaluateAilment(ActionClip.Ailment attackAilment, bool applyAilmentRegardless, Vector3 hitSourcePosition, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, ActionClip hitReaction)
         {
             foreach (ActionClip.StatusPayload status in attack.statusesToApplyToTargetOnHit)
             {
@@ -711,7 +728,7 @@ namespace Vi.Core
 
                     if (attackAilment == ActionClip.Ailment.Pull)
                     {
-                        pullAssailantDataId.Value = attacker.NetworkObjectId;
+                        pullAssailantNetworkObjectId.Value = attackingNetworkObject.NetworkObjectId;
                         isPulled.Value = true;
                     }
                     else if (attackAilment == ActionClip.Ailment.Grab)
@@ -1081,19 +1098,19 @@ namespace Vi.Core
             }
         }
 
-        public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public override bool ProcessMeleeHit(CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
-            return CastHitResultToBoolean(ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon));
+            return CastHitResultToBoolean(ProcessHit(true, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon));
         }
 
-        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        public override bool ProcessProjectileHit(CombatAgent attacker, NetworkObject attackingNetworkObject, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
-            return CastHitResultToBoolean(ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
+            return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
-        protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
+        protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (!CanProcessHit(isMeleeHit, attacker, attack, runtimeWeapon)) { return HitResult.False; }
 
@@ -1279,7 +1296,7 @@ namespace Vi.Core
                     AddDamageToMapping(attacker, prevHP - GetHP());
                 }
 
-                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attack, hitReaction);
+                EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
 
             if (runtimeWeapon)

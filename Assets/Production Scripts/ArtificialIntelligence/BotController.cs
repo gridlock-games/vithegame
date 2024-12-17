@@ -387,11 +387,7 @@ namespace Vi.ArtificialIntelligence
             }
             else if (combatAgent.IsPulled)
             {
-                CombatAgent pullAssailant = combatAgent.GetPullAssailant();
-                if (pullAssailant)
-                {
-                    movement = pullAssailant.MovementHandler.GetPosition() - GetPosition();
-                }
+                movement = combatAgent.GetPullAssailantPosition() - GetPosition();
             }
             else if (combatAgent.AnimationHandler.ShouldApplyRootMotion())
             {

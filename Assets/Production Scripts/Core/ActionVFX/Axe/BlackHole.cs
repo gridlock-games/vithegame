@@ -97,7 +97,7 @@ namespace Vi.Core.VFX.Axe
                             copy.name = GetAttack().name;
                             copy.ailment = ailmentToTriggerOnEnd;
 
-                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
+                            networkCollider.CombatAgent.ProcessProjectileHit(GetAttacker(), NetworkObject, null, new Dictionary<IHittable, RuntimeWeapon.HitCounterData>(),
                                 copy, networkCollider.CombatAgent.transform.position, transform.position);
                         }
                     }

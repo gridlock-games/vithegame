@@ -1707,7 +1707,7 @@ MonoBehaviour:
   recoveryAnimationSpeed: 1
   agentStaminaCost: 12
   agentRageCost: 0
-  effectedWeaponBones: 11000000
+  effectedWeaponBones: 
   weaponBonesToHide: 
   mustBeAiming: 0
   chargeAttackHasEndAnimation: 0
@@ -1789,17 +1789,18 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit:
   - status: 9
     value: 0.25
+    valueIsPercentage: 0
     duration: 1
     delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
   actionVFXList:
-  - {fileID: -4058509365489480618, guid: 28b70c428e4c04c13b8ce72a71aa58dd, type: 3}
+  - {fileID: 5682364909986063076, guid: 28b70c428e4c04c13b8ce72a71aa58dd, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,
     type: 3}
-  previewActionVFXPositionOffset: {x: 0, y: 0, z: 20}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
-  previewActionVFXScale: {x: 0.2, y: 0.2, z: 0.2}
+  previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 0
   limitAttackMotionBasedOnTarget: 0
   maximumTargetingRotationAngle: 10

@@ -176,18 +176,18 @@ namespace Vi.Core.CombatAgents
             respawnSelfCalledTime = default;
         }
 
-        public override bool ProcessMeleeHit(CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
+        public override bool ProcessMeleeHit(CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
-            HitResult hitResult = ProcessHit(true, attacker, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
+            HitResult hitResult = ProcessHit(true, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
             if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
             return CastHitResultToBoolean(hitResult);
         }
 
-        public override bool ProcessProjectileHit(CombatAgent attacker, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
+        public override bool ProcessProjectileHit(CombatAgent attacker, NetworkObject attackingNetworkObject, RuntimeWeapon runtimeWeapon, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, float damageMultiplier = 1)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
-            HitResult hitResult = ProcessHit(false, attacker, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
+            HitResult hitResult = ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
             if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
             return CastHitResultToBoolean(hitResult);
         }
