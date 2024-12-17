@@ -212,11 +212,21 @@ namespace Vi.Core
         public float SpiritIncreaseMultiplier { get; private set; } = 1;
         public float SpiritReductionMultiplier { get; private set; } = 1;
 
-        public float GetMovementSpeedDecreaseAmount() { return movementSpeedDecrease.Value; }
-        private NetworkVariable<float> movementSpeedDecrease = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedDecreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedDecreasePercentage = new NetworkVariable<float>();
 
-        public float GetMovementSpeedIncreaseAmount() { return movementSpeedIncrease.Value; }
-        private NetworkVariable<float> movementSpeedIncrease = new NetworkVariable<float>();
+        public float GetMovementSpeedDecreaseAmount()
+        {
+            return 0;
+        }
+
+        private NetworkVariable<float> movementSpeedIncreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> movementSpeedIncreasePercentage = new NetworkVariable<float>();
+
+        public float GetMovementSpeedIncreaseAmount()
+        {
+            return 0;
+        }
 
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
         public bool IsSilenced() { return activeStatuses.Contains((int)ActionClip.Status.silenced); }
@@ -434,7 +444,14 @@ namespace Vi.Core
                     }
                     break;
                 case ActionClip.Status.movementSpeedDecrease:
-                    movementSpeedDecrease.Value += StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedDecreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedDecreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -447,10 +464,25 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    movementSpeedDecrease.Value -= StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedDecreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedDecreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
                     break;
                 case ActionClip.Status.movementSpeedIncrease:
-                    movementSpeedIncrease.Value += StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedIncreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedIncreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    Debug.Log(movementSpeedIncreaseAmount.Value + " " + movementSpeedIncreasePercentage.Value);
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -463,7 +495,15 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    movementSpeedIncrease.Value -= StatusEventsForThisObject[statusEventId].value;
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        movementSpeedIncreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        movementSpeedIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    Debug.Log(movementSpeedIncreaseAmount.Value + " " + movementSpeedIncreasePercentage.Value);
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;

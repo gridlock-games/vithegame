@@ -1783,7 +1783,7 @@ MonoBehaviour:
   canBeCancelledByHeavyAttacks: 1
   canBeCancelledByAbilities: 1
   abilityImageIcon: {fileID: 21300000, guid: f531143d2ad9d5641bcb003ddcf86c8b, type: 3}
-  abilityCooldownTime: 2
+  abilityCooldownTime: 10
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit:
@@ -1798,7 +1798,7 @@ MonoBehaviour:
   - {fileID: 5682364909986063076, guid: 28b70c428e4c04c13b8ce72a71aa58dd, type: 3}
   previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,
     type: 3}
-  previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
+  previewActionVFXPositionOffset: {x: 0, y: 0, z: 1}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 1, y: 1, z: 1}
   useRotationalTargetingSystem: 0
