@@ -1108,7 +1108,7 @@ namespace Vi.Core
                     }
                     StatusAgent.TryAddStatus(status);
                 }
-                return HitResult.False;
+                return HitResult.True;
             }
 
             if (!CanHit(isMeleeHit, attacker, attack)) { return HitResult.False; }

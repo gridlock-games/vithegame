@@ -276,6 +276,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.03
   recoveryNormalizedTime: 0.37
   isAffectedByRage: 1
@@ -347,9 +348,10 @@ MonoBehaviour:
   statusesToApplyToSelfOnActivate:
   - status: 2
     value: 2
+    valueIsPercentage: 0
     duration: 1.5
     delay: 0
-    associatedWithCurrentWeapon: 0
+    associatedWithCurrentWeapon: 1
   statusesToApplyToTargetOnHit: []
   statusesToApplyToTeammateOnHit: []
   actionVFXList:

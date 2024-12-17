@@ -96,12 +96,12 @@ namespace Vi.Core
         }
 
         private int statusEventId;
-        public int AddConditionalStatus(ActionClip.StatusPayload statusPayload)
+        public int AddConditionalStatus(ActionClip.StatusPayload statusPayload, float maxDuration = Mathf.Infinity)
         {
             if (!IsSpawned) { Debug.LogError("StatusAgent.AddConditionalStatus() should onyl be called when we're spawned"); return 0; }
             if (!IsServer) { Debug.LogError("StatusAgent.AddConditionalStatus() should only be called on the server"); return 0; }
 
-            statusPayload.duration = Mathf.Infinity;
+            statusPayload.duration = maxDuration;
 
             statusEventId++;
             StartCoroutine(ProcessStatusChange(statusEventId, statusPayload));
