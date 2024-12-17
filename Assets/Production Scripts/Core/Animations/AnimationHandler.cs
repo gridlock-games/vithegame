@@ -1397,7 +1397,8 @@ namespace Vi.Core
                     Vector3 prev = combatAgent.WeaponHandler.GetWeapon().GetRootMotion(stateName, prevNormalizedTime);
 
                     bool isInRecovery = prevNormalizedTime >= combatAgent.WeaponHandler.CurrentActionClip.recoveryNormalizedTime & combatAgent.WeaponHandler.CurrentActionClip.IsAttack();
-                    float animationSpeed = (Mathf.Max(0, combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount()) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount()) / combatAgent.WeaponHandler.GetWeapon().GetRunSpeed() * (isInRecovery ? combatAgent.WeaponHandler.CurrentActionClip.recoveryAnimationSpeed : combatAgent.WeaponHandler.CurrentActionClip.animationSpeed);
+
+                    float animationSpeed = combatAgent.MovementHandler.GetAnimatorSpeed();
 
                     rootMotionTime += Time.fixedDeltaTime * animationSpeed;
                     totalRootMotionTime += Time.fixedDeltaTime * animationSpeed;

@@ -397,7 +397,7 @@ namespace Vi.ArtificialIntelligence
                 }
                 else
                 {
-                    movement = newRotation * rootMotion * GetRootMotionSpeed();
+                    movement = newRotation * rootMotion;
                 }
             }
             else if (combatAgent.AnimationHandler.IsAtRest())

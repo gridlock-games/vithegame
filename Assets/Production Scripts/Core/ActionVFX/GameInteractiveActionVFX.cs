@@ -159,6 +159,8 @@ namespace Vi.Core.VFX
 
         private void RegisterCollisionStatuses(HittableAgent hittableAgent)
         {
+            if (collisionStatusTracker.ContainsKey(hittableAgent)) { return; }
+
             foreach (ActionClip.StatusPayload statusPayload in (PlayerDataManager.Singleton.CanHit(GetAttacker(), hittableAgent) ? enemyStatuses : friendlyStatuses))
             {
                 if (collisionStatusTracker.ContainsKey(hittableAgent))

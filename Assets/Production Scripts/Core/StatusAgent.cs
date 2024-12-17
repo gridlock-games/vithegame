@@ -215,17 +215,21 @@ namespace Vi.Core
         private NetworkVariable<float> movementSpeedDecreaseAmount = new NetworkVariable<float>();
         private NetworkVariable<float> movementSpeedDecreasePercentage = new NetworkVariable<float>();
 
-        public float GetMovementSpeedDecreaseAmount()
+        public float GetMovementSpeedDecreaseAmount(float baseRunSpeed)
         {
-            return 0;
+            float decrease = movementSpeedDecreaseAmount.Value;
+            decrease += baseRunSpeed * movementSpeedDecreasePercentage.Value;
+            return Mathf.Max(0, decrease);
         }
 
         private NetworkVariable<float> movementSpeedIncreaseAmount = new NetworkVariable<float>();
         private NetworkVariable<float> movementSpeedIncreasePercentage = new NetworkVariable<float>();
 
-        public float GetMovementSpeedIncreaseAmount()
+        public float GetMovementSpeedIncreaseAmount(float baseRunSpeed)
         {
-            return 0;
+            float increase = movementSpeedIncreaseAmount.Value;
+            increase += baseRunSpeed * movementSpeedIncreasePercentage.Value;
+            return Mathf.Max(0, increase);
         }
 
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
@@ -482,7 +486,6 @@ namespace Vi.Core
                     {
                         movementSpeedIncreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
                     }
-                    Debug.Log(movementSpeedIncreaseAmount.Value + " " + movementSpeedIncreasePercentage.Value);
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -503,7 +506,6 @@ namespace Vi.Core
                     {
                         movementSpeedIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
                     }
-                    Debug.Log(movementSpeedIncreaseAmount.Value + " " + movementSpeedIncreasePercentage.Value);
                     break;
                 case ActionClip.Status.rooted:
                     elapsedTime = 0;
