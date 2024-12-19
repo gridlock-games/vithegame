@@ -842,6 +842,18 @@ namespace Vi.Core
                 if (successfulHits >= grabAttackClip.maxHitLimit) { break; }
                 yield return new WaitForSeconds(grabAttackClip.GetTimeBetweenHits(Animator.speed));
             }
+
+            // Catch all for missing hits
+            while (successfulHits < grabAttackClip.maxHitLimit)
+            {
+                weaponBoneIndex = weaponBoneIndex + 1 == grabAttackClip.effectedWeaponBones.Length ? 0 : weaponBoneIndex + 1;
+                RuntimeWeapon runtimeWeapon = combatAgent.WeaponHandler.WeaponInstances[grabAttackClip.effectedWeaponBones[weaponBoneIndex]];
+
+                grabVictim.ProcessMeleeHit(combatAgent, NetworkObject, grabAttackClip, runtimeWeapon,
+                        runtimeWeapon.GetClosetPointFromAttributes(grabVictim), combatAgent.transform.position);
+
+                successfulHits++;
+            }
         }
 
         public bool AreActionClipRequirementsMet(ActionClip actionClip)
