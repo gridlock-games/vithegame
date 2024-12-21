@@ -2606,6 +2606,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 626131296}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &626131298 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8907430221231453135, guid: 64a22302573bb1b48bedd66988ab9f25,
+    type: 3}
+  m_PrefabInstance: {fileID: 626131296}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &634003505
 GameObject:
   m_ObjectHideFlags: 0
@@ -8150,6 +8162,7 @@ MonoBehaviour:
   oAuthMessageText: {fileID: 1973996067}
   playParent: {fileID: 77962636}
   playButton: {fileID: 394614240}
+  logoutButton: {fileID: 626131298}
   loadingProgressParent: {fileID: 883424018}
   loadingProgressText: {fileID: 1969863163}
   loadingProgresssBar: {fileID: 1136504230}
