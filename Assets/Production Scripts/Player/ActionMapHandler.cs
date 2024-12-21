@@ -19,6 +19,7 @@ namespace Vi.Player
 
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
+        private TextChat.TextChat textChatInstance;
         private PlayerInput playerInput;
         private WeaponHandler weaponHandler;
 
@@ -74,11 +75,13 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
+                textChatInstance = playerUIInstance.GetComponentInChildren<TextChat.TextChat>(true);
                 if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
+                textChatInstance = spectatorUIInstance.GetComponentInChildren<TextChat.TextChat>(true);
                 if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else
@@ -232,9 +235,9 @@ namespace Vi.Player
             if (inventoryInstance) { return; }
             if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
-            if (TextChatManager.Singleton.TextChatInstance)
+            if (textChatInstance)
             {
-                TextChatManager.Singleton.TextChatInstance.OnTextChat();
+                textChatInstance.OnTextChat();
             }
         }
 
