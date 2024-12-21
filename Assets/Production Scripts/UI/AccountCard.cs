@@ -63,7 +63,21 @@ namespace Vi.UI
         public void InitializeAsMVPScore(int playerDataId)
         {
             this.playerDataId = playerDataId;
-            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            PlayerDataManager.PlayerData playerData;
+            if (PlayerDataManager.Singleton.ContainsId(playerDataId))
+            {
+                playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            }
+            else if (PlayerDataManager.Singleton.ContainsDisconnectedPlayerData(playerDataId))
+            {
+                playerData = PlayerDataManager.Singleton.GetDisconnectedPlayerData(playerDataId);
+            }
+            else
+            {
+                Debug.LogWarning("Could not find MVP player data for account card");
+                playerData = default;
+            }
+
             backgroundImage.color = playerData.team == PlayerDataManager.Team.Competitor ? Color.white : PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
 
             nameDisplayText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
