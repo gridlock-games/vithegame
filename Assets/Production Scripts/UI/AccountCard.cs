@@ -16,6 +16,9 @@ namespace Vi.UI
         [SerializeField] private Image lockedUIImage;
         [SerializeField] private Sprite lockedSprite;
         [SerializeField] private Sprite unlockedSprite;
+        [SerializeField] private Image changeTeamImage;
+        [SerializeField] private Sprite leftArrowSprite;
+        [SerializeField] private Sprite rightArrowSprite;
 
         private int playerDataId;
         private bool initialized;
@@ -23,7 +26,6 @@ namespace Vi.UI
         {
             this.playerDataId = playerDataId;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            nameDisplayText.text = playerData.character.name.ToString();
             backgroundImage.color = playerData.team == PlayerDataManager.Team.Competitor ? Color.white : PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
 
             lockedUIImage.sprite = isLocked | playerDataId < 0 ? lockedSprite : unlockedSprite;
@@ -35,6 +37,40 @@ namespace Vi.UI
             initialized = true;
 
             nameDisplayText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+
+            changeTeamImage.gameObject.SetActive(false);
+        }
+
+        private PlayerDataManager.Team teamToChangeTo = PlayerDataManager.Team.Environment;
+        public void SetChangeTeamLogic(PlayerDataManager.Team teamToChangeTo, bool isRightSideCard)
+        {
+            if (teamToChangeTo == PlayerDataManager.Team.Environment) { return; }
+
+            if (isRightSideCard)
+            {
+                changeTeamImage.transform.SetAsFirstSibling();
+                changeTeamImage.sprite = leftArrowSprite;
+            }
+            else
+            {
+                changeTeamImage.transform.SetAsLastSibling();
+                changeTeamImage.sprite = rightArrowSprite;
+            }
+            changeTeamImage.gameObject.SetActive(true);
+            this.teamToChangeTo = teamToChangeTo;
+        }
+
+        public void InitializeAsMVPScore(int playerDataId)
+        {
+            this.playerDataId = playerDataId;
+            PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+            backgroundImage.color = playerData.team == PlayerDataManager.Team.Competitor ? Color.white : PlayerDataManager.Singleton.GetRelativeTeamColor(playerData.team);
+
+            nameDisplayText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+
+            lobbyLeaderImage.gameObject.SetActive(true);
+            kickButton.gameObject.SetActive(false);
+            changeTeamImage.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -52,6 +88,18 @@ namespace Vi.UI
         public void KickPlayer()
         {
             PlayerDataManager.Singleton.KickPlayer(playerDataId);
+        }
+
+        public void ChangeTeam()
+        {
+            if (teamToChangeTo == PlayerDataManager.Team.Environment) { return; }
+
+            if (PlayerDataManager.Singleton.ContainsId((int)playerDataId))
+            {
+                PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
+                playerData.team = teamToChangeTo;
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
+            }
         }
     }
 }

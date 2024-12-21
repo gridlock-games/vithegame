@@ -870,7 +870,11 @@ namespace Vi.UI
 
                     AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardParent).GetComponent<AccountCard>();
                     accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
-
+                    if (teamParentDict.Count > 1)
+                    {
+                        accountCard.SetChangeTeamLogic(teamParentDict.FirstOrDefault(item => item.Key != playerData.team).Key, accountCardParent == rightTeamParent.transformParent);
+                    }
+                    
                     if (playerData.id == (int)NetworkManager.LocalClientId)
                     {
                         leftTeamJoinInteractable = teamParentDict[playerData.team] != leftTeamParent.transformParent;
