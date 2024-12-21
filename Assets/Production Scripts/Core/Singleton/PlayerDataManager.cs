@@ -14,6 +14,7 @@ using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using static Vi.Core.PlayerDataManager;
 
 namespace Vi.Core
 {
@@ -783,17 +784,14 @@ namespace Vi.Core
         }
 
         private int botClientId = 0;
-        public void AddBotData(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam = -1)
+        public void AddBotData(Team team, bool useDefaultPrimaryWeapon)
         {
             if (team == Team.Spectator) { Debug.LogError("Trying to add a bot as a spectator!"); return; }
 
+            if (!CanPlayersChangeTeams(team)) { return; }
+
             if (IsServer)
             {
-                if (limitTotalNumberOfPlayersOnTeam > -1)
-                {
-                    if (GetPlayerDataListWithoutSpectators().Where(item => item.team == team).ToArray().Length >= limitTotalNumberOfPlayersOnTeam) { return; }
-                }
-
                 botClientId--;
 
                 WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
@@ -806,11 +804,11 @@ namespace Vi.Core
             }
             else
             {
-                AddBotDataServerRpc(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam);
+                AddBotDataServerRpc(team, useDefaultPrimaryWeapon);
             }
         }
 
-        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon, int limitTotalNumberOfPlayersOnTeam) { AddBotData(team, useDefaultPrimaryWeapon, limitTotalNumberOfPlayersOnTeam); }
+        [Rpc(SendTo.Server, RequireOwnership = false)] private void AddBotDataServerRpc(Team team, bool useDefaultPrimaryWeapon) { AddBotData(team, useDefaultPrimaryWeapon); }
 
         public void AddPlayerData(PlayerData playerData)
         {
@@ -857,12 +855,30 @@ namespace Vi.Core
             return new PlayerData();
         }
 
+        public bool CanPlayersChangeTeams(PlayerDataManager.Team teamToChangeTo)
+        {
+            if (PlayerDataManager.Singleton.GetGameMode() == GameMode.None) { return true; }
+            if (GameModeManager.Singleton) { return false; }
+
+            int limitTotalNumberOfPlayersOnTeam = PlayerDataManager.Singleton.GetMaxPlayersForMap() / PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length;
+            return GetPlayerDataListWithoutSpectators().Where(item => item.team == teamToChangeTo).ToArray().Length < limitTotalNumberOfPlayersOnTeam;
+        }
+
         public void SetPlayerData(PlayerData playerData)
         {
+            int index = playerDataList.IndexOf(playerData);
+            if (index == -1) { return; }
+
+            if (!CanPlayersChangeTeams(playerData.team))
+            {
+                if (playerData.team != playerDataList[index].team)
+                {
+                    return;
+                }
+            }
+            
             if (IsServer)
             {
-                int index = playerDataList.IndexOf(playerData);
-                if (index == -1) { return; }
                 playerDataList[index] = playerData;
             }
             else

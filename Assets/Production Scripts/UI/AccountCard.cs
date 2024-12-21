@@ -73,6 +73,11 @@ namespace Vi.UI
             changeTeamImage.gameObject.SetActive(false);
         }
 
+        private void Start()
+        {
+            Update();
+        }
+
         private void Update()
         {
             if (initialized)
@@ -81,6 +86,17 @@ namespace Vi.UI
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
                     nameDisplayText.text = PlayerDataManager.Singleton.GetTeamPrefix(playerData.team) + playerData.character.name.ToString();
+                }
+            }
+
+            if (changeTeamImage.gameObject.activeInHierarchy)
+            {
+                if (teamToChangeTo != PlayerDataManager.Team.Environment)
+                {
+                    if (!PlayerDataManager.Singleton.CanPlayersChangeTeams(teamToChangeTo))
+                    {
+                        changeTeamImage.gameObject.SetActive(false);
+                    }
                 }
             }
         }
