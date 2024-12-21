@@ -25,7 +25,20 @@ namespace Vi.Player.TextChat
 
         public void SendTextChat()
         {
-            TextChatManager.Singleton.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
+            string username;
+            PlayerDataManager.Team team;
+            if (NetworkManager.Singleton.IsClient)
+            {
+                username = PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString();
+                team = PlayerDataManager.Singleton.LocalPlayerData.team;
+            }
+            else
+            {
+                username = "SERVER";
+                team = PlayerDataManager.Team.Peaceful;
+            }
+
+            TextChatManager.Singleton.SendTextChat(username, team, textChatInputField.text);
             textChatInputField.text = "";
             if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
         }
@@ -36,12 +49,22 @@ namespace Vi.Player.TextChat
             {
                 actionMapHandler.OnTextChat();
             }
+            else
+            {
+                OnTextChat();
+            }
         }
 
-        public void CloseTextChat()
+        private bool ShouldUseTextChatOpenButton()
+        {
+            if (FasterPlayerPrefs.IsMobilePlatform) { return true; }
+            return !actionMapHandler;
+        }
+
+        public void CloseTextChat(bool evaluateCursorLockMode)
         {
             textChatParentCanvas.enabled = false;
-            if (FasterPlayerPrefs.IsMobilePlatform)
+            if (ShouldUseTextChatOpenButton())
             {
                 textChatButtonCanvas.enabled = true;
             }
@@ -52,7 +75,7 @@ namespace Vi.Player.TextChat
 
             if (actionMapHandler)
             {
-                actionMapHandler.OnTextChatClose();
+                actionMapHandler.OnTextChatClose(evaluateCursorLockMode);
             }
         }
 
@@ -81,10 +104,10 @@ namespace Vi.Player.TextChat
             {
                 if (actionMapHandler)
                 {
-                    actionMapHandler.OnTextChatClose();
+                    actionMapHandler.OnTextChatClose(true);
                 }
             }
-            textChatButtonCanvas.enabled = FasterPlayerPrefs.IsMobilePlatform ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
+            textChatButtonCanvas.enabled = ShouldUseTextChatOpenButton() ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
         }
 
         public void ScrollToBottomOfTextChat()
@@ -128,7 +151,7 @@ namespace Vi.Player.TextChat
                     textChatMessageNumberText.text = unreadMessageCount.ToString();
                 }
 
-                if (!FasterPlayerPrefs.IsMobilePlatform)
+                if (!ShouldUseTextChatOpenButton())
                 {
                     textChatButtonCanvas.enabled = unreadMessageCount > 0;
                 }
@@ -145,19 +168,21 @@ namespace Vi.Player.TextChat
             }
         }
 
+        private void OnEnable()
+        {
+            CloseTextChat(false);
+        }
+
+        private void OnDisable()
+        {
+            CloseTextChat(false);
+        }
+
         private PlayerInput playerInput;
         private ActionMapHandler actionMapHandler;
         private void Awake()
         {
-            textChatParentCanvas.enabled = false;
-            if (FasterPlayerPrefs.IsMobilePlatform)
-            {
-                textChatButtonCanvas.enabled = true;
-            }
-            else
-            {
-                textChatButtonCanvas.enabled = unreadMessageCount > 0;
-            }
+            TextChatManager.Singleton.RegisterTextChatInstance(this);
 
             actionMapHandler = transform.root.GetComponent<ActionMapHandler>();
             playerInput = transform.root.GetComponent<PlayerInput>();
@@ -165,12 +190,24 @@ namespace Vi.Player.TextChat
             {
                 textChatAction = playerInput.actions.FindAction("TextChat");
             }
-            TextChatManager.Singleton.RegisterTextChatInstance(this);
+
+            textChatParentCanvas.enabled = false;
+            if (ShouldUseTextChatOpenButton())
+            {
+                textChatButtonCanvas.enabled = true;
+            }
+            else
+            {
+                textChatButtonCanvas.enabled = unreadMessageCount > 0;
+            }
         }
 
         private void OnDestroy()
         {
-            TextChatManager.Singleton.UnregisterTextChatInstance(this);
+            if (TextChatManager.DoesExist())
+            {
+                TextChatManager.Singleton.UnregisterTextChatInstance(this);
+            }
         }
     }
 }

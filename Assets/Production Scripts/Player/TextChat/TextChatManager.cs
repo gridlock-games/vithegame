@@ -8,6 +8,8 @@ namespace Vi.Player.TextChat
 {
     public class TextChatManager : NetworkBehaviour
     {
+        public static bool DoesExist() { return _singleton; }
+
         public static TextChatManager Singleton
         {
             get
@@ -63,7 +65,7 @@ namespace Vi.Player.TextChat
             SendTextChatRpc(textChatElement);
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
+        [Rpc(SendTo.Everyone)]
         private void SendTextChatRpc(TextChatElement textChatElement)
         {
             if (TextChatInstance) { TextChatInstance.DisplayNextTextElement(textChatElement); }

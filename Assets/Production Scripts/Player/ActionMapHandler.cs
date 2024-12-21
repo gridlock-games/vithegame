@@ -246,11 +246,14 @@ namespace Vi.Player
             playerInput.SwitchCurrentActionMap("UI");
         }
 
-        public void OnTextChatClose()
+        public void OnTextChatClose(bool evaluateCursorLockMode)
         {
             textChatIsOpen = false;
-            if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
-            playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            if (evaluateCursorLockMode)
+            {
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            }
         }
 
         public static bool CanUseOrbitalCamera()
