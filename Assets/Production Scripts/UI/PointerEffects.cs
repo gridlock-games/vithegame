@@ -54,9 +54,12 @@ namespace Vi.UI
                 RefreshStatus();
             }
 
-            if (WebRequestManager.Singleton.IsLoggedIn)
+            if (WebRequestManager.Singleton)
             {
-                if (!pointerEffectsEnabled) { return; }
+                if (WebRequestManager.Singleton.IsLoggedIn)
+                {
+                    if (!pointerEffectsEnabled) { return; }
+                }
             }
             
             FindPlayerInput();
