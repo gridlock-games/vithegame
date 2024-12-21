@@ -55,6 +55,9 @@ namespace Vi.Core
                     // Just updated, execute this code
                 }
             }
+
+            if (!FasterPlayerPrefs.Singleton.HasBool("PointerEffects")) { FasterPlayerPrefs.Singleton.SetBool("PointerEffects", true); }
+
             FasterPlayerPrefs.Singleton.SetString("LastApplicationVersion", Application.version);
 
             if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
