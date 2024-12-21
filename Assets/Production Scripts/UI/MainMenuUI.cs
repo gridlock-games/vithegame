@@ -876,9 +876,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
+            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {

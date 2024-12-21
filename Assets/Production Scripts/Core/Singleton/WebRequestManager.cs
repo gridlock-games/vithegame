@@ -118,7 +118,7 @@ namespace Vi.Core
             }
             catch
             {
-                servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777"), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776") };
+                servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777", ""), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776", "") };
             }
 
             if (NetworkManager.Singleton.IsServer)
@@ -188,17 +188,17 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.UpdateServerProgress()" + putRequest.error);
             }
             putRequest.Dispose();
         }
 
-        public IEnumerator UpdateServerPopulation(int population, string label)
+        public IEnumerator UpdateServerPopulation(int population, string label, string hostCharId)
         {
             if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
             if (!thisServerCreated) { yield break; }
 
-            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label == "" ? "Lobby" : label);
+            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label == "" ? "Lobby" : label, hostCharId);
 
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -216,7 +216,7 @@ namespace Vi.Core
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.ServerPutRequest()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.UpdateServerPopulation()" + putRequest.error);
             }
             putRequest.Dispose();
         }
@@ -247,6 +247,7 @@ namespace Vi.Core
             form.AddField("ip", payload.ip);
             form.AddField("label", payload.label);
             form.AddField("port", payload.port);
+            form.AddField("hostCharId", payload.hostCharId);
 
             UnityWebRequest postRequest = UnityWebRequest.Post(APIURL + "servers/duels", form);
             yield return postRequest.SendWebRequest();
@@ -309,8 +310,9 @@ namespace Vi.Core
             public string label;
             public string __v;
             public string port;
+            public string hostCharId;
 
-            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port)
+            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port, string hostCharId)
             {
                 this._id = _id;
                 this.type = type;
@@ -320,6 +322,7 @@ namespace Vi.Core
                 this.label = label;
                 this.__v = __v;
                 this.port = port;
+                this.hostCharId = hostCharId;
             }
         }
 
@@ -331,8 +334,9 @@ namespace Vi.Core
             public string ip;
             public string label;
             public string port;
+            public string hostCharId;
 
-            public ServerPostPayload(int type, int population, int progress, string ip, string label, string port)
+            public ServerPostPayload(int type, int population, int progress, string ip, string label, string port, string hostCharId)
             {
                 this.type = type;
                 this.population = population;
@@ -340,6 +344,7 @@ namespace Vi.Core
                 this.ip = ip;
                 this.label = label;
                 this.port = port;
+                this.hostCharId = hostCharId;
             }
         }
 
@@ -360,12 +365,14 @@ namespace Vi.Core
             public string serverId;
             public int population;
             public string label;
+            public string hostCharId;
 
-            public ServerPopulationPayload(string serverId, int population, string label)
+            public ServerPopulationPayload(string serverId, int population, string label, string hostCharId)
             {
                 this.serverId = serverId;
                 this.population = population;
                 this.label = label;
+                this.hostCharId = hostCharId;
             }
         }
 

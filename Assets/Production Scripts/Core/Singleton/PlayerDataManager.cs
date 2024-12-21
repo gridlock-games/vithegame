@@ -1287,7 +1287,8 @@ namespace Vi.Core
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode()),
+                            kvp.Key ? kvp.Value.character._id.ToString() : ""));
 
                         channelCounts[networkListEvent.Value.channel]++;
 
@@ -1308,7 +1309,8 @@ namespace Vi.Core
                     {
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
                         StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
-                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode())));
+                            kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode()),
+                            kvp.Key ? kvp.Value.character._id.ToString() : ""));
 
                         // If there is a local player for this id, despawn it
                         if (localPlayers.ContainsKey(networkListEvent.Value.id)) { localPlayers[networkListEvent.Value.id].NetworkObject.Despawn(true); }
