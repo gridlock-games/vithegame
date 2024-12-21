@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Player.TextChat;
 
 namespace Vi.Player
 {
@@ -231,13 +232,9 @@ namespace Vi.Player
             if (inventoryInstance) { return; }
             if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
-            if (playerUIInstance)
+            if (TextChatManager.Singleton.TextChatInstance)
             {
-                playerUIInstance.SendMessage("OnTextChat");
-            }
-            else if (spectatorUIInstance)
-            {
-                spectatorUIInstance.SendMessage("OnTextChat");
+                TextChatManager.Singleton.TextChatInstance.OnTextChat();
             }
         }
 

@@ -1,14 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 using Vi.Core;
+using Unity.Netcode;
 using Unity.Collections;
+using System.Collections.Generic;
 
-namespace Vi.UI
+namespace Vi.Player.TextChat
 {
-    public class TextChat : NetworkBehaviour
+    public class TextChatManager : NetworkBehaviour
     {
+        public static TextChatManager Singleton
+        {
+            get
+            {
+                if (!_singleton) { Debug.LogError("Text Chat Manager is null"); }
+                return _singleton;
+            }
+        }
+
+        private static TextChatManager _singleton;
+
+        private void Awake()
+        {
+            _singleton = this;
+        }
+
         public struct TextChatElement : INetworkSerializable
         {
             public ulong senderClientId;
@@ -51,41 +66,43 @@ namespace Vi.UI
         [Rpc(SendTo.ClientsAndHost)]
         private void SendTextChatRpc(TextChatElement textChatElement)
         {
-            if (!playerUI) { playerUI = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponentInChildren<PlayerUI>(); }
-
-            if (playerUI) { playerUI.DisplayNextTextElement(textChatElement); }
+            if (TextChatInstance) { TextChatInstance.DisplayNextTextElement(textChatElement); }
         }
 
         private const string connectionMessageColor = "008000";
         private const string disconnectionMessageColor = "902A13";
 
-        private PlayerUI playerUI;
-        public override void OnNetworkSpawn()
+        public TextChat TextChatInstance { get; private set; }
+        public void RegisterTextChatInstance(TextChat textChat)
         {
-            if (IsLocalPlayer)
+            if (TextChatInstance != null)
             {
-                playerUI = GetComponentInChildren<PlayerUI>();
-            }
-            else if (IsClient)
-            {
-                if (NetworkManager.Singleton.LocalClient.PlayerObject)
-                {
-                    playerUI = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponentInChildren<PlayerUI>();
-                }
+                Debug.LogError("You're registering a text chat instance but we already have one registered");
             }
 
-            if (playerUI)
+            TextChatInstance = textChat;
+        }
+
+        public void UnregisterTextChatInstance(TextChat textChat)
+        {
+            if (textChat != TextChatInstance)
             {
-                playerUI.DisplayConnectionMessage("<color=#" + connectionMessageColor + ">" + PlayerDataManager.Singleton.GetPlayerData((int)OwnerClientId).character.name.ToString() + " has connected." + "</color>");
+                Debug.LogError("You're unregistering a text chat instance that isn't the currently registered one!");
             }
+
+            TextChatInstance = null;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            string connectionMessage = "<color=#" + connectionMessageColor + ">" + PlayerDataManager.Singleton.GetPlayerData((int)OwnerClientId).character.name.ToString() + " has connected." + "</color>";
+            if (TextChatInstance) { TextChatInstance.DisplayConnectionMessage(connectionMessage); }
         }
 
         public override void OnNetworkDespawn()
         {
-            if (playerUI)
-            {
-                playerUI.DisplayConnectionMessage("<color=#" + disconnectionMessageColor + ">" + PlayerDataManager.Singleton.GetPlayerData((int)OwnerClientId).character.name.ToString() + " has disconnected." + "</color>");
-            }
+            string connectionMessage = "<color=#" + disconnectionMessageColor + ">" + PlayerDataManager.Singleton.GetPlayerData((int)OwnerClientId).character.name.ToString() + " has disconnected." + "</color>";
+            if (TextChatInstance) { TextChatInstance.DisplayConnectionMessage(connectionMessage); }
         }
     }
 }
