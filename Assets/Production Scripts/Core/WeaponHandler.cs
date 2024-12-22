@@ -52,6 +52,7 @@ namespace Vi.Core
         public AnimatorOverrideController AnimatorOverrideControllerInstance { get; private set; }
         public void SetNewWeapon(Weapon weapon, AnimatorOverrideController animatorOverrideController)
         {
+            if (!weapon) { Debug.LogWarning("Weapon is null!"); return; }
             if (IsOwner & IsSpawned) { aiming.Value = false; }
 
             CurrentActionClip = ScriptableObject.CreateInstance<ActionClip>();
@@ -205,6 +206,9 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            WeaponInitialized = default;
+            AnimatorOverrideControllerInstance = default;
+
             foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in weaponInstances)
             {
                 if (kvp.Value.TryGetComponent(out MagicaCapsuleCollider weaponCapsuleCollider))
