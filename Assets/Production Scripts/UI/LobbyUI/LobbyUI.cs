@@ -36,6 +36,7 @@ namespace Vi.UI
         [SerializeField] private Text primaryWeaponText;
         [SerializeField] private Image secondaryWeaponIcon;
         [SerializeField] private Text secondaryWeaponText;
+        [SerializeField] private GameObject loadoutButtonParent;
         [SerializeField] private Button[] loadoutPresetButtons;
         [SerializeField] private Button spectateButton;
         [SerializeField] private Text spectatorCountText;
@@ -564,6 +565,17 @@ namespace Vi.UI
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
         private void Update()
         {
+            if (IsClient)
+            {
+                loadoutButtonParent.SetActive(PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator);
+            }
+            else
+            {
+                loadoutButtonParent.SetActive(false);
+            }
+
+            characterPreviewImage.enabled = loadoutButtonParent.activeSelf;
+
             if (PlayerDataManager.Singleton.TeamNameOverridesUpdatedThisFrame)
             {
                 leftTeamParent.teamNameOverrideInputField.SetTextWithoutNotify(PlayerDataManager.Singleton.GetTeamText(leftTeamParent.team));
