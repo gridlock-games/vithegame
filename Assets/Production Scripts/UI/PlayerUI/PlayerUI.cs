@@ -380,8 +380,6 @@ namespace Vi.UI
                 }
             }
 
-            Debug.Log("CHECK " + attributes.WeaponHandler.GetWeapon());
-
             InputControlScheme controlScheme = controlsAsset.FindControlScheme(playerInput.currentControlScheme).Value;
 
             List<ActionClip> abilities = attributes.WeaponHandler.GetWeapon().GetAbilities();
