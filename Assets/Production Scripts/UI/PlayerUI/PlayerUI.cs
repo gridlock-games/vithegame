@@ -665,6 +665,7 @@ namespace Vi.UI
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                     {
                         mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color,  newInteractableImageAlpha);
+                        overrideDodgeColor = true;
                     }
                     else
                     {
