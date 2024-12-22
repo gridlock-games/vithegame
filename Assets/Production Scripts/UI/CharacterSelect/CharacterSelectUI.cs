@@ -290,6 +290,10 @@ namespace Vi.UI
                     characterCardInstances[0].Button.onClick.Invoke();
                 }
             }
+            else if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
+            {
+                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            }
         }
 
         private readonly int leftStartOffset = 400;
@@ -943,11 +947,6 @@ namespace Vi.UI
             returnButton.onClick.AddListener(ReturnToMainMenu);
 
             UpdateSelectedCharacter(default);
-
-            if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
-            {
-                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
-            }
         }
 
         private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
@@ -1075,7 +1074,14 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", true);
 
-            CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
+            {
+                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            }
+            else if (selectCharacterButton.interactable)
+            {
+                CreateUIElementHighlight((RectTransform)selectCharacterButton.transform);
+            }
 
             selectCharacterButton.onClick.RemoveAllListeners();
             selectCharacterButton.onClick.AddListener(() => GoToTrainingRoom());
