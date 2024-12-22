@@ -1205,12 +1205,9 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            //foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
-            //{
-            //    yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
-            //}
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender));
 
-            //yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
+            yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
             postRequest.Dispose();
         }
@@ -1348,69 +1345,6 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Shoulders,
             CharacterReference.EquipmentType.Robe
         };
-
-        private Loadout[] GetDefaultCharacterCreationLoadouts(Character character)
-        {
-            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-            var helmOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Helm & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var chestOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Chest & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var shoulderOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Shoulders & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var bootsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Boots & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var pantsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Pants & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var beltOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Belt & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var gloveOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Gloves & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var capeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Cape & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var robeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Robe & inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-
-            weaponOptions = System.Array.FindAll(weaponOptions, item => inventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-
-            List<int> possibleWeaponIndicies = new List<int>();
-            for (int i = 0; i < weaponOptions.Length; i++)
-            {
-                possibleWeaponIndicies.Add(i);
-            }
-
-            List<Loadout> loadouts = new List<Loadout>();
-            for (int i = 1; i < 5; i++)
-            {
-                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
-                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
-                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
-                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
-                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
-                
-                // These must be in the same grouping
-                int chestIndex = Random.Range(0, chestOptions.Count);
-                int pantsIndex = pantsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-                int bootsIndex = bootsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-                int beltIndex = beltOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-
-                int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
-                if (i == 1) { weapon1Index = System.Array.FindIndex(weaponOptions, item => item.name == "Flintblade"); }
-                possibleWeaponIndicies.Remove(weapon1Index);
-
-                var weaponOptionsOfDifferentClass = System.Array.FindAll(weaponOptions, item => item.weapon.GetWeaponClass() != weaponOptions[weapon1Index].weapon.GetWeaponClass());
-                int weapon2Index = Random.Range(0, weaponOptionsOfDifferentClass.Length);
-                weapon2Index = System.Array.FindIndex(weaponOptions, item => item.itemWebId == weaponOptionsOfDifferentClass[weapon2Index].itemWebId);
-
-                loadouts.Add(new Loadout(i.ToString(),
-                    helmOptions.Count == 0 ? "" : (helmIndex == -1 ? "" : helmOptions[helmIndex].itemWebId),
-                    chestOptions.Count == 0 ? "" : (chestIndex == -1 ? "" : chestOptions[chestIndex].itemWebId),
-                    shoulderOptions.Count == 0 ? "" : (shoulderIndex == -1 ? "" : shoulderOptions[shoulderIndex].itemWebId),
-                    bootsOptions.Count == 0 ? "" : (bootsIndex == -1 ? "" : bootsOptions[bootsIndex].itemWebId),
-                    pantsOptions.Count == 0 ? "" : (pantsIndex == -1 ? "" : pantsOptions[pantsIndex].itemWebId),
-                    beltOptions.Count == 0 ? "" : (beltIndex == -1 ? "" : beltOptions[beltIndex].itemWebId),
-                    gloveOptions.Count == 0 ? "" : (gloveIndex == -1 ? "" : gloveOptions[gloveIndex].itemWebId),
-                    capeOptions.Count == 0 ? "" : (capeIndex == -1 ? "" : capeOptions[capeIndex].itemWebId),
-                    robeOptions.Count == 0 ? "" : (robeIndex == -1 ? "" : robeOptions[robeIndex].itemWebId),
-                    weaponOptions[weapon1Index].itemWebId,
-                    weaponOptions[weapon2Index].itemWebId,
-                    false));
-            }
-            return loadouts.ToArray();
-        }
 
         public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender, bool useDefaultPrimaryWeapon = false)
         {
