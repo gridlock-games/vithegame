@@ -14,7 +14,6 @@ using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static Vi.Core.PlayerDataManager;
 
 namespace Vi.Core
 {
@@ -812,7 +811,6 @@ namespace Vi.Core
 
         public void AddPlayerData(PlayerData playerData)
         {
-            Debug.Log(playerData.character.loadoutPreset1.weapon1ItemId);
             if (!IsSpawned)
             {
                 StartCoroutine(WaitForSpawnToAddPlayerData(playerData));

@@ -227,7 +227,6 @@ namespace Vi.Isolated
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
             WebRequestManager.Singleton.GetCharacterById(characterId);
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
-            Debug.Log(WebRequestManager.Singleton.CharacterById.loadoutPreset1.weapon1ItemId);
             // If the game crashed, or the player disconnected for some reason, don't add their data
             if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId))
             {

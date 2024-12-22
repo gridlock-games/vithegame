@@ -195,12 +195,11 @@ namespace Vi.Core
 
         public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn)
         {
-            Debug.Log("CHECK " + loadout.weapon1ItemId);
             // This will happen when a player hasn't made a loadout in one of its slots yet
             // TODO change this to only modify the loadout's invalid values
             if (!loadout.IsValid())
             {
-                loadout = WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender);
+                loadout = loadout.GetValidCopy(raceAndGender);
             }
 
             if (waitForRespawn) { yield return new WaitUntil(() => canApplyLoadoutThisFrame); }
@@ -327,6 +326,23 @@ namespace Vi.Core
         public override void OnNetworkDespawn()
         {
             currentEquippedWeapon.OnValueChanged -= OnCurrentEquippedWeaponChange;
+
+            if (IsLocalPlayer)
+            {
+                if (combatAgent is Attributes attributes)
+                {
+                    PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
+                    int index = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == playerData.character._id);
+                    if (index == -1)
+                    {
+                        WebRequestManager.Singleton.Characters.Add(playerData.character);
+                    }
+                    else
+                    {
+                        WebRequestManager.Singleton.Characters[index] = playerData.character;
+                    }
+                }
+            }
         }
 
         private void OnCurrentEquippedWeaponChange(int prev, int current)

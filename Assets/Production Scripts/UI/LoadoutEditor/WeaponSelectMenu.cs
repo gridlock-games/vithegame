@@ -72,7 +72,7 @@ namespace Vi.UI
 
                 ele.InitializeWeapon(weaponOption);
                 Button button = ele.GetComponentInChildren<Button>();
-                button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, loadoutSlot); });
+                button.onClick.AddListener(delegate { ChangeWeapon(button, weaponOption, inventoryItem, loadoutSlot); });
 
                 // Always keep other weapon's button non-interactable
                 if (otherWeapon != null)
@@ -97,20 +97,12 @@ namespace Vi.UI
             }
         }
 
-        private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, int loadoutSlot)
+        private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, WebRequestManager.InventoryItem inventoryItem, int loadoutSlot)
         {
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
             WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
-            string inventoryItemId = "";
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), weaponOption.itemWebId, out WebRequestManager.InventoryItem weaponInventoryItem))
-            {
-                inventoryItemId = weaponInventoryItem.id;
-            }
-            else
-            {
-                Debug.LogWarning("Can't find inventory item for weapon!");
-            }
+            string inventoryItemId = inventoryItem.id;
             
             foreach (Button b in buttonList)
             {
