@@ -1308,11 +1308,22 @@ namespace Vi.Core
                 raceAndGender);
         }
 
-        public Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
+        public static CharacterReference.WeaponOption GetDefaultPrimaryWeapon()
+        {
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            return System.Array.Find(weaponOptions, item => item.name == "Flintblade");
+        }
+
+        public static CharacterReference.WeaponOption GetDefaultSecondaryWeapon()
+        {
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            return System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel");
+        }
+
+        public static Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
+            
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "Winterstalk").itemWebId,
@@ -1323,8 +1334,8 @@ namespace Vi.Core
                 "",
                 "",
                 "",
-                System.Array.Find(weaponOptions, item => item.name == "Flintblade").itemWebId,
-                System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel").itemWebId,
+                GetDefaultPrimaryWeapon().itemWebId,
+                GetDefaultSecondaryWeapon().itemWebId,
                 true);
         }
 
@@ -1768,7 +1779,7 @@ namespace Vi.Core
                 if (IsValid()) { return this; }
 
                 Loadout validCopy = Copy();
-                Loadout defaultLoadout = Singleton.GetDefaultDisplayLoadout(raceAndGender);
+                Loadout defaultLoadout = GetDefaultDisplayLoadout(raceAndGender);
 
                 if (string.IsNullOrWhiteSpace(validCopy.weapon1ItemId.ToString())) { validCopy.weapon1ItemId = defaultLoadout.weapon1ItemId; }
                 if (string.IsNullOrWhiteSpace(validCopy.weapon2ItemId.ToString())) { validCopy.weapon2ItemId = defaultLoadout.weapon2ItemId; }

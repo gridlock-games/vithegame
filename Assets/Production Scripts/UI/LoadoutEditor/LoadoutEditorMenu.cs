@@ -231,10 +231,10 @@ namespace Vi.UI
             
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
-            CharacterReference.WeaponOption weaponOption1 = null;
+            CharacterReference.WeaponOption primaryWeaponOption = null;
             if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
             {
-                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out weaponOption1))
+                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out primaryWeaponOption))
                 {
                     Debug.LogWarning("Can't find primary weapon inventory item in character reference");
                 }
@@ -244,10 +244,10 @@ namespace Vi.UI
                 Debug.LogWarning("Can't find primary weapon inventory item " + loadout.weapon1ItemId);
             }
 
-            CharacterReference.WeaponOption weaponOption2 = null;
+            CharacterReference.WeaponOption secondaryWeaponOption = null;
             if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
             {
-                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out weaponOption2))
+                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out secondaryWeaponOption))
                 {
                     Debug.LogWarning("Can't find secondary weapon inventory item in character reference");
                 }
@@ -258,14 +258,24 @@ namespace Vi.UI
             }
 
             primaryWeaponButton.onClick.RemoveAllListeners();
-            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
-            primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1 == null ? defaultSprite : weaponOption1.weaponIcon;
+            CharacterReference.WeaponOption otherSecondaryOption = secondaryWeaponOption;
+            if (otherSecondaryOption == null)
+            {
+                otherSecondaryOption = WebRequestManager.GetDefaultSecondaryWeapon();
+            }
+            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(primaryWeaponOption, otherSecondaryOption, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
+            primaryWeaponButton.GetComponent<Image>().sprite = primaryWeaponOption == null ? defaultSprite : primaryWeaponOption.weaponIcon;
             bool canEditLoadout = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
             primaryWeaponButton.interactable = canEditLoadout;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
-            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
-            secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2 == null ? defaultSprite : weaponOption2.weaponIcon;
+            CharacterReference.WeaponOption otherPrimaryOption = primaryWeaponOption;
+            if (otherPrimaryOption == null)
+            {
+                otherPrimaryOption = WebRequestManager.GetDefaultPrimaryWeapon();
+            }
+            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(secondaryWeaponOption, otherPrimaryOption, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
+            secondaryWeaponButton.GetComponent<Image>().sprite = secondaryWeaponOption == null ? defaultSprite : secondaryWeaponOption.weaponIcon;
             secondaryWeaponButton.interactable = canEditLoadout;
 
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
