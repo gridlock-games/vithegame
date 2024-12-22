@@ -237,6 +237,7 @@ namespace Vi.UI
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
 
+        private bool characterCardsAreDirty;
         private IEnumerator RefreshCharacterCards()
         {
             characterCardButtonReference.Clear();
@@ -249,14 +250,21 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
 
-            WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
+            if (characterCardsAreDirty)
+            {
+                WebRequestManager.Singleton.RefreshCharacters();
+                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+            }
+
             bool addButtonCreated = false;
+            bool invokeFirstCharacterCard = false;
             for (int i = 0; i < characterCardInstances.Length; i++)
             {
                 if (i < WebRequestManager.Singleton.Characters.Count)
                 {
+                    invokeFirstCharacterCard = true;
                     WebRequestManager.Character character = WebRequestManager.Singleton.Characters[i];
                     characterCardInstances[i].InitializeAsCharacter(character);
                     characterCardInstances[i].Button.onClick.RemoveAllListeners();
@@ -273,6 +281,15 @@ namespace Vi.UI
             }
 
             webRequestStatusText.gameObject.SetActive(false);
+
+            if (invokeFirstCharacterCard)
+            {
+                if (characterCardInstances.Length > 0)
+                {
+                    yield return null;
+                    characterCardInstances[0].Button.onClick.Invoke();
+                }
+            }
         }
 
         private readonly int leftStartOffset = 400;
@@ -945,6 +962,8 @@ namespace Vi.UI
 
             yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
 
+            characterCardsAreDirty = true;
+
             webRequestStatusText.gameObject.SetActive(false);
 
             RefreshButtonInteractability();
@@ -979,6 +998,8 @@ namespace Vi.UI
             webRequestStatusText.text = "DELETING CHARACTER";
 
             yield return WebRequestManager.Singleton.CharacterDisableRequest(character._id.ToString());
+
+            characterCardsAreDirty = true;
 
             webRequestStatusText.gameObject.SetActive(false);
 

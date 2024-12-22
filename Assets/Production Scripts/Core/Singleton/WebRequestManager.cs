@@ -542,6 +542,11 @@ namespace Vi.Core
 
             postRequest.Dispose();
             IsLoggingIn = false;
+
+            if (IsLoggedIn)
+            {
+                RefreshCharacters();
+            }
         }
 
         public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
@@ -608,6 +613,12 @@ namespace Vi.Core
             IsLoggedIn = false;
             currentlyLoggedInUserId = "";
             LogInErrorText = default;
+
+            if (characterGetRequestRoutine != null)
+            {
+                StopCoroutine(characterGetRequestRoutine);
+            }
+            IsRefreshingCharacters = false;
         }
 
         public struct LoginPayload
@@ -667,7 +678,8 @@ namespace Vi.Core
         public List<Character> Characters { get; private set; } = new List<Character>();
 
         public bool IsRefreshingCharacters { get; private set; }
-        public void RefreshCharacters() { StartCoroutine(CharacterGetRequest()); }
+        private Coroutine characterGetRequestRoutine;
+        public void RefreshCharacters() { characterGetRequestRoutine = StartCoroutine(CharacterGetRequest()); }
         private IEnumerator CharacterGetRequest()
         {
             if (IsRefreshingCharacters) { yield break; }
@@ -714,7 +726,6 @@ namespace Vi.Core
                             Characters.Add(jsonStruct.ToCharacter());
                         }
                     }
-
                 }
                 catch (System.Exception e)
                 {
