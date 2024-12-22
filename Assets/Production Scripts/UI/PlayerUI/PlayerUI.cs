@@ -701,6 +701,15 @@ namespace Vi.UI
 
             if (overrideDodgeColor)
             {
+                if (dodgeButton.raycastTarget) { dodgeButton.raycastTarget = false; }
+            }
+            else
+            {
+                if (!dodgeButton.raycastTarget) { dodgeButton.raycastTarget = true; }
+            }
+
+            if (overrideDodgeColor)
+            {
                 float newAlpha = Mathf.MoveTowards(dodgeButton.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                 if (!Mathf.Approximately(dodgeButton.color.a, newAlpha))
                 {

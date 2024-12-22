@@ -879,7 +879,7 @@ namespace Vi.UI
                     if (!accountCardCounter.ContainsKey(playerData.team)) { accountCardCounter.Add(playerData.team, 0); }
 
                     Transform accountCardParent = teamParentDict[playerData.team];
-                    if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length == 1) { accountCardParent = accountCardCounter[playerData.team] >= 4 ? rightTeamParent.transformParent : teamParentDict[playerData.team]; }
+                    if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length == 1) { accountCardParent = accountCardCounter[playerData.team] >= 5 ? rightTeamParent.transformParent : teamParentDict[playerData.team]; }
 
                     AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardParent).GetComponent<AccountCard>();
                     accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
