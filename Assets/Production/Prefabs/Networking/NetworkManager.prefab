@@ -111,8 +111,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 018eed73770681549b77a83e40335e91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkMetricManagerPrefab:
-    m_AssetGUID: eecc4a984c1d1834e8b07d0476809e8d
+  referencesToSpawn:
+  - m_AssetGUID: eecc4a984c1d1834e8b07d0476809e8d
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 2c05ee8e9c3750842b8980b36fbfce8c
     m_SubObjectName: 
     m_SubObjectGUID: 
     m_SubObjectType: 

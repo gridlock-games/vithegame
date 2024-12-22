@@ -237,6 +237,7 @@ namespace Vi.UI
 
         private List<ButtonInfo> characterCardButtonReference = new List<ButtonInfo>();
 
+        private bool characterCardsAreDirty;
         private IEnumerator RefreshCharacterCards()
         {
             characterCardButtonReference.Clear();
@@ -249,14 +250,21 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
 
-            WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
+            if (characterCardsAreDirty)
+            {
+                WebRequestManager.Singleton.RefreshCharacters();
+                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+            }
+
             bool addButtonCreated = false;
+            bool invokeFirstCharacterCard = false;
             for (int i = 0; i < characterCardInstances.Length; i++)
             {
                 if (i < WebRequestManager.Singleton.Characters.Count)
                 {
+                    invokeFirstCharacterCard = true;
                     WebRequestManager.Character character = WebRequestManager.Singleton.Characters[i];
                     characterCardInstances[i].InitializeAsCharacter(character);
                     characterCardInstances[i].Button.onClick.RemoveAllListeners();
@@ -273,6 +281,19 @@ namespace Vi.UI
             }
 
             webRequestStatusText.gameObject.SetActive(false);
+
+            if (invokeFirstCharacterCard)
+            {
+                if (characterCardInstances.Length > 0)
+                {
+                    yield return null;
+                    characterCardInstances[0].Button.onClick.Invoke();
+                }
+            }
+            else if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
+            {
+                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            }
         }
 
         private readonly int leftStartOffset = 400;
@@ -926,11 +947,6 @@ namespace Vi.UI
             returnButton.onClick.AddListener(ReturnToMainMenu);
 
             UpdateSelectedCharacter(default);
-
-            if (FasterPlayerPrefs.Singleton.GetBool("TutorialInProgress"))
-            {
-                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
-            }
         }
 
         private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
@@ -944,6 +960,8 @@ namespace Vi.UI
             webRequestStatusText.text = "UPLOADING CHARACTER";
 
             yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+
+            characterCardsAreDirty = true;
 
             webRequestStatusText.gameObject.SetActive(false);
 
@@ -979,6 +997,8 @@ namespace Vi.UI
             webRequestStatusText.text = "DELETING CHARACTER";
 
             yield return WebRequestManager.Singleton.CharacterDisableRequest(character._id.ToString());
+
+            characterCardsAreDirty = true;
 
             webRequestStatusText.gameObject.SetActive(false);
 
@@ -1054,7 +1074,14 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", true);
 
-            CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
+            {
+                CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
+            }
+            else if (selectCharacterButton.interactable)
+            {
+                CreateUIElementHighlight((RectTransform)selectCharacterButton.transform);
+            }
 
             selectCharacterButton.onClick.RemoveAllListeners();
             selectCharacterButton.onClick.AddListener(() => GoToTrainingRoom());

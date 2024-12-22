@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using Vi.Utility;
+using Vi.Core;
 
 namespace Vi.UI
 {
@@ -11,6 +13,11 @@ namespace Vi.UI
         [SerializeField] ParticleSystem clickParticle;
 
         ParticleSystem.EmitParams clickParticleEmitSettings;
+
+        private void OnEnable()
+        {
+            RefreshStatus();
+        }
 
         private void Start()
         {
@@ -34,8 +41,27 @@ namespace Vi.UI
             }
         }
 
+        private bool pointerEffectsEnabled;
+        private void RefreshStatus()
+        {
+            pointerEffectsEnabled = FasterPlayerPrefs.Singleton.GetBool("PointerEffects");
+        }
+
         private void Update()
         {
+            if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame)
+            {
+                RefreshStatus();
+            }
+
+            if (WebRequestManager.Singleton)
+            {
+                if (WebRequestManager.Singleton.IsLoggedIn)
+                {
+                    if (!pointerEffectsEnabled) { return; }
+                }
+            }
+            
             FindPlayerInput();
 
             if (playerInput)

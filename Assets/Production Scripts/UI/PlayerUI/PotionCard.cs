@@ -13,6 +13,9 @@ namespace Vi.UI
         [SerializeField] private Text cooldownText;
         [SerializeField] private Text keybindText;
         [SerializeField] private Text potionsLeftText;
+        [SerializeField] private Image backgroundImageSquare;
+        [SerializeField] private Image backgroundImageCircle;
+        [SerializeField] private Image circleMask;
 
         private bool isPreview;
         public void SetPreviewOn()
@@ -47,7 +50,6 @@ namespace Vi.UI
         }
 
         private Canvas canvas;
-        private Image borderImage;
         private CombatAgent combatAgent;
 
         private Graphic[] graphics;
@@ -55,13 +57,30 @@ namespace Vi.UI
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
-            borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
 
             button = GetComponent<Button>();
             button.onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
 
             graphics = GetComponentsInChildren<Graphic>();
+
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                backgroundImageSquare.gameObject.SetActive(false);
+                backgroundImageCircle.gameObject.SetActive(true);
+                circleMask.enabled = true;
+            }
+            else
+            {
+                backgroundImageSquare.gameObject.SetActive(true);
+                backgroundImageCircle.gameObject.SetActive(false);
+                circleMask.enabled = false;
+            }
+        }
+
+        private void Start()
+        {
+            keybindText.enabled = !FasterPlayerPrefs.IsMobilePlatform;
         }
 
         public void Initialize(string keybindText)

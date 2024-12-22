@@ -6,6 +6,7 @@ using Vi.Core;
 using Vi.Core.GameModeManagers;
 using Unity.Netcode;
 using Vi.Utility;
+using Vi.Player.TextChat;
 
 namespace Vi.Player
 {
@@ -18,6 +19,7 @@ namespace Vi.Player
 
         private GameObject playerUIInstance;
         private GameObject spectatorUIInstance;
+        private TextChat.TextChat textChatInstance;
         private PlayerInput playerInput;
         private WeaponHandler weaponHandler;
 
@@ -73,11 +75,13 @@ namespace Vi.Player
             if (playerInput.defaultActionMap == "Base")
             {
                 playerUIInstance = Instantiate(playerUIPrefab, transform);
+                textChatInstance = playerUIInstance.GetComponentInChildren<TextChat.TextChat>(true);
                 if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else if (playerInput.defaultActionMap == "Spectator")
             {
                 spectatorUIInstance = Instantiate(spectatorUIPrefab, transform);
+                textChatInstance = spectatorUIInstance.GetComponentInChildren<TextChat.TextChat>(true);
                 if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
             }
             else
@@ -231,13 +235,9 @@ namespace Vi.Player
             if (inventoryInstance) { return; }
             if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
-            if (playerUIInstance)
+            if (textChatInstance)
             {
-                playerUIInstance.SendMessage("OnTextChat");
-            }
-            else if (spectatorUIInstance)
-            {
-                spectatorUIInstance.SendMessage("OnTextChat");
+                textChatInstance.OnTextChat();
             }
         }
 
@@ -249,11 +249,14 @@ namespace Vi.Player
             playerInput.SwitchCurrentActionMap("UI");
         }
 
-        public void OnTextChatClose()
+        public void OnTextChatClose(bool evaluateCursorLockMode)
         {
             textChatIsOpen = false;
-            if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
-            playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            if (evaluateCursorLockMode)
+            {
+                if (networkObject.IsSpawned) { Cursor.lockState = PlayerActiveLockMode; }
+                playerInput.SwitchCurrentActionMap(playerInput.defaultActionMap);
+            }
         }
 
         public static bool CanUseOrbitalCamera()

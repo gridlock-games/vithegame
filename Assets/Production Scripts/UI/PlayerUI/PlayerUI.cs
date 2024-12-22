@@ -101,15 +101,6 @@ namespace Vi.UI
         [SerializeField] private Image mobileInteractableImage;
         [Header("Text Chat")]
         [SerializeField] private Canvas textChatButtonCanvas;
-        [SerializeField] private Canvas textChatParentCanvas;
-        [SerializeField] private Scrollbar chatScrollbar;
-        [SerializeField] private RectTransform textChatElementParent;
-        [SerializeField] private InputField textChatInputField;
-        [SerializeField] private GameObject textChatElementPrefab;
-        [SerializeField] private Button openTextChatButton;
-        [SerializeField] private Text textChatMessageNumberText;
-
-        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         private InputAction pauseMenuAction;
         public void OpenPauseMenu()
@@ -130,54 +121,6 @@ namespace Vi.UI
         {
             if (!scoreboardAction.enabled) { return; }
             actionMapHandler.OpenScoreboard();
-        }
-
-        public void OpenTextChat()
-        {
-            actionMapHandler.OnTextChat();
-        }
-
-        private InputAction textChatAction;
-        private int unreadMessageCount;
-        private void OnTextChat()
-        {
-            if (!textChatAction.enabled & playerInput.currentActionMap.name == playerInput.defaultActionMap) { return; }
-
-            textChatParentCanvas.enabled = !textChatParentCanvas.enabled;
-            if (textChatParentCanvas.enabled)
-            {
-                ScrollToBottomOfTextChat();
-                actionMapHandler.OnTextChatOpen();
-                if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
-                unreadMessageCount = 0;
-                textChatMessageNumberText.text = "";
-            }
-            else
-            {
-                actionMapHandler.OnTextChatClose();
-            }
-            textChatButtonCanvas.enabled = FasterPlayerPrefs.IsMobilePlatform ? !textChatParentCanvas.enabled : !textChatParentCanvas.enabled & unreadMessageCount > 0;
-        }
-
-        public void CloseTextChat()
-        {
-            textChatParentCanvas.enabled = false;
-            if (FasterPlayerPrefs.IsMobilePlatform)
-            {
-                textChatButtonCanvas.enabled = true;
-            }
-            else
-            {
-                textChatButtonCanvas.enabled = unreadMessageCount > 0;
-            }
-            actionMapHandler.OnTextChatClose();
-        }
-
-        public void SendTextChat()
-        {
-            textChat.SendTextChat(PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(), PlayerDataManager.Singleton.LocalPlayerData.team, textChatInputField.text);
-            textChatInputField.text = "";
-            if (!FasterPlayerPrefs.IsMobilePlatform) { textChatInputField.ActivateInputField(); }
         }
 
         private InputAction switchWeaponAction;
@@ -319,7 +262,6 @@ namespace Vi.UI
 
         private Attributes attributes;
         private PlayerMovementHandler playerMovementHandler;
-        private TextChat textChat;
         private ActionMapHandler actionMapHandler;
         private PlayerInput playerInput;
 
@@ -333,13 +275,11 @@ namespace Vi.UI
             attributes = GetComponentInParent<Attributes>();
             playerMovementHandler = attributes.GetComponent<PlayerMovementHandler>();
             actionMapHandler = attributes.GetComponent<ActionMapHandler>();
-            textChat = attributes.GetComponent<TextChat>();
 
             playerInput = attributes.GetComponent<PlayerInput>();
             pauseMenuAction = playerInput.actions.FindAction("Pause");
             inventoryAction = playerInput.actions.FindAction("Inventory");
             scoreboardAction = playerInput.actions.FindAction("Scoreboard");
-            textChatAction = playerInput.actions.FindAction("TextChat");
             switchWeaponAction = playerInput.actions.FindAction("SwitchWeapon");
             lightAttackAction = playerInput.actions.FindAction("LightAttack");
             heavyAttackAction = playerInput.actions.FindAction("HeavyAttack");
@@ -355,16 +295,6 @@ namespace Vi.UI
 
             RefreshStatus();
 
-            textChatParentCanvas.enabled = false;
-            if (FasterPlayerPrefs.IsMobilePlatform)
-            {
-                textChatButtonCanvas.enabled = true;
-            }
-            else
-            {
-                textChatButtonCanvas.enabled = unreadMessageCount > 0;
-            }
-
             GetOrbitalCameraButton().gameObject.SetActive(ActionMapHandler.CanUseOrbitalCamera());
         }
 
@@ -375,6 +305,7 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsThatAffectOpacity;
 
         private bool canFadeIn;
+        private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private void Start()
         {
             StartCoroutine(BeginFadeIn());
@@ -658,64 +589,6 @@ namespace Vi.UI
             }
 
             lastNumDodgesEvaluated = -1;
-        }
-
-        public void ScrollToBottomOfTextChat()
-        {
-            chatScrollbar.value = 0;
-            StartCoroutine(ScrollToBottomOfTextChatAfterOneFrame());
-        }
-
-        private IEnumerator ScrollToBottomOfTextChatAfterOneFrame()
-        {
-            yield return null;
-            yield return null;
-            chatScrollbar.value = 0;
-        }
-
-        public void ScrollToTopOfTextChat() { chatScrollbar.value = 1; }
-        public void ScrollALittleDownTextChat() { chatScrollbar.value -= 0.1f; }
-        public void ScrollALittleUpTextChat() { chatScrollbar.value += 0.1f; }
-
-        public void DisplayNextTextElement(TextChat.TextChatElement textChatElement)
-        {
-            Text text = Instantiate(textChatElementPrefab, textChatElementParent).GetComponent<Text>();
-            text.text = textChatElement.GetMessageUIValue();
-            if (textChatParentCanvas.enabled)
-            {
-                ScrollToBottomOfTextChat();
-            }
-            else
-            {
-                unreadMessageCount++;
-                if (unreadMessageCount == 0)
-                {
-                    textChatMessageNumberText.text = "";
-                }
-                else if (unreadMessageCount > 99)
-                {
-                    textChatMessageNumberText.text = "99+";
-                }
-                else
-                {
-                    textChatMessageNumberText.text = unreadMessageCount.ToString();
-                }
-
-                if (!FasterPlayerPrefs.IsMobilePlatform)
-                {
-                    textChatButtonCanvas.enabled = unreadMessageCount > 0;
-                }
-            }
-        }
-
-        public void DisplayConnectionMessage(string connectionMessage)
-        {
-            Text text = Instantiate(textChatElementPrefab, textChatElementParent).GetComponent<Text>();
-            text.text = connectionMessage;
-            if (textChatParentCanvas.enabled)
-            {
-                ScrollToBottomOfTextChat();
-            }
         }
 
         public const float alphaTransitionSpeed = 5;

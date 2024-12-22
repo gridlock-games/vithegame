@@ -63,6 +63,7 @@ namespace Vi.UI
         [Header("Play Menu")]
         [SerializeField] private GameObject playParent;
         [SerializeField] private Button playButton;
+        [SerializeField] private Button logoutButton;
         [SerializeField] private GameObject loadingProgressParent;
         [SerializeField] private Text loadingProgressText;
         [SerializeField] private Image loadingProgresssBar;
@@ -827,8 +828,11 @@ namespace Vi.UI
 
         private void Update()
         {
-            playButton.interactable = !ObjectPoolingManager.Singleton.IsLoadingOrPooling;
+            playButton.gameObject.SetActive(!ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+            logoutButton.gameObject.SetActive(!ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+
             loadingProgressParent.SetActive(ObjectPoolingManager.Singleton.IsLoadingOrPooling);
+
             if (loadingProgressParent.activeSelf)
             {
                 if (!PlayerDataManager.CharacterReferenceHandle.IsValid())
@@ -876,9 +880,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.interactable;
+            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {

@@ -192,7 +192,7 @@ namespace Vi.UI
                 case GameModeManager.PostGameStatus.MVP:
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview()); }
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
-                    MVPAccountCard.Initialize(gameModeManager.GetMVPScore().id, true);
+                    MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
