@@ -68,7 +68,7 @@ namespace Vi.Core
             isBearer = false;
         }
 
-        private void Start()
+        public void RegisterChildRenderers()
         {
             foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
             {
@@ -84,6 +84,7 @@ namespace Vi.Core
             if (renderer.GetComponent<MagicaCloth>()) { return; }
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
+            if (!netObj) { return; }
             if (!netObj.IsSpawned) { return; }
 
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
@@ -136,6 +137,14 @@ namespace Vi.Core
             renderer.materials = newMatList.ToArray();
 
             glowMaterialInstances.Remove(renderer);
+        }
+
+        public void UnregisterAllRenderers()
+        {
+            foreach (Renderer r in glowMaterialInstances.Keys.ToArray())
+            {
+                UnregisterRenderer(r);
+            }
         }
 
         private readonly Color invincibleColor = new Color(1, 1, 0);

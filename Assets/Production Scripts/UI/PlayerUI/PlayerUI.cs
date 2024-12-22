@@ -589,6 +589,9 @@ namespace Vi.UI
             }
 
             lastNumDodgesEvaluated = -1;
+
+            tooltipImage.color = StringUtility.SetColorAlpha(tooltipImage.color, 0);
+            mobileInteractableImage.color = StringUtility.SetColorAlpha(mobileInteractableImage.color, 0);
         }
 
         public const float alphaTransitionSpeed = 5;
@@ -658,12 +661,6 @@ namespace Vi.UI
                     if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
                     if (!blockingButton.raycastTarget) { blockingButton.raycastTarget = true; }
 
-                    float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
-                    if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
-                    {
-                        blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
-                    }
-
                     float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
                     {
@@ -677,6 +674,12 @@ namespace Vi.UI
                         ability4.CrossFadeOpacity(1);
                         healthPotionCard.CrossFadeOpacity(1);
                         staminaPotionCard.CrossFadeOpacity(1);
+
+                        float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
+                        if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
+                        {
+                            blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
+                        }
 
                         float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
                         if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
