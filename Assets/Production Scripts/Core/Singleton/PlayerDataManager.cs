@@ -812,6 +812,7 @@ namespace Vi.Core
 
         public void AddPlayerData(PlayerData playerData)
         {
+            Debug.Log(playerData.character.loadoutPreset1.weapon1ItemId);
             if (!IsSpawned)
             {
                 StartCoroutine(WaitForSpawnToAddPlayerData(playerData));

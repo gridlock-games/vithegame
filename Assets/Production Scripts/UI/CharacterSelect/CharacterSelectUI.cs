@@ -652,7 +652,7 @@ namespace Vi.UI
             selectedGender = raceAndGenderStrings[1];
             CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
 
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
+            if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
             {
                 primaryWeaponDisplayElement.gameObject.SetActive(true);
                 secondaryWeaponDisplayElement.gameObject.SetActive(true);

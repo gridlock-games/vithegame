@@ -8,6 +8,7 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
+using static Vi.Core.WebRequestManager;
 
 namespace Vi.UI
 {
@@ -977,7 +978,7 @@ namespace Vi.UI
                 b.interactable = button != b;
             }
 
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
             Unity.Collections.FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
@@ -986,19 +987,53 @@ namespace Vi.UI
                 PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
             }
 
+            // TODO remove this
             PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
-
             playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
             PlayerDataManager.Singleton.SetPlayerData(playerData);
 
-            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon1ItemId).itemId);
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon2ItemId).itemId);
+            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
-            primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-            primaryWeaponText.text = primaryOption.name;
-            secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-            secondaryWeaponText.text = secondaryOption.name;
+            CharacterReference.WeaponOption primaryOption;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out primaryOption))
+                {
+                    Debug.LogWarning("Can't find primary weapon inventory item in character reference");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Can't find primary weapon inventory item");
+                primaryOption = null;
+            }
 
+            CharacterReference.WeaponOption secondaryOption;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out secondaryOption))
+                {
+                    Debug.LogWarning("Can't find primary weapon inventory item in character reference");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Can't find primary weapon inventory item");
+                secondaryOption = null;
+            }
+
+            if (primaryOption != null)
+            {
+                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                primaryWeaponText.text = primaryOption.name;
+            }
+
+            if (secondaryOption != null)
+            {
+                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                secondaryWeaponText.text = secondaryOption.name;
+            }
+            
             if (previewObject)
             {
                 previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString());

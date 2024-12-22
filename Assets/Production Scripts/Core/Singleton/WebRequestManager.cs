@@ -843,11 +843,46 @@ namespace Vi.Core
         //    return new List<InventoryItem>();
         //}
 
-        public bool TryGetInventoryItem(string characterId, FixedString64Bytes inventoryItemId, out InventoryItem resultingInventoryItem)
+        public static bool IsItemInInventory(string characterId, string itemWebId)
         {
             if (characterId == null) { characterId = ""; }
+            if (itemWebId == null) { itemWebId = ""; }
 
-            if (WebRequestManager.Singleton.InventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
+            if (HasCharacterInventory(characterId))
+            {
+                List<InventoryItem> inventoryItems = GetInventory(characterId);
+                return inventoryItems.Exists(item => item.itemId == itemWebId);
+            }
+
+            return false;
+        }
+
+        public static CharacterReference.WeaponOption GetWeaponOption(InventoryItem inventoryItem)
+        {
+            CharacterReference.WeaponOption[] options = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            int index = System.Array.FindIndex(options, item => item.itemWebId == inventoryItem.itemId);
+
+            if (index == -1) { return null; }
+
+            return options[index];
+        }
+
+        public static CharacterReference.WearableEquipmentOption GetEquipmentOption(InventoryItem inventoryItem, CharacterReference.RaceAndGender raceAndGender)
+        {
+            List<CharacterReference.WearableEquipmentOption> options = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
+            int index = options.FindIndex(item => item.itemWebId == inventoryItem.itemId);
+
+            if (index == -1) { return null; }
+
+            return options[index];
+        }
+
+        public static bool TryGetInventoryItem(string characterId, string inventoryItemId, out InventoryItem resultingInventoryItem)
+        {
+            if (characterId == null) { characterId = ""; }
+            if (inventoryItemId == null) { inventoryItemId = ""; }
+
+            if (InventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
             {
                 int index = items.FindIndex(item => item.id == inventoryItemId);
                 if (index != -1)
@@ -861,7 +896,40 @@ namespace Vi.Core
             return false;
         }
 
-        public Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
+        public static bool HasCharacterInventory(string characterId)
+        {
+            if (characterId == null) { characterId = ""; }
+            return InventoryItems.ContainsKey(characterId);
+        }
+
+        public static bool HasInventoryItem(string characterId, string inventoryItemId)
+        {
+            if (characterId == null) { characterId = ""; }
+            if (inventoryItemId == null) { inventoryItemId = ""; }
+
+            if (InventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
+            {
+                int index = items.FindIndex(item => item.id == inventoryItemId);
+                if (index != -1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static List<InventoryItem> GetInventory(string characterId)
+        {
+            if (characterId == null) { characterId = ""; }
+
+            if (HasCharacterInventory(characterId))
+            {
+                return InventoryItems[characterId];
+            }
+            return new List<InventoryItem>();
+        }
+
+        public static Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
         public IEnumerator GetCharacterInventory(Character character)
         {
             string characterId = character._id.ToString();
@@ -2138,10 +2206,10 @@ namespace Vi.Core
                 // Index values of -1 mean that this loadout doesn't exist in the API yet
 
                 //return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                //    loadout1Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                //    loadout2Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                //    loadout3Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                //    loadout4Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                //    loadout1Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                //    loadout2Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                //    loadout3Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                //    loadout4Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                 //    raceAndGender);
 
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
