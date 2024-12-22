@@ -1821,6 +1821,14 @@ namespace Vi.Core
                     & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
                     & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
             }
+
+            public bool EqualsIgnoringSlot(Loadout other)
+            {
+                return helmGearItemId == other.helmGearItemId & chestArmorGearItemId == other.chestArmorGearItemId
+                    & shouldersGearItemId == other.shouldersGearItemId & bootsGearItemId == other.bootsGearItemId & pantsGearItemId == other.pantsGearItemId
+                    & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
+                    & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
+            }
         }
 
         private struct CharacterJson

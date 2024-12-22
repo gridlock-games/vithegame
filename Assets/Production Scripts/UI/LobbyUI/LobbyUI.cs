@@ -8,7 +8,7 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
-using static Vi.Core.WebRequestManager;
+using Unity.Collections;
 
 namespace Vi.UI
 {
@@ -971,7 +971,7 @@ namespace Vi.UI
             PlayerDataManager.Singleton.AddBotData(team, false);
         }
 
-        private void ChooseLoadoutPreset(Button button, int loadoutSlot)
+        private void ChooseLoadoutPreset(Button button, int loadoutSlotIndex)
         {
             foreach (Button b in loadoutPresetButtons)
             {
@@ -981,18 +981,16 @@ namespace Vi.UI
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
-            Unity.Collections.FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
-            if ((loadoutSlot + 1).ToString() != activeLoadoutSlot)
+            FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if ((loadoutSlotIndex + 1).ToString() != activeLoadoutSlot)
             {
                 PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+
+                playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlotIndex);
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
 
-            // TODO remove this
-            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
-            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
-            PlayerDataManager.Singleton.SetPlayerData(playerData);
-
-            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
 
             CharacterReference.WeaponOption primaryOption;
             if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
@@ -1036,7 +1034,8 @@ namespace Vi.UI
             
             if (previewObject)
             {
-                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString());
+                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender,
+                    loadout, playerData.character._id.ToString());
             }
         }
 
