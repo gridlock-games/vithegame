@@ -271,6 +271,8 @@ namespace Vi.Core
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
 
+            StopGrabSequence();
+
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
 
             PlayerDataManager.Singleton.RemoveCombatAgent(this);
@@ -389,7 +391,7 @@ namespace Vi.Core
             return grabAttackClip;
         }
 
-        public void CancelGrab()
+        private void CancelGrab()
         {
             if (!IsSpawned) { Debug.LogError("CombatAgent.CancelGrab() should only be called when spawned!"); return; }
             if (!IsServer) { Debug.LogError("CombatAgent.CancelGrab() should only be called on the server!"); return; }
@@ -407,6 +409,31 @@ namespace Vi.Core
             {
                 AnimationHandler.CancelAllActions(0.15f, false);
             }
+        }
+
+        private void StopGrabSequence()
+        {
+            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("CombatAgent.EndGrabSequence() should only be called on the server!"); return; }
+
+            if (IsGrabbed)
+            {
+                CombatAgent attacker = GetGrabAssailant();
+                if (attacker)
+                {
+                    attacker.CancelGrab();
+                }
+            }
+
+            if (IsGrabbing)
+            {
+                CombatAgent victim = GetGrabVictim();
+                if (victim)
+                {
+                    victim.CancelGrab();
+                }
+            }
+
+            if (IsSpawned) { CancelGrab(); }
         }
 
         protected Coroutine grabResetCoroutine;
@@ -855,7 +882,11 @@ namespace Vi.Core
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(false); }
-                if (IsServer) { isRaging.Value = false; }
+                if (IsServer)
+                {
+                    isRaging.Value = false;
+                    StopGrabSequence();
+                }
                 OnDeath();
             }
             else if (prev == ActionClip.Ailment.Death)
