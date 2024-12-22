@@ -346,7 +346,7 @@ namespace Vi.Core
             CancelAllActionsClientRpc(transitionTime, resetGameplayVariables);
         }
 
-        [Rpc(SendTo.NotServer)]
+        [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void CancelAllActionsClientRpc(float transitionTime, bool resetGameplayVariables)
         {
             if (playAdditionalClipsCoroutine != null) { StopCoroutine(playAdditionalClipsCoroutine); }
