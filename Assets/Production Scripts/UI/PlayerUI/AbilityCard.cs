@@ -19,6 +19,9 @@ namespace Vi.UI
         [SerializeField] private RectTransform upgradeIconActivePosition;
         [SerializeField] private RectTransform upgradeIconInactivePosition;
         [SerializeField] private Animator upgradeAnimationAnimator;
+        [SerializeField] private Image backgroundImageSquare;
+        [SerializeField] private Image backgroundImageCircle;
+        [SerializeField] private Image circleMask;
 
         public ActionClip Ability { get; private set; }
 
@@ -60,12 +63,26 @@ namespace Vi.UI
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
-            borderImage = GetComponent<Image>();
             combatAgent = GetComponentInParent<CombatAgent>();
 
             graphics = GetComponentsInChildren<Graphic>();
 
             button = GetComponent<Button>();
+
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                borderImage = backgroundImageCircle;
+                backgroundImageSquare.gameObject.SetActive(false);
+                backgroundImageCircle.gameObject.SetActive(true);
+                circleMask.enabled = true;
+            }
+            else
+            {
+                borderImage = backgroundImageSquare;
+                backgroundImageSquare.gameObject.SetActive(true);
+                backgroundImageCircle.gameObject.SetActive(false);
+                circleMask.enabled = false;
+            }
         }
 
         public void SetPreviewOn()
