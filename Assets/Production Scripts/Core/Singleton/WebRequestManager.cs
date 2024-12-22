@@ -832,6 +832,35 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
+        //public List<InventoryItem> GetInventoryItems(string characterId)
+        //{
+        //    if (characterId == null) { characterId = ""; }
+
+        //    if (InventoryItems.TryGetValue(characterId, out List<InventoryItem> result))
+        //    {
+        //        return result;
+        //    }
+        //    return new List<InventoryItem>();
+        //}
+
+        public bool TryGetInventoryItem(string characterId, FixedString64Bytes inventoryItemId, out InventoryItem resultingInventoryItem)
+        {
+            if (characterId == null) { characterId = ""; }
+
+            if (WebRequestManager.Singleton.InventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
+            {
+                int index = items.FindIndex(item => item.id == inventoryItemId);
+                if (index != -1)
+                {
+                    resultingInventoryItem = items[index];
+                    return true;
+                }
+            }
+
+            resultingInventoryItem = InventoryItem.GetEmptyInventoryItem();
+            return false;
+        }
+
         public Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
         public IEnumerator GetCharacterInventory(Character character)
         {
@@ -915,6 +944,11 @@ namespace Vi.Core
                 this.itemId = itemId;
                 this.enabled = enabled;
                 this.id = id;
+            }
+
+            public static InventoryItem GetEmptyInventoryItem()
+            {
+                return new InventoryItem("", null, "", false, "");
             }
         }
 
@@ -1082,12 +1116,12 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
-            {
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
-            }
+            //foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
+            //{
+            //    yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
+            //}
 
-            yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
+            //yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
             postRequest.Dispose();
         }
@@ -1212,6 +1246,7 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Gloves,
             CharacterReference.EquipmentType.Helm,
             CharacterReference.EquipmentType.Shoulders,
+            CharacterReference.EquipmentType.Robe
         };
 
         private Loadout[] GetDefaultCharacterCreationLoadouts(Character character)
@@ -1549,6 +1584,11 @@ namespace Vi.Core
                 this.active = active;
             }
 
+            public static Loadout GetEmptyLoadout()
+            {
+                return new Loadout();
+            }
+
             public Loadout Copy()
             {
                 return new Loadout(loadoutSlot, helmGearItemId, chestArmorGearItemId, shouldersGearItemId, bootsGearItemId, pantsGearItemId,
@@ -1605,6 +1645,21 @@ namespace Vi.Core
                     weapon1ItemId.ToString(),
                     weapon2ItemId.ToString()
                 };
+            }
+
+            public bool IsValid()
+            {
+                foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in GetLoadoutArmorPiecesAsDictionary())
+                {
+                    if (!NullableEquipmentTypes.Contains(kvp.Key))
+                    {
+                        if (string.IsNullOrWhiteSpace(kvp.Value.ToString()))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -2080,11 +2135,20 @@ namespace Vi.Core
                 int loadout3Index = loadOuts.FindIndex(item => item.loadoutSlot == "3");
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
+                // Index values of -1 mean that this loadout doesn't exist in the API yet
+
+                //return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                //    loadout1Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                //    loadout2Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                //    loadout3Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                //    loadout4Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                //    raceAndGender);
+
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    loadout1Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                    loadout2Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                    loadout3Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                    loadout4Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                    loadout1Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
             }
         }
