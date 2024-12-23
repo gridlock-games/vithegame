@@ -558,23 +558,24 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        public float AbilityCooldownMultiplier { get; set; }
         private float GetAbilityCooldownTime(ActionClip ability)
         {
             if (ability == ability1)
             {
-                return Mathf.Max(0, ability1.abilityCooldownTime - ability1CooldownOffset);
+                return Mathf.Max(0, ability1.abilityCooldownTime - ability1CooldownOffset) * AbilityCooldownMultiplier;
             }
             else if (ability == ability2)
             {
-                return Mathf.Max(0, ability2.abilityCooldownTime - ability2CooldownOffset);
+                return Mathf.Max(0, ability2.abilityCooldownTime - ability2CooldownOffset) * AbilityCooldownMultiplier;
             }
             else if (ability == ability3)
             {
-                return Mathf.Max(0, ability3.abilityCooldownTime - ability3CooldownOffset);
+                return Mathf.Max(0, ability3.abilityCooldownTime - ability3CooldownOffset) * AbilityCooldownMultiplier;
             }
             else if (ability == ability4)
             {
-                return Mathf.Max(0, ability4.abilityCooldownTime - ability4CooldownOffset);
+                return Mathf.Max(0, ability4.abilityCooldownTime - ability4CooldownOffset) * AbilityCooldownMultiplier;
             }
             else
             {

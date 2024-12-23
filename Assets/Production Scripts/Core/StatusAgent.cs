@@ -79,7 +79,8 @@ namespace Vi.Core
             ActionClip.Status.rooted,
             ActionClip.Status.silenced,
             ActionClip.Status.fear,
-            ActionClip.Status.attackSpeedDecrease
+            ActionClip.Status.attackSpeedDecrease,
+            ActionClip.Status.abilityCooldownIncrease
         };
 
         private static Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>> statusEvents = new Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>>();
@@ -252,6 +253,31 @@ namespace Vi.Core
             float increase = attackSpeedIncreaseAmount.Value;
             increase += baseAttackSpeed * attackSpeedIncreasePercentage.Value;
             return Mathf.Max(0, increase);
+        }
+
+        private NetworkVariable<float> abilityCooldownDecreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> abilityCooldownDecreasePercentage = new NetworkVariable<float>();
+
+        private float GetAbilityCooldownDecreaseAmount()
+        {
+            float decrease = abilityCooldownDecreaseAmount.Value;
+            decrease += abilityCooldownDecreasePercentage.Value;
+            return Mathf.Max(0, decrease);
+        }
+
+        private NetworkVariable<float> abilityCooldownIncreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> abilityCooldownIncreasePercentage = new NetworkVariable<float>();
+
+        private float GetAbilityCooldownIncreaseAmount()
+        {
+            float increase = abilityCooldownIncreaseAmount.Value;
+            increase += abilityCooldownIncreasePercentage.Value;
+            return Mathf.Max(0, increase);
+        }
+
+        public float GetAbilityCooldownMultiplier()
+        {
+            return Mathf.Max(0, 1 - GetAbilityCooldownDecreaseAmount() + GetAbilityCooldownIncreaseAmount());
         }
 
         public bool IsRooted() { return activeStatuses.Contains((int)ActionClip.Status.rooted); }
@@ -712,6 +738,66 @@ namespace Vi.Core
                     else
                     {
                         attackSpeedIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    break;
+                case ActionClip.Status.abilityCooldownDecrease:
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        abilityCooldownDecreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        abilityCooldownDecreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        abilityCooldownDecreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        abilityCooldownDecreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    break;
+                case ActionClip.Status.abilityCooldownIncrease:
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        abilityCooldownIncreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        abilityCooldownIncreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        abilityCooldownIncreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        abilityCooldownIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
                     }
                     break;
                 default:

@@ -71,7 +71,9 @@ namespace Vi.ScriptableObjects
             spiritRegeneration,
             staminaRegeneration,
             attackSpeedDecrease,
-            attackSpeedIncrease
+            attackSpeedIncrease,
+            abilityCooldownDecrease,
+            abilityCooldownIncrease
         }
 
         [System.Serializable]
