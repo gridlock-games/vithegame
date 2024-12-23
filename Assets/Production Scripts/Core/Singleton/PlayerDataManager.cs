@@ -246,7 +246,8 @@ namespace Vi.Core
             { Team.Blue, Color.blue },
             { Team.Purple, Color.magenta },
             { Team.Light, new Color(5f / 255, 159f / 255, 242f / 255, 1) },
-            { Team.Corruption, new Color(237f / 255, 85f / 255, 84f / 255, 1) }
+            { Team.Corruption, new Color(237f / 255, 85f / 255, 84f / 255, 1) },
+            { Team.Spectator, Color.white }
         };
 
         public static Color GetTeamColor(Team team)
@@ -263,7 +264,7 @@ namespace Vi.Core
 
         public Color GetRelativeTeamColor(Team team)
         {
-            if (LocalPlayerData.team == Team.Spectator)
+            if (LocalPlayerData.team == Team.Spectator | team == Team.Spectator)
             {
                 return GetTeamColor(team);
             }
