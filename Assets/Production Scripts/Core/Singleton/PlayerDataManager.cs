@@ -1619,6 +1619,7 @@ namespace Vi.Core
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
             }
+
             if (IsClient)
             {
                 if (!WasDisconnectedByClient)
