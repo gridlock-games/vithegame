@@ -61,6 +61,11 @@ namespace Vi.UI
             }
         }
 
+        private void Awake()
+        {
+            StartCoroutine(WebRequestManager.Singleton.GetLeaderboard());
+        }
+
         private Vector3 originalScale;
 
         private void Start()
