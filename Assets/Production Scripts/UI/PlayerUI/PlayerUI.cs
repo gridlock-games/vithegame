@@ -74,8 +74,7 @@ namespace Vi.UI
         [SerializeField] private Text dodgeStackText;
         [SerializeField] private Image dodgeBackgroundTextImage;
         [Header("Status UI")]
-        [SerializeField] private Transform statusImageParent;
-        [SerializeField] private StatusIcon statusImagePrefab;
+        [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
         [Header("Death UI")]
         [SerializeField] private PlayerCard killerCard;
         [SerializeField] private Text respawnTimerText;
@@ -296,6 +295,8 @@ namespace Vi.UI
             RefreshStatus();
 
             GetOrbitalCameraButton().gameObject.SetActive(ActionMapHandler.CanUseOrbitalCamera());
+
+            statusIconLayoutGroup.Initialize(attributes.StatusAgent);
         }
 
         private Vector2 equippedWeaponCardTargetAnchoredPosition;
@@ -305,17 +306,9 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsThatAffectOpacity;
 
         private bool canFadeIn;
-        private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private void Start()
         {
             StartCoroutine(BeginFadeIn());
-
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
-                statusIcon.InitializeStatusIcon(status);
-                statusIcons.Add(statusIcon);
-            }
 
             equippedWeaponCardTargetAnchoredPosition = ((RectTransform)primaryWeaponCard.transform).anchoredPosition;
             stowedWeaponCardTargetAnchoredPosition = ((RectTransform)secondaryWeaponCard.transform).anchoredPosition;
@@ -569,20 +562,6 @@ namespace Vi.UI
         {
             RefreshStatus();
 
-            List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
-            foreach (StatusIcon statusIcon in statusIcons)
-            {
-                if (activeStatuses.Contains(statusIcon.Status))
-                {
-                    statusIcon.SetActive(true);
-                    statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 4);
-                }
-                else
-                {
-                    statusIcon.SetActive(false);
-                }
-            }
-
             if (attributes.WeaponHandler.WeaponInitialized)
             {
                 canFadeIn = true;
@@ -767,23 +746,6 @@ namespace Vi.UI
                 {
                     dodgeStackText.color = StringUtility.SetColorAlpha(dodgeStackText.color, newAlpha);
                     dodgeBackgroundTextImage.color = StringUtility.SetColorAlpha(dodgeBackgroundTextImage.color, newAlpha);
-                }
-            }
-
-            if (attributes.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
-            {
-                List<ActionClip.Status> activeStatuses = attributes.StatusAgent.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
-                {
-                    if (activeStatuses.Contains(statusIcon.Status))
-                    {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 4);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
-                    }
                 }
             }
 

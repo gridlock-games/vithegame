@@ -26,7 +26,6 @@ namespace Vi.UI
         {
             canvas = GetComponent<Canvas>();
             image = GetComponent<Image>();
-            SetActive(false);
         }
 
         public void SetActive(bool isActive)

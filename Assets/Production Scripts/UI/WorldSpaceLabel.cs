@@ -33,13 +33,11 @@ namespace Vi.UI
         [SerializeField] private Text healthText;
 
         [Header("Status UI")]
-        [SerializeField] private Transform statusImageParent;
-        [SerializeField] private StatusIcon statusImagePrefab;
+        [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
 
         private PooledObject pooledObject;
         private Canvas canvas;
         private CombatAgent combatAgent;
-        private List<StatusIcon> statusIcons = new List<StatusIcon>();
         private CanvasGroup[] canvasGroups;
 
         private void Awake()
@@ -47,17 +45,6 @@ namespace Vi.UI
             pooledObject = GetComponent<PooledObject>();
             canvas = GetComponent<Canvas>();
             canvasGroups = GetComponentsInChildren<CanvasGroup>(true);
-
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
-                statusIcon.InitializeStatusIcon(status);
-                foreach (Transform child in statusIcon.GetComponentsInChildren<Transform>(true))
-                {
-                    child.gameObject.layer = gameObject.layer;
-                }
-                statusIcons.Add(statusIcon);
-            }
 
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
@@ -75,6 +62,8 @@ namespace Vi.UI
                 transform.SetParent(null, true);
 
                 SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(ObjectPoolingManager.instantiationSceneName));
+
+                statusIconLayoutGroup.Initialize(null);
             }
 
             if (combatAgent)
@@ -92,19 +81,8 @@ namespace Vi.UI
 
                 UpdateNameTextAndColors();
 
-                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
-                {
-                    if (activeStatuses.Contains(statusIcon.Status))
-                    {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
-                    }
-                }
+                statusIconLayoutGroup.Initialize(combatAgent.StatusAgent);
+
                 transform.position = combatAgent.transform.position;
                 transform.rotation = combatAgent.transform.rotation;
                 transform.localScale = Vector3.zero;
@@ -314,23 +292,6 @@ namespace Vi.UI
             lastMaxHP = maxHP;
 
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, combatAgent.GetHP() / combatAgent.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
-
-            if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
-            {
-                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
-                {
-                    if (activeStatuses.Contains(statusIcon.Status))
-                    {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
-                    }
-                }
-            }
         }
     }
 }
