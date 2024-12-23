@@ -606,6 +606,11 @@ namespace Vi.Core
 
             postRequest.Dispose();
             IsLoggingIn = false;
+
+            if (IsLoggedIn)
+            {
+                RefreshCharacters();
+            }
         }
 
         public void Logout()
@@ -3247,6 +3252,11 @@ namespace Vi.Core
 
                 IsLoggedIn = true;
                 currentlyLoggedInUserId = "";
+
+                if (IsLoggedIn)
+                {
+                    RefreshCharacters();
+                }
                 yield break;
             }
 
